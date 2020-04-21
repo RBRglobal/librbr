@@ -385,7 +385,7 @@ static void RBRInstrument_terminateResponse(
      * might happen when initially establishing communication with a streaming
      * instrument: we'll be intruding on the data stream at who knows what
      * point and might encounter anything. */
-    while (isspace(**beginning) && **beginning != '\0')
+    while (isspace((unsigned char)**beginning) && **beginning != '\0')
     {
         ++*beginning;
     }

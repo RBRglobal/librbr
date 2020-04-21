@@ -19,7 +19,7 @@ char *rbr_strnesccntrl(char *destination, const char *source, size_t num)
     size_t pos = 0;
     while (*source && pos < num - 4)
     {
-        if (!isprint(*source))
+        if (!isprint((unsigned char)*source))
         {
             destination[pos++] = '<';
 

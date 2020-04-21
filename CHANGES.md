@@ -13,6 +13,7 @@ Release TBD.
 * Moved developer tools into `tools/`.
   An attempt to keep only universally interesting things
   in the top level of the project directory.
+* Added explicit array index subscript to unsigned char to remove char-subscripts warning.
 
 ## v1.1.0
 
