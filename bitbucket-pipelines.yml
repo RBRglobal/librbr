@@ -1,15 +1,15 @@
 pipelines:
     default:
-        #- step:
-        #    name: GCC 6 compilation
-        #    image: gcc:6
-        #    script:
-        #        - apt-get update && apt-get -y install libsdl2-dev
-        #        - make clean
-        #        - make lib tests
-        #        - cd examples/posix
-        #        - make clean
-        #        - make
+        - step:
+            name: GCC 6 compilation
+            image: gcc:6
+            script:
+                - apt-get update && apt-get -y install libsdl2-dev
+                - make clean
+                - make lib tests
+                - cd examples/posix
+                - make clean
+                - make
         - step:
             name: GCC 7 compilation
             image: gcc:7
