@@ -103,10 +103,10 @@ static const RBRInstrumentHardwareError WARNING_NUMBERS[] = {
 #define SAMPLE_ERROR_PREFIX_LEN ((long) (sizeof(SAMPLE_ERROR_PREFIX) - 1))
 
 static const char *RBRInstrumentDateTime_sampleFormat
-    = "%04d-%02d-%02d %02d:%02d:%02d.%03" PRIi64;
+    = "%04d-%02d-%02d %02d:%02d:%02d.%03d";
 
 static const char *RBRInstrumentDateTime_sampleScanFormat
-    = "%04d-%02d-%02d %02d:%02d:%02d.%03" PRIi64 "%n";
+    = "%04d-%02d-%02d %02d:%02d:%02d.%03d%n";
 
 static const char *RBRInstrumentDateTime_scheduleFormat
     = "%04d%02d%02d%02d%02d%02d";
@@ -1148,6 +1148,8 @@ RBRInstrumentError RBRInstrumentDateTime_parseSampleTime(
 
     int32_t timestampLength;
     struct tm split = {0};
+    uint16_t milliseconds;
+
     if (sscanf(s,
                RBRInstrumentDateTime_sampleScanFormat,
                &split.tm_year,
@@ -1156,12 +1158,13 @@ RBRInstrumentError RBRInstrumentDateTime_parseSampleTime(
                &split.tm_hour,
                &split.tm_min,
                &split.tm_sec,
-               timestamp,
+               &milliseconds,
                &timestampLength) < 7)
     {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
+    *timestamp = milliseconds;
     RBR_TRY(RBRInstrumentDateTime_parse(&split, timestamp));
     if (end != NULL)
     {
