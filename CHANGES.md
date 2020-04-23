@@ -1,8 +1,8 @@
 # Changes
 
-## v1.2.0
+## v1.1.1
 
-Release TBD.
+Released 2020-04-23
 
 ### Added
 
@@ -14,6 +14,7 @@ Release TBD.
   An attempt to keep only universally interesting things
   in the top level of the project directory.
 * Added explicit array index subscript to unsigned char to remove char-subscripts warning.
+* PRIi64 use in sscanf is avoided.
 
 ## v1.1.0
 
