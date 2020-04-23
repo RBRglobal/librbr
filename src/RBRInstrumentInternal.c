@@ -1148,7 +1148,7 @@ RBRInstrumentError RBRInstrumentDateTime_parseSampleTime(
 
     int32_t timestampLength;
     struct tm split = {0};
-    uint16_t milliseconds;
+    int milliseconds;
 
     if (sscanf(s,
                RBRInstrumentDateTime_sampleScanFormat,
@@ -1216,6 +1216,7 @@ static void RBRInstrumentDateTime_toFormat(RBRInstrumentDateTime timestamp,
 {
     time_t t = timestamp / 1000;
     struct tm *split = gmtime(&t);
+    int milliseconds = (int) (timestamp % 1000);
     snprintf(s,
              size,
              format,
@@ -1225,7 +1226,7 @@ static void RBRInstrumentDateTime_toFormat(RBRInstrumentDateTime timestamp,
              split->tm_hour,
              split->tm_min,
              split->tm_sec,
-             timestamp % 1000);
+             milliseconds);
 }
 
 void RBRInstrumentDateTime_toSampleTime(RBRInstrumentDateTime timestamp,
