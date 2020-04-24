@@ -2,7 +2,7 @@
  * \file posix-download-wifi.c
  *
  * \brief Example of using the library to download instrument data in a POSIX
- * environment over a TCP socket.
+ * environment over a TCP socket. User must connect to the Logger's Wi-Fi first.
  *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
