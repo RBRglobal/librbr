@@ -1,5 +1,13 @@
 # Changes
 
+## v1.2.0
+
+Release ????
+
+### Added
+
+* Download over Wi-Fi example.
+
 ## v1.1.2
 
 Released 2020-04-23
