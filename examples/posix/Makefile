@@ -11,7 +11,6 @@ LDFLAGS := -L../../bin
 LDLIBS := -lRBR
 
 example: posix-download \
-         posix-download-wifi \
          posix-fetch \
          posix-parse-download \
          posix-parse-file \
@@ -20,8 +19,6 @@ example: posix-download \
          posix-stream-sdl
 
 posix-download: posix-shared.o posix-download.o ../../bin/libRBR.a
-
-posix-download-wifi: posix-shared.o posix-download-wifi.o ../../bin/libRBR.a
 
 posix-fetch: posix-shared.o posix-fetch.o ../../bin/libRBR.a
 
@@ -41,7 +38,6 @@ clean:
 	rm -Rf \
 		*.o \
 		posix-download \
-        posix-download-wifi \
 		posix-fetch \
 		posix-parse-download \
 		posix-parse-file \

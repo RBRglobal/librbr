@@ -2,9 +2,7 @@
  * \file posix-download-wifi.c
  *
  * \brief Example of using the library to download instrument data in a POSIX
- * environment over a TCP socket. User must connect to the Logger's Wi-Fi first,
- * this is accomplished by connecting to SSID "RBR ######" where '######' is the 0
- * padded serial number of the device. Once connected this program can be run.
+ * environment over a TCP socket. User must connect to the Logger's Wi-Fi first.
  *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
@@ -35,22 +33,15 @@
 
 /* Networking includes */
 #include <sys/socket.h> 
-#include <sys/types.h>
 #include <arpa/inet.h> 
 #include <unistd.h> 
-#include <netdb.h>
 
 #include "posix-shared.h"
 
 #define CHUNK_SIZE 4096
-#define HOST_SIZE 1024
-static char host[HOST_SIZE];
-static uint16_t port = 0;
 
-/**** Private functions.*********/
 static int listenUdp( void );
 static int openSocketFd( void );
-/********************************/
 
 /**
  * Data packets are broadcast over UDP, listen for this to determine if a logger is connected and to obtain 
@@ -58,7 +49,7 @@ static int openSocketFd( void );
  */
 static int listenUdp( void )
 {
-    unsigned char message[1024];
+    char message[1024];
     int sock;
     struct sockaddr_in name;
     int bytes;
@@ -83,42 +74,22 @@ static int listenUdp( void )
     }
       
     bool messageReceived = false;
-    struct sockaddr peer_addr;
-    socklen_t peer_addr_len  = sizeof(struct sockaddr_storage);
+    int totalBytes = 0;
     while (!messageReceived)
     {
-
-        bytes = recvfrom(sock, message, 1024, 0, &peer_addr, &peer_addr_len) ;
-        printf("nrecv:");
-        for (int i = 0; i < bytes; i++)
+        while (((bytes = read(sock, message, 1024)) > 0) && totalBytes < 109) 
         {
-            printf("%c", message[i]);
+            printf("nrecv:");
+            for (int i = 0; i < bytes; i++)
+            {
+                printf("%c", message[i]);
+            }
+            totalBytes += bytes;
         }
 
-        if (bytes < 110)
-        {
-            printf("Wait for a full packet\n");
-            continue;
-        }       
-
-        //get host information.        
-        char service[64];
-        int s = getnameinfo((struct sockaddr *) &peer_addr,
-                        peer_addr_len, host, HOST_SIZE,
-                        service, 64, NI_NUMERICHOST | NI_NUMERICSERV);
-        if (s == 0)
-        {
-            printf("\nReceived %ld bytes from %s:%s \n", (long) bytes, host, service);
-        }
-        else
-        {
-            printf("Could not determin host. retry.\n");
-            continue;
-        }
-        
-        //Find 'RBR_' location (in case UDP packet is split and out of order)
+        //Find 'RBR' location (incase we have end of one packet and start of antoher)
         int offset = -1;
-        for(int i = 0 ; i < bytes; i++)
+        for(int i = 0 ; i < totalBytes; i++)
         {
             if (message[i] == 'R' && message[i+1] == 'B' && message[i+2] == 'R' && message[i+3] == '_' && message[i+4] == 'W')
             {
@@ -127,28 +98,22 @@ static int listenUdp( void )
             }
         }
 
-        if (offset != 32)
-        {
-            printf("Malformed packet. Wait for another.\n");
-            continue;
-        }
+        printf("\r\nDevice Id: %s\n", message + offset);
 
-        printf("\r\nDevice ID: %s\n", message + offset);
-
-        //we want to know if the device is busy 
-        int busy = message[7];           
-        printf("Device is busy? %d\r\n", busy);
-        if (busy == 0)
+        //we really just want to know if the device is busy 
+        if (offset >= 32)
         {
-            messageReceived = true;        
+            int busy = message[offset - 25];           
+            printf("Device is busy? %d\r\n", busy);
+            if (busy == 0)
+            {
+                messageReceived = true;        
+            }
+            else
+            {
+                printf("Device is busy. We will wait.\r\n");
+            }
         }
-        else
-        {
-            printf("Device is busy. We will wait.\r\n");
-        }
-
-        port = (message[8] << 8) | message[9];
-        printf("The port is %d\n", port);
     }
     
     close(sock);
@@ -156,10 +121,6 @@ static int listenUdp( void )
     return 0;
 }
 
-/**
- * This function will open the socket conenction to the address and port indicated in the UDP packet to issue commands to the logger.
- * Port and address must have been set by listenUdp before calling this function. 
- */
 static int openSocketFd( void )
 {
     int sock = 0; 
@@ -174,10 +135,10 @@ static int openSocketFd( void )
    
     memset(&serv_addr, '0', sizeof(serv_addr)); 
     serv_addr.sin_family = AF_INET; 
-    serv_addr.sin_port = htons(port); 
+    serv_addr.sin_port = htons(2000); 
 
     // Convert IPv4 and IPv6 addresses from text to binary form 
-    if(inet_pton(AF_INET, host, &serv_addr.sin_addr)<=0)  
+    if(inet_pton(AF_INET, "192.168.4.1", &serv_addr.sin_addr)<=0)  
     { 
         printf("Invalid address/ Address not supported \n"); 
         return -1; 
@@ -188,6 +149,7 @@ static int openSocketFd( void )
         printf("\nConnection Failed \n"); 
         return -1; 
     } 
+
 
     return sock;
 }
