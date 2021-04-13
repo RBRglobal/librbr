@@ -31,7 +31,7 @@
 
 
 /* Precalculate some factors/index used for temperature interpolation */
-int RBRDynCorr_initCorrectionCoeff(RBR_DynCorrParams *params, float Fs)
+int RBRDynCorr_initCorrectionCoeff(RBRDynCorrParams *params, float Fs)
 {
     params->_lagIndex = (int)(Fs * params->t_delay);
     params->_phi = (params->t_delay - params->_lagIndex/Fs)*Fs;
@@ -55,7 +55,7 @@ int RBRDynCorr_initCorrectionCoeff(RBR_DynCorrParams *params, float Fs)
 }
 
 /* initial arrays */
-void RBRDynCorr_initLagArray(RBR_DynCorrParams *params)
+void RBRDynCorr_initLagArray(RBRDynCorrParams *params)
 {
     int k;
 
@@ -71,7 +71,7 @@ void RBRDynCorr_initLagArray(RBR_DynCorrParams *params)
 }
 
 /* apply temparature interpolation */
-float RBRDynCorr_applyTempCorr(RBR_DynCorrParams *params, float T_meas)
+float RBRDynCorr_applyTempCorr(RBRDynCorrParams *params, float T_meas)
 {
     float T_cor;
 
@@ -82,7 +82,7 @@ float RBRDynCorr_applyTempCorr(RBR_DynCorrParams *params, float T_meas)
 }
 
 /* sanity check on data */
-int32_t RBRDynCorr_checkData(RBR_DynCorrMeasurement * measIn)
+int32_t RBRDynCorr_checkData(RBRDynCorrMeasurement * measIn)
 {
     int32_t isError = 0;
 
@@ -103,7 +103,7 @@ int32_t RBRDynCorr_checkData(RBR_DynCorrMeasurement * measIn)
 }
 
 /* update all lagged variables */
-int32_t RBRDynCorr_updateLag(RBR_DynCorrParams *params, const RBR_DynCorrMeasurement * measIn, RBR_DynCorrMeasurement * meas_out)
+int32_t RBRDynCorr_updateLag(RBRDynCorrParams *params, const RBRDynCorrMeasurement * measIn, RBRDynCorrMeasurement * meas_out)
 {
     int32_t lagIndex;
     int32_t isValid;
@@ -142,7 +142,7 @@ int32_t RBRDynCorr_updateLag(RBR_DynCorrParams *params, const RBR_DynCorrMeasure
 }
 
 
-RBR_DynCorrError RBRDynCorr_init(RBR_DynCorrParams *params, float Fs)
+RBRDynCorrError RBRDynCorr_init(RBRDynCorrParams *params, float Fs)
 {
     float F_nyquist;
 
@@ -177,9 +177,9 @@ RBR_DynCorrError RBRDynCorr_init(RBR_DynCorrParams *params, float Fs)
     return RBR_DCORR_SUCCESS;
 }
 
-RBR_DynCorrError RBRDynCorr_addMeasurement(RBR_DynCorrParams *params, const RBR_DynCorrMeasurement * measIn, RBR_DynCorrMeasurement * corrMeasOut)
+RBRDynCorrError RBRDynCorr_addMeasurement(RBRDynCorrParams *params, const RBRDynCorrMeasurement * measIn, RBRDynCorrMeasurement * corrMeasOut)
 {
-    RBR_DynCorrMeasurement measLagged;
+    RBRDynCorrMeasurement measLagged;
     float T_adj = 0.0f;
     float C_cor, T_cor, T_cell;
     float timestamp;
@@ -187,7 +187,7 @@ RBR_DynCorrError RBRDynCorr_addMeasurement(RBR_DynCorrParams *params, const RBR_
     float S_cor;
     int32_t isValid;
     int32_t isDataError;
-    RBR_DynCorrError statusCode = DYN_CORR_UNKNOWN_ERROR;
+    RBRDynCorrError statusCode = DYN_CORR_UNKNOWN_ERROR;
 
 
     T_meas = measIn->marineTemperature;

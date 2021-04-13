@@ -51,7 +51,7 @@ typedef enum
     DYN_CORR_CORRUPTED,
     /** Other error */
     DYN_CORR_UNKNOWN_ERROR
-} RBR_DynCorrError;
+} RBRDynCorrError;
 
 
 typedef struct
@@ -80,7 +80,7 @@ typedef struct
     float _C_meas_lagArray[DCORR_MAX_LAG_ARRAY];
     float _P_meas_lagArray[DCORR_MAX_LAG_ARRAY];
     float _T_cond_lagArray[DCORR_MAX_LAG_ARRAY];
-} RBR_DynCorrParams;
+} RBRDynCorrParams;
 
 typedef struct {
     float timestamp;            // time in seconds
@@ -89,7 +89,7 @@ typedef struct {
     float condTemperature;     // Temperature of conductivity cell measurement (Celcius)
     float pressure;             // Pressure measurement (dBar)
     float salinity;             // Practical salinity (unitless)
-} RBR_DynCorrMeasurement;
+} RBRDynCorrMeasurement;
 
 
 /**
@@ -103,7 +103,7 @@ typedef struct {
  * @param Fs sampling rate (Samples/sec)
  * @return error code (0 = no error)
  */
-RBR_DynCorrError RBRDynCorr_init(RBR_DynCorrParams *params, float Fs);
+RBRDynCorrError RBRDynCorr_init(RBRDynCorrParams *params, float Fs);
 
 /**
  * @brief Feed a new measurement in the algorithm.  
@@ -115,7 +115,7 @@ RBR_DynCorrError RBRDynCorr_init(RBR_DynCorrParams *params, float Fs);
  * @param corrMeasOut Output corrected measurements (time aligned)
  * @return error code (0 = no error)
  */
-RBR_DynCorrError RBRDynCorr_addMeasurement(RBR_DynCorrParams *params, const RBR_DynCorrMeasurement * measIn, RBR_DynCorrMeasurement * corrMeasOut);
+RBRDynCorrError RBRDynCorr_addMeasurement(RBRDynCorrParams *params, const RBRDynCorrMeasurement * measIn, RBRDynCorrMeasurement * corrMeasOut);
 
 
 #endif // LIBRBR_DYNCORRECTION_H
