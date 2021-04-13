@@ -98,7 +98,7 @@ CFLAGS += -DRBR_LIB_NAME=\""$(LIB_NAME)"\" \
 
 all: lib docs tests
 
-lib: bin/libRBR.a bin/libRBRDynCorr.a
+lib: bin/libRBR.a
 
 bin/libRBR.a: bin bin/libRBR.a(src/RBRInstrument.o \
                                src/RBRInstrumentCommunication.o \
@@ -115,9 +115,6 @@ bin/libRBR.a: bin bin/libRBR.a(src/RBRInstrument.o \
                                src/RBRInstrumentStreaming.o \
                                src/RBRInstrumentVehicle.o \
                                src/RBRParser.o)
-
-bin/libRBRDynCorr.a: bin bin/libRBRDynCorr.a(src/dyncorr/RBRDynCorrectionPss78.o \
-                               src/dyncorr/RBRDynCorrection.o )
 
 .PHONY: docs
 docs:
