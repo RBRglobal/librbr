@@ -245,7 +245,7 @@ int main()
         &ioBuffers,
         "RBR RBRduo3 1.090 999999"
         COMMAND_TERMINATOR
-        "id model = RBRoem3, version = 1.090, serial = 999999, fwtype = 104"
+        "id model = RBRoem3, version = 1.134, serial = 999999, fwtype = 104"
         COMMAND_TERMINATOR,
         0);
     err = RBRInstrument_open(&instrumentL3,

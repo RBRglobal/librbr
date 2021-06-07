@@ -1,0 +1,7 @@
+# Generated artifacts.
+posix-dynamiccorrection
+*.exe
+
+# Temporary/output files.
+*.bin
+*.csv

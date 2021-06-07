@@ -1,0 +1,358 @@
+/**
+ * \file RBRDynamicCorrection.c
+ *
+ * \brief Library for salinity dynamic correction
+ *
+ * \copyright
+ * Copyright (c) 2021 RBR Ltd.
+ * Licensed under the Apache License, Version 2.0.
+ */
+
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+#include <stdio.h>
+#include <math.h>
+
+#include "RBRDynamicCorrection.h"
+
+
+/* need to using C99 standard to get NAN and isnan().
+ * (some alternative definition otherwise) */
+#if __STDC_VERSION__ >= 199901L
+#define ISNAN(x) isnan(x)
+#else
+#define NAN      (float)(0.0f/0.0f)
+#define ISNAN(x) (x != x)
+#endif
+
+
+
+/* parameters for PSS-78 conversion */
+#define	PSS78_A0 0.0080f
+#define	PSS78_A1 -0.1692f
+#define	PSS78_A2 25.3851f
+#define	PSS78_A3 14.0941f
+#define	PSS78_A4 -7.0261f
+#define	PSS78_A5 2.7081f
+#define	PSS78_B0 0.0005f
+#define	PSS78_B1 -0.0056f
+#define	PSS78_B2 -0.0066f
+#define	PSS78_B3 -0.0375f
+#define	PSS78_B4 0.0636f
+#define	PSS78_B5 -0.0144f
+#define	PSS78_K  0.0162f
+#define	PSS78_C0 0.6766097f
+#define	PSS78_C1 2.00564e-2f
+#define	PSS78_C2 1.104259e-4f
+#define	PSS78_C3 -6.9698e-7f
+#define	PSS78_C4 1.0031e-9f
+#define	PSS78_D1 3.426e-2f
+#define	PSS78_D2 4.464e-4f
+#define	PSS78_D3 0.4215f
+#define	PSS78_D4 -3.107e-3f
+#define	PSS78_E1 2.070e-4f
+#define	PSS78_E2 -6.370e-8f
+#define	PSS78_E3 3.989e-12f
+#define PSS78_C_REF 42.914f
+#define PSS78_T_REF 15.0f
+
+
+/**
+ * \brief Internal: Apply the practical salinity 1978 (PSS-78) equation from C,T,P input.
+ *
+ * \param [in] C Conductivity
+ * \param [in] T Temperature
+ * \param [in] P Pressure
+ * \return Salinity
+ */
+float RBRDynamicCorrection_PSS78(float C, float T, float P)
+{
+    float pressure;
+    float T_its68;
+    float Rp_num, Rp_den;
+    float R, Rp, rT;
+    float RT, RT_sqrt;
+    float S_1, S_2;
+    float S;
+
+    // hydrostatic pressure in bars
+    pressure=P*0.1f;
+
+    // temperature in ITS68...
+    T_its68=T*1.00024f;
+
+    // convert conductivity to a ratio
+    R= C/PSS78_C_REF;
+
+    // rT & Rp
+    //rT = PSS78_C0 + PSS78_C1*T_its68 + PSS78_C2*(T_its68*T_its68) + PSS78_C3*T_its68*(T_its68*T_its68) + 
+    //                        PSS78_C4*(T_its68*T_its68)*(T_its68*T_its68);
+    rT = PSS78_C3 + PSS78_C4*T_its68;
+    rT = PSS78_C2 + rT*T_its68;
+    rT = PSS78_C1 + rT*T_its68;
+    rT = PSS78_C0 + rT*T_its68;
+
+    //Rp_num = PSS78_E1*pressure + PSS78_E2*(pressure*pressure) + PSS78_E3*pressure*(pressure*pressure);
+    Rp_num = PSS78_E2 + PSS78_E3*pressure;
+    Rp_num = (PSS78_E1 + Rp_num*pressure)*pressure;
+
+    Rp_den = 1.0f + PSS78_D1*T_its68 + PSS78_D2*(T_its68*T_its68) + PSS78_D3*R + PSS78_D4*(T_its68*R);
+    Rp = 1.0f + Rp_num/Rp_den;
+
+    // R_T
+    RT = R/(Rp*rT);
+
+    // sqrt(RT)
+    RT_sqrt = sqrtf(RT);
+
+    S_1 = PSS78_A4 + PSS78_A5*RT_sqrt;
+    S_1 = PSS78_A3 + S_1*RT_sqrt;
+    S_1 = PSS78_A2 + S_1*RT_sqrt;
+    S_1 = PSS78_A1 + S_1*RT_sqrt;
+    S_1 = PSS78_A0 + S_1*RT_sqrt;
+
+    S_2 = PSS78_B4 + PSS78_B5*RT_sqrt;
+    S_2 = PSS78_B3 + S_2*RT_sqrt;
+    S_2 = PSS78_B2 + S_2*RT_sqrt;
+    S_2 = PSS78_B1 + S_2*RT_sqrt;
+    S_2 = PSS78_B0 + S_2*RT_sqrt;
+
+    S = S_1 + ((T_its68 - PSS78_T_REF)/(1.0f + PSS78_K*(T_its68 - PSS78_T_REF)))*S_2;
+
+    return S;
+}
+
+
+/* Precalculate some factors/index used for temperature interpolation */
+int RBRDynamicCorrection_initCorrectionCoeff(RBRDynamicCorrectionParams *params, float Fs)
+{
+    params->_lagIndex = (int)(Fs * params->t_delay);
+    params->_phi = (params->t_delay - params->_lagIndex/Fs)*Fs;
+
+    /* sanity check (parameter for Fs should have been checked before call) */
+    if ( params->_lagIndex < 0 || params->_lagIndex >= DCORR_MAX_LAG_ARRAY )
+    {
+        return -1;
+    }
+    if ( params->_phi < 0.0f || params->_phi > 1.0f )
+    {
+        return -1;
+    }
+
+    return 0;
+}
+
+/* initial arrays */
+void RBRDynamicCorrection_initLagArray(RBRDynamicCorrectionParams *params)
+{
+    int k;
+
+    /* fill with invalid entries (to catch errors) */
+    for (k = 0; k < DCORR_MAX_LAG_ARRAY; k++)
+    {
+        params->_isValid_lagArray[k] = 0;
+        params->_timestamp_lagArray[k] = -999.9f;
+        params->_C_meas_lagArray[k] = -999.9f;
+        params->_P_meas_lagArray[k] = -999.9f;
+        params->_T_cond_lagArray[k] = -999.9f;
+    }
+}
+
+/* apply temparature interpolation */
+float RBRDynamicCorrection_applyTempCorr(RBRDynamicCorrectionParams *params, float T_meas)
+{
+    float T_cor;
+
+    /* (first evaluation will be incorrect, but won't be used */
+    T_cor = (1.0 - params->_phi)*params->_T_meas_lag + (params->_phi)*T_meas;
+
+    return T_cor;
+}
+
+/* sanity check on data */
+int32_t RBRDynamicCorrection_checkData(RBRDynamicCorrectionMeasurement * measIn)
+{
+    int32_t isError = 0;
+
+    if ( ISNAN(measIn->conductivity) )
+    {
+        isError = -1;
+    }
+    if ( ISNAN(measIn->pressure) )
+    {
+        isError = -1;
+    }
+    if ( ISNAN(measIn->condTemperature) )
+    {
+        isError = -1;
+    }
+
+    return isError;
+}
+
+/* update all lagged variables */
+int32_t RBRDynamicCorrection_updateLag(RBRDynamicCorrectionParams *params, const RBRDynamicCorrectionMeasurement * measIn, RBRDynamicCorrectionMeasurement * meas_out)
+{
+    int32_t lagIndex;
+    int32_t isValid;
+    float T_meas;
+    int k;
+
+    /* a simple shortcut */
+    lagIndex = params->_lagIndex;
+
+    T_meas = measIn->marineTemperature;
+    params->_T_meas_lag = T_meas;
+
+    isValid = params->_isValid_lagArray[lagIndex];
+    meas_out->timestamp = params->_timestamp_lagArray[lagIndex];
+    meas_out->conductivity = params->_C_meas_lagArray[lagIndex];
+    meas_out->pressure = params->_P_meas_lagArray[lagIndex];
+    meas_out->condTemperature = params->_T_cond_lagArray[lagIndex];
+    
+    /* Move all the values (even above lagIndex) */
+    for (k = DCORR_MAX_LAG_ARRAY-1; k > 0; k--)
+    {
+        params->_isValid_lagArray[k] = params->_isValid_lagArray[k-1];
+        params->_timestamp_lagArray[k] = params->_timestamp_lagArray[k-1];
+        params->_C_meas_lagArray[k] = params->_C_meas_lagArray[k-1];
+        params->_P_meas_lagArray[k] = params->_P_meas_lagArray[k-1];
+        params->_T_cond_lagArray[k] = params->_T_cond_lagArray[k-1];
+    }
+
+    params->_isValid_lagArray[0] = 1;
+    params->_timestamp_lagArray[0] = measIn->timestamp;
+    params->_C_meas_lagArray[0] = measIn->conductivity;
+    params->_P_meas_lagArray[0] = measIn->pressure;
+    params->_T_cond_lagArray[0] = measIn->condTemperature;
+
+    return isValid;
+}
+
+
+RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *params, float Fs)
+{
+    float F_nyquist;
+
+    /* sanity check */
+    if ( DCORR_MAX_LAG_ARRAY/Fs < DCORR_T_DELAY )
+    {
+        return RBR_DCORR_INVALID_SAMPLING_RATE;
+    }
+
+    params->Fs = Fs;
+    params->t_delay = DCORR_T_DELAY;
+    params->alpha = DCORR_ALPHA;
+    params->tau = DCORR_TAU;
+    params->CT_coeff = DCORR_CT_COEFF;
+
+    params->_firstCall = 1;
+    params->_blankingPeriod = 0;
+    params->_T_meas_lag = -999.0f;
+    params->_T_cor_lag = 0.0f;
+    params->_T_adj_lag = 0.0f;
+    
+    // calculate a, b from initial parameters
+    F_nyquist = params->Fs / 2.0f;
+    params->_cte_a = 4.0f*F_nyquist * (params->alpha*params->tau) / (1.0 + 4.0f*F_nyquist*params->tau);
+    params->_cte_b = 1.0f -  2.0f * params->_cte_a / params->alpha;
+    
+    RBRDynamicCorrection_initCorrectionCoeff(params, Fs);
+    RBRDynamicCorrection_initLagArray(params);
+
+    return RBR_DCORR_SUCCESS;
+}
+
+RBRDynamicCorrectionError RBRDynamicCorrection_addMeasurement(RBRDynamicCorrectionParams *params, const RBRDynamicCorrectionMeasurement * measIn, RBRDynamicCorrectionResult * corrMeasOut)
+{
+    RBRDynamicCorrectionMeasurement measLagged;
+    float T_adj = 0.0f;
+    float C_cor, T_cor, T_cell;
+    float timestamp;
+    float C_meas, T_meas, P_meas, T_cond;
+    float S_cor;
+    int32_t isValid;
+    int32_t isDataError;
+    RBRDynamicCorrectionError statusCode = DYN_CORR_UNKNOWN_ERROR;
+
+
+    T_meas = measIn->marineTemperature;
+
+    /* initial call */
+    if ( params->_firstCall && ( ISNAN(measIn->marineTemperature) == 0) )
+    {
+        params->_T_meas_lag = measIn->marineTemperature;
+        params->_T_cor_lag = measIn->marineTemperature;
+        params->_firstCall = 0;
+    }
+
+    T_cor = RBRDynamicCorrection_applyTempCorr(params, T_meas);
+
+    /* the variables need to be delayed until all samples are available for calculation */
+    isValid = RBRDynamicCorrection_updateLag(params, measIn, &measLagged);
+
+    if ( !isValid )
+    {
+        statusCode = RBR_DCORR_NOT_VALID_YET;
+    }
+
+    if ( isValid )
+    {
+        /* check input */
+        isDataError = RBRDynamicCorrection_checkData(&measLagged);
+
+        /* if T_cor ever become NAN, it will not recover
+         * (all other variables will eventually cleared once correct data is available) */
+        if ( ISNAN(T_cor) )
+        {
+            isDataError = -1;
+            T_cor = params->_T_cor_lag;
+        }
+
+        /* shortcut */
+        timestamp = measLagged.timestamp;
+        C_meas = measLagged.conductivity;
+        P_meas = measLagged.pressure;
+        T_cond = measLagged.condTemperature;
+
+        if ( isDataError )
+        {
+            /* blank period (make sure it is at least 1 sample) */
+            params->_blankingPeriod = (int)(params->Fs * DCORR_ERROR_PERIOD) + 1;
+        }
+
+        /* conductivity correction */
+        C_cor = C_meas / ( 1.0f + params->CT_coeff * (T_cond - T_cor) );
+
+        /* apply filter */
+        T_adj = -params->_cte_b*params->_T_adj_lag + params->_cte_a*(T_cor - params->_T_cor_lag);
+        T_cell = T_cor - T_adj;
+
+        /* calculate salinity based on corrected values */
+        S_cor = RBRDynamicCorrection_PSS78(C_cor, T_cell, P_meas);
+
+        /* update lagged variables */
+        params->_T_adj_lag = T_adj;
+        params->_T_cor_lag = T_cor;
+
+        /* assign output */
+        corrMeasOut->timestamp = timestamp;
+        corrMeasOut->corrConductivity = C_cor;
+        corrMeasOut->corrTemperature = T_cor;
+        corrMeasOut->pressure = P_meas;
+        corrMeasOut->corrSalinity = S_cor;
+
+        statusCode = RBR_DCORR_SUCCESS;
+    }
+
+    /* flag the data with potential issue */
+    if ( params->_blankingPeriod > 0 )
+    {
+        params->_blankingPeriod--;
+        statusCode = DYN_CORR_CORRUPTED;
+    }
+
+    return statusCode;
+}
+

@@ -546,6 +546,40 @@ typedef struct RBRInstrumentPostprocessing
      * binning origin point.
      */
     float depthMax;
+    /**
+     * \brief (dynamic correction) Alpha parameter from Lueck and Picklo equation
+     *
+     * Coefficient is unitless (default 0.08)
+     *
+     * This parameter is ignored when no dynamic correction channel are selected
+     */
+    float dcAlpha;
+    /**
+     * \brief (dynamic correction) Tau parameter from Lueck and Picklo equation (1/beta)
+     *
+     * Coefficient is unitless (default 8.000)
+     *
+     * This parameter is ignored when no dynamic correction channel are selected
+     */
+    float dcTau;
+    /**
+     * \brief (dynamic correction) Parameter for the time lag correction 
+     *          between marine temperature and conductivity cell temperature
+     *
+     * Coefficient is in second (default 0.35)
+     *
+     * This parameter is ignored when no dynamic correction channel are selected
+     */
+    float dcTdelay;
+    /**
+     * \brief (dynamic correction) Parameter for the long term thermal coefficient
+     *                  for the conductivity cell
+     *
+     * Coefficient is in 1/celcius (default 2.4e-4)
+     *
+     * This parameter is ignored when no dynamic correction channel are selected
+     */
+    float dcCtCoeff;
 } RBRInstrumentPostprocessing;
 
 /**

@@ -41,16 +41,6 @@ pipelines:
                 - make clean
                 - make
 
-        - step:
-            name: Clang 6 compilation
-            image: rsmmr/clang:6.0
-            script:
-                - apt-get update && apt-get -y install libsdl2-dev
-                - make clean
-                - make lib tests
-                - cd examples/posix
-                - make clean
-                - make
         # To save time, and under the assumption that the quality and relevance
         # of scan-build findings will only improve over time, we'll perform
         # static analysis with only the latest version of Clang.
@@ -59,6 +49,7 @@ pipelines:
             image: rsmmr/clang:9.0
             script:
                 - apt-get update && apt-get -y install libsdl2-dev
+                - export CC=/opt/clang/bin/clang
                 - make clean
                 - scan-build make lib
                 - make lib tests

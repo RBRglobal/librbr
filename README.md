@@ -46,6 +46,10 @@ that this project is maintained
 [EasyParse]: https://docs.rbr-global.com/L3commandreference/format-of-stored-data/overview/easyparse-format
 [on Bitbucket]: https://bitbucket.org/rbr/librbr
 
+
+
+
+
 ## Support
 
 The library is intended to support
@@ -57,7 +61,15 @@ are rare and made only when absolutely necessary.
 | Firmware Type           | Generation | Version |
 | ----------------------- | ---------- | ------- |
 | 103 (Logger2, standard) | Early 2015 |  v1.440 |
-| 104 (Logger3, standard) |  Late 2017 |  v1.102 |
+| 104 (Logger3, standard) |  Late 2017 |  v1.102 and up |
+
+
+The standalone dynamic correction library supports:
+
+| Firmware Type           | Generation | Version |
+| ----------------------- | ---------- | ------- |
+| 104 (Logger3, standard) |  Mid 2021 |  v1.134 and up |
+
 
 ## Building
 
@@ -72,29 +84,6 @@ For details, see [the documentation on porting][porting].
 
 API document compilation requires [Doxygen].
 
-In most cases,
-the library can be built
-in a few steps.
-First, check out the code with Git:
-
-~~~{.sh}
-git clone https://bitbucket.org/rbr/librbr.git
-cd librbr
-~~~
-
-Then use `make(1)` to build the library:
-
-~~~{.sh}
-# Build just the library.
-make lib
-# Build and execute tests. Also builds the library if necessary.
-make tests
-# Build Doxygen documentation.
-make docs
-# Does all of the above.
-make
-~~~
-
 Platform-specific instructions and advice
 are available:
 
@@ -104,6 +93,100 @@ are available:
 [porting]: porting.md
 [Doxygen]: http://doxygen.org/
 [Cygwin]: cygwin.md
+
+In most cases,
+the library can be built
+in a few steps.
+
+First, check out the code with Git:
+
+~~~{.sh}
+$ git clone https://bitbucket.org/rbr/librbr.git
+$ cd <PATH>/librbr
+~~~
+
+### option 1: build librbr with dynamic correction feature
+Assuming cygwin is used, and current path is `<PATH>/librbr`.
+Then use either `make tests` or `make all` to build the libraries:
+~~~{.sh}
+# Build and execute tests. Also builds the library if necessary:
+$ make tests
+# Build Doxygen documentation:
+$ make docs
+# Does all of the above. Build both libraries - librbr and libRBRDynamicCorrection:
+$ make all
+~~~
+
+continue with commands below if one wants to use the posix example with dynamic correction:
+~~~{.sh}
+$ cd <PATH>/librbr/examples/posix
+# Build all the posix example:
+# (ignore errors if any)
+$ make all
+~~~
+
+To test posix-parse-file-dynamiccorrection example:
+~~~{.sh}
+$ ./posix-parse-file-dynamiccorrection.exe ../sampledata/dynamiccorrection-sample.bin 4
+~~~
+
+or if one wants to try posix-streaming-dynamiccorrection example, use commands below:
+~~~{.sh}
+# first connect USB, get the port:
+$ ls /dev/tty*
+/dev/tty /dev/ttyS<number>
+
+# this command would make the instrument start streaming:
+$ ./posix-stream-dynamiccorrection.exe /dev/ttyS<number>
+~~~
+
+or test with .csv file:
+~~~{.sh}
+$ cd <PATH>/librbr/examples/dynamiccorrection
+# Build the example:
+$ make
+# Test with the example file:
+$ ./dynamiccorrection-example.exe ../sampledata/dynamiccorrection-sample.csv
+~~~
+
+### option 2: build standalone dynamic correction library only
+Assuming cygwin is used, and current path is `<PATH>/librbr`:
+~~~{.sh}
+# Build just the standalone dynamic correction library:
+$ make libdynamiccorrection
+
+# Continue with commands below if one wants to use the example provided:
+$ cd <PATH>/librbr/examples/dynamiccorrection
+# Build the example:
+$ make
+# Test with the example file:
+$ ./dynamiccorrection-example.exe ../sampledata/dynamiccorrection-sample.csv
+~~~
+
+
+### option 3: build libRBR without dynamic correction feature
+Assuming cywin is used, current path is `<PATH>/librbr`.
+Then commands below shows how to use the library:
+
+~~~{.sh}
+# Build just the library - libRBR:
+$ make lib
+
+# Continue with commands below if one wants to use the posix example:
+$ cd <PATH>/librbr/examples/posix
+# Build the exmamples:
+$ make example
+~~~
+
+Take streaming as example:
+~~~{.sh}
+# First connect USB, get the port:
+$ ls /dev/tty*
+/dev/tty /dev/ttyS<number>
+# This command would make the instrument start streaming:
+$ ./posix-stream.exe /dev/ttyS<number>
+~~~
+
 
 ## Using
 

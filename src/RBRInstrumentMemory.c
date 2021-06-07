@@ -708,6 +708,22 @@ RBRInstrumentError RBRInstrument_getPostprocessing(
         {
             postprocessing->depthMax = strtod(parameter.value, NULL);
         }
+        else if (strcmp(parameter.key, "dc_alpha") == 0)
+        {
+            postprocessing->dcAlpha = strtod(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "dc_tau") == 0)
+        {
+            postprocessing->dcTau = strtod(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "dc_tdelay") == 0)
+        {
+            postprocessing->dcTdelay = strtod(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "dc_ctcoeff") == 0)
+        {
+            postprocessing->dcCtCoeff = strtod(parameter.value, NULL);
+        }
     }
 
     return RBRINSTRUMENT_SUCCESS;
@@ -781,6 +797,18 @@ RBRInstrumentError RBRInstrument_setPostprocessing(
         "postprocessing depth_min = %.1f, depth_max = %.1f",
         postprocessing->depthMin,
         postprocessing->depthMax));
+
+    /* on-board dynamic correction only available for firmware 1.134 and above */
+    if ( instrument->id.fwtype == 104 && RBRInstrumentVersion_compare(instrument->id.version, "1.134") >= 0 )
+    {
+       RBR_TRY(RBRInstrument_converse(
+            instrument,
+            "postprocessing dc_alpha = %.3f, dc_tau = %.3f, dc_tdelay = %.3f, dc_ctcoeff = %.4e",
+            postprocessing->dcAlpha,
+            postprocessing->dcTau,
+            postprocessing->dcTdelay,
+            postprocessing->dcCtCoeff));
+    }
 
     char *commandBuffer = (char *) instrument->commandBuffer;
     int32_t *commandBufferLength = &instrument->commandBufferLength;

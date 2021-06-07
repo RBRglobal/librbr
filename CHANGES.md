@@ -2,9 +2,17 @@
 
 ## v1.2.0
 
-Release ????
+Release 2021-06-04
 
 ### Added
+
+* new feature: standalone library for dynamic correction provided:
+
+ > Dynamic correction corrects all the dynamic errors affecting the salinity estimates for a profiling CTD, such as response time and sensor misalignments, or thermal mass errors.
+
+ > A standalone dynamic correction library is provided, together with various examples on how to apply the dynamic correction to a .csv data file, or to loggers during/after logging.
+
+ > Refer to `README.md` for more details.
 
 * Download over Wi-Fi example.
 

@@ -306,7 +306,11 @@ TEST_LOGGER3(postprocessing)
         .tstampMin = RBRINSTRUMENT_DATETIME_MIN,
         .tstampMax = RBRINSTRUMENT_DATETIME_MAX,
         .depthMin = 10.0,
-        .depthMax = 1000.0
+        .depthMax = 1000.0,
+        .dcAlpha = 0.08,
+        .dcTau = 8.0,
+        .dcTdelay = 0.35,
+        .dcCtCoeff = 2.4e-4
     };
     RBRInstrumentPostprocessing actual;
 
@@ -318,7 +322,8 @@ TEST_LOGGER3(postprocessing)
                           "tstamp_max = 20991231235959, "
                           "binsize = 50.0, binreference = pressure_01, "
                           "depth_min = 10.0, depth_max = 1000.0, "
-                          "binfilter = none" COMMAND_TERMINATOR;
+                          "binfilter = none, "
+                          "dc_alpha = 0.08, dc_tau = 8.000, dc_tdelay = 0.35, dc_ctcoeff = 2.4e-4" COMMAND_TERMINATOR;
     TestIOBuffers_init(buffers, command, 0);
     RBRInstrumentError err = RBRInstrument_getPostprocessing(instrument,
                                                              &actual);
@@ -344,6 +349,10 @@ TEST_LOGGER3(postprocessing)
     TEST_ASSERT_EQ(expected.tstampMax, actual.tstampMax, "%" PRIi64);
     TEST_ASSERT_EQ(expected.depthMin, actual.depthMin, "%f");
     TEST_ASSERT_EQ(expected.depthMax, actual.depthMax, "%f");
+    TEST_ASSERT_EQ(expected.dcAlpha, actual.dcAlpha, "%f");
+    TEST_ASSERT_EQ(expected.dcTau, actual.dcTau, "%f");
+    TEST_ASSERT_EQ(expected.dcTdelay, actual.dcTdelay, "%f");
+    TEST_ASSERT_EQ(expected.dcCtCoeff, actual.dcCtCoeff, "%f");
     TEST_ASSERT_STR_EQ("postprocessing all" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
 
@@ -386,16 +395,23 @@ TEST_LOGGER3(postprocessing_set)
         .tstampMin = RBRINSTRUMENT_DATETIME_MIN,
         .tstampMax = RBRINSTRUMENT_DATETIME_MAX,
         .depthMin = 10.0,
-        .depthMax = 1000.0
+        .depthMax = 1000.0,
+        .dcAlpha = 0.08,
+        .dcTau = 8.0,
+        .dcTdelay = 0.35,
+        .dcCtCoeff = 2.4e-4
     };
 
     const char *command = "postprocessing binreference = pressure_01, "
-                          "binfilter = none, binsize = 50.0" COMMAND_TERMINATOR
+                          "binfilter = none, binsize = 50.0"
+                          COMMAND_TERMINATOR
                           "postprocessing tstamp_min = 20000101000000"
                           COMMAND_TERMINATOR
                           "postprocessing tstamp_max = 20991231235959"
                           COMMAND_TERMINATOR
                           "postprocessing depth_min = 10.0, depth_max = 1000.0"
+                          COMMAND_TERMINATOR
+                          "postprocessing dc_alpha = 0.080, dc_tau = 8.000, dc_tdelay = 0.350, dc_ctcoeff = 2.4000e-04"
                           COMMAND_TERMINATOR
                           "postprocessing channels = mean(pressure_01)"
                           "|count(pressure_01)|mean(temperature_01)"

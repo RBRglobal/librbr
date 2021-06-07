@@ -75,6 +75,35 @@ extern "C" {
 } while (0)
 
 /**
+ * \brief Assert that two float variables are equal.
+ *
+ * If the assertion fails, an error message will be printed containing the file
+ * name and line number on which the macro invocation occurs and the expected
+ * and actual values, and the surrounding function will `return false;`.
+ *
+ * Because \a _expected, \a _actual, and \a _type will be evaluated multiple
+ * times by the macro, do not pass expressions having side effects.
+ *
+ * \param [in] _expected the expected value
+ * \param [in] _actual the actual value
+ * \param [in] _eps the precision range for comparison
+ */
+#define TEST_ASSERT_FLOAT_EQ(_expected, _actual, _eps) do { \
+        if ( ((_expected) < (_actual - _eps)) || ((_expected) > (_actual + _eps)) ) \
+        { \
+            printf(" assertion failure at %s:%d:" \
+                   " expected %f ; actual %f",  \
+                   __FILE__, \
+                   __LINE__, \
+                   _expected, \
+                   _actual); \
+            return false; \
+        } \
+} while (0)
+
+
+
+/**
  * \brief Assert that two enum members are equal.
  *
  * If the assertion fails, an error message will be printed containing the file

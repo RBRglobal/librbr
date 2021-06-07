@@ -168,7 +168,11 @@ int main(int argc, char *argv[])
         .tstampMin = now - 1800000LL /* data from the last half-hour */,
         .tstampMax = now,
         .depthMin = 0.0,
-        .depthMax = 0.0
+        .depthMax = 0.0,
+        .dcAlpha = 0.08,
+        .dcTau = 8.0,
+        .dcTdelay = 0.35,
+        .dcCtCoeff = 2.4e-4
     };
 
     if ((err = RBRInstrument_setPostprocessing(
