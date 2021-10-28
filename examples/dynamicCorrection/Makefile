@@ -10,14 +10,14 @@ CFLAGS := -I../../include \
 LDFLAGS := -L../../bin
 LDLIBS := -lm
 
-example: dynamiccorrection-example 
+example: dynamicCorrection-example 
 
-dynamiccorrection-example: dynamiccorrection-example.o ../../bin/libRBRDynamicCorrection.a
+dynamicCorrection-example: dynamicCorrection-example.o ../../bin/libRBRDynamicCorrection.a
 
 
 .PHONY: clean
 clean:
 	rm -Rf \
 		*.o \
-		dynamiccorrection-example \
+		dynamicCorrection-example \
 

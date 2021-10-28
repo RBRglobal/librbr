@@ -1,5 +1,14 @@
 # Changes
 
+## v1.2.1
+
+Release 2021-10-21
+
+### Changed
+* method of dynamic correction updated.
+* default coefficients updated.
+* added README.md for the posix examples and the example in dynamicCorrection folder.
+
 ## v1.2.0
 
 Release 2021-06-04

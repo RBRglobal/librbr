@@ -40,7 +40,7 @@ typedef struct
 {
     int size;
     float timestamp_sec[MAX_CSV_SIZE];
-    float P_meas[MAX_CSV_SIZE];
+    float P_meas[MAX_CSV_SIZE]; //P_meas is sea pressure.
     float T_meas[MAX_CSV_SIZE];
     float C_meas[MAX_CSV_SIZE];
     float T_cond[MAX_CSV_SIZE];
@@ -54,11 +54,11 @@ void RBRDynamicCorrection_replayData(FILE *file, csvData_t *data, float Fs)
     RBRDynamicCorrectionParams params;
     RBRDynamicCorrectionError status;
     RBRDynamicCorrectionMeasurement meas;
-    RBRDynamicCorrectionResult      corrResult;
+    RBRDynamicCorrectionResult corrResult;
     int index;
     
     /* first step, initialiaze the algorithm */
-    status = RBRDynamicCorrection_init(&params, Fs);
+    status = RBRDynamicCorrection_init(&params, Fs, DCORR_T_DELAY, DCORR_ALPHA, DCORR_TAU, DCORR_CT_COEFF);
     if ( status != RBR_DCORR_SUCCESS )
     {
         fprintf(stderr, "RBRDynamicCorrection_init() return error code %u", status);
@@ -66,8 +66,7 @@ void RBRDynamicCorrection_replayData(FILE *file, csvData_t *data, float Fs)
     }
 
     /* write an header */
-    fprintf(file, "# COMPILATION " __DATE__ " , " __TIME__ "\n");
-    fprintf(file, "# timestamp(s), C_cor(mS/cm), T_cor (celcius), P_meas (sea pressure, dbar), S_cor\n");
+    fprintf(file, "# timestamp(s), T_cor(°C), P_meas(sea pressure, dbar), S_cor(PSU), T_cond(°C)\n");
 
     for (index = 0; index < data->size; index++)
     {
@@ -88,25 +87,25 @@ void RBRDynamicCorrection_replayData(FILE *file, csvData_t *data, float Fs)
 
         if ( status != RBR_DCORR_SUCCESS )
         {
-            /* timestamp and pressure are not corrected,
-             * so they should still be valid */
-            corrResult.corrConductivity = NAN;
+            /* timestamp and pressure, conductivity are not corrected,
+             * so they should still be valid 
+             * here the pressure is sea pressure.
+            */
             corrResult.corrTemperature = NAN;
             corrResult.corrSalinity = NAN;
         }
-
+        /* here the pressure is sea pressure */
         fprintf(file, "%.3f, %.8f, %.8f, %.8f, %.8f\n", 
                 corrResult.timestamp,
-                corrResult.corrConductivity,
                 corrResult.corrTemperature,
                 corrResult.pressure,
-                corrResult.corrSalinity);
-
+                corrResult.corrSalinity,
+                meas.condTemperature);
     }
 }
 
 /* parse a .csv with the following format
- *  # timestamp (sec), C_meas (mS/cm), T_meas (celcius), P_meas (sea pressure, dbar), T_cond (celcius) */
+ *  # timestamp (s), C_meas (mS/cm), T_meas (°C), P_meas (sea pressure, dbar), T_cond (°C) */
 int RBRDynamicCorrection_parseCsv(const char *filename, csvData_t *data)
 {
     char line[MAX_LINE_SIZE];
@@ -127,12 +126,13 @@ int RBRDynamicCorrection_parseCsv(const char *filename, csvData_t *data)
     if (file == NULL)
     {
         fprintf(stderr, "Unable to open file %s\r\n", filename);
-        return -1;
+        return EXIT_FAILURE;
     }
 
-    /* skip header (unknown number of line) */
-    /* assuming in csv file, all header lines start with # */
-    /* also assuming column 0->4 corresponds to timestamp_sec, C_meas, T_meas, P_meas, T_cond*/
+    /* skip header (unknown number of line)
+     * assuming in csv file, all header lines start with '#'
+     * also assuming column 0->4 corresponds to timestamp_sec, C_meas, T_meas, P_meas, T_cond
+     * here the P_meas means sea pressure */
     do {
         fgets(line, MAX_LINE_SIZE, file);
         line_no++;
@@ -160,7 +160,8 @@ int RBRDynamicCorrection_parseCsv(const char *filename, csvData_t *data)
 
             value = strtof(entry, NULL);
             
-            /*as mentioned, assuming column 0->4 corresponds to timestamp_sec, C_meas, T_meas, P_meas, T_cond*/
+            /*as mentioned, assuming column 0->4 corresponds to timestamp_sec, C_meas, T_meas, P_meas, T_cond
+             *here the P_meas is sea pressure */
             switch (n++)
             {
                 case 0:
@@ -209,20 +210,16 @@ int RBRDynamicCorrection_parseCsv(const char *filename, csvData_t *data)
     if ( data->size == 0 )
     {
         fprintf(stderr, "Input file %s was empty!", filename);
-        return -1;
+        return EXIT_FAILURE;
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
-
-
 
 void usage()
 {
-    printf("xxx csv_file\r\n");
-    printf("\r\n");
-    printf("    --help       : Show help\r\n");
-
+    printf("usage: <path>/dynamicCorrection-example <path_to_.csv_file>\r\n");
+    printf("       %s\r\n","e.g: ./dynamicCorrection-example ../sampledata/dynamiccorrection-sample.csv");
     return;
 }
 
@@ -233,20 +230,16 @@ int main(int argc, char *argv[])
     char filenameOut[MAX_LINE_SIZE];
     csvData_t data;
     float Fs;
-    
-    if ( argc <= 1 )
-    {
-        printf("Provide input arguments\r\n");
-        printf("\r\n");
-        
+    if ( argc <= 1 ){
+        fprintf(stderr, "command incomplete: %s\r\n", argv[0]);
         usage();
-        return 0;
+        return EXIT_SUCCESS;
     }
 
     if ( strcmp(argv[1], "--help") == 0 )
     {
         usage();
-        return 0;
+        return EXIT_SUCCESS;
     }
 
 
@@ -281,5 +274,5 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Unable to write file %s\n", filenameOut);
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }

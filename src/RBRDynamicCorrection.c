@@ -63,7 +63,7 @@
  *
  * \param [in] C Conductivity
  * \param [in] T Temperature
- * \param [in] P Pressure
+ * \param [in] P Sea Pressure
  * \return Salinity
  */
 float RBRDynamicCorrection_PSS78(float C, float T, float P)
@@ -76,7 +76,7 @@ float RBRDynamicCorrection_PSS78(float C, float T, float P)
     float S_1, S_2;
     float S;
 
-    // hydrostatic pressure in bars
+    // hydrostatic pressure(i.e. sea Pressure) in bars
     pressure=P*0.1f;
 
     // temperature in ITS68...
@@ -93,7 +93,7 @@ float RBRDynamicCorrection_PSS78(float C, float T, float P)
     rT = PSS78_C1 + rT*T_its68;
     rT = PSS78_C0 + rT*T_its68;
 
-    //Rp_num = PSS78_E1*pressure + PSS78_E2*(pressure*pressure) + PSS78_E3*pressure*(pressure*pressure);
+    //Rp_num = PSS78_E1*seaPressure + PSS78_E2*(seaPressure*seaPressure) + PSS78_E3*seaPressure*(seaPressure*seaPressure);
     Rp_num = PSS78_E2 + PSS78_E3*pressure;
     Rp_num = (PSS78_E1 + Rp_num*pressure)*pressure;
 
@@ -191,6 +191,58 @@ int32_t RBRDynamicCorrection_checkData(RBRDynamicCorrectionMeasurement * measIn)
     return isError;
 }
 
+/* resample all lagged variables using new sampling rate */
+void RBRDynamicCorrection_resampleLag(RBRDynamicCorrectionParams *params, float timestamp, float Fs)
+{
+    float timestamp_array[DCORR_MAX_LAG_ARRAY];
+    float C_meas_array[DCORR_MAX_LAG_ARRAY];
+    float P_meas_array[DCORR_MAX_LAG_ARRAY];
+    float T_cond_array[DCORR_MAX_LAG_ARRAY];
+    float factor;
+    float t1, t2;
+    float dt = 1.0f/Fs;
+    int k;
+    int j;
+    int timeout = 0;
+
+    /* check entries (current/next got timestamp, interp) */
+    j = 0;
+
+    for (k = 0; k < DCORR_MAX_LAG_ARRAY-1; k++)
+    {
+        timeout = 0;
+        while (params->_timestamp_lagArray[k] < timestamp)
+        {
+            timestamp -= dt;
+            timeout++;
+            if ( timeout > 30 )
+            {
+                return;
+            }
+        }
+
+        t1 = params->_timestamp_lagArray[k+1];
+        t2 = params->_timestamp_lagArray[k];
+        
+        if ( timestamp > t1 && timestamp <= t2 )
+        {
+            factor = (timestamp - t2) / (t2 - t1);
+
+            timestamp_array[j] = timestamp;
+            C_meas_array[j] = params->_C_meas_lagArray[k] + factor*(params->_C_meas_lagArray[k+1] - params->_C_meas_lagArray[k]);
+            P_meas_array[j] = params->_P_meas_lagArray[k] + factor*(params->_P_meas_lagArray[k+1] - params->_P_meas_lagArray[k]);
+            T_cond_array[j] = params->_T_cond_lagArray[k] + factor*(params->_T_cond_lagArray[k+1] - params->_T_cond_lagArray[k]);   
+            timestamp -= dt;
+            j++;
+        }
+    }
+
+    memcpy(params->_timestamp_lagArray, timestamp_array, DCORR_MAX_LAG_ARRAY*sizeof(float));
+    memcpy(params->_C_meas_lagArray, C_meas_array, DCORR_MAX_LAG_ARRAY*sizeof(float));
+    memcpy(params->_P_meas_lagArray, P_meas_array, DCORR_MAX_LAG_ARRAY*sizeof(float));
+    memcpy(params->_T_cond_lagArray, T_cond_array, DCORR_MAX_LAG_ARRAY*sizeof(float));
+}
+
 /* update all lagged variables */
 int32_t RBRDynamicCorrection_updateLag(RBRDynamicCorrectionParams *params, const RBRDynamicCorrectionMeasurement * measIn, RBRDynamicCorrectionMeasurement * meas_out)
 {
@@ -231,7 +283,34 @@ int32_t RBRDynamicCorrection_updateLag(RBRDynamicCorrectionParams *params, const
 }
 
 
-RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *params, float Fs)
+RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionParams *params, float Fs)
+{
+    float F_nyquist;
+    
+    /* sanity check */
+    if ( DCORR_MAX_LAG_ARRAY/Fs < DCORR_T_DELAY )
+    {
+        return RBR_DCORR_INVALID_SAMPLING_RATE;
+    }
+
+    // calculate a, b from initial parameters
+    params->Fs = Fs;
+    F_nyquist = params->Fs / 2.0f;
+    params->_cte_a = 4.0f*F_nyquist * (params->alpha*params->tau) / (1.0 + 4.0f*F_nyquist*params->tau);
+    params->_cte_b = 1.0f -  2.0f * params->_cte_a / params->alpha;
+
+    // not enough info to update, keep unchanged
+    params->_T_short_lag = params->_T_short_lag;
+
+    RBRDynamicCorrection_initCorrectionCoeff(params, Fs);
+    //RBRDynamicCorrection_initLagArray(params);
+    RBRDynamicCorrection_resampleLag(params, params->_timestamp_lagArray[0], Fs);
+
+    return RBR_DCORR_SUCCESS;
+}
+
+RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *params, float Fs, 
+            float t_delay, float alpha, float tau, float CT_coeff)
 {
     float F_nyquist;
 
@@ -242,16 +321,16 @@ RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *
     }
 
     params->Fs = Fs;
-    params->t_delay = DCORR_T_DELAY;
-    params->alpha = DCORR_ALPHA;
-    params->tau = DCORR_TAU;
-    params->CT_coeff = DCORR_CT_COEFF;
+    params->t_delay = t_delay;
+    params->alpha = alpha;
+    params->tau = tau;
+    params->CT_coeff = CT_coeff;
 
     params->_firstCall = 1;
     params->_blankingPeriod = 0;
     params->_T_meas_lag = -999.0f;
     params->_T_cor_lag = 0.0f;
-    params->_T_adj_lag = 0.0f;
+    params->_T_short_lag = 0.0f;
     
     // calculate a, b from initial parameters
     F_nyquist = params->Fs / 2.0f;
@@ -267,8 +346,8 @@ RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *
 RBRDynamicCorrectionError RBRDynamicCorrection_addMeasurement(RBRDynamicCorrectionParams *params, const RBRDynamicCorrectionMeasurement * measIn, RBRDynamicCorrectionResult * corrMeasOut)
 {
     RBRDynamicCorrectionMeasurement measLagged;
-    float T_adj = 0.0f;
-    float C_cor, T_cor, T_cell;
+    float T_cor, T_cell;
+    float T_short, T_long;
     float timestamp;
     float C_meas, T_meas, P_meas, T_cond;
     float S_cor;
@@ -322,23 +401,24 @@ RBRDynamicCorrectionError RBRDynamicCorrection_addMeasurement(RBRDynamicCorrecti
             params->_blankingPeriod = (int)(params->Fs * DCORR_ERROR_PERIOD) + 1;
         }
 
-        /* conductivity correction */
-        C_cor = C_meas / ( 1.0f + params->CT_coeff * (T_cond - T_cor) );
+        /* long-term thermal mass adjustment */
+        T_long = params->CT_coeff * (T_cond - T_cor);
 
-        /* apply filter */
-        T_adj = -params->_cte_b*params->_T_adj_lag + params->_cte_a*(T_cor - params->_T_cor_lag);
-        T_cell = T_cor - T_adj;
+        /* short-term thermal mass adjustment */
+        T_short = -params->_cte_b*params->_T_short_lag + params->_cte_a*(T_cor - params->_T_cor_lag);
+
+        T_cell = T_cor + T_long - T_short;
 
         /* calculate salinity based on corrected values */
-        S_cor = RBRDynamicCorrection_PSS78(C_cor, T_cell, P_meas);
+        S_cor = RBRDynamicCorrection_PSS78(C_meas, T_cell, P_meas);
 
         /* update lagged variables */
-        params->_T_adj_lag = T_adj;
+        params->_T_short_lag = T_short;
         params->_T_cor_lag = T_cor;
 
         /* assign output */
         corrMeasOut->timestamp = timestamp;
-        corrMeasOut->corrConductivity = C_cor;
+        corrMeasOut->conductivity = C_meas;
         corrMeasOut->corrTemperature = T_cor;
         corrMeasOut->pressure = P_meas;
         corrMeasOut->corrSalinity = S_cor;

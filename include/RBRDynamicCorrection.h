@@ -14,17 +14,43 @@
 #include <stdint.h>
 
 
+/*! @def DCORR_MAX_LAG_ARRAY
+* \brief Define the maximum amount of lag permitted.
+*/
+
 /* Define the maximum amount of lag permitted.
  * (this need to be increase for faster sampling rate).
  * DCORR_MAX_LAG_ARRAY/F_s > t_delay */
 #define DCORR_MAX_LAG_ARRAY  20
 
-/* default parameters */
-#define DCORR_T_DELAY       0.35f
-#define DCORR_ALPHA         0.08f
-#define DCORR_TAU           8.0f
-#define DCORR_CT_COEFF      2.4e-4f
+/*! @def DCORR_ERROR_PERIOD
+* \brief Define the period before an error condition in the algorithm is cleared (in seconds)
+*/
 #define DCORR_ERROR_PERIOD  10.0f
+
+
+/* default parameters
+ * (applicable for 10cm/sec ascent/descent rate) */
+
+/*! @def DCORR_T_DELAY 
+* \brief Define the C-T lag adjustment delay (in seconds)
+*/
+#define DCORR_T_DELAY       0.35f
+/*! @def DCORR_ALPHA
+* \brief Define the magnitude of short-term thermal mass correction (unitless)
+*/
+#define DCORR_ALPHA         0.13f
+/*! 
+*   @def DCORR_TAU
+* \brief Define the time constant of short-term thermal mass correction (seconds)
+*/
+#define DCORR_TAU           5.9f
+/*! 
+*   @def DCORR_CT_COEFF
+* \brief Define the magnitude of long-term thermal mass correction (unitless)
+*/
+#define DCORR_CT_COEFF      1.02e-2f
+
 
 /**
  * \brief Errors which can be returned from dynamic correction algorithm
@@ -55,11 +81,11 @@ typedef enum
    *  @var RBRDynamicCorrectionParams::Fs
    *    sampling rate (Hz)
    *  @var RBRDynamicCorrectionParams::alpha
-   *    amplitude of short-term thermal mass correction
+   *    magnitude of short-term thermal mass correction
    *  @var RBRDynamicCorrectionParams::tau
-   *    timescale of short-term thermal mass correction
+   *    time constant of short-term thermal mass correction
    *  @var RBRDynamicCorrectionParams::CT_coeff
-   *    amplitude of long-term thermal mass correction
+   *    magnitude of long-term thermal mass correction
    */
 typedef struct
 {
@@ -69,6 +95,7 @@ typedef struct
     float tau;
     float CT_coeff;
     // --- internal private data ---
+    /// @cond
     int32_t _firstCall;
     int32_t _blankingPeriod;
     int32_t _isError;
@@ -81,35 +108,34 @@ typedef struct
     float _T_cond_lag;
     float _P_meas_lag;
     float _T_cor_lag;
-    float _T_adj_lag;
+    float _T_short_lag;
     int32_t _isValid_lagArray[DCORR_MAX_LAG_ARRAY];
     float _timestamp_lagArray[DCORR_MAX_LAG_ARRAY];
     float _C_meas_lagArray[DCORR_MAX_LAG_ARRAY];
     float _P_meas_lagArray[DCORR_MAX_LAG_ARRAY];
-    float _T_cond_lagArray[DCORR_MAX_LAG_ARRAY];
+    float _T_cond_lagArray[DCORR_MAX_LAG_ARRAY];    
+    /// @endcond
 } RBRDynamicCorrectionParams;
 
 /** @struct RBRDynamicCorrectionMeasurement
    *  This is a struct
    *
    *  @var RBRDynamicCorrectionMeasurement::timestamp
-   *    time in seconds
+   *    Time in seconds
    *  @var RBRDynamicCorrectionMeasurement::conductivity
    *    Conductivity measurement (mS/cm)
    *  @var RBRDynamicCorrectionMeasurement::marineTemperature
-   *    Marine temperature measurement (Celcius)
+   *    Marine temperature measurement (°C)
    *  @var RBRDynamicCorrectionMeasurement::condTemperature
-   *    Temperature of conductivity cell measurement (Celcius)
+   *    Temperature of conductivity cell measurement (°C)
    *  @var RBRDynamicCorrectionMeasurement::pressure
    *    Pressure measurement (dbar)
-   *  @var RBRDynamicCorrectionMeasurement::salinity
-   *    Practical salinity (unitless)
    */
 typedef struct {
-    float timestamp;            // time in seconds
+    float timestamp;            // Time in seconds
     float conductivity;         // Conductivity measurement (mS/cm)
-    float marineTemperature;    // Marine temperature measurement (Celcius)
-    float condTemperature;      // Temperature of conductivity cell measurement (Celcius)
+    float marineTemperature;    // Marine temperature measurement (°C)
+    float condTemperature;      // Temperature of conductivity cell measurement (°C)
     float pressure;             // Pressure measurement (dbar)
 } RBRDynamicCorrectionMeasurement;
 
@@ -117,21 +143,21 @@ typedef struct {
    *  This is a struct
    *
    *  @var RBRDynamicCorrectionResult::timestamp
-   *    time in seconds
-   *  @var RBRDynamicCorrectionResult::corrConductivity
-   *    Corrected conductivity (mS/cm)
+   *    Time in seconds
+   *  @var RBRDynamicCorrectionResult::conductivity
+   *    Conductivity measured (mS/cm)
    *  @var RBRDynamicCorrectionResult::corrTemperature
-   *    Corrected temperature (Celcius)
+   *    Corrected temperature (°C)
    *  @var RBRDynamicCorrectionResult::pressure
-   *    Pressure measurement (dbar)
+   *    Sea pressure measurement (dbar)
    *  @var RBRDynamicCorrectionResult::corrSalinity
    *    Practical salinity after all corrections (corrected, unitless)
    */
 typedef struct {
-    float timestamp;            // time in seconds
-    float corrConductivity;     // Corrected conductivity (mS/cm)
-    float corrTemperature;      // Corrected temperature (Celcius)
-    float pressure;             // Pressure measurement (dbar)
+    float timestamp;            // Time in seconds
+    float conductivity;         // Conductivity measurement (mS/cm)
+    float corrTemperature;      // Corrected temperature (°C)
+    float pressure;             // Sea pressure measurement (dbar)
     float corrSalinity;         // Practical salinity after all corrections (unitless)
 } RBRDynamicCorrectionResult;
 
@@ -144,9 +170,23 @@ typedef struct {
  *
  * @param params Parameters for dynamic correction algorithm
  * @param Fs sampling rate (Samples/sec)
+ * @param t_delay default value DCORR_<paraName> used as input
+ * @param alpha default value DCORR_<paraName> used as input
+ * @param tau default value DCORR_<paraName> used as input
+ * @param CT_coeff default value DCORR_<paraName> used as input
  * @return error code (0 = no error)
  */
-RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *params, float Fs);
+RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *params, float Fs,
+                                            float t_delay, float alpha, float tau, float CT_coeff);
+
+/**
+ * @brief Change the sampling rate for the algorithm.
+ *
+ * @param params Parameters for dynamic correction algorithm
+ * @param Fs sampling rate (Samples/sec)
+ * @return error code (0 = no error)
+ */
+RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionParams *params, float Fs);
 
 /**
  * @brief Feed a new measurement in the algorithm.  

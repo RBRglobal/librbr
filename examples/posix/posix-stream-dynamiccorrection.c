@@ -28,10 +28,10 @@
 #include "posix-shared.h"
 #include "RBRDynamicCorrection.h"
 
+#define _AbsP_To_SeaP        10.132507
+
 static RBRInstrumentDateTime g_timeReference = 0;
-
 static RBRInstrumentSample g_sample;
-
 
 RBRInstrumentError instrumentSample(
     const struct RBRInstrument *instrument,
@@ -56,9 +56,18 @@ RBRInstrumentError instrumentSample(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError streamCTD(RBRInstrument *instrument, int dynamicCorrection_channel[], RBRDynamicCorrectionMeasurement *meas)
+RBRInstrumentError streamCTD(RBRInstrument *instrument, int dynamicCorrection_channel[], bool _flagAbsP, RBRDynamicCorrectionMeasurement *meas)
 {
     RBRInstrumentError err;
+    /* if seapressure_00 channel is used, _flagAbsP will be false, isAbsolute = 0. 
+     * Otherwise if pressure_00 channel is in use, it needs a conversion to sea pressure.
+    */
+    int isAbsolute = 0;
+
+    /* if dynamicCorrection_channel[2] stores the channel index of pressure_00, then its value will be converted to sea pressure below */
+    if(_flagAbsP == true){
+        isAbsolute = 1;
+    }
     
     err = RBRInstrument_readSample(instrument);
     if (err != RBRINSTRUMENT_SUCCESS)
@@ -73,20 +82,19 @@ RBRInstrumentError streamCTD(RBRInstrument *instrument, int dynamicCorrection_ch
             g_timeReference = g_sample.timestamp;
         }
 
-
         /* we already pre-validated the channels to be
          * defined in the following order */
         meas->timestamp = (g_sample.timestamp - g_timeReference) / 1000.0f;
         meas->conductivity = g_sample.readings[dynamicCorrection_channel[0]];
         meas->marineTemperature = g_sample.readings[dynamicCorrection_channel[1]];
-        meas->pressure = g_sample.readings[dynamicCorrection_channel[2]];
+        meas->pressure = g_sample.readings[dynamicCorrection_channel[2]]-isAbsolute*_AbsP_To_SeaP;
         meas->condTemperature = g_sample.readings[dynamicCorrection_channel[3]];
-    }
+      }
 
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError applyCorrection(RBRInstrument *instrument, int dynamicCorrection_channel[], float Fs)
+RBRInstrumentError applyCorrection(RBRInstrument *instrument, int dynamicCorrection_channel[], bool _flagAbsP, float Fs)
 {
     RBRDynamicCorrectionParams params;
     RBRDynamicCorrectionError status;
@@ -94,21 +102,17 @@ RBRInstrumentError applyCorrection(RBRInstrument *instrument, int dynamicCorrect
     RBRDynamicCorrectionResult      corrResult;
 
     /* first step, initialiaze the algorithm using the proper sampling rate */
-    status = RBRDynamicCorrection_init(&params, Fs);
+    status = RBRDynamicCorrection_init(&params, Fs, DCORR_T_DELAY, DCORR_ALPHA, DCORR_TAU, DCORR_CT_COEFF);
     if ( status != RBR_DCORR_SUCCESS )
     {
         fprintf(stderr, "RBRDynamicCorrection_init() return error code %u\n", status);
         return RBRINSTRUMENT_UNKNOWN_ERROR;
     }
 
-    /* write an header */
-    printf("timestamp(s), C_cor(mS/cm), T_cor (celcius), P_meas(sea pressure, dbar), S_cor\n");
-    printf("-----------------------------------------------------------------------------------\n");
-
     while (1)
     {
         /* input to algorithm */
-        streamCTD(instrument, dynamicCorrection_channel, &meas);
+        streamCTD(instrument, dynamicCorrection_channel, _flagAbsP, &meas);
         
         /* feed the data into the correction algorithm */
         status = RBRDynamicCorrection_addMeasurement(&params, &meas, &corrResult);
@@ -121,20 +125,19 @@ RBRInstrumentError applyCorrection(RBRInstrument *instrument, int dynamicCorrect
 
         if ( status != RBR_DCORR_SUCCESS )
         {
-            /* timestamp and pressure are not corrected,
+            /* timestamp and pressure, conductivity are not corrected,
             * so they should still be valid */
-            corrResult.corrConductivity = NAN;
             corrResult.corrTemperature = NAN;
             corrResult.corrSalinity = NAN;
         }
 
         /* report the result */
-        printf("timestamp: %.3f, C_cor: %.8f, T_cor: %.8f, P_meas: %.8f, S_cor: %.8f\n", 
+        printf("timestamp(s) | T_cor(°C) | P_meas(sea pressure, dbar) | S_cor(PSU) | T_cond(°C): %.3f, %.8f, %.8f, %.8f, %.8f\n", 
                 corrResult.timestamp,
-                corrResult.corrConductivity,
                 corrResult.corrTemperature,
                 corrResult.pressure,
-                corrResult.corrSalinity);
+                corrResult.corrSalinity,
+                meas.condTemperature);
     }
 
     return RBRINSTRUMENT_SUCCESS;
@@ -210,42 +213,74 @@ int main(int argc, char *argv[])
             goto fileCleanup;
     }
 
-    /* scan labelsList to find C,T,D, T_for_cond_corr and store channel index in an array */
     bool isCtd = true;
+    /* variables below are used in scannning labelsList to find C,T,D, T_for_cond_corr and store channel index in an array */
     int i = 0;
     int dynamicCorrection_channel[4];
-    for (int ch_id = 0; ch_id < labelList.count; ch_id++)
-    {
-                if ( strcmp(labelList.labels[ch_id],"conductivity_00") == 0)
-                {
-                   dynamicCorrection_channel[0]=ch_id;
-                   i ++;
-                }
-                else if ( strcmp(labelList.labels[ch_id],"temperature_00")==0 )
-                {
-                    dynamicCorrection_channel[1]=ch_id;
-                    i ++;
-                }
-                else if ( strcmp(labelList.labels[ch_id],"seapressure_00")==0 )
-                {
-                    dynamicCorrection_channel[2]=ch_id;
-                    i ++;
-                }
-                else if (strcmp(labelList.labels[ch_id],"conductivitycelltemperature_00")==0)
-                {
-                    dynamicCorrection_channel[3]=ch_id;
-                    i ++;
-                }
-    }
-
-    if ( labelList.count < 4 || i<4)
-    {
+    bool _flagAbsP = false; //if false, it means no absolute pressure channel detected.
+    int _iSeaP = -1;
+    int _iAbsP = -1;
+    
+    /* if total channels are less than 4, then it's impossible to have all 4 channels below. 
+     * this will cause a warning message below */
+    if (labelList.count < 4){
         isCtd = false;
     }
+    /* otherwise channels list will be scanned to find C,T,D, T_for_cond_corr
+     * and store channel index in an array dynamicCorrection_channel[] 
+     */
+    else if (labelList.count >= 4){
+        for (int ch_id = 0; ch_id < labelList.count; ch_id++)
+        {
+            if (strcmp(labelList.labels[ch_id], "conductivity_00") == 0)
+            {
+                dynamicCorrection_channel[0] = ch_id;
+                i++;
+            }
+            else if (strcmp(labelList.labels[ch_id], "temperature_00") == 0)
+            {
+                dynamicCorrection_channel[1] = ch_id;
+                i++;
+            }
+            else if (strcmp(labelList.labels[ch_id], "pressure_00") == 0)
+            {
+                _iAbsP = ch_id;
+                _flagAbsP = true;
+                i++;
+            }
+            else if (strcmp(labelList.labels[ch_id], "seapressure_00") == 0)
+            {
+                _iSeaP = ch_id;
+                i++;
+            }
+            else if (strcmp(labelList.labels[ch_id], "conductivitycelltemperature_00") == 0)
+            {
+                dynamicCorrection_channel[3] = ch_id;
+                i++;
+            }
+        }
 
-    if ( isCtd == false )
-    {
-        fprintf(stderr, "Warning: Logger not configured as a CTD\n");
+        /* if only absolute pressure channel detected, it will be marked 
+        * to inform dynamiccorrection algorithm to convert it to sea pressure before use.
+        * if neither absolute pressure channel nor sea pressure channel detected, it will not be treated as CTD.
+        */
+        if(_iSeaP == -1){
+            if (_flagAbsP == true) {
+                dynamicCorrection_channel[2]= _iAbsP;
+            }
+            else{
+                isCtd = false;
+            }
+        }
+
+        /* if not all 4 channels above are detected, then it will not be treated as CTD.*/
+        if (i<4){
+            isCtd = false;
+        }
+    }
+    
+    if ( isCtd == false ){
+        fprintf(stderr, "Warning: Logger doesn't have all these channels on:\n  conductivity_00, temperature_00, pressure_00|seapressure_00, conductivitycelltemperature_00\n");
         goto instrumentCleanup;
     }
 
@@ -311,10 +346,12 @@ int main(int argc, char *argv[])
     /* sampling.period is in ms, samplingRate is in Hz */
     float samplingRate = 1000.0 / (float)sampling.period;
 
-    err = applyCorrection(instrument, dynamicCorrection_channel, samplingRate);
-    if (err != RBRINSTRUMENT_SUCCESS)
-    {
-        fprintf(stderr, "Unexpected termination\n");
+    if(isCtd == true){
+        err = applyCorrection(instrument, dynamicCorrection_channel, _flagAbsP, samplingRate);
+        if (err != RBRINSTRUMENT_SUCCESS)
+        {
+            fprintf(stderr, "Unexpected termination\n");
+        }
     }
 
 instrumentCleanup:

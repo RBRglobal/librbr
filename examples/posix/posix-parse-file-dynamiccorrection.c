@@ -7,9 +7,9 @@
  * if one wants to test with customer bin file, a few assumptions are made:
  * in the bin file, the channels are defined in the following order:
  *      channel 1 -> C(mS/cm),
- *      channel 2 -> T marine (celcius),
+ *      channel 2 -> T meas (°C),
  *      channel 3 -> P (sea pressure, dbar), 
- *      channel 4 -> T cond (celcius).
+ *      channel 4 -> T cond (°C).
  *
  * \copyright
  * Copyright (c) 2021 RBR Ltd.
@@ -42,6 +42,7 @@
 
 
 /* CSV column assignement */
+/* channel id from 1 to 4 corresponds to C(mS/cm), T meas(°C), P meas(dbar), T cond(°C) */
 #define CHANNEL_COND        1
 #define CHANNEL_T_MEAS      2
 #define CHANNEL_P_MEAS      3
@@ -79,8 +80,9 @@ RBRInstrumentError parserSample(
     }
 
     /* The channels to be defined in the following order (for this example) */
-    /* channel id 1 ->4 corresponds to C(mS/cm), T marine(celcius), P(dbar), T cond(celcius) */
-    meas.timestamp = (sample->timestamp - g_timeReference) * 1000.0f;
+    /* channel id from 1 to 4 corresponds to C(mS/cm), T meas(°C), P meas(dbar), T cond(°C) */
+    /* here the P meas means sea pressure */
+    meas.timestamp = (sample->timestamp - g_timeReference) / 1000.0f;
     meas.conductivity = sample->readings[CHANNEL_COND - 1];
     meas.marineTemperature = sample->readings[CHANNEL_T_MEAS - 1];
     meas.pressure = sample->readings[CHANNEL_P_MEAS - 1];
@@ -97,20 +99,19 @@ RBRInstrumentError parserSample(
 
     if ( status != RBR_DCORR_SUCCESS )
     {
-        /* timestamp and pressure are not corrected,
+        /* timestamp and sea pressure are not corrected,
          * so they should still be valid */
-        corrResult.corrConductivity = NAN;
         corrResult.corrTemperature = NAN;
         corrResult.corrSalinity = NAN;
     }
-
-    /* report the result */
-    printf("%.3f, %.8f, %.8f, %.8f, %.8f\n", 
+    
+    /* report the result. here pressure is sea pressure*/
+    printf("%.3f, %.8f, %.8f, %.8f, %.8f\n",
             corrResult.timestamp,
-            corrResult.corrConductivity,
             corrResult.corrTemperature,
             corrResult.pressure,
-            corrResult.corrSalinity);
+            corrResult.corrSalinity,
+            meas.condTemperature);
 
     return RBRINSTRUMENT_SUCCESS;
 }
@@ -126,7 +127,9 @@ int main(int argc, char *argv[])
 
     if (argc < 3)
     {
-        fprintf(stderr, "Usage: %s file channels\n", argv[0]);
+        fprintf(stderr, "command incomplete: %s\r\n", argv[0]);
+        printf("usage: <path>/posix-parse-file-dynamiccorrection <path_to_.bin_file> <number of channels>\r\n");
+        printf("       %s\r\n","e.g: ./posix-parse-file-dynamiccorrection ../sampledata/dynamiccorrection-sample.bin 4");
         return EXIT_FAILURE;
     }
 
@@ -148,6 +151,11 @@ int main(int argc, char *argv[])
             RBRINSTRUMENT_LIB_VERSION,
             RBRINSTRUMENT_LIB_BUILD_DATE);
 
+    /* write an header */
+    printf("-----------------------------------------------------------------------------------\n");
+    printf("timestamp(s) | T_cor(°C) | P_meas(sea pressure, dbar) | S_cor(PSU) | T_cond(°C)\n");
+    printf("-----------------------------------------------------------------------------------\n");
+    
     RBRParser *parser = NULL;
 
     RBRInstrumentSample sampleBuffer;
@@ -166,7 +174,7 @@ int main(int argc, char *argv[])
     };
 
     RBRDynamicCorrectionError dynamicCorrStatus;
-    dynamicCorrStatus = RBRDynamicCorrection_init(&dynamicCorrParams, SAMPLING_RATE);
+    dynamicCorrStatus = RBRDynamicCorrection_init(&dynamicCorrParams, SAMPLING_RATE, DCORR_T_DELAY, DCORR_ALPHA, DCORR_TAU, DCORR_CT_COEFF);
     if ( dynamicCorrStatus != RBR_DCORR_SUCCESS )
     {
         fprintf(stderr, "%s: Failed to initialize dynamic correction library: err code %u!\n",

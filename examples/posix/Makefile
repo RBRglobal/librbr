@@ -6,7 +6,7 @@ CFLAGS := -I../../include \
           -pedantic-errors \
           -Wwrite-strings \
           -std=c99 \
-          -g
+          -g 
 LDFLAGS := -L../../bin
 LDLIBS := -lRBR -lm
 
@@ -16,6 +16,7 @@ example: posix-download \
          posix-download-wifi \
          posix-fetch \
          posix-parse-download \
+         posix-parse-download-dataset \
          posix-parse-file \
          posix-postprocessing \
          posix-stream \
@@ -31,6 +32,8 @@ posix-download-wifi: posix-shared.o posix-download-wifi.o ../../bin/libRBR.a
 posix-fetch: posix-shared.o posix-fetch.o ../../bin/libRBR.a
 
 posix-parse-download: posix-shared.o posix-parse-download.o ../../bin/libRBR.a
+
+posix-parse-download-dataset: posix-shared.o posix-parse-download-dataset.o ../../bin/libRBR.a
 
 posix-parse-file: posix-shared.o posix-parse-file.o ../../bin/libRBR.a
 
@@ -53,6 +56,7 @@ clean:
 		posix-download-wifi \
 		posix-fetch \
 		posix-parse-download \
+        posix-parse-download-dataset \
 		posix-parse-file \
 		posix-parse-file-dynamiccorrection \
 		posix-postprocessing \

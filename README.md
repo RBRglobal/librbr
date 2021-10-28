@@ -68,7 +68,7 @@ The standalone dynamic correction library supports:
 
 | Firmware Type           | Generation | Version |
 | ----------------------- | ---------- | ------- |
-| 104 (Logger3, standard) |  Mid 2021 |  v1.134 and up |
+| 104 (Logger3, standard) |  Late 2021 |  v1.136 and up |
 
 
 ## Building
@@ -127,7 +127,7 @@ $ make all
 
 To test posix-parse-file-dynamiccorrection example:
 ~~~{.sh}
-$ ./posix-parse-file-dynamiccorrection.exe ../sampledata/dynamiccorrection-sample.bin 4
+$ ./posix-parse-file-dynamiccorrection ../sampledata/dynamiccorrection-sample.bin 4
 ~~~
 
 or if one wants to try posix-streaming-dynamiccorrection example, use commands below:
@@ -137,16 +137,16 @@ $ ls /dev/tty*
 /dev/tty /dev/ttyS<number>
 
 # this command would make the instrument start streaming:
-$ ./posix-stream-dynamiccorrection.exe /dev/ttyS<number>
+$ ./posix-stream-dynamiccorrection /dev/ttyS<number>
 ~~~
 
 or test with .csv file:
 ~~~{.sh}
-$ cd <PATH>/librbr/examples/dynamiccorrection
+$ cd <PATH>/librbr/examples/dynamicCorrection
 # Build the example:
 $ make
 # Test with the example file:
-$ ./dynamiccorrection-example.exe ../sampledata/dynamiccorrection-sample.csv
+$ ./dynamicCorrection-example ../sampledata/dynamiccorrection-sample.csv
 ~~~
 
 ### option 2: build standalone dynamic correction library only
@@ -160,7 +160,7 @@ $ cd <PATH>/librbr/examples/dynamiccorrection
 # Build the example:
 $ make
 # Test with the example file:
-$ ./dynamiccorrection-example.exe ../sampledata/dynamiccorrection-sample.csv
+$ ./dynamicCorrection-example ../sampledata/dynamiccorrection-sample.csv
 ~~~
 
 
@@ -184,7 +184,7 @@ Take streaming as example:
 $ ls /dev/tty*
 /dev/tty /dev/ttyS<number>
 # This command would make the instrument start streaming:
-$ ./posix-stream.exe /dev/ttyS<number>
+$ ./posix-stream /dev/ttyS<number>
 ~~~
 
 

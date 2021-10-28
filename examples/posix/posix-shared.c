@@ -58,9 +58,14 @@ int openSerialFd(char *devicePath)
  * doing so would break a vast number of existing applications). And this
  * approach is more platform-generic than an ioctl. */
 #define B115200 115200
+#define B9600 9600
 #endif
 
-    cfsetospeed(&portSettings, B115200);
+    /*important!!!
+     change baudrate below if one is using 115200:
+     */
+    cfsetospeed(&portSettings, B9600);
+
     /* Input baud rate of 0 causes the output baud rate to be used. */
     cfsetispeed(&portSettings, B0);
 

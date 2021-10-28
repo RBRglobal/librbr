@@ -1,8 +1,8 @@
 /**
- * \file posix-parse-download.c
+ * \file posix-parse-download-dataset.c
  *
- * \brief Example of using the library to continuously download and parse
- * instrument data in a POSIX environment.
+ * \brief Example of using the library to download and parse
+ * instrument data from dataset1 or dataset4 in a POSIX environment.
  *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
@@ -37,7 +37,6 @@ RBRInstrumentError parserSample(
     struct tm sampleTime;
     gmtime_r(&sampleSeconds, &sampleTime);
     strftime(ftime, sizeof(ftime), "%F %T", &sampleTime);
-
     printf("%s.%03" PRIi64, ftime, sample->timestamp % 1000);
     for (int32_t i = 0; i < sample->channels; i++)
     {
@@ -52,6 +51,7 @@ int main(int argc, char *argv[])
 {
     char *programName = argv[0];
     char *devicePath;
+    int _downloadFrom;
 
     int status = EXIT_SUCCESS;
     int instrumentFd;
@@ -59,20 +59,30 @@ int main(int argc, char *argv[])
     RBRInstrumentError err;
     RBRInstrument *instrument = NULL;
 
-    if (argc < 2)
+    if (argc < 3)
     {
-        fprintf(stderr, "Usage: %s device\n", argv[0]);
+        fprintf(stderr, "command incomplete: %s\r\n", argv[0]);
+        printf("usage: <path>/dynamicCorrection-example <terminal> <dataset number>\r\n");
+        printf("       %s\r\n","e.g: ./posix-parse-download-dataset /dev/ttyS5 1");
         return EXIT_FAILURE;
     }
-
+    
     devicePath = argv[1];
-
     if ((instrumentFd = openSerialFd(devicePath)) < 0)
     {
         fprintf(stderr, "%s: Failed to open serial device: %s!\n",
                 programName,
                 strerror(errno));
         return EXIT_FAILURE;
+    }
+
+    _downloadFrom = strtol(argv[2], NULL, 10);
+    if(_downloadFrom != 1 && _downloadFrom !=4){
+        fprintf(stderr, "only dataset1 or dataset4 can be downloaded!");
+        return EXIT_FAILURE;
+    }
+    if (_downloadFrom == 4){
+        fprintf(stderr, "Warning: this code requires 5 channels' output. Please modify \"channels.count\" and \"channels.on\" to match your settings.\n");
     }
 
     fprintf(stderr,
@@ -105,18 +115,19 @@ int main(int argc, char *argv[])
     RBRInstrument_setUSBStreamingState(instrument, false);
     RBRInstrument_setSerialStreamingState(instrument, false);
 
-    if ((err = instrumentStart(instrument)) != RBRINSTRUMENT_SUCCESS)
-    {
-        fprintf(stderr,
-                "%s: Failed to start instrument: %s!\n",
-                programName,
-                RBRInstrumentError_name(err));
-        status = EXIT_FAILURE;
-        goto instrumentCleanup;
-    }
-
     RBRInstrumentChannels channels;
-    RBRInstrument_getChannels(instrument, &channels);
+    if (_downloadFrom == 1){
+        RBRInstrument_getChannels(instrument, &channels);
+    }
+    else if(_downloadFrom == 4){
+        //important!!!
+        //channels should be set the same number with output channels.
+        channels.count = 5;
+        channels.on = 5;
+        channels.settlingTime = 60;
+        channels.readTime = 290;
+        channels.minimumPeriod = 480;
+    }
 
     RBRParser *parser = NULL;
 
@@ -150,8 +161,9 @@ int main(int argc, char *argv[])
 
     uint8_t buf[1024];
     int32_t bufSize = 0;
+    RBRInstrumentDataset _numOfDataset = _downloadFrom;
     RBRInstrumentData data = {
-        .dataset = RBRINSTRUMENT_DATASET_EASYPARSE_SAMPLE_DATA,
+        .dataset = _numOfDataset,
         .offset  = 0
     };
     int32_t parsedSize;
@@ -161,6 +173,7 @@ int main(int argc, char *argv[])
         data.data = buf + bufSize;
         data.size = sizeof(buf) - bufSize;
         err = RBRInstrument_readData(instrument, &data);
+
         if (err == RBRINSTRUMENT_TIMEOUT)
         {
             printf("\nWarning: timeout. Retrying...\n");
@@ -180,6 +193,7 @@ int main(int argc, char *argv[])
                         RBRINSTRUMENT_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize);
+
         bufSize -= parsedSize;
         memmove(buf, buf + parsedSize, bufSize);
 
@@ -191,6 +205,7 @@ int main(int argc, char *argv[])
         };
         nanosleep(&sleep, NULL);
     }
+    
 instrumentCleanup:
     RBRInstrument_close(instrument);
 fileCleanup:
