@@ -1,5 +1,12 @@
 # Changes
 
+## v1.2.2
+
+Release 2021-12-01
+
+### Changed
+* default coefficients for dynamic correction updated.
+
 ## v1.2.1
 
 Release 2021-10-21

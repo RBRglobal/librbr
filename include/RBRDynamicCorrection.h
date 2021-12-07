@@ -39,17 +39,17 @@
 /*! @def DCORR_ALPHA
 * \brief Define the magnitude of short-term thermal mass correction (unitless)
 */
-#define DCORR_ALPHA         0.13f
+#define DCORR_ALPHA         0.041f
 /*! 
 *   @def DCORR_TAU
 * \brief Define the time constant of short-term thermal mass correction (seconds)
 */
-#define DCORR_TAU           5.9f
+#define DCORR_TAU           8.11f
 /*! 
 *   @def DCORR_CT_COEFF
 * \brief Define the magnitude of long-term thermal mass correction (unitless)
 */
-#define DCORR_CT_COEFF      1.02e-2f
+#define DCORR_CT_COEFF      0.97e-2f
 
 
 /**
