@@ -350,17 +350,11 @@ typedef RBRInstrumentError (*RBRInstrumentTimeCallback)(
  * Library functions will call this user code when they know the instrument
  * will be unavailable particularly when waking the instrument from sleep.
  *
- * Library functions will call this user code to determine whether an
- * instrument has likely gone to sleep (based on time of last communication).
- * The time returned should be independent of any instrument (i.e., a real
- * system time) and, while it must return a number of milliseconds, that number
- * need be relative only to other values returned by the callback (i.e.,
- * doesn't need to be an RTC time). On POSIX systems, the value can easily be
- * based on CLOCK_BOOTTIME (or CLOCK_MONOTONIC on older systems where
- * CLOCK_BOOTTIME is unavailable).
+ * Library functions will call this user code to suspend execution for a period
+ * of time.
  *
  * \param [in] instrument the instrument for which sleep is being requested
- * \param [out] time the current platform time in milliseconds
+ * \param [in] time the duration for which a sleep is requested
  * \return #RBRINSTRUMENT_SUCCESS when the time is successfully retrieved
  * \return #RBRINSTRUMENT_CALLBACK_ERROR when an unrecoverable error occurs
  * \see RBRInstrumentReadCallback() for details on how the values returned from
