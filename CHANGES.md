@@ -1,14 +1,5 @@
 # Changes
 
-## v1.2.3
-
-Released 2022-01-27
-
-### Changed
-
-* updated description of function RBRInstrumentSleepCallBack in RBRInstrument.h.
-
-
 ## v1.2.2
 
 Released 2021-12-01

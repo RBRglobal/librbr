@@ -10,7 +10,7 @@ from the low-level details
 of instrument communication
 by wrapping each instrument command
 in a function with fully typed arguments.
-Familiarity with the **[instrument command set]**
+Familiarity with the [**instrument command set**](https://docs.rbr-global.com/L3commandreference)
 is still required
 in order to know which commands to send,
 but the library handles the intricacies
