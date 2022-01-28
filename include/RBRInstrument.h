@@ -350,11 +350,11 @@ typedef RBRInstrumentError (*RBRInstrumentTimeCallback)(
  * Library functions will call this user code when they know the instrument
  * will be unavailable particularly when waking the instrument from sleep.
  *
- * Library functions will call this user code to suspend execution for a period
+ * Library functions will call this user code to suspend activity for a fixed amount
  * of time.
  *
  * \param [in] instrument the instrument for which sleep is being requested
- * \param [in] time the duration for which a sleep is requested
+ * \param [in] time the duration for which a sleep is requested in milliseconds
  * \return #RBRINSTRUMENT_SUCCESS when the time is successfully retrieved
  * \return #RBRINSTRUMENT_CALLBACK_ERROR when an unrecoverable error occurs
  * \see RBRInstrumentReadCallback() for details on how the values returned from

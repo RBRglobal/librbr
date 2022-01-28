@@ -10,7 +10,7 @@ from the low-level details
 of instrument communication
 by wrapping each instrument command
 in a function with fully typed arguments.
-Familiarity with the [instrument command set]
+Familiarity with the **[instrument command set]**
 is still required
 in order to know which commands to send,
 but the library handles the intricacies
@@ -195,7 +195,7 @@ for an overview of library conventions.
 
 API documentation is built into the `docs/` subdirectory.
 Prebuilt API documentation corresponding to the latest release
-is available at https://docs.rbr-global.com/librbr/.
+is available at **https://docs.rbr-global.com/librbr/.**
 
 For examples,
 please see the `examples/` subdirectory.

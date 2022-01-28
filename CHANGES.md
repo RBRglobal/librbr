@@ -1,24 +1,35 @@
 # Changes
 
-## v1.2.2
+## v1.2.3
 
-Release 2021-12-01
+Released 2022-01-27
 
 ### Changed
+
+* updated description of function RBRInstrumentSleepCallBack in RBRInstrument.h.
+
+
+## v1.2.2
+
+Released 2021-12-01
+
+### Changed
+
 * default coefficients for dynamic correction updated.
 
 ## v1.2.1
 
-Release 2021-10-21
+Released 2021-10-21
 
 ### Changed
+
 * method of dynamic correction updated.
 * default coefficients updated.
 * added README.md for the posix examples and the example in dynamicCorrection folder.
 
 ## v1.2.0
 
-Release 2021-06-04
+Released 2021-06-04
 
 ### Added
 
