@@ -1,68 +1,90 @@
 pipelines:
     default:
-        - step:
-            name: GCC 6 compilation
-            image: gcc:6
-            script:
-                - apt-get update && apt-get -y install libsdl2-dev
-                - make clean
-                - make lib tests
-                - cd examples/posix
-                - make clean
-                - make
-        - step:
-            name: GCC 7 compilation
-            image: gcc:7
-            script:
-                - apt-get update && apt-get -y install libsdl2-dev
-                - make clean
-                - make lib tests
-                - cd examples/posix
-                - make clean
-                - make
-        - step:
-            name: GCC 8 compilation
-            image: gcc:8
-            script:
-                - apt-get update && apt-get -y install libsdl2-dev
-                - make clean
-                - make lib tests
-                - cd examples/posix
-                - make clean
-                - make
-        - step:
-            name: GCC 9 compilation
-            image: gcc:9
-            script:
-                - apt-get update && apt-get -y install libsdl2-dev
-                - make clean
-                - make lib tests
-                - cd examples/posix
-                - make clean
-                - make
+        - parallel:
+            - step:
+                name: GCC 6 compilation
+                image: gcc:6
+                script:
+                    - apt-get update && apt-get -y install libsdl2-dev
+                    - make clean
+                    - make lib tests
+                    - cd examples/posix
+                    - make clean
+                    - make
+            - step:
+                name: GCC 7 compilation
+                image: gcc:7
+                script:
+                    - apt-get update && apt-get -y install libsdl2-dev
+                    - make clean
+                    - make lib tests
+                    - cd examples/posix
+                    - make clean
+                    - make
+            - step:
+                name: GCC 8 compilation
+                image: gcc:8
+                script:
+                    - apt-get update && apt-get -y install libsdl2-dev
+                    - make clean
+                    - make lib tests
+                    - cd examples/posix
+                    - make clean
+                    - make
+            - step:
+                name: GCC 9 compilation
+                image: gcc:9
+                script:
+                    - apt-get update && apt-get -y install libsdl2-dev
+                    - make clean
+                    - make lib tests
+                    - cd examples/posix
+                    - make clean
+                    - make
+            - step:
+                name: GCC 10 compilation
+                image: gcc:10
+                script:
+                    - apt-get update && apt-get -y install libsdl2-dev
+                    - make clean
+                    - make lib tests
+                    - cd examples/posix
+                    - make clean
+                    - make
+            - step:
+                name: GCC 11 compilation
+                image: gcc:11
+                script:
+                    - apt-get update && apt-get -y install libsdl2-dev
+                    - make clean
+                    - make lib tests
+                    - cd examples/posix
+                    - make clean
+                    - make
 
-        # To save time, and under the assumption that the quality and relevance
-        # of scan-build findings will only improve over time, we'll perform
-        # static analysis with only the latest version of Clang.
-        - step:
-            name: Clang 9 compilation and static analysis
-            image: rsmmr/clang:9.0
-            script:
-                - apt-get update && apt-get -y install libsdl2-dev
-                - export CC=/opt/clang/bin/clang
-                - make clean
-                - scan-build make lib
-                - make lib tests
-                - cd examples/posix
-                - make clean
-                - scan-build make
+            # To save time, and under the assumption that the quality and
+            # relevance of scan-build findings will only improve over time,
+            # we'll perform static analysis with only the latest version of
+            # Clang.
+            - step:
+                name: Clang 12 compilation and static analysis
+                image: silkeh/clang:12
+                script:
+                    - apt-get update && apt-get -y install libsdl2-dev
+                    - export CC=clang CCC_CC=clang
+                    - make clean
+                    - scan-build make lib libdynamiccorrection
+                    - make tests
+                    - cd examples/posix
+                    - make clean
+                    - scan-build make
 
-        - step:
-            name: Documentation compilation
-            image: gcc:9
-            script:
-                - apt-get update && apt-get -y install doxygen graphviz
-                - make clean
-                - make docs
-                - make clean
-                - make devdocs
+            - step:
+                name: Documentation compilation
+                image: gcc:11
+                script:
+                    - apt-get update && apt-get -y install doxygen graphviz
+                    - make clean
+                    - make docs
+                    - make clean
+                    - make devdocs
