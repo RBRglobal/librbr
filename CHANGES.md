@@ -1,5 +1,15 @@
 # Changes
 
+## v1.2.3
+
+Release TBD
+
+### Changed
+
+* updated description of function RBRInstrumentSleepCallBack in RBRInstrument.h.
+* pipelines steps changed to parallel.
+* pipelines added steps: GCC10, GCC11, Clang12.
+
 ## v1.2.2
 
 Released 2021-12-01
