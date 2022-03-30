@@ -72,7 +72,7 @@ RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument,
         }
     }
 
-    if ((size_t) *commandBufferLength + RBRINSTRUMENT_COMMAND_TERMINATOR_LEN
+    if ((size_t) *commandBufferLength + RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN
         > sizeof(instrument->commandBuffer))
     {
         RBR_TRY(RBRInstrument_sendBuffer(instrument));
@@ -82,7 +82,7 @@ RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument,
     *commandBufferLength += snprintf(
         commandBuffer + *commandBufferLength,
         sizeof(instrument->commandBuffer) - *commandBufferLength,
-        RBRINSTRUMENT_COMMAND_TERMINATOR);
+        RBRINSTRUMENT_SEND_COMMAND_TERMINATOR);
 
     RBR_TRY(RBRInstrument_sendBuffer(instrument));
 
