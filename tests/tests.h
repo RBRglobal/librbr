@@ -177,7 +177,7 @@ extern "C" {
 #define TESTIOBUFFERS_WRITE_BUFFER_SIZE 4096
 
 /** \brief The characters terminating an instrument command response. */
-#define COMMAND_TERMINATOR "\r\n"
+#define COMMAND_TERMINATOR "\r"
 
 /** \brief The maximum number of parsed samples to buffer. */
 #define TESTPARSERBUFFERS_SAMPLES_MAX 64
