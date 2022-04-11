@@ -26,7 +26,7 @@
 /*! @def DCORR_ERROR_PERIOD
 * \brief Define the period before an error condition in the algorithm is cleared (in seconds)
 */
-#define DCORR_ERROR_PERIOD  10.0f
+#define DCORR_ERROR_PERIOD  0.01f
 
 
 /* default parameters
