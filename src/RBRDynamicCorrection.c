@@ -164,7 +164,7 @@ float RBRDynamicCorrection_applyTempCorr(RBRDynamicCorrectionParams *params, flo
 {
     float T_cor;
 
-    /* (first evaluation will be incorrect, but won't be used */
+    /* (first evaluation will be incorrect, but won't be used) */
     T_cor = (1.0 - params->_phi)*params->_T_meas_lag + (params->_phi)*T_meas;
 
     return T_cor;
