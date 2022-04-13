@@ -230,32 +230,32 @@ int main(int argc, char *argv[])
      * and store channel index in an array dynamicCorrection_chlIndex[] 
      */
     else if (labelList.count >= 4){
-        for (int ch_id = 0; ch_id < labelList.count; ch_id++)
+        for (int _index = 0; _index < labelList.count; _index++)
         {
-            if (strcmp(labelList.labels[ch_id], "conductivity_00") == 0)
+            if (strcmp(labelList.labels[_index], "conductivity_00") == 0)
             {
-                dynamicCorrection_chlIndex[0] = ch_id;
+                dynamicCorrection_chlIndex[0] = _index;
                 i++;
             }
-            else if (strcmp(labelList.labels[ch_id], "temperature_00") == 0)
+            else if (strcmp(labelList.labels[_index], "temperature_00") == 0)
             {
-                dynamicCorrection_chlIndex[1] = ch_id;
+                dynamicCorrection_chlIndex[1] = _index;
                 i++;
             }
-            else if (strcmp(labelList.labels[ch_id], "pressure_00") == 0)
+            else if (strcmp(labelList.labels[_index], "pressure_00") == 0)
             {
-                _indexAbsP = ch_id;
+                _indexAbsP = _index;
                 _foundAbsP = true;
                 i++;
             }
-            else if (strcmp(labelList.labels[ch_id], "seapressure_00") == 0)
+            else if (strcmp(labelList.labels[_index], "seapressure_00") == 0)
             {
-                _indexSeaP = ch_id;
+                _indexSeaP = _index;
                 i++;
             }
-            else if (strcmp(labelList.labels[ch_id], "conductivitycelltemperature_00") == 0)
+            else if (strcmp(labelList.labels[_index], "conductivitycelltemperature_00") == 0)
             {
-                dynamicCorrection_chlIndex[3] = ch_id;
+                dynamicCorrection_chlIndex[3] = _index;
                 i++;
             }
         }
@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
     }
     
     if ( isCtd == false ){
-        fprintf(stderr, "Warning: Logger doesn't have all these channels on:\n  conductivity_00, temperature_00, pressure_00|seapressure_00, conductivitycelltemperature_00\n");
+        fprintf(stderr, "Warning: Logger doesn't have all these channels ON:\n  conductivity_00, temperature_00, pressure_00|seapressure_00, conductivitycelltemperature_00\n");
         goto instrumentCleanup;
     }
 
