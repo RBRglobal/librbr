@@ -12,7 +12,7 @@
 
 typedef struct LinkTest
 {
-    const char *command;
+    const char *response;
     RBRInstrumentLink expected;
 } LinkTest;
 
@@ -23,9 +23,9 @@ static bool test_link(RBRInstrument *instrument,
     RBRInstrumentError err;
     RBRInstrumentLink actual;
 
-    for (int i = 0; tests[i].command != NULL; i++)
+    for (int i = 0; tests[i].response != NULL; i++)
     {
-        TestIOBuffers_init(buffers, tests[i].command, 0);
+        TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_getLink(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
         TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, RBRInstrumentLink);
@@ -37,9 +37,9 @@ static bool test_link(RBRInstrument *instrument,
 TEST_LOGGER2(link)
 {
     LinkTest tests[] = {
-        {"link = usb" COMMAND_TERMINATOR, RBRINSTRUMENT_LINK_USB},
-        {"link = serial" COMMAND_TERMINATOR, RBRINSTRUMENT_LINK_SERIAL},
-        {"link = wifi" COMMAND_TERMINATOR, RBRINSTRUMENT_LINK_WIFI},
+        {"link = usb" RESPONSE_TERMINATOR, RBRINSTRUMENT_LINK_USB},
+        {"link = serial" RESPONSE_TERMINATOR, RBRINSTRUMENT_LINK_SERIAL},
+        {"link = wifi" RESPONSE_TERMINATOR, RBRINSTRUMENT_LINK_WIFI},
         {0}
     };
 
@@ -49,9 +49,9 @@ TEST_LOGGER2(link)
 TEST_LOGGER3(link)
 {
     LinkTest tests[] = {
-        {"link type = usb" COMMAND_TERMINATOR, RBRINSTRUMENT_LINK_USB},
-        {"link type = serial" COMMAND_TERMINATOR, RBRINSTRUMENT_LINK_SERIAL},
-        {"link type = wifi" COMMAND_TERMINATOR, RBRINSTRUMENT_LINK_WIFI},
+        {"link type = usb" RESPONSE_TERMINATOR, RBRINSTRUMENT_LINK_USB},
+        {"link type = serial" RESPONSE_TERMINATOR, RBRINSTRUMENT_LINK_SERIAL},
+        {"link type = wifi" RESPONSE_TERMINATOR, RBRINSTRUMENT_LINK_WIFI},
         {0}
     };
 
@@ -60,7 +60,7 @@ TEST_LOGGER3(link)
 
 typedef struct SerialTest
 {
-    const char *command;
+    const char *response;
     RBRInstrumentSerial expected;
 } SerialTest;
 
@@ -68,7 +68,7 @@ TEST_LOGGER2(serial)
 {
     SerialTest tests[] = {
         {
-            "serial baudrate = 19200, mode = rs232" COMMAND_TERMINATOR,
+            "serial baudrate = 19200, mode = rs232" RESPONSE_TERMINATOR,
             {
                 RBRINSTRUMENT_SERIAL_BAUD_19200,
                 RBRINSTRUMENT_SERIAL_MODE_RS232,
@@ -85,7 +85,7 @@ TEST_LOGGER2(serial)
             }
         },
         {
-            "serial baudrate = 115200, mode = rs485f" COMMAND_TERMINATOR,
+            "serial baudrate = 115200, mode = rs485f" RESPONSE_TERMINATOR,
             {
                 RBRINSTRUMENT_SERIAL_BAUD_115200,
                 RBRINSTRUMENT_SERIAL_MODE_RS485F,
@@ -107,9 +107,9 @@ TEST_LOGGER2(serial)
     RBRInstrumentError err;
     RBRInstrumentSerial actual;
 
-    for (int i = 0; tests[i].command != NULL; i++)
+    for (int i = 0; tests[i].response != NULL; i++)
     {
-        TestIOBuffers_init(buffers, tests[i].command, 0);
+        TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_getSerial(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate,
@@ -135,7 +135,7 @@ TEST_LOGGER3(serial)
         {
             "serial baudrate = 19200, mode = rs232, availablebaudrates = "
             "115200|19200|9600|4800|2400|1200|230400|460800, availablemodes = "
-            "rs232|rs485f|uart|uart_idlelow" COMMAND_TERMINATOR,
+            "rs232|rs485f|uart|uart_idlelow" RESPONSE_TERMINATOR,
             {
                 RBRINSTRUMENT_SERIAL_BAUD_19200,
                 RBRINSTRUMENT_SERIAL_MODE_RS232,
@@ -156,7 +156,7 @@ TEST_LOGGER3(serial)
         {
             "serial baudrate = 115200, mode = rs485f, availablebaudrates = "
             "115200|19200|9600|4800|2400|1200|230400|460800, availablemodes = "
-            "rs232|rs485f|uart|uart_idlelow" COMMAND_TERMINATOR,
+            "rs232|rs485f|uart|uart_idlelow" RESPONSE_TERMINATOR,
             {
                 RBRINSTRUMENT_SERIAL_BAUD_115200,
                 RBRINSTRUMENT_SERIAL_MODE_RS485F,
@@ -180,9 +180,9 @@ TEST_LOGGER3(serial)
     RBRInstrumentError err;
     RBRInstrumentSerial actual;
 
-    for (int i = 0; tests[i].command != NULL; i++)
+    for (int i = 0; tests[i].response != NULL; i++)
     {
-        TestIOBuffers_init(buffers, tests[i].command, 0);
+        TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_getSerial(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate,
@@ -207,8 +207,7 @@ TEST_LOGGER3(sleep)
     TestIOBuffers_init(buffers, "", 0);
     RBRInstrumentError err = RBRInstrument_sleep(instrument);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ("sleep" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("sleep" COMMAND_TERMINATOR,buffers->writeBuffer);
     TEST_ASSERT(instrument->lastActivityTime < 0);
 
     return true;
@@ -216,7 +215,7 @@ TEST_LOGGER3(sleep)
 
 typedef struct WiFiTest
 {
-    const char *command;
+    const char *response;
     RBRInstrumentError expectedError;
     RBRInstrumentWiFi expected;
 } WiFiTest;
@@ -228,9 +227,9 @@ static bool test_wifi(RBRInstrument *instrument,
     RBRInstrumentError err;
     RBRInstrumentWiFi actual;
 
-    for (int i = 0; tests[i].command != NULL; i++)
+    for (int i = 0; tests[i].response != NULL; i++)
     {
-        TestIOBuffers_init(buffers, tests[i].command, 0);
+        TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_getWiFi(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentError);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.enabled, actual.enabled, bool);
@@ -255,7 +254,7 @@ TEST_LOGGER2(wifi)
 {
     WiFiTest tests[] = {
         {
-            "wifi timeout = 60, commandtimeout = 90" COMMAND_TERMINATOR,
+            "wifi timeout = 60, commandtimeout = 90" RESPONSE_TERMINATOR,
             RBRINSTRUMENT_SUCCESS,
             {
                 false,
@@ -276,7 +275,7 @@ TEST_LOGGER3(wifi)
     WiFiTest tests[] = {
         {
             "wifi enabled = false, state = n/a, timeout = 60, "
-            "commandtimeout = 60, baudrate = 921600" COMMAND_TERMINATOR,
+            "commandtimeout = 60, baudrate = 921600" RESPONSE_TERMINATOR,
             RBRINSTRUMENT_SUCCESS,
             {
                 false,
@@ -288,7 +287,7 @@ TEST_LOGGER3(wifi)
         },
         {
             "wifi enabled = true, state = off, timeout = 90, "
-            "commandtimeout = 30, baudrate = 921600" COMMAND_TERMINATOR,
+            "commandtimeout = 30, baudrate = 921600" RESPONSE_TERMINATOR,
             RBRINSTRUMENT_SUCCESS,
             {
                 true,
@@ -299,7 +298,7 @@ TEST_LOGGER3(wifi)
             }
         },
         {
-            "E0109 feature not available" COMMAND_TERMINATOR,
+            "E0109 feature not available" RESPONSE_TERMINATOR,
             RBRINSTRUMENT_HARDWARE_ERROR,
             {
                 false,

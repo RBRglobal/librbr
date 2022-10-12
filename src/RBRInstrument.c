@@ -12,6 +12,7 @@
 #include <string.h>
 /* Required for free/malloc. */
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "RBRInstrument.h"
 #include "RBRInstrumentInternal.h"

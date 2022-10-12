@@ -315,6 +315,8 @@ static RBRInstrumentError RBRInstrument_readSingleResponse(
         RBR_TRY(instrument->callbacks.time(instrument, &now));
         if (now - startTime > instrument->commandTimeout)
         {
+
+
             return RBRINSTRUMENT_TIMEOUT;
         }
 
@@ -330,7 +332,6 @@ static RBRInstrumentError RBRInstrument_readSingleResponse(
 
         readLength = RBRINSTRUMENT_RESPONSE_BUFFER_MAX
                      - instrument->responseBufferLength;
-
         RBR_TRY(instrument->callbacks.read(
                     instrument,
                     instrument->responseBuffer

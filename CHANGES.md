@@ -9,6 +9,7 @@ Release TBD
 * updated description of function RBRInstrumentSleepCallBack in RBRInstrument.h.
 * pipelines steps changed to parallel.
 * pipelines added steps: GCC10, GCC11, Clang12.
+* command terminator changed to \r instead of \r\n.
 
 ## v1.2.2
 

@@ -12,7 +12,7 @@
 
 typedef struct ThresholdingTest
 {
-    const char *command;
+    const char *response;
     RBRInstrumentThresholding expected;
 } ThresholdingTest;
 
@@ -23,9 +23,9 @@ static bool test_thresholding(RBRInstrument *instrument,
     RBRInstrumentError err;
     RBRInstrumentThresholding actual;
 
-    for (int i = 0; tests[i].command != NULL; i++)
+    for (int i = 0; tests[i].response != NULL; i++)
     {
-        TestIOBuffers_init(buffers, tests[i].command, 0);
+        TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_getThresholding(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.enabled, actual.enabled, bool);
@@ -57,7 +57,7 @@ TEST_LOGGER2(thresholding)
     ThresholdingTest tests[] = {
         {
             "thresholding state = off, channel = 1, condition = above, "
-            "value = 0.0000, interval = 60000" COMMAND_TERMINATOR,
+            "value = 0.0000, interval = 60000" RESPONSE_TERMINATOR,
             {
                 .enabled = false,
                 .state = RBRINSTRUMENT_UNKNOWN_GATING,
@@ -81,7 +81,7 @@ TEST_LOGGER3(thresholding)
         {
             "thresholding enabled = false, state = n/a, channelindex = 1, "
             "channellabel = temperature_00, condition = above, value = 0.0000, "
-            "interval = 60000" COMMAND_TERMINATOR,
+            "interval = 60000" RESPONSE_TERMINATOR,
             {
                 .enabled = false,
                 .state = RBRINSTRUMENT_GATING_NA,
@@ -96,7 +96,7 @@ TEST_LOGGER3(thresholding)
         {
             "thresholding enabled = true, state = paused, channelindex = 2, "
             "channellabel = pressure_00, condition = below, value = 600.0000, "
-            "interval = 10000" COMMAND_TERMINATOR,
+            "interval = 10000" RESPONSE_TERMINATOR,
             {
                 .enabled = true,
                 .state = RBRINSTRUMENT_GATING_PAUSED,
@@ -112,7 +112,7 @@ TEST_LOGGER3(thresholding)
             "thresholding enabled = true, state = paused, channelindex = 2, "
             "channellabel = thispressurelabelislongerthanthe31characterlimit, "
             "condition = below, value = 600.0000, interval = 10000"
-            COMMAND_TERMINATOR,
+            RESPONSE_TERMINATOR,
             {
                 .enabled = true,
                 .state = RBRINSTRUMENT_GATING_PAUSED,
@@ -143,15 +143,17 @@ TEST_LOGGER2(thresholding_set)
 
     RBRInstrumentError err;
 
-    const char *response = "thresholding state = on, channel = 1, "
+    const char *text = "thresholding state = on, channel = 1, "
                            "condition = above, value = 0.0000, "
-                           "interval = 60000" COMMAND_TERMINATOR;
+                           "interval = 60000";
+    char expectedCommand[1024];
+    char response[1024];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
     err = RBRInstrument_setThresholding(instrument, &threshold);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(response, buffers->writeBuffer);
-
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     return true;
 }
 
@@ -168,14 +170,22 @@ TEST_LOGGER3(thresholding_set_channel_by_index)
 
     RBRInstrumentError err;
 
-    const char *response = "thresholding enabled = true, channelindex = 1, "
+    const char *text = "thresholding enabled = true, channelindex = 1, "
                            "condition = above, value = 0.0000, "
-                           "interval = 60000" COMMAND_TERMINATOR;
+                           "interval = 60000";
+    char expectedCommand[1024];
+    char response[1024];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
+
+    // const char *command = "thresholding enabled = true, channelindex = 1, "
+    //                        "condition = above, value = 0.0000, "
+    //                        "interval = 60000"
+    //                         COMMAND_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
     err = RBRInstrument_setThresholding(instrument, &threshold);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(response, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -193,22 +203,24 @@ TEST_LOGGER3(thresholding_set_channel_by_label)
 
     RBRInstrumentError err;
 
-    const char *response = "thresholding enabled = false, "
+    const char *text = "thresholding enabled = false, "
                            "channellabel = pressure_00, condition = below, "
-                           "value = 30.0000, interval = 30000"
-                           COMMAND_TERMINATOR;
+                           "value = 30.0000, interval = 30000";
+    char expectedCommand[1024];
+    char response[1024];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
     err = RBRInstrument_setThresholding(instrument, &threshold);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(response, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
 
 typedef struct TwistActivationTest
 {
-    const char *command;
+    const char *response;
     RBRInstrumentTwistActivation expected;
 } TwistActivationTest;
 
@@ -219,9 +231,9 @@ static bool test_twistactivation(RBRInstrument *instrument,
     RBRInstrumentError err;
     RBRInstrumentTwistActivation actual;
 
-    for (int i = 0; tests[i].command != NULL; i++)
+    for (int i = 0; tests[i].response != NULL; i++)
     {
-        TestIOBuffers_init(buffers, tests[i].command, 0);
+        TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_getTwistActivation(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.enabled, actual.enabled, bool);
@@ -237,14 +249,14 @@ TEST_LOGGER2(twistactivation)
 {
     TwistActivationTest tests[] = {
         {
-            "twistactivation state = off, location = off" COMMAND_TERMINATOR,
+            "twistactivation state = off, location = off" RESPONSE_TERMINATOR,
             {
                 .enabled = false,
                 .state = RBRINSTRUMENT_UNKNOWN_GATING
             }
         },
         {
-            "twistactivation state = on, location = who cares" COMMAND_TERMINATOR,
+            "twistactivation state = on, location = who cares" RESPONSE_TERMINATOR,
             {
                 .enabled = true,
                 .state = RBRINSTRUMENT_UNKNOWN_GATING
@@ -260,7 +272,7 @@ TEST_LOGGER3(twistactivation)
 {
     TwistActivationTest tests[] = {
         {
-            "twistactivation enabled = false, state = n/a" COMMAND_TERMINATOR,
+            "twistactivation enabled = false, state = n/a" RESPONSE_TERMINATOR,
             {
                 .enabled = false,
                 .state = RBRINSTRUMENT_GATING_NA
@@ -268,7 +280,7 @@ TEST_LOGGER3(twistactivation)
         },
         {
             "twistactivation enabled = true, state = paused"
-            COMMAND_TERMINATOR,
+            RESPONSE_TERMINATOR,
             {
                 .enabled = true,
                 .state = RBRINSTRUMENT_GATING_PAUSED
@@ -276,7 +288,7 @@ TEST_LOGGER3(twistactivation)
         },
         {
             "twistactivation enabled = true, state = running"
-            COMMAND_TERMINATOR,
+            RESPONSE_TERMINATOR,
             {
                 .enabled = true,
                 .state = RBRINSTRUMENT_GATING_RUNNING
@@ -296,12 +308,15 @@ TEST_LOGGER2(twistactivation_set)
 
     RBRInstrumentError err;
 
-    const char *response = "twistactivation state = on" COMMAND_TERMINATOR;
+    const char *text = "twistactivation state = on";
+    char expectedCommand[1024];
+    char response[1024];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
     err = RBRInstrument_setTwistActivation(instrument, &twistActivation);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(response, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -314,12 +329,15 @@ TEST_LOGGER3(twistactivation_set)
 
     RBRInstrumentError err;
 
-    const char *response = "twistactivation enabled = true" COMMAND_TERMINATOR;
+    const char *text = "twistactivation enabled = true";
+    char expectedCommand[1024];
+    char response[1024];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
     err = RBRInstrument_setTwistActivation(instrument, &twistActivation);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(response, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }

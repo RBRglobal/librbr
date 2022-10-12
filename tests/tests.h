@@ -176,8 +176,11 @@ extern "C" {
 /** \brief The size of the write buffer used for tests. */
 #define TESTIOBUFFERS_WRITE_BUFFER_SIZE 4096
 
-/** \brief The characters terminating an instrument command response. */
+/** \brief The characters terminating an instrument command. */
 #define COMMAND_TERMINATOR "\r"
+
+/** \brief The characters terminating an instrument command response. */
+#define RESPONSE_TERMINATOR "\r\n"
 
 /** \brief The maximum number of parsed samples to buffer. */
 #define TESTPARSERBUFFERS_SAMPLES_MAX 64
@@ -203,6 +206,21 @@ extern "C" {
  * \return the destination string buffer
  */
 char *rbr_strnesccntrl(char *destination, const char *source, size_t num);
+
+/**
+ * \brief Prepare expectedCommand and response with correct terminator for TestIOBuffers.
+ *
+ * This function is usually used in tests to set parameters. 
+ * 
+ * Terminators are defined in tests.h as COMMAND_TERMINATOR and RESPONSE_TERMINATOR.
+ * expectedCommand and response are defined in each test, set as char xx[1024]. 
+ * expectedCommand will terminate with COMMAND_TERMINATOR, and response will terminate with RESPONSE_TERMINATOR.
+ *
+ * \param [in] text the string used in command and appear in response
+ * \param [in] expectedCommand the command expected to be written to TESTIOBuffers->writeBuffer
+ * \param [in] response the response expected to be in TESTIOBuffers->readBuffer
+ */
+void rbr_prepareCommandResponse(const char *text, char *expectedCommand, char *response);
 
 /**
  * \brief The I/O buffers used for tests.

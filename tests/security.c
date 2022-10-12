@@ -12,22 +12,30 @@
 
 TEST_LOGGER2(permit)
 {
-    const char *command = "permit = foo" COMMAND_TERMINATOR;
-    TestIOBuffers_init(buffers, command, 0);
+    const char *text = "permit = foo";
+    char expectedCommand[1024];
+    char response[1024];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
+
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_permit(instrument, "foo");
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
 
 TEST_LOGGER3(permit)
 {
-    const char *command = "permit command = foo" COMMAND_TERMINATOR;
-    TestIOBuffers_init(buffers, command, 0);
+    const char *text = "permit command = foo";
+    char expectedCommand[1024];
+    char response[1024];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
+
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_permit(instrument, "foo");
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -37,7 +45,7 @@ TEST_LOGGER3(prompt)
     bool expected = true;
     bool actual = false;
 
-    TestIOBuffers_init(buffers, "prompt state = on" COMMAND_TERMINATOR, 0);
+    TestIOBuffers_init(buffers, "prompt state = on" RESPONSE_TERMINATOR, 0);
     RBRInstrumentError err = RBRInstrument_getPrompt(instrument, &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
     TEST_ASSERT_ENUM_EQ(expected, actual, bool);
@@ -49,11 +57,15 @@ TEST_LOGGER3(prompt)
 
 TEST_LOGGER3(prompt_set)
 {
-    const char *command = "prompt state = on" COMMAND_TERMINATOR;
-    TestIOBuffers_init(buffers, command, 0);
+    const char *text = "prompt state = on";
+    char expectedCommand[1024];
+    char response[1024];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
+
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_setPrompt(instrument, true);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -64,7 +76,7 @@ TEST_LOGGER3(confirmation)
     bool actual = false;
 
     TestIOBuffers_init(buffers,
-                       "confirmation state = on" COMMAND_TERMINATOR,
+                       "confirmation state = on" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getConfirmation(instrument,
                                                            &actual);
@@ -78,11 +90,15 @@ TEST_LOGGER3(confirmation)
 
 TEST_LOGGER3(confirmation_set_on)
 {
-    const char *command = "confirmation state = on" COMMAND_TERMINATOR;
-    TestIOBuffers_init(buffers, command, 0);
+    const char *text = "confirmation state = on";
+    char expectedCommand[1024];
+    char response[1024];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
+
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_setConfirmation(instrument, true);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -101,7 +117,7 @@ TEST_LOGGER3(confirmation_set_off)
 TEST_LOGGER3(reboot)
 {
     TestIOBuffers_init(buffers,
-                       "permit command = reboot" COMMAND_TERMINATOR,
+                       "permit command = reboot" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_reboot(instrument, 123);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);

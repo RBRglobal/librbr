@@ -53,6 +53,20 @@ char *rbr_strnesccntrl(char *destination, const char *source, size_t num)
     return destination;
 }
 
+void rbr_prepareCommandResponse(const char *text, char *expectedCommand, char *response){
+    //some tests have command="", such as "sampling_set" for Logger3 in tests/schedule.c
+    if (strlen(text)!=0){
+        strcpy(expectedCommand, text);
+        strcat(expectedCommand, COMMAND_TERMINATOR);
+
+        strcpy(response, text);
+        strcat(response, RESPONSE_TERMINATOR);
+    }
+    else{
+        expectedCommand[0]='\0';
+    }
+}
+
 void TestIOBuffers_init(TestIOBuffers *buffers,
                         const char *readBuffer,
                         int32_t readBufferSize)
@@ -100,9 +114,9 @@ RBRInstrumentError TestIOBuffers_read(
     {
         fprintf(
             stderr,
-            "TestIOBuffers_read: read buffer underrun! (%" PRIi32 "B "
+            "%s line %d, TestIOBuffers_read: read buffer underrun! (%" PRIi32 "B "
             "requested.)\n",
-            *size);
+            __FILE__, __LINE__, *size);
         return RBRINSTRUMENT_CALLBACK_ERROR;
     }
     else if (readLength > *size)
@@ -219,9 +233,9 @@ int main()
     TestIOBuffers_init(
         &ioBuffers,
         "RBR RBRoem 1.430 999999"
-        COMMAND_TERMINATOR
+        RESPONSE_TERMINATOR
         "id model = RBRoem, version = 1.430, serial = 999999, fwtype = 103"
-        COMMAND_TERMINATOR,
+        RESPONSE_TERMINATOR,
         0);
     err = RBRInstrument_open(&instrumentL2,
                              &instrumentCallbacks,
@@ -244,9 +258,9 @@ int main()
     TestIOBuffers_init(
         &ioBuffers,
         "RBR RBRduo3 1.090 999999"
-        COMMAND_TERMINATOR
+        RESPONSE_TERMINATOR
         "id model = RBRoem3, version = 1.134, serial = 999999, fwtype = 104"
-        COMMAND_TERMINATOR,
+        RESPONSE_TERMINATOR,
         0);
     err = RBRInstrument_open(&instrumentL3,
                              &instrumentCallbacks,
