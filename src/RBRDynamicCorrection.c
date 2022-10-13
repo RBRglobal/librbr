@@ -159,12 +159,12 @@ void RBRDynamicCorrection_initLagArray(RBRDynamicCorrectionParams *params)
     }
 }
 
-/* apply temparature interpolation */
+/* apply temperature interpolation */
 float RBRDynamicCorrection_applyTempCorr(RBRDynamicCorrectionParams *params, float T_meas)
 {
     float T_cor;
 
-    /* (first evaluation will be incorrect, but won't be used */
+    /* (first evaluation will be incorrect, but won't be used) */
     T_cor = (1.0 - params->_phi)*params->_T_meas_lag + (params->_phi)*T_meas;
 
     return T_cor;
@@ -243,6 +243,28 @@ void RBRDynamicCorrection_resampleLag(RBRDynamicCorrectionParams *params, float 
     memcpy(params->_T_cond_lagArray, T_cond_array, DCORR_MAX_LAG_ARRAY*sizeof(float));
 }
 
+/* resample all lagged variables using new sampling rate
+ * (this implementation repeat the last sample value.  This is
+ * used when the timestamp cannot be used to perform true resample).
+ * Keep the interface the same as the other analogous function. */
+void RBRDynamicCorrection_resampleLag_repeat(RBRDynamicCorrectionParams *params, float timestamp, float Fs)
+{
+    /* Unused. */
+    (void) timestamp;
+    (void) Fs;
+    
+    int k;
+
+    /* don't change the timestamp, don't change the valid flag.
+     * (this should be enough to prevent a glitch between sampling rate transition) */
+    for (k = 1; k < DCORR_MAX_LAG_ARRAY-1; k++)
+    {
+        params->_C_meas_lagArray[k] = params->_C_meas_lagArray[0];
+        params->_P_meas_lagArray[k] = params->_P_meas_lagArray[0];
+        params->_T_cond_lagArray[k] = params->_T_cond_lagArray[0];
+    }
+}
+
 /* update all lagged variables */
 int32_t RBRDynamicCorrection_updateLag(RBRDynamicCorrectionParams *params, const RBRDynamicCorrectionMeasurement * measIn, RBRDynamicCorrectionMeasurement * meas_out)
 {
@@ -282,7 +304,6 @@ int32_t RBRDynamicCorrection_updateLag(RBRDynamicCorrectionParams *params, const
     return isValid;
 }
 
-
 RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionParams *params, float Fs)
 {
     float F_nyquist;
@@ -303,8 +324,7 @@ RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionPar
     params->_T_short_lag = params->_T_short_lag;
 
     RBRDynamicCorrection_initCorrectionCoeff(params, Fs);
-    //RBRDynamicCorrection_initLagArray(params);
-    RBRDynamicCorrection_resampleLag(params, params->_timestamp_lagArray[0], Fs);
+    RBRDynamicCorrection_resampleLag_repeat(params, params->_timestamp_lagArray[0], Fs);
 
     return RBR_DCORR_SUCCESS;
 }
@@ -351,10 +371,15 @@ RBRDynamicCorrectionError RBRDynamicCorrection_addMeasurement(RBRDynamicCorrecti
     float timestamp;
     float C_meas, T_meas, P_meas, T_cond;
     float S_cor;
+    int32_t isFasterSampling;
     int32_t isValid;
     int32_t isDataError;
     RBRDynamicCorrectionError statusCode = DYN_CORR_UNKNOWN_ERROR;
 
+    /* flag to indicate 'fast sampling (>= 1Hz)'.
+     * In this case, the data won't go through the 0.35s lag and
+     * it will bypass the short-term thermal correction */
+    isFasterSampling = (params->Fs >= 1.0f) ? 1 : 0;
 
     T_meas = measIn->marineTemperature;
 
@@ -366,10 +391,31 @@ RBRDynamicCorrectionError RBRDynamicCorrection_addMeasurement(RBRDynamicCorrecti
         params->_firstCall = 0;
     }
 
+    // Interpolate the temperature with time offset 't_delay'.
+    // (only for >= 1Hz data rate)
+    if ( isFasterSampling )
+    {
     T_cor = RBRDynamicCorrection_applyTempCorr(params, T_meas);
+    }
+    else
+    {
+        T_cor = T_meas;
+    }
 
-    /* the variables need to be delayed until all samples are available for calculation */
+    /* the variables need to be delayed until all samples are available for calculation
+     * (only when rate >= 1Hz) */
+    if ( isFasterSampling )
+    {
     isValid = RBRDynamicCorrection_updateLag(params, measIn, &measLagged);
+    }
+    else
+    {
+        /* we still need to update the array (in case sampling rate change) */
+        isValid = RBRDynamicCorrection_updateLag(params, measIn, &measLagged);
+        
+        /* ignore the lag, just copy the data to the variable */
+        memcpy(&measLagged, measIn, sizeof(RBRDynamicCorrectionMeasurement));
+    }
 
     if ( !isValid )
     {
@@ -404,8 +450,16 @@ RBRDynamicCorrectionError RBRDynamicCorrection_addMeasurement(RBRDynamicCorrecti
         /* long-term thermal mass adjustment */
         T_long = params->CT_coeff * (T_cond - T_cor);
 
-        /* short-term thermal mass adjustment */
+        /* apply the short-term thermal mass adjustment (but only when rate >= 1Hz) */
+        if ( isFasterSampling )
+        {
         T_short = -params->_cte_b*params->_T_short_lag + params->_cte_a*(T_cor - params->_T_cor_lag);
+        }
+        else
+        {
+            /* do a no-op */
+            T_short = 0;
+        }
 
         T_cell = T_cor + T_long - T_short;
 
