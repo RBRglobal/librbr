@@ -61,7 +61,7 @@ void rbr_prepareCommandResponse(const char *text, char *expectedCommand, char *r
         strcpy(response, text);
         strcat(response, RESPONSE_TERMINATOR);
     }
-    /* In some test cases, no command will be sent, such as test case 2 in "sampling_set" for Logger3 in tests/schedule.c.
+    /* In some test cases, no command will be sent, such as testCase 2 in "sampling_set" for Logger3 in tests/schedule.c.
        And in such cases, expectedCommand should be empty string. */
     else{
         expectedCommand[0]='\0';
