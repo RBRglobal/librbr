@@ -208,27 +208,27 @@ static RBRInstrumentError RBRInstrument_vSendCommand(RBRInstrument *instrument,
         return RBRINSTRUMENT_BUFFER_TOO_SMALL;
     }
 
-    /* Make sure the command is CRLF-terminated. */
-    if (instrument->commandBufferLength < RBRINSTRUMENT_COMMAND_TERMINATOR_LEN
+    /* Make sure the command is LF-terminated. */
+    if (instrument->commandBufferLength < RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN
         || memcmp(instrument->commandBuffer
                   + instrument->commandBufferLength
-                  - RBRINSTRUMENT_COMMAND_TERMINATOR_LEN,
-                  RBRINSTRUMENT_COMMAND_TERMINATOR,
-                  RBRINSTRUMENT_COMMAND_TERMINATOR_LEN) != 0)
+                  - RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN,
+                  RBRINSTRUMENT_SEND_COMMAND_TERMINATOR,
+                  RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN) != 0)
     {
         /* It isn't. Make sure there's room before adding it. */
         if (instrument->commandBufferLength
-            + RBRINSTRUMENT_COMMAND_TERMINATOR_LEN
+            + RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN
             > RBRINSTRUMENT_COMMAND_BUFFER_MAX)
         {
             return RBRINSTRUMENT_BUFFER_TOO_SMALL;
         }
 
         memcpy(instrument->commandBuffer + instrument->commandBufferLength,
-               RBRINSTRUMENT_COMMAND_TERMINATOR,
-               RBRINSTRUMENT_COMMAND_TERMINATOR_LEN);
+               RBRINSTRUMENT_SEND_COMMAND_TERMINATOR,
+               RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN);
         instrument->commandBufferLength +=
-            RBRINSTRUMENT_COMMAND_TERMINATOR_LEN;
+            RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN;
     }
 
     return RBRInstrument_sendBuffer(instrument);
@@ -315,6 +315,8 @@ static RBRInstrumentError RBRInstrument_readSingleResponse(
         RBR_TRY(instrument->callbacks.time(instrument, &now));
         if (now - startTime > instrument->commandTimeout)
         {
+
+
             return RBRINSTRUMENT_TIMEOUT;
         }
 
@@ -330,7 +332,6 @@ static RBRInstrumentError RBRInstrument_readSingleResponse(
 
         readLength = RBRINSTRUMENT_RESPONSE_BUFFER_MAX
                      - instrument->responseBufferLength;
-
         RBR_TRY(instrument->callbacks.read(
                     instrument,
                     instrument->responseBuffer

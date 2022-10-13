@@ -50,7 +50,7 @@ TEST_LOGGER2(id)
 
     TestIOBuffers_init(buffers,
                        "id model = RBRduo, version = 1.440, "
-                       "serial = 912345, fwtype = 103" COMMAND_TERMINATOR,
+                       "serial = 912345, fwtype = 103" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getId(instrument, &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -76,7 +76,7 @@ TEST_LOGGER3(id)
 
     TestIOBuffers_init(buffers,
                        "id model = RBRduo3, version = 1.092, "
-                       "serial = 923456, fwtype = 104" COMMAND_TERMINATOR,
+                       "serial = 923456, fwtype = 104" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getId(instrument, &actual);
     TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
@@ -104,7 +104,7 @@ TEST_LOGGER3(id_simulated)
     TestIOBuffers_init(buffers,
                        "id mode = SIMULATED, model = RBRduo3, "
                        "version = 1.092, serial = 923456, fwtype = 104"
-                       COMMAND_TERMINATOR,
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getId(instrument, &actual);
     TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
@@ -129,7 +129,7 @@ TEST_LOGGER3(id_short)
     };
     RBRInstrumentId actual;
 
-    TestIOBuffers_init(buffers, "id" COMMAND_TERMINATOR, 0);
+    TestIOBuffers_init(buffers, "id" RESPONSE_TERMINATOR, 0);
     RBRInstrumentError err = RBRInstrument_getId(instrument, &actual);
     TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -152,7 +152,7 @@ TEST_LOGGER2(hwrev)
 
     TestIOBuffers_init(buffers,
                        "hwrev pcb = G, cpu = 5659A, bsl = A"
-                       COMMAND_TERMINATOR,
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getHardwareRevision(instrument,
                                                                &actual);
@@ -175,7 +175,7 @@ TEST_LOGGER3(hwrev)
 
     TestIOBuffers_init(buffers,
                        "hwrev pcb = J, cpu = 5659A, bsl = A"
-                       COMMAND_TERMINATOR,
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getHardwareRevision(instrument,
                                                                &actual);
@@ -199,7 +199,7 @@ TEST_LOGGER2(powerstatus)
 
     TestIOBuffers_init(buffers,
                        "powerstatus source = usb, int = 12.40, ext = 0.00, "
-                       "capacity = 24.000" COMMAND_TERMINATOR,
+                       "capacity = 24.000" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getPower(instrument, &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -225,7 +225,7 @@ TEST_LOGGER3(power)
 
     TestIOBuffers_init(buffers,
                        "power source = ext, int =  0.00, ext = 11.59, "
-                       "reg = n/a" COMMAND_TERMINATOR,
+                       "reg = n/a" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getPower(instrument, &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -261,7 +261,7 @@ TEST_LOGGER3(powerinternal)
     TestIOBuffers_init(buffers,
                        "powerinternal batterytype = nimh, "
                        "capacity = 138.000e+003, used = 100.100e+003"
-                       COMMAND_TERMINATOR,
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getPowerInternal(instrument,
                                                             &actual);
@@ -297,7 +297,7 @@ TEST_LOGGER3(powerexternal)
     TestIOBuffers_init(buffers,
                        " powerexternal batterytype = fermata_lisocl2, "
                        "capacity = 22.000e+006, used = 100.100e+003"
-                       COMMAND_TERMINATOR,
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getPowerExternal(instrument,
                                                             &actual);
@@ -316,7 +316,7 @@ TEST_LOGGER2(info)
     RBRInstrumentInfo actual;
 
     TestIOBuffers_init(buffers,
-                       "E0102 invalid command 'info'" COMMAND_TERMINATOR,
+                       "E0102 invalid command 'info'" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getInfo(instrument,
                                                    &actual);
@@ -335,7 +335,7 @@ TEST_LOGGER3(info)
 
     TestIOBuffers_init(buffers,
                        "info pn = L3-M11-BEC11-SC11-ST11-SP11"
-                       COMMAND_TERMINATOR,
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getInfo(instrument,
                                                    &actual);
@@ -357,7 +357,7 @@ TEST_LOGGER3(info_fwlock)
 
     TestIOBuffers_init(buffers,
                        "info pn = L3-M11-F14-BEC11-G1-SCT12-SP11, fwlock = on"
-                       COMMAND_TERMINATOR,
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getInfo(instrument,
                                                    &actual);

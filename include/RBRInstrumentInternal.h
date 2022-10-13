@@ -24,6 +24,10 @@ extern "C" {
 #define RBRINSTRUMENT_NO_ACTIVITY ((RBRInstrumentDateTime) - 1)
 
 /** \brief The terminator at the end of a command sent to the instrument. */
+#define RBRINSTRUMENT_SEND_COMMAND_TERMINATOR "\r"
+/** \brief The length of the command terminator. */
+#define RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN 1
+/** \brief The terminator at the end of a command received from the instrument. */
 #define RBRINSTRUMENT_COMMAND_TERMINATOR "\r\n"
 /** \brief The length of the command terminator. */
 #define RBRINSTRUMENT_COMMAND_TERMINATOR_LEN 2
