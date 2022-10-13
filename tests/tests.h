@@ -188,6 +188,9 @@ extern "C" {
 /** \brief The maximum number of parsed events to buffer. */
 #define TESTPARSERBUFFERS_EVENTS_MAX 64
 
+/** \brief The size of the array for expectedCommand and response used in tests*/
+#define COMMAND_RESPONSE_SIZE 1024
+
 /**
  * \brief Escape control characters in a string.
  *
@@ -213,7 +216,7 @@ char *rbr_strnesccntrl(char *destination, const char *source, size_t num);
  * This function is usually used in tests to set parameters. 
  * 
  * Terminators are defined in tests.h as COMMAND_TERMINATOR and RESPONSE_TERMINATOR.
- * expectedCommand and response are defined in each test, set as char xx[1024]. 
+ * expectedCommand and response are defined in each test, and size is COMMAND_RESPONSE_SIZE.
  * expectedCommand will terminate with COMMAND_TERMINATOR, and response will terminate with RESPONSE_TERMINATOR.
  *
  * \param [in] text the string used in command and appear in response

@@ -260,8 +260,8 @@ TEST_LOGGER3(memformat_newtype)
 TEST_LOGGER3(memformat_newtype_set)
 {
     const char *text = "memformat newtype = calbin00";
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);

@@ -13,8 +13,8 @@
 TEST_LOGGER2(permit)
 {
     const char *text = "permit = foo";
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
@@ -28,8 +28,8 @@ TEST_LOGGER2(permit)
 TEST_LOGGER3(permit)
 {
     const char *text = "permit command = foo";
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
@@ -58,8 +58,8 @@ TEST_LOGGER3(prompt)
 TEST_LOGGER3(prompt_set)
 {
     const char *text = "prompt state = on";
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
@@ -91,8 +91,8 @@ TEST_LOGGER3(confirmation)
 TEST_LOGGER3(confirmation_set_on)
 {
     const char *text = "confirmation state = on";
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);

@@ -629,8 +629,8 @@ TEST_LOGGER3(channel_gain_set_auto)
     };
 
     const char *text = "channel 1 gain = auto";
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
@@ -652,8 +652,8 @@ TEST_LOGGER3(channel_gain_set_manual)
     };
 
     const char *text = "channel 1 gain = 5.0";
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);

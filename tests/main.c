@@ -54,7 +54,6 @@ char *rbr_strnesccntrl(char *destination, const char *source, size_t num)
 }
 
 void rbr_prepareCommandResponse(const char *text, char *expectedCommand, char *response){
-    //some tests have command="", such as "sampling_set" for Logger3 in tests/schedule.c
     if (strlen(text)!=0){
         strcpy(expectedCommand, text);
         strcat(expectedCommand, COMMAND_TERMINATOR);
@@ -62,6 +61,8 @@ void rbr_prepareCommandResponse(const char *text, char *expectedCommand, char *r
         strcpy(response, text);
         strcat(response, RESPONSE_TERMINATOR);
     }
+    /* In some test cases, no command will be sent, such as test case 2 in "sampling_set" for Logger3 in tests/schedule.c.
+       And in such cases, expectedCommand should be empty string. */
     else{
         expectedCommand[0]='\0';
     }

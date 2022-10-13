@@ -260,8 +260,8 @@ TEST_LOGGER2(streamserial_set_aux)
     const char *text = "streamserial aux1_state = on, "
                            "aux1_setup = 500, aux1_hold = 750, "
                            "aux1_active = low, aux1_sleep = high";
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
@@ -339,8 +339,8 @@ TEST_LOGGER3(streamserial_set_aux)
     const char *text = "streamserial aux1_enabled = true, "
                            "aux1_setup = 500, aux1_hold = 750, "
                            "aux1_active = low, aux1_sleep = high";
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);

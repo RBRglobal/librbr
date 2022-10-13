@@ -146,8 +146,8 @@ TEST_LOGGER2(thresholding_set)
     const char *text = "thresholding state = on, channel = 1, "
                            "condition = above, value = 0.0000, "
                            "interval = 60000";
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
@@ -173,8 +173,8 @@ TEST_LOGGER3(thresholding_set_channel_by_index)
     const char *text = "thresholding enabled = true, channelindex = 1, "
                            "condition = above, value = 0.0000, "
                            "interval = 60000";
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     // const char *command = "thresholding enabled = true, channelindex = 1, "
@@ -206,8 +206,8 @@ TEST_LOGGER3(thresholding_set_channel_by_label)
     const char *text = "thresholding enabled = false, "
                            "channellabel = pressure_00, condition = below, "
                            "value = 30.0000, interval = 30000";
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
@@ -309,8 +309,8 @@ TEST_LOGGER2(twistactivation_set)
     RBRInstrumentError err;
 
     const char *text = "twistactivation state = on";
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
@@ -330,8 +330,8 @@ TEST_LOGGER3(twistactivation_set)
     RBRInstrumentError err;
 
     const char *text = "twistactivation enabled = true";
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);

@@ -87,8 +87,8 @@ TEST_LOGGER3(regimes_set)
 
     RBRInstrumentError err;
 
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     for (int i = 0; tests[i].response != NULL; i++)
     {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
@@ -178,8 +178,8 @@ TEST_LOGGER3(regime_set)
     };
 
     RBRInstrumentError err;
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     for (int i = 0; tests[i].response != NULL; i++)
     {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
@@ -263,8 +263,8 @@ TEST_LOGGER3(ddsampling_set)
 
     RBRInstrumentError err;
 
-    char expectedCommand[1024];
-    char response[1024];
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
     for (int i = 0; tests[i].response != NULL; i++)
     {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
