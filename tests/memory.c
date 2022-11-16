@@ -89,6 +89,31 @@ TEST_LOGGER2(read)
     return true;
 }
 
+TEST_LOGGER2(read_offset_mismatch)
+{
+    uint8_t buf[1400];
+    RBRInstrumentData actual = {
+        .dataset = RBRINSTRUMENT_DATASET_STANDARD,
+        .size    = 1400,
+        .offset  = 2800,
+        .data    = buf
+    };
+
+
+    TestIOBuffers_init(buffers,
+                       "data 1 8 1000"
+                       RESPONSE_TERMINATOR
+                       "AAAAAAAA\045\224"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentError err = RBRInstrument_readData(instrument, &actual);
+    TEST_ASSERT_STR_EQ("read data 1 1400 2800"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_COMMUNICATION_ERROR, err, RBRInstrumentError);
+    return true;
+}
+
 TEST_LOGGER3(readdata)
 {
     uint8_t buf[1400];
@@ -121,6 +146,30 @@ TEST_LOGGER3(readdata)
                        COMMAND_TERMINATOR,
                        buffers->writeBuffer);
 
+    return true;
+}
+
+TEST_LOGGER3(readdata_offset_mismatch)
+{
+    uint8_t buf[1400];
+    RBRInstrumentData actual = {
+        .dataset = RBRINSTRUMENT_DATASET_STANDARD,
+        .size    = 1400,
+        .offset  = 2800,
+        .data    = buf
+    };
+
+    TestIOBuffers_init(buffers,
+                       "readdata dataset = 1, size = 8, offset = 1000"
+                       RESPONSE_TERMINATOR
+                       "AAAAAAAA\045\024"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentError err = RBRInstrument_readData(instrument, &actual);
+    TEST_ASSERT_STR_EQ("readdata dataset = 1, size = 1400, offset = 2800"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_COMMUNICATION_ERROR, err, RBRInstrumentError);
     return true;
 }
 

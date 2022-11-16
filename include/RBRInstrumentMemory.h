@@ -159,6 +159,7 @@ typedef struct RBRInstrumentData
  * fwrite(buf, data.size, 1, datasetFile);
  * ~~~
  *
+ * A communication error will be reported if the offset in response doesn't match request.
  * A checksum error will be reported if the CRC check of the read data fails.
  * However, \a data will still faithfully reflect the response parameters and
  * data. Be sure to check the return value lest you accidentally consume

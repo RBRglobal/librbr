@@ -230,6 +230,8 @@ typedef enum RBRInstrumentError
      * \see RBRInstrument_readSample()
      */
     RBRINSTRUMENT_SAMPLE,
+    /** Communication error. */
+    RBRINSTRUMENT_COMMUNICATION_ERROR,
     /** The number of specific errors. Should not be used as an error value. */
     RBRINSTRUMENT_ERROR_COUNT,
     /** An unknown or unrecognized error. */

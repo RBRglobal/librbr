@@ -187,6 +187,7 @@ static RBRInstrumentError RBRInstrument_fixedRead(
     return RBRINSTRUMENT_SUCCESS;
 }
 
+/* CRC-CCITT */
 static uint16_t calculateCrc(const void *data, int32_t size)
 {
 #define CRC_POLYNOMIAL 0x1021
@@ -271,6 +272,11 @@ RBRInstrumentError RBRInstrument_readData(RBRInstrument *instrument,
         RBR_TRY(RBRInstrumentL3_parseDataResponse(instrument, &workingData));
     }
 
+    /* check if offset in response matches requested offset. If not, return error. */
+    if(workingData.offset !=data->offset){
+        return RBRINSTRUMENT_COMMUNICATION_ERROR;
+    }
+    
     /* Fill the user-provided buffer. RBRInstrument_fixedRead() will first pull
      * leftover data from RBRInstrument.responseBuffer, then read from the
      * instrument. */
@@ -283,11 +289,13 @@ RBRInstrumentError RBRInstrument_readData(RBRInstrument *instrument,
         uint16_t value;
     }
     crc;
+
     RBR_TRY(RBRInstrument_fixedRead(instrument, crc.buf, 2));
     /* The logger reports the CRC as big-endian. Under the assumption that the
      * host is little-endian, we'll byte swap it before using it for
      * comparison. ntohs() is POSIX but not part of the C standard, and we want
      * to target pure C99, so we can't use it here. */
+
     crc.value = (crc.value >> 8) | (crc.value << 8);
 
     uint16_t calculatedCrc = calculateCrc(data->data, workingData.size);
