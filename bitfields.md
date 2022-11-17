@@ -19,7 +19,7 @@ The availability of a specific option
 can be confirmed using bitwise operators.
 
 For example,
-if all four streaming output formats
+if all five streaming output formats
 are available:
 
 ~~~{.c}
@@ -28,7 +28,8 @@ RBRInstrument_getAvailableOutputFormats(instrument, &outputFormats);
 assert(outputFormats == RBRINSTRUMENT_CALTEXT01
                       | RBRINSTRUMENT_CALTEXT02
                       | RBRINSTRUMENT_CALTEXT03
-                      | RBRINSTRUMENT_CALTEXT04);
+                      | RBRINSTRUMENT_CALTEXT04
+                      | RBRINSTRUMENT_CALTEXT07);
 ~~~
 
 And to check if a specific format is supported, e.g., `caltext03`:

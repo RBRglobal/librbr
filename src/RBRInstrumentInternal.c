@@ -25,6 +25,7 @@
 
 #include "RBRInstrument.h"
 #include "RBRInstrumentInternal.h"
+#include "RBRInstrumentMemory.h"
 
 /** \brief 10-second command timeout. */
 #define COMMAND_TIMEOUT (10 * 1000)
@@ -417,6 +418,36 @@ static RBRInstrumentError RBRInstrumentSample_parse(
     memset(sample, 0, sizeof(RBRInstrumentSample));
 
     char *values;
+    int32_t _serialNum;
+    int32_t _prefixLen;
+
+    /* if it starts with "RBR xxSNxx, ", skip it. it's outputFormat caltext07.*/
+    if (sscanf(response, "RBR %d,%n", &_serialNum, &_prefixLen)==1){
+        // check if CRC is correct
+        // get string length used to calculate CRC:
+        char *_end = response;
+        uint32_t _responseLen = 0;
+        while(*_end != '\0'){
+            _end +=1;
+            _responseLen +=1;
+        }
+        // calculate CRC:
+        uint16_t _calCrc;
+        _calCrc = calculateCrc(response, _responseLen-6);
+        
+        // compare calculated CRC with real CRC read from instrument:
+        char *_endPt=NULL;
+        uint16_t _realCrc = strtoul(_end-6, &_endPt, 16);
+
+        if (_calCrc == _realCrc){
+            response += (_prefixLen+1); /* skip the space after comma */
+            *(_end-7) = '\0';
+        }
+        else{
+            return RBRINSTRUMENT_CHECKSUM_ERROR;
+        }
+    }
+
     RBR_TRY(RBRInstrumentDateTime_parseSampleTime(response,
                                                   &sample->timestamp,
                                                   &values));
@@ -465,6 +496,7 @@ static RBRInstrumentError RBRInstrumentSample_parse(
         }
         else
         {
+            /* for caltext02, even though token has units (e.g. 22.1234 dbar), reading will still return 22.1234. */
             reading = strtod(token, NULL);
         }
 
@@ -485,7 +517,7 @@ static RBRInstrumentError RBRInstrumentSample_parse(
  * \return #RBRINSTRUMENT_SUCCESS when the response is a warning or success
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the response indicates an error
  */
-static RBRInstrumentError RBRInstrument_errorCheckResponse(
+RBRInstrumentError RBRInstrument_errorCheckResponse(
     RBRInstrument *instrument,
     char *beginning,
     char *end)

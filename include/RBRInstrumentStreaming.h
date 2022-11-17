@@ -134,8 +134,12 @@ typedef enum RBRInstrumentOutputFormat
     RBRINSTRUMENT_OUTFORMAT_CALTEXT03 = 1 << 2,
     /** Physical units expressed as “engineering-notation” floating point. */
     RBRINSTRUMENT_OUTFORMAT_CALTEXT04 = 1 << 3,
+    /** Physical units to 4 decimal places. 
+     *  The output starts with the keyword "RBR" followed by the serial number. 
+     *  This format is available for LOGGER3 with fw 1.109 or later*/
+    RBRINSTRUMENT_OUTFORMAT_CALTEXT07 = 1 << 4,
     /** Corresponds to the largest output format enum value. */
-    RBRINSTRUMENT_OUTFORMAT_MAX       = RBRINSTRUMENT_OUTFORMAT_CALTEXT04
+    RBRINSTRUMENT_OUTFORMAT_MAX       = RBRINSTRUMENT_OUTFORMAT_CALTEXT07
 } RBRInstrumentOutputFormat;
 
 /**

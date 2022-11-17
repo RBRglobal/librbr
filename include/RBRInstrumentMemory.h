@@ -647,6 +647,20 @@ RBRInstrumentError RBRInstrument_setPostprocessingCommand(
     RBRInstrumentPostprocessingCommand command,
     RBRInstrumentPostprocessingStatus *status);
 
+/**
+ * \brief Calculate the 16-bit CRC using the CCITT polynomial f(x)=x^16+x^12+x^5+1
+ * feeding bytes into the generator LSB first and using 0xFFFF as a seed value,
+ * is then transmitted.
+ *
+ * \param [in] data the data string used to calculate the CRC
+ * \param [in] size the number of characters in the string used to calculate the CRC
+ * \return calculated CRC
+ * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
+ */
+uint16_t calculateCrc(
+    const void *data,
+    int32_t size);   
+
 #ifdef __cplusplus
 }
 #endif

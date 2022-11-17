@@ -188,7 +188,7 @@ static RBRInstrumentError RBRInstrument_fixedRead(
 }
 
 /* CRC-CCITT */
-static uint16_t calculateCrc(const void *data, int32_t size)
+uint16_t calculateCrc(const void *data, int32_t size)
 {
 #define CRC_POLYNOMIAL 0x1021
 

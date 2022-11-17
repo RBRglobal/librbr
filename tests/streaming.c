@@ -117,7 +117,26 @@ bool test_outputformat_support(RBRInstrument *instrument)
         | RBRINSTRUMENT_OUTFORMAT_CALTEXT04,
         formats,
         "0x%04X");
+    return true;
+}
 
+/* test outputformat caltext07 for LOGGER3 with firmware >= 1.109. */
+bool test_outputformat_support_caltext07(RBRInstrument *instrument)
+{
+    RBRInstrumentError err;
+    RBRInstrumentOutputFormat formats;
+
+    err = RBRInstrument_getAvailableOutputFormats(instrument, &formats);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    /* assuming instrument->id.fwtype==104, and id.version>=1.109. */
+    TEST_ASSERT_EQ(
+        RBRINSTRUMENT_OUTFORMAT_CALTEXT01
+        | RBRINSTRUMENT_OUTFORMAT_CALTEXT02
+        | RBRINSTRUMENT_OUTFORMAT_CALTEXT03
+        | RBRINSTRUMENT_OUTFORMAT_CALTEXT04
+        | RBRINSTRUMENT_OUTFORMAT_CALTEXT07,
+        formats,
+        "0x%04X");
     return true;
 }
 
@@ -139,6 +158,17 @@ TEST_LOGGER3(outputformat_availabletypes)
         RESPONSE_TERMINATOR,
         0);
     return test_outputformat_support(instrument);
+}
+
+/* test outputformat caltext07 for LOGGER3 with firmware >= 1.109. */
+TEST_LOGGER3(outputformat_availabletypes_caltext07)
+{
+    TestIOBuffers_init(
+        buffers,
+        "outputformat availabletypes = caltext01|caltext02|caltext03|caltext04|caltext07"
+        RESPONSE_TERMINATOR,
+        0);
+    return test_outputformat_support_caltext07(instrument);
 }
 
 TEST_LOGGER3(outputformat_type)

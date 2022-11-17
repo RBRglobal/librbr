@@ -2,7 +2,13 @@
 
 ## v1.2.3
 
-Release TBD
+Released 2022-11-17
+
+### Added
+
+* support for outputformat caltext07 for LOGGER3 with fw 1.109 or later.
+* support pause/resume feature for LOGGER3 with fw 1.116 or later.
+
 
 ### Changed
 

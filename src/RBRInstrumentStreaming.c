@@ -150,6 +150,8 @@ const char *RBRInstrumentOutputFormat_name(RBRInstrumentOutputFormat format)
         return "caltext03";
     case RBRINSTRUMENT_OUTFORMAT_CALTEXT04:
         return "caltext04";
+    case RBRINSTRUMENT_OUTFORMAT_CALTEXT07:
+        return "caltext07";
     default:
         return "unknown output format";
     }
@@ -272,11 +274,34 @@ RBRInstrumentError RBRInstrument_getOutputFormat(
     return RBRINSTRUMENT_SUCCESS;
 }
 
+
 RBRInstrumentError RBRInstrument_setOutputFormat(
     RBRInstrument *instrument,
     RBRInstrumentOutputFormat outputFormat)
 {
     const char *formatName = RBRInstrumentOutputFormat_name(outputFormat);
+    
+    /* if it's caltext07, it is only available for LOGGER3 with fw 1.109 or later. */
+    if (strcmp(formatName, "caltext07") == 0){
+        RBRInstrumentError err = RBRInstrument_getId(instrument, &instrument->id);
+        if (err != RBRINSTRUMENT_SUCCESS)
+        {
+            return RBRINSTRUMENT_UNSUPPORTED;
+        }
+        else{
+            if (instrument->id.fwtype == 104
+                && (atof)(instrument-> id.version) >= 1.109)
+            {
+                return RBRInstrument_converse(instrument,
+                                    "outputformat type = %s",
+                                    formatName);
+            }
+            else {
+                /* caltext07 is not supported by the firmware version in use. */
+                return RBRINSTRUMENT_UNSUPPORTED;
+            }
+        }
+    }
     return RBRInstrument_converse(instrument,
                                   "outputformat type = %s",
                                   formatName);

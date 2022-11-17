@@ -105,7 +105,7 @@ $ git clone https://bitbucket.org/rbr/librbr.git
 $ cd <PATH>/librbr
 ~~~
 
-### option 1: build librbr with dynamic correction feature
+### option 1 (recommended): build librbr with dynamic correction feature
 Assuming cygwin is used, and current path is `<PATH>/librbr`.
 Then use either `make tests` or `make all` to build the libraries:
 ~~~{.sh}

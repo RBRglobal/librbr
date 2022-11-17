@@ -290,6 +290,23 @@ void RBRInstrument_parseResponse(RBRInstrument *instrument,
                                  char **command,
                                  RBRInstrumentResponseParameter *parameter);
 
+
+/**
+ * \brief Check for errors or warnings in an instrument response.
+ *
+ * Updates RBRInstrument.response as appropriate.
+ *
+ * \param [in,out] instrument the instrument connection
+ * \param [in] beginning the beginning of the textual response
+ * \param [in] end the end of the textual response
+ * \return #RBRINSTRUMENT_SUCCESS when the response is a warning or success
+ * \return #RBRINSTRUMENT_HARDWARE_ERROR when the response indicates an error
+ */
+RBRInstrumentError RBRInstrument_errorCheckResponse(
+    RBRInstrument *instrument, 
+    char *beginning, 
+    char *end);
+
 /**
  * \brief Parse a date/time string from a sample (i.e.,
  * “YYYY-mm-dd HH:MM:SS.sss” format) to a timestamp.

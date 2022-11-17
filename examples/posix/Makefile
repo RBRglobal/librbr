@@ -18,7 +18,9 @@ example: posix-download \
          posix-parse-download \
          posix-parse-download-dataset \
          posix-parse-file \
+         posix-parse-file-dynamiccorrection \
          posix-postprocessing \
+         posix-pauseresume \
          posix-stream \
          posix-stream-sdl \
 
@@ -41,6 +43,8 @@ posix-parse-file-dynamiccorrection: posix-shared.o posix-parse-file-dynamiccorre
 
 posix-postprocessing: posix-shared.o posix-postprocessing.o ../../bin/libRBR.a
 
+posix-pauseresume: posix-shared.o posix-pauseresume.o ../../bin/libRBR.a 
+
 posix-stream: posix-shared.o posix-stream.o ../../bin/libRBR.a
 
 posix-stream-dynamiccorrection: posix-shared.o posix-stream-dynamiccorrection.o ../../bin/libRBR.a ../../bin/libRBRDynamicCorrection.a
@@ -60,6 +64,7 @@ clean:
 		posix-parse-file \
 		posix-parse-file-dynamiccorrection \
 		posix-postprocessing \
+        posix-pauseresume \
 		posix-stream \
 		posix-stream-dynamiccorrection \
 		posix-stream-sdl

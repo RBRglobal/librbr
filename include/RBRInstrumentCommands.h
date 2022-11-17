@@ -26,6 +26,7 @@ extern "C" {
 #include "RBRInstrumentOther.h"
 #include "RBRInstrumentFetching.h"
 #include "RBRInstrumentSecurity.h"
+#include "RBRInstrumentPauseresume.h"
 
 #ifdef __cplusplus
 }
