@@ -2,20 +2,21 @@
 
 ## v1.2.3
 
-Released 2022-11-17
+Released 2022-11-23
 
 ### Added
 
 * support for outputformat caltext07 for LOGGER3 with fw 1.109 or later.
 * support pause/resume feature for LOGGER3 with fw 1.116 or later.
-
+* added example bash file to auto connect to RBRinstrument wifi.
 
 ### Changed
 
 * updated description of function RBRInstrumentSleepCallBack in RBRInstrument.h.
-* pipelines steps changed to parallel.
-* pipelines added steps: GCC10, GCC11, Clang12.
-* command terminator changed to \r instead of \r\n.
+* changed pipelines steps to parallel.
+* added pipelines steps: GCC10, GCC11, Clang12.
+* changed command terminator to \r instead of \r\n.
+* checks if offset in response matches request.
 
 ## v1.2.2
 
