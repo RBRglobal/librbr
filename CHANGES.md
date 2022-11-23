@@ -9,6 +9,7 @@ Released 2022-11-23
 * support for outputformat caltext07 for LOGGER3 with fw 1.109 or later.
 * support pause/resume feature for LOGGER3 with fw 1.116 or later.
 * added example bash file to auto connect to RBRinstrument wifi.
+* added error code RBRINSTRUMENT_COMMUNICATION_ERROR.
 
 ### Changed
 
@@ -17,6 +18,7 @@ Released 2022-11-23
 * added pipelines steps: GCC10, GCC11, Clang12.
 * changed command terminator to \r instead of \r\n.
 * checks if offset in response matches request.
+* changed dynamic correction algorithm behavior for slow sampling rate and error accommondation.
 
 ## v1.2.2
 
