@@ -39,7 +39,7 @@
 typedef struct
 {
     int size;
-    float timestamp_sec[MAX_CSV_SIZE];
+    double timestamp_sec[MAX_CSV_SIZE];
     float P_meas[MAX_CSV_SIZE]; //P_meas is sea pressure.
     float T_meas[MAX_CSV_SIZE];
     float C_meas[MAX_CSV_SIZE];
@@ -58,7 +58,11 @@ void RBRDynamicCorrection_replayData(FILE *file, csvData_t *data, float Fs)
     int index;
     
     /* first step, initialiaze the algorithm */
-    status = RBRDynamicCorrection_init(&params, Fs, DCORR_T_DELAY, DCORR_ALPHA, DCORR_TAU, DCORR_CT_COEFF);
+    status = RBRDynamicCorrection_init(&params, Fs, DCORR_T_DELAY, 
+                                    DCORR_ALPHA_A, DCORR_ALPHA_E,
+                                    DCORR_TAU_A, DCORR_TAU_E,
+                                    DCORR_CT_COEFF_A, DCORR_CT_COEFF_E,
+                                    DCORR_VP_MIN, DCORR_VP_MAX, DCORR_VP_FC);
     if ( status != RBR_DCORR_SUCCESS )
     {
         fprintf(stderr, "RBRDynamicCorrection_init() return error code %u", status);
@@ -114,7 +118,7 @@ int RBRDynamicCorrection_parseCsv(const char *filename, csvData_t *data)
     int len;
     int index;
     int line_no = 0;
-    float value;
+    double value;
     int n;
     FILE *file;
     
@@ -158,7 +162,7 @@ int RBRDynamicCorrection_parseCsv(const char *filename, csvData_t *data)
                 entry[len-1] = '\0';
             }
 
-            value = strtof(entry, NULL);
+            value = atof(entry);
             
             /*as mentioned, assuming column 0->4 corresponds to timestamp_sec, C_meas, T_meas, P_meas, T_cond
              *here the P_meas is sea pressure */

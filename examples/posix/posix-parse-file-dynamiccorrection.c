@@ -48,9 +48,6 @@
 #define CHANNEL_P_MEAS      3
 #define CHANNEL_T_COND      4
 
-
-
-
 /* definition for sampling rate for input data 
  * (this value is not stored within the binary data, example given is 2 sample/sec) */ 
 #define SAMPLING_RATE 2.0f
@@ -58,7 +55,6 @@
 RBRInstrumentDateTime g_timeReference = 0;
 
 RBRDynamicCorrectionParams dynamicCorrParams;
-
 
 RBRInstrumentError parserSample(
     const struct RBRParser *parser,
@@ -151,6 +147,7 @@ int main(int argc, char *argv[])
             RBRINSTRUMENT_LIB_VERSION,
             RBRINSTRUMENT_LIB_BUILD_DATE);
 
+    printf("warning: this example works for data file with a fixed sampling rate of %.1f Hz.\n", SAMPLING_RATE);
     /* write an header */
     printf("-----------------------------------------------------------------------------------\n");
     printf("timestamp(s) | T_cor(°C) | P_meas(sea pressure, dbar) | S_cor(PSU) | T_cond(°C)\n");
@@ -174,7 +171,11 @@ int main(int argc, char *argv[])
     };
 
     RBRDynamicCorrectionError dynamicCorrStatus;
-    dynamicCorrStatus = RBRDynamicCorrection_init(&dynamicCorrParams, SAMPLING_RATE, DCORR_T_DELAY, DCORR_ALPHA, DCORR_TAU, DCORR_CT_COEFF);
+    dynamicCorrStatus = RBRDynamicCorrection_init(&dynamicCorrParams, SAMPLING_RATE, DCORR_T_DELAY, 
+                                    DCORR_ALPHA_A, DCORR_ALPHA_E,
+                                    DCORR_TAU_A, DCORR_TAU_E,
+                                    DCORR_CT_COEFF_A, DCORR_CT_COEFF_E,
+                                    DCORR_VP_MIN, DCORR_VP_MAX, DCORR_VP_FC);
     if ( dynamicCorrStatus != RBR_DCORR_SUCCESS )
     {
         fprintf(stderr, "%s: Failed to initialize dynamic correction library: err code %u!\n",

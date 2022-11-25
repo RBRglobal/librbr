@@ -26,6 +26,7 @@ extern "C" {
 #include <string.h>
 
 #include "RBRInstrument.h"
+#include "RBRDynamicCorrection.h"
 #include "RBRParser.h"
 
 /**
