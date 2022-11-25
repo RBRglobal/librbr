@@ -2,23 +2,24 @@
 
 ## v1.2.3
 
-Released 2022-11-23
+Released 2022-11-25
 
 ### Added
 
+* support for variable ascent rate in dynamic correction algorithm.
 * support for outputformat caltext07 for LOGGER3 with fw 1.109 or later.
 * support pause/resume feature for LOGGER3 with fw 1.116 or later.
 * added example bash file to auto connect to RBRinstrument wifi.
 * added error code RBRINSTRUMENT_COMMUNICATION_ERROR.
+* added pipelines steps: GCC10, GCC11, Clang12.
 
 ### Changed
 
-* updated description of function RBRInstrumentSleepCallBack in RBRInstrument.h.
-* changed pipelines steps to parallel.
-* added pipelines steps: GCC10, GCC11, Clang12.
+* changed dynamic correction algorithm behavior for slow sampling rate and error accommondation.
 * changed command terminator to \r instead of \r\n.
 * checks if offset in response matches request.
-* changed dynamic correction algorithm behavior for slow sampling rate and error accommondation.
+* updated description of function RBRInstrumentSleepCallBack in RBRInstrument.h.
+* changed pipelines steps to parallel.
 
 ## v1.2.2
 
