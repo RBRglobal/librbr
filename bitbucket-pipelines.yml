@@ -5,7 +5,7 @@ pipelines:
                 name: GCC 6 compilation
                 image: gcc:6
                 script:
-                    - apt-get update && apt-get -y install libsdl2-dev
+                    - apt-get update && apt-get -y --force-yes install libsdl2-dev
                     - make clean
                     - make lib tests
                     - cd examples/posix

@@ -13,7 +13,7 @@
 
 typedef struct ChannelsTest
 {
-    const char *command;
+    const char *response;
     RBRInstrumentChannels expected;
 } ChannelsTest;
 
@@ -24,9 +24,9 @@ static bool test_channels(RBRInstrument *instrument,
     RBRInstrumentError err;
     RBRInstrumentChannels actual;
 
-    for (int i = 0; tests[i].command != NULL; ++i)
+    for (int i = 0; tests[i].response != NULL; ++i)
     {
-        TestIOBuffers_init(buffers, tests[i].command, 0);
+        TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_getChannels(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
         TEST_ASSERT_EQ(tests[i].expected.count, actual.count, "%" PRIi32);
@@ -161,7 +161,7 @@ TEST_LOGGER2(channels)
     ChannelsTest tests[] = {
         {
             "channels count = 3, on = 3, latency = 300, readtime = 350, "
-            "minperiod = 480" COMMAND_TERMINATOR
+            "minperiod = 480" RESPONSE_TERMINATOR
             "channel 1 type = temp09, module = 1, status = on, latency = 50, "
             "readtime = 260, equation = tmp, userunits = C, gain = none, "
             "gainsavailable = none, derived = off | 2 type = pres19, "
@@ -170,7 +170,7 @@ TEST_LOGGER2(channels)
             "gainsavailable = none, derived = off | 3 type = volt00, "
             "module = 40, status = on, latency = 300, readtime = 350, "
             "equation = lin, userunits = V, gain = none, "
-            "gainsavailable = none, derived = off" COMMAND_TERMINATOR
+            "gainsavailable = none, derived = off" RESPONSE_TERMINATOR
             "calibration 1 type = temp09, datetime = 20000401000000, "
             "c0 = 3.5000000e-003, c1 = -250.00002e-006, c2 = 2.7000000e-006, "
             "c3 = 23.000000e-009 | 2 type = pres19, "
@@ -179,7 +179,7 @@ TEST_LOGGER2(channels)
             "x0 = 0.0000000e+000, x1 = 0.0000000e+000, x2 = 0.0000000e+000, "
             "x3 = 0.0000000e+000, x4 = 0.0000000e+000, x5 = 0.0000000e+000, "
             "n0 = value | 3 type = volt00, datetime = 20000401000000, "
-            "c0 = 0.0000000e+000, c1 = 1.0000000e+000" COMMAND_TERMINATOR,
+            "c0 = 0.0000000e+000, c1 = 1.0000000e+000" RESPONSE_TERMINATOR,
             {
                 .count = 3,
                 .on = 3,
@@ -285,14 +285,14 @@ TEST_LOGGER2(channels)
         },
         {
             "channels count = 1, on = 1, latency = 600, readtime = 1700, "
-            "minperiod = 1910" COMMAND_TERMINATOR
+            "minperiod = 1910" RESPONSE_TERMINATOR
             "channel 1 type = fluo01, module = 40, status = on, "
             "latency = 600, readtime = 1700, equation = lin, "
             "userunits = ug/L, gain = auto, "
             "gainsavailable = 1.0|3.0|10.0|30.0, derived = off"
-            COMMAND_TERMINATOR
+            RESPONSE_TERMINATOR
             "calibration 1 type = fluo01, datetime = 20000401000000, "
-            "c0 = 203.47984e+000, c1 = -277.72070e+000" COMMAND_TERMINATOR,
+            "c0 = 203.47984e+000, c1 = -277.72070e+000" RESPONSE_TERMINATOR,
             {
                 .count = 1,
                 .on = 1,
@@ -340,7 +340,7 @@ TEST_LOGGER3(channels)
     ChannelsTest tests[] = {
         {
             "channels count = 5, on = 5, settlingtime = 50, readtime = 290, "
-            "minperiod = 450" COMMAND_TERMINATOR
+            "minperiod = 450" RESPONSE_TERMINATOR
             "channel 1 type = temp09, module = 1, status = on, "
             "settlingtime = 50, readtime = 260, equation = tmp, "
             "userunits = C, gain = none, availablegains = none, "
@@ -358,7 +358,7 @@ TEST_LOGGER3(channels)
             "label = depth_00 || channel 5 type = cnt_00, module = 242, "
             "status = on, settlingtime = 0, readtime = 0, equation = none, "
             "userunits = counts, gain = none, availablegains = none, "
-            "derived = on, label = count_00" COMMAND_TERMINATOR
+            "derived = on, label = count_00" RESPONSE_TERMINATOR
             "calibration 1 label = temperature_00, datetime = 20000401000000, "
             "c0 = 3.5000000e-003, c1 = -250.00002e-006, c2 = 2.7000000e-006, "
             "c3 = 23.000000e-009 || calibration 2 label = pressure_00, "
@@ -370,7 +370,7 @@ TEST_LOGGER3(channels)
             "datetime = 20000401000000, n0 = 2, n1 = value || calibration 4 "
             "label = depth_00, datetime = 20000401000000, n0 = 2, n1 = value "
             "|| calibration 5 label = count_00, datetime = 20000401000000, "
-            "n0 = value" COMMAND_TERMINATOR,
+            "n0 = value" RESPONSE_TERMINATOR,
             {
                 .count = 5,
                 .on = 5,
@@ -527,13 +527,13 @@ TEST_LOGGER3(channels)
         },
         {
             "channels count = 1, on = 1, settlingtime = 5000, "
-            "readtime = 10500, minperiod = 10670" COMMAND_TERMINATOR
+            "readtime = 10500, minperiod = 10670" RESPONSE_TERMINATOR
             "channel 1 type = fluo10, module = 40, status = on, "
             "settlingtime = 5000, readtime = 10500, equation = lin, "
             "userunits = ug/L, gain = auto, availablegains = 1.0|10.0|100.0, "
-            "derived = off, label = chlorophyll_00" COMMAND_TERMINATOR
+            "derived = off, label = chlorophyll_00" RESPONSE_TERMINATOR
             "calibration 1 label = chlorophyll_00, datetime = 20000401000000, "
-            "c0 = 678.26611e+000, c1 = -925.73568e+000" COMMAND_TERMINATOR,
+            "c0 = 678.26611e+000, c1 = -925.73568e+000" RESPONSE_TERMINATOR,
             {
                 .count = 1,
                 .on = 1,
@@ -572,14 +572,14 @@ TEST_LOGGER3(channels)
         },
         {
             "channels count = 1, on = 1, settlingtime = 5000, "
-            "readtime = 10500, minperiod = 10670" COMMAND_TERMINATOR
+            "readtime = 10500, minperiod = 10670" RESPONSE_TERMINATOR
             "channel 1 type = turb00, module = 40, status = on, "
             "settlingtime = 1000, readtime = 350, equation = lin, "
             "userunits = NTU, gain = 20.0, "
             "availablegains = 1.0|5.0|20.0|100.0, derived = off, "
-            "label = turbidity_00" COMMAND_TERMINATOR
+            "label = turbidity_00" RESPONSE_TERMINATOR
             "calibration 1 label = turbidity_00, datetime = 20000401000000, "
-            "c0 = 3.3910000e+003, c1 = -4.6280000e+003" COMMAND_TERMINATOR,
+            "c0 = 3.3910000e+003, c1 = -4.6280000e+003" RESPONSE_TERMINATOR,
             {
                 .count = 1,
                 .on = 1,
@@ -628,14 +628,17 @@ TEST_LOGGER3(channel_gain_set_auto)
         .rangingMode = RBRINSTRUMENT_RANGING_AUTO
     };
 
-    const char *command = "channel 1 gain = auto" COMMAND_TERMINATOR;
+    const char *text = "channel 1 gain = auto";
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
 
-    TestIOBuffers_init(buffers, command, 0);
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_setChannelGain(instrument,
                                                           1,
                                                           &gain);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -648,14 +651,17 @@ TEST_LOGGER3(channel_gain_set_manual)
         .availableGains = {1.0, 5.0, 10.0, NAN}
     };
 
-    const char *command = "channel 1 gain = 5.0" COMMAND_TERMINATOR;
+    const char *text = "channel 1 gain = 5.0";
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
 
-    TestIOBuffers_init(buffers, command, 0);
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_setChannelGain(instrument,
                                                           1,
                                                           &gain);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -674,7 +680,7 @@ TEST_LOGGER3(calibration_set)
         .x = {NAN},
         .n = {0}
     };
-    const char *command = "calibration 1 datetime = 20180919181615, "
+    const char *expectedCommand = "calibration 1 datetime = 20180919181615, "
                           "c0 = 0.0035" COMMAND_TERMINATOR
                           "calibration 1 datetime = 20180919181615, "
                           "c1 = -0.00025" COMMAND_TERMINATOR
@@ -683,12 +689,22 @@ TEST_LOGGER3(calibration_set)
                           "calibration 1 datetime = 20180919181615, "
                           "c3 = 2.3e-08" COMMAND_TERMINATOR;
 
-    TestIOBuffers_init(buffers, command, 0);
+    const char *response = "calibration 1 datetime = 20180919181615, "
+                          "c0 = 0.0035" RESPONSE_TERMINATOR
+                          "calibration 1 datetime = 20180919181615, "
+                          "c1 = -0.00025" RESPONSE_TERMINATOR
+                          "calibration 1 datetime = 20180919181615, "
+                          "c2 = 2.7e-06" RESPONSE_TERMINATOR
+                          "calibration 1 datetime = 20180919181615, "
+                          "c3 = 2.3e-08" RESPONSE_TERMINATOR;
+
+
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_setCalibration(instrument,
                                                           1,
                                                           &calibration);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -698,7 +714,7 @@ TEST_LOGGER3(settings_fetchpoweroffdelay)
     RBRInstrumentPeriod fetchPowerOffDelay = 0;
 
     TestIOBuffers_init(buffers,
-                       "settings fetchpoweroffdelay = 8000" COMMAND_TERMINATOR,
+                       "settings fetchpoweroffdelay = 8000" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getFetchPowerOffDelay(
         instrument,
@@ -712,16 +728,20 @@ TEST_LOGGER3(settings_fetchpoweroffdelay)
 TEST_LOGGER3(settings_fetchpoweroffdelay_set)
 {
     RBRInstrumentPeriod fetchPowerOffDelay = 8000;
-    const char *command = "permit command = settings" COMMAND_TERMINATOR
+    const char *expectedCommand = "permit command = settings" COMMAND_TERMINATOR
                           "settings fetchpoweroffdelay = 8000"
                           COMMAND_TERMINATOR;
+    
+    const char *response = "permit command = settings" RESPONSE_TERMINATOR
+                          "settings fetchpoweroffdelay = 8000"
+                          RESPONSE_TERMINATOR;
 
-    TestIOBuffers_init(buffers, command, 0);
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_setFetchPowerOffDelay(
         instrument,
         fetchPowerOffDelay);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -731,7 +751,7 @@ TEST_LOGGER3(settings_sensorpoweralwayson)
     bool sensorPowerAlwaysOn = false;
 
     TestIOBuffers_init(buffers,
-                       "settings sensorpoweralwayson = on" COMMAND_TERMINATOR,
+                       "settings sensorpoweralwayson = on" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_isSensorPowerAlwaysOn(
         instrument,
@@ -745,16 +765,19 @@ TEST_LOGGER3(settings_sensorpoweralwayson)
 TEST_LOGGER3(settings_sensorpoweralwayson_set)
 {
     RBRInstrumentPeriod sensorPowerAlwaysOn = true;
-    const char *command = "permit command = settings" COMMAND_TERMINATOR
+    const char *expectedCommand = "permit command = settings" COMMAND_TERMINATOR
                           "settings sensorpoweralwayson = on"
                           COMMAND_TERMINATOR;
+    const char *response = "permit command = settings" RESPONSE_TERMINATOR
+                          "settings sensorpoweralwayson = on"
+                          RESPONSE_TERMINATOR;
 
-    TestIOBuffers_init(buffers, command, 0);
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_setSensorPowerAlwaysOn(
         instrument,
         sensorPowerAlwaysOn);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -764,7 +787,7 @@ TEST_LOGGER3(settings_castdetection)
     bool castDetection = false;
 
     TestIOBuffers_init(buffers,
-                       "settings castdetection = on" COMMAND_TERMINATOR,
+                       "settings castdetection = on" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getCastDetection(
         instrument,
@@ -778,15 +801,18 @@ TEST_LOGGER3(settings_castdetection)
 TEST_LOGGER3(settings_castdetection_set)
 {
     RBRInstrumentPeriod castDetection = true;
-    const char *command = "permit command = settings" COMMAND_TERMINATOR
+    const char *expectedCommand = "permit command = settings" COMMAND_TERMINATOR
                           "settings castdetection = on" COMMAND_TERMINATOR;
 
-    TestIOBuffers_init(buffers, command, 0);
+    const char *response = "permit command = settings" RESPONSE_TERMINATOR
+                          "settings castdetection = on" RESPONSE_TERMINATOR;
+
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_setCastDetection(
         instrument,
         castDetection);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -796,7 +822,7 @@ TEST_LOGGER3(settings_inputtimeout)
     RBRInstrumentPeriod inputTimeout = 0;
 
     TestIOBuffers_init(buffers,
-                       "settings inputtimeout = 10000" COMMAND_TERMINATOR,
+                       "settings inputtimeout = 10000" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getInputTimeout(
         instrument,
@@ -810,15 +836,18 @@ TEST_LOGGER3(settings_inputtimeout)
 TEST_LOGGER3(settings_inputtimeout_set)
 {
     RBRInstrumentPeriod inputTimeout = 15000;
-    const char *command = "permit command = settings" COMMAND_TERMINATOR
+    const char *expectedCommand = "permit command = settings" COMMAND_TERMINATOR
                           "settings inputtimeout = 15000" COMMAND_TERMINATOR;
+    
+    const char *response = "permit command = settings" RESPONSE_TERMINATOR
+                          "settings inputtimeout = 15000" RESPONSE_TERMINATOR;
 
-    TestIOBuffers_init(buffers, command, 0);
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_setInputTimeout(
         instrument,
         inputTimeout);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -828,7 +857,7 @@ TEST_LOGGER3(settings_atmosphere)
     float atmosphere = 0;
 
     TestIOBuffers_init(buffers,
-                       "settings atmosphere = 10.1325010" COMMAND_TERMINATOR,
+                       "settings atmosphere = 10.1325010" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getValueSetting(
         instrument,
@@ -843,16 +872,20 @@ TEST_LOGGER3(settings_atmosphere)
 TEST_LOGGER3(settings_atmosphere_set)
 {
     float atmosphere = 10.132501;
-    const char *command = "permit command = settings" COMMAND_TERMINATOR
+    const char *expectedCommand = "permit command = settings" COMMAND_TERMINATOR
                           "settings atmosphere = 10.132501" COMMAND_TERMINATOR;
 
-    TestIOBuffers_init(buffers, command, 0);
+    const char *response = "permit command = settings" RESPONSE_TERMINATOR
+                          "settings atmosphere = 10.132501" RESPONSE_TERMINATOR;
+
+
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_setValueSetting(
         instrument,
         RBRINSTRUMENT_SETTING_ATMOSPHERE,
         atmosphere);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -861,7 +894,7 @@ TEST_LOGGER3(settings_atmosphere_set)
 
 typedef struct SensorTest
 {
-    const char *command;
+    const char *response;
     RBRInstrumentSensorParameter expected[TEST_SENSOR_PARAMETER_MAX];
     int32_t size;
 } SensorTest;
@@ -873,13 +906,13 @@ static bool test_sensor(RBRInstrument *instrument,
     RBRInstrumentError err;
     RBRInstrumentSensorParameter actual;
 
-    for (int i = 0; tests[i].command != NULL; ++i)
+    for (int i = 0; tests[i].response != NULL; ++i)
     {
         snprintf(actual.key,
                  sizeof(actual.key),
                  "%s",
                  tests[i].expected[0].key);
-        TestIOBuffers_init(buffers, tests[i].command, 0);
+        TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_getSensorParameter(instrument, 1, &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
         TEST_ASSERT_STR_EQ(tests[i].expected[0].key, actual.key);
@@ -896,9 +929,9 @@ static bool test_sensors(RBRInstrument *instrument,
     RBRInstrumentError err;
     RBRInstrumentSensorParameter actual[TEST_SENSOR_PARAMETER_MAX];
 
-    for (int i = 0; tests[i].command != NULL; ++i)
+    for (int i = 0; tests[i].response != NULL; ++i)
     {
-        TestIOBuffers_init(buffers, tests[i].command, 0);
+        TestIOBuffers_init(buffers, tests[i].response, 0);
         int32_t size = TEST_SENSOR_PARAMETER_MAX;
         err = RBRInstrument_getSensorParameters(instrument,
                                                 1,
@@ -923,7 +956,7 @@ TEST_LOGGER2(sensor)
 {
     SensorTest tests[] = {
         {
-            .command = "sensor 1 serial = 12345" COMMAND_TERMINATOR,
+            .response = "sensor 1 serial = 12345" RESPONSE_TERMINATOR,
             .expected = {
                 {
                     .key = "serial",
@@ -933,7 +966,7 @@ TEST_LOGGER2(sensor)
             .size = 0
         },
         {
-            .command = "E0501 item is not configured" COMMAND_TERMINATOR,
+            .response = "E0501 item is not configured" RESPONSE_TERMINATOR,
             .expected = {
                 {
                     .key = "serial",
@@ -952,7 +985,7 @@ TEST_LOGGER2(sensor_all)
 {
     SensorTest tests[] = {
         {
-            .command = "sensor 1 serial = 12345" COMMAND_TERMINATOR,
+            .response = "sensor 1 serial = 12345" RESPONSE_TERMINATOR,
             .expected = {
                 {
                     .key = "serial",
@@ -962,8 +995,8 @@ TEST_LOGGER2(sensor_all)
             .size = 1
         },
         {
-            .command = "sensor 1 serial = 12345, manufacturer = Whoever, "
-                       "foo = bar" COMMAND_TERMINATOR,
+            .response = "sensor 1 serial = 12345, manufacturer = Whoever, "
+                       "foo = bar" RESPONSE_TERMINATOR,
             .expected = {
                 {
                     .key = "serial",
@@ -981,7 +1014,7 @@ TEST_LOGGER2(sensor_all)
             .size = 3
         },
         {
-            .command = "E0109 feature not available" COMMAND_TERMINATOR,
+            .response = "E0109 feature not available" RESPONSE_TERMINATOR,
             .size = 0
         },
         {0}
@@ -994,7 +1027,7 @@ TEST_LOGGER3(sensor)
 {
     SensorTest tests[] = {
         {
-            .command = "sensor 1 serial = 12345" COMMAND_TERMINATOR,
+            .response = "sensor 1 serial = 12345" RESPONSE_TERMINATOR,
             .expected = {
                 {
                     .key = "serial",
@@ -1004,7 +1037,7 @@ TEST_LOGGER3(sensor)
             .size = 0
         },
         {
-            .command = "sensor 1 serial = n/a" COMMAND_TERMINATOR,
+            .response = "sensor 1 serial = n/a" RESPONSE_TERMINATOR,
             .expected = {
                 {
                     .key = "serial",
@@ -1023,7 +1056,7 @@ TEST_LOGGER3(sensor_all)
 {
     SensorTest tests[] = {
         {
-            .command = "sensor 1 serial = 12345" COMMAND_TERMINATOR,
+            .response = "sensor 1 serial = 12345" RESPONSE_TERMINATOR,
             .expected = {
                 {
                     .key = "serial",
@@ -1033,8 +1066,8 @@ TEST_LOGGER3(sensor_all)
             .size = 1
         },
         {
-            .command = "sensor 1 serial = 12345, manufacturer = Whoever, "
-                       "foo = bar" COMMAND_TERMINATOR,
+            .response = "sensor 1 serial = 12345, manufacturer = Whoever, "
+                       "foo = bar" RESPONSE_TERMINATOR,
             .expected = {
                 {
                     .key = "serial",
@@ -1052,8 +1085,8 @@ TEST_LOGGER3(sensor_all)
             .size = 3
         },
         {
-            .command = "sensor 1 serial = 12345, manufacturer = Whoever, "
-                       "foo = bar, baz = lem" COMMAND_TERMINATOR,
+            .response = "sensor 1 serial = 12345, manufacturer = Whoever, "
+                       "foo = bar, baz = lem" RESPONSE_TERMINATOR,
             .expected = {
                 {
                     .key = "serial",
@@ -1071,7 +1104,7 @@ TEST_LOGGER3(sensor_all)
             .size = 3
         },
         {
-            .command = "sensor 1" COMMAND_TERMINATOR,
+            .response = "sensor 1" RESPONSE_TERMINATOR,
             .size = 0
         },
         {0}

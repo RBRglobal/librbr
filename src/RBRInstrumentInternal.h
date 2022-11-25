@@ -24,6 +24,10 @@ extern "C" {
 #define RBRINSTRUMENT_NO_ACTIVITY ((RBRInstrumentDateTime) - 1)
 
 /** \brief The terminator at the end of a command sent to the instrument. */
+#define RBRINSTRUMENT_SEND_COMMAND_TERMINATOR "\r"
+/** \brief The length of the command terminator. */
+#define RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN 1
+/** \brief The terminator at the end of a command received from the instrument. */
 #define RBRINSTRUMENT_COMMAND_TERMINATOR "\r\n"
 /** \brief The length of the command terminator. */
 #define RBRINSTRUMENT_COMMAND_TERMINATOR_LEN 2
@@ -285,6 +289,23 @@ typedef struct RBRInstrumentResponseParameter
 void RBRInstrument_parseResponse(RBRInstrument *instrument,
                                  char **command,
                                  RBRInstrumentResponseParameter *parameter);
+
+
+/**
+ * \brief Check for errors or warnings in an instrument response.
+ *
+ * Updates RBRInstrument.response as appropriate.
+ *
+ * \param [in,out] instrument the instrument connection
+ * \param [in] beginning the beginning of the textual response
+ * \param [in] end the end of the textual response
+ * \return #RBRINSTRUMENT_SUCCESS when the response is a warning or success
+ * \return #RBRINSTRUMENT_HARDWARE_ERROR when the response indicates an error
+ */
+RBRInstrumentError RBRInstrument_errorCheckResponse(
+    RBRInstrument *instrument, 
+    char *beginning, 
+    char *end);
 
 /**
  * \brief Parse a date/time string from a sample (i.e.,

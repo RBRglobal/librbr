@@ -25,7 +25,7 @@ TEST_LOGGER3(meminfo)
     TestIOBuffers_init(buffers,
                        "meminfo dataset = 1, used = 1528, "
                        "remaining = 134216192, size = 134217728"
-                       COMMAND_TERMINATOR,
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getMemoryInfo(instrument, &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -72,9 +72,9 @@ TEST_LOGGER2(read)
 
     TestIOBuffers_init(buffers,
                        "data 1 8 2800"
-                       COMMAND_TERMINATOR
+                       RESPONSE_TERMINATOR
                        "AAAAAAAA\045\224"
-                       COMMAND_TERMINATOR,
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_readData(instrument, &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -86,6 +86,31 @@ TEST_LOGGER2(read)
                        COMMAND_TERMINATOR,
                        buffers->writeBuffer);
 
+    return true;
+}
+
+TEST_LOGGER2(read_offset_mismatch)
+{
+    uint8_t buf[1400];
+    RBRInstrumentData actual = {
+        .dataset = RBRINSTRUMENT_DATASET_STANDARD,
+        .size    = 1400,
+        .offset  = 2800,
+        .data    = buf
+    };
+
+
+    TestIOBuffers_init(buffers,
+                       "data 1 8 1000"
+                       RESPONSE_TERMINATOR
+                       "AAAAAAAA\045\224"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentError err = RBRInstrument_readData(instrument, &actual);
+    TEST_ASSERT_STR_EQ("read data 1 1400 2800"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_COMMUNICATION_ERROR, err, RBRInstrumentError);
     return true;
 }
 
@@ -107,9 +132,9 @@ TEST_LOGGER3(readdata)
 
     TestIOBuffers_init(buffers,
                        "readdata dataset = 1, size = 8, offset = 2800"
-                       COMMAND_TERMINATOR
+                       RESPONSE_TERMINATOR
                        "AAAAAAAA\045\224"
-                       COMMAND_TERMINATOR,
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_readData(instrument, &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -121,6 +146,30 @@ TEST_LOGGER3(readdata)
                        COMMAND_TERMINATOR,
                        buffers->writeBuffer);
 
+    return true;
+}
+
+TEST_LOGGER3(readdata_offset_mismatch)
+{
+    uint8_t buf[1400];
+    RBRInstrumentData actual = {
+        .dataset = RBRINSTRUMENT_DATASET_STANDARD,
+        .size    = 1400,
+        .offset  = 2800,
+        .data    = buf
+    };
+
+    TestIOBuffers_init(buffers,
+                       "readdata dataset = 1, size = 8, offset = 1000"
+                       RESPONSE_TERMINATOR
+                       "AAAAAAAA\045\024"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentError err = RBRInstrument_readData(instrument, &actual);
+    TEST_ASSERT_STR_EQ("readdata dataset = 1, size = 1400, offset = 2800"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_COMMUNICATION_ERROR, err, RBRInstrumentError);
     return true;
 }
 
@@ -160,9 +209,9 @@ TEST_LOGGER3(readdata_crc_failure)
 
     TestIOBuffers_init(buffers,
                        "readdata dataset = 1, size = 8, offset = 2800"
-                       COMMAND_TERMINATOR
+                       RESPONSE_TERMINATOR
                        "AAAAAAAA00"
-                       COMMAND_TERMINATOR,
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_readData(instrument, &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_CHECKSUM_ERROR, err, RBRInstrumentError);
@@ -185,7 +234,7 @@ TEST_LOGGER2(memformat_support)
 
     TestIOBuffers_init(buffers,
                        "memformat support = rawbin00, calbin00"
-                       COMMAND_TERMINATOR,
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getAvailableMemoryFormats(
         instrument,
@@ -206,7 +255,7 @@ TEST_LOGGER3(memformat_availabletypes)
 
     TestIOBuffers_init(buffers,
                        "memformat availabletypes = rawbin00|calbin00"
-                       COMMAND_TERMINATOR,
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getAvailableMemoryFormats(
         instrument,
@@ -225,7 +274,7 @@ TEST_LOGGER3(memformat_type)
     RBRInstrumentMemoryFormat actual = RBRINSTRUMENT_MEMFORMAT_NONE;
 
     TestIOBuffers_init(buffers,
-                       "memformat type = rawbin00" COMMAND_TERMINATOR,
+                       "memformat type = rawbin00" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getCurrentMemoryFormat(
         instrument,
@@ -244,7 +293,7 @@ TEST_LOGGER3(memformat_newtype)
     RBRInstrumentMemoryFormat actual = RBRINSTRUMENT_MEMFORMAT_NONE;
 
     TestIOBuffers_init(buffers,
-                       "memformat newtype = calbin00" COMMAND_TERMINATOR,
+                       "memformat newtype = calbin00" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentError err = RBRInstrument_getNewMemoryFormat(
         instrument,
@@ -259,13 +308,17 @@ TEST_LOGGER3(memformat_newtype)
 
 TEST_LOGGER3(memformat_newtype_set)
 {
-    const char *command = "memformat newtype = calbin00" COMMAND_TERMINATOR;
-    TestIOBuffers_init(buffers, command, 0);
+    const char *text = "memformat newtype = calbin00";
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
+
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_setNewMemoryFormat(
         instrument,
         RBRINSTRUMENT_MEMFORMAT_CALBIN00);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -314,7 +367,7 @@ TEST_LOGGER3(postprocessing)
     };
     RBRInstrumentPostprocessing actual;
 
-    const char *command = "postprocessing status = idle, channels = "
+    const char *response = "postprocessing status = idle, channels = "
                           "mean(pressure_01)|count(pressure_01)"
                           "|mean(temperature_01)|std(temperature_01)"
                           "|mean(conductivity_01), "
@@ -323,8 +376,8 @@ TEST_LOGGER3(postprocessing)
                           "binsize = 50.0, binreference = pressure_01, "
                           "depth_min = 10.0, depth_max = 1000.0, "
                           "binfilter = none, "
-                          "dc_alpha = 0.08, dc_tau = 8.000, dc_tdelay = 0.35, dc_ctcoeff = 2.4e-4" COMMAND_TERMINATOR;
-    TestIOBuffers_init(buffers, command, 0);
+                          "dc_alpha = 0.08, dc_tau = 8.000, dc_tdelay = 0.35, dc_ctcoeff = 2.4e-4" RESPONSE_TERMINATOR;
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_getPostprocessing(instrument,
                                                              &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -402,7 +455,7 @@ TEST_LOGGER3(postprocessing_set)
         .dcCtCoeff = 2.4e-4
     };
 
-    const char *command = "postprocessing binreference = pressure_01, "
+    const char *expectedCommand = "postprocessing binreference = pressure_01, "
                           "binfilter = none, binsize = 50.0"
                           COMMAND_TERMINATOR
                           "postprocessing tstamp_min = 20000101000000"
@@ -418,20 +471,36 @@ TEST_LOGGER3(postprocessing_set)
                           "|std(temperature_01)|mean(conductivity_01)"
                           COMMAND_TERMINATOR;
 
-    TestIOBuffers_init(buffers, command, 0);
+    const char *response = "postprocessing binreference = pressure_01, "
+                          "binfilter = none, binsize = 50.0"
+                          RESPONSE_TERMINATOR
+                          "postprocessing tstamp_min = 20000101000000"
+                          RESPONSE_TERMINATOR
+                          "postprocessing tstamp_max = 20991231235959"
+                          RESPONSE_TERMINATOR
+                          "postprocessing depth_min = 10.0, depth_max = 1000.0"
+                          RESPONSE_TERMINATOR
+                          "postprocessing dc_alpha = 0.080, dc_tau = 8.000, dc_tdelay = 0.350, dc_ctcoeff = 2.4000e-04"
+                          RESPONSE_TERMINATOR
+                          "postprocessing channels = mean(pressure_01)"
+                          "|count(pressure_01)|mean(temperature_01)"
+                          "|std(temperature_01)|mean(conductivity_01)"
+                          RESPONSE_TERMINATOR;
+
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_setPostprocessing(instrument,
                                                              &postprocessing);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
 
 TEST_LOGGER3(postprocessing_command)
 {
-    const char *command = "postprocessing status = processing"
-                          COMMAND_TERMINATOR;
-    TestIOBuffers_init(buffers, command, 0);
+    const char *response = "postprocessing status = processing"
+                          RESPONSE_TERMINATOR;
+    TestIOBuffers_init(buffers, response, 0);
 
     RBRInstrumentPostprocessingStatus result;
     RBRInstrumentError err = RBRInstrument_setPostprocessingCommand(

@@ -79,7 +79,7 @@ TEST_LOGGER3(fetch)
         {
             "fetch sleepafter = false" COMMAND_TERMINATOR,
             "2000-01-01 03:22:42.000, -129.993424e+000, 349.649536e-003, "
-            "500.022304e-003" COMMAND_TERMINATOR,
+            "500.022304e-003" RESPONSE_TERMINATOR,
             false,
             {0},
             false,
@@ -96,7 +96,7 @@ TEST_LOGGER3(fetch)
         {
             "fetch sleepafter = false" COMMAND_TERMINATOR,
             "2000-01-01 20:09:36.000, -129.805680e+000, Error-14, Error-14, "
-            "Error-14, 1.00000000e+000" COMMAND_TERMINATOR,
+            "Error-14, 1.00000000e+000" RESPONSE_TERMINATOR,
             false,
             {0},
             false,
@@ -123,7 +123,7 @@ TEST_LOGGER3(fetch)
             "|temperature_01|temperature_02|temperature_03|temperature_04"
             COMMAND_TERMINATOR,
             "2000-01-01 00:00:00.000, 0.0, 1.0, 2.0, 3.0, 4.0"
-            COMMAND_TERMINATOR,
+            RESPONSE_TERMINATOR,
             true,
             {
                 .count = 5,
@@ -187,7 +187,7 @@ TEST_LOGGER3(fetch)
             "8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, "
             "19.0, 20.0, 21.0, 22.0, 23.0, 24.0, 25.0, 26.0, 27.0, 28.0, "
             "29.0, 30.0, 31.0"
-            COMMAND_TERMINATOR,
+            RESPONSE_TERMINATOR,
             true,
             {
                 .count = 32,

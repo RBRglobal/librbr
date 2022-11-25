@@ -55,8 +55,8 @@ TEST_LOGGER2(now)
         {
             "settings offsetfromutc" COMMAND_TERMINATOR
             "now" COMMAND_TERMINATOR,
-            "settings offsetfromutc = unknown" COMMAND_TERMINATOR
-            "now = 20180920214914" COMMAND_TERMINATOR,
+            "settings offsetfromutc = unknown" RESPONSE_TERMINATOR
+            "now = 20180920214914" RESPONSE_TERMINATOR,
             {
                 .dateTime = 1537480154000LL,
                 .offsetFromUtc = NAN
@@ -65,8 +65,8 @@ TEST_LOGGER2(now)
         {
             "settings offsetfromutc" COMMAND_TERMINATOR
             "now" COMMAND_TERMINATOR,
-            "settings offsetfromutc = unknown" COMMAND_TERMINATOR
-            "now = 20000101000000" COMMAND_TERMINATOR,
+            "settings offsetfromutc = unknown" RESPONSE_TERMINATOR
+            "now = 20000101000000" RESPONSE_TERMINATOR,
             {
                 .dateTime = RBRINSTRUMENT_DATETIME_MIN,
                 .offsetFromUtc = NAN
@@ -75,8 +75,8 @@ TEST_LOGGER2(now)
         {
             "settings offsetfromutc" COMMAND_TERMINATOR
             "now" COMMAND_TERMINATOR,
-            "settings offsetfromutc = unknown" COMMAND_TERMINATOR
-            "now = 20991231235959" COMMAND_TERMINATOR,
+            "settings offsetfromutc = unknown" RESPONSE_TERMINATOR
+            "now = 20991231235959" RESPONSE_TERMINATOR,
             {
                 .dateTime = RBRINSTRUMENT_DATETIME_MAX,
                 .offsetFromUtc = NAN
@@ -85,8 +85,8 @@ TEST_LOGGER2(now)
         {
             "settings offsetfromutc" COMMAND_TERMINATOR
             "now" COMMAND_TERMINATOR,
-            "settings offsetfromutc = +7.50" COMMAND_TERMINATOR
-            "now = 20180920214914" COMMAND_TERMINATOR,
+            "settings offsetfromutc = +7.50" RESPONSE_TERMINATOR
+            "now = 20180920214914" RESPONSE_TERMINATOR,
             {
                 .dateTime = 1537480154000LL,
                 .offsetFromUtc = 7.5
@@ -95,8 +95,8 @@ TEST_LOGGER2(now)
         {
             "settings offsetfromutc" COMMAND_TERMINATOR
             "now" COMMAND_TERMINATOR,
-            "settings offsetfromutc = -4.00" COMMAND_TERMINATOR
-            "now = 20180920214914" COMMAND_TERMINATOR,
+            "settings offsetfromutc = -4.00" RESPONSE_TERMINATOR
+            "now = 20180920214914" RESPONSE_TERMINATOR,
             {
                 .dateTime = 1537480154000LL,
                 .offsetFromUtc = -4
@@ -115,14 +115,20 @@ TEST_LOGGER2(now_set)
         .offsetFromUtc = 0
     };
 
-    const char *command = "now = 20190215210558" COMMAND_TERMINATOR
+    const char *expectedCommand = "now = 20190215210558" COMMAND_TERMINATOR
                           "permit = settings" COMMAND_TERMINATOR
                           "settings offsetfromutc = 0.000000"
                           COMMAND_TERMINATOR;
-    TestIOBuffers_init(buffers, command, 0);
+
+    const char *response = "now = 20190215210558" RESPONSE_TERMINATOR
+                          "permit = settings" RESPONSE_TERMINATOR
+                          "settings offsetfromutc = 0.000000"
+                          RESPONSE_TERMINATOR;
+
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_setClock(instrument, &now);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -133,7 +139,7 @@ TEST_LOGGER3(clock)
         {
             "clock" COMMAND_TERMINATOR,
             "clock datetime = 20180920214914, "
-            "offsetfromutc = unknown" COMMAND_TERMINATOR,
+            "offsetfromutc = unknown" RESPONSE_TERMINATOR,
             {
                 .dateTime = 1537480154000LL,
                 .offsetFromUtc = NAN
@@ -142,7 +148,7 @@ TEST_LOGGER3(clock)
         {
             "clock" COMMAND_TERMINATOR,
             "clock datetime = 20000101000000, "
-            "offsetfromutc = unknown" COMMAND_TERMINATOR,
+            "offsetfromutc = unknown" RESPONSE_TERMINATOR,
             {
                 .dateTime = RBRINSTRUMENT_DATETIME_MIN,
                 .offsetFromUtc = NAN
@@ -151,7 +157,7 @@ TEST_LOGGER3(clock)
         {
             "clock" COMMAND_TERMINATOR,
             "clock datetime = 20991231235959, "
-            "offsetfromutc = unknown" COMMAND_TERMINATOR,
+            "offsetfromutc = unknown" RESPONSE_TERMINATOR,
             {
                 .dateTime = RBRINSTRUMENT_DATETIME_MAX,
                 .offsetFromUtc = NAN
@@ -160,7 +166,7 @@ TEST_LOGGER3(clock)
         {
             "clock" COMMAND_TERMINATOR,
             "clock datetime = 20180920214914, "
-            "offsetfromutc = +7.50" COMMAND_TERMINATOR,
+            "offsetfromutc = +7.50" RESPONSE_TERMINATOR,
             {
                 .dateTime = 1537480154000LL,
                 .offsetFromUtc = 7.5
@@ -169,7 +175,7 @@ TEST_LOGGER3(clock)
         {
             "clock" COMMAND_TERMINATOR,
             "clock datetime = 20180920214914, "
-            "offsetfromutc = -4.00" COMMAND_TERMINATOR,
+            "offsetfromutc = -4.00" RESPONSE_TERMINATOR,
             {
                 .dateTime = 1537480154000LL,
                 .offsetFromUtc = -4
@@ -188,12 +194,16 @@ TEST_LOGGER3(clock_set)
         .offsetFromUtc = 0
     };
 
-    const char *command = "clock datetime = 20190215210558, "
-                          "offsetfromutc = 0.000000" COMMAND_TERMINATOR;
-    TestIOBuffers_init(buffers, command, 0);
+    const char *text = "clock datetime = 20190215210558, "
+                          "offsetfromutc = 0.000000";
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
+
+    TestIOBuffers_init(buffers, response, 0);
     RBRInstrumentError err = RBRInstrument_setClock(instrument, &now);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -259,7 +269,7 @@ TEST_LOGGER2(sampling)
             "sampling" COMMAND_TERMINATOR,
             "sampling schedule = 1, mode = continuous, period = 167, "
             "burstlength = 10, burstinterval = 10000, gate = none, "
-            "userperiodlimit = 167" COMMAND_TERMINATOR,
+            "userperiodlimit = 167" RESPONSE_TERMINATOR,
             {
                 .mode = RBRINSTRUMENT_SAMPLING_CONTINUOUS,
                 .period = 167,
@@ -274,7 +284,7 @@ TEST_LOGGER2(sampling)
             "sampling" COMMAND_TERMINATOR,
             "sampling schedule = 1, mode = ddsampling, period = 83, "
             "burstlength = 10, burstinterval = 10000, gate = thresholding, "
-            "userperiodlimit = 83" COMMAND_TERMINATOR,
+            "userperiodlimit = 83" RESPONSE_TERMINATOR,
             {
                 .mode = RBRINSTRUMENT_SAMPLING_DDSAMPLING,
                 .period = 83,
@@ -298,7 +308,7 @@ TEST_LOGGER3(sampling)
             "sampling all" COMMAND_TERMINATOR,
             "sampling mode = continuous, period = 1000, burstlength = 240, "
             "burstinterval = 300000, gate = none, userperiodlimit = 32, "
-            "availablefastperiods = 500|250|125|63|32" COMMAND_TERMINATOR,
+            "availablefastperiods = 500|250|125|63|32" RESPONSE_TERMINATOR,
             {
                 .mode = RBRINSTRUMENT_SAMPLING_CONTINUOUS,
                 .period = 1000,
@@ -314,7 +324,7 @@ TEST_LOGGER3(sampling)
             "sampling mode = continuous, period = 1000, burstlength = 10, "
             "burstinterval = 10000, gate = thresholding, "
             "userperiodlimit = 1000, availablefastperiods = none"
-            COMMAND_TERMINATOR,
+            RESPONSE_TERMINATOR,
             {
                 .mode = RBRINSTRUMENT_SAMPLING_CONTINUOUS,
                 .period = 1000,
@@ -334,8 +344,8 @@ TEST_LOGGER3(sampling)
 typedef struct SamplingSetTest
 {
     RBRInstrumentSampling sampling;
-    const char *command;
-    const char *burstCommand;
+    const char *response;
+    const char *burstResponse;
     RBRInstrumentError expectedError;
     RBRInstrumentError expectedBurstError;
 } SamplingSetTest;
@@ -353,9 +363,8 @@ TEST_LOGGER3(sampling_set)
                 .burstInterval = 300000,
                 .gate = RBRINSTRUMENT_GATE_NONE
             },
-            "sampling mode = continuous, period = 1000" COMMAND_TERMINATOR,
-            "sampling burstlength = 240, burstinterval = 300000"
-            COMMAND_TERMINATOR,
+            "sampling mode = continuous, period = 1000",
+            "sampling burstlength = 240, burstinterval = 300000",
             RBRINSTRUMENT_SUCCESS,
             RBRINSTRUMENT_SUCCESS
         },
@@ -401,7 +410,7 @@ TEST_LOGGER3(sampling_set)
                 .burstInterval = 1000 * 240,
                 .gate = RBRINSTRUMENT_GATE_NONE
             },
-            "sampling mode = continuous, period = 1000" COMMAND_TERMINATOR,
+            "sampling mode = continuous, period = 1000",
             "",
             RBRINSTRUMENT_SUCCESS,
             /* Failure because the burst interval is inconsistent. */
@@ -412,19 +421,23 @@ TEST_LOGGER3(sampling_set)
 
     RBRInstrumentError err;
 
-    for (int i = 0; tests[i].command != NULL; i++)
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
+    for (int i = 0; tests[i].response != NULL; i++)
     {
-        TestIOBuffers_init(buffers, tests[i].command, 0);
+        rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
+        TestIOBuffers_init(buffers, response, 0);
         err = RBRInstrument_setSampling(instrument, &tests[i].sampling);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentError);
-        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+        TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
-        TestIOBuffers_init(buffers, tests[i].burstCommand, 0);
+        rbr_prepareCommandResponse(tests[i].burstResponse, expectedCommand, response);
+        TestIOBuffers_init(buffers, response, 0);
         err = RBRInstrument_setBurstSampling(instrument, &tests[i].sampling);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedBurstError,
                             err,
                             RBRInstrumentError);
-        TEST_ASSERT_STR_EQ(tests[i].burstCommand, buffers->writeBuffer);
+        TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     }
 
     return true;
@@ -471,9 +484,9 @@ TEST_LOGGER2(deployment)
             "starttime" COMMAND_TERMINATOR
             "endtime" COMMAND_TERMINATOR
             "status" COMMAND_TERMINATOR,
-            "starttime = 20000101000000" COMMAND_TERMINATOR
-            "endtime = 2099123123595959" COMMAND_TERMINATOR
-            "status = disabled" COMMAND_TERMINATOR,
+            "starttime = 20000101000000" RESPONSE_TERMINATOR
+            "endtime = 2099123123595959" RESPONSE_TERMINATOR
+            "status = disabled" RESPONSE_TERMINATOR,
             {
                 .startTime = RBRINSTRUMENT_DATETIME_MIN,
                 .endTime = RBRINSTRUMENT_DATETIME_MAX,
@@ -492,7 +505,7 @@ TEST_LOGGER3(deployment)
         {
             "deployment" COMMAND_TERMINATOR,
             "deployment starttime = 20000101000000, "
-            "endtime = 2099123123595959, status = disabled" COMMAND_TERMINATOR,
+            "endtime = 2099123123595959, status = disabled" RESPONSE_TERMINATOR,
             {
                 .startTime = RBRINSTRUMENT_DATETIME_MIN,
                 .endTime = RBRINSTRUMENT_DATETIME_MAX,
@@ -508,7 +521,7 @@ TEST_LOGGER3(deployment)
 typedef struct DeploymentSetTest
 {
     RBRInstrumentDeployment deployment;
-    const char *command;
+    const char *response;
     RBRInstrumentError expectedError;
 } DeploymentSetTest;
 
@@ -522,7 +535,7 @@ TEST_LOGGER3(deployment_set)
                 .status = RBRINSTRUMENT_STATUS_DISABLED
             },
             "deployment starttime = 20000101000000, "
-            "endtime = 20991231235959" COMMAND_TERMINATOR,
+            "endtime = 20991231235959",
             RBRINSTRUMENT_SUCCESS
         },
         {
@@ -570,12 +583,15 @@ TEST_LOGGER3(deployment_set)
 
     RBRInstrumentError err;
 
-    for (int i = 0; tests[i].command != NULL; i++)
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
+    for (int i = 0; tests[i].response != NULL; i++)
     {
-        TestIOBuffers_init(buffers, tests[i].command, 0);
+        rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
+        TestIOBuffers_init(buffers, response, 0);
         err = RBRInstrument_setDeployment(instrument, &tests[i].deployment);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentError);
-        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentError);  
+        TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     }
 
     return true;

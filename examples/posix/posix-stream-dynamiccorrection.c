@@ -102,7 +102,11 @@ RBRInstrumentError applyCorrection(RBRInstrument *instrument, int dynamicCorrect
     RBRDynamicCorrectionResult      corrResult;
 
     /* first step, initialiaze the algorithm using the proper sampling rate */
-    status = RBRDynamicCorrection_init(&params, Fs, DCORR_T_DELAY, DCORR_ALPHA, DCORR_TAU, DCORR_CT_COEFF);
+    status = RBRDynamicCorrection_init(&params, Fs, DCORR_T_DELAY, 
+                                    DCORR_ALPHA_A, DCORR_ALPHA_E,
+                                    DCORR_TAU_A, DCORR_TAU_E,
+                                    DCORR_CT_COEFF_A, DCORR_CT_COEFF_E,
+                                    DCORR_VP_MIN, DCORR_VP_MAX, DCORR_VP_FC);
     if ( status != RBR_DCORR_SUCCESS )
     {
         fprintf(stderr, "RBRDynamicCorrection_init() return error code %u\n", status);
@@ -262,25 +266,30 @@ int main(int argc, char *argv[])
 
         /* if only absolute pressure channel detected, it will be marked 
         * to inform dynamiccorrection algorithm to convert it to sea pressure before use.
-        * if neither absolute pressure channel nor sea pressure channel detected, it will not be treated as CTD.
+        * if neither absolute pressure channel nor sea pressure channel detected, it will not be treated as CTD instrument.
         */
-        if(_iSeaP == -1){
-            if (_flagAbsP == true) {
-                dynamicCorrection_channel[2]= _iAbsP;
+        if (_iSeaP >= 0){
+            //found sea pressure channel, use it
+            dynamicCorrection_channel[2]= _iSeaP;
+        }
+        else{
+            //didn't find sea pressure channel
+            if(_flagAbsP == true){ //found absolute pressure channel, use it
+                dynamicCorrection_channel[2]=_iAbsP;
             }
-            else{
+            else{ //didn't find absolute pressure channel
                 isCtd = false;
             }
         }
 
-        /* if not all 4 channels above are detected, then it will not be treated as CTD.*/
+        /* if not all 4 channels (C.T.D.Tcond) above are detected, it will not be treated as CTD instrument.*/
         if (i<4){
             isCtd = false;
         }
     }
     
     if ( isCtd == false ){
-        fprintf(stderr, "Warning: Logger doesn't have all these channels on:\n  conductivity_00, temperature_00, pressure_00|seapressure_00, conductivitycelltemperature_00\n");
+        fprintf(stderr, "Warning: Logger doesn't have all these channels ON:\n  conductivity_00, temperature_00, pressure_00|seapressure_00, conductivitycelltemperature_00\n");
         goto instrumentCleanup;
     }
 
@@ -346,7 +355,7 @@ int main(int argc, char *argv[])
     /* sampling.period is in ms, samplingRate is in Hz */
     float samplingRate = 1000.0 / (float)sampling.period;
 
-    if(isCtd == true){
+    if(isCtd == true) {
         err = applyCorrection(instrument, dynamicCorrection_channel, _flagAbsP, samplingRate);
         if (err != RBRINSTRUMENT_SUCCESS)
         {
@@ -361,6 +370,3 @@ fileCleanup:
 
     return status;
 }
-
-
-

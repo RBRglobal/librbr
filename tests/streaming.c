@@ -41,7 +41,7 @@ TEST_LOGGER3(outputformat_channelslist)
         buffers,
         "outputformat channelslist = temperature(C)|pressure(dbar)"
         "|pressure(dbar)|depth(m)|measurement_count(counts)"
-        COMMAND_TERMINATOR,
+        RESPONSE_TERMINATOR,
         0);
     err = RBRInstrument_getChannelsList(instrument, &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -89,7 +89,7 @@ TEST_LOGGER3(outputformat_labelslist)
         buffers,
         "outputformat labelslist = temperature_00|pressure_00|seapressure_00"
         "|depth_00|count_00"
-        COMMAND_TERMINATOR,
+        RESPONSE_TERMINATOR,
         0);
     err = RBRInstrument_getLabelsList(instrument, &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -117,7 +117,26 @@ bool test_outputformat_support(RBRInstrument *instrument)
         | RBRINSTRUMENT_OUTFORMAT_CALTEXT04,
         formats,
         "0x%04X");
+    return true;
+}
 
+/* test outputformat caltext07 for LOGGER3 with firmware >= 1.109. */
+bool test_outputformat_support_caltext07(RBRInstrument *instrument)
+{
+    RBRInstrumentError err;
+    RBRInstrumentOutputFormat formats;
+
+    err = RBRInstrument_getAvailableOutputFormats(instrument, &formats);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    /* assuming instrument->id.fwtype==104, and id.version>=1.109. */
+    TEST_ASSERT_EQ(
+        RBRINSTRUMENT_OUTFORMAT_CALTEXT01
+        | RBRINSTRUMENT_OUTFORMAT_CALTEXT02
+        | RBRINSTRUMENT_OUTFORMAT_CALTEXT03
+        | RBRINSTRUMENT_OUTFORMAT_CALTEXT04
+        | RBRINSTRUMENT_OUTFORMAT_CALTEXT07,
+        formats,
+        "0x%04X");
     return true;
 }
 
@@ -126,7 +145,7 @@ TEST_LOGGER2(outputformat_support)
     TestIOBuffers_init(
         buffers,
         "outputformat support = caltext01, caltext02, caltext03, caltext04"
-        COMMAND_TERMINATOR,
+        RESPONSE_TERMINATOR,
         0);
     return test_outputformat_support(instrument);
 }
@@ -136,9 +155,20 @@ TEST_LOGGER3(outputformat_availabletypes)
     TestIOBuffers_init(
         buffers,
         "outputformat availabletypes = caltext01|caltext02|caltext03|caltext04"
-        COMMAND_TERMINATOR,
+        RESPONSE_TERMINATOR,
         0);
     return test_outputformat_support(instrument);
+}
+
+/* test outputformat caltext07 for LOGGER3 with firmware >= 1.109. */
+TEST_LOGGER3(outputformat_availabletypes_caltext07)
+{
+    TestIOBuffers_init(
+        buffers,
+        "outputformat availabletypes = caltext01|caltext02|caltext03|caltext04|caltext07"
+        RESPONSE_TERMINATOR,
+        0);
+    return test_outputformat_support_caltext07(instrument);
 }
 
 TEST_LOGGER3(outputformat_type)
@@ -147,7 +177,7 @@ TEST_LOGGER3(outputformat_type)
     RBRInstrumentOutputFormat format;
 
     TestIOBuffers_init(buffers,
-                       "outputformat type = caltext01" COMMAND_TERMINATOR,
+                       "outputformat type = caltext01" RESPONSE_TERMINATOR,
                        0);
     err = RBRInstrument_getOutputFormat(instrument, &format);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -160,7 +190,7 @@ TEST_LOGGER3(outputformat_type)
 
 typedef struct ToggleTest
 {
-    const char *command;
+    const char *response;
     bool expected;
 } ToggleTest;
 
@@ -170,14 +200,14 @@ TEST_LOGGER3(streamusb)
     bool actual;
 
     ToggleTest tests[] = {
-        {"streamusb state = on" COMMAND_TERMINATOR, true},
-        {"streamusb state = off" COMMAND_TERMINATOR, false},
+        {"streamusb state = on" RESPONSE_TERMINATOR, true},
+        {"streamusb state = off" RESPONSE_TERMINATOR, false},
         {NULL, 0}
     };
 
-    for (int i = 0; tests[i].command != NULL; i++)
+    for (int i = 0; tests[i].response != NULL; i++)
     {
-        TestIOBuffers_init(buffers, tests[i].command, 0);
+        TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_getUSBStreamingState(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
         TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, bool);
@@ -192,14 +222,14 @@ TEST_LOGGER3(streamserial)
     bool actual;
 
     ToggleTest tests[] = {
-        {"streamserial state = on" COMMAND_TERMINATOR, true},
-        {"streamserial state = off" COMMAND_TERMINATOR, false},
+        {"streamserial state = on" RESPONSE_TERMINATOR, true},
+        {"streamserial state = off" RESPONSE_TERMINATOR, false},
         {NULL, 0}
     };
 
-    for (int i = 0; tests[i].command != NULL; i++)
+    for (int i = 0; tests[i].response != NULL; i++)
     {
-        TestIOBuffers_init(buffers, tests[i].command, 0);
+        TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_getSerialStreamingState(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
         TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, bool);
@@ -226,7 +256,7 @@ TEST_LOGGER2(streamserial_aux)
     TestIOBuffers_init(
         buffers,
         "streamserial aux1_state = off, aux1_setup = 1000, aux1_hold = 1000, "
-        "aux1_active = high, aux1_sleep = tristate" COMMAND_TERMINATOR,
+        "aux1_active = high, aux1_sleep = tristate" RESPONSE_TERMINATOR,
         0);
     err = RBRInstrument_getAuxOutput(instrument, &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -257,15 +287,17 @@ TEST_LOGGER2(streamserial_set_aux)
 
     RBRInstrumentError err;
 
-    const char *response = "streamserial aux1_state = on, "
+    const char *text = "streamserial aux1_state = on, "
                            "aux1_setup = 500, aux1_hold = 750, "
-                           "aux1_active = low, aux1_sleep = high"
-                           COMMAND_TERMINATOR;
+                           "aux1_active = low, aux1_sleep = high";
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
     err = RBRInstrument_setAuxOutput(instrument, &auxOutput);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(response, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -289,7 +321,7 @@ TEST_LOGGER3(streamserial_aux)
         buffers,
         "streamserial aux1_enabled = false, aux1_setup = 1000, "
         "aux1_hold = 1000, aux1_active = high, aux1_sleep = tristate"
-        COMMAND_TERMINATOR,
+        RESPONSE_TERMINATOR,
         0);
     err = RBRInstrument_getAuxOutput(instrument, &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -334,15 +366,17 @@ TEST_LOGGER3(streamserial_set_aux)
 
     RBRInstrumentError err;
 
-    const char *response = "streamserial aux1_enabled = true, "
+    const char *text = "streamserial aux1_enabled = true, "
                            "aux1_setup = 500, aux1_hold = 750, "
-                           "aux1_active = low, aux1_sleep = high"
-                           COMMAND_TERMINATOR;
+                           "aux1_active = low, aux1_sleep = high";
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
     err = RBRInstrument_setAuxOutput(instrument, &auxOutput);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_STR_EQ(response, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
 }
@@ -353,7 +387,7 @@ TEST_LOGGER3(stream_sample_parse)
 
     TestIOBuffers_init(
         buffers,
-        "2018-07-26 14:56:24.000, 10.1325" COMMAND_TERMINATOR,
+        "2018-07-26 14:56:24.000, 10.1325" RESPONSE_TERMINATOR,
         0);
     err = RBRInstrument_readSample(instrument);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);

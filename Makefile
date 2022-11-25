@@ -112,6 +112,7 @@ bin/libRBR.a: bin bin/libRBR.a(src/RBRInstrument.o \
                                src/RBRInstrumentInternal.o \
                                src/RBRInstrumentMemory.o \
                                src/RBRInstrumentOther.o \
+                               src/RBRInstrumentPauseresume.o \
                                src/RBRInstrumentSchedule.o \
                                src/RBRInstrumentSecurity.o \
                                src/RBRInstrumentStreaming.o \
@@ -153,7 +154,8 @@ TEST_MODULES := communication \
                 security \
                 streaming \
                 vehicle \
-                parser
+                parser \
+                pauseresume
 
 bin/tests: bin/libRBR.a \
            bin/libRBRDynamicCorrection.a \

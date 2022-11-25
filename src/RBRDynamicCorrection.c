@@ -26,6 +26,9 @@
 #define ISNAN(x) (x != x)
 #endif
 
+#ifndef M_PI
+#define M_PI 3.14159265f
+#endif
 
 
 /* parameters for PSS-78 conversion */
@@ -105,6 +108,12 @@ float RBRDynamicCorrection_PSS78(float C, float T, float P)
 
     // sqrt(RT)
     RT_sqrt = sqrtf(RT);
+    if ( ISNAN(RT_sqrt) )
+    {
+        /* comply with RBR logger conversion
+         * when salinity value is undefined */
+        return 0.0f;
+    }
 
     S_1 = PSS78_A4 + PSS78_A5*RT_sqrt;
     S_1 = PSS78_A3 + S_1*RT_sqrt;
@@ -159,12 +168,12 @@ void RBRDynamicCorrection_initLagArray(RBRDynamicCorrectionParams *params)
     }
 }
 
-/* apply temparature interpolation */
+/* apply temperature interpolation */
 float RBRDynamicCorrection_applyTempCorr(RBRDynamicCorrectionParams *params, float T_meas)
 {
     float T_cor;
 
-    /* (first evaluation will be incorrect, but won't be used */
+    /* (first evaluation will be incorrect, but won't be used) */
     T_cor = (1.0 - params->_phi)*params->_T_meas_lag + (params->_phi)*T_meas;
 
     return T_cor;
@@ -282,66 +291,162 @@ int32_t RBRDynamicCorrection_updateLag(RBRDynamicCorrectionParams *params, const
     return isValid;
 }
 
-
 RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionParams *params, float Fs)
 {
-    float F_nyquist;
-    
     /* sanity check */
     if ( DCORR_MAX_LAG_ARRAY/Fs < DCORR_T_DELAY )
     {
         return RBR_DCORR_INVALID_SAMPLING_RATE;
     }
 
-    // calculate a, b from initial parameters
+    // parameters _cte_a and _cte_b no longer valid.
+    // But they will be updated on next call to _addMeasurement().
     params->Fs = Fs;
-    F_nyquist = params->Fs / 2.0f;
-    params->_cte_a = 4.0f*F_nyquist * (params->alpha*params->tau) / (1.0 + 4.0f*F_nyquist*params->tau);
-    params->_cte_b = 1.0f -  2.0f * params->_cte_a / params->alpha;
 
     // not enough info to update, keep unchanged
     params->_T_short_lag = params->_T_short_lag;
 
     RBRDynamicCorrection_initCorrectionCoeff(params, Fs);
-    //RBRDynamicCorrection_initLagArray(params);
     RBRDynamicCorrection_resampleLag(params, params->_timestamp_lagArray[0], Fs);
 
     return RBR_DCORR_SUCCESS;
 }
 
-RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *params, float Fs, 
-            float t_delay, float alpha, float tau, float CT_coeff)
+/* calculate the ascent rate (in our case, using the pressure as unit).
+ * return Vp (positive for ascent, negative for descent)*/
+float RBRDynamicCorrection_calcAscentRate(RBRDynamicCorrectionParams *params, float timestamp, float pressure)
+{
+    float Vp;
+    float a;
+    float deltaT;
+
+    a = 1.0f - expf(-2.0f*M_PI*params->Vp_fc / params->Fs);
+
+    if ( !ISNAN(params->_ascentRate) )
+    {
+        Vp = params->_ascentRate;
+    }
+    else
+    {
+        Vp = 0.0f;  
+    }
+
+    if ( !ISNAN(pressure) )
+    {
+        /* NOTE: _lastPressureTime is initialiazed to negative value.
+         * We cannot calculate ascent rate until we got two samples */
+        if ( params->_lastPressureTime > 0 )
+        {
+            deltaT = timestamp - params->_lastPressureTime;
+            if ( deltaT > 1.0f / params->Fs )
+            {
+                a = 1.0f - expf(-2.0f*M_PI*params->Vp_fc * deltaT);
+                Vp = (1.0f - a)*Vp + a*((params->_lastPressure - pressure)/deltaT);
+            }
+            else
+            {
+                Vp = (1.0f - a)*Vp + a*((params->_lastPressure - pressure)*params->Fs);
+            }
+        }
+
+        // update the pressure for next step
+        params->_lastPressure = pressure;
+        params->_lastPressureTime = timestamp;
+        params->_ascentRate = Vp;
+    }
+
+    /* we want ascent rate (positive for ascent) */
+    return Vp;
+}
+
+void RBRDynamicCorrection_updateVariables(RBRDynamicCorrectionParams *params, float Vp)
 {
     float F_nyquist;
+    float alpha, tau;
 
+    /* for evaluation of 'alpha', 'tau' and 'CT_coeff',
+     * the value for 'Vp' need to clamp between 'min' and 'max' */
+    if ( Vp < params->Vp_min )
+    {
+        Vp = params->Vp_min;
+    }
+    if ( Vp > params->Vp_max )
+    {
+        Vp = params->Vp_max;
+    }
+
+    /* new evaluation */
+    alpha = params->alpha_a * powf(Vp, params->alpha_e);
+    tau = params->tau_a * powf(Vp, params->tau_e);
+    params->alpha = alpha;
+    params->tau = tau;
+    params->CT_coeff = params->ctcoeff_a * powf(Vp, params->ctcoeff_e);
+
+    F_nyquist = params->Fs / 2.0f;
+    params->_cte_a = (4.0f*F_nyquist * alpha * tau) / (1.0 + 4.0f*F_nyquist * tau);
+    params->_cte_b = 1.0f -  2.0f * params->_cte_a / alpha;
+}
+
+void RBRDynamicCorrection_updatePressure(RBRDynamicCorrectionParams *params, float timestamp, float pressure)
+{
+    float Vp;
+
+    Vp = RBRDynamicCorrection_calcAscentRate(params, timestamp, pressure);
+
+    RBRDynamicCorrection_updateVariables(params, Vp);
+}
+
+RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *params, float Fs,
+                                            float t_delay, float alpha_a, float alpha_e, 
+                                            float tau_a, float tau_e, float ctcoeff_a, float ctcoeff_e, 
+                                            float Vp_min, float Vp_max, float Vp_fc)
+{
     /* sanity check */
     if ( DCORR_MAX_LAG_ARRAY/Fs < DCORR_T_DELAY )
     {
-        return RBR_DCORR_INVALID_SAMPLING_RATE;
+        return DYN_CORR_BAD_PARAMS;
+    }
+    if ( Vp_min < 0.0f || Vp_max < 0.0f )
+    {
+        return DYN_CORR_BAD_PARAMS;
+    }
+    if ( Vp_max < Vp_min )
+    {
+        return DYN_CORR_BAD_PARAMS;
     }
 
     params->Fs = Fs;
     params->t_delay = t_delay;
-    params->alpha = alpha;
-    params->tau = tau;
-    params->CT_coeff = CT_coeff;
+    params->alpha_a = alpha_a;
+    params->alpha_e = alpha_e;
+    params->tau_a = tau_a;
+    params->tau_e = tau_e;
+    params->ctcoeff_a = ctcoeff_a;
+    params->ctcoeff_e = ctcoeff_e;
+    params->Vp_min = Vp_min;
+    params->Vp_max = Vp_max;
+    params->Vp_fc = Vp_fc;
 
     params->_firstCall = 1;
-    params->_blankingPeriod = 0;
     params->_T_meas_lag = -999.0f;
     params->_T_cor_lag = 0.0f;
     params->_T_short_lag = 0.0f;
-    
-    // calculate a, b from initial parameters
-    F_nyquist = params->Fs / 2.0f;
-    params->_cte_a = 4.0f*F_nyquist * (params->alpha*params->tau) / (1.0 + 4.0f*F_nyquist*params->tau);
-    params->_cte_b = 1.0f -  2.0f * params->_cte_a / params->alpha;
+
+    params->_ascentRate = -1.0f;
+    params->_lastPressure = -1.0f;
+    params->_lastPressureTime = -1.0f;
+
+    /* we don't want uninitialiazed values, but we don't know
+     * the ascent rate yet.  Let just use the mid-point for now,
+     * this will get re-evaluated in _addMeasurement() anyway */
+    RBRDynamicCorrection_updateVariables(params, 0.5f*(Vp_min + Vp_max));
     
     RBRDynamicCorrection_initCorrectionCoeff(params, Fs);
     RBRDynamicCorrection_initLagArray(params);
 
     return RBR_DCORR_SUCCESS;
 }
+
 
 RBRDynamicCorrectionError RBRDynamicCorrection_addMeasurement(RBRDynamicCorrectionParams *params, const RBRDynamicCorrectionMeasurement * measIn, RBRDynamicCorrectionResult * corrMeasOut)
 {
@@ -351,10 +456,15 @@ RBRDynamicCorrectionError RBRDynamicCorrection_addMeasurement(RBRDynamicCorrecti
     float timestamp;
     float C_meas, T_meas, P_meas, T_cond;
     float S_cor;
+    int32_t isFasterSampling;
     int32_t isValid;
-    int32_t isDataError;
+    int32_t isDataError = 0;
     RBRDynamicCorrectionError statusCode = DYN_CORR_UNKNOWN_ERROR;
 
+    /* flag to indicate 'fast sampling (>= 1Hz)'.
+     * In this case, the data won't go through the 0.35s lag and
+     * it will bypass the short-term thermal correction */
+    isFasterSampling = (params->Fs >= 1.0f) ? 1 : 0;
 
     T_meas = measIn->marineTemperature;
 
@@ -366,10 +476,39 @@ RBRDynamicCorrectionError RBRDynamicCorrection_addMeasurement(RBRDynamicCorrecti
         params->_firstCall = 0;
     }
 
-    T_cor = RBRDynamicCorrection_applyTempCorr(params, T_meas);
+    // Interpolate the temperature with time offset 't_delay'.
+    // (only for >= 1Hz data rate)
+    if ( isFasterSampling )
+    {
+        T_cor = RBRDynamicCorrection_applyTempCorr(params, T_meas);
+    }
+    else
+    {
+        T_cor = T_meas;
+    }
 
-    /* the variables need to be delayed until all samples are available for calculation */
-    isValid = RBRDynamicCorrection_updateLag(params, measIn, &measLagged);
+    /* update coefficient alpha, tau and ctcoeff based on ascent rate 
+     * (use instantaneous value, the filter is several second and data only
+     * got a lag delay of 0.35s.  Since the first pass of the filter need to
+     * be initialiazed anyway, this will do the trick since the data will need to feed
+     * multiple time before reaching the 0.35s mark */
+    RBRDynamicCorrection_updatePressure(params, measIn->timestamp, measIn->pressure);
+
+    /* the variables need to be delayed until all samples are available for calculation
+     * (only when rate >= 1Hz) */
+    if ( isFasterSampling )
+    {
+        isValid = RBRDynamicCorrection_updateLag(params, measIn, &measLagged);
+    }
+    else
+    {
+        /* we still need to update the array (in case sampling rate change) */
+        RBRDynamicCorrection_updateLag(params, measIn, &measLagged);
+        
+        /* ignore the lag, just copy the data to the variable */
+        isValid = 1;
+        memcpy(&measLagged, measIn, sizeof(RBRDynamicCorrectionMeasurement));
+    }
 
     if ( !isValid )
     {
@@ -395,17 +534,19 @@ RBRDynamicCorrectionError RBRDynamicCorrection_addMeasurement(RBRDynamicCorrecti
         P_meas = measLagged.pressure;
         T_cond = measLagged.condTemperature;
 
-        if ( isDataError )
-        {
-            /* blank period (make sure it is at least 1 sample) */
-            params->_blankingPeriod = (int)(params->Fs * DCORR_ERROR_PERIOD) + 1;
-        }
-
         /* long-term thermal mass adjustment */
         T_long = params->CT_coeff * (T_cond - T_cor);
 
-        /* short-term thermal mass adjustment */
-        T_short = -params->_cte_b*params->_T_short_lag + params->_cte_a*(T_cor - params->_T_cor_lag);
+        /* apply the short-term thermal mass adjustment (but only when rate >= 1Hz) */
+        if ( isFasterSampling )
+        {
+            T_short = -params->_cte_b*params->_T_short_lag + params->_cte_a*(T_cor - params->_T_cor_lag);
+        }
+        else
+        {
+            /* do a no-op */
+            T_short = 0;
+        }
 
         T_cell = T_cor + T_long - T_short;
 
@@ -427,9 +568,8 @@ RBRDynamicCorrectionError RBRDynamicCorrection_addMeasurement(RBRDynamicCorrecti
     }
 
     /* flag the data with potential issue */
-    if ( params->_blankingPeriod > 0 )
+    if ( isDataError )
     {
-        params->_blankingPeriod--;
         statusCode = DYN_CORR_CORRUPTED;
     }
 
