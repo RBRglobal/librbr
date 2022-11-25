@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # This file runs on Ubuntu and Raspbian. Interrupt with Ctl+C anytime.
-# Run with command $./<filename.sh> or $sh ./<filename.sh>
+# Run with command $<dir> ./<filename.sh> or $sh <dir> ./<filename.sh>
 # If it doesn't work, use command $chmod u+x <filename.sh> first before running.
 
 SCRIPT_DIR="$(dirname "$0")"
