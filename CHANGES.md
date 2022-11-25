@@ -11,15 +11,12 @@ Released 2022-11-25
 * support pause/resume feature for LOGGER3 with fw 1.116 or later.
 * added example bash file to auto connect to RBRinstrument wifi.
 * added error code RBRINSTRUMENT_COMMUNICATION_ERROR.
-* added pipelines steps: GCC10, GCC11, Clang12.
 
 ### Changed
 
-* changed dynamic correction algorithm behavior for slow sampling rate and error accommondation.
 * changed command terminator to \r instead of \r\n.
 * checks if offset in response matches request.
 * updated description of function RBRInstrumentSleepCallBack in RBRInstrument.h.
-* changed pipelines steps to parallel.
 
 ## v1.2.2
 
