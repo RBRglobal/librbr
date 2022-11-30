@@ -87,6 +87,10 @@ int main(int argc, char *argv[])
             RBRINSTRUMENT_LIB_BUILD_DATE);
 
     RBRParser *parser = NULL;
+    #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
+    RBRParser parserSpace;
+    parser = &parserSpace;
+    #endif
 
     RBRInstrumentSample sampleBuffer;
     RBRParserCallbacks parserCallbacks = {

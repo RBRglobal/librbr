@@ -11,7 +11,9 @@
 /* Required for memcpy, memcmp, memset, strlen. */
 #include <string.h>
 /* Required for free/malloc. */
+#ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
 #include <stdlib.h>
+#endif
 
 #include "RBRInstrument.h"
 #include "RBRInstrumentInternal.h"
@@ -159,10 +161,14 @@ RBRInstrumentError RBRInstrument_open(RBRInstrument **instrument,
     if (*instrument == NULL)
     {
         allocated = true;
+        #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
         if ((*instrument = malloc(sizeof(RBRInstrument))) == NULL)
         {
+        #endif
             return RBRINSTRUMENT_ALLOCATION_FAILURE;
+        #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
         }
+        #endif
     }
 
     memset(*instrument, 0, sizeof(RBRInstrument));
@@ -184,7 +190,9 @@ RBRInstrumentError RBRInstrument_open(RBRInstrument **instrument,
     {
         if (allocated)
         {
+            #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
             free(*instrument);
+            #endif
         }
         return err;
     }
@@ -194,7 +202,9 @@ RBRInstrumentError RBRInstrument_open(RBRInstrument **instrument,
     {
         if (allocated)
         {
+            #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
             free(*instrument);
+            #endif
         }
         return RBRINSTRUMENT_UNSUPPORTED;
     }
@@ -210,7 +220,9 @@ RBRInstrumentError RBRInstrument_close(RBRInstrument *instrument)
 {
     if (instrument->managedAllocation)
     {
+    #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
         free(instrument);
+    #endif
     }
 
     return RBRINSTRUMENT_SUCCESS;

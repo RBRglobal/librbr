@@ -136,6 +136,9 @@ tests: LDLIBS += -lRBR -lRBRDynamicCorrection -lm
 tests: bin bin/tests
 	./bin/tests
 
+nomalloc: CFLAGS += -DRBR_LIB_NODYNAMICMEMORYALLOCATION
+nomalloc: lib libdynamiccorrection docs tests
+
 ## \brief Test modules.
 ##
 ## Each one of these names corresponds to a C source file in the `tests/`

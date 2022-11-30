@@ -34,6 +34,10 @@ int main(int argc, char *argv[])
 
     RBRInstrumentError err;
     RBRInstrument *instrument = NULL;
+    #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
+    RBRInstrument instrumentSpace;
+    instrument = &instrumentSpace;
+    #endif
 
     if (argc < 2)
     {

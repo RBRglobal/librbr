@@ -13,7 +13,20 @@ Assuming librbr is already built.(if not, go to librbr directory, and then use c
 Go to librbr/examples/posix directory, then use sygwin command "make". Ignore the error you see.
 
 ## Tips before you start:
-(1) Check the baudrate:
+(1) build without dynamic memory allocation:
+build librbr without dynamic memory allocation first: 
+~~~{.sh}
+$ cd <PATH>/librbr
+$ make nomalloc
+~~~
+
+Then build posix examples without dynamic memory allocation:
+~~~{.sh}
+$ cd examples/posix
+$ make nomalloc
+~~~
+
+(2) Check the baudrate:
 If it's 9600, it's all good. If not, you'll need to modify librbr/examples/posix/posix-shared.c:
 ~~~{.c}
 #ifndef B115200
@@ -26,18 +39,18 @@ If it's 9600, it's all good. If not, you'll need to modify librbr/examples/posix
      */
     cfsetospeed(&portSettings, B9600);
 ~~~
-(2) Make sure which port is in use:
+(3) Confirm which port is in use:
 If terminal tool suggest COM6, it's most likely /dev/ttyS5 in cygwin.
 Alternatively, one can use cygwin command "ls /dev/ttyS*", then try it out. (ttyS5 is used as example below.)
 
-(3) How to clean the built files:
-To clean the .a, .o, .exe files one built, use cygwin command "make clean" in that folder directory.
+(4) How to clean the built files:
+To clean the .a, .o, .exe files one built, use cygwin command "$ make clean" in that folder directory.
 
-(4) For posix-stream-dynamiccorrection.c example, make sure these channels are ON:
+(5) For posix-stream-dynamiccorrection.c example, make sure these channels are ON:
 ~~~{.sh}
 conductivity_00, temperature_00, pressure_00/seapressure_00, conductivitycelltemperature_00
 ~~~
-(5) For posix-parse-download-dataset.c example, if downloading from dataset4, make sure the channels is set the same as number of channels in output.
+(6) For posix-parse-download-dataset.c example, if downloading from dataset4, make sure the channels is set the same as number of channels in output.
 for example, if we set in firmware:
 ~~~{.sh}
 >> postprocessing channels = mean(temperature_00_dyn_corr)|mean(pressure_00)|mean(salinity_00_dyn_corr)|mean(salinity_00)|mean(conductivitycelltemperature_00)

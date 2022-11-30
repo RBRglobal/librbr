@@ -1,5 +1,12 @@
 # Changes
 
+## v1.2.4
+Released TBD
+
+### Changed
+
+* added support for no dynamic memory allocation.
+
 ## v1.2.3
 
 Released 2022-11-25

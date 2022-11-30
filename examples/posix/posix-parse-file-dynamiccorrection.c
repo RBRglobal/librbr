@@ -154,6 +154,10 @@ int main(int argc, char *argv[])
     printf("-----------------------------------------------------------------------------------\n");
     
     RBRParser *parser = NULL;
+    #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
+    RBRParser parserSpace;
+    parser = &parserSpace;
+    #endif
 
     RBRInstrumentSample sampleBuffer;
     RBRParserCallbacks parserCallbacks = {

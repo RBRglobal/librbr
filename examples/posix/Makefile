@@ -12,6 +12,9 @@ LDLIBS := -lRBR -lm
 
 all: exampledynamiccorrection example
 
+nomalloc: CFLAGS += -DRBR_LIB_NODYNAMICMEMORYALLOCATION
+nomalloc: exampledynamiccorrection examplenomalloc
+
 example: posix-download \
          posix-download-wifi \
          posix-fetch \
@@ -23,6 +26,17 @@ example: posix-download \
          posix-pauseresume \
          posix-stream \
          posix-stream-sdl \
+
+examplenomalloc: posix-download \
+         posix-download-wifi \
+         posix-fetch \
+         posix-parse-download \
+         posix-parse-download-dataset \
+         posix-parse-file \
+         posix-parse-file-dynamiccorrection \
+         posix-postprocessing \
+         posix-pauseresume \
+         posix-stream
 
 exampledynamiccorrection: posix-parse-file-dynamiccorrection \
            posix-stream-dynamiccorrection \

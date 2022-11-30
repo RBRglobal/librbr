@@ -137,10 +137,14 @@ RBRInstrumentError RBRParser_init(RBRParser **parser,
     if (*parser == NULL)
     {
         allocated = true;
+        #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
         if ((*parser = malloc(sizeof(RBRParser))) == NULL)
         {
+        #endif
             return RBRINSTRUMENT_ALLOCATION_FAILURE;
+        #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
         }
+        #endif
     }
 
     memset(*parser, 0, sizeof(RBRParser));
@@ -152,11 +156,14 @@ RBRInstrumentError RBRParser_init(RBRParser **parser,
     return RBRINSTRUMENT_SUCCESS;
 }
 
+
 RBRInstrumentError RBRParser_destroy(RBRParser *parser)
 {
     if (parser->managedAllocation)
     {
+        #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
         free(parser);
+        #endif
     }
 
     return RBRINSTRUMENT_SUCCESS;
