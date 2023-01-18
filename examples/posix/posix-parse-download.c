@@ -26,6 +26,8 @@
 #include "posix-shared.h"
 #include "RBRParser.h"
 
+#define CHUNK_SIZE 1024
+
 RBRInstrumentError parserSample(
     const struct RBRParser *parser,
     const struct RBRInstrumentSample *const sample)
@@ -152,7 +154,7 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    uint8_t buf[1024];
+    uint8_t buf[CHUNK_SIZE];
     int32_t bufSize = 0;
     RBRInstrumentData data = {
         .dataset = RBRINSTRUMENT_DATASET_EASYPARSE_SAMPLE_DATA,

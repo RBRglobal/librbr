@@ -1,5 +1,5 @@
 # Generated artifacts.
-posix-dynamiccorrection
+dynamicCorrection-example
 *.exe
 
 # Temporary/output files.

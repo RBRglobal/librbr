@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     if (argc < 3)
     {
         fprintf(stderr, "command incomplete: %s\r\n", argv[0]);
-        printf("usage: <path>/dynamicCorrection-example <terminal> <dataset number>\r\n");
+        printf("usage: <path>/posix-parse-download-dataset <terminal> <dataset number>\r\n");
         printf("       %s\r\n","e.g: ./posix-parse-download-dataset /dev/ttyS5 1");
         return EXIT_FAILURE;
     }

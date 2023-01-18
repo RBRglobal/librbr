@@ -1,10 +1,15 @@
 # Generated artifacts.
 posix-download
+posix-download-wifi
 posix-fetch
 posix-parse-download
+posix-parse-download-dataset
 posix-parse-file
+posix-parse-file-dynamiccorrection
 posix-postprocessing
+posix-pauseresume
 posix-stream
+posix-stream-dynamiccorrection
 posix-stream-sdl
 *.exe
 
