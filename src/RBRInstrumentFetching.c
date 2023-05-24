@@ -101,6 +101,11 @@ RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument,
     {
         err = RBRINSTRUMENT_SUCCESS;
     }
-
+    
+    if(sleepAfter)
+    {
+    /* Instrument was put to sleep with "sleepAfter=true". */
+        instrument->lastActivityTime = RBRINSTRUMENT_NO_ACTIVITY;
+    }
     return err;
 }
