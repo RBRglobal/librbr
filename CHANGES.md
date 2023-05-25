@@ -6,6 +6,7 @@ Released TBD
 ### Changed
 
 * added support for no dynamic memory allocation.
+* fixed bug where wake up sequence not occuring after RBRInstrument_fetch() usage.
 
 ## v1.2.3
 
