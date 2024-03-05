@@ -1,0 +1,364 @@
+/**
+ * \file RBRInstrumentGen4Schedule.c
+ *
+ * \brief Library implementation.
+ *
+ * \copyright
+ * Copyright (c) 2018 RBR Ltd.
+ * Licensed under the Apache License, Version 2.0.
+ */
+
+/* Required for isnan, NAN. */
+#include <math.h>
+/* Required for memset, strcmp. */
+#include <string.h>
+
+#include "RBRInstrumentGen4.h"
+#include "RBRInstrumentGen4Internal.h"
+#include "RBRInstrumentGen4Schedule.h"
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getClock(RBRInstrumentGen4 *instrument,
+                                          RBRInstrumentGen4Clock *clock)
+{
+    clock->dateTime = 0;
+    clock->offsetFromUtc = NAN;
+
+RBR_TRY(RBRInstrumentGen4_converse(instrument, "clock"));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                    &command,
+                                    &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "datetime") == 0)
+        {
+            RBR_TRY(RBRInstrumentGen4DateTime_parseScheduleTime(parameter.value,
+                                                            &clock->dateTime,
+                                                            NULL));
+        }
+        else if (strcmp(parameter.key, "offsetfromutc") == 0
+                 && strcmp(parameter.value, "unknown") != 0)
+        {
+            clock->offsetFromUtc = strtod(parameter.value, NULL);
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_setClock(RBRInstrumentGen4 *instrument,
+                                          const RBRInstrumentGen4Clock *clock)
+{
+    if (clock->dateTime < RBRINSTRUMENTGEN4_DATETIME_MIN
+        || clock->dateTime > RBRINSTRUMENTGEN4_DATETIME_MAX)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    char dateTime[RBRINSTRUMENTGEN4_SCHEDULE_TIME_LEN + 1];
+    RBRInstrumentGen4DateTime_toScheduleTime(clock->dateTime, dateTime);
+
+    if (instrument->generation == RBRINSTRUMENTGEN4_LOGGER4)
+    {
+        float offsetFromUtc = (clock->offsetFromUtc);
+        if (!isnan(offsetFromUtc))
+        {
+            return RBRInstrumentGen4_converse(
+                instrument,
+                "clock datetime = %s, offsetfromutc = %02f",
+                dateTime,
+                offsetFromUtc);
+        }
+        else
+        {
+            return RBRInstrumentGen4_converse(instrument,
+                                        "clock datetime = %s",
+                                        dateTime);
+        }
+    }
+    else
+    {
+        return RBRINSTRUMENTGEN4_UNSUPPORTED;
+    }
+}
+
+const char *RBRInstrumentGen4DeploymentStatus_name(
+    RBRInstrumentGen4DeploymentStatus status)
+{
+    switch (status)
+    {
+    case RBRINSTRUMENTGEN4_STATUS_DISABLED:
+        return "disabled";
+    case RBRINSTRUMENTGEN4_STATUS_PENDING:
+        return "pending";
+    case RBRINSTRUMENTGEN4_STATUS_LOGGING:
+        return "logging";
+    case RBRINSTRUMENTGEN4_STATUS_GATED:
+        return "gated";
+    case RBRINSTRUMENTGEN4_STATUS_PAUSED:
+        return "paused";
+    case RBRINSTRUMENTGEN4_STATUS_FINISHED:
+        return "finished";
+    case RBRINSTRUMENTGEN4_STATUS_STOPPED:
+        return "stopped";
+    case RBRINSTRUMENTGEN4_STATUS_FULLANDSTOPPED:
+        return "fullandstopped";
+    case RBRINSTRUMENTGEN4_STATUS_FULL:
+        return "full";
+    case RBRINSTRUMENTGEN4_STATUS_FAILED:
+        return "failed";
+    case RBRINSTRUMENTGEN4_STATUS_NOTBLANK:
+        return "notblank";
+    case RBRINSTRUMENTGEN4_STATUS_UNKNOWN:
+        return "unknown";
+    case RBRINSTRUMENTGEN4_STATUS_COUNT:
+        return "status count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_STATUS:
+    default:
+        return "unknown status";
+    }
+}
+
+const char *RBRInstrumentGen4Gate_name(RBRInstrumentGen4Gate gate)
+{
+    switch (gate)
+    {
+    case RBRINSTRUMENTGEN4_GATE_NONE:
+        return "none";
+    case RBRINSTRUMENTGEN4_GATE_THRESHOLDING:
+        return "thresholding";
+    case RBRINSTRUMENTGEN4_GATE_TWISTACTIVATION:
+        return "twistactivation";
+    case RBRINSTRUMENTGEN4_GATE_INVALID:
+        return "invalid";
+    case RBRINSTRUMENTGEN4_GATE_COUNT:
+        return "gate count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_GATE:
+    default:
+        return "unknown gate";
+    }
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Deployment *deployment)
+{
+    (void)instrument;
+    (void)deployment;
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_setDeployment(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Deployment *deployment)
+{
+    if (deployment->endTime <= deployment->startTime
+        || deployment->startTime < RBRINSTRUMENTGEN4_DATETIME_MIN
+        || deployment->startTime > RBRINSTRUMENTGEN4_DATETIME_MAX
+        || deployment->endTime < RBRINSTRUMENTGEN4_DATETIME_MIN
+        || deployment->endTime > RBRINSTRUMENTGEN4_DATETIME_MAX)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    char startTime[RBRINSTRUMENTGEN4_SCHEDULE_TIME_LEN + 1];
+    RBRInstrumentGen4DateTime_toScheduleTime(deployment->startTime, startTime);
+
+    char endTime[RBRINSTRUMENTGEN4_SCHEDULE_TIME_LEN + 1];
+    RBRInstrumentGen4DateTime_toScheduleTime(deployment->endTime, endTime);
+
+    if (instrument->generation == RBRINSTRUMENTGEN4_LOGGER4)
+    {
+        RBR_TRY(RBRInstrumentGen4_converse(
+                    instrument,
+                    "deployment starttime = %s, endtime = %s",
+                    startTime,
+                    endTime));
+        return RBRINSTRUMENTGEN4_SUCCESS;
+    }
+    else
+    {
+        return RBRINSTRUMENTGEN4_UNSUPPORTED;
+    }
+}
+
+const char *RBRInstrumentGen4PauseresumeStatus_name(RBRInstrumentGen4PauseresumeStatus status)
+{
+    switch (status)
+    {
+    /* The deployment has been enabled and is paused */
+    case RBRINSTRUMENTGEN4_PAUSERESUME_STATUS_PAUSED:
+        return "paused";
+    /* The deployment has been enabled and will start at starttime */
+    case RBRINSTRUMENTGEN4_PAUSERESUME_STATUS_PENDING:
+        return "pending";
+    /* The deployment has been enabled and running */
+    case RBRINSTRUMENTGEN4_PAUSERESUME_STATUS_LOGGING:
+        return "logging";
+    /* The feature is not allowed on this instrument */
+    //case RBRINSTRUMENTGEN4_UNKNOWN_PAUSERESUME_STATUS:
+    default:
+        return "unknown pauseresume status";
+    }
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_pause(RBRInstrumentGen4 *instrument)
+{
+    (void)instrument;
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_resume(RBRInstrumentGen4 *instrument)
+{
+    (void)instrument;
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+/******************************************************************/
+const char *RBRInstrumentGen4SamplingMode_name(RBRInstrumentGen4SamplingMode mode)
+{
+    switch (mode)
+    {
+    case RBRINSTRUMENTGEN4_SAMPLING_CONTINUOUS:
+        return "continuous";
+    case RBRINSTRUMENTGEN4_SAMPLING_BURST:
+        return "burst";
+    case RBRINSTRUMENTGEN4_SAMPLING_WAVE:
+        return "wave";
+    case RBRINSTRUMENTGEN4_SAMPLING_AVERAGE:
+        return "average";
+    case RBRINSTRUMENTGEN4_SAMPLING_TIDE:
+        return "tide";
+    case RBRINSTRUMENTGEN4_SAMPLING_REGIMES:
+        return "regimes";
+    case RBRINSTRUMENTGEN4_SAMPLING_DDSAMPLING:
+        return "ddsampling";
+    case RBRINSTRUMENTGEN4_SAMPLING_COUNT:
+        return "sampling mode count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_SAMPLING:
+    default:
+        return "unknown sampling mode";
+    }
+}
+
+const char *RBRInstrumentGen4Direction_name(RBRInstrumentGen4Direction direction)
+{
+    switch (direction)
+    {
+    case RBRINSTRUMENTGEN4_DIRECTION_ASCENDING:
+        return "ascending";
+    case RBRINSTRUMENTGEN4_DIRECTION_DESCENDING:
+        return "descending";
+    case RBRINSTRUMENTGEN4_DIRECTION_COUNT:
+        return "direction count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_DIRECTION:
+    default:
+        return "unknown direction";
+    }
+}
+
+const char *RBRInstrumentGen4RegimesReference_name(
+    RBRInstrumentGen4RegimesReference reference)
+{
+    switch (reference)
+    {
+    case RBRINSTRUMENTGEN4_REFERENCE_ABSOLUTE:
+        return "absolute";
+    case RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE:
+        return "seapressure";
+    case RBRINSTRUMENTGEN4_REFERENCE_COUNT:
+        return "regimes reference count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_REFERENCE:
+    default:
+        return "unknown regimes reference";
+    }
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getSchedules(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Schedules *schedules)
+{
+    //GEN4 todo: add logic about it.
+    (void)instrument;
+    (void)schedules;
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
+    RBRInstrumentGen4 *instrument,
+    const char *schedulelabel,
+    RBRInstrumentGen4Schedule *schedule)
+{
+    (void)instrument;
+    (void)schedulelabel;
+    (void)schedule;
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Schedule *schedule)
+{
+    //GEN4 todo: Question: do we want to validate period with deployment values?
+    //RBR_TRY(RBRInstrumentGen4Schedule_validateSchedulePeriod(schedule, scheduleLabel, deployment));
+
+    if (schedule->mode < 0 || schedule->mode >= RBRINSTRUMENTGEN4_SAMPLING_COUNT)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    //GEN4 todo: generate a command which is mode-dependent.
+    const char *setScheduleCommand=NULL;
+    return RBRInstrumentGen4_converse(
+        instrument,
+        setScheduleCommand);
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_createSchedule(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Schedule *schedule,
+    RBRInstrumentGen4Schedules *schedules){
+        //GEN4 todo: add logic about it.
+    (void)instrument;
+    (void)schedule;
+    (void)schedules;
+        return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_deleteSchedule(
+    RBRInstrumentGen4 *instrument,
+    const char *schedulelabel,
+    RBRInstrumentGen4Schedules *schedules){
+        //GEN4 todo: add logic about it.
+    (void)instrument;
+    (void)schedulelabel;
+    (void)schedules;
+        return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_deleteScheduleMultiple(
+    RBRInstrumentGen4 *instrument,
+    const char *schedulelist,
+    RBRInstrumentGen4Schedules *schedules){
+        //GEN4 todo: add logic about it.
+            (void)instrument;
+    (void)schedulelist;
+    (void)schedules;
+        return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_deleteScheduleAll(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Schedules *schedules){
+        //GEN4 todo: add logic about it.
+        (void)instrument;
+        (void)schedules;
+        return RBRINSTRUMENTGEN4_SUCCESS;
+}
+/******************************************************************/

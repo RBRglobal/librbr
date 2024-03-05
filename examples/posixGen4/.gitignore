@@ -1,0 +1,14 @@
+# Generated artifacts.
+posix-download-datablock-bySchedule
+posix-footprint
+posix-generation
+posix-multiScheduleDiffConfig
+posix-parse-file
+posix-poll
+posix-singleScheduleSingleConfig
+posix-stream
+*.exe
+*.o
+
+# Temporary/output files.
+*.bin
