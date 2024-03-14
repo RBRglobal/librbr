@@ -46,16 +46,16 @@ Technical pedantry:
 
 * Use UTF-8 encoding for all files.
 * Wrap comment and code lines at 79 characters.
-  * Where possible to do so
-    and still fit on the line,
-    align when wrapping.
-  * If line breaks must occur between function arguments,
-    prefer to break between _all_ arguments,
-    not just where strictly necessary
-    to adhere to the line length limit.
-  * Prefer to place operators
-    at the beginning of new lines,
-    not trailing the previous line.
+    * Where possible to do so
+      and still fit on the line,
+      align when wrapping.
+    * If line breaks must occur between function arguments,
+      prefer to break between _all_ arguments,
+      not just where strictly necessary
+      to adhere to the line length limit.
+    * Prefer to place operators
+      at the beginning of new lines,
+      not trailing the previous line.
 * Use Unix-style line endings (`\n`).
 * Include a trailing newline
   at the end of all files.
@@ -64,10 +64,10 @@ Technical pedantry:
 * Use C99 syntax,
   but C89/ANSI C caution.
   This means, among other things:
-  * No GNU extensions.
-  * Use only compile-time constant-size arrays.
-  * Use C-style (`/* ... */`) comments,
-    not C++-style comments (`// ...`).
+    * No GNU extensions.
+    * Use only compile-time constant-size arrays.
+    * Use C-style (`/* ... */`) comments,
+      not C++-style comments (`// ...`).
 * Use types to help error checking.
   Even if your compiler doesn't mind you
   using a `uint8_t` interchangeably with `RBRInstrumentChannelIndex`,
@@ -75,20 +75,20 @@ Technical pedantry:
   and makes type interchange mistakes easier
   for human readers to spot.
 * Speaking of number types:
-  * Always use specifically-sized types from `inttypes.h`
-    (e.g., `uint8_t`, `int32_t`)
-    instead of platform-specific types
-    (e.g., `unsigned char`, `int`)
-    when dealing with data.
-  * Prefer specifically-sized types elsewhere, too.
-  * Prefer signed numbers over unsigned
-    wherever there's any chance that the value might be used
-    in arithmetic expressions
-    (i.e., where the number is a number,
-    not an identifier).
-  * Conventionally, `int32_t` is used as a counter
-    even where it's far larger than necessary.
-    This sort of consistency helps reduce mental overhead.
+    * Always use specifically-sized types from `inttypes.h`
+      (e.g., `uint8_t`, `int32_t`)
+      instead of platform-specific types
+      (e.g., `unsigned char`, `int`)
+      when dealing with data.
+    * Prefer specifically-sized types elsewhere, too.
+    * Prefer signed numbers over unsigned
+      wherever there's any chance that the value might be used
+      in arithmetic expressions
+      (i.e., where the number is a number,
+      not an identifier).
+    * Conventionally, `int32_t` is used as a counter
+      even where it's far larger than necessary.
+      This sort of consistency helps reduce mental overhead.
 * Most functions should return an `RBRInstrumentError`
   and pass actual values back to the caller via out pointers.
   Only the most trivial or pure functions
@@ -115,20 +115,20 @@ Technical pedantry:
 * Generally, everything that can have a Doxygen comment
   should have a Doxygen comment
   (typedefs, macros, structs, enums, functions, etc.).
-  * In cases where the declaration and definition are separate
-    (e.g., a function declaration in a header
-    versus its implementation),
-    only the declaration need be commented.
-  * Use C/C++-style Doxygen commands (`\​command`),
-    not Javadoc-style commands (`@​command`).
-  * Files must use the `\​file` command
-    (or else no documentation gets generated!).
-  * Everything except enum members
-    must have at least a `\​brief` comment.
-    * Enum members can just have a comment:
-      brief comments are handled no differently.
-  * Functions must have at least appropriate `\​param`
-    and `\​return` comments.
+    * In cases where the declaration and definition are separate
+      (e.g., a function declaration in a header
+      versus its implementation),
+      only the declaration need be commented.
+    * Use C/C++-style Doxygen commands (`\​command`),
+      not Javadoc-style commands (`@​command`).
+    * Files must use the `\​file` command
+      (or else no documentation gets generated!).
+    * Everything except enum members
+      must have at least a `\​brief` comment.
+        * Enum members can just have a comment:
+          brief comments are handled no differently.
+    * Functions must have at least appropriate `\​param`
+      and `\​return` comments.
 
 A short example:
 
