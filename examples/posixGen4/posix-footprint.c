@@ -26,30 +26,19 @@ int main()
     RBRInstrumentGen4 instrument;
     printf("%ld\n", sizeof(instrument)); //in bytes
 
-    RBRInstrumentGen4Configs configs;
-    RBRInstrumentGen4Configlist configlist;
-    RBRInstrumentGen4Config config;
-    printf("%ld, %ld, %ld\n", sizeof(configs), sizeof(configlist), sizeof(config));
+    RBRInstrumentGen4ConfigPool configPool;
+    printf("%ld, %ld\n", sizeof(configPool), sizeof(configPool.pool[0]));
 
-    RBRInstrumentGen4Schedules schedules;
-    RBRInstrumentGen4Schedulelist schedulelist;
-    RBRInstrumentGen4Schedule schedule;
-    printf("%ld, %ld, %ld\n", sizeof(schedules), sizeof(schedulelist), sizeof(schedule));
+    RBRInstrumentGen4SchedulePool schedulePool;
+    printf("%ld, %ld\n", sizeof(schedulePool), sizeof(schedulePool.pool[0]));
 
-    RBRInstrumentGen4Groups groups;
-    RBRInstrumentGen4Grouplist grouplist;
-    RBRInstrumentGen4Group group;
-    printf("%ld, %ld, %ld\n", sizeof(groups), sizeof(grouplist), sizeof(group));
+    RBRInstrumentGen4GroupPool groupPool;
+    printf("%ld, %ld\n", sizeof(groupPool), sizeof(groupPool.pool[0]));
 
-    RBRInstrumentGen4Channels channels;
-    RBRInstrumentGen4Channellist channellist;
-    RBRInstrumentGen4Channel channel;
-    RBRInstrumentGen4Calibration calibration;
-    printf("%ld, %ld, %ld, %ld\n", sizeof(channels), sizeof(channellist), sizeof(channel), sizeof(calibration));
+    RBRInstrumentGen4ChannelPool channelPool;
+    printf("%ld, %ld, %ld\n", sizeof(channelPool), sizeof(channelPool.pool[0]), sizeof(channelPool.pool[0].calibration));
 
-    RBRInstrumentGen4Datasets datasets;
-    RBRInstrumentGen4Datasetlist datasetlist;
-    RBRInstrumentGen4Dataset dataset;
-    printf("%ld, %ld, %ld\n", sizeof(datasets), sizeof(datasetlist), sizeof(dataset));
+    RBRInstrumentGen4DatasetPool datasetPool;
+    printf("%ld, %ld\n", sizeof(datasetPool), sizeof(datasetPool.pool[0]));
 
 }

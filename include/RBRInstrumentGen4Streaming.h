@@ -18,28 +18,7 @@
 extern "C" {
 #endif
 
-/**
- * \brief Properties of `outputformat` command that can be set.
- * each paramter is treated as a bit field.
- *
- * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
- */
-typedef enum RBRInstrumentGen4Outputformat
-{
-    /** Determins whether or not the output begins with a peramble 
-     * consisting of the string RBR, then the logger's 6-digit serial number.
-     * The default state is off.*/
-    RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL = 1 << 0,
-    /** Determines whether or not the schedule label appears timestamp.
-     * The default state is off.
-     */
-    RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL = 1 << 1,
-    /** Determines whether or not a cyclic redudant check (CRC) is included at
-     * the end of the line immediately before the terminating "\r""\n". The dfault
-     * state is off.
-     */
-    RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC = 1 << 2
-}RBRInstrumentGen4Outputformat;
+#include "RBRInstrumentGen4.h"
 
 /**
  * \brief Get the current output format.
@@ -88,6 +67,62 @@ typedef enum RBRInstrumentGen4ReadingFlag
     RBRINSTRUMENTGEN4_UNKNOWN_READING_FLAG
 } RBRInstrumentGen4ReadingFlag;
 
+typedef enum RBRInstrumentGen4ReadingError
+{
+    /** -NaN; General error condition; error from undefined mathematical operation */
+    RBRINSTRUMENTGEN4_READING_ERROR_GENERAL,
+    /** ADC error – end of conversion */
+    RBRINSTRUMENTGEN4_READING_ERROR_ADC_END_OF_CONVERSION,
+    /** ADC error – invalid value */
+    RBRINSTRUMENTGEN4_READING_ERROR_ADC_INVALID_VALUE,
+    /** Bus error – invalid address */
+    RBRINSTRUMENTGEN4_READING_ERROR_BUS_INVALID_ADDRESS,
+    /** Bus error – frame overflow */
+    RBRINSTRUMENTGEN4_READING_ERROR_BUS_FRAME_OVERFLOW,
+    /** Bus error – locked */
+    RBRINSTRUMENTGEN4_READING_ERROR_BUS_LOCKED,
+    /** Bus error – cannot transmit */
+    RBRINSTRUMENTGEN4_READING_ERROR_BUS_CANNOT_TRANSMIT,
+    /** Bus error – receive timed out */
+    RBRINSTRUMENTGEN4_READING_ERROR_BUS_RECEIVE_TIMEOUT,
+    /** Bus error – invalid frame */
+    RBRINSTRUMENTGEN4_READING_ERROR_BUS_INVALID_FRAME,
+    /** Sample error – no sample started */
+    RBRINSTRUMENTGEN4_READING_ERROR_SAMPLE_NONE_STARTED,
+    /** Sample error – sample in progress */
+    RBRINSTRUMENTGEN4_READING_ERROR_SAMPLE_IN_PROGRESS,
+    /** Sample error – sample failed */
+    RBRINSTRUMENTGEN4_READING_ERROR_SAMPLE_FAILED,
+    /** Sample error – averaging failed */
+    RBRINSTRUMENTGEN4_READING_ERROR_SAMPLE_AVERAGING_FAILED,
+    /** Bus error – packet truncated */
+    RBRINSTRUMENTGEN4_READING_ERROR_BUS_PACKET_TRUNCATED,
+    /** Data error – unable to compute */
+    RBRINSTRUMENTGEN4_READING_ERROR_DATA_UNABLE_TO_COMPUTE,
+    /** Safety – high power consumption */
+    RBRINSTRUMENTGEN4_READING_ERROR_SAFETY_HIGH_POWER_CONSUMPTION,
+    /** Data error – out of range */
+    RBRINSTRUMENTGEN4_READING_ERROR_DATA_OUT_OF_RANGE,
+    /** Data error – under range */
+    RBRINSTRUMENTGEN4_READING_ERROR_DATA_UNDER_RANGE,
+    /** Data error – over range */
+    RBRINSTRUMENTGEN4_READING_ERROR_DATA_OVER_RANGE,
+    /** Sensor error – communications timeout */
+    RBRINSTRUMENTGEN4_READING_ERROR_SENSOR_COMMUNICATIONS_TIMEOUT,
+    /** Sensor error – cannot parse response */
+    RBRINSTRUMENTGEN4_READING_ERROR_SENSOR_CANNOT_PARSE_RESPONSE,
+    /** Data error – not calibrated / invalid calibration */
+    RBRINSTRUMENTGEN4_READING_ERROR_DATA_NOT_CALIBRATED,
+    /** Data error – malformed floating point number */
+    RBRINSTRUMENTGEN4_READING_ERROR_DATA_MALFORMED_NUMBER,
+    /** Data error – no sample logged */
+    RBRINSTRUMENTGEN4_READING_ERROR_DATA_NO_SAMPLE_LOGGED,
+    /** The number of reading flags. */
+    RBRINSTRUMENTGEN4_READING_ERROR_COUNT,
+    /** An unknown or unrecognized reading flag. */
+    RBRINSTRUMENTGEN4_UNKNOWN_READING_ERROR
+} RBRInstrumentGen4ReadingError;
+
 /**
  * \brief Get a human-readable string name for a reading flag.
  *
@@ -121,7 +156,7 @@ RBRInstrumentGen4ReadingFlag RBRInstrumentGen4Reading_getFlag(double reading);
  * \see RBRInstrumentGen4Reading_getFlag() to get the error flag, if present
  * \see RBRInstrumentGen4Reading_setError() to create a reading with an error set
  */
-uint8_t RBRInstrumentGen4Reading_getError(double reading);
+RBRInstrumentGen4ReadingError RBRInstrumentGen4Reading_getError(double reading);
 
 /**
  * \brief Synthesize a reading with an error set.
@@ -143,7 +178,7 @@ typedef struct RBRInstrumentGen4Sample
     /** \brief The timestamp of the sample. */
     RBRInstrumentGen4DateTime timestamp;
     /** \brief The number of populated sample readings. */
-    int32_t channels;
+    int32_t channelCount;
     /**
      * \brief The sample readings.
      *

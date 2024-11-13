@@ -55,8 +55,8 @@ const char *RBRInstrumentGen4EventType_name(RBRInstrumentGen4EventType type)
         return "start of a_recorded burst";
     case RBRINSTRUMENTGEN4_EVENT_START_OF_A_WAVE_BURST:
         return "start of a_wave burst";
-    case RBRINSTRUMENTGEN4_EVENT_RESERVED1:
-        return "reserved";
+    case RBRINSTRUMENTGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_USB:
+        return "power source switched to USB";
     case RBRINSTRUMENTGEN4_EVENT_STREAMING_NOW_OFF_FOR_BOTH_PORTS:
         return "streaming now OFF for both ports";
     case RBRINSTRUMENTGEN4_EVENT_STREAMING_ON_FOR_USB_OFF_FOR_SERIAL:
@@ -107,6 +107,14 @@ const char *RBRInstrumentGen4EventType_name(RBRInstrumentGen4EventType type)
         return "energy used marker, internal battery";
     case RBRINSTRUMENTGEN4_EVENT_ENERGY_USED_MARKER_EXTERNAL_POWER_SOURCE:
         return "energy used marker, external power source";
+    case RBRINSTRUMENTGEN4_EVENT_DEVICE_CONTROL_ACTION_RESULT:
+        return "device control action result";
+    case RBRINSTRUMENTGEN4_EVENT_DEPLOYMENT_RESUMED:
+        return "Paused deployment resumed by the resume command";
+    case RBRINSTRUMENTGEN4_EVENT_DEPLOYMENT_PAUSED:
+        return "Deployment paused using the pause command";
+    case RBRINSTRUMENTGEN4_EVENT_REGIMES_PASSED_FINAL_BOUNDARY:
+        return "Regimes; passed final boundary";
     }
 }
 
@@ -122,8 +130,8 @@ RBRInstrumentGen4Error RBRParserGen4_init(RBRParserGen4 **parser,
         return RBRINSTRUMENTGEN4_MISSING_CALLBACK;
     }
 
-    if (config->formatConfig.easyParse.channels <= 0
-        || config->formatConfig.easyParse.channels > RBRINSTRUMENTGEN4_CHANNEL_MAX)
+    if (config->channelCount <= 0
+        || config->channelCount > RBRINSTRUMENTGEN4_CHANNEL_MAX)
     {
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
@@ -249,7 +257,7 @@ static RBRInstrumentGen4Error RBRParserGen4_parseEPEvents(
 // }
 
 RBRInstrumentGen4Error RBRParserGen4_parse(RBRParserGen4 *parser,
-                                   RBRInstrumentGen4Dataset dataset,
+                                   RBRInstrumentGen4Block block,
                                    const void *const data,
                                    int32_t *size)
 {
@@ -266,6 +274,6 @@ RBRInstrumentGen4Error RBRParserGen4_parse(RBRParserGen4 *parser,
     //     return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     // }
     //GEN4 todo: edit this parser.
-    (void)dataset;
+    (void)block;
     return RBRParserGen4_parseEPEvents(parser, d, size);
 }

@@ -20,6 +20,9 @@
 extern "C" {
 #endif
 
+#include "RBRInstrumentGen4.h"
+#include "RBRInstrumentGen4Streaming.h"
+
 /** \brief Timestamp indicating that no instrument activity has occurred. */
 #define RBRINSTRUMENTGEN4_NO_ACTIVITY ((RBRInstrumentGen4DateTime) - 1)
 

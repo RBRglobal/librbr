@@ -10,7 +10,9 @@
 
 /* Required for NAN. */
 #include <math.h>
+
 #include "tests.h"
+#include "RBRInstrumentGen4Instrument.h"
 
 // only used in RBRInstrumentGen4_setPostprocessing() in RBRInstrumentGen4Memory.c
 TEST_LOGGER4(version_comparison)
@@ -48,8 +50,11 @@ typedef struct IdTest
 TEST_LOGGER4(id)
 {
     IdTest tests[] = {
-        { "id model = RBRconcerto4, version = 1.14.5+202310150927, "
-          "serial = 092431, fwtype = 130" RESPONSE_TERMINATOR,
+        { "id model=RBRconcerto4 "
+          "sn=092431 "
+          "fwversion=1.14.5+202310150927 "
+          "fwtype=130"
+          RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           { "RBRconcerto4",
             "1.14.5+202310150927",
@@ -75,71 +80,102 @@ TEST_LOGGER4(id)
         TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].expected.model, actual.model);
-        TEST_ASSERT_STR_EQ(tests[i].expected.version, actual.version);
-        TEST_ASSERT_EQ(tests[i].expected.serial, actual.serial, "%" PRIi32);
+        TEST_ASSERT_STR_EQ(tests[i].expected.fwversion, actual.fwversion);
+        TEST_ASSERT_EQ(tests[i].expected.sn, actual.sn, "%" PRIi32);
         TEST_ASSERT_EQ(tests[i].expected.fwtype, actual.fwtype, "%" PRIi32);
     }
     return true;
 }
 
-TEST_LOGGER4(hwrev)
+static bool test_pcba(RBRInstrumentGen4Pcba *expected, RBRInstrumentGen4Pcba *actual)
 {
-    RBRInstrumentGen4HardwareRevision expected = {
-        .pcb = 'J',
-        .cpu = "5659A",
-        .bsl = 'A'
-    };
-    RBRInstrumentGen4HardwareRevision actual;
-
-    TestIOBuffers_init(buffers,
-                       "hwrev pcb = J, cpu = 5659A, bsl = A" RESPONSE_TERMINATOR,
-                       0);
-    RBRInstrumentGen4Error err = RBRInstrumentGen4_getHardwareRevision(instrument,
-                                                                       &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(expected.pcb, actual.pcb, "%c");
-    TEST_ASSERT_STR_EQ(expected.cpu, actual.cpu);
-    TEST_ASSERT_EQ(expected.bsl, actual.bsl, "%c");
+    TEST_ASSERT_STR_EQ(expected->label, actual->label);
+    TEST_ASSERT_EQ(expected->sn, actual->sn, "%" PRIi32);
+    TEST_ASSERT_STR_EQ(expected->pn, actual->pn);
+    TEST_ASSERT_STR_EQ(expected->fw, actual->fw);
+    TEST_ASSERT_STR_EQ(expected->hw, actual->hw);
+    TEST_ASSERT_EQ(expected->address, actual->address, "%" PRIi32);
 
     return true;
+}
+
+TEST_LOGGER4(pcbalist)
+{
+    RBRInstrumentGen4PcbaPool expected = {
+        .count = 3,
+        .pool = { {"L3-CPU", 0, "", "", "", 0},
+                  {"FE-cond3", 0, "", "", "", 0},
+                  {"FE-v2", 0, "", "", "", 0} }
+    };
+    RBRInstrumentGen4PcbaPool actual;
+
+    TestIOBuffers_init(buffers,
+                       "pcba count=3 list=L3-CPU|FE-cond3|FE-v2" RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getPcbaPool(instrument,
+                                                               &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(expected.count, actual.count, "%" PRIi32);
+    for (int32_t pcba = 0; pcba < actual.count; ++pcba)
+    {
+        if (!test_pcba(&expected.pool[pcba], &actual.pool[pcba]))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+TEST_LOGGER4(pcba)
+{
+    RBRInstrumentGen4Pcba expected = {
+        .label = "FE-cond3",
+        .sn = 123456,
+        .pn = "0123456revA",
+        .fw = "1.1.1",
+        .hw = "A01",
+        .address = 128
+    };
+
+    RBRInstrumentGen4Pcba actual = {
+        .label = "FE-cond3"
+    };
+
+    TestIOBuffers_init(buffers,
+                       "pcba FE-cond3 sn=123456 pn=0123456revA fw=1.1.1 hw=A01 address=128" RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getPcba(instrument,
+                                                           &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+
+    return test_pcba(&expected, &actual);
 }
 
 typedef struct PowerTest
 {
     const char *response;
     RBRInstrumentGen4Error expectedError;
-    RBRInstrumentGen4Power expected;
+    RBRInstrumentGen4PowerSource expected;
 } PowerTest;
 
 TEST_LOGGER4(power)
 {
     PowerTest tests[] = {
-        { "power source = usb, int = 12.40, ext = 0.00, "
-          "reg = n/a" RESPONSE_TERMINATOR,
+        { "instrument power source=usb" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { RBRINSTRUMENTGEN4_POWER_SOURCE_USB,
-            12.4,
-            0.0,
-            NAN } },
-        { "power source = ext, int =  0.00, ext = 4.53, "
-          "reg = n/a" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_POWER_SOURCE_USB },
+        { "instrument power source=ext" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { RBRINSTRUMENTGEN4_POWER_SOURCE_EXTERNAL,
-            0.0,
-            4.53,
-            NAN } },
-        { "power source = int, int =  0.00, ext = 12.4, "
-          "reg = n/a" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_POWER_SOURCE_EXTERNAL },
+        { "instrument power source=int" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { RBRINSTRUMENTGEN4_POWER_SOURCE_INTERNAL,
-            0.0,
-            12.4,
-            NAN } },
+          RBRINSTRUMENTGEN4_POWER_SOURCE_INTERNAL },
         { 0 }
     };
 
     RBRInstrumentGen4Error err;
-    RBRInstrumentGen4Power actual;
+    RBRInstrumentGen4PowerSource actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
@@ -147,14 +183,11 @@ TEST_LOGGER4(power)
         TestIOBuffers_init(buffers,
                            tests[i].response,
                            0);
-        err = RBRInstrumentGen4_getPower(instrument, &actual);
+        err = RBRInstrumentGen4_getPowerSource(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen4Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected.source,
-                            actual.source,
+        TEST_ASSERT_ENUM_EQ(tests[i].expected,
+                            actual,
                             RBRInstrumentGen4PowerSource);
-        TEST_ASSERT_EQ(tests[i].expected.internal, actual.internal, "%f");
-        TEST_ASSERT_EQ(tests[i].expected.external, actual.external, "%f");
-        TEST_ASSERT(isnan(actual.regulator));
     }
 
     return true;
@@ -163,6 +196,7 @@ TEST_LOGGER4(power)
 TEST_LOGGER4(powerinternal)
 {
     RBRInstrumentGen4PowerInternal expected = {
+        .voltage = 14.21,
         .batteryType = RBRINSTRUMENTGEN4_INTERNAL_BATTERY_NIMH,
         .capacity = 138000,
         .used = 100100
@@ -170,12 +204,13 @@ TEST_LOGGER4(powerinternal)
     RBRInstrumentGen4PowerInternal actual;
 
     TestIOBuffers_init(buffers,
-                       "powerinternal batterytype = nimh, "
-                       "capacity = 138.000e+003, used = 100.100e+003" RESPONSE_TERMINATOR,
+                       "instrument power internal voltage=14.21 batterytype=nimh "
+                       "capacity=138.000e+003 used=100.100e+003" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getPowerInternal(instrument,
                                                                     &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(expected.voltage, actual.voltage, "%f");
     TEST_ASSERT_ENUM_EQ(expected.batteryType,
                         actual.batteryType,
                         RBRInstrumentGen4InternalBatteryType);
@@ -196,28 +231,28 @@ typedef struct PowerInternalBatteryTypeTest
 TEST_LOGGER4(setPowerInternalBatteryType)
 {
     PowerInternalBatteryTypeTest tests[] = {
-        { "powerinternal batterytype = lisocl2" COMMAND_TERMINATOR,
-          "powerinternal batterytype = lisocl2" RESPONSE_TERMINATOR,
+        { "instrument power internal batterytype=lisocl2" COMMAND_TERMINATOR,
+          "instrument power internal batterytype=lisocl2" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           RBRINSTRUMENTGEN4_INTERNAL_BATTERY_LISOCL2 },
-        { "powerinternal batterytype = lifes2" COMMAND_TERMINATOR,
-          "powerinternal batterytype = lifes2" RESPONSE_TERMINATOR,
+        { "instrument power internal batterytype=lifes2" COMMAND_TERMINATOR,
+          "instrument power internal batterytype=lifes2" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           RBRINSTRUMENTGEN4_INTERNAL_BATTERY_LIFES2 },
-        { "powerinternal batterytype = znmno2" COMMAND_TERMINATOR,
-          "powerinternal batterytype = znmno2" RESPONSE_TERMINATOR,
+        { "instrument power internal batterytype=znmno2" COMMAND_TERMINATOR,
+          "instrument power internal batterytype=znmno2" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           RBRINSTRUMENTGEN4_INTERNAL_BATTERY_ZNMNO2 },
-        { "powerinternal batterytype = linimnco" COMMAND_TERMINATOR,
-          "powerinternal batterytype = linimnco" RESPONSE_TERMINATOR,
+        { "instrument power internal batterytype=linimnco" COMMAND_TERMINATOR,
+          "instrument power internal batterytype=linimnco" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           RBRINSTRUMENTGEN4_INTERNAL_BATTERY_LINIMNCO },
-        { "powerinternal batterytype = nimh" COMMAND_TERMINATOR,
-          "powerinternal batterytype = nimh" RESPONSE_TERMINATOR,
+        { "instrument power internal batterytype=nimh" COMMAND_TERMINATOR,
+          "instrument power internal batterytype=nimh" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           RBRINSTRUMENTGEN4_INTERNAL_BATTERY_NIMH },
-        { "powerinternal batterytype = none" COMMAND_TERMINATOR,
-          "powerinternal batterytype = none" RESPONSE_TERMINATOR,
+        { "instrument power internal batterytype=none" COMMAND_TERMINATOR,
+          "instrument power internal batterytype=none" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           RBRINSTRUMENTGEN4_INTERNAL_BATTERY_NONE },
         { 0 }
@@ -239,16 +274,17 @@ TEST_LOGGER4(setPowerInternalBatteryType)
 
 TEST_LOGGER4(resetPowerInternalUsed)
 {
-    TestIOBuffers_init(buffers, "powerinternal used = 0.000e+000" RESPONSE_TERMINATOR, 0);
+    TestIOBuffers_init(buffers, "instrument power internal used=0.000e+000" RESPONSE_TERMINATOR, 0);
     RBRInstrumentGen4Error err = RBRInstrumentGen4_resetPowerInternalUsed(instrument);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_STR_EQ("powerinternal used = 0" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("instrument power internal used=0" COMMAND_TERMINATOR, buffers->writeBuffer);
     return true;
 }
 
 TEST_LOGGER4(powerexternal)
 {
     RBRInstrumentGen4PowerExternal expected = {
+        .voltage = 14.21,
         .batteryType = RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMATA_LISOCL2,
         .capacity = 22000000,
         .used = 100100
@@ -256,12 +292,13 @@ TEST_LOGGER4(powerexternal)
     RBRInstrumentGen4PowerExternal actual;
 
     TestIOBuffers_init(buffers,
-                       " powerexternal batterytype = fermata_lisocl2, "
-                       "capacity = 22.000e+006, used = 100.100e+003" RESPONSE_TERMINATOR,
+                       "instrument power external voltage=14.21 batterytype=fermata_lisocl2 "
+                       "capacity=22.000e+006 used=100.100e+003" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getPowerExternal(instrument,
                                                                     &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(expected.voltage, actual.voltage, "%f");
     TEST_ASSERT_ENUM_EQ(expected.batteryType,
                         actual.batteryType,
                         RBRInstrumentGen4ExternalBatteryType);
@@ -282,50 +319,50 @@ typedef struct PowerExternalBatteryTypeTest
 TEST_LOGGER4(setPowerExternalBatteryType)
 {
     PowerExternalBatteryTypeTest tests[] = {
-        {
-            "powerexternal batterytype = fermata_lisocl2" COMMAND_TERMINATOR,
-            "powerexternal batterytype = fermata_lisocl2" RESPONSE_TERMINATOR,
-            RBRINSTRUMENTGEN4_SUCCESS,
-            RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMATA_LISOCL2,
-        },
-        { "powerexternal batterytype = fermata_znmno2" COMMAND_TERMINATOR,
-          "powerexternal batterytype = fermata_znmno2" RESPONSE_TERMINATOR,
+        { "instrument power external batterytype=fermata_lisocl2" COMMAND_TERMINATOR,
+          "instrument power external batterytype=fermata_lisocl2" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMATA_LISOCL2, },
+        { "instrument power external batterytype=fermata_znmno2" COMMAND_TERMINATOR,
+          "instrument power external batterytype=fermata_znmno2" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMATA_ZNMNO2 },
-        { "powerexternal batterytype = fermette_limno2" COMMAND_TERMINATOR,
-          "powerexternal batterytype = fermette_limno2" RESPONSE_TERMINATOR,
+        { "instrument power external batterytype=fermette_limno2" COMMAND_TERMINATOR,
+          "instrument power external batterytype=fermette_limno2" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMETTE_LIMNO2 },
-        { "powerexternal batterytype = fermette3_lisocl2" COMMAND_TERMINATOR,
-          "powerexternal batterytype = fermette3_lisocl2" RESPONSE_TERMINATOR,
+        { "instrument power external batterytype=fermette3_lisocl2" COMMAND_TERMINATOR,
+          "instrument power external batterytype=fermette3_lisocl2" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMETTE3_LISOCL2 },
-        {
-            "powerexternal batterytype = fermette3_lifes2" COMMAND_TERMINATOR,
-            "powerexternal batterytype = fermette3_lifes2" RESPONSE_TERMINATOR,
-            RBRINSTRUMENTGEN4_SUCCESS,
-            RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMETTE3_LIFES2,
-        },
-        { "powerexternal batterytype = fermette3_znmno2" COMMAND_TERMINATOR,
-          "powerexternal batterytype = fermette3_znmno2" RESPONSE_TERMINATOR,
+        { "instrument power external batterytype=fermette3_lifes2" COMMAND_TERMINATOR,
+          "instrument power external batterytype=fermette3_lifes2" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMETTE3_LIFES2 },
+        { "instrument power external batterytype=fermette3_znmno2" COMMAND_TERMINATOR,
+          "instrument power external batterytype=fermette3_znmno2" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMETTE3_ZNMNO2 },
-        { "powerexternal batterytype = fermette3_linimnco" COMMAND_TERMINATOR,
-          "powerexternal batterytype = fermette3_linimnco" RESPONSE_TERMINATOR,
+        { "instrument power external batterytype=fermette3_linimnco" COMMAND_TERMINATOR,
+          "instrument power external batterytype=fermette3_linimnco" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMETTE3_LINIMNCO },
-        { "powerexternal batterytype = fermette3_nimh" COMMAND_TERMINATOR,
-          "powerexternal batterytype = fermette3_nimh" RESPONSE_TERMINATOR,
+        { "instrument power external batterytype=fermette3_nimh" COMMAND_TERMINATOR,
+          "instrument power external batterytype=fermette3_nimh" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMETTE3_NIMH },
-        { "powerexternal batterytype = fermata_nimh" COMMAND_TERMINATOR,
-          "powerexternal batterytype = fermata_nimh" RESPONSE_TERMINATOR,
+        { "instrument power external batterytype=fermata_nimh" COMMAND_TERMINATOR,
+          "instrument power external batterytype=fermata_nimh" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMATA_NIMH },
-        { "powerexternal batterytype = other" COMMAND_TERMINATOR,
-          "powerexternal batterytype = other" RESPONSE_TERMINATOR,
+        { "instrument power external batterytype=other" COMMAND_TERMINATOR,
+          "instrument power external batterytype=other" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_OTHER },
+        { "instrument power external batterytype=none" COMMAND_TERMINATOR,
+          "instrument power external batterytype=none" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_NONE },
         { 0 }
     };
 
@@ -345,10 +382,10 @@ TEST_LOGGER4(setPowerExternalBatteryType)
 
 TEST_LOGGER4(resetPowerExternalUsed)
 {
-    TestIOBuffers_init(buffers, "powerexternal used = 0.000e+000" RESPONSE_TERMINATOR, 0);
+    TestIOBuffers_init(buffers, "instrument power external used=0.000e+000" RESPONSE_TERMINATOR, 0);
     RBRInstrumentGen4Error err = RBRInstrumentGen4_resetPowerExternalUsed(instrument);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_STR_EQ("powerexternal used = 0" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("instrument power external used=0" COMMAND_TERMINATOR, buffers->writeBuffer);
     return true;
 }
 
@@ -362,14 +399,16 @@ typedef struct InfoTest
 TEST_LOGGER4(info)
 {
     InfoTest tests[] = {
-        { "info pn = L3-M11-BEC11-SC11-ST11-SP11, fwlock = off" RESPONSE_TERMINATOR,
+        { "instrument pn=L3-M11-BEC11-SC11-ST11-SP11 fwlock=off datatype=float64" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           { "L3-M11-BEC11-SC11-ST11-SP11",
-            false } },
-        { "info pn = 012345revA, fwlock = on" RESPONSE_TERMINATOR,
+            false,
+            RBRINSTRUMENTGEN4_DATATYPE_FLOAT64 } },
+        { "instrument pn=012345revA fwlock=on datatype=float32" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           { "012345revA",
-            true } },
+            true,
+            RBRINSTRUMENTGEN4_DATATYPE_FLOAT32 } },
         { 0 }
     };
     RBRInstrumentGen4Error err;
@@ -383,8 +422,9 @@ TEST_LOGGER4(info)
         err = RBRInstrumentGen4_getInfo(instrument,
                                         &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen4Error);
-        TEST_ASSERT_STR_EQ(tests[i].expected.partNumber, actual.partNumber);
+        TEST_ASSERT_STR_EQ(tests[i].expected.pn, actual.pn);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.fwLock, actual.fwLock, bool);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.dataType, actual.dataType, RBRInstrumentGen4DataType);
     }
     return true;
 }

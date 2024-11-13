@@ -33,22 +33,22 @@ Alternatively, one can use cygwin command "ls /dev/ttyS*", then try it out. (tty
 (3) How to clean the built files:
 To clean the .a, .o, .exe files one built, use cygwin command "$ make clean" in that folder directory.
 
-(4) For posix-stream-dynamiccorrection.c example, make sure these channels are ON:
+(4) For posix-stream-dynamiccorrection.c example, make sure these channelPool are ON:
 ~~~{.sh}
 conductivity_00, temperature_00, pressure_00/seapressure_00, conductivitycelltemperature_00
 ~~~
-(5) For posix-parse-download-dataset.c example, if downloading from dataset4, make sure the channels is set the same as number of channels in output.
+(5) For posix-parse-download-dataset.c example, if downloading from dataset4, make sure the channelPool is set the same as number of channelPool in output.
 for example, if we set in firmware:
 ~~~{.sh}
->> postprocessing channels = mean(temperature_00_dyn_corr)|mean(pressure_00)|mean(salinity_00_dyn_corr)|mean(salinity_00)|mean(conductivitycelltemperature_00)
+>> postprocessing channelPool = mean(temperature_00_dyn_corr)|mean(pressure_00)|mean(salinity_00_dyn_corr)|mean(salinity_00)|mean(conductivitycelltemperature_00)
 ~~~
 Then we set:
 ~~~{.c}
-RBRInstrumentGen4Channels channels;
+RBRInstrumentGen4ChannelPool channelPool;
     //important!!!
-    //channels.count should be set the same number with output channels.
-    channels.count = 5;
-    channels.on = 5;
+    //channelPool.count should be set the same number with output channelPool.
+    channelPool.count = 5;
+    channelPool.on = 5;
 ~~~
 
 

@@ -10,6 +10,7 @@
 
 /* Required for isprint. */
 #include <ctype.h>
+#include <stdlib.h>
 
 #include "RBRInstrumentGen4.h"
 #include "tests.h"
@@ -90,6 +91,7 @@ RBRInstrumentGen4Error TestIOBuffers_time(
 {
     /* No-op. */
     *time = 0;
+    (void)instrument;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
@@ -98,6 +100,8 @@ RBRInstrumentGen4Error TestIOBuffers_sleep(
     RBRInstrumentGen4DateTime time)
 {
     /* No-op. */
+    (void)instrument;
+    (void)time;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
@@ -234,7 +238,11 @@ int main()
 
     TestIOBuffers_init(
         &ioBuffers,
-        "id model = RBRconcerto4, version = 1.14.5+202310150927, serial = 092431, fwtype = 130"
+        /* This will actually cause a segfault: */
+        // "id model = RBRconcerto4, version = 1.14.5+202310150927, serial = 092431, fwtype = 130"
+        "id model=RBRconcerto4 version=1.14.5+202310150927 serial=092431 fwtype=130"
+        RESPONSE_TERMINATOR
+        "instrument outputformat sn=off schedulelabel=on datetime=on crc=off encoding=ascii datatype=float32"
         RESPONSE_TERMINATOR,
         0);
     err = RBRInstrumentGen4_open(&instrumentL4,

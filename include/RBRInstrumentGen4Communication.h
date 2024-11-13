@@ -4,7 +4,7 @@
  * \brief Instrument commands and structures pertaining to the communication
  * interfaces of the instrument.
  *
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830218/Communications
  *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
@@ -18,14 +18,18 @@
 extern "C" {
 #endif
 
+#include "RBRInstrumentGen4.h"
+
 /**
  * \brief Instrument link types.
  *
  * \see RBRInstrumentGen4_getLink()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/link
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830279/link
  */
 typedef enum RBRInstrumentGen4Link
 {
+    /** No link connectivity. */
+    RBRINSTRUMENTGEN4_LINK_OFF,
     /** USB CDC connectivity. */
     RBRINSTRUMENTGEN4_LINK_USB,
     /** Serial connectivity. */
@@ -49,13 +53,14 @@ const char *RBRInstrumentGen4Link_name(RBRInstrumentGen4Link link);
 
 /**
  * \brief Get the type of connectivity for the instrument connection.
+ * \note Issues the `link` command.
  *
  * \param [in] instrument the instrument connection
  * \param [out] link the link type
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/link
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830279/link
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getLink(
     RBRInstrumentGen4 *instrument,
@@ -71,7 +76,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getLink(
  * \see RBRInstrumentGen4Serial
  * \see RBRInstrumentGen4_getSerial()
  * \see RBRInstrumentGen4_setSerial()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
 typedef enum RBRInstrumentGen4SerialBaudRate
 {
@@ -157,150 +162,11 @@ typedef enum RBRInstrumentGen4SerialMode
 const char *RBRInstrumentGen4SerialMode_name(RBRInstrumentGen4SerialMode mode);
 
 /**
- * \brief Possible levels of the auxiliary output signal during the setup time,
- * data transmission, and hold time.
- *
- * \see RBRInstrument4Aux1
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
- */
-typedef enum RBRInstrumentGen4Aux1ActiveState
-{
-    /** Signal actively driven high. */
-    RBRINSTRUMENTGEN4_AUX1ACTIVE_HIGH,
-    /** Signal actively driven low. */
-    RBRINSTRUMENTGEN4_AUX1ACTIVE_LOW,
-    /** The number of active output levels. */
-    RBRINSTRUMENTGEN4_AUX1ACTIVE_COUNT,
-    /** An unknown or unrecognized active output level. */
-    RBRINSTRUMENTGEN4_UNKNOWN_AUX1ACTIVE
-} RBRInstrumentGen4Aux1ActiveState;
-
-/**
- * \brief Get a human-readable string name for a signal level of an active
- * auxiliary output.
- *
- * \param [in] aux1_active the signal level
- * \return a string name for the signal level
- * \see RBRInstrumentError_name() for a description of the format of names
- */
-const char *RBRInstrumentGen4Aux1ActiveState_name(
-    RBRInstrumentGen4Aux1ActiveState aux1_active);
-
-/**
- * \brief The level of the AUX1 signal seen by the external device while the 
- * logger is asleep.
- *
- * \see RBRInstrumentGen4Serial
- * \see RBRInstrumentGen4_getSerial()
- * \see RBRInstrumentGen4_setSerial()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
- */
-typedef enum RBRInstrumentGen4Aux1SleepState{
-    /** High impedance on AUX1 when logger is asleep. */
-    RBRINSTRUMENTGEN4_AUX1SLEEP_TRISTATE,
-    /** +5V on AUX1 when logger is asleep. */
-    RBRINSTRUMENTGEN4_AUX1SLEEP_HIGH,
-    /** -5V on AUX1 when logger is asleep. */
-    RBRINSTRUMENTGEN4_AUX1SLEEP_LOW,
-    /** THe number of sleep output levels. */
-    RBRINSTRUMENTGEN4_AUX1SLEEP_COUNT,
-    /** An unknown or unrecognized sleep output level. */
-    RBRINSTRUMENTGEN4_UNKNOWN_AUX1SLEEP
-}RBRInstrumentGen4Aux1SleepState;
-
-/**
- * \brief Get a human-readable string name for a serial mode.
- *
- * \param [in] aux1_sleep the aux1_sleep state
- * \return a string name for the aux1_sleep state
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
- */
-const char *RBRInstrumentGen4Aux1SleepState_name(RBRInstrumentGen4Aux1SleepState aux1_sleep);
-
-/** \brief configure the behavior of an auxiliary RS-232 output signal AUX1,
- * if the logger is configured to support it. The signal can be used to control
- * an external device such as a modem, but is intended only for the purpose of
- * transmitting streamed data.It is not intended to be, and should not be used
- * as a general purpose flow control signal.
-*/
-typedef struct RBRInstrumentGen4Aux1{
-    /** reports the state of the feature, or optionally enables or disables the 
-     * feature as required. When the feature is disabled, the remaining aux1_... 
-     * parameters have no effect. The default setting as shipped from the factory 
-     * is off.
-     */
-    bool aux1_state;
-    /** available only if in rs232 mode.
-     * reports or sets the AUX1 signal set-up time, in milliseconds. When the 
-     * logger is sampling and is about to stream data over the serial link, 
-     * this is the time for which AUX1 will be set to the active level before 
-     * the streaming transmission begins. The valid range of values is 
-     * 10...120000 (10ms to 2 minutes); the default value as shipped from the 
-     * factory is 1000ms.*/
-    RBRInstrumentGen4Period aux1_setup;
-    /** available only if in rs232 mode.
-     * reports or sets the AUX1 signal hold time, in milliseconds. This is the 
-     * time for which AUX1 will be held at the active level after the serial 
-     * streaming transmission has finished. The valid range of values is 
-     * 10...120000 (10ms to 2 minutes); the default value as shipped from the 
-     * factory is 1000ms.
-     */
-    RBRInstrumentGen4Period aux1_hold;
-    /** available only if in rs232 mode.
-     * reports or sets the active level of the AUX1 signal seen by the external
-     * device throughout the setup, data transmission, and hold phases. The high 
-     * and low signal levels are approximately +5V and –5V respectively, 
-     * compatible with the RS-232 specification. The default setting as shipped 
-     * from the factory is high.
-     */
-    RBRInstrumentGen4Aux1ActiveState aux1_active;
-    /** available only if in rs232 mode.
-     * reports or sets the level of the AUX1 signal seen by the external device 
-     * while the logger is asleep. In the high and low states the signal is 
-     * actively driven to the appropriate level by the logger, which may be 
-     * necessary for some external devices. The high and low signal levels are 
-     * approximately +5V and –5V respectively,
-     * However, these two options cause a large increase in the logger's sleep 
-     * current, and will severely impact the available deployment lifetime when 
-     * using the logger's internal batteries. In the tristate condition, the 
-     * signal is not actively driven, but becomes high impedance. This allows 
-     * the logger to maintain a very low sleep current
-     */
-    RBRInstrumentGen4Aux1SleepState aux1_sleep;
-}RBRInstrumentGen4Aux1;
-
-/**
- * \brief Get the behaviour of an auxiliary RS-232 output signal AUX1.
- *
- * \param [in] instrument the instrument connection
- * \param [out] aux1 the auxiliary output signal parameters
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_getAux1(RBRInstrumentGen4 *instrument,
-                                           RBRInstrumentGen4Aux1 *aux1);
-
-/**
- * \brief Configure the behaviour of an auxiliary RS-232 output signal AUX1.
- *
- * \param [in] instrument the instrument connection
- * \param [inout] aux1 the auxiliary output signal parameters
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_setAux1(RBRInstrumentGen4 *instrument,
-                                           RBRInstrumentGen4Aux1 *aux1);                                           
-
-/**
  * \brief Instrument `serial` command parameters.
  *
  * \see RBRInstrumentGen4_getSerial()
  * \see RBRInstrumentGen4_setSerial()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
 typedef struct RBRInstrumentGen4Serial
 {
@@ -326,29 +192,28 @@ typedef struct RBRInstrumentGen4Serial
      * [Working with Bit Fields](bitfields.md).
      *
      * \readonly
-     *
-     * The `serial availablemodes` command does not exist on Logger2
-     * instruments. RBRInstrumentGen4_getSerial() will populate this field with the
-     * baud rates supported by all Logger2 instruments.
      */
     const RBRInstrumentGen4SerialMode availableModes;
 } RBRInstrumentGen4Serial;
 
 /**
  * \brief Retrieve the current and available serial baud rates and modes.
+ * \note Issues the `link serial` command.
  *
  * \param [in] instrument the instrument connection
  * \param [out] serial the current and available serial parameters
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
+ * \see RBRInstrumentGen4_setSerial()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getSerial(RBRInstrumentGen4 *instrument,
                                            RBRInstrumentGen4Serial *serial);
 
 /**
  * \brief Reconfigure the instrument serial baud rate and mode.
+ * \note Issues the `link serial` command.
  *
  * A hardware error will occur if the baud rate or mode is unsupported by the
  * instrument. See RBRInstrumentGen4Serial.availableBaudRates and
@@ -367,7 +232,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSerial(RBRInstrumentGen4 *instrument
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when a value is not supported
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the baud/mode is invalid
  * \see RBRInstrumentGen4_getSerial()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_setSerial(RBRInstrumentGen4 *instrument,
                                             const RBRInstrumentGen4Serial *serial);
@@ -375,13 +240,26 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSerial(RBRInstrumentGen4 *instrument
 /**
  * \brief Immediately shut down communications and implement any possible
  * power-saving measures.
+ * \note Issues the `sleep` command.
+ *
+ * Any scheduled sampling activity is not affected.
+ * The `sleep` command does not attempt to power down a USB link, because there
+ * is always enough power available via USB to run the logger's basic functions;
+ * sensor channels used for a `poll` command will still be shut down.
  *
  * \param [in] instrument the instrument connection
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the instrument has been put to sleep
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/sleep
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828543/sleep
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828337/Timeouts+output+blanking+and+power+saving
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_sleep(RBRInstrumentGen4 *instrument);
+
+/**
+ * L3.5/L4 WiFi interface is To Be Defined as of October 2024
+ */
+
+#if 0
 
 /**
  * \brief The state of the Wi-Fi connection.
@@ -502,7 +380,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getWiFi(RBRInstrumentGen4 *instrument,
 RBRInstrumentGen4Error RBRInstrumentGen4_setWiFi(RBRInstrumentGen4 *instrument,
                                          const RBRInstrumentGen4WiFi *wifi);
 
-
+#endif
 
 #ifdef __cplusplus
 }

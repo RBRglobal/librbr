@@ -20,6 +20,8 @@
 #include <sys/stat.h>
 /* Required for fprintf, printf. */
 #include <stdio.h>
+/* Required for EXIT_SUCCESS, etc. */
+#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
 /* Required for gmtime_r, nanosleep, time_t, strftime. */
@@ -44,7 +46,7 @@ RBRInstrumentGen4Error parserSample(
     strftime(ftime, sizeof(ftime), "%F %T", &sampleTime);
 
     printf("%s.%03" PRIi64, ftime, sample->timestamp % 1000);
-    for (int32_t i = 0; i < sample->channels; i++)
+    for (int32_t i = 0; i < sample->channelCount; i++)
     {
         printf(", %lf", sample->readings[i]);
     }
@@ -99,12 +101,8 @@ int main(int argc, char *argv[])
     };
 
     RBRParserGen4Config parserConfig = {
-        .format = RBRINSTRUMENTGEN4_MEMFORMAT_CALBIN00,
-        .formatConfig = {
-            .easyParse = {
-                .channels = channels
-            }
-        }
+        .channelCount = channels,
+        .datatype = RBRINSTRUMENTGEN4_DATATYPE_FLOAT32
     };
 
     RBRInstrumentGen4Error err;
@@ -147,7 +145,7 @@ int main(int argc, char *argv[])
         bufSize += readSize;
         parsedSize = bufSize;
         RBRParserGen4_parse(parser,
-                        RBRINSTRUMENTGEN4_DATASET_EASYPARSE_SAMPLE_DATA,
+                        RBRINSTRUMENTGEN4_BLOCK_DATA,
                         buf,
                         &parsedSize);
         bufSize -= parsedSize;

@@ -16,6 +16,8 @@
 #include <errno.h>
 /* Required for fprintf, printf. */
 #include <stdio.h>
+/* Required for EXIT_SUCCESS, etc. */
+#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
 /* Required for gmtime_r, time_t, strftime. */
@@ -40,6 +42,7 @@
             TEMPERATURE,                                \
             SALINITY_DYNCORR                            \
     }
+#define GROUP_PTS_CHANNEL_COUNT 3
 
 #define SCHEDULE_PTS_LABEL "sch_asc_pts"
 #define SCHEDULE_PTS_MODE RBRINSTRUMENTGEN4_SAMPLING_REGIMES
@@ -52,6 +55,7 @@
     {                                                \
         GROUP_PTS_LABEL                              \
     }
+#define SCHEDULE_PTS_GROUP_COUNT 1
 #define SCHEDULE_PTS_REGIMES           \
     (RBRInstrumentGen4Regimes)         \
     {                                  \
@@ -75,6 +79,7 @@
     {                                                \
         SCHEDULE_PTS_LABEL                           \
     }
+#define CONFIG_ASCENT_SCHEDULE_COUNT 1
 
 #define STARTTIME "20000101000000"
 #define ENDTIME "20991231235959"
@@ -108,7 +113,7 @@ RBRInstrumentGen4Error instrumentSample(
     strftime(ftime, sizeof(ftime), "%F %T", &sampleTime);
 
     printf("%s.%03" PRIi64, ftime, sample->timestamp % 1000);
-    for (int32_t i = 0; i < sample->channels; i++)
+    for (int32_t i = 0; i < sample->channelCount; i++)
     {
         printf(", %lf", sample->readings[i]);
     }
@@ -193,6 +198,8 @@ int main(int argc, char *argv[])
                RBRInstrumentGen4SerialBaudRate_name(serial.baudRate));
         break;
     }
+    /* WiFi is not yet implemented */
+    #if 0
     case RBRINSTRUMENTGEN4_LINK_WIFI:
     {
         RBRInstrumentGen4WiFi wifi;
@@ -202,6 +209,7 @@ int main(int argc, char *argv[])
                wifi.commandTimeout);
         break;
     }
+    #endif
     default:
         fprintf(stderr,
                 "Warning: connection method to the instrument is unclear, so"
@@ -214,81 +222,76 @@ int main(int argc, char *argv[])
     //(optional) verify
 
     // enable with config and dataset.
-    // group -> channellist
-    // schedule -> grouplist, stream (serial, usb, off), store (on), mode (continuous, average, tide, burst, wave, ddsampling, regimes)
-    // config -> schedulelist
+    // group -> channelList
+    // schedule -> groupList, stream (serial, usb, off), store (on), mode (continuous, average, tide, burst, wave, ddsampling, regimes)
+    // config -> scheduleList
     // outputformat -> specify format for data output
     // verify -> config, dataset
     // delpoyment -> check status, set startime, endtime
-    // enable -> config, dataset, simulation, storagemode
+    // enable -> config, dataset, simulation, storageMode
 
     // need to change all list to a struct (array of strings, and count)
 
     /************ ensure default state ************/
-    RBRInstrumentGen4DeploymentStatus deploymentStatus = RBRINSTRUMENTGEN4_STATUS_UNKNOWN;
-    RBRInstrumentGen4_disable(instrument, deploymentStatus);
+    RBRInstrumentGen4LoggingState loggingState = RBRINSTRUMENTGEN4_UNKNOWN_LOGGING_STATE;
+    RBRInstrumentGen4_disable(instrument, &loggingState);
 
-    RBRInstrumentGen4Datasets datasets;
-    RBRInstrumentGen4_getDatasets(instrument, &datasets);
-    RBRInstrumentGen4_deleteDatasetAll(instrument, &datasets);
+    RBRInstrumentGen4DatasetPool datasetPool;
+    RBRInstrumentGen4_getDatasetPool(instrument, &datasetPool);
+    RBRInstrumentGen4_deleteDatasetAll(instrument, &datasetPool);
 
-    RBRInstrumentGen4Configs configs;
-    RBRInstrumentGen4_getConfigs(instrument, &configs);
-    RBRInstrumentGen4_deleteConfigAll(instrument, &configs);
+    RBRInstrumentGen4ConfigPool configPool;
+    RBRInstrumentGen4_getConfigPool(instrument, &configPool);
+    RBRInstrumentGen4_deleteConfigAll(instrument, &configPool);
 
-    RBRInstrumentGen4Schedules schedules;
-    RBRInstrumentGen4_getSchedules(instrument, &schedules);
-    RBRInstrumentGen4_deleteScheduleAll(instrument, &schedules);
+    RBRInstrumentGen4SchedulePool schedulePool;
+    RBRInstrumentGen4_getSchedulePool(instrument, &schedulePool);
+    RBRInstrumentGen4_deleteScheduleAll(instrument, &schedulePool);
 
-    RBRInstrumentGen4Groups groups;
-    RBRInstrumentGen4_getGroups(instrument, &groups);
-    RBRInstrumentGen4_deleteGroupAll(instrument, &groups);
+    RBRInstrumentGen4GroupPool groupPool;
+    RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
+    RBRInstrumentGen4_deleteGroupAll(instrument, &groupPool);
 
     /************ group definition ************/
-    // populate all channels and calibrations
-    RBRInstrumentGen4Channels channels;
-    RBRInstrumentGen4_getChannels(instrument, &channels);
+    // populate all channelPool and calibrations
+    RBRInstrumentGen4ChannelPool channelPool;
+    RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
 
-    // specify grouplabel, channel labels, and create group instance
-    RBRInstrumentGen4Group group_pts;
-    init_groupStructure(instrument,
+    // specify groupLabel, channel labels, and create group instance
+    RBRInstrumentGen4Group* group_pts;
+    RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
-                        &channels,
-                        &group_pts,
-                        &groups); // warning: need to read error!!!
+                        GROUP_PTS_CHANNEL_COUNT,
+                        &channelPool,
+                        &groupPool,
+                        &group_pts); // warning: need to read error!!!
 
     /************ schedule definition ************/
-    RBRInstrumentGen4Schedule schedule_pts;
-    init_schedule_regimes(instrument,
+    RBRInstrumentGen4Schedule* schedule_pts;
+    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_PTS_LABEL,
                           SCHEDULE_PTS_GROUPS,
+                          SCHEDULE_PTS_GROUP_COUNT,
                           SCHEDULE_PTS_MODE,
-                          &groups,
                           SCHEDULE_PTS_REGIMES,
-                          &schedule_pts,
-                          &schedules);
+                          &groupPool,
+                          &schedulePool,
+                          &schedule_pts);
 
-    schedule_pts.stream = link;
-    // warning: read error for init_scheduleStructure!!!
-    RBRInstrumentGen4_setSchedule(instrument, &schedule_pts);
-    // if ((err=RBRInstrumentGen4_createSchedule(instrument, &schedule, &schedules)) != RBRINSTRUMENTGEN4_SUCCESS)
-    // {
-    //     fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
-    //             programName,
-    //             RBRInstrumentGen4Error_name(err));
-    //     status = EXIT_FAILURE;
-    //     goto instrumentCleanup;
-    // }
+    schedule_pts->stream = link;
+    // warning: read error for RBRInstrumentGen4_initNewSchedule!!!
+    RBRInstrumentGen4_setSchedule(instrument, schedule_pts);
 
     /************ configuration definition ************/
-    RBRInstrumentGen4Config config_ascent;
-    init_configStructure(instrument,
+    RBRInstrumentGen4Config *config_ascent;
+    RBRInstrumentGen4_initNewConfig(instrument,
                          CONFIG_ASCENT_LABEL,
                          CONFIG_ASCENT_SCHEDULES,
-                         &schedules,
-                         &config_ascent,
-                         &configs);
+                        CONFIG_ASCENT_SCHEDULE_COUNT,
+                         &schedulePool,
+                         &configPool,
+                         &config_ascent);
 
     // specify outputformat
     RBRInstrumentGen4Outputformat outputformat = 0;
@@ -300,32 +303,26 @@ int main(int argc, char *argv[])
     // need to stop if it's logging.
     RBRInstrumentGen4Deployment deployment;
     RBRInstrumentGen4_getDeployment(instrument, &deployment);
-    // GEN4 TODO: if it's pending, could we modify parameters???
-    if (deployment.status == RBRINSTRUMENTGEN4_STATUS_LOGGING || deployment.status == RBRINSTRUMENTGEN4_STATUS_PENDING)
-    {
-        printf("%s: Instrument is logging/pending. I'm going to disable it first.\n",
-               programName);
-        RBRInstrumentGen4_disable(instrument, deploymentStatus);
-    }
+
     str_to_deploymentDatetime(&deployment.startTime, STARTTIME);
-    str_to_deploymentDatetime(&deployment.endTime, ENDTIME);
     RBRInstrumentGen4_setDeployment(instrument, &deployment);
 
     // verify the configurations for enable
     RBRInstrumentGen4_verify(instrument,
-                             &config_ascent,
+                             config_ascent,
                              NEW_DATASET_LABEL,
-                             deploymentStatus);
+                             &loggingState);
 
     printf("%s: Start instrument logging with default_config.\n",
            programName);
+    RBRInstrumentGen4Dataset *dataset;
     if ((err = RBRInstrumentGen4_enable(instrument,
-                                        &config_ascent,
+                                        config_ascent,
                                         NEW_DATASET_LABEL,
-                                        false,
                                         RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
-                                        &datasets,
-                                        deploymentStatus)) != RBRINSTRUMENTGEN4_SUCCESS)
+                                        &datasetPool,
+                                        &dataset,
+                                        &loggingState)) != RBRINSTRUMENTGEN4_SUCCESS)
     {
         fprintf(stderr,
                 "%s: Failed to start instrument: %s!\n",

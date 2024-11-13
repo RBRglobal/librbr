@@ -11,9 +11,11 @@
 /* Required for isnan, NAN. */
 #include <math.h>
 /* Required for memset, strcmp. */
+#include <stdlib.h>
 #include <string.h>
 
 #include "RBRInstrumentGen4.h"
+#include "RBRInstrumentGen4Configuration.h"
 #include "RBRInstrumentGen4Internal.h"
 #include "RBRInstrumentGen4Schedule.h"
 
@@ -72,14 +74,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setClock(RBRInstrumentGen4 *instrument,
         {
             return RBRInstrumentGen4_converse(
                 instrument,
-                "clock datetime = %s, offsetfromutc = %02f",
+                "clock datetime=%s offsetfromutc=%02f",
                 dateTime,
                 offsetFromUtc);
         }
         else
         {
             return RBRInstrumentGen4_converse(instrument,
-                                        "clock datetime = %s",
+                                        "clock datetime=%s",
                                         dateTime);
         }
     }
@@ -89,33 +91,35 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setClock(RBRInstrumentGen4 *instrument,
     }
 }
 
+const char *RBRInstrumentGen4LoggingState_name(RBRInstrumentGen4LoggingState state)
+{
+    switch (state)
+    {
+    case RBRINSTRUMENTGEN4_LOGGING_STATE_DISABLED:
+        return "disabled";
+    case RBRINSTRUMENTGEN4_LOGGING_STATE_ENABLED:
+        return "enabled";
+    case RBRINSTRUMENTGEN4_LOGGING_STATE_COUNT:
+        return "logging state count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_LOGGING_STATE:
+    default:
+        return "unknown logging state";
+    }
+}
+
 const char *RBRInstrumentGen4DeploymentStatus_name(
     RBRInstrumentGen4DeploymentStatus status)
 {
     switch (status)
     {
-    case RBRINSTRUMENTGEN4_STATUS_DISABLED:
-        return "disabled";
-    case RBRINSTRUMENTGEN4_STATUS_PENDING:
-        return "pending";
-    case RBRINSTRUMENTGEN4_STATUS_LOGGING:
-        return "logging";
+    case RBRINSTRUMENTGEN4_STATUS_SAMPLING:
+        return "sampling";
     case RBRINSTRUMENTGEN4_STATUS_GATED:
         return "gated";
     case RBRINSTRUMENTGEN4_STATUS_PAUSED:
         return "paused";
-    case RBRINSTRUMENTGEN4_STATUS_FINISHED:
-        return "finished";
-    case RBRINSTRUMENTGEN4_STATUS_STOPPED:
-        return "stopped";
-    case RBRINSTRUMENTGEN4_STATUS_FULLANDSTOPPED:
-        return "fullandstopped";
-    case RBRINSTRUMENTGEN4_STATUS_FULL:
-        return "full";
-    case RBRINSTRUMENTGEN4_STATUS_FAILED:
-        return "failed";
-    case RBRINSTRUMENTGEN4_STATUS_NOTBLANK:
-        return "notblank";
+    case RBRINSTRUMENTGEN4_STATUS_INACTIVE:
+        return "inactive";
     case RBRINSTRUMENTGEN4_STATUS_UNKNOWN:
         return "unknown";
     case RBRINSTRUMENTGEN4_STATUS_COUNT:
@@ -159,11 +163,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setDeployment(
     RBRInstrumentGen4 *instrument,
     const RBRInstrumentGen4Deployment *deployment)
 {
-    if (deployment->endTime <= deployment->startTime
-        || deployment->startTime < RBRINSTRUMENTGEN4_DATETIME_MIN
-        || deployment->startTime > RBRINSTRUMENTGEN4_DATETIME_MAX
-        || deployment->endTime < RBRINSTRUMENTGEN4_DATETIME_MIN
-        || deployment->endTime > RBRINSTRUMENTGEN4_DATETIME_MAX)
+    if (deployment->startTime < RBRINSTRUMENTGEN4_DATETIME_MIN
+        || deployment->startTime > RBRINSTRUMENTGEN4_DATETIME_MAX)
     {
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
@@ -171,16 +172,12 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setDeployment(
     char startTime[RBRINSTRUMENTGEN4_SCHEDULE_TIME_LEN + 1];
     RBRInstrumentGen4DateTime_toScheduleTime(deployment->startTime, startTime);
 
-    char endTime[RBRINSTRUMENTGEN4_SCHEDULE_TIME_LEN + 1];
-    RBRInstrumentGen4DateTime_toScheduleTime(deployment->endTime, endTime);
-
     if (instrument->generation == RBRINSTRUMENTGEN4_LOGGER4)
     {
         RBR_TRY(RBRInstrumentGen4_converse(
                     instrument,
-                    "deployment starttime = %s, endtime = %s",
-                    startTime,
-                    endTime));
+                    "deployment starttime=%s",
+                    startTime));
         return RBRINSTRUMENTGEN4_SUCCESS;
     }
     else
@@ -189,35 +186,21 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setDeployment(
     }
 }
 
-const char *RBRInstrumentGen4PauseresumeStatus_name(RBRInstrumentGen4PauseresumeStatus status)
-{
-    switch (status)
-    {
-    /* The deployment has been enabled and is paused */
-    case RBRINSTRUMENTGEN4_PAUSERESUME_STATUS_PAUSED:
-        return "paused";
-    /* The deployment has been enabled and will start at starttime */
-    case RBRINSTRUMENTGEN4_PAUSERESUME_STATUS_PENDING:
-        return "pending";
-    /* The deployment has been enabled and running */
-    case RBRINSTRUMENTGEN4_PAUSERESUME_STATUS_LOGGING:
-        return "logging";
-    /* The feature is not allowed on this instrument */
-    //case RBRINSTRUMENTGEN4_UNKNOWN_PAUSERESUME_STATUS:
-    default:
-        return "unknown pauseresume status";
-    }
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_pause(RBRInstrumentGen4 *instrument)
+RBRInstrumentGen4Error RBRInstrumentGen4_pause(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4DeploymentStatus *status)
 {
     (void)instrument;
+    (void)status;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_resume(RBRInstrumentGen4 *instrument)
+RBRInstrumentGen4Error RBRInstrumentGen4_resume(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4DeploymentStatus *status)
 {
     (void)instrument;
+    (void)status;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
@@ -281,22 +264,23 @@ const char *RBRInstrumentGen4RegimesReference_name(
     }
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getSchedules(
+RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedules *schedules)
+    RBRInstrumentGen4SchedulePool *schedulePool)
 {
     //GEN4 todo: add logic about it.
     (void)instrument;
-    (void)schedules;
+    (void)schedulePool;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
+
 RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
     RBRInstrumentGen4 *instrument,
-    const char *schedulelabel,
+    RBRInstrumentGen4GroupPool *groupPool,
     RBRInstrumentGen4Schedule *schedule)
 {
     (void)instrument;
-    (void)schedulelabel;
+    (void)groupPool;
     (void)schedule;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
@@ -322,43 +306,31 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
 
 RBRInstrumentGen4Error RBRInstrumentGen4_createSchedule(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedule *schedule,
-    RBRInstrumentGen4Schedules *schedules){
+    const char *newScheduleLabel,
+    RBRInstrumentGen4SchedulePool *schedulePool,
+    RBRInstrumentGen4Schedule **newSchedule){
         //GEN4 todo: add logic about it.
     (void)instrument;
-    (void)schedule;
-    (void)schedules;
+    (void)newScheduleLabel;
+    (void)schedulePool;
+    (void)newSchedule;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteSchedule(
     RBRInstrumentGen4 *instrument,
-    const char *schedulelabel,
-    RBRInstrumentGen4Schedules *schedules){
+    RBRInstrumentGen4Schedule *schedule){
         //GEN4 todo: add logic about it.
     (void)instrument;
-    (void)schedulelabel;
-    (void)schedules;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteScheduleMultiple(
-    RBRInstrumentGen4 *instrument,
-    const char *schedulelist,
-    RBRInstrumentGen4Schedules *schedules){
-        //GEN4 todo: add logic about it.
-            (void)instrument;
-    (void)schedulelist;
-    (void)schedules;
+    (void)schedule;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteScheduleAll(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedules *schedules){
+    RBRInstrumentGen4SchedulePool *schedulePool){
         //GEN4 todo: add logic about it.
         (void)instrument;
-        (void)schedules;
+        (void)schedulePool;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
-/******************************************************************/

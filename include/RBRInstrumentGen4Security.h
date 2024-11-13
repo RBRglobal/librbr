@@ -18,6 +18,8 @@
 extern "C" {
 #endif
 
+#include "RBRInstrumentGen4.h"
+
 /**
  * \brief Permits a protected command to be executed.
  *

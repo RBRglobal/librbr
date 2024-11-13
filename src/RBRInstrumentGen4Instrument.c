@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen4Other.c
+ * \file RBRInstrumentGen4Instrument.c
  *
  * \brief Library implementation.
  *
@@ -19,7 +19,7 @@
 
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Internal.h"
-#include "RBRInstrumentGen4Other.h"
+#include "RBRInstrumentGen4Instrument.h"
 
 /* The minimum length of a version string. */
 #define VERSION_MIN 3
@@ -97,8 +97,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
     do
     {
         RBRInstrumentGen4_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+                                        &command,
+                                        &parameter);
         if (parameter.key == NULL || parameter.value == NULL)
         {
             break;
@@ -110,16 +110,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
                      "%s",
                      parameter.value);
         }
-        else if (strcmp(parameter.key, "version") == 0)
+        else if (strcmp(parameter.key, "fwversion") == 0)
         {
-            snprintf((char *)(id->version),
-                     sizeof(id->version),
+            snprintf((char *)(id->fwversion),
+                     sizeof(id->fwversion),
                      "%s",
                      parameter.value);
         }
-        else if (strcmp(parameter.key, "serial") == 0)
+        else if (strcmp(parameter.key, "sn") == 0)
         {
-            id->serial = strtol(parameter.value, NULL, 10);
+            id->sn = strtol(parameter.value, NULL, 10);
         }
         else if (strcmp(parameter.key, "fwtype") == 0)
         {
@@ -134,40 +134,109 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getHardwareRevision(
+RBRInstrumentGen4Error RBRInstrumentGen4_getPcbaPool(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4HardwareRevision *hwrev)
+    RBRInstrumentGen4PcbaPool *pcbaPool)
 {
-    memset(hwrev, 0, sizeof(RBRInstrumentGen4HardwareRevision));
+    memset(pcbaPool, 0, sizeof(RBRInstrumentGen4PcbaPool));
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "hwrev"));
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "pcba"));
 
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
     {
         RBRInstrumentGen4_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+                                        &command,
+                                        &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
             break;
         }
-        else if (strcmp(parameter.key, "pcb") == 0)
+        else if (strcmp(parameter.key, "count") == 0)
         {
-            hwrev->pcb = *parameter.value;
+            pcbaPool->count = strtol(parameter.value, NULL, 10);
         }
-        else if (strcmp(parameter.key, "cpu") == 0)
+        else if (strcmp(parameter.key, "list") == 0)
         {
-            snprintf(hwrev->cpu,
-                     sizeof(hwrev->cpu),
+            char *nextValue = NULL;
+            for (int32_t pcba = 0; pcba < RBRINSTRUMENTGEN4_PCBA_COUNT_MAX; pcba++)
+            {
+                if ((nextValue = strstr(parameter.value, "|")) != NULL)
+                {
+                    *nextValue = '\0';
+                    nextValue++;
+                }
+
+                snprintf((char *)(pcbaPool->pool[pcba].label),
+                         sizeof(pcbaPool->pool[pcba].label),
+                         "%s",
+                         parameter.value);
+
+                if (nextValue == NULL)
+                {
+                    break;
+                }
+                else
+                {
+                    parameter.value = nextValue;
+                }
+            }
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getPcba(
+        RBRInstrumentGen4 *instrument,
+        RBRInstrumentGen4Pcba *pcba)
+    {
+        memset(pcba, 0, sizeof(RBRInstrumentGen4Pcba));
+
+        RBR_TRY(RBRInstrumentGen4_converse(instrument, "pcba %s", pcba->label));
+
+        char *command = NULL;
+        RBRInstrumentGen4ResponseParameter parameter;
+        while (true)
+        {
+            RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+            if (parameter.key == NULL || parameter.value == NULL)
+            {
+                break;
+            }
+            else if (strcmp(parameter.key, "sn") == 0)
+            {
+                pcba->sn = strtol(parameter.value, NULL, 10);
+            }
+            else if (strcmp(parameter.key, "pn") == 0)
+            {
+                snprintf(pcba->pn,
+                        sizeof(pcba->pn),
                      "%s",
                      parameter.value);
         }
-        else if (strcmp(parameter.key, "bsl") == 0)
+        else if (strcmp(parameter.key, "fw") == 0)
         {
-            hwrev->bsl = *parameter.value;
+            snprintf(pcba->fw,
+                     sizeof(pcba->fw),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "hw") == 0)
+        {
+            snprintf(pcba->hw,
+                     sizeof(pcba->fw),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "address") == 0)
+        {
+            pcba->address = strtol(parameter.value, NULL, 10);
         }
     }
 
@@ -192,22 +261,12 @@ const char *RBRInstrumentGen4PowerSource_name(RBRInstrumentGen4PowerSource sourc
     }
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getPower(RBRInstrumentGen4 *instrument,
-                                          RBRInstrumentGen4Power *power)
+RBRInstrumentGen4Error RBRInstrumentGen4_getPowerSource(RBRInstrumentGen4 *instrument,
+                                          RBRInstrumentGen4PowerSource *powerSource)
 {
-    memset(power, 0, sizeof(RBRInstrumentGen4Power));
-    power->source = RBRINSTRUMENTGEN4_POWER_SOURCE_UNKNOWN;
-    power->internal = NAN;
-    power->regulator = NAN;
+    *powerSource = RBRINSTRUMENTGEN4_POWER_SOURCE_UNKNOWN;
 
-    if (instrument->generation == RBRINSTRUMENTGEN4_LOGGER2)
-    {
-        RBR_TRY(RBRInstrumentGen4_converse(instrument, "powerstatus"));
-    }
-    else
-    {
-        RBR_TRY(RBRInstrumentGen4_converse(instrument, "power"));
-    }
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "instrument power"));
 
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
@@ -228,30 +287,9 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPower(RBRInstrumentGen4 *instrument,
                 if (strcmp(RBRInstrumentGen4PowerSource_name(i),
                            parameter.value) == 0)
                 {
-                    power->source = i;
+                    *powerSource = i;
                     break;
                 }
-            }
-        }
-        else if (strcmp(parameter.key, "int") == 0)
-        {
-            if (strcmp(parameter.value, "n/a") != 0)
-            {
-                power->internal = strtod(parameter.value, NULL);
-            }
-        }
-        else if (strcmp(parameter.key, "ext") == 0)
-        {
-            if (strcmp(parameter.value, "n/a") != 0)
-            {
-                power->external = strtod(parameter.value, NULL);
-            }
-        }
-        else if (strcmp(parameter.key, "reg") == 0)
-        {
-            if (strcmp(parameter.value, "n/a") != 0)
-            {
-                power->regulator = strtod(parameter.value, NULL);
             }
         }
     }
@@ -284,7 +322,7 @@ const char *RBRInstrumentGen4InternalBatteryType_name(
     }
 }
 
-const char *RBRInstrumentGen4InternalBatteryType_dispalyName(
+const char *RBRInstrumentGen4InternalBatteryType_displayName(
     RBRInstrumentGen4InternalBatteryType type)
 {
     switch (type)
@@ -321,7 +359,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPowerInternal(
     memset(power, 0, sizeof(RBRInstrumentGen4PowerInternal));
     power->batteryType = RBRINSTRUMENTGEN4_UNKNOWN_INTERNAL_BATTERY;
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "powerinternal"));
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "instrument power internal"));
 
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
@@ -334,6 +372,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPowerInternal(
         if (parameter.key == NULL || parameter.value == NULL)
         {
             break;
+        }
+        else if (strcmp(parameter.key, "voltage") == 0)
+        {
+            *(float *) &power->voltage = strtod(parameter.value, NULL);
         }
         else if (strcmp(parameter.key, "batterytype") == 0)
         {
@@ -371,14 +413,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPowerInternalBatteryType(
 
     return RBRInstrumentGen4_converse(
         instrument,
-        "powerinternal batterytype = %s",
+        "instrument power internal batterytype=%s",
         RBRInstrumentGen4InternalBatteryType_name(type));
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_resetPowerInternalUsed(
     RBRInstrumentGen4 *instrument)
 {
-    return RBRInstrumentGen4_converse(instrument, "powerinternal used = 0");
+    return RBRInstrumentGen4_converse(instrument, "instrument power internal used=0");
 }
 
 const char *RBRInstrumentGen4ExternalBatteryType_name(
@@ -386,6 +428,8 @@ const char *RBRInstrumentGen4ExternalBatteryType_name(
 {
     switch (type)
     {
+    case RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_NONE:
+        return "none";
     case RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMATA_LISOCL2:
         return "fermata_lisocl2";
     case RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMATA_ZNMNO2:
@@ -419,7 +463,8 @@ const char *RBRInstrumentGen4ExternalBatteryType_displayName(
 {
     switch (type)
     {
-
+    case RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_NONE:
+        return "none";
     case RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMATA_LISOCL2:
         return "RBRfermata Li-SOCl₂";
     case RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMATA_ZNMNO2:
@@ -452,15 +497,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPowerExternal(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4PowerExternal *power)
 {
-    if (instrument->generation == RBRINSTRUMENTGEN4_LOGGER2)
-    {
-        return RBRINSTRUMENTGEN4_UNSUPPORTED;
-    }
-
     memset(power, 0, sizeof(RBRInstrumentGen4PowerExternal));
     power->batteryType = RBRINSTRUMENTGEN4_UNKNOWN_EXTERNAL_BATTERY;
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "powerexternal"));
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "instrument power external"));
 
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
@@ -473,6 +513,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPowerExternal(
         if (parameter.key == NULL || parameter.value == NULL)
         {
             break;
+        }
+        else if (strcmp(parameter.key, "voltage") == 0)
+        {
+            *(float *) &power->voltage = strtod(parameter.value, NULL);
         }
         else if (strcmp(parameter.key, "batterytype") == 0)
         {
@@ -510,28 +554,23 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPowerExternalBatteryType(
 
     return RBRInstrumentGen4_converse(
         instrument,
-        "powerexternal batterytype = %s",
+        "instrument power external batterytype=%s",
         RBRInstrumentGen4ExternalBatteryType_name(type));
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_resetPowerExternalUsed(
     RBRInstrumentGen4 *instrument)
 {
-    return RBRInstrumentGen4_converse(instrument, "powerexternal used = 0");
+    return RBRInstrumentGen4_converse(instrument, "instrument power external used=0");
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getInfo(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4Info *info)
 {
-    if (instrument->generation == RBRINSTRUMENTGEN4_LOGGER2)
-    {
-        return RBRINSTRUMENTGEN4_UNSUPPORTED;
-    }
-
     memset(info, 0, sizeof(RBRInstrumentGen4Info));
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "info"));
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "instrument"));
 
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
@@ -547,14 +586,29 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getInfo(
         }
         else if (strcmp(parameter.key, "pn") == 0)
         {
-            snprintf(info->partNumber,
-                     sizeof(info->partNumber),
+            snprintf(info->pn,
+                     sizeof(info->pn),
                      "%s",
                      parameter.value);
         }
         else if (strcmp(parameter.key, "fwlock") == 0)
         {
             info->fwLock = (strcmp(parameter.value, "on") == 0);
+        }
+        else if (strcmp(parameter.key, "datatype") == 0)
+        {
+            if (strcmp(parameter.value, "float32") == 0)
+            {
+                info->dataType = RBRINSTRUMENTGEN4_DATATYPE_FLOAT32;
+            }
+            else if (strcmp(parameter.value, "float64") == 0)
+            {
+                info->dataType = RBRINSTRUMENTGEN4_DATATYPE_FLOAT64;
+            }
+            else if (strcmp(parameter.value, "cal64") == 0)
+            {
+                info->dataType = RBRINSTRUMENTGEN4_DATATYPE_CALFLOAT64;
+            }
         }
     }
 

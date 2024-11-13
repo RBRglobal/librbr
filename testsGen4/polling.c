@@ -9,13 +9,14 @@
  */
 
 #include <math.h>
+#include "RBRInstrumentGen4Polling.h"
 #include "tests.h"
 
 typedef struct PollAllChannelsTest
 {
     const char *expectedCommand;
     const char *response;
-    bool sleepAfter;
+    RBRInstrumentGen4Outputformat outputFormat;
     RBRInstrumentGen4Sample expected;
 } PollAllChannelsTest;
 
@@ -29,12 +30,12 @@ static bool test_pollAllChannels(RBRInstrumentGen4 *instrument,
     for (int i = 0; tests[i].expectedCommand != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        if(i == 0)
+        if (i == 0)
         {
           instrument->lastActivityTime = 0;
         }
+        instrument->outputFormat=tests[i].outputFormat;
         err = RBRInstrumentGen4_pollAllChannels(instrument,
-                                  tests[i].sleepAfter,
                                   &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].expectedCommand, buffers->writeBuffer);
@@ -78,10 +79,11 @@ TEST_LOGGER4(poll_all_channels)
 {
     PollAllChannelsTest tests[] = {
         {
-            "poll sleepafter = false, channel = all" COMMAND_TERMINATOR,
-            "poll, 2000-01-01 03:22:42.000, -129.993424e+000, 349.649536e-003, "
+            "poll channellist=all" COMMAND_TERMINATOR,
+            "polling 2000-01-01 03:22:42.000 -129.993424e+000 349.649536e-003 "
             "500.022304e-003" RESPONSE_TERMINATOR,
-            false,
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP,
             {
                 .timestamp = 946696962000LL,
                 .channels = 3,
@@ -93,10 +95,12 @@ TEST_LOGGER4(poll_all_channels)
             }
         },
         {
-            "poll sleepafter = false, channel = all" COMMAND_TERMINATOR,
-            "RBR 999999, poll, 2000-01-01 03:22:42.000, -129.993424e+000, 349.649536e-003, "
+            "poll channellist=all" COMMAND_TERMINATOR,
+            "RBR 999999 polling 2000-01-01 03:22:42.000 -129.993424e+000 349.649536e-003 "
             "500.022304e-003" RESPONSE_TERMINATOR,
-            false,
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL,
             {
                 .timestamp = 946696962000LL,
                 .channels = 3,
@@ -108,10 +112,11 @@ TEST_LOGGER4(poll_all_channels)
             }
         },
         {
-            "poll sleepafter = false, channel = all" COMMAND_TERMINATOR,
-            "2000-01-01 03:22:42.000, -129.993424e+000, 349.649536e-003, "
+            "poll channellist=all" COMMAND_TERMINATOR,
+            "polling 2000-01-01 03:22:42.000 -129.993424e+000 349.649536e-003 "
             "500.022304e-003" RESPONSE_TERMINATOR,
-            false,
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP,
             {
                 .timestamp = 946696962000LL,
                 .channels = 3,
@@ -123,10 +128,11 @@ TEST_LOGGER4(poll_all_channels)
             }
         },
         {
-            "poll sleepafter = false, channel = all" COMMAND_TERMINATOR,
-            "poll, 2000-01-01 20:09:36.000, -129.805680e+000, Error-14, Error-14, "
-            "Error-14, 1.00000000e+000" RESPONSE_TERMINATOR,
-            false,
+            "poll channellist=all" COMMAND_TERMINATOR,
+            "polling 2000-01-01 20:09:36.000 -129.805680e+000 Error-14 Error-14 "
+            "Error-14 1.00000000e+000" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP,
             {
                 .timestamp = 946757376000LL,
                 .channels = 5,
@@ -146,10 +152,13 @@ TEST_LOGGER4(poll_all_channels)
             }
         },
         {
-            "poll sleepafter = false, channel = all" COMMAND_TERMINATOR,
-            "RBR 999999, poll, 2000-01-01 03:22:42.000, -129.993424e+000, 349.649536e-003, "
-            "500.022304e-003, 0xFBC7" RESPONSE_TERMINATOR,
-            false,
+            "poll channellist=all" COMMAND_TERMINATOR,
+            "RBR 999999 polling 2000-01-01 03:22:42.000 -129.993424e+000 349.649536e-003 "
+            "500.022304e-003 0x802A" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC,
             {
                 .timestamp = 946696962000LL,
                 .channels = 3,
@@ -169,8 +178,8 @@ typedef struct PollOneChannelTest
 {
     const char *expectedCommand;
     const char *response;
-    bool sleepAfter;
-    const char *channellabel;
+    const char *channelLabel;
+    RBRInstrumentGen4Outputformat outputFormat;
     RBRInstrumentGen4Sample expected;
 } PollOneChannelTest;
 
@@ -181,12 +190,12 @@ static bool test_pollOneChannel(RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4Error err;
     RBRInstrumentGen4Sample actual;
 
-    for (int i = 0; tests[i].expectedCommand != NULL; i++)
+    for (int i=0; tests[i].expectedCommand != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
+        instrument->outputFormat=tests[i].outputFormat;
         err = RBRInstrumentGen4_pollOneChannel(instrument,
-                                  tests[i].channellabel,
-                                  tests[i].sleepAfter,
+                                  tests[i].channelLabel,
                                   &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].expectedCommand, buffers->writeBuffer);
@@ -230,10 +239,11 @@ TEST_LOGGER4(poll_one_channel)
 {
     PollOneChannelTest tests[] = {
         {
-            "poll sleepafter = false, channel = conductivity_00" COMMAND_TERMINATOR,
-            "poll, 2018-07-26 14:56:24.000, 39.993424e+000" RESPONSE_TERMINATOR,
-            false,
+            "poll channellist=conductivity_00" COMMAND_TERMINATOR,
+            "polling 2018-07-26 14:56:24.000 39.993424e+000" RESPONSE_TERMINATOR,
             "conductivity_00",
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP,
             {
                 .timestamp = 1532616984000LL,
                 .channels = 1,
@@ -243,10 +253,10 @@ TEST_LOGGER4(poll_one_channel)
             }
         },
         {
-            "poll sleepafter = false, channel = temperature_00" COMMAND_TERMINATOR,
-            "2000-01-01 03:22:42.000, 39.993424e+000" RESPONSE_TERMINATOR,
-            false,
+            "poll channellist=temperature_00" COMMAND_TERMINATOR,
+            "2000-01-01 03:22:42.000 39.993424e+000" RESPONSE_TERMINATOR,
             "temperature_00",
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP,
             {
                 .timestamp = 946696962000LL,
                 .channels = 1,
@@ -256,10 +266,10 @@ TEST_LOGGER4(poll_one_channel)
             }
         },
         {
-            "poll sleepafter = false, channel = temperature_00" COMMAND_TERMINATOR,
-            "2000-01-01 03:22:42.000, Error-07" RESPONSE_TERMINATOR,
-            false,
+            "poll channellist=temperature_00" COMMAND_TERMINATOR,
+            "2000-01-01 03:22:42.000 Error-07" RESPONSE_TERMINATOR,
             "temperature_00",
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP,
             {
                 .timestamp = 946696962000LL,
                 .channels = 1,
@@ -271,10 +281,11 @@ TEST_LOGGER4(poll_one_channel)
             }
         },
         {
-            "poll sleepafter = false, channel = temperature_00" COMMAND_TERMINATOR,
-            "RBR 999999, 2000-01-01 03:22:42.000, Error-07" RESPONSE_TERMINATOR,
-            false,
+            "poll channellist=temperature_00" COMMAND_TERMINATOR,
+            "RBR 999999 2000-01-01 03:22:42.000 Error-07" RESPONSE_TERMINATOR,
             "temperature_00",
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL 
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP,
             {
                 .timestamp = 946696962000LL,
                 .channels = 1,
@@ -286,10 +297,13 @@ TEST_LOGGER4(poll_one_channel)
             }
         },
         {
-            "poll sleepafter = false, channel = temperature_00" COMMAND_TERMINATOR,
-            "RBR 999999, poll, 2000-01-01 03:22:42.000, 349.649536e-003, 0x65BB" RESPONSE_TERMINATOR,
-            false,
+            "poll channellist=temperature_00" COMMAND_TERMINATOR,
+            "RBR 999999 polling 2000-01-01 03:22:42.000 349.649536e-003 0xAD85" RESPONSE_TERMINATOR,
             "temperature_00",
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC,
             {
                 .timestamp = 946696962000LL,
                 .channels = 1,
@@ -308,8 +322,8 @@ typedef struct PollOneGroupTest
 {
     const char *expectedCommand;
     const char *response;
-    bool sleepAfter;
-    const char *grouplabel;
+    const char *groupLabel;
+    RBRInstrumentGen4Outputformat outputFormat;
     RBRInstrumentGen4Sample expected;
 } PollOneGroupTest;
 
@@ -323,9 +337,9 @@ static bool test_pollOneGroup(RBRInstrumentGen4 *instrument,
     for (int i = 0; tests[i].expectedCommand != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
+        instrument->outputFormat=tests[i].outputFormat;
         err = RBRInstrumentGen4_pollOneGroup(instrument,
-                                  tests[i].grouplabel,
-                                  tests[i].sleepAfter,
+                                  tests[i].groupLabel,
                                   &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].expectedCommand, buffers->writeBuffer);
@@ -369,10 +383,11 @@ TEST_LOGGER4(poll_one_group)
 {
     PollOneGroupTest tests[] = {
         {
-            "poll sleepafter = true, group = g_depth" COMMAND_TERMINATOR,
-            "poll, 2000-01-01 03:22:42.000, 39.993424e+000" RESPONSE_TERMINATOR,
-            true,
+            "poll grouplist=g_depth" COMMAND_TERMINATOR,
+            "polling 2000-01-01 03:22:42.000 39.993424e+000" RESPONSE_TERMINATOR,
             "g_depth",
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP,
             {
                 .timestamp = 946696962000LL,
                 .channels = 1,
@@ -382,11 +397,11 @@ TEST_LOGGER4(poll_one_group)
             }
         },
         {
-            "poll sleepafter = false, group = gr_odo" COMMAND_TERMINATOR,
-            "2000-01-01 03:22:42.000, 39.993424e+000, -129.993424e+000, 349.649536e-003, "
+            "poll grouplist=gr_odo" COMMAND_TERMINATOR,
+            "2000-01-01 03:22:42.000 39.993424e+000 -129.993424e+000 349.649536e-003 "
             "500.022304e-003" RESPONSE_TERMINATOR,
-            false,
             "gr_odo",
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP,
             {
                 .timestamp = 946696962000LL,
                 .channels = 4,
@@ -399,10 +414,10 @@ TEST_LOGGER4(poll_one_group)
             }
         },
         {
-            "poll sleepafter = false, group = gr_ph" COMMAND_TERMINATOR,
-            "2000-01-01 03:22:42.000, 39.993424e+000, Error-07" RESPONSE_TERMINATOR,
-            false,
+            "poll grouplist=gr_ph" COMMAND_TERMINATOR,
+            "2000-01-01 03:22:42.000 39.993424e+000 Error-07" RESPONSE_TERMINATOR,
             "gr_ph",
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP,
             {
                 .timestamp = 946696962000LL,
                 .channels = 2,
@@ -415,11 +430,13 @@ TEST_LOGGER4(poll_one_group)
             }
         },
         {
-            "poll sleepafter = false, group = gr_bbpfl" COMMAND_TERMINATOR,
-            "RBR 999999, 2000-01-01 03:22:42.000, 39.993424e+000, -129.993424e+000, "
-            "349.649536e-003, 0x41F7" RESPONSE_TERMINATOR,
-            false,
+            "poll grouplist=gr_bbpfl" COMMAND_TERMINATOR,
+            "RBR 999999 2000-01-01 03:22:42.000 39.993424e+000 -129.993424e+000 "
+            "349.649536e-003 0xD863" RESPONSE_TERMINATOR,
             "gr_bbpfl",
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC,
             {
                 .timestamp = 946696962000LL,
                 .channels = 3,
@@ -431,10 +448,13 @@ TEST_LOGGER4(poll_one_group)
             }
         },
         {
-            "poll sleepafter = false, group = gr_radiometry" COMMAND_TERMINATOR,
-            "RBR 999999, poll, 2000-01-01 03:22:42.000, 349.649536e-003, 39.993424e+000, 0x7DC2" RESPONSE_TERMINATOR,
-            false,
+            "poll grouplist=gr_radiometry" COMMAND_TERMINATOR,
+            "RBR 999999 polling 2000-01-01 03:22:42.000 349.649536e-003 39.993424e+000 0x89AB" RESPONSE_TERMINATOR,
             "gr_radiometry",
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC,
             {
                 .timestamp = 946696962000LL,
                 .channels = 2,

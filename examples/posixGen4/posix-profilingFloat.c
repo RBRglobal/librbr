@@ -9,23 +9,29 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
+/* Prerequisite for gmtime_r in time.h. */
+#define _POSIX_C_SOURCE 200112L
+
 /* Required for errno. */
 #include <errno.h>
 /* Required for isnan. */
 #include <math.h>
 /* Required for fprintf, printf, snprintf. */
 #include <stdio.h>
-/* Required for EXIT_SUCCESS, etc. */
-#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
+#include <stdlib.h>
 /* Required for close. */
+#include <time.h>
 #include <unistd.h>
 
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Configuration.h"
+#include "RBRInstrumentGen4Deployment.h"
+#include "RBRInstrumentGen4Instrument.h"
 #include "RBRInstrumentGen4Memory.h"
 #include "RBRInstrumentGen4Schedule.h"
+#include "RBRParserGen4.h"
 #include "posix-shared.h"
 
 //************************************* customer defined parameters *************************************//
@@ -38,8 +44,8 @@
     (const char[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX]) \
     {                                                   \
         PRESSURE,                                       \
-            TEMPERATURE,                                \
-            SALINITY_DYNCORR                            \
+        SALINITY_DYNCORR,                               \
+        TEMPERATURE                                     \
     }
 #define GROUP_PTS_CHANNEL_COUNT 3
 
@@ -78,12 +84,35 @@
     {                                                \
         SCHEDULE_PTS_LABEL                           \
     }
-#define CONFIG_ASCENT_SCHEDULE_COUNT 1
 
 #define STARTTIME "20000101000000"
-#define ENDTIME "20991231235959"
 
 #define NEW_DATASET_LABEL "ds_ascent"
+
+#define CHUNK_LEN_BYTES 1000
+
+RBRInstrumentGen4Error parserSample(
+    const struct RBRParserGen4 *parser,
+    const struct RBRInstrumentGen4Sample *const sample)
+{
+    /* Unused. */
+    (void) parser;
+
+    char ftime[128];
+    time_t sampleSeconds = (time_t) (sample->timestamp / 1000);
+    struct tm sampleTime;
+    gmtime_r(&sampleSeconds, &sampleTime);
+    strftime(ftime, sizeof(ftime), "%F %T", &sampleTime);
+
+    printf("%s.%03" PRIi64, ftime, sample->timestamp % 1000);
+    for (int32_t i = 0; i < sample->channelCount; i++)
+    {
+        printf(", %lf", sample->readings[i]);
+    }
+    printf("\n");
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
 
 int main(int argc, char *argv[])
 {
@@ -182,7 +211,7 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_deleteGroupAll(instrument, &groupPool);
 
     /************ group definition ************/
-    /* populate all channelPool and calibrations */
+    /* populate all channels and calibrations */
     RBRInstrumentGen4ChannelPool channelPool;
     RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
 
@@ -220,7 +249,7 @@ int main(int argc, char *argv[])
                         &group_pts);
 
     /************ schedule definition ************/
-    RBRInstrumentGen4Schedule* schedule;
+    RBRInstrumentGen4Schedule* schedule_asc_pts;
     RBRInstrumentGen4_initNewScheduleRegimes(instrument,
                          SCHEDULE_PTS_LABEL,
                          SCHEDULE_PTS_GROUPS,
@@ -229,41 +258,91 @@ int main(int argc, char *argv[])
                          SCHEDULE_PTS_REGIMES,
                          &groupPool,
                          &schedulePool,
-                         &schedule);
+                         &schedule_asc_pts);
 
     /************ configuration definition ************/
-    RBRInstrumentGen4Config* config;
+    RBRInstrumentGen4Config* config_ascent;
     RBRInstrumentGen4_initNewConfig(instrument,
-                        CONFIG_ASCENT_LABEL,
-                        CONFIG_ASCENT_SCHEDULES,
-                        CONFIG_ASCENT_SCHEDULE_COUNT,
+                        GROUP_PTS_LABEL,
+                        GROUP_PTS_CHANNELS,
+                        GROUP_PTS_CHANNEL_COUNT,
                         &schedulePool,
                         &configPool,
-                        &config);
+                        &config_ascent);
 
     /************ deployment parameters ************/
     RBRInstrumentGen4Deployment deployment;
+    deployment.gate = RBRINSTRUMENTGEN4_GATE_NONE;
     RBRInstrumentGen4_getDeployment(instrument, &deployment);
 
     str_to_deploymentDatetime(&deployment.startTime, STARTTIME);
     RBRInstrumentGen4_setDeployment(instrument, &deployment);
 
     /************ start of ascent ************/
-    /* verify the configurations for enable */
-    RBRInstrumentGen4_verify(instrument,
-                             config,
-                             NEW_DATASET_LABEL,
-                             &loggingState);
-
     /* enable the instrument */
-    RBRInstrumentGen4Dataset *dataset;
+    RBRInstrumentGen4Dataset *dataset_ascent;
     RBRInstrumentGen4_enable(instrument,
-                             config,
+                             config_ascent,
                              NEW_DATASET_LABEL,
                              RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
                              &datasetPool,
-                             &dataset,
+                             &dataset_ascent,
                              &loggingState);
+
+    /************ end of ascent ************/
+    /* Stop the current deployment */
+    RBRInstrumentGen4_disable(instrument, &loggingState);
+    /* Determine how much memory has been used */
+    RBRInstrumentGen4_getDataset(instrument,
+                                 &configPool,
+                                 dataset_ascent);
+    RBRInstrumentGen4DatasetInfo dataset_asc_info;
+    RBRInstrumentGen4_getDatasetByScheduleBlock(
+        instrument,
+        schedule_asc_pts,
+        RBRINSTRUMENTGEN4_BLOCK_DATA,
+        dataset_ascent,
+        &dataset_asc_info);
+    /* Get the data type */
+    RBRInstrumentGen4Info info;
+    RBRInstrumentGen4_getInfo(instrument, &info);
+    /* Prepare the parser */
+    RBRParserGen4 parserSpace;
+    RBRParserGen4* parser = &parserSpace;
+    RBRParserGen4Config config = {
+        .channelCount = group_pts->count,
+        .datatype = info.dataType
+    };
+    RBRInstrumentGen4Sample sampleBuffer;
+    RBRParserGen4Callbacks parserCallbacks = {
+        .sample = parserSample,
+        .sampleBuffer = &sampleBuffer
+    };
+    RBRParserGen4_init(&parser,
+                       &parserCallbacks,
+                       &config,
+                       NULL);
+    /* Now loop over the data to download it in chunks */
+    uint8_t buf[CHUNK_LEN_BYTES];
+    RBRInstrumentGen4Download download_data_pts = {
+        .dataset = dataset_ascent,
+        .schedule = schedule_asc_pts,
+        .block = RBRINSTRUMENTGEN4_BLOCK_DATA,
+        .countKey = RBRINSTRUMENTGEN4_COUNTKEY_BYTECOUNT,
+        .countValue = CHUNK_LEN_BYTES,
+        .startKey = RBRINSTRUMENTGEN4_COUNTKEY_BYTECOUNT,
+        .startOffset = 1,
+        .data = buf
+    };
+    while (download_data_pts.startOffset < dataset_ascent->byteCount) // if not downloaded all data from targetDataset/schedule/datablock
+    {
+        RBRInstrumentGen4_download(instrument,
+                                   &download_data_pts);
+        RBRParserGen4_parse(parser,
+                            download_data_pts.block,
+                            download_data_pts.data,
+                            &download_data_pts.countValue);
+    }
 
 instrumentCleanup:
     RBRInstrumentGen4_close(instrument);

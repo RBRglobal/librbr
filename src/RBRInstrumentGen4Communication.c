@@ -129,120 +129,6 @@ const char *RBRInstrumentGen4SerialMode_name(RBRInstrumentGen4SerialMode mode)
     }
 }
 
-const char *RBRInstrumentGen4Aux1ActiveState_name(
-    RBRInstrumentGen4Aux1ActiveState aux1_active)
-{
-    switch (aux1_active)
-    {
-    case RBRINSTRUMENTGEN4_AUX1ACTIVE_HIGH:
-        return "high";
-    case RBRINSTRUMENTGEN4_AUX1ACTIVE_LOW:
-        return "low";
-    case RBRINSTRUMENTGEN4_AUX1ACTIVE_COUNT:
-        return "active output level count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_AUX1ACTIVE:
-    default:
-        return "unknown active output level";
-    }
-}
-
-const char *RBRInstrumentGen4Aux1SleepState_name(RBRInstrumentGen4Aux1SleepState aux1_sleep)
-{
-
-    switch (aux1_sleep)
-    {
-    case RBRINSTRUMENTGEN4_AUX1SLEEP_TRISTATE:
-        return "tristate";
-    case RBRINSTRUMENTGEN4_AUX1SLEEP_HIGH:
-        return "high";
-    case RBRINSTRUMENTGEN4_AUX1SLEEP_LOW:
-        return "low";
-    case RBRINSTRUMENTGEN4_AUX1SLEEP_COUNT:
-        return "sleep output level count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_AUX1SLEEP:
-    default:
-        return "unknown aux1_sleep level";
-    }
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_getAux1(RBRInstrumentGen4 *instrument,
-                                                 RBRInstrumentGen4Aux1 *aux1)
-{
-    memset(aux1, 0, sizeof(RBRInstrumentGen4Aux1));
-    aux1->aux1_active = RBRINSTRUMENTGEN4_UNKNOWN_AUX1ACTIVE;
-    aux1->aux1_sleep = RBRINSTRUMENTGEN4_UNKNOWN_AUX1SLEEP;
-
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "serial aux1_all"));
-
-    char *command = NULL;
-    RBRInstrumentGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRInstrumentGen4_parseResponse(instrument,
-                                        &command,
-                                        &parameter);
-
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
-            break;
-        }
-        if (strcmp(parameter.key, "aux1_state") == 0)
-        {
-            aux1->aux1_state = (strcmp(parameter.value, "on") == 0);
-        }
-        else if (strcmp(parameter.key, "aux1_setup") == 0)
-        {
-            aux1->aux1_setup = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "aux1_hold") == 0)
-        {
-            aux1->aux1_hold = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "aux1_active") == 0)
-        {
-            for (int i = 0; i < RBRINSTRUMENTGEN4_AUX1ACTIVE_COUNT; i++)
-            {
-                if (strcmp(RBRInstrumentGen4Aux1ActiveState_name(i),
-                           parameter.value) == 0)
-                {
-                    aux1->aux1_active = i;
-                    break;
-                }
-            }
-        }
-        else if (strcmp(parameter.key, "aux1_sleep") == 0)
-        {
-            for (int i = 0; i < RBRINSTRUMENTGEN4_AUX1SLEEP_COUNT; i++)
-            {
-                if (strcmp(RBRInstrumentGen4Aux1SleepState_name(i),
-                           parameter.value) == 0)
-                {
-                    aux1->aux1_sleep = i;
-                    break;
-                }
-            }
-        }
-    }
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_setAux1(RBRInstrumentGen4 *instrument,
-                                                 RBRInstrumentGen4Aux1 *aux1)
-{
-    const char *enabledValue;
-    enabledValue = aux1->aux1_state ? "on" : "off";
-
-    return RBRInstrumentGen4_converse(
-        instrument,
-        "serial aux1_state = %s, aux1_setup = %" PRIi32 ", "
-        "aux1_hold = %" PRIi32 ", aux1_active = %s, aux1_sleep = %s",
-        enabledValue,
-        aux1->aux1_setup,
-        aux1->aux1_hold,
-        RBRInstrumentGen4Aux1ActiveState_name(aux1->aux1_active),
-        RBRInstrumentGen4Aux1SleepState_name(aux1->aux1_sleep));
-}
-
 RBRInstrumentGen4Error RBRInstrumentGen4_getSerial(RBRInstrumentGen4 *instrument,
                                                    RBRInstrumentGen4Serial *serial)
 {
@@ -256,7 +142,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSerial(RBRInstrumentGen4 *instrument
     *availableBaudRates = RBRINSTRUMENTGEN4_SERIAL_BAUD_NONE;
     *availableModes = RBRINSTRUMENTGEN4_SERIAL_MODE_NONE;
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "serial all"));
+    RBR_TRY(RBRInstrumentGen4_converse(
+        instrument,
+        "link serial baudrate mode availablebaudrates availablemodes"
+        ));
 
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
@@ -362,7 +251,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSerial(RBRInstrumentGen4 *instrument
 
     return RBRInstrumentGen4_converse(
         instrument,
-        "serial baudrate = %s, mode = %s",
+        "link serial baudrate=%s mode=%s",
         RBRInstrumentGen4SerialBaudRate_name(serial->baudRate),
         RBRInstrumentGen4SerialMode_name(serial->mode));
 }
@@ -373,6 +262,12 @@ RBRInstrumentGen4Error RBRInstrumentGen4_sleep(RBRInstrumentGen4 *instrument)
     instrument->lastActivityTime = RBRINSTRUMENTGEN4_NO_ACTIVITY;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
+
+/**
+ * L3.5/L4 WiFi interface is To Be Defined as of October 2024.
+*/
+
+#if 0
 
 const char *RBRInstrumentGen4WiFiState_name(RBRInstrumentGen4WiFiState state)
 {
@@ -473,8 +368,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setWiFi(RBRInstrumentGen4 *instrument,
 
     return RBRInstrumentGen4_converse(
             instrument,
-            "wifi enabled = %s, timeout = %d, commandtimeout = %d",
+            "wifi enabled=%s timeout=%d commandtimeout=%d",
             wifi->enabled ? "true" : "false",
             wifi->timeout / 1000,
             wifi->commandTimeout / 1000);
 }
+
+#endif

@@ -18,8 +18,7 @@
 #include "RBRInstrumentGen4Polling.h"
 
 RBRInstrumentGen4Error RBRInstrumentGen4_pollOneChannel(RBRInstrumentGen4 *instrument,
-                                       const char *channellabel,
-                                       const bool sleepafter, 
+                                       const char *channelLabel,
                                        RBRInstrumentGen4Sample *sample)
 {
     char *commandBuffer = (char *) instrument->commandBuffer;
@@ -30,20 +29,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollOneChannel(RBRInstrumentGen4 *instr
     *commandBufferLength = snprintf(
         commandBuffer,
         sizeof(instrument->commandBuffer),
-        "poll sleepafter = %s",
-        sleepafter ? "true" : "false");
-
-    *commandBufferLength += snprintf(
-        commandBuffer + *commandBufferLength,
-        sizeof(instrument->commandBuffer) - *commandBufferLength,
-        ", channel = ");
-
-    //append channel label and terminator to command buffer
-    *commandBufferLength += snprintf(
-        commandBuffer + *commandBufferLength,
-        sizeof(instrument->commandBuffer) - *commandBufferLength,
-        "%s%s",
-        channellabel, RBRINSTRUMENTGEN4_SEND_COMMAND_TERMINATOR);
+        "poll channellist=%s%s",
+        channelLabel, RBRINSTRUMENTGEN4_SEND_COMMAND_TERMINATOR);
 
     RBR_TRY(RBRInstrumentGen4_sendBuffer(instrument));
 
@@ -67,8 +54,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollOneChannel(RBRInstrumentGen4 *instr
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_pollOneGroup(RBRInstrumentGen4 *instrument,
-                                       const char *grouplabel,
-                                       const bool sleepafter,
+                                       const char *groupLabel,
                                        RBRInstrumentGen4Sample *sample)
 {
     char *commandBuffer = (char *) instrument->commandBuffer;
@@ -79,20 +65,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollOneGroup(RBRInstrumentGen4 *instrum
     *commandBufferLength = snprintf(
         commandBuffer,
         sizeof(instrument->commandBuffer),
-        "poll sleepafter = %s",
-        sleepafter ? "true" : "false");
-
-    *commandBufferLength += snprintf(
-        commandBuffer + *commandBufferLength,
-        sizeof(instrument->commandBuffer) - *commandBufferLength,
-        ", group = ");
-
-    //append group label and terminator to command buffer
-    *commandBufferLength += snprintf(
-        commandBuffer + *commandBufferLength,
-        sizeof(instrument->commandBuffer) - *commandBufferLength,
-        "%s%s",
-        grouplabel, RBRINSTRUMENTGEN4_SEND_COMMAND_TERMINATOR);
+        "poll grouplist=%s%s",
+        groupLabel, RBRINSTRUMENTGEN4_SEND_COMMAND_TERMINATOR);
 
     RBR_TRY(RBRInstrumentGen4_sendBuffer(instrument));
 
@@ -116,7 +90,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollOneGroup(RBRInstrumentGen4 *instrum
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_pollAllChannels(RBRInstrumentGen4 *instrument,
-                                       const bool sleepafter, 
                                        RBRInstrumentGen4Sample *sample)
 {
     char *commandBuffer = (char *) instrument->commandBuffer;
@@ -126,13 +99,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollAllChannels(RBRInstrumentGen4 *inst
     *commandBufferLength = snprintf(
         commandBuffer,
         sizeof(instrument->commandBuffer),
-        "poll sleepafter = %s, channel = all",
-        sleepafter ? "true" : "false");
-
-    //append terminator to command buffer
-    *commandBufferLength += snprintf(
-        commandBuffer + *commandBufferLength,
-        sizeof(instrument->commandBuffer) - *commandBufferLength,
+        "poll channellist=all%s",
         RBRINSTRUMENTGEN4_SEND_COMMAND_TERMINATOR);
 
     RBR_TRY(RBRInstrumentGen4_sendBuffer(instrument));

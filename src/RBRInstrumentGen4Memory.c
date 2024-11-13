@@ -16,48 +16,37 @@
 #include <stdlib.h>
 
 #include "RBRInstrumentGen4.h"
+#include "RBRInstrumentGen4Configuration.h"
+#include "RBRInstrumentGen4Instrument.h"
 #include "RBRInstrumentGen4Internal.h"
 #include "RBRInstrumentGen4Memory.h"
 
-const char *RBRInstrumentGen4Datatype_name(RBRInstrumentGen4Datatype datatype)
-{
-    switch(datatype){
-        case RBRINSTRUMENTGEN4_DATATYPE_FLOAT32:
-            return "float32";
-        case RBRINSTRUMENTGEN4_DATATYPE_FLOAT64:
-            return "float64";
-        case RBRINSTRUMENTGEN4_DATATYPE_CALFLOAT64:
-            return "calfloat64";
-        case RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE:
-        default:
-            return "unknown datatype";
-    }
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_getMemoryInfo(
+RBRInstrumentGen4Error RBRInstrumentGen4_getStorage(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4MemoryInfo *memoryInfo)
+    RBRInstrumentGen4Storage *storage)
 {
     //GEN4 todo: revisit the logic. Seems alright now.
         (void)instrument;
-        (void)memoryInfo;
+        (void)storage;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getDatasets(
+RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetPool(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Datasets *datasets){
+    RBRInstrumentGen4DatasetPool *datasetPool){
         (void)instrument;
-        (void)datasets;
+        (void)datasetPool;
         return RBRINSTRUMENTGEN4_SUCCESS;
     }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getDataset(
     RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4ConfigPool *configPool,
     RBRInstrumentGen4Dataset *dataset)
 {
     //GEN4 todo: need to add logic.
     (void)instrument;
+    (void)configPool;
     (void)dataset;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
@@ -65,11 +54,11 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDataset(
 const char *RBRInstrumentGen4Block_name(RBRInstrumentGen4Block block){
     switch(block)
     {
-        case RBRINSTRUMENTGEN4_DATA:
+        case RBRINSTRUMENTGEN4_BLOCK_DATA:
             return "data";
-        case RBRINSTRUMENTGEN4_EVENTS:
+        case RBRINSTRUMENTGEN4_BLOCK_EVENTS:
             return "events";
-        case RBRINSTRUMENTGEN4_META:
+        case RBRINSTRUMENTGEN4_BLOCK_META:
             return "meta";
         case RBRINSTRUMENTGEN4_BLOCK_UNKNOWN:
         default:
@@ -80,18 +69,19 @@ const char *RBRInstrumentGen4Block_name(RBRInstrumentGen4Block block){
 RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetByBlock(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4Block block,
-    RBRInstrumentGen4Dataset *dataset
-){
+    RBRInstrumentGen4Dataset *dataset,
+    RBRInstrumentGen4DatasetInfo *datasetInfo)
+{
     char _blockname[RBRINSTRUMENTGEN4_DATABLOCK_NAME_MAX+1];
     switch(block){
         //need end to be \0. 
-        case RBRINSTRUMENTGEN4_DATA:
+        case RBRINSTRUMENTGEN4_BLOCK_DATA:
             strncpy(_blockname, "data", sizeof(_blockname));
             break;
-        case RBRINSTRUMENTGEN4_EVENTS:
+        case RBRINSTRUMENTGEN4_BLOCK_EVENTS:
             strncpy(_blockname, "events", sizeof(_blockname));
             break;
-        case RBRINSTRUMENTGEN4_META:
+        case RBRINSTRUMENTGEN4_BLOCK_META:
             strncpy(_blockname, "meta", sizeof(_blockname));
             break;
         case RBRINSTRUMENTGEN4_BLOCK_UNKNOWN:
@@ -100,71 +90,64 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetByBlock(
     }
     (void)instrument;
     (void)dataset;
+    (void)datasetInfo;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetBySchedule(
     RBRInstrumentGen4 *instrument,
-    char *scheduleLabel,
-    RBRInstrumentGen4Dataset *dataset){
+    RBRInstrumentGen4Schedule *schedule,
+    RBRInstrumentGen4Dataset *dataset,
+    RBRInstrumentGen4DatasetInfo *datasetInfo)
+{
         (void)instrument;
-        (void)scheduleLabel;
+        (void)schedule;
         (void)dataset;
+        (void)datasetInfo;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetByScheduleBlock(
     RBRInstrumentGen4 *instrument,
-    const char *scheduleLabel,
+    RBRInstrumentGen4Schedule *schedule,
     RBRInstrumentGen4Block block,
-    RBRInstrumentGen4Dataset *dataset){
-        (void)instrument;
-        (void)scheduleLabel;
-        (void)block;
-        (void)dataset;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-    }
+    RBRInstrumentGen4Dataset *dataset,
+    RBRInstrumentGen4DatasetInfo *datasetInfo)
+{
+    (void)instrument;
+    (void)schedule;
+    (void)block;
+    (void)dataset;
+    (void)datasetInfo;
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
 
 
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteDataset(
     RBRInstrumentGen4 *instrument,
-    const char *datasetlabel,
-    RBRInstrumentGen4Datasets *datasets)
+    RBRInstrumentGen4Dataset *dataset)
 {
     //GEN4 todo: need to add logic.
         (void)instrument;
-        (void)datasetlabel;
-        (void)datasets;
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteDatasetMultiple(
-    RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Datasetlist *datasetlist,
-    RBRInstrumentGen4Datasets *datasets)
-{
-    //GEN4 todo: need to add logic.
-        (void)instrument;
-        (void)datasetlist;
-        (void)datasets;
+        (void)dataset;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteDatasetAll(
     RBRInstrumentGen4 *instrument, 
-    RBRInstrumentGen4Datasets *datasets)
+    RBRInstrumentGen4DatasetPool *datasetPool)
 {
     //GEN4 todo: need to add logic.
     //need to "permit command=deletedataset" first.
         (void)instrument;
-        (void)datasets;
+        (void)datasetPool;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-const char *RBRInstrumentGen4Countkey_name(RBRInstrumentGen4Countkey countkey)
+const char *RBRInstrumentGen4CountKey_name(RBRInstrumentGen4CountKey countKey)
 {
-    switch(countkey){
+    switch(countKey){
         case RBRINSTRUMENTGEN4_COUNTKEY_BYTECOUNT:
             return "bytecount";
         case RBRINSTRUMENTGEN4_COUNTKEY_SAMPLECOUNT:
@@ -261,33 +244,34 @@ uint16_t calculateCrc(const void *data, int32_t size)
 }
 /**********************************************************************/
 /** If using multiple instances of the command, one can use only
- * `download` or `download start=value` or `download countkey=value`. 
- * However, if any portion of source is changed, or countkey is changed, ALL
+ * `download` or `download start=value` or `download countKey=value`. 
+ * However, if any portion of source is changed, or countKey is changed, ALL
  * parameters are required.
 */
-RBRInstrumentGen4Error RBRInstrumentGen4_download(RBRInstrumentGen4 *instrument,
-                                          const RBRInstrumentGen4Download *download)
+RBRInstrumentGen4Error RBRInstrumentGen4_download(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Download *download)
 {
     const char *generationCommand;
-    generationCommand = "download source= %s/%s/%s"
-                        ", %s = %" PRId32
-                        ", start = %" PRId32;
+    generationCommand = "download source=%s/%s/%s"
+                        "%s=%" PRId32
+                        "start=%" PRId32;
 
     const char *block = RBRInstrumentGen4Block_name(download->block);
-    const char *countkey = RBRInstrumentGen4Countkey_name(download->countkey);
+    const char *countKey = RBRInstrumentGen4CountKey_name(download->countKey);
     RBR_TRY(RBRInstrumentGen4_converse(instrument,
                                    generationCommand,
-                                   download->datasetlabel,
-                                   download->schedulelabel,
+                                   download->dataset->label,
+                                   download->dataset->config->scheduleList[0]->label,
                                    block,
-                                   countkey,
-                                   download->countvalue,
-                                   download->start));
+                                   countKey,
+                                   download->countValue,
+                                   download->startOffset));
     
     /* Fill the user-provided buffer. RBRInstrumentGen4_fixedRead() will first pull
      * leftover data from RBRInstrument.responseBuffer, then read from the
      * instrument. */
-    RBR_TRY(RBRInstrumentGen4_fixedRead(instrument, download->data, download->start));
+    RBR_TRY(RBRInstrumentGen4_fixedRead(instrument, download->data, download->startOffset));
 
     /* CRC check the last two bytes. */
     union
@@ -305,7 +289,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_download(RBRInstrumentGen4 *instrument,
 
     crc.value = (crc.value >> 8) | (crc.value << 8);
 
-    uint16_t calculatedCrc = calculateCrc(download->data, download->countvalue);
+    uint16_t calculatedCrc = calculateCrc(download->data, download->countValue);
     if (calculatedCrc != crc.value)
     {
         return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;
@@ -427,7 +411,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPostprocessing(
         }
         else if (strcmp(parameter.key, "channels") == 0)
         {
-            RBRInstrumentGen4PostprocessingChannelsList *channelsList =
+            RBRInstrumentGen4PostprocessingChannelList *channelList =
                 &postprocessing->channels;
 
             char *functionStart;
@@ -455,19 +439,19 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPostprocessing(
                     if (strcmp(RBRInstrumentGen4PostprocessingAggregate_name(i),
                                functionStart) == 0)
                     {
-                        channelsList->channels[channel].function = i;
+                        channelList->channels[channel].function = i;
                         break;
                     }
                 }
 
-                snprintf(channelsList->channels[channel].label,
-                         sizeof(channelsList->channels[channel].label),
+                snprintf(channelList->channels[channel].label,
+                         sizeof(channelList->channels[channel].label),
                          "%s",
                          labelStart);
 
                 next = strtok(NULL, "(");
             }
-            channelsList->count = channel;
+            channelList->count = channel;
         }
         else if (strcmp(parameter.key, "binreference") == 0)
         {
@@ -560,14 +544,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPostprocessing(
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    const RBRInstrumentGen4PostprocessingChannelsList *channelsList =
+    const RBRInstrumentGen4PostprocessingChannelList *channelList =
         &postprocessing->channels;
 
-    for (int channel = 0; channel < channelsList->count; ++channel)
+    for (int channel = 0; channel < channelList->count; ++channel)
     {
-        if (channelsList->channels[channel].function <
+        if (channelList->channels[channel].function <
             RBRINSTRUMENTGEN4_POSTPROCESSING_AGGREGATE_MEAN
-            || channelsList->channels[channel].function >=
+            || channelList->channels[channel].function >=
             RBRINSTRUMENTGEN4_POSTPROCESSING_AGGREGATE_COUNT)
         {
             return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
@@ -579,7 +563,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPostprocessing(
      * parameters in groups instead of all at once. */
     RBR_TRY(RBRInstrumentGen4_converse(
         instrument,
-        "postprocessing binreference = %s, binfilter = %s, binsize = %.1f",
+        "postprocessing binreference=%s binfilter=%s binsize=%.1f",
         postprocessing->binReference,
         RBRInstrumentGen4PostprocessingBinFilter_name(postprocessing->binFilter),
         postprocessing->binSize));
@@ -589,27 +573,27 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPostprocessing(
     RBRInstrumentGen4DateTime_toScheduleTime(postprocessing->tstampMin, tstamp);
     RBR_TRY(RBRInstrumentGen4_converse(
         instrument,
-        "postprocessing tstamp_min = %s",
+        "postprocessing tstamp_min=%s",
         tstamp));
 
     RBRInstrumentGen4DateTime_toScheduleTime(postprocessing->tstampMax, tstamp);
     RBR_TRY(RBRInstrumentGen4_converse(
         instrument,
-        "postprocessing tstamp_max = %s",
+        "postprocessing tstamp_max=%s",
         tstamp));
 
     RBR_TRY(RBRInstrumentGen4_converse(
         instrument,
-        "postprocessing depth_min = %.1f, depth_max = %.1f",
+        "postprocessing depth_min=%.1f depth_max=%.1f",
         postprocessing->depthMin,
         postprocessing->depthMax));
 
     /* on-board dynamic correction only available for firmware 1.134 and above */
-    if ( instrument->id.fwtype == 104 && RBRInstrumentGen4Version_compare(instrument->id.version, "1.134") >= 0 )
+    if ( instrument->id.fwtype == 104 && RBRInstrumentGen4Version_compare(instrument->id.fwversion, "1.134") >= 0 )
     {
        RBR_TRY(RBRInstrumentGen4_converse(
             instrument,
-            "postprocessing dc_alpha = %.3f, dc_tau = %.3f, dc_tdelay = %.3f, dc_ctcoeff = %.4e",
+            "postprocessing dc_alpha=%.3f dc_tau=%.3f dc_tdelay=%.3f dc_ctcoeff=%.4e",
             postprocessing->dcAlpha,
             postprocessing->dcTau,
             postprocessing->dcTdelay,
@@ -622,22 +606,22 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPostprocessing(
     *commandBufferLength = snprintf(
         commandBuffer,
         sizeof(instrument->commandBuffer),
-        "postprocessing channels =");
+        "postprocessing channels=");
 
     /* As with fetching, we want to be cautious that we don't exceed the length
      * of the command buffer when configuring many channels. We'll defensively
      * add each to the buffer, flushing as necessary. */
     char separator = ' ';
     const char *functionName;
-    for (int channel = 0; channel < channelsList->count; ++channel)
+    for (int channel = 0; channel < channelList->count; ++channel)
     {
         functionName = RBRInstrumentGen4PostprocessingAggregate_name(
-            channelsList->channels[channel].function);
+            channelList->channels[channel].function);
 
         if (*commandBufferLength
             + 3 /* separator + paren pair */
             + strlen(functionName)
-            + strlen(channelsList->channels[channel].label)
+            + strlen(channelList->channels[channel].label)
             > sizeof(instrument->commandBuffer))
         {
             RBR_TRY(RBRInstrumentGen4_sendBuffer(instrument));
@@ -650,7 +634,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPostprocessing(
             "%c%s(%s)",
             separator,
             functionName,
-            channelsList->channels[channel].label);
+            channelList->channels[channel].label);
         separator = '|';
     }
 
@@ -702,7 +686,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPostprocessingCommand(
 
     RBR_TRY(RBRInstrumentGen4_converse(
                 instrument,
-                "postprocessing command = %s",
+                "postprocessing command=%s",
                 RBRInstrumentGen4PostprocessingCommand_name(command)));
 
     char *instrumentCommand = NULL;

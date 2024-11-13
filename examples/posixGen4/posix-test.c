@@ -14,11 +14,14 @@
 #include <math.h>
 /* Required for fprintf, printf, snprintf. */
 #include <stdio.h>
+/* Required for EXIT_SUCCESS, etc. */
+#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
 /* Required for close. */
 #include <unistd.h>
 
+#include "RBRInstrumentGen4Schedule.h"
 #include "posix-shared.h"
 
 #define RESPONSE_TERMINATOR "\r\n"
@@ -202,14 +205,14 @@ int main()
         TestIOBuffers_init(
             &ioBuffers,
             "verify config = profiling, dataset = test, simulation = off, "
-            "storagemode = normal, status = pending, warning = none" RESPONSE_TERMINATOR,
+            "storageMode = normal, status = pending, warning = none" RESPONSE_TERMINATOR,
         0);
 
         RBRInstrumentGen4Config config = {
             .label = "profiling"
         };
         char datasetLabel[] = "test";
-        RBRInstrumentGen4DeploymentStatus verifyStatus = RBRINSTRUMENTGEN4_STATUS_UNKNOWN;
+        RBRInstrumentGen4LoggingState verifyStatus = RBRINSTRUMENTGEN4_UNKNOWN_LOGGING_STATE;
 
    if ((err = RBRInstrumentGen4_verify(
                   instrument, &config, datasetLabel, &verifyStatus)) != RBRINSTRUMENTGEN4_SUCCESS)

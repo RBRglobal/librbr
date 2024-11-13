@@ -18,6 +18,9 @@
 extern "C" {
 #endif
 
+#include "RBRInstrumentGen4.h"
+#include "RBRInstrumentGen4Streaming.h"
+
 /**
  * \brief Requests an “on-demand” sample of one channel from the logger.
  *
@@ -32,9 +35,7 @@ extern "C" {
  * produced by the instrument before the response to the `poll` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] channellabel specifies one channel to sample
- * \param [in] sleepafter determines if the power-down delay will be infoked follwing
-     * completion of the polling operation
+ * \param [in] channelLabel specifies one channel to sample
  * \param [out] sample the polled sample
  * \return #RBRINSTRUMENTGEN4_SUCCESS when a sample is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
@@ -43,8 +44,7 @@ extern "C" {
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_pollOneChannel(RBRInstrumentGen4 *instrument,
-                                       const char *channellabel,
-                                       const bool sleepafter, 
+                                       const char *channelLabel,
                                        RBRInstrumentGen4Sample *sample);
 
 /**
@@ -61,9 +61,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollOneChannel(RBRInstrumentGen4 *instr
  * produced by the instrument before the response to the `poll` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] grouplabel specifies one group to sample
- * \param [in] sleepafter determines if the power-down delay will be infoked follwing
-     * completion of the polling operation
+ * \param [in] groupLabel specifies one group to sample
  * \param [out] sample the polled sample
  * \return #RBRINSTRUMENTGEN4_SUCCESS when a sample is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
@@ -72,8 +70,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollOneChannel(RBRInstrumentGen4 *instr
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_pollOneGroup(RBRInstrumentGen4 *instrument,
-                                       const char *grouplabel,
-                                       const bool sleepafter,
+                                       const char *groupLabel,
                                        RBRInstrumentGen4Sample *sample);
 
 /**
@@ -90,8 +87,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollOneGroup(RBRInstrumentGen4 *instrum
  * produced by the instrument before the response to the `poll` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] sleepafter determines if the power-down delay will be infoked follwing
-     * completion of the polling operation
  * \param [out] sample the polled sample
  * \return #RBRINSTRUMENTGEN4_SUCCESS when a sample is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
@@ -100,7 +95,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollOneGroup(RBRInstrumentGen4 *instrum
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_pollAllChannels(RBRInstrumentGen4 *instrument,
-                                       const bool sleepafter, 
                                        RBRInstrumentGen4Sample *sample);
                             
 

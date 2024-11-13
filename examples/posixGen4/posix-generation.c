@@ -14,6 +14,8 @@
 #include <math.h>
 /* Required for fprintf, printf, snprintf. */
 #include <stdio.h>
+/* Required for EXIT_SUCCESS, etc. */
+#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
 /* Required for close. */

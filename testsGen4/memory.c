@@ -12,13 +12,13 @@
 
 TEST_LOGGER3(meminfo)
 {
-    RBRInstrumentGen4MemoryInfo expected = {
+    RBRInstrumentGen4Storage expected = {
         .dataset = RBRINSTRUMENTGEN4_DATASET_STANDARD,
         .used = 1528,
         .remaining = 134216192,
         .size = 134217728
     };
-    RBRInstrumentGen4MemoryInfo actual = {
+    RBRInstrumentGen4Storage actual = {
         .dataset = RBRINSTRUMENTGEN4_DATASET_STANDARD
     };
 
@@ -27,7 +27,7 @@ TEST_LOGGER3(meminfo)
                        "remaining = 134216192, size = 134217728"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_getMemoryInfo(instrument, &actual);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getStorage(instrument, &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
     TEST_ASSERT_EQ(expected.dataset, actual.dataset, "%" PRIi32);
     TEST_ASSERT_EQ(expected.used, actual.used, "%" PRIi32);
@@ -41,12 +41,12 @@ TEST_LOGGER3(meminfo)
 
 TEST_LOGGER3(meminfo_invalid_dataset)
 {
-    RBRInstrumentGen4MemoryInfo test = {
+    RBRInstrumentGen4Storage test = {
         .dataset = RBRINSTRUMENTGEN4_UNKNOWN_DATASET
     };
 
     TestIOBuffers_init(buffers, "", 0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_getMemoryInfo(instrument, &test);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getStorage(instrument, &test);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
                         err,
                         RBRInstrumentGen4Error);

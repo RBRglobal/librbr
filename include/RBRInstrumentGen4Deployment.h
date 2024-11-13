@@ -18,22 +18,28 @@ extern "C"
 {
 #endif
 
+#include "RBRInstrumentGen4.h"
+#include "RBRInstrumentGen4Configuration.h"
+#include "RBRInstrumentGen4Memory.h"
+#include "RBRInstrumentGen4Schedule.h"
+
 /**
  * \brief Performs all the same deployment consistency checks which the
  * enable command performs.It then reports the same response which the enable
  * command would produce, However, it does not actually enable the logger for
  * sampling.
+ * \note Issues the `verify` instrument command.
  *
  * \param [in] instrument the instrument connection
  * \param [in] config specifies the configuration which will define this 
  * deployment.  The configuration must be valid.
  * \param [in] datasetLabel new dataset label for this deployment. It needs to be new name.
- * \param [inout] status the deployment status which would be assumed by logger if the enable
- * command were issued.
+ * \param [out] state the state which would be assumed by logger if the enable
+ * command were issued. If a warning or an error occurs, this parameter not modified.
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if an error would occur when enabling logging
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if an error or a warning would occur when enabling logging
  * \see RBRInstrumentGen4_enable()
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/verify
  */
@@ -41,13 +47,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_verify(
     RBRInstrumentGen4 *instrument,
     const RBRInstrumentGen4Config *config, 
     const char datasetLabel[],
-    RBRInstrumentGen4DeploymentStatus *status);
+    RBRInstrumentGen4LoggingState *state);
 
 /** \brief Possible storage modes in `enable` command.
  * \see RBRInstrumentGen4DeploymentEnable
  * \see RBRInstrumentGen4_enable()
- * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/enable
- * \see meminfo datatype command for more details.
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828472/verify
+ * \see meminfo dataType command for more details.
  */
 typedef enum RBRInstrumentGen4DeploymentStoragemode
 {
@@ -64,68 +70,63 @@ typedef enum RBRInstrumentGen4DeploymentStoragemode
 } RBRInstrumentGen4DeploymentStoragemode;
 
 /**
- * \brief Get a human-readable string name for a deployment storagemode.
+ * \brief Get a human-readable string name for a deployment storageMode.
  *
- * \param [in] storagemode the deployment storage mode
+ * \param [in] storageMode the deployment storage mode
  * \return a string name for the deployment storage mode
  * \see RBRInstrumentGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4DeploymentStoragemode_name(
-    RBRInstrumentGen4DeploymentStoragemode storagemode);
-    
+    RBRInstrumentGen4DeploymentStoragemode storageMode);
+ 
 /**
  * \brief Enable the instrument to sample according to the programmed schedule.
+ * \note Issues the `enable` instrument command.
  *
  * \param [in] instrument the instrument connection
  * \param [in] config specifies the configuration which will define this deployment.
  * \param [in] datasetLabel the new datasetLabel.
- * \param [in] simulation (optional) default to state in `simulation` command.
- * determines whether or not any of the instrument's 
- * channels will be simulated (on), or whether they will all report true measured data (off).
- * The setting applies only to the current deployment;
- * This option can therefore be used to override the default 
- * setting, enabling a single deployment with simulated data(true measured data) when the 
- * default setting is off(on).
- * The channel(s) to be simulated are determined by the simulation channellist command.  
- * During a deployment, the command deployment simulation will indicate whether 
- * simulation is being used or not.
- * \param [in] storagemode (opional) default to normal.
+ * \param [in] storageMode (opional) default to normal.
  * determines whether calibration equations will 
  * be applied to all channel data (normal), or not (calibration).  The 
  * setting applies only to the current deployment.  
- * When storagemode = calibration, all data 
+ * When storageMode = calibration, all data 
  * values are stored as IEEE double precision floating point numbers in 
  * the nominal range 0.0 to 1.0, regardless of the normal storage format used. 
- * \param [inout] datasets datasets.
- * \param [out] status the status of the deployment.
+ * \param [inout] datasetPool datasetPool.
+ * \param [out] newDataset the new dataset.
+ * \param [out] state the status of the logger.
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when an error occurs enabling logging
- * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/enable
+ * \see RBRInstrumentGen4_disable()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828476/enable
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_enable(
     RBRInstrumentGen4 *instrument,
     const RBRInstrumentGen4Config *config,
     const char datasetLabel[],
-    const bool simulation, 
-    const RBRInstrumentGen4DeploymentStoragemode storagemode,
-    RBRInstrumentGen4Datasets *datasets,
-    RBRInstrumentGen4DeploymentStatus *status);
+    const RBRInstrumentGen4DeploymentStoragemode storageMode,
+    RBRInstrumentGen4DatasetPool *datasetPool,
+    RBRInstrumentGen4Dataset **newDataset,
+    RBRInstrumentGen4LoggingState *state);
 
 /**
  * \brief If the instrument is logging, terminate the current deployment.
+ * \note Issues the `disable` instrument command.
  *
  * \param [in] instrument the instrument connection
- * \param [inout] status the status of logger
+ * \param [inout] state the status of logger
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen4_enable()
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/disable
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_disable(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4DeploymentStatus *status);
+    RBRInstrumentGen4LoggingState *state);
 
 /**
  * \brief Instrument `simulation` command parameters.
@@ -137,7 +138,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_disable(
 typedef struct RBRInstrumentGen4Simulation
 {
     /** \brief factory default is off.
-     * It determines whether the channels specified in the channellist 
+     * It determines whether the channels specified in the channelList 
      * option will be simulated (on), or report true measured data (off).  
      * The default setting as shipped from the Factory is off.  When changed, 
      * the setting is persistent; it will remain in force by default from one 
@@ -147,36 +148,40 @@ typedef struct RBRInstrumentGen4Simulation
      * to succeed.
      */
     bool state;
+
     /**
      * \brief The period of each simulated profile.
      *
      * Specified in milliseconds. Must be greater than 0.
      */
     RBRInstrumentGen4Period period;
-    /** \brief specifies which channels will be simulated.  Each channel is 
-     * specified by its label, and channel labels in the list are separated 
-     * by a pipe character ('|') with no spaces.
-     */
-    char channellabellist[RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX*RBRINSTRUMENTGEN4_CHANNEL_MAX + RBRINSTRUMENTGEN4_CHANNEL_MAX-1];
+
+    /** \brief specifies which channels will be simulated. */
+    RBRInstrumentGen4Channel *channelList[RBRINSTRUMENTGEN4_CHANNEL_MAX];
 } RBRInstrumentGen4Simulation;
 
 /**
  * \brief Get the instrument simulation settings.
+ * \note Issues the `simulation` instrument command.
  *
  * \param [in] instrument the instrument connection
+ * \param [in] channelPool the channel pool to associate channel labels with
  * \param [out] simulation the simulation parameters
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the feature is unavailable
- * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
+ * \see RBRInstrumentGen4_setSimulation()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828483/simulation
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getSimulation(
     RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4ChannelPool *channelPool,
     RBRInstrumentGen4Simulation *simulation);
 
 /**
  * \brief Set the instrument simulation settings.
+ * \note Issues the `simulation` instrument command.
  *
  * Hardware errors may occur if:
  *
@@ -194,7 +199,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSimulation(
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when an out-of-bounds
  *                                                simulation period is
  *                                                requested
- * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
+ * \see RBRInstrumentGen4_getSimulation()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828483/simulation
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_setSimulation(
     RBRInstrumentGen4 *instrument,

@@ -17,6 +17,8 @@
 extern "C" {
 #endif
 
+#include "RBRInstrumentGen4.h"
+
 /** \brief The state of a gating condition. */
 typedef enum RBRInstrumentGen4GatingState
 {

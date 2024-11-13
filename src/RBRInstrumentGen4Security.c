@@ -19,7 +19,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_permit(RBRInstrumentGen4 *instrument,
                                         const char *command)
 {
     const char *permitCommand;
-    permitCommand = "permit command = %s";
+    permitCommand = "permit command=%s";
     return RBRInstrumentGen4_converse(instrument, permitCommand, command);
 }
 
@@ -36,7 +36,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPrompt(RBRInstrumentGen4 *instrument
                                            const bool prompt)
 {
     return RBRInstrumentGen4_converse(instrument,
-                                  "prompt state = %s",
+                                  "prompt state=%s",
                                   prompt ? "on" : "off");
 }
 
@@ -54,13 +54,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setConfirmation(RBRInstrumentGen4 *inst
 {
     if (confirmation)
     {
-        return RBRInstrumentGen4_converse(instrument, "confirmation state = on");
+        return RBRInstrumentGen4_converse(instrument, "confirmation state=on");
     }
     else
     {
         //because when turned off, there will be nothing in return.
         return RBRInstrumentGen4_sendCommand(instrument,
-                                         "confirmation state = off");
+                                         "confirmation state=off");
     }
 }
 

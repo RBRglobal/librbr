@@ -14,7 +14,8 @@ CFLAGS += -Wno-sizeof-pointer-div -Werror
 LDFLAGS := -L../../bin
 LDLIBS := -lRBR -lm
 
-example: posix-test
+example: posix-test \
+         posix-communications \
 
 posix-download-datablock-bySchedule: posix-download-datablock-bySchedule.o posix-shared.o ../../bin/libRBR.a
 posix-footprint: posix-footprint.o posix-shared.o ../../bin/libRBR.a
@@ -25,6 +26,7 @@ posix-singleScheduleSingleConfig: posix-singleScheduleSingleConfig.o posix-share
 posix-stream: posix-stream.o posix-shared.o ../../bin/libRBR.a
 
 posix-test: posix-test.o ../../bin/libRBR.a
+posix-communications: posix-communications.o posix-shared.o ../../bin/libRBR.a
 
 
 .PHONY: clean

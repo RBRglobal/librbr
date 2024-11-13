@@ -13,28 +13,139 @@
 /* Required for snprintf. */
 #include <stdio.h>
 /* Required for memset, strcmp. */
+#include <stdlib.h>
 #include <string.h>
 
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Internal.h"
 #include "RBRInstrumentGen4Configuration.h"
 
+/*
+RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
+    RBRInstrumentGen4 *instrument,
+    const char *channelLabel,
+    RBRInstrumentGen4Calibration *calibration)
+{
+    memset(calibration, 0, sizeof(RBRInstrumentGen4Calibration));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "calibration %s",
+                                       channelLabel));
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    do
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "fwversion") == 0)
+        {
+            snprintf((char *)(id->fwversion),
+                     sizeof(id->fwversion),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "sn") == 0)
+        {
+            id->sn = strtol(parameter.value, NULL, 10);
+        }
+    } while (true);
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+*/
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
     RBRInstrumentGen4 *instrument,
-    const char *channellabel,
     RBRInstrumentGen4Calibration *calibration)
 {
-    (void)instrument;
-    (void)channellabel;
-    (void)calibration;
-    //GEN4 todo: need to add logic.
+    memset(calibration, 0, sizeof(RBRInstrumentGen4Calibration));
+
+    calibration->userOffset = NAN;
+    calibration->userSlope = NAN;
+
+    for (int32_t c = 0;
+         c < RBRINSTRUMENTGEN4_CALIBRATION_C_COEFFICIENT_MAX;
+         ++c)
+    {
+        calibration->c[c] = NAN;
+    }
+    for (int32_t x = 0;
+         x < RBRINSTRUMENTGEN4_CALIBRATION_X_COEFFICIENT_MAX;
+         ++x)
+    {
+        calibration->x[x] = NAN;
+    }
+
+    RBRInstrumentGen4Channel *parent = (RBRInstrumentGen4Channel *)(calibration->parent);
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "calibration %s",
+                                       parent->label));
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    do
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "datetime") == 0)
+        {
+            calibration->dateTime = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "offset") == 0)
+        {
+            calibration->userOffset = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "slope") == 0)
+        {
+            calibration->userSlope = strtol(parameter.value, NULL, 10);
+        }
+        else if (parameter.key[0] != 'c'
+                 && parameter.key[0] != 'x'
+                 && parameter.key[0] != 'n')
+        {
+            continue;
+        }
+
+        int32_t index = strtol(&parameter.key[1], NULL, 10);
+
+        if (parameter.key[0] == 'c'
+            && index < RBRINSTRUMENTGEN4_CALIBRATION_C_COEFFICIENT_MAX)
+        {
+            calibration->c[index] = strtod(parameter.value, NULL);
+        }
+        else if (parameter.key[0] == 'x'
+                 && index < RBRINSTRUMENTGEN4_CALIBRATION_X_COEFFICIENT_MAX)
+        {
+            calibration->x[index] = strtod(parameter.value, NULL);
+        }
+        else if (parameter.key[0] == 'n'
+                 && index < RBRINSTRUMENTGEN4_CALIBRATION_N_COEFFICIENT_MAX)
+        {
+            /* GEN4TODO: Get the dependents by reference */
+            /*
+            snprintf(calibration->n[index],
+                     sizeof(calibration->n[index]),
+                     "%s",
+                     parameter.value);
+            */
+        }
+
+    } while (true);
+
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_setCalibration(
     RBRInstrumentGen4 *instrument,
-    const char *channellabel,
     const RBRInstrumentGen4Calibration *calibration)
 {
     //GEN4 todo: add logic.
@@ -44,12 +155,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setCalibration(
 
     const char *calibrationCommand = "calibration %s datetime = %s, %c%d = %g";
 
+    RBRInstrumentGen4Channel *parent = (RBRInstrumentGen4Channel *)(calibration->parent);
     RBR_TRY(RBRInstrumentGen4_converse(instrument,
                                 "calibration %s datetime=%s, useroffset=%d, userslope=%d",
-                                channellabel,
+                                parent->label,
                                 calibrationDateTime,
-                                calibration->useroffset,
-                                calibration->userslope));
+                                calibration->userOffset,
+                                calibration->userSlope));
 
     for (int32_t c = 0;
          c < RBRINSTRUMENTGEN4_CALIBRATION_C_COEFFICIENT_MAX
@@ -58,7 +170,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setCalibration(
     {
         RBR_TRY(RBRInstrumentGen4_converse(instrument,
                                        calibrationCommand,
-                                       channellabel,
+                                       parent->label,
                                        calibrationDateTime,
                                        'c',
                                        c,
@@ -71,7 +183,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setCalibration(
     {
         RBR_TRY(RBRInstrumentGen4_converse(instrument,
                                        calibrationCommand,
-                                       channellabel,
+                                       parent->label,
                                        calibrationDateTime,
                                        'x',
                                        x,
@@ -101,21 +213,21 @@ const char *RBRInstrumentGen4ChannelGainMode_name(
     }
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(RBRInstrumentGen4 *instrument, const char *channellabel, RBRInstrumentGen4Channel *channel){
+RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(RBRInstrumentGen4 *instrument,
+                                                    RBRInstrumentGen4Channel *channel){
     //GEN4 todo: add logic
     (void)instrument;
-    (void)channellabel;
     (void)channel;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getChannels(RBRInstrumentGen4 *instrument,
-                                             RBRInstrumentGen4Channels *channels)
+RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(RBRInstrumentGen4 *instrument,
+                                             RBRInstrumentGen4ChannelPool *channelPool)
 {
     //GEN4 todo: add logic.
     //populate all channel instances, which included the calbration instances.
     (void)instrument;
-    (void)channels;
+    (void)channelPool;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
@@ -135,9 +247,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4Settings_setSettings(
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
+#if 0
 RBRInstrumentGen4Error RBRInstrumentGen4_getSensorParameter(
     RBRInstrumentGen4 *instrument,
-    char *channellabel,
+    char *channelLabel,
     RBRInstrumentGen4SensorParameter *parameter)
 {
     memset(parameter->value, 0, sizeof(parameter->value));
@@ -148,7 +261,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSensorParameter(
      * because we need to suppress that error. */
     err = RBRInstrumentGen4_converse(instrument,
                                  "sensor %s %s",
-                                 channellabel,
+                                 channelLabel,
                                  parameter->key);
 
     if (instrument->generation == RBRINSTRUMENTGEN4_LOGGER2
@@ -197,12 +310,12 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSensorParameter(
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getSensorParameters(
     RBRInstrumentGen4 *instrument,
-    const char *channellabel,
+    const char *channelLabel,
     int32_t *size,
     RBRInstrumentGen4SensorParameter *parameters)
 {
     (void)instrument;
-    (void)channellabel;
+    (void)channelLabel;
     (void)size;
     (void)parameters;
     return RBRINSTRUMENTGEN4_SUCCESS;
@@ -210,15 +323,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSensorParameters(
 
 RBRInstrumentGen4Error RBRInstrumentGen4_setSensorParameter(
     RBRInstrumentGen4 *instrument,
-    const char *channellabel,
+    const char *channelLabel,
     const RBRInstrumentGen4SensorParameter *parameter)
 {
     return RBRInstrumentGen4_converse(instrument,
-                                  "sensor %s %s = %s",
-                                  channellabel,
+                                  "sensor %s %s=%s",
+                                  channelLabel,
                                   parameter->key,
                                   parameter->value);
 }
+#endif
 
 const char *RBRInstrumentGen4UvledCommand_name(RBRInstrumentGen4UvledCommand uvledCommand)
 {
@@ -250,119 +364,114 @@ RBRInstrumentGen4Error RBRInstrumentGen4Uvled_setUvled(RBRInstrumentGen4 *instru
 }
 
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getGroup(RBRInstrumentGen4 *instrument, const char *grouplabel, RBRInstrumentGen4Group *group){
+RBRInstrumentGen4Error RBRInstrumentGen4_getGroup(RBRInstrumentGen4 *instrument,
+                                                  RBRInstrumentGen4ChannelPool *channelPool,
+                                                  RBRInstrumentGen4Group *group){
         (void)instrument;
-        (void)grouplabel;
+        (void)channelPool;
         (void)group;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
 RBRInstrumentGen4Error RBRInstrumentGen4_setGroup(RBRInstrumentGen4 *instrument, 
-                                                const char *grouplabel,
-                                                RBRInstrumentGen4Group *group){
-        (void)instrument;
-        (void)grouplabel;
-        (void)group;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_createGroup(RBRInstrumentGen4 *instrument,  
-                                                    const RBRInstrumentGen4Group *group, 
-                                                    RBRInstrumentGen4Groups *groups){
+                                                  RBRInstrumentGen4Group *group){
         (void)instrument;
         (void)group;
-        (void)groups;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteGroup(RBRInstrumentGen4 *instrument, 
-                                                    const char *grouplabel, 
-                                                    RBRInstrumentGen4Groups *groups){
+RBRInstrumentGen4Error RBRInstrumentGen4_createGroup(
+    RBRInstrumentGen4 *instrument,
+    const char *newGroupLabel,
+    RBRInstrumentGen4GroupPool *groupPool,
+    RBRInstrumentGen4Group **newGroup){
         (void)instrument;
-        (void)grouplabel;
-        (void)groups;
+        (void)newGroupLabel;
+        (void)groupPool;
+        (void)newGroup;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteGroupMultiple(RBRInstrumentGen4 *instrument, 
-                                                    const char *grouplabellist,
-                                                    RBRInstrumentGen4Groups *groups){
+RBRInstrumentGen4Error RBRInstrumentGen4_deleteGroup(
+    RBRInstrumentGen4 *instrument, 
+    RBRInstrumentGen4Group *groupToDelete){
         (void)instrument;
-        (void)grouplabellist;
-        (void)groups;
+        (void)groupToDelete;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteGroupAll(RBRInstrumentGen4 *instrument,
-                                                    RBRInstrumentGen4Groups *groups){
+                                                    RBRInstrumentGen4GroupPool *groupPool){
     (void)instrument;
-    (void)groups;                                                            
+    (void)groupPool;                                                            
     return RBRINSTRUMENTGEN4_SUCCESS;
 }                                                    
-RBRInstrumentGen4Error RBRInstrumentGen4_getGroups(RBRInstrumentGen4 *instrument, RBRInstrumentGen4Groups *groups){
+RBRInstrumentGen4Error RBRInstrumentGen4_getGroupPool(RBRInstrumentGen4 *instrument, RBRInstrumentGen4GroupPool *groupPool){
         (void)instrument;
-        (void)groups;
+        (void)groupPool;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getConfig(RBRInstrumentGen4 *instrument, const char *configlabel, RBRInstrumentGen4Config *config){
+RBRInstrumentGen4Error RBRInstrumentGen4_getConfig(
+    RBRInstrumentGen4 *instrument, 
+    RBRInstrumentGen4SchedulePool *schedulePool,
+    RBRInstrumentGen4Config *config){
         (void)instrument;
-        (void)configlabel;
+        (void)schedulePool;
         (void)config;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_setConfig(RBRInstrumentGen4 *instrument, 
-                                                    const char *configlabel,
-                                                    const RBRInstrumentGen4Config *config)
+                                                   RBRInstrumentGen4Config *config)
 {
         (void)instrument;
-        (void)configlabel;
         (void)config;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getConfigs(RBRInstrumentGen4 *instrument, RBRInstrumentGen4Configs *configs){
+RBRInstrumentGen4Error RBRInstrumentGen4_getConfigPool(RBRInstrumentGen4 *instrument, RBRInstrumentGen4ConfigPool *configPool){
         (void)instrument;
-        (void)configs;
+        (void)configPool;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_createConfig(RBRInstrumentGen4 *instrument, 
-                                                    const RBRInstrumentGen4Config *config,
-                                                    RBRInstrumentGen4Configs *configs)
+RBRInstrumentGen4Error RBRInstrumentGen4_createConfig(
+    RBRInstrumentGen4 *instrument, 
+    const char *newConfigLabel,
+    RBRInstrumentGen4ConfigPool *configPool,
+    RBRInstrumentGen4Config **newConfig)
 {
         (void)instrument;
-        (void)config;
-        (void)configs;
+        (void)newConfigLabel;
+        (void)configPool;
+        (void)newConfig;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfig(RBRInstrumentGen4 *instrument, 
-                                                    const char *configlabel,
-                                                    RBRInstrumentGen4Configs *configs)
+                                                    RBRInstrumentGen4Config *config)
 {
         (void)instrument;
-        (void)configlabel;
-        (void)configs;
+        (void)config;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfigMultiple(RBRInstrumentGen4 *instrument, 
-                                                    const char *configlabellist,
-                                                    RBRInstrumentGen4Configs *configs){
-        (void)instrument;
-        (void)configlabellist;
-        (void)configs;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-}
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfigAll(RBRInstrumentGen4 *instrument,
-                                                    RBRInstrumentGen4Configs *configs){
+                                                    RBRInstrumentGen4ConfigPool *configPool){
         (void)instrument;
-        (void)configs;
+        (void)configPool;
         return RBRINSTRUMENTGEN4_SUCCESS;                                                
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_factoryReset(RBRInstrumentGen4 *instrument){
+RBRInstrumentGen4Error RBRInstrumentGen4_factoryReset(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4GroupPool *groupPool,
+    RBRInstrumentGen4SchedulePool *schedulePool,
+    RBRInstrumentGen4ConfigPool *configPool)
+{
         (void)instrument;
+        (void)groupPool;
+        (void)schedulePool;
+        (void)configPool;
         return RBRINSTRUMENTGEN4_SUCCESS;
 }

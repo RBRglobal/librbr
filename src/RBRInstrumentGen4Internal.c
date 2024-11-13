@@ -27,6 +27,7 @@
 #include "RBRInstrumentGen4Internal.h"
 #include "RBRInstrumentGen4Memory.h"
 #include "RBRInstrumentGen4Internal.h"
+#include "RBRInstrumentGen4Streaming.h"
 
 /** \brief 10-second command timeout. */
 #define COMMAND_TIMEOUT (10 * 1000)
@@ -65,37 +66,19 @@
 #define COMMAND_PROMPT "Ready: "
 #define COMMAND_PROMPT_LEN 7
 
-#define ARRAY_SEPARATOR_L2 " | "
-#define ARRAY_SEPARATOR_LEN_L2 3
-#define ARRAY_SEPARATOR_L3 " || "
-#define ARRAY_SEPARATOR_LEN_L3 4
-
-#define PARAMETER_SEPARATOR ", "
-#define PARAMETER_SEPARATOR_LEN 2
-#define PARAMETER_VALUE_SEPARATOR " = "
-#define PARAMETER_VALUE_SEPARATOR_LEN 3
+#define ARRAY_SEPARATOR_L4 '|'
+#define PARAMETER_SEPARATOR_L4 ' '
+#define PARAMETER_VALUE_SEPARATOR_L4 '='
 
 #define OFFSET_UNINITIALIZED (-1)
 
-/* The length of an error number plus trailing space: “Exxxx ”. */
-#define ERROR_LEN 6
+#define ERROR_PARAMETER "ERR-"
+#define ERROR_PARAMETER_LEN ((long) (sizeof(ERROR_PARAMETER) - 1))
+#define ERROR_NUMBER_LEN 3
 
-/*
- * Logger2 instruments don't distinguish between warnings and errors. Some of
- * the “errors” produced by `verify`/`enable`/`stop` are non-fatal, but the
- * output doesn't distinguish between them – the consumer needs to be aware of
- * the difference. This is a list of error numbers which are actually warnings.
- */
-static const RBRInstrumentGen4HardwareError WARNING_NUMBERS[] = {
-    RBRINSTRUMENTGEN4_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
-    RBRINSTRUMENTGEN4_HARDWARE_ERROR_NOT_LOGGING
-};
-#define WARNING_NUMBER_COUNT \
-    ((long) (sizeof(WARNING_NUMBERS) / sizeof(WARNING_NUMBERS[0])))
-
-#define WARNING_PARAMETER ", warning = W"
+#define WARNING_PARAMETER "WRN-"
 #define WARNING_PARAMETER_LEN ((long) (sizeof(WARNING_PARAMETER) - 1))
-#define WARNING_NUMBER_LEN 4
+#define WARNING_NUMBER_LEN 3
 
 #define SAMPLE_NAN "nan"
 #define SAMPLE_INF "inf"
@@ -189,11 +172,16 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_vSendCommand(RBRInstrumentGen4 *
                                                              va_list format)
 {
     /* Prepare the command. */
+
     instrument->commandBufferLength = vsnprintf(
         (char *) instrument->commandBuffer,
         sizeof(instrument->commandBuffer),
         command,
         format);
+
+    /* Debug print
+    fprintf(stdout, ">>%s\n", (char *) instrument->commandBuffer);
+    */
 
     /* Make sure we're within buffer bounds. This is a greater-or-equal check,
      * not just a greater-than check, because vsnprintf doesn't include the
@@ -274,6 +262,9 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_readSingleResponse(
     RBRInstrumentGen4DateTime startTime,
     char **end)
 {
+    /*
+    fprintf(stdout, "In RBRInstrumentGen4_readSingleResponse:\n");
+    */
     RBRInstrumentGen4DateTime now;
     int32_t readLength;
     while ((*end = (char *) rbr_memmem(
@@ -304,6 +295,14 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_readSingleResponse(
          */
         RBR_TRY(instrument->callbacks.time(instrument, &now));
 
+        /*
+        fprintf(stdout,
+                "now: %ld, startTime: %ld, now - startTime: %ld, commandTimeout: %ld\n",
+                now,
+                startTime,
+                now - startTime,
+                instrument->commandTimeout);
+        */
         if (now - startTime > instrument->commandTimeout)
         {
             return RBRINSTRUMENTGEN4_TIMEOUT;
@@ -329,6 +328,21 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_readSingleResponse(
 
         instrument->responseBufferLength += readLength;
     }
+
+    /*
+    fprintf(stdout, "responseBuffer (%dB):\n", instrument->responseBufferLength);
+    fprintf(stdout, "<<");
+    for (int32_t i = 0; i < instrument->responseBufferLength; i++)
+    {
+        fprintf(stdout, "%c", instrument->responseBuffer[i]);
+    }
+    fprintf(stdout, "\n");
+    for (int32_t i = 0; i < instrument->responseBufferLength; i++)
+    {
+        fprintf(stdout, "%x ", instrument->responseBuffer[i]);
+    }
+    fprintf(stdout, "\n");
+    */
 
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
@@ -392,175 +406,200 @@ static void RBRInstrumentGen4_terminateResponse(
 }
 
 /**
+ * \brief Search a string for the first byte after the next delimiter or consecutive delimiters.
+ *
+ * \param [in] str the null-terminated string to parse
+ * \param [in] delimiter the delimiter to search for
+ * \return the first byte after the next delimiter or consecutive delimiters
+ * \return NULL if no such byte exists
+ */
+char *seek(const char *str, char delimiter)
+{
+    char *token = (char *)str;
+    if (token == NULL
+        || *token == '\0')
+    {
+        return NULL;
+    }
+
+    while (*token != delimiter
+           && *token != '\0')
+    {
+        ++token;
+    }
+    if (*token == '\0')
+    {
+        return NULL;
+    }
+
+    while (*token == delimiter
+           && *token != '\0')
+    {
+        ++token;
+    }
+    if (*token == '\0')
+    {
+        return NULL;
+    }
+    return token;
+}
+
+/**
  * \brief Attempt to parse a sample from a response.
  *
  * \param [out] sample the sample
+ * \param [in] outputFormat the format of the response to parse
  * \param [in] response the response to parse
  * \return RBRINSTRUMENTGEN4_SUCCESS if the response is a sample
- * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if the response is not a
- *                                               sample
+ * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if the response does not
+ *         follow the specified output format
  */
+
 static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
     RBRInstrumentGen4Sample *sample,
+    RBRInstrumentGen4Outputformat *outputFormat,
     char *response)
 {
     memset(sample, 0, sizeof(RBRInstrumentGen4Sample));
 
     /*
     All samples scenario:
-    2023-09-10 11:24:14.125, 38.6671142e+000, 22.0217124e+000
-    <RBR 999999, >poll, 2023-09-10 11:24:14.125, 38.6671142e+000, 22.0217124e+000<, 0xABCD>
-    <RBR 999999, ><scheduleLabel, >2023-09-10 11:24:14.125, 38.6671142e+000, 22.0217124e+000<, 0xABCD>
+    2023-09-10 11:24:14.125 38.6671142e+000 22.0217124e+000
+    <RBR 999999 >polling 2023-09-10 11:24:14.125 38.6671142e+000 22.0217124e+000< 0xABCD>
+    <RBR 999999 ><scheduleLabel >2023-09-10 11:24:14.125 38.6671142e+000 22.0217124e+000< 0xABCD>
     */
-    char *values; //will be used in "foundTimestamp" statement.
-    int notTokenized = 1;
-    char *conditionalPtr = response;
 
-    char *pch;
-    /* Find first whitespace or "," in the response. 
-    If whitespace found, and it's not "RBR ", it's not a sample.
-    Not likely to be NULL with RBR commands. But just in case.
-    */
-    if ((pch = strpbrk(response, " ,")) != NULL)
+    double reading;
+    sample->channelCount = 0;
+    if (strchr(response, PARAMETER_SEPARATOR_L4) != NULL)
     {
-        if ((*pch == ' ') && (strncmp(response, "RBR ", 4) != 0))
+        char *token = response;
+        if ((*outputFormat) & RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL)
         {
-            // if it's not sample, it will return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE.
-            goto foundTimestamp;
-        }
-        else
-        // otherwise it's a sample. (i.e. (1) found ',' first, or (2) found whitespace but starts with "RBR ".)
-        {
-            char *crcptr = NULL;
-            // if CRC exist, check CRC first before response is modified.
-            // after this case, CRC will be chopped from response string.
-            if ((crcptr = strstr(response, " 0x")) != NULL)
+            if (memcmp(token, "RBR", 3) != 0)
             {
-                // get the string before CRC
-                // e.g. RBR 999999, poll, 2020-01-01 00:19:15.001, 0.00000000e+000, 0.00000000e+000|, 0x4A63
-
-                /*
-                 * calculate CRC.
-                 * The CRC includes all characters already sent on this line, starting with the first, up to
-                 * and including the last space character before the <CRC>.
-                 */
-                uint16_t _realCrc = strtol(crcptr + 3, NULL, 16);
-                uint16_t _calCrc;
-                response[crcptr - response + 1] = '\0';
-                _calCrc = calculateCrc(response, strlen(response));
-                if (_calCrc != _realCrc)
-                {
-                    return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;
-                }
+                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
             }
-
-            // Find timestamp and populate sample values.
-            char *_token;
-            _token = strtok(response, ",");
-            notTokenized = 0;
-            if (_token != NULL)
+            if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
             {
-                // check if the first token is timestamp.
-                if (isdigit((int) _token[0]))
-                // first token is timestamp:
-                {
-                    goto foundTimestamp;
-                }
-                else
-                /* first token is not timestamp. keep skipping "RBR <serial>" and/or "<schedulelabel>/poll"
-                 * until we find a token starts with " <digit>".
-                 */
-                {
-                    while (((_token = strtok(NULL, ",")) != NULL) && strlen(_token) >= 2)
-                    {
-                        if (isdigit((int) _token[1]))
-                        {
-                            _token++; // get rid of leading whitespace.
-                            goto foundTimestamp;
-                        }
-                    }
-                }
+                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+            }
+            if (!isdigit(*token))
+            {
+                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+            }
+            if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
+            {
+                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+            }
+        }
 
-            foundTimestamp:
-                if (notTokenized == 0){
-                    conditionalPtr = _token;
-                }
-                RBR_TRY(RBRInstrumentGen4DateTime_parseSampleTime(conditionalPtr,
-                                                    &sample->timestamp,
-                                                    &values));
-                // reset sample->channels if it has random initialization
-                if (sample->channels >= RBRINSTRUMENTGEN4_CHANNEL_MAX)
-                {
-                    sample->channels = 0;
-                }
-                double reading;
-                
-                if(notTokenized == 0){
-                    conditionalPtr = NULL;
-                }
-                else if(notTokenized == 1){
-                    conditionalPtr = values;
-                }
+        if ((*outputFormat) & RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL)
+        {
+            if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
+            {
+                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+            }
+        }
 
-                while ((_token = strtok(conditionalPtr, ",")) != NULL && strlen(_token)>=2 &&sample->channels < RBRINSTRUMENTGEN4_CHANNEL_MAX)
-                {
-                    /* The token will always have a leading space. */
-                    /* If sample has CRC, then there's a trailing ", " that should not be considered a channel reading.*/
-                    if(notTokenized == 1)
-                    {conditionalPtr = NULL;}
+        if ((*outputFormat) & RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP)
+        {
+            char* timestamp_end;
+            RBR_TRY(RBRInstrumentGen4DateTime_parseSampleTime(token,
+                                                        &sample->timestamp,
+                                                        &timestamp_end));
+            token = timestamp_end;
+        }
 
-                    ++_token;
-
-                    if (strcmp(_token, SAMPLE_NAN) == 0)
-                    {
-                        reading = NAN;
-                    }
-                    else if (strcmp(_token, SAMPLE_INF) == 0)
-                    {
-                        reading = INFINITY;
-                    }
-                    else if (strcmp(_token, SAMPLE_NINF) == 0)
-                    {
-                        reading = -INFINITY;
-                    }
-                    else if (strcmp(_token, SAMPLE_UNCAL) == 0)
-                    {
-                        reading = RBRInstrumentGen4Reading_setError(
-                            RBRINSTRUMENTGEN4_READING_FLAG_UNCALIBRATED,
-                            0);
-                    }
-                    else if (memcmp(_token,
-                                    SAMPLE_ERROR_PREFIX,
-                                    SAMPLE_ERROR_PREFIX_LEN) == 0)
-                    {
-                        /* Uh-oh. We'll encode the error in a NaN. Filtering, etc. will
-                         * ignore the value and the sample formatter will output it just as
-                         * we received it. */
-                        reading = RBRInstrumentGen4Reading_setError(
-                            RBRINSTRUMENTGEN4_READING_FLAG_ERROR,
-                            strtol(_token + SAMPLE_ERROR_PREFIX_LEN,
-                                   NULL,
-                                   10));
-                    }
-                    else
-                    {
-                        reading = strtod(_token, NULL);
-                    }
-
-                    sample->readings[sample->channels++] = reading;
-                }
+        while ((token = seek(token, PARAMETER_SEPARATOR_L4)) != NULL
+               && sample->channelCount < RBRINSTRUMENTGEN4_CHANNEL_MAX)
+        {
+            char *reading_end = token;
+            /*
+            if (memcmp(token,
+                       RBRINSTRUMENTGEN4_RESPONSE_TERMINATOR,
+                       RBRINSTRUMENTGEN4_RESPONSE_TERMINATOR_LEN))
+            {
                 return RBRINSTRUMENTGEN4_SUCCESS;
             }
-            else
-            { // return error if no "," present in the response. Not likely but just in case.
-                return RBRINSTRUMENTGEN4_UNKNOWN_ERROR;
+            else */
+            if (memcmp(token, SAMPLE_NAN, 3) == 0)
+            {
+                reading = NAN;
             }
-        }
+            else if (memcmp(token, SAMPLE_INF, 3) == 0)
+            {
+                reading = INFINITY;
+            }
+            else if (memcmp(token, SAMPLE_NINF, 4) == 0)
+            {
+                reading = -INFINITY;
+            }
+            else if (memcmp(token, SAMPLE_UNCAL, 3) == 0)
+            {
+                reading = RBRInstrumentGen4Reading_setError(
+                    RBRINSTRUMENTGEN4_READING_FLAG_UNCALIBRATED,
+                    0);
+            }
+            else if (memcmp(token,
+                            SAMPLE_ERROR_PREFIX,
+                            SAMPLE_ERROR_PREFIX_LEN) == 0)
+            {
+                /* Uh-oh. We'll encode the error in a NaN. Filtering, etc. will
+                    * ignore the value and the sample formatter will output it just as
+                    * we received it. */
+                reading = RBRInstrumentGen4Reading_setError(
+                    RBRINSTRUMENTGEN4_READING_FLAG_ERROR,
+                    strtol(token + SAMPLE_ERROR_PREFIX_LEN,
+                           NULL,
+                           10));
+            }
+            else if (memcmp(token, "0x", 2) == 0)
+            {
+                if ((*outputFormat) & RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC)
+                {
+                    /*
+                    * calculate CRC.
+                    * The CRC includes all characters already sent on this line, starting with the first, up to
+                    * and including the last space character before the <CRC>.
+                    */
+                    uint16_t realCrc = strtol(token, &reading_end, 16);
+                    if (reading == 0 && token == reading_end)
+                    {
+                        /* No value was parsed. */
+                        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+                    }
+                    uint16_t calCrc;
+                    calCrc = calculateCrc(response, token - response);
+                    if (calCrc != realCrc)
+                    {
+                        return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;
+                    }
+                    return RBRINSTRUMENTGEN4_SUCCESS;
+                }
+                else
+                {
+                    return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+                }
+            }
+            else
+            {
+                reading = strtod(token, &reading_end);
+                if (reading == 0 && token == reading_end)
+                {
+                    /* No value was parsed. */
+                    return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+                }
+            }
 
+            sample->readings[sample->channelCount++] = reading;
+        }
+        return RBRINSTRUMENTGEN4_SUCCESS;
     }
-    else // no whitespace nor "," in the response. Not likely but just in case.
+    else 
     {
-        return RBRINSTRUMENTGEN4_UNKNOWN_ERROR;
+        /* No spaces in the response. Not likely but just in case. */
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 }
 
@@ -581,94 +620,52 @@ RBRInstrumentGen4Error RBRInstrumentGen4_errorCheckResponse(
     char *end)
 {
     /*
-     * Errors will be found at the beginning of commands. E.g.,
+     * In L3.5 and L4, errors and warnings are found at the beginning of
+     * commands and are followed by a message. E.g.,
      *
-     *     >> wifi timeout = whenever
-     *     << E0108 invalid argument to command: 'whenever'
+     * >> enable config=pH_cal dataset=d_pHcal_20240401 storagemode=calibration
+     * << WRN-408 instrument was already enabled
+     *
+     * >> enable config=pH_cal dataset=d_pHcal_20240401 storagemode=calibration
+     * << ERR-128 instrument was already enabled with different settings
      */
-    if (*beginning == 'E')
+    if (end - beginning >= (ERROR_PARAMETER_LEN + ERROR_NUMBER_LEN)
+        && memcmp(beginning, ERROR_PARAMETER, ERROR_PARAMETER_LEN) == 0)
     {
         instrument->response.type = RBRINSTRUMENTGEN4_RESPONSE_ERROR;
-        instrument->response.error = strtol(beginning + 1, NULL, 10);
+        instrument->response.error = strtol(beginning + ERROR_PARAMETER_LEN, NULL, 10);
         /* Make sure we actually have a message to go along with the error.
          * There should be one, but it's best to play safe. */
-        if (end - beginning >= ERROR_LEN)
+        if (end - beginning >= (ERROR_PARAMETER_LEN + ERROR_NUMBER_LEN))
         {
-            instrument->response.response = beginning + ERROR_LEN;
+            instrument->response.response = beginning + ERROR_PARAMETER_LEN + ERROR_NUMBER_LEN;
         }
         else
         {
             instrument->response.response = NULL;
         }
-
-        /* Logger2 instruments don't distinguish between warnings and errors,
-         * so if we get an error response, we'll check whether it needs to be
-         * translated into a warning. */
-        if (instrument->generation == RBRINSTRUMENTGEN4_LOGGER2)
+        return RBRINSTRUMENTGEN4_HARDWARE_ERROR;
+    }
+    else if (end - beginning >= (WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN)
+             && memcmp(beginning, WARNING_PARAMETER, WARNING_PARAMETER_LEN) == 0)
+    {
+        instrument->response.type = RBRINSTRUMENTGEN4_RESPONSE_WARNING;
+        instrument->response.error = strtol(beginning + WARNING_PARAMETER_LEN, NULL, 10);
+        if (end - beginning >= (WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN))
         {
-            for (int i = 0; i < WARNING_NUMBER_COUNT; ++i)
-            {
-                if (instrument->response.error != WARNING_NUMBERS[i])
-                {
-                    continue;
-                }
-
-                instrument->response.type = RBRINSTRUMENTGEN4_RESPONSE_WARNING;
-
-                /*
-                 * The actual command response will be after the warning, so
-                 * we'll fast-forward past it.
-                 *
-                 * This doesn't support fast-forwarding past warning messages
-                 * containing commas. However, while there are multiple error
-                 * messages which contain commas, there are no such warnings.
-                 */
-                if (instrument->response.response != NULL)
-                {
-                    instrument->response.response = strchr(
-                        instrument->response.response,
-                        ',');
-                }
-
-                if (instrument->response.response != NULL)
-                {
-                    instrument->response.response += 2;
-                }
-
-                return RBRINSTRUMENTGEN4_SUCCESS;
-            }
+            instrument->response.response = beginning + WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN;
         }
-
-        /* Not being Logger2 or not having performed a substitution means it's
-         * a real error. */
+        else
+        {
+            instrument->response.response = NULL;
+        }
+        /* Create an additional status for warnings? */
         return RBRINSTRUMENTGEN4_HARDWARE_ERROR;
     }
 
     instrument->response.type = RBRINSTRUMENTGEN4_RESPONSE_INFO;
     instrument->response.error = RBRINSTRUMENTGEN4_HARDWARE_ERROR_NONE;
     instrument->response.response = beginning;
-
-    /*
-     * In Logger3, warnings are at the end of a response. E.g.,
-     *
-     *     >> verify
-     *     << verify status = logging, warning = W0401
-     *
-     * Warnings never have a message and the number is always zero-padded to
-     * four digits, so we can just check for the presence of a “warning”
-     * parameter in a fixed position, parse out the number, and then truncate
-     * the response so the parser doesn't have to deal with it.
-     */
-    if (end - beginning >= (WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN) && memcmp(end - WARNING_PARAMETER_LEN - WARNING_NUMBER_LEN,
-                                                                                  WARNING_PARAMETER,
-                                                                                  WARNING_PARAMETER_LEN) == 0)
-    {
-        instrument->response.type = RBRINSTRUMENTGEN4_RESPONSE_WARNING;
-        instrument->response.error = strtol(end - WARNING_NUMBER_LEN,
-                                            NULL,
-                                            10);
-        *(end - WARNING_PARAMETER_LEN - WARNING_NUMBER_LEN) = '\0';
-    }
 
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
@@ -705,7 +702,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_readResponse(RBRInstrumentGen4 *instrum
 
         RBRInstrumentGen4_terminateResponse(instrument, &beginning, end);
 
-        if (sampleTarget != NULL && RBRInstrumentGen4Sample_parse(sampleTarget, beginning) == RBRINSTRUMENTGEN4_SUCCESS)
+        if (sampleTarget != NULL && RBRInstrumentGen4Sample_parse(sampleTarget, &instrument->outputFormat, beginning) == RBRINSTRUMENTGEN4_SUCCESS)
         {
             if (instrument->callbacks.sample != NULL && sample == NULL)
             {
@@ -730,13 +727,17 @@ void RBRInstrumentGen4_parseResponse(RBRInstrumentGen4 *instrument,
                                      char **command,
                                      RBRInstrumentGen4ResponseParameter *parameter)
 {
-    bool hasParameters = true;
+    /*
+     * If this has not been run, the command string is null, so the command end
+     * seeks forward from the start of the response until finding the parameter
+     * separator (' ') or the end of the string.
+     */
     if (*command == NULL)
     {
         memset(parameter, 0, sizeof(RBRInstrumentGen4ResponseParameter));
 
         *command = instrument->response.response;
-        // char testcommand[103] = "id model = RBRoem, fwtype = 130, version = 1.14.5+202310150927, serial = 092431";
+        // char testcommand[103] = "id model=RBRoem fwtype=120 version=1.14.5+202310150927 serial=092431";
         // *command = testcommand;
         char *commandEnd = *command;
 
@@ -745,9 +746,11 @@ void RBRInstrumentGen4_parseResponse(RBRInstrumentGen4 *instrument,
             switch (*commandEnd)
             {
             case '\0':
-                hasParameters = false;
-            /* Fallthrough. */
-            case ' ':
+                parameter->key = NULL;
+                parameter->value = NULL;
+                parameter->nextKey = NULL;
+                return;
+            case PARAMETER_SEPARATOR_L4:
                 goto foundCommandEnd;
             default:
                 ++commandEnd;
@@ -755,39 +758,18 @@ void RBRInstrumentGen4_parseResponse(RBRInstrumentGen4 *instrument,
         }
     foundCommandEnd:
         /*
-         * All L3 commands return at least one parameter. However, lots of
-         * simple L2 commands (e.g., link) use the command itself as a
-         * parameter. E.g.,
-         *
-         *     >> link
-         *     << link = usb
-         *
-         * So before terminating the command, we'll check if it should also be
-         * used as the first parameter key. If so, we won't null-terminate it:
-         * that will be done for us when the value is parsed.
+         * Finding the parameter separator (' ') indicates the start of a key.
+         * Move the next key past the command_end pointer.
          */
-        if (hasParameters)
-        {
-            if (memcmp(commandEnd,
-                       PARAMETER_VALUE_SEPARATOR,
-                       PARAMETER_VALUE_SEPARATOR_LEN) == 0)
-            {
-                parameter->nextKey = *command;
-            }
-            else
-            {
-                *commandEnd = '\0';
-                parameter->nextKey = commandEnd + 1;
-            }
-        }
+        *commandEnd = '\0';
+        parameter->nextKey = commandEnd + 1;
     }
 
-    if (!hasParameters || parameter->nextKey == NULL)
+    if (parameter->nextKey == NULL)
     {
         parameter->key = NULL;
         parameter->value = NULL;
         parameter->nextKey = NULL;
-
         return;
     }
 
@@ -795,12 +777,19 @@ void RBRInstrumentGen4_parseResponse(RBRInstrumentGen4 *instrument,
      * Some commands (e.g., channel, regime) take an index parameter and return
      * it with the response. E.g.,
      *
-     *     >> regime 1
-     *     << regime 1 boundary = 50, binsize = 0.1, samplingperiod = 63
+     *     >> channel conductivity_00
+     *     << channel conductivity_00 type=cond00 address=32 settlingtime=50 readtime=260 guardtime=20 userunits=mS/cm derived=off grouplist=none sensor=none
      *
-     * We'll look for the value separator and remember where we most recently
-     * saw a space before it. That space separates the end of the index value
-     * from the beginning of the parameter key. Because this can happen both
+     * This gets parsed into:
+     * 
+     *     << channel\0conductivity_00\0type\0cond00\0address=32 settlingtime=50 readtime=260 guardtime=20 userunits=mS/cm derived=off grouplist=none sensor=none\0
+     *        ^command ^indexValue      ^key  ^value  ^nextKey
+     *        ^instrument->response.response 
+     *
+     * Next, the value seeks forward from the key pointer until finding the 
+     * value separator ('='), saving the position of the rightmost parameter
+     * separator (' '), which separates the end of the index parameter from the
+     * beginning of the parameter key. Because this can theoretically happen both
      * after the initial command word and after the array member separator,
      * we'll check for this each time we parse a parameter.
      */
@@ -812,28 +801,32 @@ void RBRInstrumentGen4_parseResponse(RBRInstrumentGen4 *instrument,
     {
         if (*parameter->value == '\0')
         {
+            /* 
+             * Nothing left to do if value reaches the end without finding the
+             * value separator.
+             */
             parameter->nextKey = NULL;
             return;
         }
-        else if (memcmp(parameter->value,
-                        PARAMETER_VALUE_SEPARATOR,
-                        PARAMETER_VALUE_SEPARATOR_LEN) == 0)
+        else if (*parameter->value == PARAMETER_VALUE_SEPARATOR_L4)
         {
-            /* Null-terminate the key. */
+            /* Null-terminate the value if found. */
             *parameter->value = '\0';
-            parameter->value += PARAMETER_VALUE_SEPARATOR_LEN;
+            ++parameter->value;
             break;
         }
-        else if (*parameter->value == ' ')
+        else if (*parameter->value == PARAMETER_SEPARATOR_L4)
         {
             previousSpace = parameter->value;
         }
-
         ++parameter->value;
     }
 
-    /* If we found whitespace between the beginning of the key and the value
-     * separator, that means there's an index value. */
+    /* 
+     * Finding the parameter separator between the key and the value indicates
+     * an index value. 
+     * Set the index value to the current key and move the key past the separator.
+     */
     if (previousSpace != NULL)
     {
         *previousSpace = '\0';
@@ -841,76 +834,42 @@ void RBRInstrumentGen4_parseResponse(RBRInstrumentGen4 *instrument,
         parameter->indexValue = parameter->key;
         parameter->key = previousSpace + 1;
     }
+
     /*
-     * L3 uses the pipe character as the separator for parameters returning
+     * L4 uses the pipe character as the separator for parameters returning
      * lists. E.g.,
      *
-     *     >> memformat availabletypes type
-     *     << memformat type = calbin00, availabletypes = rawbin00|calbin00
+     *     >> link serial availablebaudrates availablemodes
+     *     << link serial availablebaudrates=115200|19200|9600|4800|2400|1200|230400|460800 availablemodes=rs232|rs485f|uart|uart_idlelow
      *
-     * However, L2 used a comma:
+     * This gets parsed into:
+     *     << link serial\0availablebaudrates\0115200|19200|9600|4800|2400|1200|230400|460800\0availablemodes=rs232|rs485f|uart|uart_idlelow\0
+     *        ^command     ^key               ^value                                           ^nextKey
+     *        ^instrument->response.response 
      *
-     *     >> memformat support type
-     *     << memformat support = rawbin00, calbin00, type = rawbin00
-     *                                    ^         ^      ^
-     *                                    |         |      |
-     *                                    c         b      a
-     *
-     * So to find the end of the value (in this example, the value of the
-     *  “support” parameter), we need to seek forward to the next value
-     * separator (“a”), then seek _backwards_ to find the parameter separator
-     * (“b”). Any earlier parameter separator (“c”) might be part of the value.
-     * We also need to check for the separator used by array responses (“ | ”
-     * for Logger2, “ || ” for Logger3).
+     * At last, the next key seeks forward from the value until the parameter
+     * separator (' ') or the end of the string.
      */
-    parameter->nextKey = strstr(parameter->value, PARAMETER_VALUE_SEPARATOR);
-
-    if (parameter->nextKey == NULL)
+    parameter->nextKey = parameter->value;
+    while (true)
     {
-        return;
-    }
-
-    int32_t separatorLength = -1;
-    while (parameter->nextKey > parameter->value && separatorLength < 0)
-    {
-        if (memcmp(parameter->nextKey,
-                   PARAMETER_SEPARATOR,
-                   PARAMETER_SEPARATOR_LEN) == 0)
+        if (*parameter->nextKey == '\0')
         {
-            separatorLength = PARAMETER_SEPARATOR_LEN;
+            /* 
+             * Nothing left to do if next key reaches the end without finding
+             * the parameter separator.
+             */
+            parameter->nextKey = NULL;
+            return;
         }
-        else if (instrument->generation == RBRINSTRUMENTGEN4_LOGGER2 && memcmp(parameter->nextKey,
-                                                                               ARRAY_SEPARATOR_L2,
-                                                                               ARRAY_SEPARATOR_LEN_L2) == 0)
+        else if (*parameter->nextKey == PARAMETER_SEPARATOR_L4)
         {
-            separatorLength = ARRAY_SEPARATOR_LEN_L2;
+            /* Null-terminate the next key. */
+            *parameter->nextKey = '\0';
+            ++parameter->nextKey;
+            break;
         }
-        else if (memcmp(parameter->nextKey,
-                        ARRAY_SEPARATOR_L3,
-                        ARRAY_SEPARATOR_LEN_L3) == 0)
-        {
-            /* L3 separates array members in responses with the separator _and_
-             * the command name. */
-            separatorLength = ARRAY_SEPARATOR_LEN_L3 + strlen(*command) + 1;
-        }
-        else
-        {
-            --parameter->nextKey;
-        }
-    }
-
-    if (separatorLength >= 0)
-    {
-        /* Null-terminate the value. */
-        *parameter->nextKey = '\0';
-        parameter->nextKey += separatorLength;
-    }
-    else
-    {
-        /* Something went horribly wrong: we found what we thought was the
-         * start of the next key, but then didn't find any separators between
-         * it and the start of the value. Give up. */
-        parameter->nextKey = NULL;
+        ++parameter->nextKey;
     }
 }
 

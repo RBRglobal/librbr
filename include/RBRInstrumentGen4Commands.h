@@ -25,7 +25,7 @@ extern "C" {
 #include "RBRInstrumentGen4Streaming.h"
 #include "RBRInstrumentGen4Memory.h"
 #include "RBRInstrumentGen4Deployment.h"
-#include "RBRInstrumentGen4Other.h"
+#include "RBRInstrumentGen4Instrument.h"
 #include "RBRInstrumentGen4Polling.h"
 #include "RBRInstrumentGen4Security.h"
 

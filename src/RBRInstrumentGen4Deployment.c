@@ -9,18 +9,21 @@
  */
 
 /* Required for memset, strcmp. */
+#include <stdlib.h>
 #include <string.h>
 /* Required for snprintf. */
 #include <stdio.h>
 
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Internal.h"
+#include "RBRInstrumentGen4Schedule.h"
+#include "RBRInstrumentGen4Security.h"
 #include "RBRInstrumentGen4Deployment.h"
 
 static RBRInstrumentGen4Error RBRInstrumentGen4_parseDeploymentResponse(
     RBRInstrumentGen4 *instrument,
     const char *deploymentCommand,
-    RBRInstrumentGen4DeploymentStatus *status)
+    RBRInstrumentGen4LoggingState *state)
 {
     //GEN4 todo: maybe make this consistent with other code, like get xxx name function.
     /** 
@@ -47,10 +50,10 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_parseDeploymentResponse(
 
         for (int i = 0; i < RBRINSTRUMENTGEN4_STATUS_COUNT; i++)
         {
-            if (strcmp(RBRInstrumentGen4DeploymentStatus_name(i),
+            if (strcmp(RBRInstrumentGen4LoggingState_name(i),
                        parameter.value) == 0)
             {
-                *status = i;
+                *state = i;
                 break;
             }
         }
@@ -65,19 +68,19 @@ RBRInstrumentGen4Error RBRInstrumentGen4_verify(
         RBRInstrumentGen4 *instrument,
         const RBRInstrumentGen4Config *config, 
         const char datasetLabel[],
-        RBRInstrumentGen4DeploymentStatus *status)
+        RBRInstrumentGen4LoggingState *status)
 {
     RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                   "verify config = %s, dataset = %s", config->label, datasetLabel));
+                                   "verify config=%s dataset=%s", config->label, datasetLabel));
 
     return RBRInstrumentGen4_parseDeploymentResponse(instrument,
                                                  "verify",
                                                  status);
 }
 
-const char *RBRInstrumentGen4DeploymentStoragemode_name(RBRInstrumentGen4DeploymentStoragemode storagemode)
+const char *RBRInstrumentGen4DeploymentStoragemode_name(RBRInstrumentGen4DeploymentStoragemode storageMode)
 {
-    switch (storagemode)
+    switch (storageMode)
     {
     case RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL:
         return "normal";
@@ -95,43 +98,42 @@ RBRInstrumentGen4Error RBRInstrumentGen4_enable(
         RBRInstrumentGen4 *instrument,
         const RBRInstrumentGen4Config *config,
         const char datasetLabel[], 
-        const bool simulation, 
-        const RBRInstrumentGen4DeploymentStoragemode storagemode, 
-        RBRInstrumentGen4Datasets *datasets,
-        RBRInstrumentGen4DeploymentStatus *status)
+        const RBRInstrumentGen4DeploymentStoragemode storageMode, 
+        RBRInstrumentGen4DatasetPool *datasetPool,
+        RBRInstrumentGen4Dataset **newDataset,
+        RBRInstrumentGen4LoggingState *state)
 {
     RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                   "enable config = %s, dataset = %s, simulation = %s, storagemode = %s", 
+                                   "enable config=%s dataset=%s simulation=%s storagemode=%s", 
                                    config->label, datasetLabel,
-                                   simulation?"on":"off",
-                                   storagemode?"normal":"calibration"
+                                   storageMode?"normal":"calibration"
                                    ));
 
     RBRInstrumentGen4_parseDeploymentResponse(instrument,
-                                                 "enable",
-                                                 status);
+                                              "enable",
+                                              state);
     
-    RBRInstrumentGen4Dataset newDataset;
-    strcpy(newDataset.label, datasetLabel);
-    datasets->datasetlist.count += 1;
-    datasets->datasetlist.datasets[datasets->datasetlist.count-1] = &newDataset;
+    *newDataset = &datasetPool->pool[datasetPool->count];
+    datasetPool->count += 1;
+    strcpy((*newDataset)->label, datasetLabel);
 
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_disable(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4DeploymentStatus *status)
+    RBRInstrumentGen4LoggingState *state)
 {
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "disable"));
 
     return RBRInstrumentGen4_parseDeploymentResponse(instrument,
                                                  "disable",
-                                                 status);
+                                                 state);
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getSimulation(
     RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4ChannelPool *channelPool,
     RBRInstrumentGen4Simulation *simulation)
 {
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "simulation"));
@@ -156,9 +158,19 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSimulation(
         {
             simulation->period = strtol(parameter.value, NULL, 10);
         }
-        else if (strcmp(parameter.key, "channellist")==0)
+        else if (strcmp(parameter.key, "channellist") == 0)
         {
-            strcpy(simulation->channellabellist, parameter.value);
+            /* Match the labels to channels from the pool */
+            /* TODO: This would be great as a helper function */
+            for (int32_t channel_idx = 0; channel_idx < channelPool->count; channel_idx++)
+            {
+                if (strcmp(channelPool->pool[channel_idx].label,
+                       parameter.key) == 0)
+                {
+                    strcpy(channelPool->pool[channel_idx].label,
+                           parameter.key);
+                }
+            }
         }
     }
     return RBRINSTRUMENTGEN4_SUCCESS;
@@ -174,10 +186,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSimulation(
     }
 
     RBR_TRY(RBRInstrumentGen4_permit(instrument, "simulation"));
+    /* Iterate over channel label list */
+    /*
     RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                   "simulation state = %s, period = %i, channellist = %s",
+                                   "simulation state=%s period=%i channellist=%s",
                                    (simulation->state) ? "on" : "off",
                                    simulation->period,
-                                   simulation->channellabellist));
+                                   simulation->channelLabelList));
+    */
     return RBRINSTRUMENTGEN4_SUCCESS;
 }

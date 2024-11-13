@@ -15,6 +15,8 @@
 #include <math.h>
 /* Required for fprintf, printf, snprintf. */
 #include <stdio.h>
+/* Required for EXIT_SUCCESS, etc. */
+#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
 /* Required for close. */
@@ -98,7 +100,6 @@ int main(int argc, char *argv[])
            RBRInstrumentGen4Link_name(link));
 
     RBRInstrumentGen4Serial serial;
-    RBRInstrumentGen4WiFi wifi;
 
     switch (link)
     {
@@ -112,14 +113,6 @@ int main(int argc, char *argv[])
                RBRInstrumentGen4SerialBaudRate_name(serial.baudRate));
         break;
     }
-    case RBRINSTRUMENTGEN4_LINK_WIFI:
-    {
-        RBRInstrumentGen4_getWiFi(instrument, &wifi);
-        printf("Connected in WiFi mode at %s baud. Timeout is %d\n",
-               RBRInstrumentGen4SerialBaudRate_name(wifi.baudRate),
-               wifi.commandTimeout);
-        break;
-    }
     default:
         fprintf(stderr,
                 "Warning: connection method to the instrument is unclear, so"
@@ -128,20 +121,12 @@ int main(int argc, char *argv[])
     }
 
     // populate all channels and calibrations.
-    RBRInstrumentGen4Channels channels;
-    RBRInstrumentGen4_getChannels(instrument, &channels);
+    RBRInstrumentGen4ChannelPool channelPool;
+    RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
 
     // create group
-    RBRInstrumentGen4Groups groups;
-    RBRInstrumentGen4_getGroups(instrument, &groups);
-
-    RBRInstrumentGen4Group group_pts;
-    init_groupStructure(instrument,
-                        GROUP_PTS_LABEL,
-                        GROUP_PTS_CHANNELS,
-                        &channels,
-                        &group_pts,
-                        &groups); // warning: need to read error!!!
+    RBRInstrumentGen4GroupPool groupPool;
+    RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
 
     // specify outputformat
     RBRInstrumentGen4Outputformat outputformat = 0;
@@ -154,7 +139,7 @@ int main(int argc, char *argv[])
     while (true)
     {
         // poll one group
-        err = RBRInstrumentGen4_pollOneGroup(instrument, group_pts.label, true, &sample);
+        err = RBRInstrumentGen4_pollOneGroup(instrument, groupPool.pool[0].label, &sample);
         if (err != RBRINSTRUMENTGEN4_SUCCESS)
         {
             fprintf(stderr, "Error: %s\n", RBRInstrumentGen4Error_name(err));
@@ -162,7 +147,7 @@ int main(int argc, char *argv[])
         else
         {
             printf("%" PRIi64, sample.timestamp);
-            for (int32_t i = 0; i < sample.channels; i++)
+            for (int32_t i = 0; i < sample.channelCount; i++)
             {
                 switch (RBRInstrumentGen4Reading_getFlag(sample.readings[i]))
                 {

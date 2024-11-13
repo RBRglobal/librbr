@@ -13,24 +13,17 @@
 #ifndef LIBRBR_RBRINSTRUMENTGEN4SCHEDULE_H
 #define LIBRBR_RBRINSTRUMENTGEN4SCHEDULE_H
 
+#include "RBRInstrumentGen4Configuration.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * \brief The maximum number of available fast schedule periods to parse from
- * the instrument.
- *
- * \see RBRInstrumentGen4Deployment.availableFastPeriods
- */
-#define RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX 32
 
 /**
  * \brief Instrument `clock` command parameters.
  *
  * \see RBRInstrumentGen4_getClock()
  * \see RBRInstrumentGen4_setClock()
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
 typedef struct RBRInstrumentGen4Clock
 {
@@ -57,6 +50,7 @@ typedef struct RBRInstrumentGen4Clock
 } RBRInstrumentGen4Clock;
 
 /**
+ * \note Issues the `clock` instrument command.
  * \brief Get the instrument clock.
  *
  * Because UTC offset is tracked as a setting on Logger2 instruments, not as a
@@ -71,13 +65,15 @@ typedef struct RBRInstrumentGen4Clock
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
+ * \see RBRInstrumentGen4_setClock
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getClock(RBRInstrumentGen4 *instrument,
                                           RBRInstrumentGen4Clock *clock);
 
 /**
  * \brief Set the instrument clock.
+ * \note Issues the `clock` instrument command.
  *
  * Because UTC offset is tracked as a setting on Logger2 instruments, not as a
  * parameter of the `now` command (as it is of `clock` on Logger3), this
@@ -99,49 +95,71 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getClock(RBRInstrumentGen4 *instrument,
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the settings cannot be changed
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the clock values are out
  *                                                of range
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
+ * \see RBRInstrumentGen4_getClock
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_setClock(RBRInstrumentGen4 *instrument,
                                           const RBRInstrumentGen4Clock *clock);
 
 /**
- * \brief Possible instrument logging statuses.
+ * \brief Possible instrument logging states.
+ * This tracks whether the deployment is running on the instrument.
+ *
+ * Returned by:
+ * \see RBRInstrumentGen4_getInfo()
+ * \see RBRInstrumentGen4_enable()
+ * \see RBRInstrumentGen4_verify()
+ *
+ * For the deployment state:
+ * \see RBRInstrumentGen4DeploymentStatus
+ * \see RBRInstrumentGen4Deployment
+ */
+typedef enum RBRInstrumentGen4LoggingState
+{
+    /** Logging is not enabled. */
+    RBRINSTRUMENTGEN4_LOGGING_STATE_DISABLED,
+    /** Logging for at least one deployment is enabled. */
+    RBRINSTRUMENTGEN4_LOGGING_STATE_ENABLED,
+    /** The number of specific logging states. */
+    RBRINSTRUMENTGEN4_LOGGING_STATE_COUNT,
+    /** An unknown or unrecognized logging state. */
+    RBRINSTRUMENTGEN4_UNKNOWN_LOGGING_STATE
+} RBRInstrumentGen4LoggingState;
+
+/**
+ * \brief Get a human-readable string name for a logging state.
+ *
+ * \param [in] state the logging state
+ * \return a string name for the logging state
+ * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ */
+const char *RBRInstrumentGen4LoggingState_name(RBRInstrumentGen4LoggingState status);
+
+/**
+ * \brief Possible deployment statuses.
+ * This tracks the status of the deployment running on the instrument.
  *
  * \see RBRInstrumentGen4Deployment
  * \see RBRInstrumentGen4_getDeployment()
- * \see RBRInstrumentGen4_enable()
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
- * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/enable
+ * \see RBRInstrumentGen4_pause()
+ * \see RBRInstrumentGen4_resume()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
 typedef enum RBRInstrumentGen4DeploymentStatus
 {
-    /** Logging is not enabled. */
-    RBRINSTRUMENTGEN4_STATUS_DISABLED,
-    /** Logging is enabled but the start time has not yet passed. */
-    RBRINSTRUMENTGEN4_STATUS_PENDING,
     /** Logging is in progress. */
-    RBRINSTRUMENTGEN4_STATUS_LOGGING,
+    RBRINSTRUMENTGEN4_STATUS_SAMPLING,
     /** Logging paused; awaiting satisfaction of a gating condition. */
     RBRINSTRUMENTGEN4_STATUS_GATED,
     /** Logging paused, waiting for a resume command. */
     RBRINSTRUMENTGEN4_STATUS_PAUSED,
-    /** The programmed end time has been passed. */
-    RBRINSTRUMENTGEN4_STATUS_FINISHED,
     /**
      * A `disable` command was received.
      *
      * \see RBRInstrumentGen4_disable()
      */
-    RBRINSTRUMENTGEN4_STATUS_STOPPED,
+    RBRINSTRUMENTGEN4_STATUS_INACTIVE,
     /** Memory full; logging has stopped. */
-    RBRINSTRUMENTGEN4_STATUS_FULLANDSTOPPED,
-    /** Memory full; logger continues to stream data. */
-    RBRINSTRUMENTGEN4_STATUS_FULL,
-    /** Stopped; internal error. */
-    RBRINSTRUMENTGEN4_STATUS_FAILED,
-    /** Memory failed to erase. */
-    RBRINSTRUMENTGEN4_STATUS_NOTBLANK,
-    /** Instrument internal error; state unknown. */
     RBRINSTRUMENTGEN4_STATUS_UNKNOWN,
     /** The number of specific statuses. */
     RBRINSTRUMENTGEN4_STATUS_COUNT,
@@ -204,77 +222,45 @@ const char *RBRInstrumentGen4Gate_name(RBRInstrumentGen4Gate gate);
  *
  * \see RBRInstrumentGen4_getDeployment()
  * \see RBRInstrumentGen4_setDeployment()
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
 typedef struct RBRInstrumentGen4Deployment
 {
-    /**
-     * \brief The deployment start date and time.
-     *
-     * Must be before the end time.
-     */
+    /** \brief The deployment start date and time.  */
     RBRInstrumentGen4DateTime startTime;
-    /**
-     * \brief The deployment end date and time.
-     *
-     * Must be after the start time.
-     */
-    RBRInstrumentGen4DateTime endTime;
+
     /**
      * \brief The deployment status.
      *
      * \readonly
      */
-    const RBRInstrumentGen4DeploymentStatus status;
-
-    /** \brief Gets the label of the configuration currently being used to run an
-     * active deployment. 
-     * If a deployment is not actively in progress, the word "none" is reported.
-    */
-    const char config[RBRINSTRUMENTGEN4_LABEL_NAME_MAX+1];
-
-    /** \brief Gets the label of the dataset currently being written to the instrument's
-     * memory during an active deployment.
-     * If a deployment is not actively in progress, the word "none" is reported.
-    */
-    const char dataset[RBRINSTRUMENTGEN4_LABEL_NAME_MAX+1];
-        /**
-     * \brief Fast measurement periods available for the logger for sampling
-     * rates faster than 1Hz.
-     *
-     * Available fast periods are stored in the array in the order reported by
-     * the instrument. Unused array elements are populated with `0`. If more
-     * than #RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX are available, trailing
-     * entries are discarded.
-     *
-     * Logger2 instruments do not report available fast periods. 
-     *
-     * \readonly
-     */
-    const RBRInstrumentGen4Period
-        availableFastPeriods[RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX];
+    RBRInstrumentGen4DeploymentStatus status;
 
     /** \brief Gets any gating condition currently enabled.
-     * options: none|thresholding|twistactivation|invalid
-    */
-    const RBRInstrumentGen4Gate gate;
+     * options: none|wetswitch|twistactivation|invalid
+     */
+    RBRInstrumentGen4Gate gate;
 
     /** \brief Gets whether any of the instrument's channels are being simulated (on),
      * or whether they are all reporting true measure data(off).
      * Options: on|off.
-    */
+     *
+     * \readonly
+     */
     const bool simulation;
 } RBRInstrumentGen4Deployment;
 
 /**
  * \brief Get the instrument deployment parameters.
+ * \note Issues the `deployment` instrument command.
  *
  * \param [in] instrument the instrument connection
  * \param [out] deployment the deployment parameters
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the deployment is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
+ * \see RBRInstrumentGen4_setDeployment()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
     RBRInstrumentGen4 *instrument,
@@ -282,6 +268,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
 
 /**
  * \brief Set the instrument deployment parameters.
+ * \note Issues the `deployment` instrument command.
  *
  * As noted in the description of RBRInstrumentGen4Deployment.status, that field is
  * ignored when setting the deployment.
@@ -297,62 +284,54 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
  *
  * \param [in] instrument the instrument connection
  * \param [in] deployment the deployment parameters
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully written
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the deployment is successfully changed
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the deployment cannot be changed
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the start or end time
  *                                                values are out of range
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
+ * \see RBRInstrumentGen4_getDeployment()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_setDeployment(
     RBRInstrumentGen4 *instrument,
     const RBRInstrumentGen4Deployment *deployment);
 
-/** \brief The status of a pauseresume condition. */
-typedef enum RBRInstrumentGen4PauseresumeStatus
-{
-    /** Deployment is enaled and paused. */
-    RBRINSTRUMENTGEN4_PAUSERESUME_STATUS_PAUSED,
-    /** Deployment is enabled and will start at starttime. */
-    RBRINSTRUMENTGEN4_PAUSERESUME_STATUS_PENDING,
-    /** Deployment is enabled and running. */
-    RBRINSTRUMENTGEN4_PAUSERESUME_STATUS_LOGGING,
-    /** feature is not allowed, or firmware in use doesn't support this feature. */
-    RBRINSTRUMENTGEN4_UNKNOWN_PAUSERESUME_STATUS
-} RBRInstrumentGen4PauseresumeStatus;
-
 /**
- * \brief Get a human-readable string name for a pauseresume status.
- *
- * \param [in] status the pauseresume state
- * \return a string name for the gating state
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
- */
-const char *RBRInstrumentGen4PauseresumeStatus_name(RBRInstrumentGen4PauseresumeStatus status);
-
-/**
- * \brief It pauses an enabled deloyment.
+ * \brief Pauses an enabled deloyment.
+ * \note Issues the `pause` instrument command.
  * 
  * \param [in] instrument the instrument connection
+ * \param [out] status the deployment status
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the status is "paused".
  * \return #RBRINSTRUMENTGEN4_UNSUPPORTED when the current firmware doesn't support
  * pauseresume feature, or pauseresume is not allowed.
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the response indicates an error.
+ * \see RBRInstrumentGen4_resume()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828461/pause
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_pause(RBRInstrumentGen4 *instrument);
+RBRInstrumentGen4Error RBRInstrumentGen4_pause(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4DeploymentStatus *status);
+
 /**
- * \brief It resumes an enabled deployment which was previously
+ * \brief Resumes an enabled deployment which was previously
  * paused using the pause command
+ * \note Issues the `resume` instrument command.
  * 
  * \param [in] instrument the instrument connection
+ * \param [out] status the deployment status
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the state is one of the following:
- * "pending", "logging".
+ * "sampling", "gated".
  * \return #RBRINSTRUMENTGEN4_UNSUPPORTED when the current firmware doesn't support
  * pauseresume feature, or pauseresume is not allowed.
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the response indicates an error.
+ * \see RBRInstrumentGen4_pause()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828461/pause
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_resume(RBRInstrumentGen4 *instrument);
+RBRInstrumentGen4Error RBRInstrumentGen4_resume(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4DeploymentStatus *status);
 
 /**
  * \brief Get a human-readable string name for a schedule mode.
@@ -362,7 +341,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_resume(RBRInstrumentGen4 *instrument);
  * \see RBRInstrumentGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4SamplingMode_name(RBRInstrumentGen4SamplingMode mode);
-
 
 /**
  * \brief Get a human-readable string name for an instrument direction.
@@ -384,38 +362,56 @@ const char *RBRInstrumentGen4RegimesReference_name(
     RBRInstrumentGen4RegimesReference reference);
 
 /**
- * \brief Get the pool of logger schedules.
+ * \brief Populate the pool of schedules with the labels of the schedules defined on the logger.
+ * \note Issues the `schedule` instrument command.
  *
  * \param [in] instrument the instrument connection
- * \param [out] schedules the schedules of this instrument.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/schedules
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_getSchedules(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedules *schedules);
-
-/**
- * \brief Get the instrument schedule parameters.
- *
- * \param [in] instrument the instrument connection
- * \param [in] schedulelabel the schedule label
- * \param [in] schedule the schedule to populate
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
+ * \param [out] schedulePool the pool of schedules defined on the logger
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedules are all successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/schedule
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if any schedule cannot be read
+ * \see RBRInstrumentGen4_getSchedule()
+ * \see RBRInstrumentGen4_setSchedule()
+ * \see RBRInstrumentGen4_createSchedule()
+ * \see RBRInstrumentGen4_deleteSchedule()
+ * \see RBRInstrumentGen4_deleteScheduleAll()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4SchedulePool *schedulePool);
+
+/**
+ * \brief Populate a schedule with schedule parameters from the logger.
+ * \note Issues the `schedule <schedule_label>` instrument command.
+ *
+ * Hardware errors may occur if:
+ *
+ * - you specify a schedule that does not exist
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] groupPool the pool of groups defined on the logger, to associate with the schedule
+ * \param [inout] schedule a pointer to the specified schedule
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the schedule cannot be read
+ * \see RBRInstrumentGen4_getSchedulePool()
+ * \see RBRInstrumentGen4_setSchedule()
+ * \see RBRInstrumentGen4_createSchedule()
+ * \see RBRInstrumentGen4_deleteSchedule()
+ * \see RBRInstrumentGen4_deleteScheduleAll()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
     RBRInstrumentGen4 *instrument,
-    const char *schedulelabel,
+    RBRInstrumentGen4GroupPool *groupPool,
     RBRInstrumentGen4Schedule *schedule);
 
 /**
  * \brief Set the instrument schedule.
- *
- * Configlist is readonly. Attempts to set parameters that are not included in the specific schedule results in a hardware
- * error; 
+ * \note Issues the `schedule <schedule_label>` instrument command.
  *
  * The values of RBRInstrumentGen4Deployment.availableFastPeriods are not sent to the instrument,
  * but they are used to validate the chosen period in RBRInstrumentGen4Schedule.
@@ -427,82 +423,107 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
  *
  * Hardware errors may occur if:
  *
- * - the instrument is logging
- * - you set an out-of-bounds parameter the library fails to detect
- * - you attempt to set schedule parameters for an Instruments prior to GEN4 (where schedule is
- *   not supported)
+ * - you include a group that does not exist
+ * - you include a group multiple times
+ * - you include too many groups
+ * - you specify a sampling mode which is not supported
+ * - you specify a sampling rate which is not supported
  *
  * \param [in] instrument the instrument connection
  * \param [in] schedule the schedule to be set
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully written
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully changed
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the schedule cannot be changed
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/schedule
+ * \see RBRInstrumentGen4_getSchedulePool()
+ * \see RBRInstrumentGen4_getSchedule()
+ * \see RBRInstrumentGen4_createSchedule()
+ * \see RBRInstrumentGen4_deleteSchedule()
+ * \see RBRInstrumentGen4_deleteScheduleAll()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4Schedule *schedule);
 
 /**
- * \brief Creates a schedule with optional user defined parameters.
+ * \brief Creates a schedule with default parameters and the provided label.
+ * \note Issues the `schedule create <schedule_label>` instrument command.
  *
- * Schedulelabel is required, grouplist and mode are optional. 
- * default grouplist is empty.
- * default mode is the simplest in availablemodes in command `schedules`.
+ * Hardware errors may occur if:
+ *
+ * - you specify a schedule label that already exists
+ * - you specify an invalid schedule label
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
+ *
  * \param [in] instrument the instrument connection
- * \param [in] schedule the created schedule.
- * \param [inout] schedules where the schedules are mapped with a pointer array.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the operation is successful.
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/createschedule
+ * \param [in] newScheduleLabel the label to give the new schedule
+ * \param [inout] schedulePool the pool of schedules defined on the logger
+ * \param [out] newSchedule a pointer to the new schedule in schedulePool
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfuly created
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the schedule cannot be created
+ * \see RBRInstrumentGen4_getSchedulePool()
+ * \see RBRInstrumentGen4_getSchedule()
+ * \see RBRInstrumentGen4_setSchedule()
+ * \see RBRInstrumentGen4_deleteSchedule()
+ * \see RBRInstrumentGen4_deleteScheduleAll()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_createSchedule(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedule *schedule,
-    RBRInstrumentGen4Schedules *schedules
-    );
+    const char *newScheduleLabel,
+    RBRInstrumentGen4SchedulePool *schedulePool,
+    RBRInstrumentGen4Schedule **newSchedule);
 
 /**
- * \brief Deletes one schedule. Schedules may not be deleted while logging is enabled.
+ * \brief Deletes one schedule defined on the logger.
+ * \note Issues the `schedule delete <schedule_label>` instrument command.
+ *
+ * Hardware errors may occur if:
+ *
+ * - you specify a schedule that does not exist
  *
  * \param [in] instrument the instrument connection
- * \param [in] schedulelabel specifies by label a single schedule to delete from the pool
- * \param [in] schedules all the schedules
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the operation is successful.
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/createschedule
+ * \param [in] scheduleToDelete the single schedule to delete from the pool
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfuly deleted
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the schedule cannot be deleted
+ * \see RBRInstrumentGen4_getSchedulePool()
+ * \see RBRInstrumentGen4_getSchedule()
+ * \see RBRInstrumentGen4_setSchedule()
+ * \see RBRInstrumentGen4_createSchedule()
+ * \see RBRInstrumentGen4_deleteScheduleAll()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteSchedule(
     RBRInstrumentGen4 *instrument,
-    const char *schedulelabel,
-    RBRInstrumentGen4Schedules *schedules);
+    RBRInstrumentGen4Schedule *scheduleToDelete);
 
 /**
- * \brief Deletes more than one schedules. Schedules may not be deleted while logging is enabled.
+ * \brief Deletes all the schedules defined on the logger.
+ * \note Issues the `schedule delete all` instrument command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] schedulelist specifies by their labels on or more schedules to delete from the pool
- * \param [in] schedules all the schedules
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the operation is successful.
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/createschedule
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteScheduleMultiple(
-    RBRInstrumentGen4 *instrument,
-    const char *schedulelist,
-    RBRInstrumentGen4Schedules *schedules);
-
-/**
- * \brief Deletes all schedules. Schedules may not be deleted while logging is enabled.
- *
- * \param [in] instrument the instrument connection
- * \param [in] schedules all the schedules
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the operation is successful.
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/createschedule
+ * \param [inout] schedulePoolToDelete the pool of schedules defined on the logger
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when all configs are successfully deleted
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if any schedule cannot be deleted
+ * \see RBRInstrumentGen4_getSchedulePool()
+ * \see RBRInstrumentGen4_getSchedule()
+ * \see RBRInstrumentGen4_setSchedule()
+ * \see RBRInstrumentGen4_createSchedule()
+ * \see RBRInstrumentGen4_deleteSchedule()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteScheduleAll(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedules *schedules);
+    RBRInstrumentGen4SchedulePool *schedulePoolToDelete);
 
 #ifdef __cplusplus
 }

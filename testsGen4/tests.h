@@ -20,6 +20,8 @@ extern "C" {
 
 /* Required for printf. */
 #include <stdio.h>
+
+#include <stdlib.h>
 /* Required for strcmp, strlen. */
 #include <string.h>
 

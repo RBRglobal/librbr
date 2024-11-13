@@ -1,7 +1,7 @@
 /**
  * \file RBRParserGen4.h
  *
- * \brief Interface for parsing datasets produced by RBR instruments.
+ * \brief Interface for parsing datasetPool produced by RBR instruments.
  *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
@@ -19,9 +19,11 @@ extern "C" {
 #include <stdbool.h>
 
 #include "RBRInstrumentGen4.h"
+#include "RBRInstrumentGen4Streaming.h"
+#include "RBRInstrumentGen4Memory.h"
 
 /** \brief The maximum number of pieces of auxiliary data in an event. */
-#define RBRINSTRUMENTGEN4_EVENT_AUXILIARY_DATA_MAX 4
+#define RBRINSTRUMENTGEN4_EVENT_AUXILIARY_DATA_MAX 8
 
 struct RBRParserGen4;
 
@@ -49,7 +51,7 @@ typedef RBRInstrumentGen4Error (*RBRParserGen4SampleCallback)(
 typedef enum RBRInstrumentGen4EventType
 {
     RBRINSTRUMENTGEN4_EVENT_UNKNOWN_OR_UNRECOGNIZED_EVENT                                     = 0x00,
-    RBRINSTRUMENTGEN4_EVENT_TIME_SYNCHRONIZATION_MARKER                                       = 0x01,
+    RBRINSTRUMENTGEN4_EVENT_TIME_SYNCHRONIZATION_MARKER                                       = 0x01, /* Reserved in L3.5 and L4 */
     RBRINSTRUMENTGEN4_EVENT_DISABLE_COMMAND_RECEIVED                                          = 0x02,
     RBRINSTRUMENTGEN4_EVENT_RUN_TIME_ERROR_ENCOUNTERED                                        = 0x03,
     RBRINSTRUMENTGEN4_EVENT_CPU_RESET_DETECTED                                                = 0x04,
@@ -61,34 +63,38 @@ typedef enum RBRInstrumentGen4EventType
     RBRINSTRUMENTGEN4_EVENT_SAMPLING_RESTARTED_AFTER_RESETTING_RTC                            = 0x0A,
     RBRINSTRUMENTGEN4_EVENT_PARAMETERS_RECOVERED_SAMPLING_RESTARTED_AFTER_RESETTING_RTC       = 0x0B,
     RBRINSTRUMENTGEN4_EVENT_SAMPLING_STOPPED_END_TIME_REACHED                                 = 0x0C,
-    RBRINSTRUMENTGEN4_EVENT_START_OF_A_RECORDED_BURST                                         = 0x0D,
-    RBRINSTRUMENTGEN4_EVENT_START_OF_A_WAVE_BURST                                             = 0x0E,
-    RBRINSTRUMENTGEN4_EVENT_RESERVED1                                                         = 0x0F,
-    RBRINSTRUMENTGEN4_EVENT_STREAMING_NOW_OFF_FOR_BOTH_PORTS                                  = 0x10,
-    RBRINSTRUMENTGEN4_EVENT_STREAMING_ON_FOR_USB_OFF_FOR_SERIAL                               = 0x11,
-    RBRINSTRUMENTGEN4_EVENT_STREAMING_OFF_FOR_USB_ON_FOR_SERIAL                               = 0x12,
-    RBRINSTRUMENTGEN4_EVENT_STREAMING_NOW_ON_FOR_BOTH_PORTS                                   = 0x13,
-    RBRINSTRUMENTGEN4_EVENT_SAMPLING_STARTED_THRESHOLD_CONDITION_SATISFIED                    = 0x14,
-    RBRINSTRUMENTGEN4_EVENT_SAMPLING_PAUSED_THRESHOLD_CONDITION_NOT_MET                       = 0x15,
+    RBRINSTRUMENTGEN4_EVENT_START_OF_A_RECORDED_BURST                                         = 0x0D, /* Reserved in L3.5 */
+    RBRINSTRUMENTGEN4_EVENT_START_OF_A_WAVE_BURST                                             = 0x0E, /* Reserved in L3.5 */
+    RBRINSTRUMENTGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_USB                                      = 0x0F,
+    RBRINSTRUMENTGEN4_EVENT_STREAMING_NOW_OFF_FOR_BOTH_PORTS                                  = 0x10, /* Reserved in L3.5 and L4, used in L3 */
+    RBRINSTRUMENTGEN4_EVENT_STREAMING_ON_FOR_USB_OFF_FOR_SERIAL                               = 0x11, /* Reserved in L3.5 and L4, used in L3 */
+    RBRINSTRUMENTGEN4_EVENT_STREAMING_OFF_FOR_USB_ON_FOR_SERIAL                               = 0x12, /* Reserved in L3.5 and L4, used in L3 */
+    RBRINSTRUMENTGEN4_EVENT_STREAMING_NOW_ON_FOR_BOTH_PORTS                                   = 0x13, /* Reserved in L3.5 and L4, used in L3 */
+    RBRINSTRUMENTGEN4_EVENT_SAMPLING_STARTED_THRESHOLD_CONDITION_SATISFIED                    = 0x14, /* Reserved in L3.5 */
+    RBRINSTRUMENTGEN4_EVENT_SAMPLING_PAUSED_THRESHOLD_CONDITION_NOT_MET                       = 0x15, /* Reserved in L3.5 */
     RBRINSTRUMENTGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_INTERNAL_BATTERY                         = 0x16,
     RBRINSTRUMENTGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_EXTERNAL_BATTERY                         = 0x17,
-    RBRINSTRUMENTGEN4_EVENT_TWIST_ACTIVATION_STARTED_SAMPLING                                 = 0x18,
-    RBRINSTRUMENTGEN4_EVENT_TWIST_ACTIVATION_PAUSED_SAMPLING                                  = 0x19,
-    RBRINSTRUMENTGEN4_EVENT_WIFI_MODULE_DETECTED_AND_ACTIVATED                                = 0x1A,
-    RBRINSTRUMENTGEN4_EVENT_WIFI_MODULE_DEACTIVATED_REMOVED_OR_ACTIVITY_TIMEOUT               = 0x1B,
+    RBRINSTRUMENTGEN4_EVENT_TWIST_ACTIVATION_STARTED_SAMPLING                                 = 0x18, /* Reserved in L3.5 */
+    RBRINSTRUMENTGEN4_EVENT_TWIST_ACTIVATION_PAUSED_SAMPLING                                  = 0x19, /* Reserved in L3.5 */
+    RBRINSTRUMENTGEN4_EVENT_WIFI_MODULE_DETECTED_AND_ACTIVATED                                = 0x1A, /* Reserved in L3.5 */
+    RBRINSTRUMENTGEN4_EVENT_WIFI_MODULE_DEACTIVATED_REMOVED_OR_ACTIVITY_TIMEOUT               = 0x1B, /* Reserved in L3.5 */
     RBRINSTRUMENTGEN4_EVENT_REGIMES_ENABLED_BUT_NOT_YET_IN_A_REGIME                           = 0x1C,
     RBRINSTRUMENTGEN4_EVENT_ENTERED_REGIME_1                                                  = 0x1D,
     RBRINSTRUMENTGEN4_EVENT_ENTERED_REGIME_2                                                  = 0x1E,
     RBRINSTRUMENTGEN4_EVENT_ENTERED_REGIME_3                                                  = 0x1F,
     RBRINSTRUMENTGEN4_EVENT_START_OF_REGIME_BIN                                               = 0x20,
-    RBRINSTRUMENTGEN4_EVENT_BEGIN_PROFILING_UP_CAST                                           = 0x21,
-    RBRINSTRUMENTGEN4_EVENT_BEGIN_PROFILING_DOWN_CAST                                         = 0x22,
-    RBRINSTRUMENTGEN4_EVENT_END_OF_PROFILING_CAST                                             = 0x23,
+    RBRINSTRUMENTGEN4_EVENT_BEGIN_PROFILING_UP_CAST                                           = 0x21, /* Reserved in L3.5 */
+    RBRINSTRUMENTGEN4_EVENT_BEGIN_PROFILING_DOWN_CAST                                         = 0x22, /* Reserved in L3.5 */
+    RBRINSTRUMENTGEN4_EVENT_END_OF_PROFILING_CAST                                             = 0x23, /* Reserved in L3.5 */
     RBRINSTRUMENTGEN4_EVENT_BATTERY_FAILED_SCHEDULE_FINISHED                                  = 0x24,
-    RBRINSTRUMENTGEN4_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_FAST_SAMPLING_MODE    = 0x25,
-    RBRINSTRUMENTGEN4_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_SLOW_SAMPLING_MODE    = 0x26,
-    RBRINSTRUMENTGEN4_EVENT_ENERGY_USED_MARKER_INTERNAL_BATTERY                               = 0x27,
-    RBRINSTRUMENTGEN4_EVENT_ENERGY_USED_MARKER_EXTERNAL_POWER_SOURCE                          = 0x28
+    RBRINSTRUMENTGEN4_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_FAST_SAMPLING_MODE    = 0x25, /* Reserved in L3.5 */
+    RBRINSTRUMENTGEN4_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_SLOW_SAMPLING_MODE    = 0x26, /* Reserved in L3.5 */
+    RBRINSTRUMENTGEN4_EVENT_ENERGY_USED_MARKER_INTERNAL_BATTERY                               = 0x27, /* Reserved in L4 and L3.5, used in L3 */
+    RBRINSTRUMENTGEN4_EVENT_ENERGY_USED_MARKER_EXTERNAL_POWER_SOURCE                          = 0x28, /* Reserved in L4 and L3.5, used in L3 */
+    RBRINSTRUMENTGEN4_EVENT_DEVICE_CONTROL_ACTION_RESULT                                      = 0x29, /* Reserved in L3.5 */
+    RBRINSTRUMENTGEN4_EVENT_DEPLOYMENT_RESUMED                                                = 0x2A, /* Reserved in L3.5 */
+    RBRINSTRUMENTGEN4_EVENT_DEPLOYMENT_PAUSED                                                 = 0x2B, /* Reserved in L3.5 */
+    RBRINSTRUMENTGEN4_EVENT_REGIMES_PASSED_FINAL_BOUNDARY                                     = 0x2D  /* Reserved in L4 */
 } RBRInstrumentGen4EventType;
 
 /**
@@ -103,26 +109,26 @@ const char *RBRInstrumentGen4EventType_name(RBRInstrumentGen4EventType type);
 /**
  * \brief An instrument event.
  *
- * \see https://docs.rbr-global.com/L3commandreference/format-of-stored-data/standard-rawbin00-format/standard-format-events-markers
- * \see https://docs.rbr-global.com/L3commandreference/format-of-stored-data/easyparse-calbin00-format/easyparse-format-events-markers
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828609/Event+data+storage+format
  */
 typedef struct RBRInstrumentGen4Event
 {
     /** \brief The type of the event. */
     RBRInstrumentGen4EventType type;
+    
+    /** \brief The schedule(s) that this event belongs to. */
+    RBRInstrumentGen4Schedule *schedules[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
+
     /** \brief The timestamp of the event. */
     RBRInstrumentGen4DateTime timestamp;
+
     /**
-     * \brief The number of populated entries in
-     * RBRInstrumentGen4Event.auxiliaryData.
-     *
-     * For EasyParse events, this will be either 0 or 1. For standard events,
-     * this may be up to RBRINSTRUMENTGEN4_EVENT_AUXILIARY_DATA_MAX depending on
-     * the event type.
+     * \brief The size of the complete event in bytes.
      */
     int32_t auxiliaryDataLength;
+
     /** \brief Auxiliary data for the event. */
-    uint32_t auxiliaryData[RBRINSTRUMENTGEN4_EVENT_AUXILIARY_DATA_MAX];
+    uint8_t auxiliaryData[RBRINSTRUMENTGEN4_EVENT_AUXILIARY_DATA_MAX];
 } RBRInstrumentGen4Event;
 
 /**
@@ -183,11 +189,9 @@ typedef struct RBRParserGen4Callbacks
 } RBRParserGen4Callbacks;
 
 /**
- * \brief EasyParse-specific parser configuration.
- *
- * \see RBRParserGen4Config
+ * \brief Configuration for a RBRParserGen4.
  */
-typedef struct RBRParserGen4EasyParseConfig
+typedef struct RBRParserGen4Config
 {
     /**
      * \brief The number of instrument channels in each sample.
@@ -196,21 +200,19 @@ typedef struct RBRParserGen4EasyParseConfig
      * #RBRINSTRUMENTGEN4_CHANNEL_MAX, then RBRParserGen4_init() will return
      * #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE.
      */
-    int32_t channels;
-} RBRParserGen4EasyParseConfig;
+    int32_t channelCount;
 
-/**
- * \brief Configuration for a RBRParserGen4.
- */
-typedef struct RBRParserGen4Config
-{
-
-    /** \brief Format-specific configuration. */
-    union
-    {
-        /** \brief EasyParse-specific parser configuration. */
-        struct RBRParserGen4EasyParseConfig easyParse;
-    } formatConfig;
+    /**
+     * \brief The numeric format used to store data values in the memory for
+     * all channels.
+     *
+     * For normal deployments this will be either float32 (IEEE single precision
+     * floating point) or float64 (IEEE double precision floating point). This
+     * setting is factory configured; most instruments will use float32, but an
+     * instrument with very high precision sensors may use float64 to maintain
+     * the necessary level of resolution.
+     */
+    RBRInstrumentGen4DataType datatype;
 } RBRParserGen4Config;
 
 /**
@@ -332,19 +334,12 @@ void RBRParserGen4_setUserData(RBRParserGen4 *parser, void *userData);
 /**
  * \brief Parse a chunk of data.
  *
- * For a parser configured to parse RBRINSTRUMENTGEN4_MEMFORMAT_CALBIN00-format
- * data, \a dataset may be given as RBRINSTRUMENTGEN4_DATASET_EASYPARSE_EVENTS or
- * RBRINSTRUMENTGEN4_DATASET_EASYPARSE_SAMPLE_DATA. Any other value (including
- * RBRINSTRUMENTGEN4_DATASET_EASYPARSE_DEPLOYMENT_HEADER, which is currently
- * unsupported) will cause the function to return
- * #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE and no data will be parsed.
- *
  * Parsed values will be returned via the RBRParserGen4Callbacks provided to
  * RBRParserGen4_init(). The value at \a size after completion of parsing indicates
  * how much of the \a data was parsed.
  *
  * \param [in] parser the dataset parser
- * \param [in] dataset the dataset from which the chunk originated
+ * \param [in] block the block from which the chunk originated
  * \param [in] data the data to be parsed
  * \param [in,out] size initially, the size of the data given by \a data; set
  *                                 by the callback to the number of bytes
@@ -356,7 +351,7 @@ void RBRParserGen4_setUserData(RBRParserGen4 *parser, void *userData);
  *                                                or invalid
  */
 RBRInstrumentGen4Error RBRParserGen4_parse(RBRParserGen4 *parser,
-                                   RBRInstrumentGen4Dataset dataset,
+                                   RBRInstrumentGen4Block block,
                                    const void *const data,
                                    int32_t *size);
 

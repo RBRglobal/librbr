@@ -22,7 +22,6 @@ extern "C" {
 
 #include <inttypes.h>
 #include <stdbool.h>
-#include <stdlib.h>
 
 #include "RBRInstrumentGen4HardwareErrors.h"
 
@@ -85,9 +84,8 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
  * The default maximum of 32 channels is reflective of the maximum number of
  * channels supported by RBR instruments, but most instruments have far fewer.
  * Adjusting this value will dramatically affect the size of some structures;
- * notably RBRInstrumentGen4Sample, but also RBRInstrumentGen4Channels (used by
- * RBRInstrumentGen4_getChannels()) and RBRInstrumentGen4ChannelsList (used by
- * RBRInstrumentGen4_getChannelsList()).
+ * notably RBRInstrumentGen4Sample, but also RBRInstrumentGen4ChannelPool (used by
+ * RBRInstrumentGen4_getChannelPool()) and RBRInstrumentGen4Calibration.n
  */
 #ifndef RBRINSTRUMENTGEN4_CHANNEL_MAX
 #define RBRINSTRUMENTGEN4_CHANNEL_MAX 32
@@ -139,6 +137,13 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
 #define RBRINSTRUMENTGEN4_DATETIME_MAX 4102444799000LL
 
 /**
+ * \brief The maximum number of characters in an instrument part number.
+ *
+ * Does not include any null terminator.
+ */
+#define RBRINSTRUMENTGEN4_PART_NUMBER_MAX 255
+
+/**
  * \brief The maximum number of characters in the instrument model name.
  *
  * Does not include any null terminator.
@@ -155,17 +160,61 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
 #define RBRINSTRUMENTGEN4_ID_VERSION_MAX 29
 
 /**
- * \brief The maximum number of characters in the instrument mode.
+ * \brief The maximum number of characters in the instrument part number.
  *
  * Does not include any null terminator.
  */
-#define RBRINSTRUMENTGEN4_ID_MODE_MAX 10
+#define RBRINSTRUMENTGEN4_ID_PN_MAX 96
 
 /** \brief The maximum length of characters within a label.*/
 #define RBRINSTRUMENTGEN4_LABEL_NAME_MAX 31
 
 /** \brief The maximum length of characters within a dataset block name.*/
 #define RBRINSTRUMENTGEN4_DATABLOCK_NAME_MAX 6
+
+/**
+ * \brief Instrument `outputformat` command parameters.
+ *
+ * \see RBRInstrumentGen4_getOutputformat()
+ * \see RBRInstrumentGen4_setOutputformat()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828467/outputformat
+ */
+typedef enum RBRInstrumentGen4Outputformat
+{
+    /**
+     * \brief Determines whether or not the output begins with "RBR" followed
+     * by the logger's 6-digit serial number.
+     * The default state is off.
+     */
+    RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL = 1 << 0,
+    /** 
+     * \brief Determines whether or not the schedule label appears before the timestamp.
+     * The default state is on.
+     */
+    RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL = 1 << 1,
+    /**
+     * \brief Determines whether or not a timestamp appears before the data.
+     * The default state is on.
+     */
+    RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP = 1 << 2,
+    /**
+     * Determines whether or not a cyclic redudant check (CRC) appears after the
+     * data and immediately before the terminating "\r""\n".
+     * The default state is off.
+     */
+    RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC = 1 << 3
+} RBRInstrumentGen4Outputformat;
+
+#define RBRINSTRUMENTGEN4_DEFAULT_OUTPUTFORMAT RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP
+
+/**
+ * \brief Get a human-readable list of enabled output format fields.
+ *
+ * \param [in] outputFormat the output format
+ * \param [out] name a buffer for the output string - must be at least 46 characters long
+ * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ */
+void RBRInstrumentGen4OutputFormat_name(RBRInstrumentGen4Outputformat outputFormat, char* name);
 
 /**
  * A date and time in milliseconds since the Unix epoch
@@ -269,27 +318,63 @@ typedef enum RBRInstrumentGen4Error
 const char *RBRInstrumentGen4Error_name(RBRInstrumentGen4Error error);
 
 /**
+ * \brief Possible instrument dataType.
+ * dataType is the numeric format used to store data values in the memory for 
+ * all channels. Options include float32|float64|calfloat64.
+ */
+typedef enum RBRInstrumentGen4DataType
+{
+    /** IEEE single precision floating point. 
+     * Most instruments will use this dataType. */
+    RBRINSTRUMENTGEN4_DATATYPE_FLOAT32,
+    /** IEEE double precision floating point. Instruments with very high 
+     * precision may use this format to maintain the necessary level 
+     * of resolution.  */
+    RBRINSTRUMENTGEN4_DATATYPE_FLOAT64,
+    /** Same as Float64, but no calibration equation applied. It is presented
+     * as a ratio compared to nominal full-scale, so the expected range is 
+     * nominally 0.0 to 1.0. The full thoretical range is -2.0 to +2.0, but the
+     * output of most channels will remain within or close to the expected 
+     * nominal range.
+     */
+    RBRINSTRUMENTGEN4_DATATYPE_CALFLOAT64,
+    /** The number of specific datatypes. */
+    RBRINSTRUMENTGEN4_DATATYPE_COUNT,
+    /** An unknown or unrecognized dataType. */
+    RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE
+} RBRInstrumentGen4DataType;
+
+/**
+ * \brief Get a human-readable string name for a dataType.
+ *
+ * \param [in] dataType the dataType
+ * \return a string name for the dataType
+ * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ */
+const char *RBRInstrumentGen4DataType_name(RBRInstrumentGen4DataType dataType);
+
+/**
  * \brief Instrument `id` command parameters.
  *
- * Externalized from RBRInstrumentGen4Other.h to facilitate inclusion by
- * RBRInstrumentGen4.
- *
  * \see RBRInstrumentGen4_getId()
- * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/id
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
  */
 typedef struct RBRInstrumentGen4Id
 {
     /** The instrument model. */
     const char model[RBRINSTRUMENTGEN4_ID_MODEL_MAX + 1];
     /** The instrument firmware version. */
-    const char version[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
+    const char fwversion[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
     /** The serial number of the instrument. */
-    uint32_t serial;
+    int32_t sn;
     /** The firmware type of the instrument. */
-    uint16_t fwtype;
+    int32_t fwtype;
 } RBRInstrumentGen4Id;
 
-/** \brief Generations of RBR instruments. */
+/** 
+ * \brief Generations of RBR instruments.
+ * \see RBRInstrumentGen4_getGeneration()
+ */
 typedef enum RBRInstrumentGen4Generation
 {
     /** Logger1 (XR/XRX/TR/DR/TDR/HT). */
@@ -593,14 +678,17 @@ typedef struct RBRInstrumentGen4
     /**
      * \brief The instrument identifier.
      *
-     * Cached every time RBRInstrumentGen4_getId() is called.
+     * \note Cached every time RBRInstrumentGen4_getId() is called.
+     * \see RBRInstrumentGen4_getId()
      */
     RBRInstrumentGen4Id id;
 
     /**
      * \brief The generation of the instrument.
      *
-     * Detected while establishing the instrument connection.
+     * \note Detected while establishing the instrument connection.
+     * \note Cached every time RBRInstrumentGen4_getGeneration() is called.
+     * \see RBRInstrumentGen4_getGeneration()
      */
     RBRInstrumentGen4Generation generation;
 
@@ -612,10 +700,16 @@ typedef struct RBRInstrumentGen4
      *
      * See [Timeouts](timeouts.md) for details on how the library handles
      * timeouts.
+     * \see RBRInstrumentGen4_getCommandTimeout();
+     * \see RBRInstrumentGen4_setCommandTimeout();
      */
     RBRInstrumentGen4DateTime commandTimeout;
 
-    /** \brief Arbitrary user data; useful in callbacks. */
+    /** 
+     * \brief Arbitrary user data; useful in callbacks.
+     * \see RBRInstrumentGen4_getUserData();
+     * \see RBRInstrumentGen4_setUserData();
+     */
     void *userData;
 
     /** \brief The number of used bytes in the command buffer. */
@@ -667,10 +761,17 @@ typedef struct RBRInstrumentGen4
      * response buffer are recorded within this struct.
      */
     RBRInstrumentGen4Response response;
+
+    /**
+     * \brief The format of the instrument's polled and streamed samples.
+     */
+    RBRInstrumentGen4Outputformat outputFormat;
+
 } RBRInstrumentGen4;
 
 /**
  * \brief Establish a connection with an instrument and initialize the context.
+ * \note Issues `id` and `outputformat` commands.
  *
  * “connection” in this library means purely the state tracking
  * and management of an instrument: the underlying physical communication with
@@ -747,6 +848,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_close(RBRInstrumentGen4 *instrument);
 
 /**
  * \brief Get the generation of an instrument.
+ * \note Issues the `id` command.
  *
  * \param [in] instrument the instrument connection
  * \return the instrument generation
@@ -859,7 +961,9 @@ const char *RBRInstrumentGen4_getLastHardwareErrorMessage(
 /* To help keep declarations and documentation organized and discoverable,
  * instrument commands and structures are broken out into individual
  * categorical headers. */
+#if 0
 #include "RBRInstrumentGen4Commands.h"
+#endif
 
 #ifdef __cplusplus
 }

@@ -29,6 +29,7 @@ static bool test_outputformat(RBRInstrumentGen4 *instrument,
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrumentGen4_getOutputformat(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+        TEST_ASSERT_EQ(tests[i].expected, instrument->outputFormat, "%" PRIi32);
         TEST_ASSERT_EQ(tests[i].expected, actual, "%" PRIi32);
     }
     return true;
@@ -38,19 +39,23 @@ TEST_LOGGER4(outputformat)
 {
     OutputformatTest tests[] = {
         {
-            "outputformat serial = on, schedulelabel = on, crc = on, "
-            "encoding = ascii, datatype = float32" RESPONSE_TERMINATOR,
-            7
+            "instrument outputformat sn=on schedulelabel=on datetime=off crc=on "
+            "encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC
         },
         {
-            "outputformat serial = off, schedulelabel = off, crc = off, "
-            "encoding = ascii, datatype = float32" RESPONSE_TERMINATOR,
+            "instrument outputformat sn=off schedulelabel=off datetime=off crc=off "
+            "encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
             0
+
         },
         {
-            "outputformat serial = on, schedulelabel = off, crc = on, "
-            "encoding = ascii, datatype = float32" RESPONSE_TERMINATOR,
-            5
+            "instrument outputformat sn=on schedulelabel=off datetime=off crc=on "
+            "encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC
         },
         {0}
     };
@@ -75,8 +80,17 @@ static bool test_setoutputformat(RBRInstrumentGen4 *instrument,
     for(int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
+        RBRInstrumentGen4Outputformat priorformat = instrument->outputFormat;
         err = RBRInstrumentGen4_setOutputformat(instrument, tests[i].outputformat);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen4Error);
+        if (err == RBRINSTRUMENTGEN4_SUCCESS)
+        {
+            TEST_ASSERT_EQ(tests[i].outputformat, instrument->outputFormat, "%" PRIi32);
+        }
+        else
+        {
+            TEST_ASSERT_EQ(priorformat, instrument->outputFormat, "%" PRIi32);
+        }
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
     }
     return true;
@@ -86,28 +100,31 @@ TEST_LOGGER4(setOutputformat)
 {
     SetOutputformatTest tests[] = {
         {
-            "outputformat serial = on, schedulelabel = on, crc = on" COMMAND_TERMINATOR,
+            "instrument outputformat sn=on schedulelabel=on datetime=on crc=on" COMMAND_TERMINATOR,
 
-            "outputformat serial = on, schedulelabel = on, crc = on, "
-            "encoding = ascii, datatype = float32" RESPONSE_TERMINATOR,
+            "instrument outputformat sn=on schedulelabel=on datetime=on crc=on "
+            "encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
             RBRINSTRUMENTGEN4_SUCCESS,
-            7
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC
         },
         {
-            "outputformat serial = off, schedulelabel = off, crc = off" COMMAND_TERMINATOR,
+            "instrument outputformat sn=off schedulelabel=off datetime=off crc=off" COMMAND_TERMINATOR,
 
-            "outputformat serial = off, schedulelabel = off, crc = off, "
-            "encoding = ascii, datatype = float32" RESPONSE_TERMINATOR,
+            "instrument outputformat sn=off schedulelabel=off datetime=off crc=off "
+            "encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
             RBRINSTRUMENTGEN4_SUCCESS,
             0
         },
         {
-            "outputformat serial = off, schedulelabel = on, crc = off" COMMAND_TERMINATOR,
+            "instrument outputformat sn=off schedulelabel=on datetime=off crc=off" COMMAND_TERMINATOR,
 
-            "outputformat serial = off, schedulelabel = on, crc = off, "
-            "encoding = ascii, datatype = float32" RESPONSE_TERMINATOR,
+            "instrument outputformat sn=off schedulelabel=on datetime=off crc=off "
+            "encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
             RBRINSTRUMENTGEN4_SUCCESS,
-            2
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL
         },
         {0}
     };
@@ -119,6 +136,7 @@ TEST_LOGGER4(setOutputformat)
 typedef struct ReadSampleTest
 {
     const char *response;
+    RBRInstrumentGen4Outputformat outputFormat;
     RBRInstrumentGen4Error expectedError;
     RBRInstrumentGen4Sample expected;
 }ReadSampleTest;
@@ -132,6 +150,7 @@ static bool test_readSample(RBRInstrumentGen4 *instrument,
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
+        instrument->outputFormat=tests[i].outputFormat;
         err = RBRInstrumentGen4_readSample(instrument);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
         TEST_ASSERT_EQ(tests[i].expected.timestamp,
@@ -175,7 +194,8 @@ TEST_LOGGER4(stream_sample_parse)
 {
     ReadSampleTest tests[]={
         {
-            "2018-07-26 14:56:24.000, 10.1325" RESPONSE_TERMINATOR,
+            "2018-07-26 14:56:24.000 10.1325" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP,
             RBRINSTRUMENTGEN4_SUCCESS,
             {
                 .timestamp = 1532616984000LL,
@@ -185,7 +205,9 @@ TEST_LOGGER4(stream_sample_parse)
                 }
             }
         },
-        {"2023-09-10 11:24:14.125, 38.6671142e+000, 22.0217124e+000, 1.95962418e+003" RESPONSE_TERMINATOR,
+        {
+            "2023-09-10 11:24:14.125 38.6671142e+000 22.0217124e+000 1.95962418e+003" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP,
             RBRINSTRUMENTGEN4_SUCCESS,
             {
                 .timestamp = 1694345054125LL,
@@ -197,7 +219,11 @@ TEST_LOGGER4(stream_sample_parse)
                 }
             }
         },
-        { "RBR 142152, sch_fast_CTD, 2018-09-10 11:24:14.125, 35.6671142e+000, 27.0217124e+000, 5.95962418e+002" RESPONSE_TERMINATOR,
+        { 
+            "RBR 142152 sch_fast_CTD 2018-09-10 11:24:14.125 35.6671142e+000 27.0217124e+000 5.95962418e+002" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP,
             RBRINSTRUMENTGEN4_SUCCESS,
             {
                 .timestamp = 1536578654125LL,
@@ -210,7 +236,10 @@ TEST_LOGGER4(stream_sample_parse)
             }
         },
         {
-            "sch_fast_CTD, 2023-09-01 15:25:10.000, 50.3724311e+000, 15.2014375e+000, 3.50074385e+002, 0x1F1B" RESPONSE_TERMINATOR,
+            "sch_fast_CTD 2023-09-01 15:25:10.000 50.3724311e+000 15.2014375e+000 3.50074385e+002 0xD607" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP
+             | RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC,
             RBRINSTRUMENTGEN4_SUCCESS,
             {
                 .timestamp = 1693581910000LL,
@@ -223,7 +252,8 @@ TEST_LOGGER4(stream_sample_parse)
             }
         },
         {
-            "2000-01-01 20:09:36.000, -129.805680e+000, Error-09, Error-14" RESPONSE_TERMINATOR,
+            "2000-01-01 20:09:36.000 -129.805680e+000 Error-09 Error-14" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP,
             RBRINSTRUMENTGEN4_SUCCESS,
             {
                 .timestamp = 946757376000LL,

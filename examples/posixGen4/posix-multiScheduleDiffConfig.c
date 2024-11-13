@@ -15,6 +15,8 @@
 #include <math.h>
 /* Required for fprintf, printf, snprintf. */
 #include <stdio.h>
+/* Required for EXIT_SUCCESS, etc. */
+#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
 /* Required for close. */
@@ -340,164 +342,164 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4DeploymentStatus deploymentStatus = RBRINSTRUMENTGEN4_STATUS_UNKNOWN;
     RBRInstrumentGen4_disable(instrument, deploymentStatus);
 
-    RBRInstrumentGen4Datasets datasets;
-    RBRInstrumentGen4_getDatasets(instrument, &datasets);
-    RBRInstrumentGen4_deleteDatasetAll(instrument, &datasets);
+    RBRInstrumentGen4DatasetPool datasetPool;
+    RBRInstrumentGen4_getDatasetPool(instrument, &datasetPool);
+    RBRInstrumentGen4_deleteDatasetAll(instrument, &datasetPool);
 
-    RBRInstrumentGen4Configs configs;
-    RBRInstrumentGen4_getConfigs(instrument, &configs);
-    RBRInstrumentGen4_deleteConfigAll(instrument, &configs);
+    RBRInstrumentGen4Configs configPool;
+    RBRInstrumentGen4_getConfigs(instrument, &configPool);
+    RBRInstrumentGen4_deleteConfigAll(instrument, &configPool);
 
-    RBRInstrumentGen4Schedules schedules;
-    RBRInstrumentGen4_getSchedules(instrument, &schedules);
-    RBRInstrumentGen4_deleteScheduleAll(instrument, &schedules);
+    RBRInstrumentGen4SchedulePool schedulePool;
+    RBRInstrumentGen4_getSchedulePool(instrument, &schedulePool);
+    RBRInstrumentGen4_deleteScheduleAll(instrument, &schedulePool);
 
-    RBRInstrumentGen4Groups groups;
-    RBRInstrumentGen4_getGroups(instrument, &groups);
-    RBRInstrumentGen4_deleteGroupAll(instrument, &groups);
+    RBRInstrumentGen4GroupPool groupPool;
+    RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
+    RBRInstrumentGen4_deleteGroupAll(instrument, &groupPool);
 
     /************ group definition ************/
-    // populate all channels and calibrations
-    RBRInstrumentGen4Channels channels;
-    RBRInstrumentGen4_getChannels(instrument, &channels);
+    // populate all channelPool and calibrations
+    RBRInstrumentGen4ChannelPool channelPool;
+    RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
 
-    // specify grouplabel, channel labels, and create group instance
+    // specify groupLabel, channel labels, and create group instance
     RBRInstrumentGen4Group group_pts;
-    init_groupStructure(instrument,
+    RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
-                        &channels,
+                        &channelPool,
                         &group_pts,
-                        &groups); // warning: need to read error!!!
+                        &groupPool); // warning: need to read error!!!
 
     RBRInstrumentGen4Group group_odo;
-    init_groupStructure(instrument,
+    RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_ODO_LABEL,
                         GROUP_ODO_CHANNELS,
-                        &channels,
+                        &channelPool,
                         &group_odo,
-                        &groups); // warning: need to read error!!!
+                        &groupPool); // warning: need to read error!!!
 
     RBRInstrumentGen4Group group_ph;
-    init_groupStructure(instrument,
+    RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_PH_LABEL,
                         GROUP_PH_CHANNELS,
-                        &channels,
+                        &channelPool,
                         &group_ph,
-                        &groups); // warning: need to read error!!!
+                        &groupPool); // warning: need to read error!!!
 
     RBRInstrumentGen4Group group_bbpfl;
-    init_groupStructure(instrument,
+    RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_BBPFL_LABEL,
                         GROUP_BBPFL_CHANNELS,
-                        &channels,
+                        &channelPool,
                         &group_bbpfl,
-                        &groups); // warning: need to read error!!!
+                        &groupPool); // warning: need to read error!!!
 
     RBRInstrumentGen4Group group_radiometry;
-    init_groupStructure(instrument,
+    RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_RADIOMETRY_LABEL,
                         GROUP_RADIOMETRY_CHANNELS,
-                        &channels,
+                        &channelPool,
                         &group_radiometry,
-                        &groups); // warning: need to read error!!!
+                        &groupPool); // warning: need to read error!!!
 
     /************ schedule definition ************/
     RBRInstrumentGen4Schedule schedule_pts;
-    init_schedule_regimes(instrument,
+    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_PTS_LABEL,
                           SCHEDULE_PTS_GROUPS,
                           SCHEDULE_PTS_MODE,
-                          &groups,
+                          &groupPool,
                           SCHEDULE_PTS_REGIME,
                           &schedule_pts,
-                          &schedules);
+                          &schedulePool);
     RBRInstrumentGen4_setSchedule(instrument, &schedule_pts);
 
     RBRInstrumentGen4Schedule schedule_odo;
-    init_schedule_regimes(instrument,
+    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_ODO_LABEL,
                           SCHEDULE_ODO_GROUPS,
                           SCHEDULE_ODO_MODE,
-                          &groups,
+                          &groupPool,
                           SCHEDULE_ODO_REGIME,
                           &schedule_odo,
-                          &schedules);
+                          &schedulePool);
     RBRInstrumentGen4_setSchedule(instrument, &schedule_odo);
 
     RBRInstrumentGen4Schedule schedule_ph;
-    init_schedule_regimes(instrument,
+    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_PH_LABEL,
                           SCHEDULE_PH_GROUPS,
                           SCHEDULE_PH_MODE,
-                          &groups,
+                          &groupPool,
                           SCHEDULE_PH_REGIME,
                           &schedule_ph,
-                          &schedules);
+                          &schedulePool);
     RBRInstrumentGen4_setSchedule(instrument, &schedule_ph);
 
     RBRInstrumentGen4Schedule schedule_BBPFL;
-    init_schedule_regimes(instrument,
+    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_BBPFL_LABEL,
                           SCHEDULE_BBPFL_GROUPS,
                           SCHEDULE_BBPFL_MODE,
-                          &groups,
+                          &groupPool,
                           SCHEDULE_BBPFL_REGIME,
                           &schedule_BBPFL,
-                          &schedules);
+                          &schedulePool);
     RBRInstrumentGen4_setSchedule(instrument, &schedule_BBPFL);
 
     RBRInstrumentGen4Schedule schedule_radiometry;
-    init_schedule_regimes(instrument,
+    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_RADIOMETRY_LABEL,
                           SCHEDULE_RADIOMETRY_GROUPS,
                           SCHEDULE_RADIOMETRY_MODE,
-                          &groups,
+                          &groupPool,
                           SCHEDULE_RADIOMETRY_REGIME,
                           &schedule_radiometry,
-                          &schedules);
+                          &schedulePool);
     RBRInstrumentGen4_setSchedule(instrument, &schedule_radiometry);
 
     RBRInstrumentGen4Schedule schedule_pts_park;
-    init_schedule_continuous(instrument,
+    RBRInstrumentGen4_initNewScheduleContinuous(instrument,
                              SCHEDULE_PARK_PTS_LABEL,
                              SCHEDULE_PTS_GROUPS,
                              SCHEDULE_PARK_PTS_MODE,
-                             &groups,
+                             &groupPool,
                              SCHEDULE_PARK_PTS_PERIOD,
                              SCHEDULE_PARK_PTS_CASTDETECTION,
                              &schedule_pts_park,
-                             &schedules);
+                             &schedulePool);
     RBRInstrumentGen4_setSchedule(instrument, &schedule_pts_park);
 
     RBRInstrumentGen4Schedule schedule_park_odo;
-    init_schedule_continuous(instrument,
+    RBRInstrumentGen4_initNewScheduleContinuous(instrument,
                              SCHEDULE_PARK_ODO_LABEL,
                              SCHEDULE_PARK_ODO_GROUPS,
                              SCHEDULE_PARK_ODO_MODE,
-                             &groups,
+                             &groupPool,
                              SCHEDULE_PARK_ODO_PERIOD,
                              SCHEDULE_PARK_ODO_CASTDETECTION,
                              &schedule_park_odo,
-                             &schedules);
+                             &schedulePool);
     RBRInstrumentGen4_setSchedule(instrument, &schedule_park_odo);
 
     /************ configuration definition ************/
     RBRInstrumentGen4Config config_ascent;
-    init_configStructure(instrument,
+    RBRInstrumentGen4_initNewConfig(instrument,
                          CONFIG_ASCENT_LABEL,
                          CONFIG_ASCENT_SCHEDULES,
-                         &schedules,
+                         &schedulePool,
                          &config_ascent,
-                         &configs);
+                         &configPool);
 
     RBRInstrumentGen4Config config_park;
-    init_configStructure(instrument,
+    RBRInstrumentGen4_initNewConfig(instrument,
                          CONFIG_PARK_LABEL,
                          CONFIG_PARK_SCHEDULES,
-                         &schedules,
+                         &schedulePool,
                          &config_park,
-                         &configs);
+                         &configPool);
 
     /************ deployment parameters ************/
     RBRInstrumentGen4Deployment deployment;
@@ -516,7 +518,7 @@ int main(int argc, char *argv[])
 
     /************ start of ascent ************/
     // ensures the memory is cleared first
-    RBRInstrumentGen4_deleteDatasetAll(instrument, &datasets);
+    RBRInstrumentGen4_deleteDatasetAll(instrument, &datasetPool);
 
     // verify the configurations for enable
     RBRInstrumentGen4_verify(instrument,
@@ -530,7 +532,7 @@ int main(int argc, char *argv[])
                              DATASET_ASCENT_LABEL,
                              false,
                              RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
-                             &datasets,
+                             &datasetPool,
                              deploymentStatus); // false, normal are default.
 
 instrumentCleanup:

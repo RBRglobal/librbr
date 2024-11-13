@@ -11,7 +11,9 @@
 /* Required for memcpy, memcmp, memset, strlen. */
 #include <string.h>
 #include "RBRInstrumentGen4.h"
+#include "RBRInstrumentGen4Instrument.h"
 #include "RBRInstrumentGen4Internal.h"
+#include "RBRInstrumentGen4Streaming.h"
 //to be deleted:
 #include <stdio.h>
 
@@ -73,6 +75,21 @@ const char *RBRInstrumentGen4Error_name(RBRInstrumentGen4Error error)
     }
 }
 
+const char *RBRInstrumentGen4DataType_name(RBRInstrumentGen4DataType dataType)
+{
+    switch(dataType){
+        case RBRINSTRUMENTGEN4_DATATYPE_FLOAT32:
+            return "float32";
+        case RBRINSTRUMENTGEN4_DATATYPE_FLOAT64:
+            return "float64";
+        case RBRINSTRUMENTGEN4_DATATYPE_CALFLOAT64:
+            return "calfloat64";
+        case RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE:
+        default:
+            return "unknown datatype";
+    }
+}
+
 const char *RBRInstrumentGen4Generation_name(RBRInstrumentGen4Generation generation)
 {
     switch (generation)
@@ -91,6 +108,17 @@ const char *RBRInstrumentGen4Generation_name(RBRInstrumentGen4Generation generat
     default:
         return "unknown generation";
     }
+}
+
+void RBRInstrumentGen4OutputFormat_name(RBRInstrumentGen4Outputformat outputFormat, char *name)
+{
+    sprintf(
+        name,
+        "sn=%s schedulelabel=%s datetime=%s crc=%s", 
+        (outputFormat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL) ? "on" : "off",
+        (outputFormat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL) ? "on" : "off",
+        (outputFormat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP) ? "on" : "off",
+        (outputFormat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC) ? "on" : "off");
 }
 
 const char *RBRInstrumentGen4ResponseType_name(RBRInstrumentGen4ResponseType type)
@@ -172,7 +200,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_open(RBRInstrumentGen4 **instrument,
     (*instrument)->userData          = userData;
     (*instrument)->lastActivityTime  = RBRINSTRUMENTGEN4_NO_ACTIVITY;
     (*instrument)->response.type     = RBRINSTRUMENTGEN4_RESPONSE_UNKNOWN_TYPE;
+    (*instrument)->outputFormat      = RBRINSTRUMENTGEN4_DEFAULT_OUTPUTFORMAT;
 
+    /**
+     * Note that because we assume a default output format,
+     * RBRInstrumentGen4Sample_parse in RBRInstrumentGen4_readResponse in
+     * RBRInstrumentGen4_converse in RBRInstrumentGen4_populateGeneration and
+     * RBRInstrumentGen4_getOutputformat will return an error if 
+     * RBRInstrumentGen4_open is called on an instrument that
+     * is streaming samples that are *not* in the default output format.
+     */
     RBRInstrumentGen4Error err;
     err = RBRInstrumentGen4_populateGeneration(*instrument);
 
@@ -184,6 +221,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_open(RBRInstrumentGen4 **instrument,
     if ((*instrument)->generation != RBRINSTRUMENTGEN4_LOGGER4)
     {
         return RBRINSTRUMENTGEN4_UNSUPPORTED;
+    }
+
+    err = RBRInstrumentGen4_getOutputformat(*instrument, &(*instrument)->outputFormat);
+
+    if (err != RBRINSTRUMENTGEN4_SUCCESS)
+    {
+        return err;
     }
 
     /* Enable the streaming callback, if applicable. */
