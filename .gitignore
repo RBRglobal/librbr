@@ -4,6 +4,8 @@
 # Generated artifacts.
 bin/
 docs/
+cmake/
+build/
 tests/tests.c
 *.o
 
@@ -12,3 +14,6 @@ tests/tests.c
 *.log
 
 examples/sampledata/dynamiccorrection-sample_corr.csv
+
+# Garbage OS files
+.DS_Store
