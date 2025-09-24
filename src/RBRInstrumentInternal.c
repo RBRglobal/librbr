@@ -22,6 +22,7 @@
 #include <stdio.h>
 /* Required for gmtime, struct tm, mktime. */
 #include <time.h>
+#include <strings.h>
 
 #include "RBRInstrument.h"
 #include "RBRInstrumentInternal.h"
@@ -49,9 +50,9 @@
  * support a single match criteria by ensuring that attempts to wake the
  * instrument will trigger the same behaviour as regular commands.
  */
-#define WAKE_COMMAND RBRINSTRUMENT_COMMAND_TERMINATOR
+#define WAKE_COMMAND      RBRINSTRUMENT_COMMAND_TERMINATOR
 /** \brief The length of the wake sequence. */
-#define WAKE_COMMAND_LEN RBRINSTRUMENT_COMMAND_TERMINATOR_LEN
+#define WAKE_COMMAND_LEN  RBRINSTRUMENT_COMMAND_TERMINATOR_LEN
 /**
  * \brief How long to wait after the wake sequence.
  *
@@ -61,17 +62,17 @@
  */
 #define WAKE_COMMAND_WAIT 50
 
-#define COMMAND_PROMPT "Ready: "
+#define COMMAND_PROMPT     "Ready: "
 #define COMMAND_PROMPT_LEN 7
 
-#define ARRAY_SEPARATOR_L2 " | "
+#define ARRAY_SEPARATOR_L2     " | "
 #define ARRAY_SEPARATOR_LEN_L2 3
-#define ARRAY_SEPARATOR_L3 " || "
+#define ARRAY_SEPARATOR_L3     " || "
 #define ARRAY_SEPARATOR_LEN_L3 4
 
-#define PARAMETER_SEPARATOR ", "
-#define PARAMETER_SEPARATOR_LEN 2
-#define PARAMETER_VALUE_SEPARATOR " = "
+#define PARAMETER_SEPARATOR           ", "
+#define PARAMETER_SEPARATOR_LEN       2
+#define PARAMETER_VALUE_SEPARATOR     " = "
 #define PARAMETER_VALUE_SEPARATOR_LEN 3
 
 #define OFFSET_UNINITIALIZED (-1)
@@ -87,33 +88,27 @@
  */
 static const RBRInstrumentHardwareError WARNING_NUMBERS[] = {
     RBRINSTRUMENT_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
-    RBRINSTRUMENT_HARDWARE_ERROR_NOT_LOGGING
-};
-#define WARNING_NUMBER_COUNT \
-    ((long) (sizeof(WARNING_NUMBERS) / sizeof(WARNING_NUMBERS[0])))
+    RBRINSTRUMENT_HARDWARE_ERROR_NOT_LOGGING};
+#define WARNING_NUMBER_COUNT ((long) (sizeof(WARNING_NUMBERS) / sizeof(WARNING_NUMBERS[0])))
 
-#define WARNING_PARAMETER ", warning = W"
+#define WARNING_PARAMETER     ", warning = W"
 #define WARNING_PARAMETER_LEN ((long) (sizeof(WARNING_PARAMETER) - 1))
-#define WARNING_NUMBER_LEN 4
+#define WARNING_NUMBER_LEN    4
 
-#define SAMPLE_NAN "nan"
-#define SAMPLE_INF "inf"
-#define SAMPLE_NINF "-inf"
-#define SAMPLE_UNCAL "###"
-#define SAMPLE_ERROR_PREFIX "Error-"
+#define SAMPLE_NAN              "nan"
+#define SAMPLE_INF              "inf"
+#define SAMPLE_NINF             "-inf"
+#define SAMPLE_UNCAL            "###"
+#define SAMPLE_ERROR_PREFIX     "Error-"
 #define SAMPLE_ERROR_PREFIX_LEN ((long) (sizeof(SAMPLE_ERROR_PREFIX) - 1))
 
-static const char *RBRInstrumentDateTime_sampleFormat
-    = "%04d-%02d-%02d %02d:%02d:%02d.%03d";
+static const char *RBRInstrumentDateTime_sampleFormat = "%04d-%02d-%02d %02d:%02d:%02d.%03d";
 
-static const char *RBRInstrumentDateTime_sampleScanFormat
-    = "%04d-%02d-%02d %02d:%02d:%02d.%03d%n";
+static const char *RBRInstrumentDateTime_sampleScanFormat = "%04d-%02d-%02d %02d:%02d:%02d.%03d%n";
 
-static const char *RBRInstrumentDateTime_scheduleFormat
-    = "%04d%02d%02d%02d%02d%02d";
+static const char *RBRInstrumentDateTime_scheduleFormat = "%04d%02d%02d%02d%02d%02d";
 
-static const char *RBRInstrumentDateTime_scheduleScanFormat
-    = "%04d%02d%02d%02d%02d%02d%n";
+static const char *RBRInstrumentDateTime_scheduleScanFormat = "%04d%02d%02d%02d%02d%02d%n";
 
 static RBRInstrumentDateTime localTimeOffset = OFFSET_UNINITIALIZED;
 
@@ -122,15 +117,12 @@ static RBRInstrumentDateTime localTimeOffset = OFFSET_UNINITIALIZED;
  */
 void *rbr_memmem(void *ptr1, size_t num1, const void *ptr2, size_t num2)
 {
-    if (num2 > num1)
-    {
+    if (num2 > num1) {
         return NULL;
     }
 
-    for (size_t offset = 0; offset <= num1 - num2; ++offset)
-    {
-        if (memcmp((uint8_t *) ptr1 + offset, ptr2, num2) == 0)
-        {
+    for (size_t offset = 0; offset <= num1 - num2; ++offset) {
+        if (memcmp((uint8_t *) ptr1 + offset, ptr2, num2) == 0) {
             return (uint8_t *) ptr1 + offset;
         }
     }
@@ -151,18 +143,13 @@ static RBRInstrumentError RBRInstrument_wake(const RBRInstrument *instrument)
     RBRInstrumentDateTime now;
     RBR_TRY(instrument->callbacks.time(instrument, &now));
 
-    if (instrument->lastActivityTime >= 0
-        && now - instrument->lastActivityTime < COMMAND_TIMEOUT)
-    {
+    if (instrument->lastActivityTime >= 0 && now - instrument->lastActivityTime < COMMAND_TIMEOUT) {
         return RBRINSTRUMENT_SUCCESS;
     }
 
     /* Send the wake sequence twice to make sure it gets noticed. */
-    for (int pass = 0; pass < 2; ++pass)
-    {
-        RBR_TRY(instrument->callbacks.write(instrument,
-                                            WAKE_COMMAND,
-                                            WAKE_COMMAND_LEN));
+    for (int pass = 0; pass < 2; ++pass) {
+        RBR_TRY(instrument->callbacks.write(instrument, WAKE_COMMAND, WAKE_COMMAND_LEN));
         RBR_TRY(instrument->callbacks.sleep(instrument, WAKE_COMMAND_WAIT));
     }
 
@@ -174,70 +161,55 @@ RBRInstrumentError RBRInstrument_sendBuffer(RBRInstrument *instrument)
     /* Wake the instrument if necessary. */
     RBR_TRY(RBRInstrument_wake(instrument));
 
-    if (instrument->commandBufferLength > RBRINSTRUMENT_COMMAND_BUFFER_MAX)
-    {
+    if (instrument->commandBufferLength > RBRINSTRUMENT_COMMAND_BUFFER_MAX) {
         instrument->commandBufferLength = RBRINSTRUMENT_COMMAND_BUFFER_MAX;
     }
 
     /* Send the command to the instrument. */
-    RBR_TRY(instrument->callbacks.write(instrument,
-                                        instrument->commandBuffer,
-                                        instrument->commandBufferLength));
-    RBR_TRY(instrument->callbacks.time(instrument,
-                                       &instrument->lastActivityTime));
+    RBR_TRY(instrument->callbacks.write(
+        instrument, instrument->commandBuffer, instrument->commandBufferLength));
+    RBR_TRY(instrument->callbacks.time(instrument, &instrument->lastActivityTime));
     return RBRINSTRUMENT_SUCCESS;
 }
 
-static RBRInstrumentError RBRInstrument_vSendCommand(RBRInstrument *instrument,
-                                                     const char *command,
+static RBRInstrumentError RBRInstrument_vSendCommand(RBRInstrument *instrument, const char *command,
                                                      va_list format)
 {
     /* Prepare the command. */
     instrument->commandBufferLength = vsnprintf(
-        (char *) instrument->commandBuffer,
-        sizeof(instrument->commandBuffer),
-        command,
-        format);
+        (char *) instrument->commandBuffer, sizeof(instrument->commandBuffer), command, format);
 
     /* Make sure we're within buffer bounds. This is a greater-or-equal check,
      * not just a greater-than check, because vsnprintf doesn't include the
      * null terminator in its return value. The longest value vsnprintf can
      * write is RBRINSTRUMENT_COMMAND_BUFFER_MAX - 1 bytes. */
-    if (instrument->commandBufferLength >= RBRINSTRUMENT_COMMAND_BUFFER_MAX)
-    {
+    if (instrument->commandBufferLength >= RBRINSTRUMENT_COMMAND_BUFFER_MAX) {
         instrument->commandBufferLength = RBRINSTRUMENT_COMMAND_BUFFER_MAX;
         return RBRINSTRUMENT_BUFFER_TOO_SMALL;
     }
 
     /* Make sure the command is LF-terminated. */
-    if (instrument->commandBufferLength < RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN
-        || memcmp(instrument->commandBuffer
-                  + instrument->commandBufferLength
-                  - RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN,
-                  RBRINSTRUMENT_SEND_COMMAND_TERMINATOR,
-                  RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN) != 0)
-    {
+    if (instrument->commandBufferLength < RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN ||
+        memcmp(instrument->commandBuffer + instrument->commandBufferLength -
+                   RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN,
+               RBRINSTRUMENT_SEND_COMMAND_TERMINATOR,
+               RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN) != 0) {
         /* It isn't. Make sure there's room before adding it. */
-        if (instrument->commandBufferLength
-            + RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN
-            > RBRINSTRUMENT_COMMAND_BUFFER_MAX)
-        {
+        if (instrument->commandBufferLength + RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN >
+            RBRINSTRUMENT_COMMAND_BUFFER_MAX) {
             return RBRINSTRUMENT_BUFFER_TOO_SMALL;
         }
 
         memcpy(instrument->commandBuffer + instrument->commandBufferLength,
                RBRINSTRUMENT_SEND_COMMAND_TERMINATOR,
                RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN);
-        instrument->commandBufferLength +=
-            RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN;
+        instrument->commandBufferLength += RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN;
     }
 
     return RBRInstrument_sendBuffer(instrument);
 }
 
-RBRInstrumentError RBRInstrument_sendCommand(RBRInstrument *instrument,
-                                             const char *command,
-                                             ...)
+RBRInstrumentError RBRInstrument_sendCommand(RBRInstrument *instrument, const char *command, ...)
 {
     RBRInstrumentError err;
     va_list format;
@@ -254,9 +226,8 @@ RBRInstrumentError RBRInstrument_sendCommand(RBRInstrument *instrument,
  */
 static void RBRInstrument_removeLastResponse(RBRInstrument *instrument)
 {
-    if (instrument->lastResponseLength <= 0
-        || instrument->responseBufferLength == instrument->lastResponseLength)
-    {
+    if (instrument->lastResponseLength <= 0 ||
+        instrument->responseBufferLength == instrument->lastResponseLength) {
         instrument->responseBufferLength = 0;
         instrument->lastResponseLength = 0;
         return;
@@ -280,19 +251,16 @@ static void RBRInstrument_removeLastResponse(RBRInstrument *instrument)
  * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENT_CALLBACK_ERROR when an unrecoverable error occurs
  */
-static RBRInstrumentError RBRInstrument_readSingleResponse(
-    RBRInstrument *instrument,
-    RBRInstrumentDateTime startTime,
-    char **end)
+static RBRInstrumentError RBRInstrument_readSingleResponse(RBRInstrument *instrument,
+                                                           RBRInstrumentDateTime startTime,
+                                                           char **end)
 {
     RBRInstrumentDateTime now;
     int32_t readLength;
-    while ((*end = (char *) rbr_memmem(
-                instrument->responseBuffer,
-                instrument->responseBufferLength,
-                RBRINSTRUMENT_COMMAND_TERMINATOR,
-                RBRINSTRUMENT_COMMAND_TERMINATOR_LEN)) == NULL)
-    {
+    while ((*end = (char *) rbr_memmem(instrument->responseBuffer,
+                                       instrument->responseBufferLength,
+                                       RBRINSTRUMENT_COMMAND_TERMINATOR,
+                                       RBRINSTRUMENT_COMMAND_TERMINATOR_LEN)) == NULL) {
         /*
          * If we're not seeing any response at all then the read callback
          * should return a character-level timeout. But if we're reading
@@ -314,9 +282,7 @@ static RBRInstrumentError RBRInstrument_readSingleResponse(
          * to the caller.
          */
         RBR_TRY(instrument->callbacks.time(instrument, &now));
-        if (now - startTime > instrument->commandTimeout)
-        {
-
+        if (now - startTime > instrument->commandTimeout) {
 
             return RBRINSTRUMENT_TIMEOUT;
         }
@@ -324,20 +290,16 @@ static RBRInstrumentError RBRInstrument_readSingleResponse(
         /* If the buffer is full but doesn't contain a terminator, there's
          * not much we can do about it: throw out the buffer, then keep
          * trying to fill it. */
-        if (instrument->responseBufferLength
-            == RBRINSTRUMENT_RESPONSE_BUFFER_MAX)
-        {
+        if (instrument->responseBufferLength == RBRINSTRUMENT_RESPONSE_BUFFER_MAX) {
             instrument->responseBufferLength = 0;
             instrument->lastResponseLength = 0;
         }
 
-        readLength = RBRINSTRUMENT_RESPONSE_BUFFER_MAX
-                     - instrument->responseBufferLength;
-        RBR_TRY(instrument->callbacks.read(
-                    instrument,
-                    instrument->responseBuffer
-                    + instrument->responseBufferLength,
-                    &readLength));
+        readLength = RBRINSTRUMENT_RESPONSE_BUFFER_MAX - instrument->responseBufferLength;
+        RBR_TRY(instrument->callbacks.read(instrument,
+                                           instrument->responseBuffer +
+                                               instrument->responseBufferLength,
+                                           &readLength));
 
         instrument->responseBufferLength += readLength;
     }
@@ -352,10 +314,7 @@ static RBRInstrumentError RBRInstrument_readSingleResponse(
  * \param [out] beginning the beginning of the response
  * \param [in] end the end of the response
  */
-static void RBRInstrument_terminateResponse(
-    RBRInstrument *instrument,
-    char **beginning,
-    char *end)
+static void RBRInstrument_terminateResponse(RBRInstrument *instrument, char **beginning, char *end)
 {
     /*
      * Put a null terminator over the “\r” in the line terminator, but let
@@ -379,25 +338,20 @@ static void RBRInstrument_terminateResponse(
 
     *beginning = (char *) instrument->responseBuffer;
     *end = '\0';
-    instrument->lastResponseLength =
-        end + RBRINSTRUMENT_COMMAND_TERMINATOR_LEN - *beginning;
+    instrument->lastResponseLength = end + RBRINSTRUMENT_COMMAND_TERMINATOR_LEN - *beginning;
 
     /* Fast-forward leftover line termination characters. This shouldn't happen
      * in the middle of a standing conversation with an instrument, but it
      * might happen when initially establishing communication with a streaming
      * instrument: we'll be intruding on the data stream at who knows what
      * point and might encounter anything. */
-    while (isspace((unsigned char)**beginning) && **beginning != '\0')
-    {
+    while (isspace((unsigned char) **beginning) && **beginning != '\0') {
         ++*beginning;
     }
 
     /* Fast-forward leading “Ready: ” prompts in the buffer. */
-    while (end - *beginning >= COMMAND_PROMPT_LEN
-           && memcmp(*beginning,
-                     COMMAND_PROMPT,
-                     COMMAND_PROMPT_LEN) == 0)
-    {
+    while (end - *beginning >= COMMAND_PROMPT_LEN &&
+           strncasecmp(*beginning, COMMAND_PROMPT, COMMAND_PROMPT_LEN) == 0) {
         *beginning += COMMAND_PROMPT_LEN;
     }
 }
@@ -411,9 +365,7 @@ static void RBRInstrument_terminateResponse(
  * \return RBRINSTRUMENT_INVALID_PARAMETER_VALUE if the response is not a
  *                                               sample
  */
-static RBRInstrumentError RBRInstrumentSample_parse(
-    RBRInstrumentSample *sample,
-    char *response)
+static RBRInstrumentError RBRInstrumentSample_parse(RBRInstrumentSample *sample, char *response)
 {
     memset(sample, 0, sizeof(RBRInstrumentSample));
 
@@ -422,81 +374,60 @@ static RBRInstrumentError RBRInstrumentSample_parse(
     int32_t _prefixLen;
 
     /* if it starts with "RBR xxSNxx, ", skip it. it's outputFormat caltext07.*/
-    if (sscanf(response, "RBR %d,%n", &_serialNum, &_prefixLen)==1){
+    if (sscanf(response, "RBR %d,%n", &_serialNum, &_prefixLen) == 1) {
         // check if CRC is correct
         // get string length used to calculate CRC:
         char *_end = response;
         uint32_t _responseLen = 0;
-        while(*_end != '\0'){
-            _end +=1;
-            _responseLen +=1;
+        while (*_end != '\0') {
+            _end += 1;
+            _responseLen += 1;
         }
         // calculate CRC:
         uint16_t _calCrc;
-        _calCrc = calculateCrc(response, _responseLen-6);
-        
-        // compare calculated CRC with real CRC read from instrument:
-        char *_endPt=NULL;
-        uint16_t _realCrc = strtoul(_end-6, &_endPt, 16);
+        _calCrc = calculateCrc(response, _responseLen - 6);
 
-        if (_calCrc == _realCrc){
-            response += (_prefixLen+1); /* skip the space after comma */
-            *(_end-7) = '\0';
-        }
-        else{
+        // compare calculated CRC with real CRC read from instrument:
+        char *_endPt = NULL;
+        uint16_t _realCrc = strtoul(_end - 6, &_endPt, 16);
+
+        if (_calCrc == _realCrc) {
+            response += (_prefixLen + 1); /* skip the space after comma */
+            *(_end - 7) = '\0';
+        } else {
             return RBRINSTRUMENT_CHECKSUM_ERROR;
         }
     }
 
-    RBR_TRY(RBRInstrumentDateTime_parseSampleTime(response,
-                                                  &sample->timestamp,
-                                                  &values));
+    RBR_TRY(RBRInstrumentDateTime_parseSampleTime(response, &sample->timestamp, &values));
 
     char *token;
 
     double reading;
-    while ((token = strtok(values, ",")) != NULL
-           && sample->channels < RBRINSTRUMENT_CHANNEL_MAX)
-    {
+    while ((token = strtok(values, ",")) != NULL && sample->channels < RBRINSTRUMENT_CHANNEL_MAX) {
         /* strtok wants NULL on all but the first pass. */
         values = NULL;
         /* The token will always have a leading space. */
         ++token;
 
-        if (strcmp(token, SAMPLE_NAN) == 0)
-        {
+        if (strcmp(token, SAMPLE_NAN) == 0) {
             reading = NAN;
-        }
-        else if (strcmp(token, SAMPLE_INF) == 0)
-        {
+        } else if (strcmp(token, SAMPLE_INF) == 0) {
             reading = INFINITY;
-        }
-        else if (strcmp(token, SAMPLE_NINF) == 0)
-        {
+        } else if (strcmp(token, SAMPLE_NINF) == 0) {
             reading = -INFINITY;
-        }
-        else if (strcmp(token, SAMPLE_UNCAL) == 0)
-        {
-            reading = RBRInstrumentReading_setError(
-                RBRINSTRUMENT_READING_FLAG_UNCALIBRATED,
-                0);
-        }
-        else if (memcmp(token,
-                        SAMPLE_ERROR_PREFIX,
-                        SAMPLE_ERROR_PREFIX_LEN) == 0)
-        {
+        } else if (strcmp(token, SAMPLE_UNCAL) == 0) {
+            reading = RBRInstrumentReading_setError(RBRINSTRUMENT_READING_FLAG_UNCALIBRATED, 0);
+        } else if (memcmp(token, SAMPLE_ERROR_PREFIX, SAMPLE_ERROR_PREFIX_LEN) == 0) {
             /* Uh-oh. We'll encode the error in a NaN. Filtering, etc. will
              * ignore the value and the sample formatter will output it just as
              * we received it. */
-            reading = RBRInstrumentReading_setError(
-                RBRINSTRUMENT_READING_FLAG_ERROR,
-                strtol(token + SAMPLE_ERROR_PREFIX_LEN,
-                       NULL,
-                       10));
-        }
-        else
-        {
-            /* for caltext02, even though token has units (e.g. 22.1234 dbar), reading will still return 22.1234. */
+            reading =
+                RBRInstrumentReading_setError(RBRINSTRUMENT_READING_FLAG_ERROR,
+                                              strtol(token + SAMPLE_ERROR_PREFIX_LEN, NULL, 10));
+        } else {
+            /* for caltext02, even though token has units (e.g. 22.1234 dbar), reading will still
+             * return 22.1234. */
             reading = strtod(token, NULL);
         }
 
@@ -517,10 +448,8 @@ static RBRInstrumentError RBRInstrumentSample_parse(
  * \return #RBRINSTRUMENT_SUCCESS when the response is a warning or success
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the response indicates an error
  */
-RBRInstrumentError RBRInstrument_errorCheckResponse(
-    RBRInstrument *instrument,
-    char *beginning,
-    char *end)
+RBRInstrumentError RBRInstrument_errorCheckResponse(RBRInstrument *instrument, char *beginning,
+                                                    char *end)
 {
     /*
      * Errors will be found at the beginning of commands. E.g.,
@@ -528,30 +457,23 @@ RBRInstrumentError RBRInstrument_errorCheckResponse(
      *     >> wifi timeout = whenever
      *     << E0108 invalid argument to command: 'whenever'
      */
-    if (*beginning == 'E')
-    {
+    if (*beginning == 'E') {
         instrument->response.type = RBRINSTRUMENT_RESPONSE_ERROR;
         instrument->response.error = strtol(beginning + 1, NULL, 10);
         /* Make sure we actually have a message to go along with the error.
          * There should be one, but it's best to play safe. */
-        if (end - beginning >= ERROR_LEN)
-        {
+        if (end - beginning >= ERROR_LEN) {
             instrument->response.response = beginning + ERROR_LEN;
-        }
-        else
-        {
+        } else {
             instrument->response.response = NULL;
         }
 
         /* Logger2 instruments don't distinguish between warnings and errors,
          * so if we get an error response, we'll check whether it needs to be
          * translated into a warning. */
-        if (instrument->generation == RBRINSTRUMENT_LOGGER2)
-        {
-            for (int i = 0; i < WARNING_NUMBER_COUNT; ++i)
-            {
-                if (instrument->response.error != WARNING_NUMBERS[i])
-                {
+        if (instrument->generation == RBRINSTRUMENT_LOGGER2) {
+            for (int i = 0; i < WARNING_NUMBER_COUNT; ++i) {
+                if (instrument->response.error != WARNING_NUMBERS[i]) {
                     continue;
                 }
 
@@ -565,15 +487,11 @@ RBRInstrumentError RBRInstrument_errorCheckResponse(
                  * containing commas. However, while there are multiple error
                  * messages which contain commas, there are no such warnings.
                  */
-                if (instrument->response.response != NULL)
-                {
-                    instrument->response.response = strchr(
-                        instrument->response.response,
-                        ',');
+                if (instrument->response.response != NULL) {
+                    instrument->response.response = strchr(instrument->response.response, ',');
                 }
 
-                if (instrument->response.response != NULL)
-                {
+                if (instrument->response.response != NULL) {
                     instrument->response.response += 2;
                 }
 
@@ -601,23 +519,19 @@ RBRInstrumentError RBRInstrument_errorCheckResponse(
      * parameter in a fixed position, parse out the number, and then truncate
      * the response so the parser doesn't have to deal with it.
      */
-    if (end - beginning >= (WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN)
-        && memcmp(end - WARNING_PARAMETER_LEN - WARNING_NUMBER_LEN,
-                  WARNING_PARAMETER,
-                  WARNING_PARAMETER_LEN) == 0)
-    {
+    if (end - beginning >= (WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN) &&
+        memcmp(end - WARNING_PARAMETER_LEN - WARNING_NUMBER_LEN,
+               WARNING_PARAMETER,
+               WARNING_PARAMETER_LEN) == 0) {
         instrument->response.type = RBRINSTRUMENT_RESPONSE_WARNING;
-        instrument->response.error = strtol(end - WARNING_NUMBER_LEN,
-                                            NULL,
-                                            10);
+        instrument->response.error = strtol(end - WARNING_NUMBER_LEN, NULL, 10);
         *(end - WARNING_PARAMETER_LEN - WARNING_NUMBER_LEN) = '\0';
     }
 
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_readResponse(RBRInstrument *instrument,
-                                              bool breakOnSample,
+RBRInstrumentError RBRInstrument_readResponse(RBRInstrument *instrument, bool breakOnSample,
                                               RBRInstrumentSample *sample)
 {
     /* Reset the response state. */
@@ -626,12 +540,9 @@ RBRInstrumentError RBRInstrument_readResponse(RBRInstrument *instrument,
     instrument->response.response = NULL;
 
     RBRInstrumentSample *sampleTarget;
-    if (sample == NULL)
-    {
+    if (sample == NULL) {
         sampleTarget = instrument->callbacks.sampleBuffer;
-    }
-    else
-    {
+    } else {
         sampleTarget = sample;
     }
 
@@ -639,8 +550,7 @@ RBRInstrumentError RBRInstrument_readResponse(RBRInstrument *instrument,
      * until we exceed the command timeout. */
     RBRInstrumentDateTime startTime;
     RBR_TRY(instrument->callbacks.time(instrument, &startTime));
-    while (true)
-    {
+    while (true) {
         RBRInstrument_removeLastResponse(instrument);
 
         char *beginning;
@@ -648,46 +558,32 @@ RBRInstrumentError RBRInstrument_readResponse(RBRInstrument *instrument,
         RBR_TRY(RBRInstrument_readSingleResponse(instrument, startTime, &end));
         RBRInstrument_terminateResponse(instrument, &beginning, end);
 
-        if (sampleTarget != NULL
-            && RBRInstrumentSample_parse(sampleTarget, beginning)
-            == RBRINSTRUMENT_SUCCESS)
-        {
-            if (instrument->callbacks.sample != NULL
-                && sample == NULL)
-            {
-                RBR_TRY(instrument->callbacks.sample(instrument,
-                                                     sampleTarget));
+        if (sampleTarget != NULL &&
+            RBRInstrumentSample_parse(sampleTarget, beginning) == RBRINSTRUMENT_SUCCESS) {
+            if (instrument->callbacks.sample != NULL && sample == NULL) {
+                RBR_TRY(instrument->callbacks.sample(instrument, sampleTarget));
             }
-            if (breakOnSample)
-            {
+            if (breakOnSample) {
                 return RBRINSTRUMENT_SAMPLE;
             }
-        }
-        else
-        {
-            return RBRInstrument_errorCheckResponse(instrument,
-                                                    beginning,
-                                                    end);
+        } else {
+            return RBRInstrument_errorCheckResponse(instrument, beginning, end);
         }
     }
 }
 
-void RBRInstrument_parseResponse(RBRInstrument *instrument,
-                                 char **command,
+void RBRInstrument_parseResponse(RBRInstrument *instrument, char **command,
                                  RBRInstrumentResponseParameter *parameter)
 {
     bool hasParameters = true;
-    if (*command == NULL)
-    {
+    if (*command == NULL) {
         memset(parameter, 0, sizeof(RBRInstrumentResponseParameter));
 
         *command = instrument->response.response;
         char *commandEnd = *command;
 
-        while (true)
-        {
-            switch (*commandEnd)
-            {
+        while (true) {
+            switch (*commandEnd) {
             case '\0':
                 hasParameters = false;
             /* Fallthrough. */
@@ -697,7 +593,7 @@ void RBRInstrument_parseResponse(RBRInstrument *instrument,
                 ++commandEnd;
             }
         }
-foundCommandEnd:
+    foundCommandEnd:
 
         /*
          * All L3 commands return at least one parameter. However, lots of
@@ -711,24 +607,17 @@ foundCommandEnd:
          * used as the first parameter key. If so, we won't null-terminate it:
          * that will be done for us when the value is parsed.
          */
-        if (hasParameters)
-        {
-            if (memcmp(commandEnd,
-                       PARAMETER_VALUE_SEPARATOR,
-                       PARAMETER_VALUE_SEPARATOR_LEN) == 0)
-            {
+        if (hasParameters) {
+            if (memcmp(commandEnd, PARAMETER_VALUE_SEPARATOR, PARAMETER_VALUE_SEPARATOR_LEN) == 0) {
                 parameter->nextKey = *command;
-            }
-            else
-            {
+            } else {
                 *commandEnd = '\0';
                 parameter->nextKey = commandEnd + 1;
             }
         }
     }
 
-    if (!hasParameters || parameter->nextKey == NULL)
-    {
+    if (!hasParameters || parameter->nextKey == NULL) {
         parameter->key = NULL;
         parameter->value = NULL;
         parameter->nextKey = NULL;
@@ -751,24 +640,18 @@ foundCommandEnd:
     parameter->key = parameter->nextKey;
     char *previousSpace = NULL;
     parameter->value = parameter->key;
-    while (true)
-    {
-        if (*parameter->value == '\0')
-        {
+    while (true) {
+        if (*parameter->value == '\0') {
             parameter->nextKey = NULL;
             return;
-        }
-        else if (memcmp(parameter->value,
-                        PARAMETER_VALUE_SEPARATOR,
-                        PARAMETER_VALUE_SEPARATOR_LEN) == 0)
-        {
+        } else if (memcmp(parameter->value,
+                          PARAMETER_VALUE_SEPARATOR,
+                          PARAMETER_VALUE_SEPARATOR_LEN) == 0) {
             /* Null-terminate the key. */
             *parameter->value = '\0';
             parameter->value += PARAMETER_VALUE_SEPARATOR_LEN;
             break;
-        }
-        else if (*parameter->value == ' ')
-        {
+        } else if (*parameter->value == ' ') {
             previousSpace = parameter->value;
         }
 
@@ -777,8 +660,7 @@ foundCommandEnd:
 
     /* If we found whitespace between the beginning of the key and the value
      * separator, that means there's an index value. */
-    if (previousSpace != NULL)
-    {
+    if (previousSpace != NULL) {
         *previousSpace = '\0';
         ++parameter->index;
         parameter->indexValue = parameter->key;
@@ -808,49 +690,31 @@ foundCommandEnd:
      * for Logger2, “ || ” for Logger3).
      */
     parameter->nextKey = strstr(parameter->value, PARAMETER_VALUE_SEPARATOR);
-    if (parameter->nextKey == NULL)
-    {
+    if (parameter->nextKey == NULL) {
         return;
     }
 
     int32_t separatorLength = -1;
-    while (parameter->nextKey > parameter->value && separatorLength < 0)
-    {
-        if (memcmp(parameter->nextKey,
-                   PARAMETER_SEPARATOR,
-                   PARAMETER_SEPARATOR_LEN) == 0)
-        {
+    while (parameter->nextKey > parameter->value && separatorLength < 0) {
+        if (memcmp(parameter->nextKey, PARAMETER_SEPARATOR, PARAMETER_SEPARATOR_LEN) == 0) {
             separatorLength = PARAMETER_SEPARATOR_LEN;
-        }
-        else if (instrument->generation == RBRINSTRUMENT_LOGGER2
-                 && memcmp(parameter->nextKey,
-                           ARRAY_SEPARATOR_L2,
-                           ARRAY_SEPARATOR_LEN_L2) == 0)
-        {
+        } else if (instrument->generation == RBRINSTRUMENT_LOGGER2 &&
+                   memcmp(parameter->nextKey, ARRAY_SEPARATOR_L2, ARRAY_SEPARATOR_LEN_L2) == 0) {
             separatorLength = ARRAY_SEPARATOR_LEN_L2;
-        }
-        else if (memcmp(parameter->nextKey,
-                        ARRAY_SEPARATOR_L3,
-                        ARRAY_SEPARATOR_LEN_L3) == 0)
-        {
+        } else if (memcmp(parameter->nextKey, ARRAY_SEPARATOR_L3, ARRAY_SEPARATOR_LEN_L3) == 0) {
             /* L3 separates array members in responses with the separator _and_
              * the command name. */
             separatorLength = ARRAY_SEPARATOR_LEN_L3 + strlen(*command) + 1;
-        }
-        else
-        {
+        } else {
             --parameter->nextKey;
         }
     }
 
-    if (separatorLength >= 0)
-    {
+    if (separatorLength >= 0) {
         /* Null-terminate the value. */
         *parameter->nextKey = '\0';
         parameter->nextKey += separatorLength;
-    }
-    else
-    {
+    } else {
         /* Something went horribly wrong: we found what we thought was the
          * start of the next key, but then didn't find any separators between
          * it and the start of the value. Give up. */
@@ -858,9 +722,7 @@ foundCommandEnd:
     }
 }
 
-RBRInstrumentError RBRInstrument_converse(RBRInstrument *instrument,
-                                          const char *command,
-                                          ...)
+RBRInstrumentError RBRInstrument_converse(RBRInstrument *instrument, const char *command, ...)
 {
     RBRInstrumentError err;
     va_list format;
@@ -870,8 +732,7 @@ RBRInstrumentError RBRInstrument_converse(RBRInstrument *instrument,
     /* Keep firing off the command and looking for a response until we find one
      * which matches. */
     bool retry;
-    do
-    {
+    do {
         /* The retry flag might be set on by the “E0102 invalid command” error
          * handling below. It needs to be reset every time we send the command
          * so that we don't accidentally retry infinitely. */
@@ -883,8 +744,7 @@ RBRInstrumentError RBRInstrument_converse(RBRInstrument *instrument,
         err = RBRInstrument_vSendCommand(instrument, command, formatSend);
         va_end(formatSend);
 
-        if (err != RBRINSTRUMENT_SUCCESS)
-        {
+        if (err != RBRINSTRUMENT_SUCCESS) {
             break;
         }
 
@@ -892,9 +752,8 @@ RBRInstrumentError RBRInstrument_converse(RBRInstrument *instrument,
          * its command word matches what we sent. To match that, we'll find the
          * first word of the command. */
         int32_t commandLength = 0;
-        while (!isspace(instrument->commandBuffer[commandLength])
-               && instrument->commandBuffer[commandLength] != '\0')
-        {
+        while (!isspace(instrument->commandBuffer[commandLength]) &&
+               instrument->commandBuffer[commandLength] != '\0') {
             ++commandLength;
         }
 
@@ -904,14 +763,11 @@ RBRInstrumentError RBRInstrument_converse(RBRInstrument *instrument,
          * expected response, or to specialize the command handling function
          * to include error checking/retry. */
         uint8_t *commandResponse = instrument->commandBuffer;
-        if (commandLength == 4
-            && memcmp("read", instrument->commandBuffer, 4) == 0)
-        {
+        if (commandLength == 4 && memcmp("read", instrument->commandBuffer, 4) == 0) {
             commandResponse = (uint8_t *) "data";
         }
 
-        do
-        {
+        do {
             err = RBRInstrument_readResponse(instrument, false, NULL);
 
             /*
@@ -934,72 +790,54 @@ RBRInstrumentError RBRInstrument_converse(RBRInstrument *instrument,
              * - Otherwise, the error message wasn't related to this command at
              *   all and should be ignored.
              */
-            if (err == RBRINSTRUMENT_HARDWARE_ERROR
-                && (instrument->response.error ==
-                    RBRINSTRUMENT_HARDWARE_ERROR_INVALID_COMMAND))
-            {
+            if (err == RBRINSTRUMENT_HARDWARE_ERROR &&
+                (instrument->response.error == RBRINSTRUMENT_HARDWARE_ERROR_INVALID_COMMAND)) {
                 /* We have no message to inspect, so we can only assume the
                  * error is legitimate and pass it along to the user. */
-                if (instrument->response.response == NULL)
-                {
+                if (instrument->response.response == NULL) {
                     break;
                 }
 
                 /* The error message indicates what the invalid command was.
                  * It's enclosed in single quotes, so we can look for those to
                  * find its bounds. */
-                char *invalidCommand = strchr(instrument->response.response,
-                                              '\'');
-                if (invalidCommand == NULL)
-                {
+                char *invalidCommand = strchr(instrument->response.response, '\'');
+                if (invalidCommand == NULL) {
                     break;
                 }
                 ++invalidCommand;
 
                 char *invalidCommandEnd = strchr(invalidCommand, '\'');
-                if (invalidCommandEnd == NULL)
-                {
+                if (invalidCommandEnd == NULL) {
                     break;
                 }
 
-                int32_t invalidCommandLength = invalidCommandEnd
-                                               - invalidCommand;
+                int32_t invalidCommandLength = invalidCommandEnd - invalidCommand;
 
                 /* The command was actually invalid. Whoops. */
-                if (invalidCommandLength == commandLength
-                    && memcmp(invalidCommand,
-                              instrument->commandBuffer,
-                              commandLength) == 0)
-                {
+                if (invalidCommandLength == commandLength &&
+                    memcmp(invalidCommand, instrument->commandBuffer, commandLength) == 0) {
                     break;
                 }
                 /* We were on the right track, but there was garbage in the
                  * buffer. Retry. */
-                else if (invalidCommandLength > commandLength
-                         && memcmp(invalidCommand
-                                   + invalidCommandLength
-                                   - commandLength,
-                                   instrument->commandBuffer,
-                                   commandLength) == 0)
-                {
+                else if (invalidCommandLength > commandLength &&
+                         memcmp(invalidCommand + invalidCommandLength - commandLength,
+                                instrument->commandBuffer,
+                                commandLength) == 0) {
                     retry = true;
                     break;
                 }
                 /* Not our garbage, not our problem. We won't retry, but we'll
                  * keep trying to read a response. */
-                else
-                {
+                else {
                     continue;
                 }
-            }
-            else if (err != RBRINSTRUMENT_SUCCESS)
-            {
+            } else if (err != RBRINSTRUMENT_SUCCESS) {
                 break;
             }
-        } while ((instrument->response.response == NULL
-                  || memcmp(instrument->response.response,
-                            commandResponse,
-                            commandLength) != 0));
+        } while ((instrument->response.response == NULL ||
+                  memcmp(instrument->response.response, commandResponse, commandLength) != 0));
     } while (retry);
 
     va_end(format);
@@ -1007,10 +845,8 @@ RBRInstrumentError RBRInstrument_converse(RBRInstrument *instrument,
     return err;
 }
 
-RBRInstrumentError RBRInstrument_getBool(RBRInstrument *instrument,
-                                         const char *command,
-                                         const char *parameter,
-                                         bool *value)
+RBRInstrumentError RBRInstrument_getBool(RBRInstrument *instrument, const char *command,
+                                         const char *parameter, bool *value)
 {
     *value = false;
 
@@ -1018,18 +854,12 @@ RBRInstrumentError RBRInstrument_getBool(RBRInstrument *instrument,
 
     char *responseCommand = NULL;
     RBRInstrumentResponseParameter responseParameter;
-    do
-    {
-        RBRInstrument_parseResponse(instrument,
-                                    &responseCommand,
-                                    &responseParameter);
+    do {
+        RBRInstrument_parseResponse(instrument, &responseCommand, &responseParameter);
 
-        if (responseParameter.key == NULL)
-        {
+        if (responseParameter.key == NULL) {
             break;
-        }
-        else if (strcmp(responseParameter.key, parameter) != 0)
-        {
+        } else if (strcmp(responseParameter.key, parameter) != 0) {
             continue;
         }
 
@@ -1039,10 +869,8 @@ RBRInstrumentError RBRInstrument_getBool(RBRInstrument *instrument,
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_getFloat(RBRInstrument *instrument,
-                                          const char *command,
-                                          const char *parameter,
-                                          float *value)
+RBRInstrumentError RBRInstrument_getFloat(RBRInstrument *instrument, const char *command,
+                                          const char *parameter, float *value)
 {
     *value = NAN;
 
@@ -1050,18 +878,12 @@ RBRInstrumentError RBRInstrument_getFloat(RBRInstrument *instrument,
 
     char *responseCommand = NULL;
     RBRInstrumentResponseParameter responseParameter;
-    while (true)
-    {
-        RBRInstrument_parseResponse(instrument,
-                                    &responseCommand,
-                                    &responseParameter);
+    while (true) {
+        RBRInstrument_parseResponse(instrument, &responseCommand, &responseParameter);
 
-        if (responseParameter.key == NULL)
-        {
+        if (responseParameter.key == NULL) {
             break;
-        }
-        else if (strcmp(responseParameter.key, parameter) != 0)
-        {
+        } else if (strcmp(responseParameter.key, parameter) != 0) {
             continue;
         }
 
@@ -1071,10 +893,8 @@ RBRInstrumentError RBRInstrument_getFloat(RBRInstrument *instrument,
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_getInt(RBRInstrument *instrument,
-                                        const char *command,
-                                        const char *parameter,
-                                        int32_t *value)
+RBRInstrumentError RBRInstrument_getInt(RBRInstrument *instrument, const char *command,
+                                        const char *parameter, int32_t *value)
 {
     *value = 0;
 
@@ -1082,18 +902,12 @@ RBRInstrumentError RBRInstrument_getInt(RBRInstrument *instrument,
 
     char *responseCommand = NULL;
     RBRInstrumentResponseParameter responseParameter;
-    while (true)
-    {
-        RBRInstrument_parseResponse(instrument,
-                                    &responseCommand,
-                                    &responseParameter);
+    while (true) {
+        RBRInstrument_parseResponse(instrument, &responseCommand, &responseParameter);
 
-        if (responseParameter.key == NULL)
-        {
+        if (responseParameter.key == NULL) {
             break;
-        }
-        else if (strcmp(responseParameter.key, parameter) != 0)
-        {
+        } else if (strcmp(responseParameter.key, parameter) != 0) {
             continue;
         }
 
@@ -1106,19 +920,11 @@ RBRInstrumentError RBRInstrument_getInt(RBRInstrument *instrument,
 /** \brief Ensure localTimeOffset is initialized. */
 static inline void RBRInstrumentDateTime_initializeOffset(void)
 {
-    if (localTimeOffset == OFFSET_UNINITIALIZED)
-    {
+    if (localTimeOffset == OFFSET_UNINITIALIZED) {
         struct tm instrumentMinTimestamp = {
-            .tm_year = 100,
-            .tm_mon = 0,
-            .tm_mday = 1,
-            .tm_hour = 0,
-            .tm_min = 0,
-            .tm_sec = 0
-        };
-        localTimeOffset =
-            RBRINSTRUMENT_DATETIME_MIN
-            - ((RBRInstrumentDateTime) mktime(&instrumentMinTimestamp) * 1000);
+            .tm_year = 100, .tm_mon = 0, .tm_mday = 1, .tm_hour = 0, .tm_min = 0, .tm_sec = 0};
+        localTimeOffset = RBRINSTRUMENT_DATETIME_MIN -
+                          ((RBRInstrumentDateTime) mktime(&instrumentMinTimestamp) * 1000);
     }
 }
 
@@ -1132,56 +938,44 @@ static inline void RBRInstrumentDateTime_initializeOffset(void)
  * \return #RBRINSTRUMENT_SUCCESS when the timestamp is successfully parsed
  * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when the time is invalid
  */
-static RBRInstrumentError RBRInstrumentDateTime_parse(
-    struct tm *split,
-    RBRInstrumentDateTime *timestamp)
+static RBRInstrumentError RBRInstrumentDateTime_parse(struct tm *split,
+                                                      RBRInstrumentDateTime *timestamp)
 {
     /* struct tm/mktime() expects years to be counted from 1900... */
     split->tm_year -= 1900;
     /* ...and months to be 0-based. */
-    split->tm_mon  -= 1;
+    split->tm_mon -= 1;
 
     /* Sanity check. */
-    if (split->tm_year < 100
-        || split->tm_year >= 200
-        || split->tm_mon > 11
-        || split->tm_mday > 31
-        || split->tm_hour > 23
-        || split->tm_min > 59
-        || split->tm_sec > 59 /* Instrument doesn't know about leap seconds. */
-        || *timestamp > 999)
-    {
+    if (split->tm_year < 100 || split->tm_year >= 200 || split->tm_mon > 11 ||
+        split->tm_mday > 31 || split->tm_hour > 23 || split->tm_min > 59 ||
+        split->tm_sec > 59 /* Instrument doesn't know about leap seconds. */
+        || *timestamp > 999) {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
     RBRInstrumentDateTime_initializeOffset();
 
-    *timestamp +=
-        (((RBRInstrumentDateTime) mktime(split)) * 1000) + localTimeOffset;
+    *timestamp += (((RBRInstrumentDateTime) mktime(split)) * 1000) + localTimeOffset;
 
-    if (*timestamp < RBRINSTRUMENT_DATETIME_MIN
-        || *timestamp > RBRINSTRUMENT_DATETIME_MAX)
-    {
+    if (*timestamp < RBRINSTRUMENT_DATETIME_MIN || *timestamp > RBRINSTRUMENT_DATETIME_MAX) {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrumentDateTime_parseSampleTime(
-    const char *s,
-    RBRInstrumentDateTime *timestamp,
-    char **end)
+RBRInstrumentError
+RBRInstrumentDateTime_parseSampleTime(const char *s, RBRInstrumentDateTime *timestamp, char **end)
 {
     *timestamp = 0;
-    if (end != NULL)
-    {
+    if (end != NULL) {
         *end = NULL;
     }
 
     int32_t timestampLength;
     struct tm split = {0};
-    int milliseconds;
+    int64_t milliseconds;
 
     if (sscanf(s,
                RBRInstrumentDateTime_sampleScanFormat,
@@ -1192,29 +986,29 @@ RBRInstrumentError RBRInstrumentDateTime_parseSampleTime(
                &split.tm_min,
                &split.tm_sec,
                &milliseconds,
-               &timestampLength) < 7)
-    {
-        return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
-    }
+               &timestampLength) == 7) {
+        *timestamp = milliseconds;
+        RBR_TRY(RBRInstrumentDateTime_parse(&split, timestamp));
+        if (end != NULL) {
+            *end = (char *) s + timestampLength;
+        }
+    } else if (sscanf(s, "%lld", &milliseconds) == 1) {
+        *timestamp = milliseconds;
 
-    *timestamp = milliseconds;
-    RBR_TRY(RBRInstrumentDateTime_parse(&split, timestamp));
-    if (end != NULL)
-    {
-        *end = (char *) s + timestampLength;
+        if (end != NULL) {
+            *end = strchr(s, ' ');
+        }
+    } else {
+        return RBRINSTRUMENT_RESPONSE_ERROR;
     }
-
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrumentDateTime_parseScheduleTime(
-    const char *s,
-    RBRInstrumentDateTime *timestamp,
-    char **end)
+RBRInstrumentError
+RBRInstrumentDateTime_parseScheduleTime(const char *s, RBRInstrumentDateTime *timestamp, char **end)
 {
     *timestamp = 0;
-    if (end != NULL)
-    {
+    if (end != NULL) {
         *end = NULL;
     }
 
@@ -1228,23 +1022,19 @@ RBRInstrumentError RBRInstrumentDateTime_parseScheduleTime(
                &split.tm_hour,
                &split.tm_min,
                &split.tm_sec,
-               &timestampLength) < 6)
-    {
+               &timestampLength) < 6) {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
     RBR_TRY(RBRInstrumentDateTime_parse(&split, timestamp));
-    if (end != NULL)
-    {
+    if (end != NULL) {
         *end = (char *) s + timestampLength;
     }
 
     return RBRINSTRUMENT_SUCCESS;
 }
 
-static void RBRInstrumentDateTime_toFormat(RBRInstrumentDateTime timestamp,
-                                           char *s,
-                                           size_t size,
+static void RBRInstrumentDateTime_toFormat(RBRInstrumentDateTime timestamp, char *s, size_t size,
                                            const char *format)
 {
     time_t t = timestamp / 1000;
@@ -1262,20 +1052,14 @@ static void RBRInstrumentDateTime_toFormat(RBRInstrumentDateTime timestamp,
              milliseconds);
 }
 
-void RBRInstrumentDateTime_toSampleTime(RBRInstrumentDateTime timestamp,
-                                        char *s)
+void RBRInstrumentDateTime_toSampleTime(RBRInstrumentDateTime timestamp, char *s)
 {
-    RBRInstrumentDateTime_toFormat(timestamp,
-                                   s,
-                                   RBRINSTRUMENT_SAMPLE_TIME_LEN + 1,
-                                   RBRInstrumentDateTime_sampleFormat);
+    RBRInstrumentDateTime_toFormat(
+        timestamp, s, RBRINSTRUMENT_SAMPLE_TIME_LEN + 1, RBRInstrumentDateTime_sampleFormat);
 }
 
-void RBRInstrumentDateTime_toScheduleTime(RBRInstrumentDateTime timestamp,
-                                          char *s)
+void RBRInstrumentDateTime_toScheduleTime(RBRInstrumentDateTime timestamp, char *s)
 {
-    RBRInstrumentDateTime_toFormat(timestamp,
-                                   s,
-                                   RBRINSTRUMENT_SCHEDULE_TIME_LEN + 1,
-                                   RBRInstrumentDateTime_scheduleFormat);
+    RBRInstrumentDateTime_toFormat(
+        timestamp, s, RBRINSTRUMENT_SCHEDULE_TIME_LEN + 1, RBRInstrumentDateTime_scheduleFormat);
 }
