@@ -110,8 +110,7 @@ const char *RBRInstrumentResponseType_name(RBRInstrumentResponseType type)
     }
 }
 
-static RBRInstrumentError RBRInstrument_populateGeneration(
-    RBRInstrument *instrument)
+static RBRInstrumentError RBRInstrument_populateGeneration(RBRInstrument *instrument)
 {
     instrument->generation = RBRINSTRUMENT_UNKNOWN_GENERATION;
 
@@ -127,9 +126,8 @@ static RBRInstrumentError RBRInstrument_populateGeneration(
      * early instruments with very old firmware won't report a firmware type.
      * Newer firmware versions and newer instruments within the generation will
      * report a firmware type of 100–103. */
-    if (instrument->id.fwtype == 0
-        || (instrument->id.fwtype >= 100
-            && instrument->id.fwtype <= 103))
+    if (instrument->id.fwtype == 0 ||
+        (instrument->id.fwtype >= 100 && instrument->id.fwtype <= 103))
     {
         instrument->generation = RBRINSTRUMENT_LOGGER2;
     }
@@ -142,15 +140,11 @@ static RBRInstrumentError RBRInstrument_populateGeneration(
 
 RBRInstrumentError RBRInstrument_open(RBRInstrument **instrument,
                                       const RBRInstrumentCallbacks *callbacks,
-                                      RBRInstrumentDateTime commandTimeout,
-                                      void *userData)
+                                      RBRInstrumentDateTime commandTimeout, void *userData)
 {
-    if (callbacks == NULL
-        || callbacks->time == NULL
-        || callbacks->sleep == NULL
-        || callbacks->read == NULL
-        || callbacks->write == NULL
-        || (callbacks->sample != NULL && callbacks->sampleBuffer == NULL))
+    if (callbacks == NULL || callbacks->time == NULL || callbacks->sleep == NULL ||
+        callbacks->read == NULL || callbacks->write == NULL ||
+        (callbacks->sample != NULL && callbacks->sampleBuffer == NULL))
     {
         return RBRINSTRUMENT_MISSING_CALLBACK;
     }
@@ -166,16 +160,14 @@ RBRInstrumentError RBRInstrument_open(RBRInstrument **instrument,
     }
 
     memset(*instrument, 0, sizeof(RBRInstrument));
-    memcpy(&(*instrument)->callbacks,
-           callbacks,
-           sizeof(RBRInstrumentCallbacks));
+    memcpy(&(*instrument)->callbacks, callbacks, sizeof(RBRInstrumentCallbacks));
     /* We don't want the streaming sample data callback to be called before the
      * constructor has finished. */
-    (*instrument)->callbacks.sample  = NULL;
-    (*instrument)->commandTimeout    = commandTimeout;
-    (*instrument)->userData          = userData;
-    (*instrument)->lastActivityTime  = RBRINSTRUMENT_NO_ACTIVITY;
-    (*instrument)->response.type     = RBRINSTRUMENT_RESPONSE_UNKNOWN_TYPE;
+    (*instrument)->callbacks.sample = NULL;
+    (*instrument)->commandTimeout = commandTimeout;
+    (*instrument)->userData = userData;
+    (*instrument)->lastActivityTime = RBRINSTRUMENT_NO_ACTIVITY;
+    (*instrument)->response.type = RBRINSTRUMENT_RESPONSE_UNKNOWN_TYPE;
     (*instrument)->managedAllocation = allocated;
 
     RBRInstrumentError err;
@@ -189,8 +181,8 @@ RBRInstrumentError RBRInstrument_open(RBRInstrument **instrument,
         return err;
     }
 
-    if ((*instrument)->generation != RBRINSTRUMENT_LOGGER2
-        && (*instrument)->generation != RBRINSTRUMENT_LOGGER3)
+    if ((*instrument)->generation != RBRINSTRUMENT_LOGGER2 &&
+        (*instrument)->generation != RBRINSTRUMENT_LOGGER3)
     {
         if (allocated)
         {
@@ -216,14 +208,12 @@ RBRInstrumentError RBRInstrument_close(RBRInstrument *instrument)
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentGeneration RBRInstrument_getGeneration(
-    const RBRInstrument *instrument)
+RBRInstrumentGeneration RBRInstrument_getGeneration(const RBRInstrument *instrument)
 {
     return instrument->generation;
 }
 
-RBRInstrumentDateTime RBRInstrument_getCommandTimeout(
-    const RBRInstrument *instrument)
+RBRInstrumentDateTime RBRInstrument_getCommandTimeout(const RBRInstrument *instrument)
 {
     return instrument->commandTimeout;
 }
@@ -244,11 +234,10 @@ void RBRInstrument_setUserData(RBRInstrument *instrument, void *userData)
     instrument->userData = userData;
 }
 
-RBRInstrumentHardwareError RBRInstrument_getLastHardwareError(
-    const RBRInstrument *instrument)
+RBRInstrumentHardwareError RBRInstrument_getLastHardwareError(const RBRInstrument *instrument)
 {
-    if (instrument->response.type == RBRINSTRUMENT_RESPONSE_ERROR
-        || instrument->response.type == RBRINSTRUMENT_RESPONSE_WARNING)
+    if (instrument->response.type == RBRINSTRUMENT_RESPONSE_ERROR ||
+        instrument->response.type == RBRINSTRUMENT_RESPONSE_WARNING)
     {
         return instrument->response.error;
     }
@@ -258,8 +247,7 @@ RBRInstrumentHardwareError RBRInstrument_getLastHardwareError(
     }
 }
 
-const char *RBRInstrument_getLastHardwareErrorMessage(
-    const RBRInstrument *instrument)
+const char *RBRInstrument_getLastHardwareErrorMessage(const RBRInstrument *instrument)
 {
     if (instrument->response.type == RBRINSTRUMENT_RESPONSE_ERROR)
     {

@@ -94,9 +94,9 @@ extern const char *RBRINSTRUMENT_LIB_BUILD_DATE;
 #endif
 
 /** \brief Stringize the result of macro expansion. */
-#define xstr(s) str(s)
+#define xstr(s)                       str(s)
 /** \brief Stringize the macro argument. */
-#define str(s) #s
+#define str(s)                        #s
 /** \brief The string length of the maximum number of instrument channels. */
 #define RBRINSTRUMENT_CHANNEL_MAX_LEN sizeof(xstr(RBRINSTRUMENT_CHANNEL_MAX))
 
@@ -136,7 +136,7 @@ extern const char *RBRINSTRUMENT_LIB_BUILD_DATE;
  * Specified in milliseconds since the Unix epoch (1970-01-01T00:00:00.000Z).
  * Represents 2000-01-01T00:00:00.000Z.
  */
-#define RBRINSTRUMENT_DATETIME_MIN  946684800000LL
+#define RBRINSTRUMENT_DATETIME_MIN 946684800000LL
 
 /**
  * \brief The minimum date and time which the instrument can handle.
@@ -342,9 +342,8 @@ struct RBRInstrument;
  * \see RBRInstrumentReadCallback() for details on how the values returned from
  *                                  user callback functions are used
  */
-typedef RBRInstrumentError (*RBRInstrumentTimeCallback)(
-    const struct RBRInstrument *instrument,
-    RBRInstrumentDateTime *time);
+typedef RBRInstrumentError (*RBRInstrumentTimeCallback)(const struct RBRInstrument *instrument,
+                                                        RBRInstrumentDateTime *time);
 
 /**
  * \brief Callback to suspend instrument activity for a fixed amount of time.
@@ -362,9 +361,8 @@ typedef RBRInstrumentError (*RBRInstrumentTimeCallback)(
  * \see RBRInstrumentReadCallback() for details on how the values returned from
  *                                  user callback functions are used
  */
-typedef RBRInstrumentError (*RBRInstrumentSleepCallback)(
-    const struct RBRInstrument *instrument,
-    RBRInstrumentDateTime time);
+typedef RBRInstrumentError (*RBRInstrumentSleepCallback)(const struct RBRInstrument *instrument,
+                                                         RBRInstrumentDateTime time);
 
 /**
  * \brief Callback to read data from the physical instrument.
@@ -408,10 +406,8 @@ typedef RBRInstrumentError (*RBRInstrumentSleepCallback)(
  * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENT_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRInstrumentError (*RBRInstrumentReadCallback)(
-    const struct RBRInstrument *instrument,
-    void *data,
-    int32_t *size);
+typedef RBRInstrumentError (*RBRInstrumentReadCallback)(const struct RBRInstrument *instrument,
+                                                        void *data, int32_t *size);
 
 /**
  * \brief Callback to write data to the physical instrument.
@@ -439,10 +435,8 @@ typedef RBRInstrumentError (*RBRInstrumentReadCallback)(
  * \see RBRInstrumentReadCallback() for details on how the values returned from
  *                                  user callback functions are used
  */
-typedef RBRInstrumentError (*RBRInstrumentWriteCallback)(
-    const struct RBRInstrument *instrument,
-    const void *const data,
-    int32_t size);
+typedef RBRInstrumentError (*RBRInstrumentWriteCallback)(const struct RBRInstrument *instrument,
+                                                         const void *const data, int32_t size);
 
 struct RBRInstrumentSample;
 
@@ -470,8 +464,7 @@ struct RBRInstrumentSample;
  * \return #RBRINSTRUMENT_CALLBACK_ERROR when an unrecoverable error occurs
  */
 typedef RBRInstrumentError (*RBRInstrumentSampleCallback)(
-    const struct RBRInstrument *instrument,
-    const struct RBRInstrumentSample *const sample);
+    const struct RBRInstrument *instrument, const struct RBRInstrumentSample *const sample);
 
 /**
  * \brief A set of callbacks from library to user code.
@@ -757,8 +750,7 @@ typedef struct RBRInstrument
  */
 RBRInstrumentError RBRInstrument_open(RBRInstrument **instrument,
                                       const RBRInstrumentCallbacks *callbacks,
-                                      RBRInstrumentDateTime commandTimeout,
-                                      void *userData);
+                                      RBRInstrumentDateTime commandTimeout, void *userData);
 
 /**
  * \brief Terminate the instrument connection and release any held resources.
@@ -778,8 +770,7 @@ RBRInstrumentError RBRInstrument_close(RBRInstrument *instrument);
  * \param [in] instrument the instrument connection
  * \return the instrument generation
  */
-RBRInstrumentGeneration RBRInstrument_getGeneration(
-    const RBRInstrument *instrument);
+RBRInstrumentGeneration RBRInstrument_getGeneration(const RBRInstrument *instrument);
 
 /**
  * \brief Get the command timeout.
@@ -788,8 +779,7 @@ RBRInstrumentGeneration RBRInstrument_getGeneration(
  * \return the command timeout
  * \see RBRInstrument_setCommandTimeout()
  */
-RBRInstrumentDateTime RBRInstrument_getCommandTimeout(
-    const RBRInstrument *instrument);
+RBRInstrumentDateTime RBRInstrument_getCommandTimeout(const RBRInstrument *instrument);
 
 /**
  * \brief Set the command timeout.
@@ -843,8 +833,7 @@ void RBRInstrument_setUserData(RBRInstrument *instrument, void *userData);
  * \return the last error
  * \see RBRInstrument_getLastHardwareErrorMessage() for the error message
  */
-RBRInstrumentHardwareError RBRInstrument_getLastHardwareError(
-    const RBRInstrument *instrument);
+RBRInstrumentHardwareError RBRInstrument_getLastHardwareError(const RBRInstrument *instrument);
 
 /**
  * \brief Get the error message which resulted from the last instrument
@@ -880,8 +869,7 @@ RBRInstrumentHardwareError RBRInstrument_getLastHardwareError(
  * \return the last error message
  * \see RBRInstrument_getLastHardwareError() for the error number/presence
  */
-const char *RBRInstrument_getLastHardwareErrorMessage(
-    const RBRInstrument *instrument);
+const char *RBRInstrument_getLastHardwareErrorMessage(const RBRInstrument *instrument);
 
 /* To help keep declarations and documentation organized and discoverable,
  * instrument commands and structures are broken out into individual

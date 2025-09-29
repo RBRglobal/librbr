@@ -14,33 +14,28 @@
 #include "RBRInstrument.h"
 #include "RBRInstrumentInternal.h"
 
-static RBRInstrumentError RBRInstrument_parseDeploymentResponse(
-    RBRInstrument *instrument,
-    const char *deploymentCommand,
-    RBRInstrumentDeploymentStatus *status)
+static RBRInstrumentError RBRInstrument_parseDeploymentResponse(RBRInstrument *instrument, const char *deploymentCommand,
+                                                                RBRInstrumentDeploymentStatus *status)
 {
     char *command = NULL;
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
             break;
         }
-        else if (strcmp(parameter.key, "status") != 0
-                 && strcmp(parameter.key, deploymentCommand) != 0)
+        else if (strcmp(parameter.key, "status") != 0 &&
+                 strcmp(parameter.key, deploymentCommand) != 0)
         {
             continue;
         }
 
         for (int i = 0; i < RBRINSTRUMENT_STATUS_COUNT; i++)
         {
-            if (strcmp(RBRInstrumentDeploymentStatus_name(i),
-                       parameter.value) == 0)
+            if (strcmp(RBRInstrumentDeploymentStatus_name(i), parameter.value) == 0)
             {
                 *status = i;
                 break;
@@ -53,41 +48,30 @@ static RBRInstrumentError RBRInstrument_parseDeploymentResponse(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_verify(
-    RBRInstrument *instrument,
-    bool eraseMemory,
-    RBRInstrumentDeploymentStatus *status)
+RBRInstrumentError RBRInstrument_verify(RBRInstrument *instrument, bool eraseMemory,
+                                        RBRInstrumentDeploymentStatus *status)
 {
     *status = RBRINSTRUMENT_UNKNOWN_STATUS;
 
-    RBR_TRY(RBRInstrument_converse(instrument,
-                                   "verify erasememory = %s",
-                                   (eraseMemory) ? "true" : "false"));
+    RBR_TRY(RBRInstrument_converse(
+                instrument, "verify erasememory = %s", (eraseMemory) ? "true" : "false"));
 
-    return RBRInstrument_parseDeploymentResponse(instrument,
-                                                 "verify",
-                                                 status);
+    return RBRInstrument_parseDeploymentResponse(instrument, "verify", status);
 }
 
-RBRInstrumentError RBRInstrument_enable(
-    RBRInstrument *instrument,
-    bool eraseMemory,
-    RBRInstrumentDeploymentStatus *status)
+RBRInstrumentError RBRInstrument_enable(RBRInstrument *instrument, bool eraseMemory,
+                                        RBRInstrumentDeploymentStatus *status)
 {
     *status = RBRINSTRUMENT_UNKNOWN_STATUS;
 
-    RBR_TRY(RBRInstrument_converse(instrument,
-                                   "enable erasememory = %s",
-                                   (eraseMemory) ? "true" : "false"));
+    RBR_TRY(RBRInstrument_converse(
+                instrument, "enable erasememory = %s", (eraseMemory) ? "true" : "false"));
 
-    return RBRInstrument_parseDeploymentResponse(instrument,
-                                                 "enable",
-                                                 status);
+    return RBRInstrument_parseDeploymentResponse(instrument, "enable", status);
 }
 
-RBRInstrumentError RBRInstrument_disable(
-    RBRInstrument *instrument,
-    RBRInstrumentDeploymentStatus *status)
+RBRInstrumentError RBRInstrument_disable(RBRInstrument *instrument,
+                                         RBRInstrumentDeploymentStatus *status)
 {
     *status = RBRINSTRUMENT_UNKNOWN_STATUS;
 
@@ -103,14 +87,11 @@ RBRInstrumentError RBRInstrument_disable(
 
     RBR_TRY(RBRInstrument_converse(instrument, disableCommand));
 
-    return RBRInstrument_parseDeploymentResponse(instrument,
-                                                 disableCommand,
-                                                 status);
+    return RBRInstrument_parseDeploymentResponse(instrument, disableCommand, status);
 }
 
-RBRInstrumentError RBRInstrument_getSimulation(
-    RBRInstrument *instrument,
-    RBRInstrumentSimulation *simulation)
+RBRInstrumentError RBRInstrument_getSimulation(RBRInstrument *instrument,
+                                               RBRInstrumentSimulation *simulation)
 {
     memset(simulation, 0, sizeof(RBRInstrumentSimulation));
 
@@ -120,9 +101,7 @@ RBRInstrumentError RBRInstrument_getSimulation(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -141,9 +120,8 @@ RBRInstrumentError RBRInstrument_getSimulation(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_setSimulation(
-    RBRInstrument *instrument,
-    const RBRInstrumentSimulation *simulation)
+RBRInstrumentError RBRInstrument_setSimulation(RBRInstrument *instrument,
+                                               const RBRInstrumentSimulation *simulation)
 {
     if (simulation->period <= 0)
     {

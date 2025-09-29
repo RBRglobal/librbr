@@ -30,8 +30,7 @@ const char *RBRInstrumentDirection_name(RBRInstrumentDirection direction)
     }
 }
 
-const char *RBRInstrumentRegimesReference_name(
-    RBRInstrumentRegimesReference reference)
+const char *RBRInstrumentRegimesReference_name(RBRInstrumentRegimesReference reference)
 {
     switch (reference)
     {
@@ -47,9 +46,8 @@ const char *RBRInstrumentRegimesReference_name(
     }
 }
 
-RBRInstrumentError RBRInstrument_getRegimes(
-    RBRInstrument *instrument,
-    RBRInstrumentRegimes *regimes)
+RBRInstrumentError RBRInstrument_getRegimes(RBRInstrument *instrument,
+                                            RBRInstrumentRegimes *regimes)
 {
     memset(regimes, 0, sizeof(RBRInstrumentRegimes));
     regimes->direction = RBRINSTRUMENT_UNKNOWN_DIRECTION;
@@ -61,9 +59,7 @@ RBRInstrumentError RBRInstrument_getRegimes(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -73,8 +69,7 @@ RBRInstrumentError RBRInstrument_getRegimes(
         {
             for (int i = 0; i < RBRINSTRUMENT_DIRECTION_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentDirection_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentDirection_name(i), parameter.value) == 0)
                 {
                     regimes->direction = i;
                     break;
@@ -89,8 +84,7 @@ RBRInstrumentError RBRInstrument_getRegimes(
         {
             for (int i = 0; i < RBRINSTRUMENT_REFERENCE_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentRegimesReference_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentRegimesReference_name(i), parameter.value) == 0)
                 {
                     regimes->reference = i;
                     break;
@@ -102,31 +96,24 @@ RBRInstrumentError RBRInstrument_getRegimes(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_setRegimes(
-    RBRInstrument *instrument,
-    const RBRInstrumentRegimes *regimes)
+RBRInstrumentError RBRInstrument_setRegimes(RBRInstrument *instrument,
+                                            const RBRInstrumentRegimes *regimes)
 {
-    if (regimes->direction < 0
-        || regimes->direction >= RBRINSTRUMENT_DIRECTION_COUNT
-        || regimes->count < 1
-        || regimes->count > RBRINSTRUMENT_REGIME_MAX
-        || regimes->reference < 0
-        || regimes->reference >= RBRINSTRUMENT_REFERENCE_COUNT)
+    if (regimes->direction < 0 || regimes->direction >= RBRINSTRUMENT_DIRECTION_COUNT ||
+        regimes->count < 1 || regimes->count > RBRINSTRUMENT_REGIME_MAX || regimes->reference < 0 ||
+        regimes->reference >= RBRINSTRUMENT_REFERENCE_COUNT)
     {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrument_converse(
-        instrument,
-        "regimes direction = %s, count = %i, reference = %s",
-        RBRInstrumentDirection_name(regimes->direction),
-        regimes->count,
-        RBRInstrumentRegimesReference_name(regimes->reference));
+    return RBRInstrument_converse(instrument,
+                                  "regimes direction = %s, count = %i, reference = %s",
+                                  RBRInstrumentDirection_name(regimes->direction),
+                                  regimes->count,
+                                  RBRInstrumentRegimesReference_name(regimes->reference));
 }
 
-RBRInstrumentError RBRInstrument_getRegime(
-    RBRInstrument *instrument,
-    RBRInstrumentRegime *regime)
+RBRInstrumentError RBRInstrument_getRegime(RBRInstrument *instrument, RBRInstrumentRegime *regime)
 {
     RBRInstrumentRegimeIndex index = regime->index;
 
@@ -144,9 +131,7 @@ RBRInstrumentError RBRInstrument_getRegime(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -175,36 +160,28 @@ RBRInstrumentError RBRInstrument_getRegime(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_setRegime(
-    RBRInstrument *instrument,
-    const RBRInstrumentRegime *regime)
+RBRInstrumentError RBRInstrument_setRegime(RBRInstrument *instrument,
+                                           const RBRInstrumentRegime *regime)
 {
-    if (regime->index < 1
-        || regime->index >= RBRINSTRUMENT_REGIME_MAX
-        || regime->boundary < 0
-        || regime->boundary > RBRINSTRUMENT_REGIME_BOUNDARY_MAX
-        || regime->binSize < 0
-        || regime->binSize > RBRINSTRUMENT_REGIME_BINSIZE_MAX
-        || regime->samplingPeriod <= 0
-        || regime->samplingPeriod > RBRINSTRUMENT_REGIME_SAMPLING_PERIOD_MAX
-        || (regime->samplingPeriod >= 1000
-            && regime->samplingPeriod % 1000 != 0))
+    if (regime->index < 1 || regime->index >= RBRINSTRUMENT_REGIME_MAX || regime->boundary < 0 ||
+        regime->boundary > RBRINSTRUMENT_REGIME_BOUNDARY_MAX || regime->binSize < 0 ||
+        regime->binSize > RBRINSTRUMENT_REGIME_BINSIZE_MAX || regime->samplingPeriod <= 0 ||
+        regime->samplingPeriod > RBRINSTRUMENT_REGIME_SAMPLING_PERIOD_MAX ||
+        (regime->samplingPeriod >= 1000 && regime->samplingPeriod % 1000 != 0))
     {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrument_converse(
-        instrument,
-        "regime %d boundary = %.0f, binsize = %0.1f, samplingperiod = %i",
-        regime->index,
-        regime->boundary,
-        regime->binSize,
-        regime->samplingPeriod);
+    return RBRInstrument_converse(instrument,
+                                  "regime %d boundary = %.0f, binsize = %0.1f, samplingperiod = %i",
+                                  regime->index,
+                                  (double) regime->boundary,
+                                  (double) regime->binSize,
+                                  regime->samplingPeriod);
 }
 
-RBRInstrumentError RBRInstrument_getDirectionDependentSampling(
-    RBRInstrument *instrument,
-    RBRInstrumentDirectionDependentSampling *ddsampling)
+RBRInstrumentError RBRInstrument_getDirectionDependentSampling(RBRInstrument *instrument,
+                                                               RBRInstrumentDirectionDependentSampling *ddsampling)
 {
     memset(ddsampling, 0, sizeof(RBRInstrumentDirectionDependentSampling));
     ddsampling->direction = RBRINSTRUMENT_UNKNOWN_DIRECTION;
@@ -213,11 +190,10 @@ RBRInstrumentError RBRInstrument_getDirectionDependentSampling(
 
     char *command = NULL;
     RBRInstrumentResponseParameter parameter;
+
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -227,8 +203,7 @@ RBRInstrumentError RBRInstrument_getDirectionDependentSampling(
         {
             for (int i = 0; i < RBRINSTRUMENT_DIRECTION_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentDirection_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentDirection_name(i), parameter.value) == 0)
                 {
                     ddsampling->direction = i;
                     break;
@@ -245,43 +220,36 @@ RBRInstrumentError RBRInstrument_getDirectionDependentSampling(
         }
         else if (strcmp(parameter.key, "fastthreshold") == 0)
         {
-            ddsampling->fastThreshold = strtod(parameter.value, NULL);
+            ddsampling->fastThreshold = (float) strtod(parameter.value, NULL);
         }
         else if (strcmp(parameter.key, "slowthreshold") == 0)
         {
-            ddsampling->slowThreshold = strtod(parameter.value, NULL);
+            ddsampling->slowThreshold = (float) strtod(parameter.value, NULL);
         }
     }
 
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_setDirectionDependentSampling(
-    RBRInstrument *instrument,
-    RBRInstrumentDirectionDependentSampling *ddsampling)
+RBRInstrumentError RBRInstrument_setDirectionDependentSampling(RBRInstrument *instrument,
+                                                               RBRInstrumentDirectionDependentSampling *ddsampling)
 {
-    if (ddsampling->direction < 0
-        || ddsampling->direction >= RBRINSTRUMENT_DIRECTION_COUNT
-        || ddsampling->fastPeriod >= ddsampling->slowPeriod
-        || ddsampling->fastPeriod <= 0
-        || ddsampling->fastPeriod > RBRINSTRUMENT_SAMPLING_PERIOD_MAX
-        || (ddsampling->fastPeriod >= 1000
-            && ddsampling->fastPeriod % 1000 != 0)
-        || ddsampling->slowPeriod <= 0
-        || ddsampling->slowPeriod > RBRINSTRUMENT_SAMPLING_PERIOD_MAX
-        || (ddsampling->slowPeriod >= 1000
-            && ddsampling->slowPeriod % 1000 != 0))
+    if (ddsampling->direction < 0 || ddsampling->direction >= RBRINSTRUMENT_DIRECTION_COUNT ||
+        ddsampling->fastPeriod >= ddsampling->slowPeriod || ddsampling->fastPeriod <= 0 ||
+        ddsampling->fastPeriod > RBRINSTRUMENT_SAMPLING_PERIOD_MAX ||
+        (ddsampling->fastPeriod >= 1000 && ddsampling->fastPeriod % 1000 != 0) ||
+        ddsampling->slowPeriod <= 0 || ddsampling->slowPeriod > RBRINSTRUMENT_SAMPLING_PERIOD_MAX ||
+        (ddsampling->slowPeriod >= 1000 && ddsampling->slowPeriod % 1000 != 0))
     {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrument_converse(
-        instrument,
-        "ddsampling direction = %s, fastperiod = %i, slowperiod = %i, "
-        "fastthreshold = %0.1f, slowthreshold = %0.1f",
-        RBRInstrumentDirection_name(ddsampling->direction),
-        ddsampling->fastPeriod,
-        ddsampling->slowPeriod,
-        ddsampling->fastThreshold,
-        ddsampling->slowThreshold);
+    return RBRInstrument_converse(instrument,
+                                  "ddsampling direction = %s, fastperiod = %i, slowperiod = %i, "
+                                  "fastthreshold = %0.1f, slowthreshold = %0.1f",
+                                  RBRInstrumentDirection_name(ddsampling->direction),
+                                  ddsampling->fastPeriod,
+                                  ddsampling->slowPeriod,
+                                  (double) ddsampling->fastThreshold,
+                                  (double) ddsampling->slowThreshold);
 }

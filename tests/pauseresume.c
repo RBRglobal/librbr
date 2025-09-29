@@ -10,36 +10,31 @@
 
 #include "tests.h"
 
-typedef struct PauseresumeTest
-{
+typedef struct PauseresumeTest {
     const char *command;
     const char *response;
     RBRInstrumentPauseresumeState state;
 } PauseresumeTest;
 
-typedef struct PauseTest
-{
+typedef struct PauseTest {
     const char *command;
     const char *response;
     RBRInstrumentPauseStatus status;
 } PauseTest;
 
-typedef struct ResumeTest
-{
+typedef struct ResumeTest {
     const char *command;
     const char *response;
     RBRInstrumentResumeStatus status;
 } ResumeTest;
 
-static bool test_pauseresume_error(RBRInstrument *instrument,
-                                   TestIOBuffers *buffers,
+static bool test_pauseresume_error(RBRInstrument *instrument, TestIOBuffers *buffers,
                                    PauseresumeTest *tests)
 {
     RBRInstrumentError err;
     RBRInstrumentPauseresumeState state;
     state = 3;
-    for (int i = 0; tests[i].command != NULL; i++)
-    {
+    for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_getPauseresume(instrument, &state);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_HARDWARE_ERROR, err, RBRInstrumentError);
@@ -48,15 +43,12 @@ static bool test_pauseresume_error(RBRInstrument *instrument,
     return true;
 }
 
-static bool test_pause_error(RBRInstrument *instrument,
-                             TestIOBuffers *buffers,
-                             PauseTest *tests)
+static bool test_pause_error(RBRInstrument *instrument, TestIOBuffers *buffers, PauseTest *tests)
 {
     RBRInstrumentError err;
     RBRInstrumentPauseStatus status;
     status = 1;
-    for (int i = 0; tests[i].command != NULL; i++)
-    {
+    for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_pause(instrument, &status);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_HARDWARE_ERROR, err, RBRInstrumentError);
@@ -65,15 +57,12 @@ static bool test_pause_error(RBRInstrument *instrument,
     return true;
 }
 
-static bool test_resume_error(RBRInstrument *instrument,
-                              TestIOBuffers *buffers,
-                              ResumeTest *tests)
+static bool test_resume_error(RBRInstrument *instrument, TestIOBuffers *buffers, ResumeTest *tests)
 {
     RBRInstrumentError err;
     RBRInstrumentResumeStatus status;
     status = 2;
-    for (int i = 0; tests[i].command != NULL; i++)
-    {
+    for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_resume(instrument, &status);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_HARDWARE_ERROR, err, RBRInstrumentError);
@@ -85,42 +74,29 @@ static bool test_resume_error(RBRInstrument *instrument,
 TEST_LOGGER2(pauseresume_error)
 {
     PauseresumeTest tests[] = {
-        {"pauseresume" COMMAND_TERMINATOR,
-         "E0102 invalid command" RESPONSE_TERMINATOR,
-         3},
-        {0}};
+        {"pauseresume" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 3}, {0}};
     return test_pauseresume_error(instrument, buffers, tests);
 }
 
 TEST_LOGGER2(pause_error)
 {
     PauseTest tests[] = {
-        {"pause" COMMAND_TERMINATOR,
-         "E0102 invalid command" RESPONSE_TERMINATOR,
-         1},
-        {0}};
+        {"pause" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 1}, {0}};
     return test_pause_error(instrument, buffers, tests);
 }
 
 TEST_LOGGER2(resume_error)
 {
     ResumeTest tests[] = {
-        {"resume" COMMAND_TERMINATOR,
-         "E0102 invalid command" RESPONSE_TERMINATOR,
-         2},
-        {0}};
+        {"resume" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 2}, {0}};
     return test_resume_error(instrument, buffers, tests);
 }
 
 TEST_LOGGER3(pauseresume_error)
 {
     PauseresumeTest tests[] = {
-        {"pauseresume" COMMAND_TERMINATOR,
-         "E0102 invalid command" RESPONSE_TERMINATOR,
-         3},
-        {"pauseresume" COMMAND_TERMINATOR,
-         "E0109 feature not available" RESPONSE_TERMINATOR,
-         3},
+        {"pauseresume" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 3},
+        {"pauseresume" COMMAND_TERMINATOR, "E0109 feature not available" RESPONSE_TERMINATOR, 3},
         {0}};
     return test_pauseresume_error(instrument, buffers, tests);
 }
@@ -128,15 +104,9 @@ TEST_LOGGER3(pauseresume_error)
 TEST_LOGGER3(pause_error)
 {
     PauseTest tests[] = {
-        {"pause" COMMAND_TERMINATOR,
-         "E0102 invalid command" RESPONSE_TERMINATOR,
-         1},
-        {"pause" COMMAND_TERMINATOR,
-         "E0109 feature not available" RESPONSE_TERMINATOR,
-         1},
-        {"pause" COMMAND_TERMINATOR,
-         "E0406 not logging" RESPONSE_TERMINATOR,
-         1},
+        {"pause" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 1},
+        {"pause" COMMAND_TERMINATOR, "E0109 feature not available" RESPONSE_TERMINATOR, 1},
+        {"pause" COMMAND_TERMINATOR, "E0406 not logging" RESPONSE_TERMINATOR, 1},
         {"pause" COMMAND_TERMINATOR,
          "E0415 more than one gating condition is enabled" RESPONSE_TERMINATOR,
          1},
@@ -150,15 +120,9 @@ TEST_LOGGER3(pause_error)
 TEST_LOGGER3(resume_error)
 {
     ResumeTest tests[] = {
-        {"resume" COMMAND_TERMINATOR,
-         "E0102 invalid command" RESPONSE_TERMINATOR,
-         2},
-        {"resume" COMMAND_TERMINATOR,
-         "E0109 feature not available" RESPONSE_TERMINATOR,
-         2},
-        {"resume" COMMAND_TERMINATOR,
-         "E0406 not logging" RESPONSE_TERMINATOR,
-         2},
+        {"resume" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 2},
+        {"resume" COMMAND_TERMINATOR, "E0109 feature not available" RESPONSE_TERMINATOR, 2},
+        {"resume" COMMAND_TERMINATOR, "E0406 not logging" RESPONSE_TERMINATOR, 2},
         {"resume" COMMAND_TERMINATOR,
          "E0415 more than one gating condition is enabled" RESPONSE_TERMINATOR,
          2},
@@ -169,16 +133,14 @@ TEST_LOGGER3(resume_error)
     return test_resume_error(instrument, buffers, tests);
 }
 
-static bool test_pauseresume(RBRInstrument *instrument,
-                             TestIOBuffers *buffers,
+static bool test_pauseresume(RBRInstrument *instrument, TestIOBuffers *buffers,
                              PauseresumeTest *tests)
 {
     RBRInstrumentError err;
     RBRInstrumentPauseresumeState state;
     state = 3;
 
-    for (int i = 0; tests[i].command != NULL; i++)
-    {
+    for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_getPauseresume(instrument, &state);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -187,15 +149,12 @@ static bool test_pauseresume(RBRInstrument *instrument,
     return true;
 }
 
-static bool test_pause(RBRInstrument *instrument,
-                       TestIOBuffers *buffers,
-                       PauseTest *tests)
+static bool test_pause(RBRInstrument *instrument, TestIOBuffers *buffers, PauseTest *tests)
 {
     RBRInstrumentError err;
     RBRInstrumentPauseStatus status;
     status = 1;
-    for (int i = 0; tests[i].command != NULL; i++)
-    {
+    for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_pause(instrument, &status);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -204,15 +163,12 @@ static bool test_pause(RBRInstrument *instrument,
     return true;
 }
 
-static bool test_resume(RBRInstrument *instrument,
-                              TestIOBuffers *buffers,
-                              ResumeTest *tests)
+static bool test_resume(RBRInstrument *instrument, TestIOBuffers *buffers, ResumeTest *tests)
 {
     RBRInstrumentError err;
     RBRInstrumentResumeStatus status;
     status = 2;
-    for (int i = 0; tests[i].command != NULL; i++)
-    {
+    for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrument_resume(instrument, &status);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
@@ -224,15 +180,9 @@ static bool test_resume(RBRInstrument *instrument,
 TEST_LOGGER3(pauseresume)
 {
     PauseresumeTest tests[] = {
-        {"pauseresume" COMMAND_TERMINATOR,
-         "pauseresume state = n/a" RESPONSE_TERMINATOR,
-         0},
-        {"pauseresume" COMMAND_TERMINATOR,
-         "pauseresume state = paused" RESPONSE_TERMINATOR,
-         1},
-        {"pauseresume" COMMAND_TERMINATOR,
-         "pauseresume state = running" RESPONSE_TERMINATOR,
-         2},
+        {"pauseresume" COMMAND_TERMINATOR, "pauseresume state = n/a" RESPONSE_TERMINATOR, 0},
+        {"pauseresume" COMMAND_TERMINATOR, "pauseresume state = paused" RESPONSE_TERMINATOR, 1},
+        {"pauseresume" COMMAND_TERMINATOR, "pauseresume state = running" RESPONSE_TERMINATOR, 2},
         {0}};
 
     return test_pauseresume(instrument, buffers, tests);
@@ -241,10 +191,7 @@ TEST_LOGGER3(pauseresume)
 TEST_LOGGER3(pause)
 {
     PauseTest tests[] = {
-        {"pause" COMMAND_TERMINATOR,
-         "pause status = paused" RESPONSE_TERMINATOR,
-         0},
-        {0}};
+        {"pause" COMMAND_TERMINATOR, "pause status = paused" RESPONSE_TERMINATOR, 0}, {0}};
 
     return test_pause(instrument, buffers, tests);
 }
@@ -252,12 +199,8 @@ TEST_LOGGER3(pause)
 TEST_LOGGER3(resume)
 {
     ResumeTest tests[] = {
-        {"resume" COMMAND_TERMINATOR,
-         "resume status = pending" RESPONSE_TERMINATOR,
-         0},
-        {"resume" COMMAND_TERMINATOR,
-         "resume status = logging" RESPONSE_TERMINATOR,
-         1},
+        {"resume" COMMAND_TERMINATOR, "resume status = pending" RESPONSE_TERMINATOR, 0},
+        {"resume" COMMAND_TERMINATOR, "resume status = logging" RESPONSE_TERMINATOR, 1},
         {0}};
 
     return test_resume(instrument, buffers, tests);

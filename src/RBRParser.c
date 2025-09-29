@@ -110,14 +110,11 @@ const char *RBRInstrumentEventType_name(RBRInstrumentEventType type)
     }
 }
 
-RBRInstrumentError RBRParser_init(RBRParser **parser,
-                                  const RBRParserCallbacks *callbacks,
-                                  const RBRParserConfig *config,
-                                  void *userData)
+RBRInstrumentError RBRParser_init(RBRParser **parser, const RBRParserCallbacks *callbacks,
+                                  const RBRParserConfig *config, void *userData)
 {
-    if (callbacks == NULL
-        || (callbacks->sample != NULL && callbacks->sampleBuffer == NULL)
-        || (callbacks->event != NULL && callbacks->eventBuffer == NULL))
+    if (callbacks == NULL || (callbacks->sample != NULL && callbacks->sampleBuffer == NULL) ||
+        (callbacks->event != NULL && callbacks->eventBuffer == NULL))
     {
         return RBRINSTRUMENT_MISSING_CALLBACK;
     }
@@ -127,8 +124,8 @@ RBRInstrumentError RBRParser_init(RBRParser **parser,
         return RBRINSTRUMENT_UNSUPPORTED;
     }
 
-    if (config->formatConfig.easyParse.channels <= 0
-        || config->formatConfig.easyParse.channels > RBRINSTRUMENT_CHANNEL_MAX)
+    if (config->formatConfig.easyParse.channels <= 0 ||
+        config->formatConfig.easyParse.channels > RBRINSTRUMENT_CHANNEL_MAX)
     {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
@@ -146,7 +143,7 @@ RBRInstrumentError RBRParser_init(RBRParser **parser,
     memset(*parser, 0, sizeof(RBRParser));
     memcpy(&(*parser)->config, config, sizeof(RBRParserConfig));
     memcpy(&(*parser)->callbacks, callbacks, sizeof(RBRParserCallbacks));
-    (*parser)->userData          = userData;
+    (*parser)->userData = userData;
     (*parser)->managedAllocation = allocated;
 
     return RBRINSTRUMENT_SUCCESS;
@@ -184,10 +181,8 @@ void RBRParser_setUserData(RBRParser *parser, void *userData)
 #define EP_EVENT_TIMESTAMP_OFFSET 4
 #define EP_EVENT_PAYLOAD_OFFSET   12
 
-static RBRInstrumentError RBRParser_parseEPEvents(
-    RBRParser *parser,
-    const uint8_t *const data,
-    int32_t *size)
+static RBRInstrumentError RBRParser_parseEPEvents(RBRParser *parser, const uint8_t *const data,
+                                                  int32_t *size)
 {
     int32_t maxSize = *size;
     *size = 0;
@@ -203,10 +198,7 @@ static RBRInstrumentError RBRParser_parseEPEvents(
         memset(event, 0, sizeof(RBRInstrumentEvent));
 
         event->type = *(uint8_t *) (data + *size + EP_EVENT_TYPE_OFFSET);
-        event->timestamp =
-            *(RBRInstrumentDateTime *) (data
-                                        + *size
-                                        + EP_EVENT_TIMESTAMP_OFFSET);
+        event->timestamp = *(RBRInstrumentDateTime *) (data + *size + EP_EVENT_TIMESTAMP_OFFSET);
         switch (event->type)
         {
         case RBRINSTRUMENT_EVENT_START_OF_REGIME_BIN:
@@ -214,8 +206,7 @@ static RBRInstrumentError RBRParser_parseEPEvents(
         case RBRINSTRUMENT_EVENT_BEGIN_PROFILING_DOWN_CAST:
         case RBRINSTRUMENT_EVENT_END_OF_PROFILING_CAST:
             event->auxiliaryDataLength = 1;
-            event->auxiliaryData[0] =
-                *(uint32_t *) (data + *size + EP_EVENT_PAYLOAD_OFFSET);
+            event->auxiliaryData[0] = *(uint32_t *) (data + *size + EP_EVENT_PAYLOAD_OFFSET);
             break;
         default:
             event->auxiliaryDataLength = 0;
@@ -231,12 +222,10 @@ static RBRInstrumentError RBRParser_parseEPEvents(
 }
 
 #define EP_SAMPLE_TIMESTAMP_SIZE ((int32_t) sizeof(RBRInstrumentDateTime))
-#define EP_SAMPLE_READING_SIZE ((int32_t) sizeof(float))
+#define EP_SAMPLE_READING_SIZE   ((int32_t) sizeof(float))
 
-static RBRInstrumentError RBRParser_parseEPSamples(
-    RBRParser *parser,
-    const uint8_t *const data,
-    int32_t *size)
+static RBRInstrumentError RBRParser_parseEPSamples(RBRParser *parser, const uint8_t *const data,
+                                                   int32_t *size)
 {
     int32_t maxSize = *size;
     *size = 0;
@@ -248,8 +237,7 @@ static RBRInstrumentError RBRParser_parseEPSamples(
     }
 
     int32_t channels = parser->config.formatConfig.easyParse.channels;
-    int32_t sampleSize = EP_SAMPLE_TIMESTAMP_SIZE
-                         + EP_SAMPLE_READING_SIZE * channels;
+    int32_t sampleSize = EP_SAMPLE_TIMESTAMP_SIZE + EP_SAMPLE_READING_SIZE * channels;
     for (; *size + sampleSize <= maxSize; *size += sampleSize)
     {
         memset(sample, 0, sizeof(RBRInstrumentEvent));
@@ -258,26 +246,22 @@ static RBRInstrumentError RBRParser_parseEPSamples(
         sample->channels = channels;
         for (int32_t channel = 0; channel < channels; ++channel)
         {
-            sample->readings[channel] =
-                *(float *) (data
-                            + *size
-                            + EP_SAMPLE_TIMESTAMP_SIZE
-                            + channel * EP_SAMPLE_READING_SIZE);
+            sample->readings[channel] = *(float *) (data + *size + EP_SAMPLE_TIMESTAMP_SIZE +
+                                                    channel * EP_SAMPLE_READING_SIZE);
         }
 
         if (parser->callbacks.sample != NULL)
         {
-            RBR_TRY(parser->callbacks.sample(parser, sample)); //calls the parser-> callback.sample function.
+            RBR_TRY(parser->callbacks.sample(
+                        parser, sample)); // calls the parser-> callback.sample function.
         }
     }
 
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRParser_parse(RBRParser *parser,
-                                   RBRInstrumentDataset dataset,
-                                   const void *const data,
-                                   int32_t *size)
+RBRInstrumentError RBRParser_parse(RBRParser *parser, RBRInstrumentDataset dataset,
+                                   const void *const data, int32_t *size)
 {
     const uint8_t *d = (const uint8_t *const) data;
 

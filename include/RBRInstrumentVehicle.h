@@ -24,7 +24,7 @@ extern "C" {
 #define RBRINSTRUMENT_REGIME_BOUNDARY_MAX 65535
 
 /** \brief The maximum regime bin size in dbar. */
-#define RBRINSTRUMENT_REGIME_BINSIZE_MAX 6553.5
+#define RBRINSTRUMENT_REGIME_BINSIZE_MAX 6553.5f
 
 /** \brief The maximum sampling period within a regime. */
 #define RBRINSTRUMENT_REGIME_SAMPLING_PERIOD_MAX 65000
@@ -84,8 +84,7 @@ typedef enum RBRInstrumentRegimesReference
  * \return a string name for the pressure reference
  * \see RBRInstrumentError_name() for a description of the format of names
  */
-const char *RBRInstrumentRegimesReference_name(
-    RBRInstrumentRegimesReference reference);
+const char *RBRInstrumentRegimesReference_name(RBRInstrumentRegimesReference reference);
 
 /**
  * \brief Instrument `regimes` command parameters.
@@ -119,9 +118,8 @@ typedef struct RBRInstrumentRegimes
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the feature is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  */
-RBRInstrumentError RBRInstrument_getRegimes(
-    RBRInstrument *instrument,
-    RBRInstrumentRegimes *regimes);
+RBRInstrumentError RBRInstrument_getRegimes(RBRInstrument *instrument,
+                                            RBRInstrumentRegimes *regimes);
 
 /**
  * \brief Set the instrument regimes settings.
@@ -144,9 +142,8 @@ RBRInstrumentError RBRInstrument_getRegimes(
  *                                                requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  */
-RBRInstrumentError RBRInstrument_setRegimes(
-    RBRInstrument *instrument,
-    const RBRInstrumentRegimes *regimes);
+RBRInstrumentError RBRInstrument_setRegimes(RBRInstrument *instrument,
+                                            const RBRInstrumentRegimes *regimes);
 
 /** \brief A regime identifier. */
 typedef uint8_t RBRInstrumentRegimeIndex;
@@ -212,9 +209,7 @@ typedef struct RBRInstrumentRegime
  *                                                is given
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regime
  */
-RBRInstrumentError RBRInstrument_getRegime(
-    RBRInstrument *instrument,
-    RBRInstrumentRegime *regime);
+RBRInstrumentError RBRInstrument_getRegime(RBRInstrument *instrument, RBRInstrumentRegime *regime);
 
 /**
  * \brief Set the instrument regime settings.
@@ -235,9 +230,8 @@ RBRInstrumentError RBRInstrument_getRegime(
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regime
  */
-RBRInstrumentError RBRInstrument_setRegime(
-    RBRInstrument *instrument,
-    const RBRInstrumentRegime *regime);
+RBRInstrumentError RBRInstrument_setRegime(RBRInstrument *instrument,
+                                           const RBRInstrumentRegime *regime);
 
 /**
  * \brief Instrument `ddsampling` command parameters.
@@ -293,9 +287,8 @@ typedef struct RBRInstrumentDirectionDependentSampling
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the feature is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/ddsampling
  */
-RBRInstrumentError RBRInstrument_getDirectionDependentSampling(
-    RBRInstrument *instrument,
-    RBRInstrumentDirectionDependentSampling *ddsampling);
+RBRInstrumentError RBRInstrument_getDirectionDependentSampling(RBRInstrument *instrument,
+                                                               RBRInstrumentDirectionDependentSampling *ddsampling);
 
 /**
  * \brief Set the instrument regime settings.
@@ -316,9 +309,8 @@ RBRInstrumentError RBRInstrument_getDirectionDependentSampling(
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/ddsampling
  */
-RBRInstrumentError RBRInstrument_setDirectionDependentSampling(
-    RBRInstrument *instrument,
-    RBRInstrumentDirectionDependentSampling *ddsampling);
+RBRInstrumentError RBRInstrument_setDirectionDependentSampling(RBRInstrument *instrument,
+                                                               RBRInstrumentDirectionDependentSampling *ddsampling);
 
 #ifdef __cplusplus
 }

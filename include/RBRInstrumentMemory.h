@@ -107,9 +107,8 @@ typedef struct RBRInstrumentMemoryInfo
  * \return #RBRINSTRUMENT_HARDWARE_ERROR if the dataset is unsupported
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/meminfo
  */
-RBRInstrumentError RBRInstrument_getMemoryInfo(
-    RBRInstrument *instrument,
-    RBRInstrumentMemoryInfo *memoryInfo);
+RBRInstrumentError RBRInstrument_getMemoryInfo(RBRInstrument *instrument,
+                                               RBRInstrumentMemoryInfo *memoryInfo);
 
 /**
  * \brief Instrument `readdata` command parameters.
@@ -176,8 +175,7 @@ typedef struct RBRInstrumentData
  * \return #RBRINSTRUMENT_HARDWARE_ERROR if the dataset is unsupported
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/readdata
  */
-RBRInstrumentError RBRInstrument_readData(RBRInstrument *instrument,
-                                          RBRInstrumentData *data);
+RBRInstrumentError RBRInstrument_readData(RBRInstrument *instrument, RBRInstrumentData *data);
 
 /**
  * \brief Clear the data storage area of the flash memory.
@@ -206,13 +204,13 @@ RBRInstrumentError RBRInstrument_memoryClear(RBRInstrument *instrument);
 typedef enum RBRInstrumentMemoryFormat
 {
     /** No format. */
-    RBRINSTRUMENT_MEMFORMAT_NONE     =      0,
+    RBRINSTRUMENT_MEMFORMAT_NONE = 0,
     /** “Standard” format, `rawbin00`. */
     RBRINSTRUMENT_MEMFORMAT_RAWBIN00 = 1 << 0,
     /** “EasyParse” format, `calbin00`. */
     RBRINSTRUMENT_MEMFORMAT_CALBIN00 = 1 << 1,
     /** Corresponds to the largest memory format enum value. */
-    RBRINSTRUMENT_MEMFORMAT_MAX      = RBRINSTRUMENT_MEMFORMAT_CALBIN00
+    RBRINSTRUMENT_MEMFORMAT_MAX = RBRINSTRUMENT_MEMFORMAT_CALBIN00
 } RBRInstrumentMemoryFormat;
 
 /**
@@ -238,9 +236,8 @@ const char *RBRInstrumentMemoryFormat_name(RBRInstrumentMemoryFormat format);
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
-RBRInstrumentError RBRInstrument_getAvailableMemoryFormats(
-    RBRInstrument *instrument,
-    RBRInstrumentMemoryFormat *memoryFormats);
+RBRInstrumentError RBRInstrument_getAvailableMemoryFormats(RBRInstrument *instrument,
+                                                           RBRInstrumentMemoryFormat *memoryFormats);
 
 /**
  * \brief Get the current memory format.
@@ -257,9 +254,8 @@ RBRInstrumentError RBRInstrument_getAvailableMemoryFormats(
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
-RBRInstrumentError RBRInstrument_getCurrentMemoryFormat(
-    RBRInstrument *instrument,
-    RBRInstrumentMemoryFormat *memoryFormat);
+RBRInstrumentError RBRInstrument_getCurrentMemoryFormat(RBRInstrument *instrument,
+                                                        RBRInstrumentMemoryFormat *memoryFormat);
 
 /**
  * \brief Get the memory format to be used for the next deployment.
@@ -271,9 +267,8 @@ RBRInstrumentError RBRInstrument_getCurrentMemoryFormat(
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
-RBRInstrumentError RBRInstrument_getNewMemoryFormat(
-    RBRInstrument *instrument,
-    RBRInstrumentMemoryFormat *memoryFormat);
+RBRInstrumentError RBRInstrument_getNewMemoryFormat(RBRInstrument *instrument,
+                                                    RBRInstrumentMemoryFormat *memoryFormat);
 
 /**
  * \brief Set the memory format to be used for the next deployment.
@@ -295,15 +290,15 @@ RBRInstrumentError RBRInstrument_getNewMemoryFormat(
  *                                       selected
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
-RBRInstrumentError RBRInstrument_setNewMemoryFormat(
-    RBRInstrument *instrument,
-    RBRInstrumentMemoryFormat memoryFormat);
+RBRInstrumentError RBRInstrument_setNewMemoryFormat(RBRInstrument *instrument,
+                                                    RBRInstrumentMemoryFormat memoryFormat);
 
 /**
  * \brief Functions available to aggregate channel values within bins.
  *
  * \see RBRInstrumentPostprocessingChannel
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
+ * \see
+ * https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 typedef enum RBRInstrumentPostprocessingAggregate
 {
@@ -332,14 +327,14 @@ typedef enum RBRInstrumentPostprocessingAggregate
  * \return a string name for the aggregate function
  * \see RBRInstrumentError_name() for a description of the format of names
  */
-const char *RBRInstrumentPostprocessingAggregate_name(
-    RBRInstrumentPostprocessingAggregate function);
+const char *RBRInstrumentPostprocessingAggregate_name(RBRInstrumentPostprocessingAggregate function);
 
 /**
  * Post-processing channel configurations.
  *
  * \see RBRInstrumentPostprocessing
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
+ * \see
+ * https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 typedef struct RBRInstrumentPostprocessingChannelsList
 {
@@ -359,7 +354,8 @@ typedef struct RBRInstrumentPostprocessingChannelsList
  * \brief Post-processing job statuses.
  *
  * \see RBRInstrumentPostprocessing
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
+ * \see
+ * https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 typedef enum RBRInstrumentPostprocessingStatus
 {
@@ -384,14 +380,14 @@ typedef enum RBRInstrumentPostprocessingStatus
  * \return a string name for the post-processing status
  * \see RBRInstrumentError_name() for a description of the format of names
  */
-const char *RBRInstrumentPostprocessingStatus_name(
-    RBRInstrumentPostprocessingStatus status);
+const char *RBRInstrumentPostprocessingStatus_name(RBRInstrumentPostprocessingStatus status);
 
 /**
  * \brief Post-processing control commands.
  *
  * \see RBRInstrumentPostprocessing
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
+ * \see
+ * https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 typedef enum RBRInstrumentPostprocessingCommand
 {
@@ -414,14 +410,14 @@ typedef enum RBRInstrumentPostprocessingCommand
  * \return a string name for the post-processing command
  * \see RBRInstrumentError_name() for a description of the format of names
  */
-const char *RBRInstrumentPostprocessingCommand_name(
-    RBRInstrumentPostprocessingCommand command);
+const char *RBRInstrumentPostprocessingCommand_name(RBRInstrumentPostprocessingCommand command);
 
 /**
  * \brief Post-processing bin filters.
  *
  * \see RBRInstrumentPostprocessing
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
+ * \see
+ * https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 typedef enum RBRInstrumentPostprocessingBinFilter
 {
@@ -454,15 +450,15 @@ typedef enum RBRInstrumentPostprocessingBinFilter
  * \return a string name for the post-processing bin filter
  * \see RBRInstrumentError_name() for a description of the format of names
  */
-const char *RBRInstrumentPostprocessingBinFilter_name(
-    RBRInstrumentPostprocessingBinFilter filter);
+const char *RBRInstrumentPostprocessingBinFilter_name(RBRInstrumentPostprocessingBinFilter filter);
 
 /**
  * \brief The instrument post-processing configuration.
  *
  * \see RBRInstrument_getPostprocessing()
  * \see RBRInstrument_setPostprocessing()
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
+ * \see
+ * https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 typedef struct RBRInstrumentPostprocessing
 {
@@ -564,7 +560,7 @@ typedef struct RBRInstrumentPostprocessing
      */
     float dcTau;
     /**
-     * \brief (dynamic correction) Parameter for the time lag correction 
+     * \brief (dynamic correction) Parameter for the time lag correction
      *          between marine temperature and conductivity cell temperature
      *
      * Coefficient is in second (default 0.35)
@@ -592,11 +588,11 @@ typedef struct RBRInstrumentPostprocessing
  * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the feature is unavailable
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
+ * \see
+ * https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
-RBRInstrumentError RBRInstrument_getPostprocessing(
-    RBRInstrument *instrument,
-    RBRInstrumentPostprocessing *postprocessing);
+RBRInstrumentError RBRInstrument_getPostprocessing(RBRInstrument *instrument,
+                                                   RBRInstrumentPostprocessing *postprocessing);
 
 /**
  * \brief Set the instrument post-processing settings.
@@ -615,11 +611,11 @@ RBRInstrumentError RBRInstrument_getPostprocessing(
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the settings cannot be changed
  * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
+ * \see
+ * https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
-RBRInstrumentError RBRInstrument_setPostprocessing(
-    RBRInstrument *instrument,
-    const RBRInstrumentPostprocessing *postprocessing);
+RBRInstrumentError RBRInstrument_setPostprocessing(RBRInstrument *instrument,
+                                                   const RBRInstrumentPostprocessing *postprocessing);
 
 /**
  * \brief Exercises control over the post-processing state.
@@ -640,12 +636,12 @@ RBRInstrumentError RBRInstrument_setPostprocessing(
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the settings cannot be changed
  * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
+ * \see
+ * https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
-RBRInstrumentError RBRInstrument_setPostprocessingCommand(
-    RBRInstrument *instrument,
-    RBRInstrumentPostprocessingCommand command,
-    RBRInstrumentPostprocessingStatus *status);
+RBRInstrumentError RBRInstrument_setPostprocessingCommand(RBRInstrument *instrument,
+                                                          RBRInstrumentPostprocessingCommand command,
+                                                          RBRInstrumentPostprocessingStatus *status);
 
 /**
  * \brief Calculate the 16-bit CRC using the CCITT polynomial f(x)=x^16+x^12+x^5+1
@@ -655,11 +651,10 @@ RBRInstrumentError RBRInstrument_setPostprocessingCommand(
  * \param [in] data the data string used to calculate the CRC
  * \param [in] size the number of characters in the string used to calculate the CRC
  * \return calculated CRC
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
+ * \see
+ * https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
-uint16_t calculateCrc(
-    const void *data,
-    int32_t size);   
+uint16_t calculateCrc(const void *data, int32_t size);
 
 #ifdef __cplusplus
 }

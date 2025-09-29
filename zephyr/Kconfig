@@ -1,28 +1,6 @@
-# Copyright (c) 2018 RBR Ltd.
-# SPDX-License-Identifier: Apache-2.0
-
 config LIBRBR
-	bool "RBR Instrument Library"
-	help
-	  Enable the RBR instrument communication and data parsing library.
-	  This library provides functionality for communicating with RBR
-	  oceanographic instruments and parsing their data.
+  bool "RBR Instrument Interface Library"
+  default n
+  help
+    This option enables the RBR instrument interface library.
 
-if LIBRBR
-
-config LIBRBR_DYNAMIC_CORRECTION
-	bool "RBR Dynamic Correction Library"
-	default n
-	help
-	  Enable the RBR dynamic correction library for post-processing
-	  instrument data with dynamic corrections.
-
-config LIBRBR_LOG_LEVEL
-	int "RBR Library Log Level"
-	default 3
-	range 0 4
-	help
-	  Set the log level for RBR library operations:
-	  0 = Off, 1 = Error, 2 = Warning, 3 = Info, 4 = Debug
-
-endif # LIBRBR

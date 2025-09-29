@@ -48,7 +48,8 @@ const char *RBRInstrumentPauseresumeState_name(RBRInstrumentPauseresumeState sta
  */
 typedef enum RBRInstrumentPauseStatus
 {
-    /** Deployment is paused and no more samples will be taken once the current acquisition finishes. */
+    /** Deployment is paused and no more samples will be taken once the current acquisition
+     * finishes. */
     RBRINSTRUMENT_PAUSE_PAUSED,
     /** An unknown or unrecognized pause status. */
     RBRINSTRUMENT_UNKNOWN_PAUSE
@@ -61,8 +62,7 @@ typedef enum RBRInstrumentPauseStatus
  * \return a string name for the pause status
  * \see RBRInstrumentError_name() for a description of the format of names
  */
-const char *RBRInstrumentPauseStatus_name(
-    RBRInstrumentPauseStatus status);
+const char *RBRInstrumentPauseStatus_name(RBRInstrumentPauseStatus status);
 
 /**
  * \brief Possible instrument resume status.
@@ -86,14 +86,13 @@ typedef enum RBRInstrumentResumeStatus
  * \return a string name for the resume status
  * \see RBRInstrumentError_name() for a description of the format of names
  */
-const char *RBRInstrumentResumeStatus_name(
-    RBRInstrumentResumeStatus status);
+const char *RBRInstrumentResumeStatus_name(RBRInstrumentResumeStatus status);
 
 /**
  * It allows the host to determine if the pauseresume feature is available on
  * the instrument. It allows an elevated host to allow and deny the feature
  * for the instrument.
- * 
+ *
  * \param [in] instrument the instrument connection
  * \param [in, out] state the state of pauseresume
  * \return #RBRINSTRUMENT_SUCCESS when the state is one of the following:
@@ -103,11 +102,11 @@ const char *RBRInstrumentResumeStatus_name(
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the response indicates an error.
  */
 RBRInstrumentError RBRInstrument_getPauseresume(RBRInstrument *instrument,
-                                       RBRInstrumentPauseresumeState *state);
+                                                RBRInstrumentPauseresumeState *state);
 
 /**
  * It pauses an enabled deloyment.
- * 
+ *
  * \param [in] instrument the instrument connection
  * \param [in, out] status the status of pause
  * \return #RBRINSTRUMENT_SUCCESS when the status is "paused".
@@ -115,12 +114,11 @@ RBRInstrumentError RBRInstrument_getPauseresume(RBRInstrument *instrument,
  * pauseresume feature, or pauseresume is not allowed.
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the response indicates an error.
  */
-RBRInstrumentError RBRInstrument_pause(RBRInstrument *instrument,
-                                       RBRInstrumentPauseStatus *status);
+RBRInstrumentError RBRInstrument_pause(RBRInstrument *instrument, RBRInstrumentPauseStatus *status);
 /**
  * It resumes an enabled deployment which was previously
  * paused using the pause command
- * 
+ *
  * \param [in] instrument the instrument connection
  * \param [in, out] status the status of resume
  * \return #RBRINSTRUMENT_SUCCESS when the state is one of the following:
@@ -130,7 +128,7 @@ RBRInstrumentError RBRInstrument_pause(RBRInstrument *instrument,
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the response indicates an error.
  */
 RBRInstrumentError RBRInstrument_resume(RBRInstrument *instrument,
-                                       RBRInstrumentResumeStatus *status);
+                                        RBRInstrumentResumeStatus *status);
 
 #ifdef __cplusplus
 }

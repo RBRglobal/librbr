@@ -48,10 +48,8 @@ extern "C" {
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when an invalid channel is requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/fetch
  */
-RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument,
-                                       RBRInstrumentLabelsList *channels,
-                                       bool sleepAfter,
-                                       RBRInstrumentSample *sample);
+RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument, RBRInstrumentLabelsList *channels,
+                                       bool sleepAfter, RBRInstrumentSample *sample);
 
 #ifdef __cplusplus
 }

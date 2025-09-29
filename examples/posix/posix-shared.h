@@ -18,7 +18,7 @@ extern "C" {
 #include "RBRInstrument.h"
 
 #define INSTRUMENT_CHARACTER_TIMEOUT_MSEC 4000
-#define INSTRUMENT_COMMAND_TIMEOUT_MSEC 10000
+#define INSTRUMENT_COMMAND_TIMEOUT_MSEC   10000
 
 int openSerialFd(char *devicePath);
 
@@ -28,12 +28,10 @@ RBRInstrumentError instrumentTime(const struct RBRInstrument *instrument,
 RBRInstrumentError instrumentSleep(const struct RBRInstrument *instrument,
                                    RBRInstrumentDateTime time);
 
-RBRInstrumentError instrumentRead(const struct RBRInstrument *instrument,
-                                  void *data,
+RBRInstrumentError instrumentRead(const struct RBRInstrument *instrument, void *data,
                                   int32_t *size);
 
-RBRInstrumentError instrumentWrite(const struct RBRInstrument *instrument,
-                                   const void *const data,
+RBRInstrumentError instrumentWrite(const struct RBRInstrument *instrument, const void *const data,
                                    int32_t size);
 
 RBRInstrumentError instrumentStart(RBRInstrument *instrument);

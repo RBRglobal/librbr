@@ -63,8 +63,7 @@ typedef enum RBRInstrumentThresholdingChannelSelection
  * \return a string name for the channel selection type
  * \see RBRInstrumentError_name() for a description of the format of names
  */
-const char *RBRInstrumentThresholdingChannelSelection_name(
-    RBRInstrumentThresholdingChannelSelection selection);
+const char *RBRInstrumentThresholdingChannelSelection_name(RBRInstrumentThresholdingChannelSelection selection);
 
 /**
  * \brief Possible instrument thresholding conditions.
@@ -91,8 +90,7 @@ typedef enum RBRInstrumentThresholdingCondition
  * \return a string name for the thresholding condition
  * \see RBRInstrumentError_name() for a description of the format of names
  */
-const char *RBRInstrumentThresholdingCondition_name(
-    RBRInstrumentThresholdingCondition condition);
+const char *RBRInstrumentThresholdingCondition_name(RBRInstrumentThresholdingCondition condition);
 
 /**
  * \brief Instrument `thresholding` command parameters.
@@ -174,9 +172,8 @@ typedef struct RBRInstrumentThresholding
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the feature is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
-RBRInstrumentError RBRInstrument_getThresholding(
-    RBRInstrument *instrument,
-    RBRInstrumentThresholding *threshold);
+RBRInstrumentError RBRInstrument_getThresholding(RBRInstrument *instrument,
+                                                 RBRInstrumentThresholding *threshold);
 
 /**
  * \brief Set the instrument thresholding settings.
@@ -198,9 +195,8 @@ RBRInstrumentError RBRInstrument_getThresholding(
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
-RBRInstrumentError RBRInstrument_setThresholding(
-    RBRInstrument *instrument,
-    const RBRInstrumentThresholding *threshold);
+RBRInstrumentError RBRInstrument_setThresholding(RBRInstrument *instrument,
+                                                 const RBRInstrumentThresholding *threshold);
 
 /**
  * \brief Instrument `twistactivation` command parameters.
@@ -234,9 +230,8 @@ typedef struct RBRInstrumentTwistActivation
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the feature is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/twistactivation
  */
-RBRInstrumentError RBRInstrument_getTwistActivation(
-    RBRInstrument *instrument,
-    RBRInstrumentTwistActivation *twistActivation);
+RBRInstrumentError RBRInstrument_getTwistActivation(RBRInstrument *instrument,
+                                                    RBRInstrumentTwistActivation *twistActivation);
 
 /**
  * \brief Set the instrument twist activation settings.
@@ -254,9 +249,8 @@ RBRInstrumentError RBRInstrument_getTwistActivation(
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the settings cannot be changed
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/twistactivation
  */
-RBRInstrumentError RBRInstrument_setTwistActivation(
-    RBRInstrument *instrument,
-    const RBRInstrumentTwistActivation *twistActivation);
+RBRInstrumentError RBRInstrument_setTwistActivation(RBRInstrument *instrument,
+                                                    const RBRInstrumentTwistActivation *twistActivation);
 
 #ifdef __cplusplus
 }

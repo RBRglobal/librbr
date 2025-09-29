@@ -76,8 +76,7 @@ typedef struct RBRInstrumentClock
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
  */
-RBRInstrumentError RBRInstrument_getClock(RBRInstrument *instrument,
-                                          RBRInstrumentClock *clock);
+RBRInstrumentError RBRInstrument_getClock(RBRInstrument *instrument, RBRInstrumentClock *clock);
 
 /**
  * \brief Set the instrument clock.
@@ -228,8 +227,7 @@ typedef struct RBRInstrumentSampling
      *
      * \readonly
      */
-    const RBRInstrumentPeriod
-        availableFastPeriods[RBRINSTRUMENT_AVAILABLE_FAST_PERIODS_MAX];
+    const RBRInstrumentPeriod availableFastPeriods[RBRINSTRUMENT_AVAILABLE_FAST_PERIODS_MAX];
     /**
      * \brief The minimum period which can be used in fast sampling modes.
      *
@@ -271,9 +269,8 @@ typedef struct RBRInstrumentSampling
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  */
-RBRInstrumentError RBRInstrument_getSampling(
-    RBRInstrument *instrument,
-    RBRInstrumentSampling *sampling);
+RBRInstrumentError RBRInstrument_getSampling(RBRInstrument *instrument,
+                                             RBRInstrumentSampling *sampling);
 
 /**
  * \brief Set the instrument sampling mode and period.
@@ -317,9 +314,8 @@ RBRInstrumentError RBRInstrument_getSampling(
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  * \see RBRInstrument_setBurstSampling()
  */
-RBRInstrumentError RBRInstrument_setSampling(
-    RBRInstrument *instrument,
-    const RBRInstrumentSampling *sampling);
+RBRInstrumentError RBRInstrument_setSampling(RBRInstrument *instrument,
+                                             const RBRInstrumentSampling *sampling);
 
 /**
  * \brief Set the instrument burst sampling length and interval.
@@ -351,9 +347,8 @@ RBRInstrumentError RBRInstrument_setSampling(
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  * \see RBRInstrument_setSampling()
  */
-RBRInstrumentError RBRInstrument_setBurstSampling(
-    RBRInstrument *instrument,
-    const RBRInstrumentSampling *sampling);
+RBRInstrumentError RBRInstrument_setBurstSampling(RBRInstrument *instrument,
+                                                  const RBRInstrumentSampling *sampling);
 
 /**
  * \brief Possible instrument logging statuses.
@@ -405,8 +400,7 @@ typedef enum RBRInstrumentDeploymentStatus
  * \return a string name for the deployment status
  * \see RBRInstrumentError_name() for a description of the format of names
  */
-const char *RBRInstrumentDeploymentStatus_name(
-    RBRInstrumentDeploymentStatus status);
+const char *RBRInstrumentDeploymentStatus_name(RBRInstrumentDeploymentStatus status);
 
 /**
  * \brief Instrument `deployment` command parameters.
@@ -447,9 +441,8 @@ typedef struct RBRInstrumentDeployment
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
-RBRInstrumentError RBRInstrument_getDeployment(
-    RBRInstrument *instrument,
-    RBRInstrumentDeployment *deployment);
+RBRInstrumentError RBRInstrument_getDeployment(RBRInstrument *instrument,
+                                               RBRInstrumentDeployment *deployment);
 
 /**
  * \brief Set the instrument deployment parameters.
@@ -472,9 +465,8 @@ RBRInstrumentError RBRInstrument_getDeployment(
  *                                                values are out of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
-RBRInstrumentError RBRInstrument_setDeployment(
-    RBRInstrument *instrument,
-    const RBRInstrumentDeployment *deployment);
+RBRInstrumentError RBRInstrument_setDeployment(RBRInstrument *instrument,
+                                               const RBRInstrumentDeployment *deployment);
 
 #ifdef __cplusplus
 }

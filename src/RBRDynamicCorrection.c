@@ -86,7 +86,8 @@ float RBRDynamicCorrection_PSS78(float C, float T, float P)
     R = C / PSS78_C_REF;
 
     // rT & Rp
-    // rT = PSS78_C0 + PSS78_C1*T_its68 + PSS78_C2*(T_its68*T_its68) + PSS78_C3*T_its68*(T_its68*T_its68) +
+    // rT = PSS78_C0 + PSS78_C1*T_its68 + PSS78_C2*(T_its68*T_its68) +
+    // PSS78_C3*T_its68*(T_its68*T_its68) +
     //                        PSS78_C4*(T_its68*T_its68)*(T_its68*T_its68);
     rT = PSS78_C3 + PSS78_C4 * T_its68;
     rT = PSS78_C2 + rT * T_its68;
@@ -98,7 +99,8 @@ float RBRDynamicCorrection_PSS78(float C, float T, float P)
     Rp_num = PSS78_E2 + PSS78_E3 * pressure;
     Rp_num = (PSS78_E1 + Rp_num * pressure) * pressure;
 
-    Rp_den = 1.0f + PSS78_D1 * T_its68 + PSS78_D2 * (T_its68 * T_its68) + PSS78_D3 * R + PSS78_D4 * (T_its68 * R);
+    Rp_den = 1.0f + PSS78_D1 * T_its68 + PSS78_D2 * (T_its68 * T_its68) + PSS78_D3 * R +
+             PSS78_D4 * (T_its68 * R);
     Rp = 1.0f + Rp_num / Rp_den;
 
     // R_T
@@ -171,7 +173,7 @@ float RBRDynamicCorrection_applyTempCorr(RBRDynamicCorrectionParams *params, flo
     float T_cor;
 
     /* (first evaluation will be incorrect, but won't be used) */
-    T_cor = (1.0 - params->_phi) * params->_T_meas_lag + (params->_phi) * T_meas;
+    T_cor = (1.0f - params->_phi) * params->_T_meas_lag + (params->_phi) * T_meas;
 
     return T_cor;
 }
@@ -198,7 +200,8 @@ int32_t RBRDynamicCorrection_checkData(RBRDynamicCorrectionMeasurement *measIn)
 }
 
 /* resample all lagged variables using new sampling rate */
-void RBRDynamicCorrection_resampleLag(RBRDynamicCorrectionParams *params, int64_t timestamp, float Fs)
+void RBRDynamicCorrection_resampleLag(RBRDynamicCorrectionParams *params, int64_t timestamp,
+                                      float Fs)
 {
     int64_t timestamp_array[DCORR_MAX_LAG_ARRAY];
     float C_meas_array[DCORR_MAX_LAG_ARRAY];
@@ -206,7 +209,7 @@ void RBRDynamicCorrection_resampleLag(RBRDynamicCorrectionParams *params, int64_
     float T_cond_array[DCORR_MAX_LAG_ARRAY];
     float factor;
     float t1, t2;
-    float dt = (1000.0f / Fs);  // Delta time in milliseconds
+    float dt = (1000.0f / Fs); // Delta time in milliseconds
     int k;
     int j;
     int timeout = 0;
@@ -236,11 +239,14 @@ void RBRDynamicCorrection_resampleLag(RBRDynamicCorrectionParams *params, int64_
 
             timestamp_array[j] = timestamp;
             C_meas_array[j] =
-                params->_C_meas_lagArray[k] + factor * (params->_C_meas_lagArray[k + 1] - params->_C_meas_lagArray[k]);
+                params->_C_meas_lagArray[k] +
+                factor * (params->_C_meas_lagArray[k + 1] - params->_C_meas_lagArray[k]);
             P_meas_array[j] =
-                params->_P_meas_lagArray[k] + factor * (params->_P_meas_lagArray[k + 1] - params->_P_meas_lagArray[k]);
+                params->_P_meas_lagArray[k] +
+                factor * (params->_P_meas_lagArray[k + 1] - params->_P_meas_lagArray[k]);
             T_cond_array[j] =
-                params->_T_cond_lagArray[k] + factor * (params->_T_cond_lagArray[k + 1] - params->_T_cond_lagArray[k]);
+                params->_T_cond_lagArray[k] +
+                factor * (params->_T_cond_lagArray[k + 1] - params->_T_cond_lagArray[k]);
             timestamp -= dt;
             j++;
         }
@@ -293,7 +299,8 @@ int32_t RBRDynamicCorrection_updateLag(RBRDynamicCorrectionParams *params,
     return isValid;
 }
 
-RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionParams *params, float Fs)
+RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionParams *params,
+                                                         float Fs)
 {
     /* sanity check */
     if (DCORR_MAX_LAG_ARRAY / Fs < DCORR_T_DELAY)
@@ -306,7 +313,6 @@ RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionPar
     params->Fs = Fs;
     params->_isFasterSampling = (params->Fs >= 1.0f) ? 1 : 0;
 
-
     // not enough info to update, keep unchanged
     params->_T_short_lag = params->_T_short_lag;
 
@@ -318,7 +324,8 @@ RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionPar
 
 /* calculate the ascent rate (in our case, using the pressure as unit).
  * return Vp (positive for ascent, negative for descent)*/
-float RBRDynamicCorrection_calcAscentRate(RBRDynamicCorrectionParams *params, int64_t timestamp, float pressure)
+float RBRDynamicCorrection_calcAscentRate(RBRDynamicCorrectionParams *params, int64_t timestamp,
+                                          float pressure)
 {
     float Vp = params->_ascentRate;
 
@@ -357,7 +364,6 @@ float RBRDynamicCorrection_calcAscentRate(RBRDynamicCorrectionParams *params, in
 
 void RBRDynamicCorrection_updateVariables(RBRDynamicCorrectionParams *params, float Vp)
 {
-
     /* for evaluation of 'alpha', 'tau' and 'CT_coeff',
      * the value for 'Vp' need to clamp between 'min' and 'max' */
     if (Vp < params->Vp_min)
@@ -380,16 +386,18 @@ void RBRDynamicCorrection_updateVariables(RBRDynamicCorrectionParams *params, fl
     params->_cte_b = 1.0f - 2.0f * factor;
 }
 
-void RBRDynamicCorrection_updatePressure(RBRDynamicCorrectionParams *params, int64_t timestamp, float pressure)
+void RBRDynamicCorrection_updatePressure(RBRDynamicCorrectionParams *params, int64_t timestamp,
+                                         float pressure)
 {
     float Vp = RBRDynamicCorrection_calcAscentRate(params, timestamp, pressure);
 
     RBRDynamicCorrection_updateVariables(params, Vp);
 }
 
-RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *params, float Fs, float t_delay,
-                                                    float alpha_a, float alpha_e, float tau_a, float tau_e,
-                                                    float ctcoeff_a, float ctcoeff_e, float Vp_min, float Vp_max,
+RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *params, float Fs,
+                                                    float t_delay, float alpha_a, float alpha_e,
+                                                    float tau_a, float tau_e, float ctcoeff_a,
+                                                    float ctcoeff_e, float Vp_min, float Vp_max,
                                                     float Vp_fc)
 {
     /* sanity check */
@@ -525,7 +533,8 @@ RBRDynamicCorrectionError RBRDynamicCorrection_addMeasurement(RBRDynamicCorrecti
         /* apply the short-term thermal mass adjustment (but only when rate >= 1Hz) */
         if (params->_isFasterSampling)
         {
-            T_short = -params->_cte_b * params->_T_short_lag + params->_cte_a * (T_cor - params->_T_cor_lag);
+            T_short = -params->_cte_b * params->_T_short_lag +
+                      params->_cte_a * (T_cor - params->_T_cor_lag);
         }
         else
         {

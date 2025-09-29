@@ -39,10 +39,8 @@ extern "C" {
  * \see RBRInstrument_enable()
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/verify
  */
-RBRInstrumentError RBRInstrument_verify(
-    RBRInstrument *instrument,
-    bool eraseMemory,
-    RBRInstrumentDeploymentStatus *status);
+RBRInstrumentError RBRInstrument_verify(RBRInstrument *instrument, bool eraseMemory,
+                                        RBRInstrumentDeploymentStatus *status);
 
 /**
  * \brief Enable the instrument to sample according to the programmed schedule.
@@ -63,10 +61,8 @@ RBRInstrumentError RBRInstrument_verify(
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when an error occurs enabling logging
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/enable
  */
-RBRInstrumentError RBRInstrument_enable(
-    RBRInstrument *instrument,
-    bool eraseMemory,
-    RBRInstrumentDeploymentStatus *status);
+RBRInstrumentError RBRInstrument_enable(RBRInstrument *instrument, bool eraseMemory,
+                                        RBRInstrumentDeploymentStatus *status);
 
 /**
  * \brief If the instrument is logging, terminate the current deployment.
@@ -78,9 +74,8 @@ RBRInstrumentError RBRInstrument_enable(
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/disable
  */
-RBRInstrumentError RBRInstrument_disable(
-    RBRInstrument *instrument,
-    RBRInstrumentDeploymentStatus *status);
+RBRInstrumentError RBRInstrument_disable(RBRInstrument *instrument,
+                                         RBRInstrumentDeploymentStatus *status);
 
 /**
  * \brief Instrument `simulation` command parameters.
@@ -112,9 +107,8 @@ typedef struct RBRInstrumentSimulation
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the feature is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
-RBRInstrumentError RBRInstrument_getSimulation(
-    RBRInstrument *instrument,
-    RBRInstrumentSimulation *simulation);
+RBRInstrumentError RBRInstrument_getSimulation(RBRInstrument *instrument,
+                                               RBRInstrumentSimulation *simulation);
 
 /**
  * \brief Set the instrument simulation settings.
@@ -137,9 +131,8 @@ RBRInstrumentError RBRInstrument_getSimulation(
  *                                                requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
-RBRInstrumentError RBRInstrument_setSimulation(
-    RBRInstrument *instrument,
-    const RBRInstrumentSimulation *simulation);
+RBRInstrumentError RBRInstrument_setSimulation(RBRInstrument *instrument,
+                                               const RBRInstrumentSimulation *simulation);
 
 #ifdef __cplusplus
 }

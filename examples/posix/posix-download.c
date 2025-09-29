@@ -44,19 +44,15 @@ int main(int argc, char *argv[])
     RBRInstrumentError err;
     RBRInstrument *instrument = NULL;
 
-    if (argc < 2)
-    {
+    if (argc < 2) {
         fprintf(stderr, "Usage: %s device\n", argv[0]);
         return EXIT_FAILURE;
     }
 
     devicePath = argv[1];
 
-    if ((instrumentFd = openSerialFd(devicePath)) < 0)
-    {
-        fprintf(stderr, "%s: Failed to open serial device: %s!\n",
-                programName,
-                strerror(errno));
+    if ((instrumentFd = openSerialFd(devicePath)) < 0) {
+        fprintf(stderr, "%s: Failed to open serial device: %s!\n", programName, strerror(errno));
         return EXIT_FAILURE;
     }
 
@@ -67,29 +63,24 @@ int main(int argc, char *argv[])
             RBRINSTRUMENT_LIB_VERSION,
             RBRINSTRUMENT_LIB_BUILD_DATE);
 
-    RBRInstrumentCallbacks callbacks = {
-        .time = instrumentTime,
-        .sleep = instrumentSleep,
-        .read = instrumentRead,
-        .write = instrumentWrite
-    };
+    RBRInstrumentCallbacks callbacks = {.time = instrumentTime,
+                                        .sleep = instrumentSleep,
+                                        .read = instrumentRead,
+                                        .write = instrumentWrite};
 
     if ((err = RBRInstrument_open(
-             &instrument,
-             &callbacks,
-             INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENT_SUCCESS)
-    {
-        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
+             &instrument, &callbacks, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd)) !=
+        RBRINSTRUMENT_SUCCESS) {
+        fprintf(stderr,
+                "%s: Failed to establish instrument connection: %s!\n",
                 programName,
                 RBRInstrumentError_name(err));
         status = EXIT_FAILURE;
         goto serialCleanup;
     }
 
-    printf(
-        "Looks like I'm connected to a %s instrument.\n",
-        RBRInstrumentGeneration_name(RBRInstrument_getGeneration(instrument)));
+    printf("Looks like I'm connected to a %s instrument.\n",
+           RBRInstrumentGeneration_name(RBRInstrument_getGeneration(instrument)));
 
     RBRInstrumentId id;
     RBRInstrument_getId(instrument, &id);
@@ -102,10 +93,7 @@ int main(int argc, char *argv[])
 
     RBRInstrumentHardwareRevision hwrev;
     RBRInstrument_getHardwareRevision(instrument, &hwrev);
-    printf("It's PCB rev%c, CPU rev%s, BSL v%c.\n",
-           hwrev.pcb,
-           hwrev.cpu,
-           hwrev.bsl);
+    printf("It's PCB rev%c, CPU rev%s, BSL v%c.\n", hwrev.pcb, hwrev.cpu, hwrev.bsl);
 
     RBRInstrumentMemoryInfo meminfo;
     meminfo.dataset = RBRINSTRUMENT_DATASET_STANDARD;
@@ -118,12 +106,8 @@ int main(int argc, char *argv[])
     RBRInstrumentMemoryFormat memformat;
     RBRInstrument_getAvailableMemoryFormats(instrument, &memformat);
     printf("It supports these memory formats:\n");
-    for (int i = RBRINSTRUMENT_MEMFORMAT_NONE + 1;
-         i <= RBRINSTRUMENT_MEMFORMAT_MAX;
-         i <<= 1)
-    {
-        if (memformat & i)
-        {
+    for (int i = RBRINSTRUMENT_MEMFORMAT_NONE + 1; i <= RBRINSTRUMENT_MEMFORMAT_MAX; i <<= 1) {
+        if (memformat & i) {
             printf("\t%s\n", RBRInstrumentMemoryFormat_name(i));
         }
     }
@@ -135,34 +119,25 @@ int main(int argc, char *argv[])
     char filename[PATH_MAX + 1];
     snprintf(filename, sizeof(filename), "%06d.bin", id.serial);
     int downloadFd;
-    if ((downloadFd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644)) < 0)
-    {
-        fprintf(stderr, "%s: Failed to open output file: %s!\n",
-                programName,
-                strerror(errno));
+    if ((downloadFd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0644)) < 0) {
+        fprintf(stderr, "%s: Failed to open output file: %s!\n", programName, strerror(errno));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
 
     struct stat stat;
-    if (fstat(downloadFd, &stat) < 0)
-    {
-        fprintf(stderr, "%s: Failed to stat output file: %s!\n",
-                programName,
-                strerror(errno));
+    if (fstat(downloadFd, &stat) < 0) {
+        fprintf(stderr, "%s: Failed to stat output file: %s!\n", programName, strerror(errno));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
     int32_t initialOffset = stat.st_size;
 
-    if (initialOffset == 0)
-    {
+    if (initialOffset == 0) {
         printf("It looks like the output file, %s, is new. Downloading from "
                "the beginning of instrument memory.\n",
                filename);
-    }
-    else
-    {
+    } else {
         printf("It looks like the output file, %s, already contains %" PRIi32
                "B. I'll resume the instrument download from there.\n",
                filename,
@@ -170,11 +145,7 @@ int main(int argc, char *argv[])
     }
 
     uint8_t buf[CHUNK_SIZE];
-    RBRInstrumentData data = {
-        .dataset = meminfo.dataset,
-        .offset  = initialOffset,
-        .data    = buf
-    };
+    RBRInstrumentData data = {.dataset = meminfo.dataset, .offset = initialOffset, .data = buf};
 
     printf("Downloading:\n");
 
@@ -183,28 +154,22 @@ int main(int argc, char *argv[])
     double elapsed = 0.0;
     double rate = 0.0;
     clock_gettime(CLOCK_MONOTONIC, &start);
-    while (data.offset < meminfo.used)
-    {
+    while (data.offset < meminfo.used) {
         data.size = sizeof(buf);
         err = RBRInstrument_readData(instrument, &data);
-        if (err == RBRINSTRUMENT_SUCCESS)
-        {
+        if (err == RBRINSTRUMENT_SUCCESS) {
             write(downloadFd, data.data, data.size);
             data.offset += data.size;
-        }
-        else if (err == RBRINSTRUMENT_TIMEOUT)
-        {
+        } else if (err == RBRINSTRUMENT_TIMEOUT) {
             printf("\nWarning: timeout. Retrying...\n");
-        }
-        else
-        {
+        } else {
             printf("\nError: %s", RBRInstrumentError_name(err));
             break;
         }
 
         clock_gettime(CLOCK_MONOTONIC, &now);
 
-        elapsed  = now.tv_sec - start.tv_sec;
+        elapsed = now.tv_sec - start.tv_sec;
         elapsed *= 1000000000L;
         elapsed += now.tv_nsec - start.tv_nsec;
         elapsed /= 1000000000L;
@@ -220,10 +185,7 @@ int main(int argc, char *argv[])
                rate);
     }
 
-    printf("\nDone. Downloaded %" PRIi32 "B in %0.3fs (%0.3fB/s).\n",
-           data.offset,
-           elapsed,
-           rate);
+    printf("\nDone. Downloaded %" PRIi32 "B in %0.3fs (%0.3fB/s).\n", data.offset, elapsed, rate);
 
 fileCleanup:
     close(downloadFd);

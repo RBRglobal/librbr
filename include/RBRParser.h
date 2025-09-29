@@ -39,55 +39,54 @@ struct RBRParser;
  * \return #RBRINSTRUMENT_CALLBACK_ERROR when an unrecoverable error occurs
  */
 typedef RBRInstrumentError (*RBRParserSampleCallback)(
-    const struct RBRParser *parser,
-    const struct RBRInstrumentSample *const sample);
+    const struct RBRParser *parser, const struct RBRInstrumentSample *const sample);
 
 /**
  * \brief Instrument event types.
  */
 typedef enum RBRInstrumentEventType
 {
-    RBRINSTRUMENT_EVENT_UNKNOWN_OR_UNRECOGNIZED_EVENT                                     = 0x00,
-    RBRINSTRUMENT_EVENT_TIME_SYNCHRONIZATION_MARKER                                       = 0x01,
-    RBRINSTRUMENT_EVENT_DISABLE_COMMAND_RECEIVED                                          = 0x02,
-    RBRINSTRUMENT_EVENT_RUN_TIME_ERROR_ENCOUNTERED                                        = 0x03,
-    RBRINSTRUMENT_EVENT_CPU_RESET_DETECTED                                                = 0x04,
-    RBRINSTRUMENT_EVENT_ONE_OR_MORE_PARAMETERS_RECOVERED_AFTER_RESET                      = 0x05,
-    RBRINSTRUMENT_EVENT_RESTART_FAILED_RTC_CALENDAR_CONTENTS_NOT_VALID                    = 0x06,
-    RBRINSTRUMENT_EVENT_RESTART_FAILED_LOGGER_STATUS_NOT_VALID                            = 0x07,
+    RBRINSTRUMENT_EVENT_UNKNOWN_OR_UNRECOGNIZED_EVENT = 0x00,
+    RBRINSTRUMENT_EVENT_TIME_SYNCHRONIZATION_MARKER = 0x01,
+    RBRINSTRUMENT_EVENT_DISABLE_COMMAND_RECEIVED = 0x02,
+    RBRINSTRUMENT_EVENT_RUN_TIME_ERROR_ENCOUNTERED = 0x03,
+    RBRINSTRUMENT_EVENT_CPU_RESET_DETECTED = 0x04,
+    RBRINSTRUMENT_EVENT_ONE_OR_MORE_PARAMETERS_RECOVERED_AFTER_RESET = 0x05,
+    RBRINSTRUMENT_EVENT_RESTART_FAILED_RTC_CALENDAR_CONTENTS_NOT_VALID = 0x06,
+    RBRINSTRUMENT_EVENT_RESTART_FAILED_LOGGER_STATUS_NOT_VALID = 0x07,
     RBRINSTRUMENT_EVENT_RESTART_FAILED_PRIMARY_SCHEDULE_PARAMETERS_COULD_NOT_BE_RECOVERED = 0x08,
-    RBRINSTRUMENT_EVENT_UNABLE_TO_LOAD_ALARM_TIME_FOR_NEXT_SAMPLE                         = 0x09,
-    RBRINSTRUMENT_EVENT_SAMPLING_RESTARTED_AFTER_RESETTING_RTC                            = 0x0A,
-    RBRINSTRUMENT_EVENT_PARAMETERS_RECOVERED_SAMPLING_RESTARTED_AFTER_RESETTING_RTC       = 0x0B,
-    RBRINSTRUMENT_EVENT_SAMPLING_STOPPED_END_TIME_REACHED                                 = 0x0C,
-    RBRINSTRUMENT_EVENT_START_OF_A_RECORDED_BURST                                         = 0x0D,
-    RBRINSTRUMENT_EVENT_START_OF_A_WAVE_BURST                                             = 0x0E,
-    RBRINSTRUMENT_EVENT_RESERVED1                                                         = 0x0F,
-    RBRINSTRUMENT_EVENT_STREAMING_NOW_OFF_FOR_BOTH_PORTS                                  = 0x10,
-    RBRINSTRUMENT_EVENT_STREAMING_ON_FOR_USB_OFF_FOR_SERIAL                               = 0x11,
-    RBRINSTRUMENT_EVENT_STREAMING_OFF_FOR_USB_ON_FOR_SERIAL                               = 0x12,
-    RBRINSTRUMENT_EVENT_STREAMING_NOW_ON_FOR_BOTH_PORTS                                   = 0x13,
-    RBRINSTRUMENT_EVENT_SAMPLING_STARTED_THRESHOLD_CONDITION_SATISFIED                    = 0x14,
-    RBRINSTRUMENT_EVENT_SAMPLING_PAUSED_THRESHOLD_CONDITION_NOT_MET                       = 0x15,
-    RBRINSTRUMENT_EVENT_POWER_SOURCE_SWITCHED_TO_INTERNAL_BATTERY                         = 0x16,
-    RBRINSTRUMENT_EVENT_POWER_SOURCE_SWITCHED_TO_EXTERNAL_BATTERY                         = 0x17,
-    RBRINSTRUMENT_EVENT_TWIST_ACTIVATION_STARTED_SAMPLING                                 = 0x18,
-    RBRINSTRUMENT_EVENT_TWIST_ACTIVATION_PAUSED_SAMPLING                                  = 0x19,
-    RBRINSTRUMENT_EVENT_WIFI_MODULE_DETECTED_AND_ACTIVATED                                = 0x1A,
-    RBRINSTRUMENT_EVENT_WIFI_MODULE_DEACTIVATED_REMOVED_OR_ACTIVITY_TIMEOUT               = 0x1B,
-    RBRINSTRUMENT_EVENT_REGIMES_ENABLED_BUT_NOT_YET_IN_A_REGIME                           = 0x1C,
-    RBRINSTRUMENT_EVENT_ENTERED_REGIME_1                                                  = 0x1D,
-    RBRINSTRUMENT_EVENT_ENTERED_REGIME_2                                                  = 0x1E,
-    RBRINSTRUMENT_EVENT_ENTERED_REGIME_3                                                  = 0x1F,
-    RBRINSTRUMENT_EVENT_START_OF_REGIME_BIN                                               = 0x20,
-    RBRINSTRUMENT_EVENT_BEGIN_PROFILING_UP_CAST                                           = 0x21,
-    RBRINSTRUMENT_EVENT_BEGIN_PROFILING_DOWN_CAST                                         = 0x22,
-    RBRINSTRUMENT_EVENT_END_OF_PROFILING_CAST                                             = 0x23,
-    RBRINSTRUMENT_EVENT_BATTERY_FAILED_SCHEDULE_FINISHED                                  = 0x24,
-    RBRINSTRUMENT_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_FAST_SAMPLING_MODE    = 0x25,
-    RBRINSTRUMENT_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_SLOW_SAMPLING_MODE    = 0x26,
-    RBRINSTRUMENT_EVENT_ENERGY_USED_MARKER_INTERNAL_BATTERY                               = 0x27,
-    RBRINSTRUMENT_EVENT_ENERGY_USED_MARKER_EXTERNAL_POWER_SOURCE                          = 0x28
+    RBRINSTRUMENT_EVENT_UNABLE_TO_LOAD_ALARM_TIME_FOR_NEXT_SAMPLE = 0x09,
+    RBRINSTRUMENT_EVENT_SAMPLING_RESTARTED_AFTER_RESETTING_RTC = 0x0A,
+    RBRINSTRUMENT_EVENT_PARAMETERS_RECOVERED_SAMPLING_RESTARTED_AFTER_RESETTING_RTC = 0x0B,
+    RBRINSTRUMENT_EVENT_SAMPLING_STOPPED_END_TIME_REACHED = 0x0C,
+    RBRINSTRUMENT_EVENT_START_OF_A_RECORDED_BURST = 0x0D,
+    RBRINSTRUMENT_EVENT_START_OF_A_WAVE_BURST = 0x0E,
+    RBRINSTRUMENT_EVENT_RESERVED1 = 0x0F,
+    RBRINSTRUMENT_EVENT_STREAMING_NOW_OFF_FOR_BOTH_PORTS = 0x10,
+    RBRINSTRUMENT_EVENT_STREAMING_ON_FOR_USB_OFF_FOR_SERIAL = 0x11,
+    RBRINSTRUMENT_EVENT_STREAMING_OFF_FOR_USB_ON_FOR_SERIAL = 0x12,
+    RBRINSTRUMENT_EVENT_STREAMING_NOW_ON_FOR_BOTH_PORTS = 0x13,
+    RBRINSTRUMENT_EVENT_SAMPLING_STARTED_THRESHOLD_CONDITION_SATISFIED = 0x14,
+    RBRINSTRUMENT_EVENT_SAMPLING_PAUSED_THRESHOLD_CONDITION_NOT_MET = 0x15,
+    RBRINSTRUMENT_EVENT_POWER_SOURCE_SWITCHED_TO_INTERNAL_BATTERY = 0x16,
+    RBRINSTRUMENT_EVENT_POWER_SOURCE_SWITCHED_TO_EXTERNAL_BATTERY = 0x17,
+    RBRINSTRUMENT_EVENT_TWIST_ACTIVATION_STARTED_SAMPLING = 0x18,
+    RBRINSTRUMENT_EVENT_TWIST_ACTIVATION_PAUSED_SAMPLING = 0x19,
+    RBRINSTRUMENT_EVENT_WIFI_MODULE_DETECTED_AND_ACTIVATED = 0x1A,
+    RBRINSTRUMENT_EVENT_WIFI_MODULE_DEACTIVATED_REMOVED_OR_ACTIVITY_TIMEOUT = 0x1B,
+    RBRINSTRUMENT_EVENT_REGIMES_ENABLED_BUT_NOT_YET_IN_A_REGIME = 0x1C,
+    RBRINSTRUMENT_EVENT_ENTERED_REGIME_1 = 0x1D,
+    RBRINSTRUMENT_EVENT_ENTERED_REGIME_2 = 0x1E,
+    RBRINSTRUMENT_EVENT_ENTERED_REGIME_3 = 0x1F,
+    RBRINSTRUMENT_EVENT_START_OF_REGIME_BIN = 0x20,
+    RBRINSTRUMENT_EVENT_BEGIN_PROFILING_UP_CAST = 0x21,
+    RBRINSTRUMENT_EVENT_BEGIN_PROFILING_DOWN_CAST = 0x22,
+    RBRINSTRUMENT_EVENT_END_OF_PROFILING_CAST = 0x23,
+    RBRINSTRUMENT_EVENT_BATTERY_FAILED_SCHEDULE_FINISHED = 0x24,
+    RBRINSTRUMENT_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_FAST_SAMPLING_MODE = 0x25,
+    RBRINSTRUMENT_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_SLOW_SAMPLING_MODE = 0x26,
+    RBRINSTRUMENT_EVENT_ENERGY_USED_MARKER_INTERNAL_BATTERY = 0x27,
+    RBRINSTRUMENT_EVENT_ENERGY_USED_MARKER_EXTERNAL_POWER_SOURCE = 0x28
 } RBRInstrumentEventType;
 
 /**
@@ -102,8 +101,10 @@ const char *RBRInstrumentEventType_name(RBRInstrumentEventType type);
 /**
  * \brief An instrument event.
  *
- * \see https://docs.rbr-global.com/L3commandreference/format-of-stored-data/standard-rawbin00-format/standard-format-events-markers
- * \see https://docs.rbr-global.com/L3commandreference/format-of-stored-data/easyparse-calbin00-format/easyparse-format-events-markers
+ * \see
+ * https://docs.rbr-global.com/L3commandreference/format-of-stored-data/standard-rawbin00-format/standard-format-events-markers
+ * \see
+ * https://docs.rbr-global.com/L3commandreference/format-of-stored-data/easyparse-calbin00-format/easyparse-format-events-markers
  */
 typedef struct RBRInstrumentEvent
 {
@@ -139,9 +140,8 @@ typedef struct RBRInstrumentEvent
  * \return #RBRINSTRUMENT_SUCCESS when the event data is successfully consumed
  * \return #RBRINSTRUMENT_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRInstrumentError (*RBRParserEventCallback)(
-    const struct RBRParser *parser,
-    const struct RBRInstrumentEvent *const event);
+typedef RBRInstrumentError (*RBRParserEventCallback)(const struct RBRParser *parser,
+                                                     const struct RBRInstrumentEvent *const event);
 
 /**
  * \brief A set of callbacks from parser to user code.
@@ -284,10 +284,8 @@ typedef struct RBRParser
  * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE if the config is invalid
  * \see RBRParser_destroy()
  */
-RBRInstrumentError RBRParser_init(RBRParser **parser,
-                                  const RBRParserCallbacks *callbacks,
-                                  const RBRParserConfig *config,
-                                  void *userData);
+RBRInstrumentError RBRParser_init(RBRParser **parser, const RBRParserCallbacks *callbacks,
+                                  const RBRParserConfig *config, void *userData);
 
 /**
  * \brief Release any resources held by the parser.
@@ -362,10 +360,8 @@ void RBRParser_setUserData(RBRParser *parser, void *userData);
  *                                                configuration is incomplete
  *                                                or invalid
  */
-RBRInstrumentError RBRParser_parse(RBRParser *parser,
-                                   RBRInstrumentDataset dataset,
-                                   const void *const data,
-                                   int32_t *size);
+RBRInstrumentError RBRParser_parse(RBRParser *parser, RBRInstrumentDataset dataset,
+                                   const void *const data, int32_t *size);
 
 #ifdef __cplusplus
 }

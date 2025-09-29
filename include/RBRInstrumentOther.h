@@ -56,8 +56,7 @@ int RBRInstrumentVersion_compare(const char *a, const char *b);
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/id
  */
-RBRInstrumentError RBRInstrument_getId(RBRInstrument *instrument,
-                                       RBRInstrumentId *id);
+RBRInstrumentError RBRInstrument_getId(RBRInstrument *instrument, RBRInstrumentId *id);
 
 /**
  * \brief Instrument `hwrev` command parameters.
@@ -85,9 +84,8 @@ typedef struct RBRInstrumentHardwareRevision
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/hwrev
  */
-RBRInstrumentError RBRInstrument_getHardwareRevision(
-    RBRInstrument *instrument,
-    RBRInstrumentHardwareRevision *hwrev);
+RBRInstrumentError RBRInstrument_getHardwareRevision(RBRInstrument *instrument,
+                                                     RBRInstrumentHardwareRevision *hwrev);
 
 /**
  * brief Possible instrument power sources.
@@ -155,8 +153,7 @@ typedef struct RBRInstrumentPower
  * \return #RBRINSTRUMENT_HARDWARE_ERROR if an error occurs reading voltages
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/power
  */
-RBRInstrumentError RBRInstrument_getPower(RBRInstrument *instrument,
-                                          RBRInstrumentPower *power);
+RBRInstrumentError RBRInstrument_getPower(RBRInstrument *instrument, RBRInstrumentPower *power);
 
 /**
  * Internal battery types.
@@ -191,8 +188,7 @@ typedef enum RBRInstrumentInternalBatteryType
  * \see RBRInstrumentError_name() for a description of the format of names
  * \see RBRInstrumentInternalBatteryType_displayName() for display names
  */
-const char *RBRInstrumentInternalBatteryType_name(
-    RBRInstrumentInternalBatteryType type);
+const char *RBRInstrumentInternalBatteryType_name(RBRInstrumentInternalBatteryType type);
 
 /**
  * \brief Get a human-readable display name for an internal battery type.
@@ -205,8 +201,7 @@ const char *RBRInstrumentInternalBatteryType_name(
  * \return a string name for the battery type
  * \see RBRInstrumentInternalBatteryType_name() for instrument-equivalent names
  */
-const char *RBRInstrumentInternalBatteryType_displayName(
-    RBRInstrumentInternalBatteryType type);
+const char *RBRInstrumentInternalBatteryType_displayName(RBRInstrumentInternalBatteryType type);
 
 /**
  * \brief Instrument `powerinternal` command parameters.
@@ -245,9 +240,8 @@ typedef struct RBRInstrumentPowerInternal
  * \see RBRInstrument_resetPowerInternalUsed()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
-RBRInstrumentError RBRInstrument_getPowerInternal(
-    RBRInstrument *instrument,
-    RBRInstrumentPowerInternal *power);
+RBRInstrumentError RBRInstrument_getPowerInternal(RBRInstrument *instrument,
+                                                  RBRInstrumentPowerInternal *power);
 
 /**
  * \brief Set the internal power battery type.
@@ -263,9 +257,8 @@ RBRInstrumentError RBRInstrument_getPowerInternal(
  * \see RBRInstrument_getPowerInternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
-RBRInstrumentError RBRInstrument_setInternalBatteryType(
-    RBRInstrument *instrument,
-    RBRInstrumentInternalBatteryType type);
+RBRInstrumentError RBRInstrument_setInternalBatteryType(RBRInstrument *instrument,
+                                                        RBRInstrumentInternalBatteryType type);
 
 /**
  * \brief Reset the counter of energy used from the internal battery.
@@ -280,8 +273,7 @@ RBRInstrumentError RBRInstrument_setInternalBatteryType(
  * \see RBRInstrument_getPowerInternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
-RBRInstrumentError RBRInstrument_resetPowerInternalUsed(
-    RBRInstrument *instrument);
+RBRInstrumentError RBRInstrument_resetPowerInternalUsed(RBRInstrument *instrument);
 
 /**
  * External battery types.
@@ -322,8 +314,7 @@ typedef enum RBRInstrumentExternalBatteryType
  * \see RBRInstrumentError_name() for a description of the format of names
  * \see RBRInstrumentExternalBatteryType_displayName() for display names
  */
-const char *RBRInstrumentExternalBatteryType_name(
-    RBRInstrumentExternalBatteryType type);
+const char *RBRInstrumentExternalBatteryType_name(RBRInstrumentExternalBatteryType type);
 
 /**
  * \brief Get a human-readable display name for an external battery type.
@@ -338,8 +329,7 @@ const char *RBRInstrumentExternalBatteryType_name(
  * \return a string name for the battery type
  * \see RBRInstrumentExternalBatteryType_name() for instrument-equivalent names
  */
-const char *RBRInstrumentExternalBatteryType_displayName(
-    RBRInstrumentExternalBatteryType type);
+const char *RBRInstrumentExternalBatteryType_displayName(RBRInstrumentExternalBatteryType type);
 
 /**
  * \brief Instrument `powerexternal` command parameters.
@@ -378,9 +368,8 @@ typedef struct RBRInstrumentPowerExternal
  * \see RBRInstrument_resetPowerExternalUsed()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
-RBRInstrumentError RBRInstrument_getPowerExternal(
-    RBRInstrument *instrument,
-    RBRInstrumentPowerExternal *power);
+RBRInstrumentError RBRInstrument_getPowerExternal(RBRInstrument *instrument,
+                                                  RBRInstrumentPowerExternal *power);
 
 /**
  * \brief Set the external power battery type.
@@ -395,9 +384,8 @@ RBRInstrumentError RBRInstrument_getPowerExternal(
  * \see RBRInstrument_getPowerExternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
-RBRInstrumentError RBRInstrument_setPowerExternalBatteryType(
-    RBRInstrument *instrument,
-    RBRInstrumentExternalBatteryType type);
+RBRInstrumentError RBRInstrument_setPowerExternalBatteryType(RBRInstrument *instrument,
+                                                             RBRInstrumentExternalBatteryType type);
 
 /**
  * \brief Reset the counter of energy used from the external battery.
@@ -411,8 +399,7 @@ RBRInstrumentError RBRInstrument_setPowerExternalBatteryType(
  * \see RBRInstrument_getPowerExternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
-RBRInstrumentError RBRInstrument_resetPowerExternalUsed(
-    RBRInstrument *instrument);
+RBRInstrumentError RBRInstrument_resetPowerExternalUsed(RBRInstrument *instrument);
 
 /**
  * \brief Instrument `info` command parameters.
@@ -441,9 +428,7 @@ typedef struct RBRInstrumentInfo
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/info
  */
-RBRInstrumentError RBRInstrument_getInfo(
-    RBRInstrument *instrument,
-    RBRInstrumentInfo *info);
+RBRInstrumentError RBRInstrument_getInfo(RBRInstrument *instrument, RBRInstrumentInfo *info);
 
 #ifdef __cplusplus
 }

@@ -32,8 +32,7 @@ const char *RBRInstrumentLink_name(RBRInstrumentLink link)
     }
 }
 
-RBRInstrumentError RBRInstrument_getLink(RBRInstrument *instrument,
-                                         RBRInstrumentLink *link)
+RBRInstrumentError RBRInstrument_getLink(RBRInstrument *instrument, RBRInstrumentLink *link)
 {
     *link = RBRINSTRUMENT_UNKNOWN_LINK;
 
@@ -43,21 +42,17 @@ RBRInstrumentError RBRInstrument_getLink(RBRInstrument *instrument,
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
             break;
         }
-        else if (strcmp(parameter.key, "link") == 0
-                 || strcmp(parameter.key, "type") == 0)
+        else if (strcmp(parameter.key, "link") == 0 || strcmp(parameter.key, "type") == 0)
         {
             for (int i = 0; i < RBRINSTRUMENT_LINK_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentLink_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentLink_name(i), parameter.value) == 0)
                 {
                     *link = i;
                     break;
@@ -129,28 +124,21 @@ const char *RBRInstrumentSerialMode_name(RBRInstrumentSerialMode mode)
     }
 }
 
-RBRInstrumentError RBRInstrument_getSerial(RBRInstrument *instrument,
-                                           RBRInstrumentSerial *serial)
+RBRInstrumentError RBRInstrument_getSerial(RBRInstrument *instrument, RBRInstrumentSerial *serial)
 {
     memset(serial, 0, sizeof(RBRInstrumentSerial));
 
     RBRInstrumentSerialBaudRate *availableBaudRates =
         (RBRInstrumentSerialBaudRate *) &serial->availableBaudRates;
-    RBRInstrumentSerialMode *availableModes =
-        (RBRInstrumentSerialMode *) &serial->availableModes;
+    RBRInstrumentSerialMode *availableModes = (RBRInstrumentSerialMode *) &serial->availableModes;
 
     if (instrument->generation == RBRINSTRUMENT_LOGGER2)
     {
-        *availableBaudRates = RBRINSTRUMENT_SERIAL_BAUD_1200
-                              | RBRINSTRUMENT_SERIAL_BAUD_2400
-                              | RBRINSTRUMENT_SERIAL_BAUD_4800
-                              | RBRINSTRUMENT_SERIAL_BAUD_9600
-                              | RBRINSTRUMENT_SERIAL_BAUD_19200
-                              | RBRINSTRUMENT_SERIAL_BAUD_115200;
-        *availableModes = RBRINSTRUMENT_SERIAL_MODE_RS232
-                          | RBRINSTRUMENT_SERIAL_MODE_RS485F
-                          | RBRINSTRUMENT_SERIAL_MODE_UART
-                          | RBRINSTRUMENT_SERIAL_MODE_UART_IDLE_LOW;
+        *availableBaudRates = RBRINSTRUMENT_SERIAL_BAUD_1200 | RBRINSTRUMENT_SERIAL_BAUD_2400 |
+                              RBRINSTRUMENT_SERIAL_BAUD_4800 | RBRINSTRUMENT_SERIAL_BAUD_9600 |
+                              RBRINSTRUMENT_SERIAL_BAUD_19200 | RBRINSTRUMENT_SERIAL_BAUD_115200;
+        *availableModes = RBRINSTRUMENT_SERIAL_MODE_RS232 | RBRINSTRUMENT_SERIAL_MODE_RS485F |
+                          RBRINSTRUMENT_SERIAL_MODE_UART | RBRINSTRUMENT_SERIAL_MODE_UART_IDLE_LOW;
 
         RBR_TRY(RBRInstrument_converse(instrument, "serial"));
     }
@@ -166,9 +154,7 @@ RBRInstrumentError RBRInstrument_getSerial(RBRInstrument *instrument,
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -176,12 +162,10 @@ RBRInstrumentError RBRInstrument_getSerial(RBRInstrument *instrument,
         }
         else if (strcmp(parameter.key, "baudrate") == 0)
         {
-            for (int i = RBRINSTRUMENT_SERIAL_BAUD_NONE + 1;
-                 i <= RBRINSTRUMENT_SERIAL_BAUD_MAX;
+            for (int i = RBRINSTRUMENT_SERIAL_BAUD_NONE + 1; i <= RBRINSTRUMENT_SERIAL_BAUD_MAX;
                  i <<= 1)
             {
-                if (strcmp(RBRInstrumentSerialBaudRate_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentSerialBaudRate_name(i), parameter.value) == 0)
                 {
                     serial->baudRate = i;
                     break;
@@ -190,12 +174,10 @@ RBRInstrumentError RBRInstrument_getSerial(RBRInstrument *instrument,
         }
         else if (strcmp(parameter.key, "mode") == 0)
         {
-            for (int i = RBRINSTRUMENT_SERIAL_MODE_NONE + 1;
-                 i <= RBRINSTRUMENT_SERIAL_MODE_MAX;
+            for (int i = RBRINSTRUMENT_SERIAL_MODE_NONE + 1; i <= RBRINSTRUMENT_SERIAL_MODE_MAX;
                  i <<= 1)
             {
-                if (strcmp(RBRInstrumentSerialMode_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentSerialMode_name(i), parameter.value) == 0)
                 {
                     serial->mode = i;
                     break;
@@ -205,20 +187,17 @@ RBRInstrumentError RBRInstrument_getSerial(RBRInstrument *instrument,
         else if (strcmp(parameter.key, "availablebaudrates") == 0)
         {
             char *nextValue;
-            do
-            {
+            do {
                 if ((nextValue = strstr(parameter.value, "|")) != NULL)
                 {
                     *nextValue = '\0';
                     nextValue++;
                 }
 
-                for (int i = RBRINSTRUMENT_SERIAL_BAUD_NONE + 1;
-                     i <= RBRINSTRUMENT_SERIAL_BAUD_MAX;
+                for (int i = RBRINSTRUMENT_SERIAL_BAUD_NONE + 1; i <= RBRINSTRUMENT_SERIAL_BAUD_MAX;
                      i <<= 1)
                 {
-                    if (strcmp(RBRInstrumentSerialBaudRate_name(i),
-                               parameter.value) == 0)
+                    if (strcmp(RBRInstrumentSerialBaudRate_name(i), parameter.value) == 0)
                     {
                         *availableBaudRates |= i;
                     }
@@ -230,20 +209,17 @@ RBRInstrumentError RBRInstrument_getSerial(RBRInstrument *instrument,
         else if (strcmp(parameter.key, "availablemodes") == 0)
         {
             char *nextValue;
-            do
-            {
+            do {
                 if ((nextValue = strstr(parameter.value, "|")) != NULL)
                 {
                     *nextValue = '\0';
                     nextValue++;
                 }
 
-                for (int i = RBRINSTRUMENT_SERIAL_MODE_NONE + 1;
-                     i <= RBRINSTRUMENT_SERIAL_MODE_MAX;
+                for (int i = RBRINSTRUMENT_SERIAL_MODE_NONE + 1; i <= RBRINSTRUMENT_SERIAL_MODE_MAX;
                      i <<= 1)
                 {
-                    if (strcmp(RBRInstrumentSerialMode_name(i),
-                               parameter.value) == 0)
+                    if (strcmp(RBRInstrumentSerialMode_name(i), parameter.value) == 0)
                     {
                         *availableModes |= i;
                     }
@@ -260,19 +236,16 @@ RBRInstrumentError RBRInstrument_getSerial(RBRInstrument *instrument,
 RBRInstrumentError RBRInstrument_setSerial(RBRInstrument *instrument,
                                            const RBRInstrumentSerial *serial)
 {
-    if (serial->baudRate < 0
-        || serial->baudRate > RBRINSTRUMENT_SERIAL_BAUD_MAX
-        || serial->mode < 0
-        || serial->mode > RBRINSTRUMENT_SERIAL_MODE_MAX)
+    if (serial->baudRate <= RBRINSTRUMENT_SERIAL_BAUD_NONE || serial->baudRate > RBRINSTRUMENT_SERIAL_BAUD_MAX ||
+        serial->mode <= RBRINSTRUMENT_SERIAL_MODE_NONE || serial->mode > RBRINSTRUMENT_SERIAL_MODE_MAX)
     {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrument_converse(
-        instrument,
-        "serial baudrate = %s, mode = %s",
-        RBRInstrumentSerialBaudRate_name(serial->baudRate),
-        RBRInstrumentSerialMode_name(serial->mode));
+    return RBRInstrument_converse(instrument,
+                                  "serial baudrate = %s, mode = %s",
+                                  RBRInstrumentSerialBaudRate_name(serial->baudRate),
+                                  RBRInstrumentSerialMode_name(serial->mode));
 }
 
 RBRInstrumentError RBRInstrument_sleep(RBRInstrument *instrument)
@@ -301,13 +274,11 @@ const char *RBRInstrumentWiFiState_name(RBRInstrumentWiFiState state)
     }
 }
 
-RBRInstrumentError RBRInstrument_getWiFi(RBRInstrument *instrument,
-                                         RBRInstrumentWiFi *wifi)
+RBRInstrumentError RBRInstrument_getWiFi(RBRInstrument *instrument, RBRInstrumentWiFi *wifi)
 {
     memset(wifi, 0, sizeof(RBRInstrumentWiFi));
 
-    RBRInstrumentWiFiState *state =
-        (RBRInstrumentWiFiState *) &wifi->state;
+    RBRInstrumentWiFiState *state = (RBRInstrumentWiFiState *) &wifi->state;
     *state = RBRINSTRUMENT_UNKNOWN_WIFI;
 
     RBR_TRY(RBRInstrument_converse(instrument, "wifi"));
@@ -316,9 +287,7 @@ RBRInstrumentError RBRInstrument_getWiFi(RBRInstrument *instrument,
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -330,12 +299,9 @@ RBRInstrumentError RBRInstrument_getWiFi(RBRInstrument *instrument,
         }
         else if (strcmp(parameter.key, "state") == 0)
         {
-            for (int i = RBRINSTRUMENT_WIFI_NA;
-                 i < RBRINSTRUMENT_WIFI_COUNT;
-                 i++)
+            for (int i = RBRINSTRUMENT_WIFI_NA; i < RBRINSTRUMENT_WIFI_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentWiFiState_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentWiFiState_name(i), parameter.value) == 0)
                 {
                     *state = i;
                     break;
@@ -352,12 +318,10 @@ RBRInstrumentError RBRInstrument_getWiFi(RBRInstrument *instrument,
         }
         else if (strcmp(parameter.key, "baudrate") == 0)
         {
-            for (int i = RBRINSTRUMENT_SERIAL_BAUD_NONE + 1;
-                 i <= RBRINSTRUMENT_SERIAL_BAUD_MAX;
+            for (int i = RBRINSTRUMENT_SERIAL_BAUD_NONE + 1; i <= RBRINSTRUMENT_SERIAL_BAUD_MAX;
                  i <<= 1)
             {
-                if (strcmp(RBRInstrumentSerialBaudRate_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentSerialBaudRate_name(i), parameter.value) == 0)
                 {
                     *(RBRInstrumentSerialBaudRate *) &wifi->baudRate = i;
                     break;
@@ -369,34 +333,28 @@ RBRInstrumentError RBRInstrument_getWiFi(RBRInstrument *instrument,
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_setWiFi(RBRInstrument *instrument,
-                                         const RBRInstrumentWiFi *wifi)
+RBRInstrumentError RBRInstrument_setWiFi(RBRInstrument *instrument, const RBRInstrumentWiFi *wifi)
 {
-    if (wifi->powerTimeout < 5000
-        || wifi->powerTimeout > 600000
-        || wifi->powerTimeout % 1000 != 0
-        || wifi->commandTimeout < 5000
-        || wifi->commandTimeout > 600000
-        || wifi->commandTimeout % 1000 != 0)
+    if (wifi->powerTimeout < 5000 || wifi->powerTimeout > 600000 ||
+        wifi->powerTimeout % 1000 != 0 || wifi->commandTimeout < 5000 ||
+        wifi->commandTimeout > 600000 || wifi->commandTimeout % 1000 != 0)
     {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
     if (instrument->generation == RBRINSTRUMENT_LOGGER2)
     {
-        return RBRInstrument_converse(
-            instrument,
-            "wifi timeout = %d, commandtimeout = %d",
-            wifi->powerTimeout / 1000,
-            wifi->commandTimeout / 1000);
+        return RBRInstrument_converse(instrument,
+                                      "wifi timeout = %d, commandtimeout = %d",
+                                      wifi->powerTimeout / 1000,
+                                      wifi->commandTimeout / 1000);
     }
     else
     {
-        return RBRInstrument_converse(
-            instrument,
-            "wifi enabled = %s, timeout = %d, commandtimeout = %d",
-            wifi->enabled ? "true" : "false",
-            wifi->powerTimeout / 1000,
-            wifi->commandTimeout / 1000);
+        return RBRInstrument_converse(instrument,
+                                      "wifi enabled = %s, timeout = %d, commandtimeout = %d",
+                                      wifi->enabled ? "true" : "false",
+                                      wifi->powerTimeout / 1000,
+                                      wifi->commandTimeout / 1000);
     }
 }

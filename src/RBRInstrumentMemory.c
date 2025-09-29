@@ -37,13 +37,12 @@ const char *RBRInstrumentDataset_name(RBRInstrumentDataset dataset)
     }
 }
 
-RBRInstrumentError RBRInstrument_getMemoryInfo(
-    RBRInstrument *instrument,
-    RBRInstrumentMemoryInfo *memoryInfo)
+RBRInstrumentError RBRInstrument_getMemoryInfo(RBRInstrument *instrument,
+                                               RBRInstrumentMemoryInfo *memoryInfo)
 {
-    if (memoryInfo->dataset < RBRINSTRUMENT_DATASET_EASYPARSE_EVENTS
-        || memoryInfo->dataset == RBRINSTRUMENT_DATASET_UNKNOWN_DATASET1
-        || memoryInfo->dataset >= RBRINSTRUMENT_DATASET_COUNT)
+    if (memoryInfo->dataset < RBRINSTRUMENT_DATASET_EASYPARSE_EVENTS ||
+        memoryInfo->dataset == RBRINSTRUMENT_DATASET_UNKNOWN_DATASET1 ||
+        memoryInfo->dataset >= RBRINSTRUMENT_DATASET_COUNT)
     {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
@@ -51,17 +50,13 @@ RBRInstrumentError RBRInstrument_getMemoryInfo(
     RBRInstrumentDataset dataset = memoryInfo->dataset;
     memset(memoryInfo, 0, sizeof(RBRInstrumentMemoryInfo));
 
-    RBR_TRY(RBRInstrument_converse(instrument,
-                                   "meminfo dataset = %d",
-                                   dataset));
+    RBR_TRY(RBRInstrument_converse(instrument, "meminfo dataset = %d", dataset));
 
     char *command = NULL;
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -88,9 +83,8 @@ RBRInstrumentError RBRInstrument_getMemoryInfo(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-static RBRInstrumentError RBRInstrumentL2_parseDataResponse(
-    RBRInstrument *instrument,
-    RBRInstrumentData *data)
+static RBRInstrumentError RBRInstrumentL2_parseDataResponse(RBRInstrument *instrument,
+                                                            RBRInstrumentData *data)
 {
     sscanf(instrument->response.response,
            "data %d %d %d",
@@ -100,17 +94,14 @@ static RBRInstrumentError RBRInstrumentL2_parseDataResponse(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-static RBRInstrumentError RBRInstrumentL3_parseDataResponse(
-    RBRInstrument *instrument,
-    RBRInstrumentData *data)
+static RBRInstrumentError RBRInstrumentL3_parseDataResponse(RBRInstrument *instrument,
+                                                            RBRInstrumentData *data)
 {
     char *command = NULL;
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -144,10 +135,8 @@ static RBRInstrumentError RBRInstrumentL3_parseDataResponse(
  * \param [out] data the buffer to write into
  * \param [in] size the amount of data to write into the buffer
  */
-static RBRInstrumentError RBRInstrument_fixedRead(
-    struct RBRInstrument *instrument,
-    void *data,
-    int32_t size)
+static RBRInstrumentError RBRInstrument_fixedRead(struct RBRInstrument *instrument, void *data,
+                                                  int32_t size)
 {
     int32_t bufferLength = 0;
     int32_t readLength;
@@ -155,16 +144,14 @@ static RBRInstrumentError RBRInstrument_fixedRead(
     /* Can we steal from the response buffer? */
     if (instrument->lastResponseLength < instrument->responseBufferLength)
     {
-        readLength = instrument->responseBufferLength
-                     - instrument->lastResponseLength;
+        readLength = instrument->responseBufferLength - instrument->lastResponseLength;
         if (readLength > size)
         {
             readLength = size;
         }
 
         memcpy(data,
-               ((uint8_t *) instrument->responseBuffer)
-               + instrument->lastResponseLength,
+               ((uint8_t *) instrument->responseBuffer) + instrument->lastResponseLength,
                readLength);
 
         bufferLength = readLength;
@@ -176,10 +163,8 @@ static RBRInstrumentError RBRInstrument_fixedRead(
     {
         readLength = size - bufferLength;
 
-        RBR_TRY(instrument->callbacks.read(
-                    instrument,
-                    ((uint8_t *) data) + bufferLength,
-                    &readLength));
+        RBR_TRY(
+            instrument->callbacks.read(instrument, ((uint8_t *) data) + bufferLength, &readLength));
 
         bufferLength += readLength;
     }
@@ -200,8 +185,8 @@ uint16_t calculateCrc(const void *data, int32_t size)
 
         for (int_fast8_t j = 0; j < 8; j++)
         {
-            uint8_t bit = ((b   >> (7 - j) & 1) == 1);
-            uint8_t c15 = ((crc >> 15      & 1) == 1);
+            uint8_t bit = ((b >> (7 - j) & 1) == 1);
+            uint8_t c15 = ((crc >> 15 & 1) == 1);
 
             crc <<= 1;
 
@@ -215,12 +200,11 @@ uint16_t calculateCrc(const void *data, int32_t size)
     return crc;
 }
 
-RBRInstrumentError RBRInstrument_readData(RBRInstrument *instrument,
-                                          RBRInstrumentData *data)
+RBRInstrumentError RBRInstrument_readData(RBRInstrument *instrument, RBRInstrumentData *data)
 {
-    if (data->dataset < RBRINSTRUMENT_DATASET_EASYPARSE_EVENTS
-        || data->dataset == RBRINSTRUMENT_DATASET_UNKNOWN_DATASET1
-        || data->dataset >= RBRINSTRUMENT_DATASET_COUNT)
+    if (data->dataset < RBRINSTRUMENT_DATASET_EASYPARSE_EVENTS ||
+        data->dataset == RBRINSTRUMENT_DATASET_UNKNOWN_DATASET1 ||
+        data->dataset >= RBRINSTRUMENT_DATASET_COUNT)
     {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
@@ -251,15 +235,11 @@ RBRInstrumentError RBRInstrument_readData(RBRInstrument *instrument,
     else
     {
         generationCommand = "readdata dataset = %d"
-                            ", size = %" PRId32
-                            ", offset = %" PRId32;
+                            ", size = %" PRId32 ", offset = %" PRId32;
     }
 
-    RBR_TRY(RBRInstrument_converse(instrument,
-                                   generationCommand,
-                                   workingData.dataset,
-                                   workingData.size,
-                                   workingData.offset));
+    RBR_TRY(RBRInstrument_converse(
+                instrument, generationCommand, workingData.dataset, workingData.size, workingData.offset));
 
     /* Because the response format for L2 is so nonstandard, we'll have to
      * parse it with sscanf. We can just do things the normal way for L3. */
@@ -273,10 +253,11 @@ RBRInstrumentError RBRInstrument_readData(RBRInstrument *instrument,
     }
 
     /* check if offset in response matches requested offset. If not, return error. */
-    if(workingData.offset !=data->offset){
+    if (workingData.offset != data->offset)
+    {
         return RBRINSTRUMENT_COMMUNICATION_ERROR;
     }
-    
+
     /* Fill the user-provided buffer. RBRInstrument_fixedRead() will first pull
      * leftover data from RBRInstrument.responseBuffer, then read from the
      * instrument. */
@@ -331,9 +312,8 @@ const char *RBRInstrumentMemoryFormat_name(RBRInstrumentMemoryFormat format)
     }
 }
 
-RBRInstrumentError RBRInstrument_getAvailableMemoryFormats(
-    RBRInstrument *instrument,
-    RBRInstrumentMemoryFormat *memoryFormats)
+RBRInstrumentError RBRInstrument_getAvailableMemoryFormats(RBRInstrument *instrument,
+                                                           RBRInstrumentMemoryFormat *memoryFormats)
 {
     *memoryFormats = RBRINSTRUMENT_MEMFORMAT_NONE;
 
@@ -372,35 +352,30 @@ RBRInstrumentError RBRInstrument_getAvailableMemoryFormats(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
             break;
         }
-        else if (strcmp(parameter.key, "availabletypes") != 0
-                 && strcmp(parameter.key, "support") != 0)
+        else if (strcmp(parameter.key, "availabletypes") != 0 &&
+                 strcmp(parameter.key, "support") != 0)
         {
             continue;
         }
 
         char *nextValue;
-        do
-        {
+        do {
             if ((nextValue = strstr(parameter.value, separator)) != NULL)
             {
                 *nextValue = '\0';
                 nextValue += separatorLen;
             }
 
-            for (int i = RBRINSTRUMENT_MEMFORMAT_NONE + 1;
-                 i <= RBRINSTRUMENT_MEMFORMAT_MAX;
+            for (int i = RBRINSTRUMENT_MEMFORMAT_NONE + 1; i <= RBRINSTRUMENT_MEMFORMAT_MAX;
                  i <<= 1)
             {
-                if (strcmp(RBRInstrumentMemoryFormat_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentMemoryFormat_name(i), parameter.value) == 0)
                 {
                     *memoryFormats |= i;
                 }
@@ -415,9 +390,8 @@ RBRInstrumentError RBRInstrument_getAvailableMemoryFormats(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_getCurrentMemoryFormat(
-    RBRInstrument *instrument,
-    RBRInstrumentMemoryFormat *memoryFormat)
+RBRInstrumentError RBRInstrument_getCurrentMemoryFormat(RBRInstrument *instrument,
+                                                        RBRInstrumentMemoryFormat *memoryFormat)
 {
     *memoryFormat = RBRINSTRUMENT_MEMFORMAT_NONE;
 
@@ -427,9 +401,7 @@ RBRInstrumentError RBRInstrument_getCurrentMemoryFormat(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -440,12 +412,9 @@ RBRInstrumentError RBRInstrument_getCurrentMemoryFormat(
             continue;
         }
 
-        for (int i = RBRINSTRUMENT_MEMFORMAT_NONE + 1;
-             i <= RBRINSTRUMENT_MEMFORMAT_MAX;
-             i <<= 1)
+        for (int i = RBRINSTRUMENT_MEMFORMAT_NONE + 1; i <= RBRINSTRUMENT_MEMFORMAT_MAX; i <<= 1)
         {
-            if (strcmp(RBRInstrumentMemoryFormat_name(i),
-                       parameter.value) == 0)
+            if (strcmp(RBRInstrumentMemoryFormat_name(i), parameter.value) == 0)
             {
                 *memoryFormat = i;
                 break;
@@ -458,9 +427,8 @@ RBRInstrumentError RBRInstrument_getCurrentMemoryFormat(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_getNewMemoryFormat(
-    RBRInstrument *instrument,
-    RBRInstrumentMemoryFormat *memoryFormat)
+RBRInstrumentError RBRInstrument_getNewMemoryFormat(RBRInstrument *instrument,
+                                                    RBRInstrumentMemoryFormat *memoryFormat)
 {
     *memoryFormat = RBRINSTRUMENT_MEMFORMAT_NONE;
 
@@ -470,9 +438,7 @@ RBRInstrumentError RBRInstrument_getNewMemoryFormat(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -483,12 +449,10 @@ RBRInstrumentError RBRInstrument_getNewMemoryFormat(
             continue;
         }
 
-        for (int i = RBRINSTRUMENT_MEMFORMAT_RAWBIN00 + 1;
-             i <= RBRINSTRUMENT_MEMFORMAT_MAX;
+        for (int i = RBRINSTRUMENT_MEMFORMAT_RAWBIN00 + 1; i <= RBRINSTRUMENT_MEMFORMAT_MAX;
              i <<= 1)
         {
-            if (strcmp(RBRInstrumentMemoryFormat_name(i),
-                       parameter.value) == 0)
+            if (strcmp(RBRInstrumentMemoryFormat_name(i), parameter.value) == 0)
             {
                 *memoryFormat = i;
                 break;
@@ -501,24 +465,19 @@ RBRInstrumentError RBRInstrument_getNewMemoryFormat(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_setNewMemoryFormat(
-    RBRInstrument *instrument,
-    RBRInstrumentMemoryFormat memoryFormat)
+RBRInstrumentError RBRInstrument_setNewMemoryFormat(RBRInstrument *instrument,
+                                                    RBRInstrumentMemoryFormat memoryFormat)
 {
-    if (memoryFormat < RBRINSTRUMENT_MEMFORMAT_NONE
-        || memoryFormat > RBRINSTRUMENT_MEMFORMAT_MAX)
+    if (memoryFormat < RBRINSTRUMENT_MEMFORMAT_NONE || memoryFormat > RBRINSTRUMENT_MEMFORMAT_MAX)
     {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
     const char *formatName = RBRInstrumentMemoryFormat_name(memoryFormat);
-    return RBRInstrument_converse(instrument,
-                                  "memformat newtype = %s",
-                                  formatName);
+    return RBRInstrument_converse(instrument, "memformat newtype = %s", formatName);
 }
 
-const char *RBRInstrumentPostprocessingAggregate_name(
-    RBRInstrumentPostprocessingAggregate function)
+const char *RBRInstrumentPostprocessingAggregate_name(RBRInstrumentPostprocessingAggregate function)
 {
     switch (function)
     {
@@ -536,8 +495,7 @@ const char *RBRInstrumentPostprocessingAggregate_name(
     }
 }
 
-const char *RBRInstrumentPostprocessingStatus_name(
-    RBRInstrumentPostprocessingStatus status)
+const char *RBRInstrumentPostprocessingStatus_name(RBRInstrumentPostprocessingStatus status)
 {
     switch (status)
     {
@@ -557,8 +515,7 @@ const char *RBRInstrumentPostprocessingStatus_name(
     }
 }
 
-const char *RBRInstrumentPostprocessingCommand_name(
-    RBRInstrumentPostprocessingCommand command)
+const char *RBRInstrumentPostprocessingCommand_name(RBRInstrumentPostprocessingCommand command)
 {
     switch (command)
     {
@@ -576,8 +533,7 @@ const char *RBRInstrumentPostprocessingCommand_name(
     }
 }
 
-const char *RBRInstrumentPostprocessingBinFilter_name(
-    RBRInstrumentPostprocessingBinFilter filter)
+const char *RBRInstrumentPostprocessingBinFilter_name(RBRInstrumentPostprocessingBinFilter filter)
 {
     switch (filter)
     {
@@ -595,9 +551,8 @@ const char *RBRInstrumentPostprocessingBinFilter_name(
     }
 }
 
-RBRInstrumentError RBRInstrument_getPostprocessing(
-    RBRInstrument *instrument,
-    RBRInstrumentPostprocessing *postprocessing)
+RBRInstrumentError RBRInstrument_getPostprocessing(RBRInstrument *instrument,
+                                                   RBRInstrumentPostprocessing *postprocessing)
 {
     memset(postprocessing, 0, sizeof(RBRInstrumentPostprocessing));
     postprocessing->status = RBRINSTRUMENT_UNKNOWN_POSTPROCESSING_STATUS;
@@ -619,8 +574,7 @@ RBRInstrumentError RBRInstrument_getPostprocessing(
         {
             for (int i = 0; i < RBRINSTRUMENT_POSTPROCESSING_STATUS_COUNT; ++i)
             {
-                if (strcmp(RBRInstrumentPostprocessingStatus_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentPostprocessingStatus_name(i), parameter.value) == 0)
                 {
                     postprocessing->status = i;
                     break;
@@ -629,8 +583,7 @@ RBRInstrumentError RBRInstrument_getPostprocessing(
         }
         else if (strcmp(parameter.key, "channels") == 0)
         {
-            RBRInstrumentPostprocessingChannelsList *channelsList =
-                &postprocessing->channels;
+            RBRInstrumentPostprocessingChannelsList *channelsList = &postprocessing->channels;
 
             char *functionStart;
             char *labelStart;
@@ -650,12 +603,9 @@ RBRInstrumentError RBRInstrument_getPostprocessing(
                     break;
                 }
 
-                for (int i = 0;
-                     i < RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_COUNT;
-                     ++i)
+                for (int i = 0; i < RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_COUNT; ++i)
                 {
-                    if (strcmp(RBRInstrumentPostprocessingAggregate_name(i),
-                               functionStart) == 0)
+                    if (strcmp(RBRInstrumentPostprocessingAggregate_name(i), functionStart) == 0)
                     {
                         channelsList->channels[channel].function = i;
                         break;
@@ -680,12 +630,9 @@ RBRInstrumentError RBRInstrument_getPostprocessing(
         }
         else if (strcmp(parameter.key, "binfilter") == 0)
         {
-            for (int i = 0;
-                 i < RBRINSTRUMENT_POSTPROCESSING_BINFILTER_COUNT;
-                 ++i)
+            for (int i = 0; i < RBRINSTRUMENT_POSTPROCESSING_BINFILTER_COUNT; ++i)
             {
-                if (strcmp(RBRInstrumentPostprocessingBinFilter_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentPostprocessingBinFilter_name(i), parameter.value) == 0)
                 {
                     postprocessing->binFilter = i;
                     break;
@@ -698,15 +645,13 @@ RBRInstrumentError RBRInstrument_getPostprocessing(
         }
         else if (strcmp(parameter.key, "tstamp_min") == 0)
         {
-            RBRInstrumentDateTime_parseScheduleTime(parameter.value,
-                                                    &postprocessing->tstampMin,
-                                                    NULL);
+            RBRInstrumentDateTime_parseScheduleTime(
+                parameter.value, &postprocessing->tstampMin, NULL);
         }
         else if (strcmp(parameter.key, "tstamp_max") == 0)
         {
-            RBRInstrumentDateTime_parseScheduleTime(parameter.value,
-                                                    &postprocessing->tstampMax,
-                                                    NULL);
+            RBRInstrumentDateTime_parseScheduleTime(
+                parameter.value, &postprocessing->tstampMax, NULL);
         }
         else if (strcmp(parameter.key, "depth_min") == 0)
         {
@@ -737,39 +682,33 @@ RBRInstrumentError RBRInstrument_getPostprocessing(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_setPostprocessing(
-    RBRInstrument *instrument,
-    const RBRInstrumentPostprocessing *postprocessing)
+RBRInstrumentError RBRInstrument_setPostprocessing(RBRInstrument *instrument,
+                                                   const RBRInstrumentPostprocessing *postprocessing)
 {
     bool timeBinning = strcmp(postprocessing->binReference, "tstamp") == 0;
 
-    if (postprocessing->channels.count < 0
-        || postprocessing->channels.count >=
-        RBRINSTRUMENT_POSTPROCESSING_CHANNEL_MAX
-        || postprocessing->binFilter <
-        RBRINSTRUMENT_POSTPROCESSING_BINFILTER_NONE
-        || postprocessing->binFilter >=
-        RBRINSTRUMENT_POSTPROCESSING_BINFILTER_COUNT
-        || postprocessing->binSize < 0
-        || postprocessing->tstampMin < RBRINSTRUMENT_DATETIME_MIN
-        || postprocessing->tstampMin > RBRINSTRUMENT_DATETIME_MAX
-        || postprocessing->tstampMax < RBRINSTRUMENT_DATETIME_MIN
-        || postprocessing->tstampMax > RBRINSTRUMENT_DATETIME_MAX
-        || postprocessing->tstampMin > postprocessing->tstampMax
-        || (timeBinning /* Depth parameters can be invalid when unused */
-            && postprocessing->depthMin > postprocessing->depthMax))
+    if (postprocessing->channels.count < 0 ||
+        postprocessing->channels.count >= RBRINSTRUMENT_POSTPROCESSING_CHANNEL_MAX ||
+        postprocessing->binFilter < RBRINSTRUMENT_POSTPROCESSING_BINFILTER_NONE ||
+        postprocessing->binFilter >= RBRINSTRUMENT_POSTPROCESSING_BINFILTER_COUNT ||
+        postprocessing->binSize < 0 || postprocessing->tstampMin < RBRINSTRUMENT_DATETIME_MIN ||
+        postprocessing->tstampMin > RBRINSTRUMENT_DATETIME_MAX ||
+        postprocessing->tstampMax < RBRINSTRUMENT_DATETIME_MIN ||
+        postprocessing->tstampMax > RBRINSTRUMENT_DATETIME_MAX ||
+        postprocessing->tstampMin > postprocessing->tstampMax ||
+        (timeBinning /* Depth parameters can be invalid when unused */
+         && postprocessing->depthMin > postprocessing->depthMax))
     {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
-    const RBRInstrumentPostprocessingChannelsList *channelsList =
-        &postprocessing->channels;
+    const RBRInstrumentPostprocessingChannelsList *channelsList = &postprocessing->channels;
 
     for (int channel = 0; channel < channelsList->count; ++channel)
     {
         if (channelsList->channels[channel].function <
-            RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_MEAN
-            || channelsList->channels[channel].function >=
+            RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_MEAN ||
+            channelsList->channels[channel].function >=
             RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_COUNT)
         {
             return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
@@ -779,52 +718,44 @@ RBRInstrumentError RBRInstrument_setPostprocessing(
     /* The default command buffer is 120B, and even without providing channels,
      * a typical postprocessing command exceeds that length. We'll send
      * parameters in groups instead of all at once. */
-    RBR_TRY(RBRInstrument_converse(
-        instrument,
-        "postprocessing binreference = %s, binfilter = %s, binsize = %.1f",
-        postprocessing->binReference,
-        RBRInstrumentPostprocessingBinFilter_name(postprocessing->binFilter),
-        postprocessing->binSize));
+    RBR_TRY(
+        RBRInstrument_converse(instrument,
+                               "postprocessing binreference = %s, binfilter = %s, binsize = %.1f",
+                               postprocessing->binReference,
+                               RBRInstrumentPostprocessingBinFilter_name(postprocessing->binFilter),
+                               (double) postprocessing->binSize));
 
     char tstamp[RBRINSTRUMENT_SCHEDULE_TIME_LEN + 1];
 
     RBRInstrumentDateTime_toScheduleTime(postprocessing->tstampMin, tstamp);
-    RBR_TRY(RBRInstrument_converse(
-        instrument,
-        "postprocessing tstamp_min = %s",
-        tstamp));
+    RBR_TRY(RBRInstrument_converse(instrument, "postprocessing tstamp_min = %s", tstamp));
 
     RBRInstrumentDateTime_toScheduleTime(postprocessing->tstampMax, tstamp);
-    RBR_TRY(RBRInstrument_converse(
-        instrument,
-        "postprocessing tstamp_max = %s",
-        tstamp));
+    RBR_TRY(RBRInstrument_converse(instrument, "postprocessing tstamp_max = %s", tstamp));
 
-    RBR_TRY(RBRInstrument_converse(
-        instrument,
-        "postprocessing depth_min = %.1f, depth_max = %.1f",
-        postprocessing->depthMin,
-        postprocessing->depthMax));
+    RBR_TRY(RBRInstrument_converse(instrument,
+                                   "postprocessing depth_min = %.1f, depth_max = %.1f",
+                                   (double) postprocessing->depthMin,
+                                   (double) postprocessing->depthMax));
 
     /* on-board dynamic correction only available for firmware 1.134 and above */
-    if ( instrument->id.fwtype == 104 && RBRInstrumentVersion_compare(instrument->id.version, "1.134") >= 0 )
+    if (instrument->id.fwtype == 104 &&
+        RBRInstrumentVersion_compare(instrument->id.version, "1.134") >= 0)
     {
-       RBR_TRY(RBRInstrument_converse(
-            instrument,
-            "postprocessing dc_alpha = %.3f, dc_tau = %.3f, dc_tdelay = %.3f, dc_ctcoeff = %.4e",
-            postprocessing->dcAlpha,
-            postprocessing->dcTau,
-            postprocessing->dcTdelay,
-            postprocessing->dcCtCoeff));
+        RBR_TRY(RBRInstrument_converse(
+                    instrument,
+                    "postprocessing dc_alpha = %.3f, dc_tau = %.3f, dc_tdelay = %.3f, dc_ctcoeff = %.4e",
+                    (double) postprocessing->dcAlpha,
+                    (double) postprocessing->dcTau,
+                    (double) postprocessing->dcTdelay,
+                    (double) postprocessing->dcCtCoeff));
     }
 
     char *commandBuffer = (char *) instrument->commandBuffer;
     int32_t *commandBufferLength = &instrument->commandBufferLength;
 
-    *commandBufferLength = snprintf(
-        commandBuffer,
-        sizeof(instrument->commandBuffer),
-        "postprocessing channels =");
+    *commandBufferLength =
+        snprintf(commandBuffer, sizeof(instrument->commandBuffer), "postprocessing channels =");
 
     /* As with fetching, we want to be cautious that we don't exceed the length
      * of the command buffer when configuring many channels. We'll defensively
@@ -833,40 +764,36 @@ RBRInstrumentError RBRInstrument_setPostprocessing(
     const char *functionName;
     for (int channel = 0; channel < channelsList->count; ++channel)
     {
-        functionName = RBRInstrumentPostprocessingAggregate_name(
-            channelsList->channels[channel].function);
+        functionName =
+            RBRInstrumentPostprocessingAggregate_name(channelsList->channels[channel].function);
 
-        if (*commandBufferLength
-            + 3 /* separator + paren pair */
-            + strlen(functionName)
-            + strlen(channelsList->channels[channel].label)
-            > sizeof(instrument->commandBuffer))
+        if (*commandBufferLength + 3 /* separator + paren pair */
+            + strlen(functionName) + strlen(channelsList->channels[channel].label) >
+            sizeof(instrument->commandBuffer))
         {
             RBR_TRY(RBRInstrument_sendBuffer(instrument));
             *commandBufferLength = 0;
         }
 
-        *commandBufferLength += snprintf(
-            commandBuffer + *commandBufferLength,
-            sizeof(instrument->commandBuffer) - *commandBufferLength,
-            "%c%s(%s)",
-            separator,
-            functionName,
-            channelsList->channels[channel].label);
+        *commandBufferLength += snprintf(commandBuffer + *commandBufferLength,
+                                         sizeof(instrument->commandBuffer) - *commandBufferLength,
+                                         "%c%s(%s)",
+                                         separator,
+                                         functionName,
+                                         channelsList->channels[channel].label);
         separator = '|';
     }
 
-    if ((size_t) *commandBufferLength + RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN
-        > sizeof(instrument->commandBuffer))
+    if ((size_t) *commandBufferLength + RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN >
+        sizeof(instrument->commandBuffer))
     {
         RBR_TRY(RBRInstrument_sendBuffer(instrument));
         *commandBufferLength = 0;
     }
 
-    *commandBufferLength += snprintf(
-        commandBuffer + *commandBufferLength,
-        sizeof(instrument->commandBuffer) - *commandBufferLength,
-        RBRINSTRUMENT_SEND_COMMAND_TERMINATOR);
+    *commandBufferLength += snprintf(commandBuffer + *commandBufferLength,
+                                     sizeof(instrument->commandBuffer) - *commandBufferLength,
+                                     RBRINSTRUMENT_SEND_COMMAND_TERMINATOR);
 
     RBR_TRY(RBRInstrument_sendBuffer(instrument));
 
@@ -889,29 +816,25 @@ RBRInstrumentError RBRInstrument_setPostprocessing(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_setPostprocessingCommand(
-    RBRInstrument *instrument,
-    RBRInstrumentPostprocessingCommand command,
-    RBRInstrumentPostprocessingStatus *status)
+RBRInstrumentError RBRInstrument_setPostprocessingCommand(RBRInstrument *instrument,
+                                                          RBRInstrumentPostprocessingCommand command,
+                                                          RBRInstrumentPostprocessingStatus *status)
 {
-    if (command < RBRINSTRUMENT_POSTPROCESSING_COMMAND_START
-        || command >= RBRINSTRUMENT_POSTPROCESSING_COMMAND_COUNT)
+    if (command < RBRINSTRUMENT_POSTPROCESSING_COMMAND_START ||
+        command >= RBRINSTRUMENT_POSTPROCESSING_COMMAND_COUNT)
     {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
     *status = RBRINSTRUMENT_UNKNOWN_POSTPROCESSING_STATUS;
 
-    RBR_TRY(RBRInstrument_converse(
-                instrument,
-                "postprocessing command = %s",
-                RBRInstrumentPostprocessingCommand_name(command)));
+    RBR_TRY(RBRInstrument_converse(instrument,
+                                   "postprocessing command = %s",
+                                   RBRInstrumentPostprocessingCommand_name(command)));
 
     char *instrumentCommand = NULL;
     RBRInstrumentResponseParameter parameter;
-    while (RBRInstrument_parseResponse(instrument,
-                                       &instrumentCommand,
-                                       &parameter),
+    while (RBRInstrument_parseResponse(instrument, &instrumentCommand, &parameter),
            parameter.key != NULL && parameter.value != NULL)
     {
         if (strcmp(parameter.key, "status") != 0)
@@ -921,8 +844,7 @@ RBRInstrumentError RBRInstrument_setPostprocessingCommand(
 
         for (int i = 0; i < RBRINSTRUMENT_POSTPROCESSING_STATUS_COUNT; ++i)
         {
-            if (strcmp(RBRInstrumentPostprocessingStatus_name(i),
-                       parameter.value) == 0)
+            if (strcmp(RBRInstrumentPostprocessingStatus_name(i), parameter.value) == 0)
             {
                 *status = i;
                 break;

@@ -66,9 +66,8 @@ typedef struct RBRInstrumentChannelsList
  * \see RBRInstrument_getLabelsList()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRInstrumentError RBRInstrument_getChannelsList(
-    RBRInstrument *instrument,
-    RBRInstrumentChannelsList *channelsList);
+RBRInstrumentError RBRInstrument_getChannelsList(RBRInstrument *instrument,
+                                                 RBRInstrumentChannelsList *channelsList);
 
 /**
  * \brief Response to the `outputformat labelslist` command.
@@ -107,9 +106,8 @@ typedef struct RBRInstrumentLabelsList
  * \see RBRInstrument_getChannelsList()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRInstrumentError RBRInstrument_getLabelsList(
-    RBRInstrument *instrument,
-    RBRInstrumentLabelsList *labelsList);
+RBRInstrumentError RBRInstrument_getLabelsList(RBRInstrument *instrument,
+                                               RBRInstrumentLabelsList *labelsList);
 
 /**
  * \brief Instrument output formats.
@@ -122,7 +120,7 @@ RBRInstrumentError RBRInstrument_getLabelsList(
 typedef enum RBRInstrumentOutputFormat
 {
     /** No format. */
-    RBRINSTRUMENT_OUTFORMAT_NONE      = 0,
+    RBRINSTRUMENT_OUTFORMAT_NONE = 0,
     /** Physical units to 4 decimal places. */
     RBRINSTRUMENT_OUTFORMAT_CALTEXT01 = 1 << 0,
     /** Physical units to 4 decimal places with units. */
@@ -134,12 +132,12 @@ typedef enum RBRInstrumentOutputFormat
     RBRINSTRUMENT_OUTFORMAT_CALTEXT03 = 1 << 2,
     /** Physical units expressed as “engineering-notation” floating point. */
     RBRINSTRUMENT_OUTFORMAT_CALTEXT04 = 1 << 3,
-    /** Physical units to 4 decimal places. 
-     *  The output starts with the keyword "RBR" followed by the serial number. 
+    /** Physical units to 4 decimal places.
+     *  The output starts with the keyword "RBR" followed by the serial number.
      *  This format is available for LOGGER3 with fw 1.109 or later*/
     RBRINSTRUMENT_OUTFORMAT_CALTEXT07 = 1 << 4,
     /** Corresponds to the largest output format enum value. */
-    RBRINSTRUMENT_OUTFORMAT_MAX       = RBRINSTRUMENT_OUTFORMAT_CALTEXT07
+    RBRINSTRUMENT_OUTFORMAT_MAX = RBRINSTRUMENT_OUTFORMAT_CALTEXT07
 } RBRInstrumentOutputFormat;
 
 /**
@@ -165,9 +163,8 @@ const char *RBRInstrumentOutputFormat_name(RBRInstrumentOutputFormat format);
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRInstrumentError RBRInstrument_getAvailableOutputFormats(
-    RBRInstrument *instrument,
-    RBRInstrumentOutputFormat *outputFormats);
+RBRInstrumentError RBRInstrument_getAvailableOutputFormats(RBRInstrument *instrument,
+                                                           RBRInstrumentOutputFormat *outputFormats);
 
 /**
  * \brief Get the current output format.
@@ -179,9 +176,8 @@ RBRInstrumentError RBRInstrument_getAvailableOutputFormats(
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRInstrumentError RBRInstrument_getOutputFormat(
-    RBRInstrument *instrument,
-    RBRInstrumentOutputFormat *outputFormat);
+RBRInstrumentError RBRInstrument_getOutputFormat(RBRInstrument *instrument,
+                                                 RBRInstrumentOutputFormat *outputFormat);
 
 /**
  * \brief Set the current output format.
@@ -195,9 +191,8 @@ RBRInstrumentError RBRInstrument_getOutputFormat(
  *                                       selected
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRInstrumentError RBRInstrument_setOutputFormat(
-    RBRInstrument *instrument,
-    RBRInstrumentOutputFormat outputFormat);
+RBRInstrumentError RBRInstrument_setOutputFormat(RBRInstrument *instrument,
+                                                 RBRInstrumentOutputFormat outputFormat);
 
 /**
  * \brief Get the USB streaming state.
@@ -210,9 +205,7 @@ RBRInstrumentError RBRInstrument_setOutputFormat(
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when USB streaming is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamusb
  */
-RBRInstrumentError RBRInstrument_getUSBStreamingState(
-    RBRInstrument *instrument,
-    bool *enabled);
+RBRInstrumentError RBRInstrument_getUSBStreamingState(RBRInstrument *instrument, bool *enabled);
 
 /**
  * \brief Set the USB streaming state.
@@ -225,9 +218,7 @@ RBRInstrumentError RBRInstrument_getUSBStreamingState(
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when USB streaming is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamusb
  */
-RBRInstrumentError RBRInstrument_setUSBStreamingState(
-    RBRInstrument *instrument,
-    bool enabled);
+RBRInstrumentError RBRInstrument_setUSBStreamingState(RBRInstrument *instrument, bool enabled);
 
 /**
  * \brief Get the serial streaming state.
@@ -240,9 +231,7 @@ RBRInstrumentError RBRInstrument_setUSBStreamingState(
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when serial streaming is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
-RBRInstrumentError RBRInstrument_getSerialStreamingState(
-    RBRInstrument *instrument,
-    bool *enabled);
+RBRInstrumentError RBRInstrument_getSerialStreamingState(RBRInstrument *instrument, bool *enabled);
 
 /**
  * \brief Set the serial streaming state.
@@ -255,9 +244,7 @@ RBRInstrumentError RBRInstrument_getSerialStreamingState(
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when serial streaming is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
-RBRInstrumentError RBRInstrument_setSerialStreamingState(
-    RBRInstrument *instrument,
-    bool enabled);
+RBRInstrumentError RBRInstrument_setSerialStreamingState(RBRInstrument *instrument, bool enabled);
 
 /**
  * \brief Possible levels of the auxiliary output signal during the setup time,
@@ -286,8 +273,7 @@ typedef enum RBRInstrumentAuxOutputActiveLevel
  * \return a string name for the signal level
  * \see RBRInstrumentError_name() for a description of the format of names
  */
-const char *RBRInstrumentAuxOutputActiveLevel_name(
-    RBRInstrumentAuxOutputActiveLevel level);
+const char *RBRInstrumentAuxOutputActiveLevel_name(RBRInstrumentAuxOutputActiveLevel level);
 
 /**
  * \brief Possible levels of the auxiliary output signal while the instrument
@@ -318,8 +304,7 @@ typedef enum RBRInstrumentAuxOutputSleepLevel
  * \return a string name for the signal level
  * \see RBRInstrumentError_name() for a description of the format of names
  */
-const char *RBRInstrumentAuxOutputSleepLevel_name(
-    RBRInstrumentAuxOutputSleepLevel level);
+const char *RBRInstrumentAuxOutputSleepLevel_name(RBRInstrumentAuxOutputSleepLevel level);
 
 /**
  * \brief Instrument `streamserial` command parameters relating to the
@@ -396,9 +381,8 @@ typedef struct RBRInstrumentAuxOutput
  *                                                signal index is not `1`
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
-RBRInstrumentError RBRInstrument_getAuxOutput(
-    RBRInstrument *instrument,
-    RBRInstrumentAuxOutput *auxOutput);
+RBRInstrumentError RBRInstrument_getAuxOutput(RBRInstrument *instrument,
+                                              RBRInstrumentAuxOutput *auxOutput);
 
 /**
  * \brief Set the instrument auxiliary output signal parameters.
@@ -418,9 +402,8 @@ RBRInstrumentError RBRInstrument_getAuxOutput(
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
-RBRInstrumentError RBRInstrument_setAuxOutput(
-    RBRInstrument *instrument,
-    const RBRInstrumentAuxOutput *auxOutput);
+RBRInstrumentError RBRInstrument_setAuxOutput(RBRInstrument *instrument,
+                                              const RBRInstrumentAuxOutput *auxOutput);
 
 /**
  * \brief A flag set on a sample reading.
@@ -483,8 +466,7 @@ uint8_t RBRInstrumentReading_getError(double reading);
  * \see RBRInstrumentReading_getFlag() to get the error flag, if present
  * \see RBRInstrumentReading_getError() to get the error value, if present
  */
-double RBRInstrumentReading_setError(RBRInstrumentReadingFlag flag,
-                                     uint8_t value);
+double RBRInstrumentReading_setError(RBRInstrumentReadingFlag flag, uint8_t value);
 
 /**
  * \brief An instrument sample.

@@ -30,9 +30,8 @@
 #include "posix-shared.h"
 #include "RBRParser.h"
 
-RBRInstrumentError parserSample(
-    const struct RBRParser *parser,
-    const struct RBRInstrumentSample *const sample)
+RBRInstrumentError parserSample(const struct RBRParser *parser,
+                                const struct RBRInstrumentSample *const sample)
 {
     /* Unused. */
     (void) parser;
@@ -44,8 +43,7 @@ RBRInstrumentError parserSample(
     strftime(ftime, sizeof(ftime), "%F %T", &sampleTime);
 
     printf("%s.%03" PRIi64, ftime, sample->timestamp % 1000);
-    for (int32_t i = 0; i < sample->channels; i++)
-    {
+    for (int32_t i = 0; i < sample->channels; i++) {
         printf(", %lf", sample->readings[i]);
     }
     printf("\n");
@@ -62,8 +60,7 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int datasetFd;
 
-    if (argc < 3)
-    {
+    if (argc < 3) {
         fprintf(stderr, "Usage: %s file channels\n", argv[0]);
         return EXIT_FAILURE;
     }
@@ -71,11 +68,8 @@ int main(int argc, char *argv[])
     filePath = argv[1];
     channels = strtol(argv[2], NULL, 10);
 
-    if ((datasetFd = open(filePath, O_RDONLY)) < 0)
-    {
-        fprintf(stderr, "%s: Failed to open file: %s!\n",
-                programName,
-                strerror(errno));
+    if ((datasetFd = open(filePath, O_RDONLY)) < 0) {
+        fprintf(stderr, "%s: Failed to open file: %s!\n", programName, strerror(errno));
         return EXIT_FAILURE;
     }
 
@@ -89,28 +83,16 @@ int main(int argc, char *argv[])
     RBRParser *parser = NULL;
 
     RBRInstrumentSample sampleBuffer;
-    RBRParserCallbacks parserCallbacks = {
-        .sample = parserSample,
-        .sampleBuffer = &sampleBuffer
-    };
+    RBRParserCallbacks parserCallbacks = {.sample = parserSample, .sampleBuffer = &sampleBuffer};
 
-    RBRParserConfig parserConfig = {
-        .format = RBRINSTRUMENT_MEMFORMAT_CALBIN00,
-        .formatConfig = {
-            .easyParse = {
-                .channels = channels
-            }
-        }
-    };
+    RBRParserConfig parserConfig = {.format = RBRINSTRUMENT_MEMFORMAT_CALBIN00,
+                                    .formatConfig = {.easyParse = {.channels = channels}}};
 
     RBRInstrumentError err;
-    if ((err = RBRParser_init(
-             &parser,
-             &parserCallbacks,
-             &parserConfig,
-             NULL)) != RBRINSTRUMENT_SUCCESS)
-    {
-        fprintf(stderr, "%s: Failed to initialize parser: %s!\n",
+    if ((err = RBRParser_init(&parser, &parserCallbacks, &parserConfig, NULL)) !=
+        RBRINSTRUMENT_SUCCESS) {
+        fprintf(stderr,
+                "%s: Failed to initialize parser: %s!\n",
                 programName,
                 RBRInstrumentError_name(err));
         status = EXIT_FAILURE;
@@ -122,30 +104,21 @@ int main(int argc, char *argv[])
     int32_t readSize;
     int32_t parsedSize;
 
-    while (true)
-    {
+    while (true) {
         readSize = read(datasetFd, buf + bufSize, sizeof(buf) - bufSize);
-        if (readSize < 0 && errno == EAGAIN)
-        {
+        if (readSize < 0 && errno == EAGAIN) {
             fprintf(stderr, "\nRetrying...\n");
             continue;
-        }
-        else if (readSize < 0)
-        {
+        } else if (readSize < 0) {
             printf("\nError: %s", strerror(errno));
             break;
-        }
-        else if (readSize == 0)
-        {
+        } else if (readSize == 0) {
             break;
         }
 
         bufSize += readSize;
         parsedSize = bufSize;
-        RBRParser_parse(parser,
-                        RBRINSTRUMENT_DATASET_EASYPARSE_SAMPLE_DATA,
-                        buf,
-                        &parsedSize);
+        RBRParser_parse(parser, RBRINSTRUMENT_DATASET_EASYPARSE_SAMPLE_DATA, buf, &parsedSize);
         bufSize -= parsedSize;
         memmove(buf, buf + parsedSize, bufSize);
     }

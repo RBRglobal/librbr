@@ -20,8 +20,7 @@
 
 const char *RBRInstrumentChannelRangingMode_name(RBRInstrumentChannelRangingMode mode)
 {
-    switch (mode)
-    {
+    switch (mode) {
     case RBRINSTRUMENT_RANGING_NONE:
         return "none";
     case RBRINSTRUMENT_RANGING_MANUAL:
@@ -36,31 +35,21 @@ const char *RBRInstrumentChannelRangingMode_name(RBRInstrumentChannelRangingMode
     }
 }
 
-#ifndef UNUSED
-#define UNUSED __attribute__((__unused__))
-#endif
-
-static UNUSED RBRInstrumentError RBRInstrument_getCalibrations(RBRInstrument *instrument,
+static RBRInstrumentError RBRInstrument_getCalibrations(RBRInstrument *instrument,
                                                         RBRInstrumentChannels *channels)
 {
-    for (int32_t channel = 0; channel < channels->count; ++channel)
-    {
-        for (int32_t c = 0; c < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX; ++c)
-        {
+    for (int32_t channel = 0; channel < channels->count; ++channel) {
+        for (int32_t c = 0; c < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX; ++c) {
             channels->channels[channel].calibration.c[c] = NAN;
         }
-        for (int32_t x = 0; x < RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX; ++x)
-        {
+        for (int32_t x = 0; x < RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX; ++x) {
             channels->channels[channel].calibration.x[x] = NAN;
         }
     }
 
-    if (instrument->generation == RBRINSTRUMENT_LOGGER2)
-    {
+    if (instrument->generation == RBRINSTRUMENT_LOGGER2) {
         RBR_TRY(RBRInstrument_converse(instrument, "calibration all"));
-    }
-    else
-    {
+    } else {
         RBR_TRY(RBRInstrument_converse(instrument, "calibration allindices"));
     }
 
@@ -68,58 +57,40 @@ static UNUSED RBRInstrumentError RBRInstrument_getCalibrations(RBRInstrument *in
     RBRInstrumentResponseParameter parameter;
     int32_t channelIndex;
     RBRInstrumentChannel *channel;
-    while (true)
-    {
+    while (true) {
         RBRInstrument_parseResponse(instrument, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
         }
 
         channelIndex = parameter.index - 1;
-        if (channelIndex < 0)
-        {
+        if (channelIndex < 0) {
             continue;
-        }
-        else if (channelIndex >= RBRINSTRUMENT_CHANNEL_MAX)
-        {
+        } else if (channelIndex >= RBRINSTRUMENT_CHANNEL_MAX) {
             break;
-        }
-        else
-        {
+        } else {
             channel = &channels->channels[channelIndex];
         }
 
-        if (strcmp(parameter.key, "datetime") == 0)
-        {
+        if (strcmp(parameter.key, "datetime") == 0) {
             RBR_TRY(RBRInstrumentDateTime_parseScheduleTime(
-                        parameter.value, &channel->calibration.dateTime, NULL));
-        }
-        else if (parameter.key[0] != 'c' && parameter.key[0] != 'x' && parameter.key[0] != 'n')
-        {
+                parameter.value, &channel->calibration.dateTime, NULL));
+        } else if (parameter.key[0] != 'c' && parameter.key[0] != 'x' && parameter.key[0] != 'n') {
             continue;
         }
 
         int32_t index = strtol(&parameter.key[1], NULL, 10);
 
-        if (parameter.key[0] == 'c' && index < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX)
-        {
+        if (parameter.key[0] == 'c' && index < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX) {
             channel->calibration.c[index] = strtod(parameter.value, NULL);
-        }
-        else if (parameter.key[0] == 'x' && index < RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX)
-        {
+        } else if (parameter.key[0] == 'x' && index < RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX) {
             channel->calibration.x[index] = strtod(parameter.value, NULL);
-        }
-        else if (parameter.key[0] == 'n' && index < RBRINSTRUMENT_CALIBRATION_N_COEFFICIENT_MAX)
-        {
+        } else if (parameter.key[0] == 'n' && index < RBRINSTRUMENT_CALIBRATION_N_COEFFICIENT_MAX) {
             RBRInstrumentChannelIndex coefficient;
-            if (strcmp(parameter.value, "value") == 0)
-            {
+            if (strcmp(parameter.value, "value") == 0) {
                 coefficient = RBRINSTRUMENT_VALUE_COEFFICIENT;
-            }
-            else
-            {
+            } else {
                 coefficient = strtol(parameter.value, NULL, 10);
             }
 
@@ -136,81 +107,51 @@ static RBRInstrumentError RBRInstrument_getChannel(RBRInstrument *instrument, in
     char command[64];
     char *cmd;
 
-    if (instrument->generation == RBRINSTRUMENT_LOGGER2)
-    {
+    if (instrument->generation == RBRINSTRUMENT_LOGGER2) {
         snprintf(command, sizeof(command), "channel %d all derived gain gainsavailable", idx + 1);
-    }
-    else
-    {
+    } else {
         snprintf(command, sizeof(command), "channel %d all", idx + 1);
     }
 
     RBR_TRY(RBRInstrument_converse(instrument, command));
 
-    while (true)
-    {
+    while (true) {
         RBRInstrumentResponseParameter parameter;
         RBRInstrument_parseResponse(instrument, &cmd, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
         }
 
-        if (strcmp(parameter.key, "type") == 0)
-        {
+        if (strcmp(parameter.key, "type") == 0) {
             snprintf(channel->type, sizeof(channel->type), "%s", parameter.value);
-        }
-        else if (strcmp(parameter.key, "module") == 0)
-        {
+        } else if (strcmp(parameter.key, "module") == 0) {
             channel->module = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "status") == 0)
-        {
+        } else if (strcmp(parameter.key, "status") == 0) {
             channel->status = (strcmp(parameter.value, "on") == 0);
-        }
-        else if (strcmp(parameter.key, "settlingtime") == 0 ||
-                 strcmp(parameter.key, "latency") == 0)
-        {
+        } else if (strcmp(parameter.key, "settlingtime") == 0 ||
+                   strcmp(parameter.key, "latency") == 0) {
             channel->settlingTime = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "readtime") == 0)
-        {
+        } else if (strcmp(parameter.key, "readtime") == 0) {
             channel->readTime = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "equation") == 0)
-        {
+        } else if (strcmp(parameter.key, "equation") == 0) {
             snprintf(channel->equation, sizeof(channel->equation), "%s", parameter.value);
-        }
-        else if (strcmp(parameter.key, "userunits") == 0)
-        {
+        } else if (strcmp(parameter.key, "userunits") == 0) {
             snprintf(channel->userUnits, sizeof(channel->userUnits), "%s", parameter.value);
-        }
-        else if (strcmp(parameter.key, "derived") == 0)
-        {
+        } else if (strcmp(parameter.key, "derived") == 0) {
             channel->derived = (strcmp(parameter.value, "on") == 0);
-        }
-        else if (strcmp(parameter.key, "gain") == 0)
-        {
-            if (strcmp(parameter.value, "none") == 0)
-            {
+        } else if (strcmp(parameter.key, "gain") == 0) {
+            if (strcmp(parameter.value, "none") == 0) {
                 continue;
-            }
-            else if (strcmp(parameter.value, "auto") == 0)
-            {
+            } else if (strcmp(parameter.value, "auto") == 0) {
                 channel->gain.rangingMode = RBRINSTRUMENT_RANGING_AUTO;
-            }
-            else
-            {
+            } else {
                 channel->gain.rangingMode = RBRINSTRUMENT_RANGING_MANUAL;
                 channel->gain.currentGain = strtod(parameter.value, NULL);
             }
-        }
-        else if (strcmp(parameter.key, "availablegains") == 0 ||
-                 strcmp(parameter.key, "gainsavailable") == 0)
-        {
-            if (strcmp(parameter.value, "none") == 0)
-            {
+        } else if (strcmp(parameter.key, "availablegains") == 0 ||
+                   strcmp(parameter.key, "gainsavailable") == 0) {
+            if (strcmp(parameter.value, "none") == 0) {
                 continue;
             }
 
@@ -218,14 +159,11 @@ static RBRInstrumentError RBRInstrument_getChannel(RBRInstrument *instrument, in
             int32_t gainCount = 0;
             char *gain = NULL;
             while ((gain = strtok(gains, "|")) != NULL &&
-                   gainCount < RBRINSTRUMENT_CHANNEL_GAINS_MAX)
-            {
+                   gainCount < RBRINSTRUMENT_CHANNEL_GAINS_MAX) {
                 gains = NULL;
                 channel->gain.availableGains[gainCount++] = strtod(gain, NULL);
             }
-        }
-        else if (strcmp(parameter.key, "label") == 0)
-        {
+        } else if (strcmp(parameter.key, "label") == 0) {
             snprintf(channel->label, sizeof(channel->label), "%s", parameter.value);
         }
     }
@@ -243,46 +181,33 @@ static RBRInstrumentError RBRInstrument_getChannelCoefficients(RBRInstrument *in
 
     RBR_TRY(RBRInstrument_converse(instrument, command));
 
-    while (true)
-    {
+    while (true) {
         RBRInstrumentResponseParameter parameter;
 
         RBRInstrument_parseResponse(instrument, &cmd, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
         }
 
-        if (strcmp(parameter.key, "datetime") == 0)
-        {
+        if (strcmp(parameter.key, "datetime") == 0) {
             RBR_TRY(RBRInstrumentDateTime_parseScheduleTime(
-                        parameter.value, &channel->calibration.dateTime, NULL));
-        }
-        else if (parameter.key[0] != 'c' && parameter.key[0] != 'x' && parameter.key[0] != 'n')
-        {
+                parameter.value, &channel->calibration.dateTime, NULL));
+        } else if (parameter.key[0] != 'c' && parameter.key[0] != 'x' && parameter.key[0] != 'n') {
             continue;
         }
 
         int32_t index = strtol(&parameter.key[1], NULL, 10);
 
-        if (parameter.key[0] == 'c' && index < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX)
-        {
+        if (parameter.key[0] == 'c' && index < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX) {
             channel->calibration.c[index] = strtod(parameter.value, NULL);
-        }
-        else if (parameter.key[0] == 'x' && index < RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX)
-        {
+        } else if (parameter.key[0] == 'x' && index < RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX) {
             channel->calibration.x[index] = strtod(parameter.value, NULL);
-        }
-        else if (parameter.key[0] == 'n' && index < RBRINSTRUMENT_CALIBRATION_N_COEFFICIENT_MAX)
-        {
+        } else if (parameter.key[0] == 'n' && index < RBRINSTRUMENT_CALIBRATION_N_COEFFICIENT_MAX) {
             RBRInstrumentChannelIndex coefficient;
-            if (strcmp(parameter.value, "value") == 0)
-            {
+            if (strcmp(parameter.value, "value") == 0) {
                 coefficient = RBRINSTRUMENT_VALUE_COEFFICIENT;
-            }
-            else
-            {
+            } else {
                 coefficient = strtol(parameter.value, NULL, 10);
             }
 
@@ -293,26 +218,22 @@ static RBRInstrumentError RBRInstrument_getChannelCoefficients(RBRInstrument *in
     return RBRINSTRUMENT_SUCCESS;
 }
 
-static RBRInstrumentError RBRInstrument_clearChannel(RBRInstrumentChannel *channel)
+static RBRInstrumentError RBRInstrument_clearChannel(RBRInstrument *instrument, int idx,
+                                                     RBRInstrumentChannel *channel)
 {
-    memset(channel, 0x00, sizeof(*channel));
 
     channel->gain.currentGain = NAN;
 
-    for (int32_t gain = 0; gain < RBRINSTRUMENT_CHANNEL_GAINS_MAX; ++gain)
-    {
+    for (int32_t gain = 0; gain < RBRINSTRUMENT_CHANNEL_GAINS_MAX; ++gain) {
         channel->gain.availableGains[gain] = NAN;
     }
 
     snprintf(channel->label, sizeof(channel->label), "%s", "none");
 
-    for (int32_t c = 0; c < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX; ++c)
-    {
+    for (int32_t c = 0; c < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX; ++c) {
         channel->calibration.c[c] = NAN;
     }
-
-    for (int32_t x = 0; x < RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX; ++x)
-    {
+    for (int32_t x = 0; x < RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX; ++x) {
         channel->calibration.x[x] = NAN;
     }
 
@@ -322,12 +243,10 @@ static RBRInstrumentError RBRInstrument_clearChannel(RBRInstrumentChannel *chann
 static RBRInstrumentError RBRInstrument_getChannelAll(RBRInstrument *instrument,
                                                       RBRInstrumentChannels *channels)
 {
-    for (int32_t idx = 0; idx < channels->count; ++idx)
-    {
+    for (int32_t idx = 0; idx < channels->count; ++idx) {
         RBRInstrumentChannel *channel = &channels->channels[idx];
-        RBRInstrument_clearChannel(channel);
-        if (RBRINSTRUMENT_SUCCESS == RBRInstrument_getChannel(instrument, idx, channel))
-        {
+        RBRInstrument_clearChannel(instrument, idx, channel);
+        if (RBRINSTRUMENT_SUCCESS == RBRInstrument_getChannel(instrument, idx, channel)) {
             RBRInstrument_getChannelCoefficients(instrument, idx, channel);
         }
     }
@@ -344,34 +263,23 @@ RBRInstrumentError RBRInstrument_getChannels(RBRInstrument *instrument,
 
     char *command = NULL;
     RBRInstrumentResponseParameter parameter;
-    while (true)
-    {
+    while (true) {
         RBRInstrument_parseResponse(instrument, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
         }
 
-        if (strcmp(parameter.key, "count") == 0)
-        {
+        if (strcmp(parameter.key, "count") == 0) {
             channels->count = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "on") == 0)
-        {
+        } else if (strcmp(parameter.key, "on") == 0) {
             channels->on = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "settlingtime") == 0 ||
-                 strcmp(parameter.key, "latency") == 0)
-        {
+        } else if (strcmp(parameter.key, "settlingtime") == 0 ||
+                   strcmp(parameter.key, "latency") == 0) {
             channels->settlingTime = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "readtime") == 0)
-        {
+        } else if (strcmp(parameter.key, "readtime") == 0) {
             channels->readTime = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "minperiod") == 0)
-        {
+        } else if (strcmp(parameter.key, "minperiod") == 0) {
             channels->minimumPeriod = strtol(parameter.value, NULL, 10);
         }
     }
@@ -392,33 +300,25 @@ RBRInstrumentError RBRInstrument_setChannelGain(RBRInstrument *instrument,
                                                 RBRInstrumentChannelIndex channel,
                                                 RBRInstrumentChannelGain *gain)
 {
-    if (gain->rangingMode == RBRINSTRUMENT_RANGING_MANUAL)
-    {
+    if (gain->rangingMode == RBRINSTRUMENT_RANGING_MANUAL) {
         bool validGain = false;
         int32_t i;
-        for (i = 0; i < RBRINSTRUMENT_CHANNEL_GAINS_MAX && !isnan(gain->availableGains[i]); ++i)
-        {
-            if (gain->currentGain == gain->availableGains[i])
-            {
+        for (i = 0; i < RBRINSTRUMENT_CHANNEL_GAINS_MAX && !isnan(gain->availableGains[i]); ++i) {
+            if (gain->currentGain == gain->availableGains[i]) {
                 validGain = true;
                 break;
             }
         }
 
-        if (i > 0 && !validGain)
-        {
+        if (i > 0 && !validGain) {
             return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
         }
 
         return RBRInstrument_converse(
-            instrument, "channel %d gain = %0.1f", channel, (double) gain->currentGain);
-    }
-    else if (gain->rangingMode == RBRINSTRUMENT_RANGING_AUTO)
-    {
+            instrument, "channel %d gain = %0.1f", channel, gain->currentGain);
+    } else if (gain->rangingMode == RBRINSTRUMENT_RANGING_AUTO) {
         return RBRInstrument_converse(instrument, "channel %d gain = auto", channel);
-    }
-    else
-    {
+    } else {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 }
@@ -434,27 +334,25 @@ RBRInstrumentError RBRInstrument_setCalibration(RBRInstrument *instrument,
 
     for (int32_t c = 0;
          c < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX && !isnan(calibration->c[c]);
-         ++c)
-    {
+         ++c) {
         RBR_TRY(RBRInstrument_converse(instrument,
                                        calibrationCommand,
                                        channel,
                                        calibrationDateTime,
                                        'c',
                                        c,
-                                       (double) calibration->c[c]));
+                                       calibration->c[c]));
     }
     for (int32_t x = 0;
          x < RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX && !isnan(calibration->x[x]);
-         ++x)
-    {
+         ++x) {
         RBR_TRY(RBRInstrument_converse(instrument,
                                        calibrationCommand,
                                        channel,
                                        calibrationDateTime,
                                        'x',
                                        x,
-                                       (double) calibration->x[x]));
+                                       calibration->x[x]));
     }
 
     return RBRINSTRUMENT_SUCCESS;
@@ -487,7 +385,7 @@ RBRInstrumentError RBRInstrument_setSensorPowerAlwaysOn(RBRInstrument *instrumen
 {
     RBR_TRY(RBRInstrument_permit(instrument, "settings"));
     RBR_TRY(RBRInstrument_converse(
-                instrument, "settings sensorpoweralwayson = %s", sensorPowerAlwaysOn ? "on" : "off"));
+        instrument, "settings sensorpoweralwayson = %s", sensorPowerAlwaysOn ? "on" : "off"));
     return RBRINSTRUMENT_SUCCESS;
 }
 
@@ -500,7 +398,7 @@ RBRInstrumentError RBRInstrument_setCastDetection(RBRInstrument *instrument, boo
 {
     RBR_TRY(RBRInstrument_permit(instrument, "settings"));
     RBR_TRY(RBRInstrument_converse(
-                instrument, "settings castdetection = %s", castDetection ? "on" : "off"));
+        instrument, "settings castdetection = %s", castDetection ? "on" : "off"));
     return RBRINSTRUMENT_SUCCESS;
 }
 
@@ -514,8 +412,7 @@ RBRInstrumentError RBRInstrument_setInputTimeout(RBRInstrument *instrument,
                                                  RBRInstrumentPeriod inputTimeout)
 {
     if (inputTimeout < RBRINSTRUMENT_INPUT_TIMEOUT_MIN ||
-        inputTimeout > RBRINSTRUMENT_INPUT_TIMEOUT_MAX)
-    {
+        inputTimeout > RBRINSTRUMENT_INPUT_TIMEOUT_MAX) {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
@@ -526,8 +423,7 @@ RBRInstrumentError RBRInstrument_setInputTimeout(RBRInstrument *instrument,
 
 const char *RBRInstrumentValueSetting_name(RBRInstrumentValueSetting setting)
 {
-    switch (setting)
-    {
+    switch (setting) {
     case RBRINSTRUMENT_SETTING_CONDUCTIVITY:
         return "conductivity";
     case RBRINSTRUMENT_SETTING_SPECCONDTEMPCO:
@@ -557,8 +453,7 @@ const char *RBRInstrumentValueSetting_name(RBRInstrumentValueSetting setting)
 RBRInstrumentError RBRInstrument_getValueSetting(RBRInstrument *instrument,
                                                  RBRInstrumentValueSetting setting, float *value)
 {
-    if (setting < ((RBRInstrumentValueSetting) 0) || setting >= RBRINSTRUMENT_SETTING_COUNT)
-    {
+    if (setting < 0 || setting >= RBRINSTRUMENT_SETTING_COUNT) {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
@@ -569,14 +464,13 @@ RBRInstrumentError RBRInstrument_getValueSetting(RBRInstrument *instrument,
 RBRInstrumentError RBRInstrument_setValueSetting(RBRInstrument *instrument,
                                                  RBRInstrumentValueSetting setting, float value)
 {
-    if (setting < 0 || setting >= RBRINSTRUMENT_SETTING_COUNT)
-    {
+    if (setting < 0 || setting >= RBRINSTRUMENT_SETTING_COUNT) {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
     RBR_TRY(RBRInstrument_permit(instrument, "settings"));
     RBR_TRY(RBRInstrument_converse(
-                instrument, "settings %s = %f", RBRInstrumentValueSetting_name(setting), (double) value));
+        instrument, "settings %s = %f", RBRInstrumentValueSetting_name(setting), value));
     return RBRINSTRUMENT_SUCCESS;
 }
 
@@ -593,25 +487,20 @@ RBRInstrumentError RBRInstrument_getSensorParameter(RBRInstrument *instrument,
     err = RBRInstrument_converse(instrument, "sensor %d %s", channel, parameter->key);
 
     if (instrument->generation == RBRINSTRUMENT_LOGGER2 && err == RBRINSTRUMENT_HARDWARE_ERROR &&
-        (instrument->response.error == RBRINSTRUMENT_HARDWARE_ERROR_ITEM_IS_NOT_CONFIGURED))
-    {
+        (instrument->response.error == RBRINSTRUMENT_HARDWARE_ERROR_ITEM_IS_NOT_CONFIGURED)) {
         snprintf(parameter->value, sizeof(parameter->value), "n/a");
         instrument->response.type = RBRINSTRUMENT_RESPONSE_INFO;
         return RBRINSTRUMENT_SUCCESS;
-    }
-    else if (err != RBRINSTRUMENT_SUCCESS)
-    {
+    } else if (err != RBRINSTRUMENT_SUCCESS) {
         return err;
     }
 
     char *command = NULL;
     RBRInstrumentResponseParameter responseParameter;
-    while (true)
-    {
+    while (true) {
         RBRInstrument_parseResponse(instrument, &command, &responseParameter);
 
-        if (responseParameter.key == NULL)
-        {
+        if (responseParameter.key == NULL) {
             break;
         }
 
@@ -631,8 +520,7 @@ RBRInstrumentError RBRInstrument_getSensorParameters(RBRInstrument *instrument,
     int32_t maxSize = *size;
     *size = 0;
 
-    if (channel < 1 || channel > RBRINSTRUMENT_CHANNEL_MAX)
-    {
+    if (channel < 1 || channel > RBRINSTRUMENT_CHANNEL_MAX) {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
@@ -645,13 +533,10 @@ RBRInstrumentError RBRInstrument_getSensorParameters(RBRInstrument *instrument,
     err = RBRInstrument_converse(instrument, "sensor %d", channel);
 
     if (instrument->generation == RBRINSTRUMENT_LOGGER2 && err == RBRINSTRUMENT_HARDWARE_ERROR &&
-        (instrument->response.error == RBRINSTRUMENT_HARDWARE_ERROR_FEATURE_NOT_AVAILABLE))
-    {
+        (instrument->response.error == RBRINSTRUMENT_HARDWARE_ERROR_FEATURE_NOT_AVAILABLE)) {
         instrument->response.type = RBRINSTRUMENT_RESPONSE_INFO;
         return RBRINSTRUMENT_SUCCESS;
-    }
-    else if (err != RBRINSTRUMENT_SUCCESS)
-    {
+    } else if (err != RBRINSTRUMENT_SUCCESS) {
         return err;
     }
 
@@ -660,12 +545,10 @@ RBRInstrumentError RBRInstrument_getSensorParameters(RBRInstrument *instrument,
 
     char *command = NULL;
     RBRInstrumentResponseParameter parameter;
-    while (true)
-    {
+    while (true) {
         RBRInstrument_parseResponse(instrument, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
         }
 
@@ -681,8 +564,7 @@ RBRInstrumentError RBRInstrument_getSensorParameters(RBRInstrument *instrument,
          * parameter value. Rather than add a special case to the parser, we'll
          * just swallow this response if it happens.
          */
-        if (strcmp(parameter.key, channelStr) == 0 && strlen(parameter.value) == 0)
-        {
+        if (strcmp(parameter.key, channelStr) == 0 && strlen(parameter.value) == 0) {
             break;
         }
 
@@ -690,8 +572,7 @@ RBRInstrumentError RBRInstrument_getSensorParameters(RBRInstrument *instrument,
 
         snprintf(parameters[*size].value, sizeof(parameters[*size].value), "%s", parameter.value);
 
-        if (++(*size) >= maxSize)
-        {
+        if (++(*size) >= maxSize) {
             break;
         }
     }

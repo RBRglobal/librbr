@@ -57,9 +57,7 @@ const char *RBRInstrumentLink_name(RBRInstrumentLink link);
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/link
  */
-RBRInstrumentError RBRInstrument_getLink(
-    RBRInstrument *instrument,
-    RBRInstrumentLink *link);
+RBRInstrumentError RBRInstrument_getLink(RBRInstrument *instrument, RBRInstrumentLink *link);
 
 /**
  * \brief Instrument serial baud rates.
@@ -76,27 +74,27 @@ RBRInstrumentError RBRInstrument_getLink(
 typedef enum RBRInstrumentSerialBaudRate
 {
     /** None */
-    RBRINSTRUMENT_SERIAL_BAUD_NONE   =       0,
+    RBRINSTRUMENT_SERIAL_BAUD_NONE = 0,
     /** 300 Bd */
-    RBRINSTRUMENT_SERIAL_BAUD_300    = 1 <<  0,
+    RBRINSTRUMENT_SERIAL_BAUD_300 = 1 << 0,
     /** 600 Bd */
-    RBRINSTRUMENT_SERIAL_BAUD_600    = 1 <<  1,
+    RBRINSTRUMENT_SERIAL_BAUD_600 = 1 << 1,
     /** 1,200 Bd */
-    RBRINSTRUMENT_SERIAL_BAUD_1200   = 1 <<  2,
+    RBRINSTRUMENT_SERIAL_BAUD_1200 = 1 << 2,
     /** 2,400 Bd */
-    RBRINSTRUMENT_SERIAL_BAUD_2400   = 1 <<  3,
+    RBRINSTRUMENT_SERIAL_BAUD_2400 = 1 << 3,
     /** 4,800 Bd */
-    RBRINSTRUMENT_SERIAL_BAUD_4800   = 1 <<  4,
+    RBRINSTRUMENT_SERIAL_BAUD_4800 = 1 << 4,
     /** 9,600 Bd */
-    RBRINSTRUMENT_SERIAL_BAUD_9600   = 1 <<  5,
+    RBRINSTRUMENT_SERIAL_BAUD_9600 = 1 << 5,
     /** 19,200 Bd */
-    RBRINSTRUMENT_SERIAL_BAUD_19200  = 1 <<  6,
+    RBRINSTRUMENT_SERIAL_BAUD_19200 = 1 << 6,
     /** 28,800 Bd */
-    RBRINSTRUMENT_SERIAL_BAUD_28800  = 1 <<  7,
+    RBRINSTRUMENT_SERIAL_BAUD_28800 = 1 << 7,
     /** 38,400 Bd */
-    RBRINSTRUMENT_SERIAL_BAUD_38400  = 1 <<  8,
+    RBRINSTRUMENT_SERIAL_BAUD_38400 = 1 << 8,
     /** 57,600 Bd */
-    RBRINSTRUMENT_SERIAL_BAUD_57600  = 1 <<  9,
+    RBRINSTRUMENT_SERIAL_BAUD_57600 = 1 << 9,
     /** 115,200 Bd */
     RBRINSTRUMENT_SERIAL_BAUD_115200 = 1 << 10,
     /** 230,400 Bd */
@@ -106,7 +104,7 @@ typedef enum RBRInstrumentSerialBaudRate
     /** 921,600 Bd */
     RBRINSTRUMENT_SERIAL_BAUD_921600 = 1 << 13,
     /** Corresponds to the largest baud rate enum value. */
-    RBRINSTRUMENT_SERIAL_BAUD_MAX    = RBRINSTRUMENT_SERIAL_BAUD_921600
+    RBRINSTRUMENT_SERIAL_BAUD_MAX = RBRINSTRUMENT_SERIAL_BAUD_921600
 } RBRInstrumentSerialBaudRate;
 
 /**
@@ -132,15 +130,15 @@ const char *RBRInstrumentSerialBaudRate_name(RBRInstrumentSerialBaudRate baud);
 typedef enum RBRInstrumentSerialMode
 {
     /** No serial mode */
-    RBRINSTRUMENT_SERIAL_MODE_NONE          =      0,
+    RBRINSTRUMENT_SERIAL_MODE_NONE = 0,
     /** RS-232/EIA-232/TIA-232. */
-    RBRINSTRUMENT_SERIAL_MODE_RS232         = 1 << 0,
+    RBRINSTRUMENT_SERIAL_MODE_RS232 = 1 << 0,
     /** RS-485/EIA-485/TIA-485. */
-    RBRINSTRUMENT_SERIAL_MODE_RS485F        = 1 << 1,
+    RBRINSTRUMENT_SERIAL_MODE_RS485F = 1 << 1,
     /** RS-485/EIA-485/TIA-485 (half-duplex). Unimplemented by the logger. */
-    RBRINSTRUMENT_SERIAL_MODE_RS485H        = 1 << 2,
+    RBRINSTRUMENT_SERIAL_MODE_RS485H = 1 << 2,
     /** 0-3.3V logic, idle high. */
-    RBRINSTRUMENT_SERIAL_MODE_UART          = 1 << 3,
+    RBRINSTRUMENT_SERIAL_MODE_UART = 1 << 3,
     /** 0-3.3V logic, idle low. */
     RBRINSTRUMENT_SERIAL_MODE_UART_IDLE_LOW = 1 << 4,
     /** Corresponds to the largest UART mode enum value. */
@@ -210,8 +208,7 @@ typedef struct RBRInstrumentSerial
  * \see RBRInstrument_setSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-RBRInstrumentError RBRInstrument_getSerial(RBRInstrument *instrument,
-                                           RBRInstrumentSerial *serial);
+RBRInstrumentError RBRInstrument_getSerial(RBRInstrument *instrument, RBRInstrumentSerial *serial);
 
 /**
  * \brief Reconfigure the instrument serial baud rate and mode.
@@ -339,8 +336,7 @@ typedef struct RBRInstrumentWiFi
  * \see RBRInstrument_setWiFi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-RBRInstrumentError RBRInstrument_getWiFi(RBRInstrument *instrument,
-                                         RBRInstrumentWiFi *wifi);
+RBRInstrumentError RBRInstrument_getWiFi(RBRInstrument *instrument, RBRInstrumentWiFi *wifi);
 
 /**
  * \brief Reconfigure the instrument Wi-Fi settings.
@@ -363,8 +359,7 @@ RBRInstrumentError RBRInstrument_getWiFi(RBRInstrument *instrument,
  * \see RBRInstrument_getWifi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-RBRInstrumentError RBRInstrument_setWiFi(RBRInstrument *instrument,
-                                         const RBRInstrumentWiFi *wifi);
+RBRInstrumentError RBRInstrument_setWiFi(RBRInstrument *instrument, const RBRInstrumentWiFi *wifi);
 
 #ifdef __cplusplus
 }

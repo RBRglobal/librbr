@@ -34,8 +34,7 @@ extern "C" {
  * \return #RBRINSTRUMENT_HARDWARE_ERROR if the command can't be permitted
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/permit
  */
-RBRInstrumentError RBRInstrument_permit(RBRInstrument *instrument,
-                                        const char *command);
+RBRInstrumentError RBRInstrument_permit(RBRInstrument *instrument, const char *command);
 
 /**
  * \brief Get the state of the “Ready:” prompt.
@@ -50,8 +49,7 @@ RBRInstrumentError RBRInstrument_permit(RBRInstrument *instrument,
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/prompt
  */
-RBRInstrumentError RBRInstrument_getPrompt(RBRInstrument *instrument,
-                                           bool *prompt);
+RBRInstrumentError RBRInstrument_getPrompt(RBRInstrument *instrument, bool *prompt);
 
 /**
  * \brief Set the state of the “Ready:” prompt.
@@ -63,8 +61,7 @@ RBRInstrumentError RBRInstrument_getPrompt(RBRInstrument *instrument,
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/prompt
  */
-RBRInstrumentError RBRInstrument_setPrompt(RBRInstrument *instrument,
-                                           bool prompt);
+RBRInstrumentError RBRInstrument_setPrompt(RBRInstrument *instrument, bool prompt);
 
 /**
  * \brief Get the state of the logger's confirmation responses.
@@ -77,10 +74,10 @@ RBRInstrumentError RBRInstrument_setPrompt(RBRInstrument *instrument,
  * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully read
  * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/confirmation
+ * \see
+ * https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/confirmation
  */
-RBRInstrumentError RBRInstrument_getConfirmation(RBRInstrument *instrument,
-                                                 bool *confirmation);
+RBRInstrumentError RBRInstrument_getConfirmation(RBRInstrument *instrument, bool *confirmation);
 
 /**
  * \brief Set the state of the logger's confirmation responses.
@@ -94,10 +91,10 @@ RBRInstrumentError RBRInstrument_getConfirmation(RBRInstrument *instrument,
  * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully written
  * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/confirmation
+ * \see
+ * https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/confirmation
  */
-RBRInstrumentError RBRInstrument_setConfirmation(RBRInstrument *instrument,
-                                                 bool confirmation);
+RBRInstrumentError RBRInstrument_setConfirmation(RBRInstrument *instrument, bool confirmation);
 
 /**
  * \brief Reset the logger CPU.
@@ -109,8 +106,7 @@ RBRInstrumentError RBRInstrument_setConfirmation(RBRInstrument *instrument,
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/reboot
  */
-RBRInstrumentError RBRInstrument_reboot(RBRInstrument *instrument,
-                                        int32_t delay);
+RBRInstrumentError RBRInstrument_reboot(RBRInstrument *instrument, int32_t delay);
 
 #ifdef __cplusplus
 }

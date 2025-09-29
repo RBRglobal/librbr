@@ -18,14 +18,13 @@
 #include "RBRInstrument.h"
 #include "RBRInstrumentInternal.h"
 
-#define READING_FLAG_MASK     0x00FF0000
+#define READING_FLAG_MASK    0x00FF0000
 #define READING_FLAG_OFFSET  (2 * 8)
-#define READING_ERROR_MASK    0x0000FFFF
+#define READING_ERROR_MASK   0x0000FFFF
 #define READING_ERROR_OFFSET (0 * 8)
 
-RBRInstrumentError RBRInstrument_getChannelsList(
-    RBRInstrument *instrument,
-    RBRInstrumentChannelsList *channelsList)
+RBRInstrumentError RBRInstrument_getChannelsList(RBRInstrument *instrument,
+                                                 RBRInstrumentChannelsList *channelsList)
 {
     if (instrument->generation == RBRINSTRUMENT_LOGGER2)
     {
@@ -40,9 +39,7 @@ RBRInstrumentError RBRInstrument_getChannelsList(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -87,9 +84,8 @@ RBRInstrumentError RBRInstrument_getChannelsList(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_getLabelsList(
-    RBRInstrument *instrument,
-    RBRInstrumentLabelsList *labelsList)
+RBRInstrumentError RBRInstrument_getLabelsList(RBRInstrument *instrument,
+                                               RBRInstrumentLabelsList *labelsList)
 {
     if (instrument->generation == RBRINSTRUMENT_LOGGER2)
     {
@@ -104,9 +100,7 @@ RBRInstrumentError RBRInstrument_getLabelsList(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -121,10 +115,8 @@ RBRInstrumentError RBRInstrument_getLabelsList(
         char *labelStart = strtok(parameter.value, "|");
         for (label = 0; labelStart != NULL; label++)
         {
-            snprintf(labelsList->labels[label],
-                     sizeof(labelsList->labels[label]),
-                     "%s",
-                     labelStart);
+            snprintf(
+                labelsList->labels[label], sizeof(labelsList->labels[label]), "%s", labelStart);
 
             labelStart = strtok(NULL, "|");
         }
@@ -157,9 +149,8 @@ const char *RBRInstrumentOutputFormat_name(RBRInstrumentOutputFormat format)
     }
 }
 
-RBRInstrumentError RBRInstrument_getAvailableOutputFormats(
-    RBRInstrument *instrument,
-    RBRInstrumentOutputFormat *outputFormats)
+RBRInstrumentError RBRInstrument_getAvailableOutputFormats(RBRInstrument *instrument,
+                                                           RBRInstrumentOutputFormat *outputFormats)
 {
     *outputFormats = RBRINSTRUMENT_OUTFORMAT_NONE;
 
@@ -189,9 +180,7 @@ RBRInstrumentError RBRInstrument_getAvailableOutputFormats(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &responseCommand,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &responseCommand, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -203,20 +192,17 @@ RBRInstrumentError RBRInstrument_getAvailableOutputFormats(
         }
 
         char *nextValue;
-        do
-        {
+        do {
             if ((nextValue = strstr(parameter.value, separator)) != NULL)
             {
                 *nextValue = '\0';
                 nextValue += separatorLength;
             }
 
-            for (int i = RBRINSTRUMENT_OUTFORMAT_NONE + 1;
-                 i <= RBRINSTRUMENT_OUTFORMAT_MAX;
+            for (int i = RBRINSTRUMENT_OUTFORMAT_NONE + 1; i <= RBRINSTRUMENT_OUTFORMAT_MAX;
                  i <<= 1)
             {
-                if (strcmp(RBRInstrumentOutputFormat_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentOutputFormat_name(i), parameter.value) == 0)
                 {
                     *outputFormats |= i;
                 }
@@ -231,9 +217,8 @@ RBRInstrumentError RBRInstrument_getAvailableOutputFormats(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_getOutputFormat(
-    RBRInstrument *instrument,
-    RBRInstrumentOutputFormat *outputFormat)
+RBRInstrumentError RBRInstrument_getOutputFormat(RBRInstrument *instrument,
+                                                 RBRInstrumentOutputFormat *outputFormat)
 {
     *outputFormat = RBRINSTRUMENT_OUTFORMAT_NONE;
 
@@ -243,9 +228,7 @@ RBRInstrumentError RBRInstrument_getOutputFormat(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -256,12 +239,9 @@ RBRInstrumentError RBRInstrument_getOutputFormat(
             continue;
         }
 
-        for (int i = RBRINSTRUMENT_OUTFORMAT_NONE + 1;
-             i <= RBRINSTRUMENT_MEMFORMAT_MAX;
-             i <<= 1)
+        for (int i = RBRINSTRUMENT_OUTFORMAT_NONE + 1; i <= RBRINSTRUMENT_MEMFORMAT_MAX; i <<= 1)
         {
-            if (strcmp(RBRInstrumentOutputFormat_name(i),
-                       parameter.value) == 0)
+            if (strcmp(RBRInstrumentOutputFormat_name(i), parameter.value) == 0)
             {
                 *outputFormat = i;
                 break;
@@ -274,81 +254,58 @@ RBRInstrumentError RBRInstrument_getOutputFormat(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-
-RBRInstrumentError RBRInstrument_setOutputFormat(
-    RBRInstrument *instrument,
-    RBRInstrumentOutputFormat outputFormat)
+RBRInstrumentError RBRInstrument_setOutputFormat(RBRInstrument *instrument,
+                                                 RBRInstrumentOutputFormat outputFormat)
 {
     const char *formatName = RBRInstrumentOutputFormat_name(outputFormat);
-    
+
     /* if it's caltext07, it is only available for LOGGER3 with fw 1.109 or later. */
-    if (strcmp(formatName, "caltext07") == 0){
+    if (strcmp(formatName, "caltext07") == 0)
+    {
         RBRInstrumentError err = RBRInstrument_getId(instrument, &instrument->id);
         if (err != RBRINSTRUMENT_SUCCESS)
         {
             return RBRINSTRUMENT_UNSUPPORTED;
         }
-        else{
-            if (instrument->id.fwtype == 104
-                && (atof)(instrument-> id.version) >= 1.109)
+        else
+        {
+            if (instrument->id.fwtype == 104 && (atof) (instrument->id.version) >= 1.109)
             {
-                return RBRInstrument_converse(instrument,
-                                    "outputformat type = %s",
-                                    formatName);
+                return RBRInstrument_converse(instrument, "outputformat type = %s", formatName);
             }
-            else {
+            else
+            {
                 /* caltext07 is not supported by the firmware version in use. */
                 return RBRINSTRUMENT_UNSUPPORTED;
             }
         }
     }
-    return RBRInstrument_converse(instrument,
-                                  "outputformat type = %s",
-                                  formatName);
+    return RBRInstrument_converse(instrument, "outputformat type = %s", formatName);
 }
 
-RBRInstrumentError RBRInstrument_getUSBStreamingState(
-    RBRInstrument *instrument,
-    bool *enabled)
+RBRInstrumentError RBRInstrument_getUSBStreamingState(RBRInstrument *instrument, bool *enabled)
 {
     *enabled = false;
-    return RBRInstrument_getBool(instrument,
-                                 "streamusb",
-                                 "state",
-                                 enabled);
+    return RBRInstrument_getBool(instrument, "streamusb", "state", enabled);
 }
 
-RBRInstrumentError RBRInstrument_setUSBStreamingState(
-    RBRInstrument *instrument,
-    bool enabled)
+RBRInstrumentError RBRInstrument_setUSBStreamingState(RBRInstrument *instrument, bool enabled)
 {
-    return RBRInstrument_converse(instrument,
-                                  "streamusb state = %s",
-                                  enabled ? "on" : "off");
+    return RBRInstrument_converse(instrument, "streamusb state = %s", enabled ? "on" : "off");
 }
 
-RBRInstrumentError RBRInstrument_getSerialStreamingState(
-    RBRInstrument *instrument,
-    bool *enabled)
+RBRInstrumentError RBRInstrument_getSerialStreamingState(RBRInstrument *instrument, bool *enabled)
 {
     *enabled = false;
-    return RBRInstrument_getBool(instrument,
-                                 "streamserial",
-                                 "state",
-                                 enabled);
+    return RBRInstrument_getBool(instrument, "streamserial", "state", enabled);
 }
 
-RBRInstrumentError RBRInstrument_setSerialStreamingState(
-    RBRInstrument *instrument,
-    bool enabled)
+RBRInstrumentError RBRInstrument_setSerialStreamingState(RBRInstrument *instrument, bool enabled)
 {
-    return RBRInstrument_converse(instrument,
-                                  "streamserial state = %s",
-                                  enabled ? "on" : "off");
+    return RBRInstrument_converse(instrument, "streamserial state = %s", enabled ? "on" : "off");
 }
 
-const char *RBRInstrumentAuxOutputActiveLevel_name(
-    RBRInstrumentAuxOutputActiveLevel level)
+const char *RBRInstrumentAuxOutputActiveLevel_name(RBRInstrumentAuxOutputActiveLevel level)
 {
     switch (level)
     {
@@ -364,8 +321,7 @@ const char *RBRInstrumentAuxOutputActiveLevel_name(
     }
 }
 
-const char *RBRInstrumentAuxOutputSleepLevel_name(
-    RBRInstrumentAuxOutputSleepLevel level)
+const char *RBRInstrumentAuxOutputSleepLevel_name(RBRInstrumentAuxOutputSleepLevel level)
 {
     switch (level)
     {
@@ -383,9 +339,8 @@ const char *RBRInstrumentAuxOutputSleepLevel_name(
     }
 }
 
-RBRInstrumentError RBRInstrument_getAuxOutput(
-    RBRInstrument *instrument,
-    RBRInstrumentAuxOutput *auxOutput)
+RBRInstrumentError RBRInstrument_getAuxOutput(RBRInstrument *instrument,
+                                              RBRInstrumentAuxOutput *auxOutput)
 {
     if (auxOutput->aux != 1)
     {
@@ -397,17 +352,13 @@ RBRInstrumentError RBRInstrument_getAuxOutput(
     auxOutput->active = RBRINSTRUMENT_UNKNOWN_ACTIVE;
     auxOutput->sleep = RBRINSTRUMENT_UNKNOWN_SLEEP;
 
-    RBR_TRY(RBRInstrument_converse(instrument,
-                                   "streamserial aux%" PRIi8 "_all",
-                                   aux));
+    RBR_TRY(RBRInstrument_converse(instrument, "streamserial aux%" PRIi8 "_all", aux));
 
     char *command = NULL;
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -433,8 +384,7 @@ RBRInstrumentError RBRInstrument_getAuxOutput(
         {
             for (int i = 0; i < RBRINSTRUMENT_ACTIVE_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentAuxOutputActiveLevel_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentAuxOutputActiveLevel_name(i), parameter.value) == 0)
                 {
                     auxOutput->active = i;
                     break;
@@ -445,8 +395,7 @@ RBRInstrumentError RBRInstrument_getAuxOutput(
         {
             for (int i = 0; i < RBRINSTRUMENT_SLEEP_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentAuxOutputSleepLevel_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentAuxOutputSleepLevel_name(i), parameter.value) == 0)
                 {
                     auxOutput->sleep = i;
                     break;
@@ -459,9 +408,8 @@ RBRInstrumentError RBRInstrument_getAuxOutput(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_setAuxOutput(
-    RBRInstrument *instrument,
-    const RBRInstrumentAuxOutput *auxOutput)
+RBRInstrumentError RBRInstrument_setAuxOutput(RBRInstrument *instrument,
+                                              const RBRInstrumentAuxOutput *auxOutput)
 {
     const char *enabledParameter;
     const char *enabledValue;
@@ -476,22 +424,22 @@ RBRInstrumentError RBRInstrument_setAuxOutput(
         enabledValue = auxOutput->enabled ? "true" : "false";
     }
 
-    return RBRInstrument_converse(
-        instrument,
-        "streamserial aux%" PRIi8 "_%s = %s, aux%" PRIi8 "_setup = %" PRIi32 ", "
-        "aux%" PRIi8 "_hold = %" PRIi32 ", aux%" PRIi8 "_active = %s, "
-        "aux%" PRIi8 "_sleep = %s",
-        auxOutput->aux,
-        enabledParameter,
-        enabledValue,
-        auxOutput->aux,
-        auxOutput->setup,
-        auxOutput->aux,
-        auxOutput->hold,
-        auxOutput->aux,
-        RBRInstrumentAuxOutputActiveLevel_name(auxOutput->active),
-        auxOutput->aux,
-        RBRInstrumentAuxOutputSleepLevel_name(auxOutput->sleep));
+    return RBRInstrument_converse(instrument,
+                                  "streamserial aux%" PRIi8 "_%s = %s, aux%" PRIi8
+                                  "_setup = %" PRIi32 ", "
+                                  "aux%" PRIi8 "_hold = %" PRIi32 ", aux%" PRIi8 "_active = %s, "
+                                  "aux%" PRIi8 "_sleep = %s",
+                                  auxOutput->aux,
+                                  enabledParameter,
+                                  enabledValue,
+                                  auxOutput->aux,
+                                  auxOutput->setup,
+                                  auxOutput->aux,
+                                  auxOutput->hold,
+                                  auxOutput->aux,
+                                  RBRInstrumentAuxOutputActiveLevel_name(auxOutput->active),
+                                  auxOutput->aux,
+                                  RBRInstrumentAuxOutputSleepLevel_name(auxOutput->sleep));
 }
 
 const char *RBRInstrumentReadingFlag_name(RBRInstrumentReadingFlag flag)
@@ -548,8 +496,7 @@ inline uint8_t RBRInstrumentReading_getError(double reading)
     return (alias.raw & READING_ERROR_MASK) >> READING_ERROR_OFFSET;
 }
 
-inline double RBRInstrumentReading_setError(RBRInstrumentReadingFlag flag,
-                                            uint8_t error)
+inline double RBRInstrumentReading_setError(RBRInstrumentReadingFlag flag, uint8_t error)
 {
     union
     {
@@ -559,8 +506,8 @@ inline double RBRInstrumentReading_setError(RBRInstrumentReadingFlag flag,
     alias;
     alias.reading = NAN;
 
-    alias.raw |= ((flag << READING_FLAG_OFFSET) & READING_FLAG_MASK)
-                 | ((error << READING_ERROR_OFFSET) & READING_ERROR_MASK);
+    alias.raw |= ((flag << READING_FLAG_OFFSET) & READING_FLAG_MASK) |
+                 ((error << READING_ERROR_OFFSET) & READING_ERROR_MASK);
 
     return alias.reading;
 }
@@ -572,8 +519,7 @@ RBRInstrumentError RBRInstrument_readSample(RBRInstrument *instrument)
      * is read to the given sample pointer; a return of #RBRINSTRUMENT_SUCCESS
      * means that it found some other command response instead, so we'll loop
      * until we get a “failure” value (which we hope is SAMPLE). */
-    do
-    {
+    do {
         err = RBRInstrument_readResponse(instrument, true, NULL);
     } while (err == RBRINSTRUMENT_SUCCESS);
     /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any

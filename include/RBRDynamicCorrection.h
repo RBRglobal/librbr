@@ -28,37 +28,37 @@
 /*! @def DCORR_T_DELAY
  * \brief Define the C-T lag adjustment delay (in seconds)
  */
-#define DCORR_T_DELAY 0.35f
+#define DCORR_T_DELAY    0.35f
 /*! @def DCORR_ALPHA
  * \brief Define the magnitude of short-term thermal mass correction (unitless)
  */
-#define DCORR_ALPHA 0.041f
+#define DCORR_ALPHA      0.041f
 /*! @def DCORR_ALPHA_A
  * \brief Define the 'a' ascent-rate fit coefficient for alpha (unitless)
  */
-#define DCORR_ALPHA_A 0.00323f
+#define DCORR_ALPHA_A    0.00323f
 /*! @def DCORR_ALPHA_E
  * \brief Define the 'e' ascent-rate fit coefficient for alpha (unitless)
  */
-#define DCORR_ALPHA_E -1.03f
+#define DCORR_ALPHA_E    -1.03f
 /*!
  *   @def DCORR_TAU
  * \brief Define the time constant of short-term thermal mass correction (seconds)
  */
-#define DCORR_TAU 8.11f
+#define DCORR_TAU        8.11f
 /*! @def DCORR_TAU_A
  * \brief Define the 'a' ascent-rate fit coefficient for alpha (unitless)
  */
-#define DCORR_TAU_A 4.93f
+#define DCORR_TAU_A      4.93f
 /*! @def DCORR_TAU_E
  * \brief Define the 'e' ascent-rate fit coefficient for alpha (unitless)
  */
-#define DCORR_TAU_E -0.26f
+#define DCORR_TAU_E      -0.26f
 /*!
  *   @def DCORR_CT_COEFF
  * \brief Define the magnitude of long-term thermal mass correction (unitless)
  */
-#define DCORR_CT_COEFF 0.97e-2f
+#define DCORR_CT_COEFF   0.97e-2f
 /*! @def DCORR_CT_COEFF_A
  * \brief Define the 'a' ascent-rate fit coefficient for ctcoeff (unitless)
  */
@@ -71,17 +71,17 @@
  *   @def DCORR_VP_MIN
  * \brief Define the minimum for the range for ascent rate as pressure/time (dbar/sec)
  */
-#define DCORR_VP_MIN 0.03f
+#define DCORR_VP_MIN     0.03f
 /*!
  *   @def DCORR_VP_MAX
  * \brief Define the minimum for the range for ascent rate as pressure/time (dbar/sec)
  */
-#define DCORR_VP_MAX 0.45f
+#define DCORR_VP_MAX     0.45f
 /*!
  *   @def DCORR_VP_FC
  * \brief Define the filter cutoff frequency for ascent rate as pressure/time (Hz)
  */
-#define DCORR_VP_FC 0.04f
+#define DCORR_VP_FC      0.04f
 
 /**
  * \brief Errors which can be returned from dynamic correction algorithm
@@ -122,16 +122,16 @@ typedef enum
  */
 typedef struct
 {
-    float t_delay;  // time delay (sec), or C-T lag
-    float Fs;       // sampling rate (Hz)
+    float t_delay; // time delay (sec), or C-T lag
+    float Fs;      // sampling rate (Hz)
     float alpha;
     float tau;
     float CT_coeff;
-    float alpha_a;  // alpha = alpha_a * powf(Vp * alpha_e)
+    float alpha_a; // alpha = alpha_a * powf(Vp * alpha_e)
     float alpha_e;
-    float tau_a;  // tau = tau_a * powf(Vp * tau_e)
+    float tau_a; // tau = tau_a * powf(Vp * tau_e)
     float tau_e;
-    float ctcoeff_a;  // ctcoeff = ctcoeff_a * powf(Vp * ctcoeff_e)
+    float ctcoeff_a; // ctcoeff = ctcoeff_a * powf(Vp * ctcoeff_e)
     float ctcoeff_e;
     float Vp_min;
     float Vp_max;
@@ -142,7 +142,7 @@ typedef struct
     int32_t _isError;
     float _ascentRate;
     float _lastPressure;
-    int64_t _lastPressureTime; //Time in milliseconds
+    int64_t _lastPressureTime; // Time in milliseconds
     float _phi;
     float _cte_a;
     float _cte_b;
@@ -155,7 +155,7 @@ typedef struct
     float _T_cor_lag;
     float _T_short_lag;
     int32_t _isValid_lagArray[DCORR_MAX_LAG_ARRAY];
-    int64_t _timestamp_lagArray[DCORR_MAX_LAG_ARRAY]; //in milliseconds
+    int64_t _timestamp_lagArray[DCORR_MAX_LAG_ARRAY]; // in milliseconds
     float _C_meas_lagArray[DCORR_MAX_LAG_ARRAY];
     float _P_meas_lagArray[DCORR_MAX_LAG_ARRAY];
     float _T_cond_lagArray[DCORR_MAX_LAG_ARRAY];
@@ -178,11 +178,11 @@ typedef struct
  */
 typedef struct
 {
-    int64_t timestamp;        // Time in milliseconds
-    float conductivity;       // Conductivity measurement (mS/cm)
-    float marineTemperature;  // Marine temperature measurement (°C)
-    float condTemperature;    // Temperature of conductivity cell measurement (°C)
-    float pressure;           // Pressure measurement (dbar)
+    int64_t timestamp;       // Time in milliseconds
+    float conductivity;      // Conductivity measurement (mS/cm)
+    float marineTemperature; // Marine temperature measurement (°C)
+    float condTemperature;   // Temperature of conductivity cell measurement (°C)
+    float pressure;          // Pressure measurement (dbar)
 } RBRDynamicCorrectionMeasurement;
 
 /** @struct RBRDynamicCorrectionResult
@@ -201,11 +201,11 @@ typedef struct
  */
 typedef struct
 {
-    int64_t timestamp;      // Time in milliseconds
-    float conductivity;     // Conductivity measurement (mS/cm)
-    float corrTemperature;  // Corrected temperature (°C)
-    float pressure;         // Sea pressure measurement (dbar)
-    float corrSalinity;     // Practical salinity after all corrections (unitless)
+    int64_t timestamp;     // Time in milliseconds
+    float conductivity;    // Conductivity measurement (mS/cm)
+    float corrTemperature; // Corrected temperature (°C)
+    float pressure;        // Sea pressure measurement (dbar)
+    float corrSalinity;    // Practical salinity after all corrections (unitless)
 } RBRDynamicCorrectionResult;
 
 /**
@@ -227,9 +227,10 @@ typedef struct
  * @param Vp_fc default value DCORR_VP_FC used as input
  * @return error code (0 = no error)
  */
-RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *params, float Fs, float t_delay,
-                                                    float alpha_a, float alpha_e, float tau_a, float tau_e,
-                                                    float ctcoeff_a, float ctcoeff_e, float Vp_min, float Vp_max,
+RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *params, float Fs,
+                                                    float t_delay, float alpha_a, float alpha_e,
+                                                    float tau_a, float tau_e, float ctcoeff_a,
+                                                    float ctcoeff_e, float Vp_min, float Vp_max,
                                                     float Vp_fc);
 
 /**
@@ -239,7 +240,8 @@ RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *
  * @param Fs sampling rate (Samples/sec)
  * @return error code (0 = no error)
  */
-RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionParams *params, float Fs);
+RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionParams *params,
+                                                         float Fs);
 
 /**
  * @brief Feed a new measurement in the algorithm.
@@ -255,4 +257,4 @@ RBRDynamicCorrectionError RBRDynamicCorrection_addMeasurement(RBRDynamicCorrecti
                                                               const RBRDynamicCorrectionMeasurement *measIn,
                                                               RBRDynamicCorrectionResult *corrMeasOut);
 
-#endif  // LIBRBR_DYNAMICCORRECTION_H
+#endif // LIBRBR_DYNAMICCORRECTION_H

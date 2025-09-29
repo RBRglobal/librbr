@@ -38,15 +38,13 @@ extern "C" {
  *
  * \param [in] _condition the condition to test
  */
-#define TEST_ASSERT(_condition) do { \
-        if (!(_condition)) \
-        { \
-            printf(" assertion failure at %s:%d", \
-                   __FILE__, \
-                   __LINE__); \
-            return false; \
-        } \
-} while (0)
+#define TEST_ASSERT(_condition)                                        \
+    do {                                                               \
+        if (!(_condition)) {                                           \
+            printf(" assertion failure at %s:%d", __FILE__, __LINE__); \
+            return false;                                              \
+        }                                                              \
+    } while (0)
 
 /**
  * \brief Assert that two variables are equal.
@@ -62,18 +60,18 @@ extern "C" {
  * \param [in] _actual the actual value
  * \param [in] _type a printf format string suitable for the values
  */
-#define TEST_ASSERT_EQ(_expected, _actual, _type) do { \
-        if ((_expected) != (_actual)) \
-        { \
-            printf(" assertion failure at %s:%d:" \
+#define TEST_ASSERT_EQ(_expected, _actual, _type)        \
+    do {                                                 \
+        if ((_expected) != (_actual)) {                  \
+            printf(" assertion failure at %s:%d:"        \
                    " expected " _type "; actual " _type, \
-                   __FILE__, \
-                   __LINE__, \
-                   _expected, \
-                   _actual); \
-            return false; \
-        } \
-} while (0)
+                   __FILE__,                             \
+                   __LINE__,                             \
+                   _expected,                            \
+                   _actual);                             \
+            return false;                                \
+        }                                                \
+    } while (0)
 
 /**
  * \brief Assert that two float variables are equal.
@@ -89,20 +87,18 @@ extern "C" {
  * \param [in] _actual the actual value
  * \param [in] _eps the precision range for comparison
  */
-#define TEST_ASSERT_FLOAT_EQ(_expected, _actual, _eps) do { \
-        if ( ((_expected) < (_actual - _eps)) || ((_expected) > (_actual + _eps)) ) \
-        { \
-            printf(" assertion failure at %s:%d:" \
-                   " expected %f ; actual %f",  \
-                   __FILE__, \
-                   __LINE__, \
-                   _expected, \
-                   _actual); \
-            return false; \
-        } \
-} while (0)
-
-
+#define TEST_ASSERT_FLOAT_EQ(_expected, _actual, _eps)                              \
+    do {                                                                            \
+        if (((_expected) < (_actual - _eps)) || ((_expected) > (_actual + _eps))) { \
+            printf(" assertion failure at %s:%d:"                                   \
+                   " expected %f ; actual %f",                                      \
+                   __FILE__,                                                        \
+                   __LINE__,                                                        \
+                   _expected,                                                       \
+                   _actual);                                                        \
+            return false;                                                           \
+        }                                                                           \
+    } while (0)
 
 /**
  * \brief Assert that two enum members are equal.
@@ -118,18 +114,18 @@ extern "C" {
  * \param [in] _actual the actual enum member
  * \param [in] _enum the type name of the enum of which the values are members
  */
-#define TEST_ASSERT_ENUM_EQ(_expected, _actual, _enum) do { \
-        if ((_expected) != (_actual)) \
-        { \
-            printf(" assertion failure at %s:%d:" \
-                   " expected %s; actual %s", \
-                   __FILE__, \
-                   __LINE__, \
-                   _enum##_name(_expected), \
-                   _enum##_name(_actual)); \
-            return false; \
-        } \
-} while (0)
+#define TEST_ASSERT_ENUM_EQ(_expected, _actual, _enum) \
+    do {                                               \
+        if ((_expected) != (_actual)) {                \
+            printf(" assertion failure at %s:%d:"      \
+                   " expected %s; actual %s",          \
+                   __FILE__,                           \
+                   __LINE__,                           \
+                   _enum##_name(_expected),            \
+                   _enum##_name(_actual));             \
+            return false;                              \
+        }                                              \
+    } while (0)
 
 /**
  * \brief Assert that two strings are equal.
@@ -144,35 +140,31 @@ extern "C" {
  * \param [in] _expected the expected string
  * \param [in] _actual the actual string
  */
-#define TEST_ASSERT_STR_EQ(_expected, _actual) do { \
-        if (strcmp((_expected), (_actual)) != 0) \
-        { \
-            int32_t _expectedLen = strlen(_expected); \
-            int32_t _actualLen = strlen(_actual); \
-            int32_t _expectedEscapedLen = _expectedLen * 4 + 1; \
-            int32_t _actualEscapedLen = _actualLen * 4 + 1; \
-            char *_expectedEscaped = (char *) malloc(_expectedEscapedLen); \
-            char *_actualEscaped = (char *) malloc(_actualEscapedLen); \
-            rbr_strnesccntrl(_expectedEscaped, \
-                             _expected, \
-                             _expectedEscapedLen); \
-            rbr_strnesccntrl(_actualEscaped, \
-                             _actual, \
-                             _actualEscapedLen); \
-            \
-            printf(" assertion failure at %s:%d:\n" \
-                   "\texpected \"%s\"\n" \
-                   "\t  actual \"%s\"", \
-                   __FILE__, \
-                   __LINE__, \
-                   _expectedEscaped, \
-                   _actualEscaped); \
-            \
-            free(_expectedEscaped); \
-            free(_actualEscaped); \
-            return false; \
-        } \
-} while (0)
+#define TEST_ASSERT_STR_EQ(_expected, _actual)                                  \
+    do {                                                                        \
+        if (strcmp((_expected), (_actual)) != 0) {                              \
+            int32_t _expectedLen = strlen(_expected);                           \
+            int32_t _actualLen = strlen(_actual);                               \
+            int32_t _expectedEscapedLen = _expectedLen * 4 + 1;                 \
+            int32_t _actualEscapedLen = _actualLen * 4 + 1;                     \
+            char *_expectedEscaped = (char *) malloc(_expectedEscapedLen);      \
+            char *_actualEscaped = (char *) malloc(_actualEscapedLen);          \
+            rbr_strnesccntrl(_expectedEscaped, _expected, _expectedEscapedLen); \
+            rbr_strnesccntrl(_actualEscaped, _actual, _actualEscapedLen);       \
+                                                                                \
+            printf(" assertion failure at %s:%d:\n"                             \
+                   "\texpected \"%s\"\n"                                        \
+                   "\t  actual \"%s\"",                                         \
+                   __FILE__,                                                    \
+                   __LINE__,                                                    \
+                   _expectedEscaped,                                            \
+                   _actualEscaped);                                             \
+                                                                                \
+            free(_expectedEscaped);                                             \
+            free(_actualEscaped);                                               \
+            return false;                                                       \
+        }                                                                       \
+    } while (0)
 
 /** \brief The size of the write buffer used for tests. */
 #define TESTIOBUFFERS_WRITE_BUFFER_SIZE 4096
@@ -214,11 +206,12 @@ char *rbr_strnesccntrl(char *destination, const char *source, size_t num);
 /**
  * \brief Prepare expectedCommand and response with correct terminator for TestIOBuffers.
  *
- * This function is usually used in tests to set parameters. 
- * 
+ * This function is usually used in tests to set parameters.
+ *
  * Terminators are defined in tests.h as COMMAND_TERMINATOR and RESPONSE_TERMINATOR.
  * expectedCommand and response are defined in each test, and size is COMMAND_RESPONSE_SIZE.
- * expectedCommand will terminate with COMMAND_TERMINATOR, and response will terminate with RESPONSE_TERMINATOR.
+ * expectedCommand will terminate with COMMAND_TERMINATOR, and response will terminate with
+ * RESPONSE_TERMINATOR.
  *
  * \param [in] text the string used in command and appear in response
  * \param [in] expectedCommand the command expected to be written to TESTIOBuffers->writeBuffer
@@ -229,8 +222,7 @@ void rbr_prepareCommandResponse(const char *text, char *expectedCommand, char *r
 /**
  * \brief The I/O buffers used for tests.
  */
-typedef struct TestIOBuffers
-{
+typedef struct TestIOBuffers {
     /** \brief The instrument under test will read from this buffer. */
     const char *readBuffer;
     /** \brief The size of the test read buffer. */
@@ -255,9 +247,7 @@ typedef struct TestIOBuffers
  * \param [in] readBuffer the new contents of the read buffer
  * \param [in] readBufferSize the length of the read buffer
  */
-void TestIOBuffers_init(TestIOBuffers *buffers,
-                        const char *readBuffer,
-                        int32_t readBufferSize);
+void TestIOBuffers_init(TestIOBuffers *buffers, const char *readBuffer, int32_t readBufferSize);
 
 /**
  * \brief Get a string name for a boolean value.
@@ -276,8 +266,7 @@ const char *bool_name(bool value);
  */
 /* Uncrustify thinks that asterisks in macros are multiplication operators and
  * incorrectly adds spacing, so we'll turn *INDENT-OFF* just for this. */
-#define _TEST(fn) bool test_##fn(RBRInstrument *instrument, \
-                                 TestIOBuffers *buffers)
+#define _TEST(fn) bool test_##fn(RBRInstrument *instrument, TestIOBuffers *buffers)
 /* *INDENT-ON* */
 
 /**
@@ -301,16 +290,14 @@ const char *bool_name(bool value);
  * \param buffers the test I/O buffers
  * \return whether the test passed
  */
-typedef bool (InstrumentTestFunction)(RBRInstrument *instrument,
-                                      TestIOBuffers *buffers);
+typedef bool(InstrumentTestFunction)(RBRInstrument *instrument, TestIOBuffers *buffers);
 
 /**
  * \brief Declaration of an instrument test.
  *
  * Instances are generated in `tests.c` at build time.
  */
-typedef struct InstrumentTest
-{
+typedef struct InstrumentTest {
     /** \brief The name of the test. */
     const char *name;
     /** \brief The instrument generation to which this test applies. */
@@ -340,16 +327,13 @@ extern InstrumentTest instrumentTests[];
  * \param [in] cfg the name of the configuration used by the test
  */
 /* *INDENT-OFF* */
-#define TEST_PARSER(fn, cfg) bool test_##fn##_parser( \
-    RBRParser *parser, \
-    TestParserBuffers *buffers)
+#define TEST_PARSER(fn, cfg) bool test_##fn##_parser(RBRParser *parser, TestParserBuffers *buffers)
 /* *INDENT-ON* */
 
 /**
  * \brief The results of test parsings.
  */
-typedef struct TestParserBuffers
-{
+typedef struct TestParserBuffers {
     /** \brief The length of TestParserBuffers.samples. */
     int32_t samplesLength;
     /** \brief Parsed samples. */
@@ -367,16 +351,14 @@ typedef struct TestParserBuffers
  * \param buffers the parser result buffers
  * \return whether the test passed
  */
-typedef bool (ParserTestFunction)(RBRParser *parser,
-                                  TestParserBuffers *buffers);
+typedef bool(ParserTestFunction)(RBRParser *parser, TestParserBuffers *buffers);
 
 /**
  * \brief Declaration of a parser test.
  *
  * Instances are generated in `tests.c` at build time.
  */
-typedef struct ParserTest
-{
+typedef struct ParserTest {
     /** \brief The name of the test. */
     const char *name;
     /** \brief The parser configuration. */

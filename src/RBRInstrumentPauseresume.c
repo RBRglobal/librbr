@@ -96,8 +96,7 @@ RBRInstrumentError RBRInstrument_getPauseresume(RBRInstrument *instrument,
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_pause(RBRInstrument *instrument,
-                                       RBRInstrumentPauseStatus *status)
+RBRInstrumentError RBRInstrument_pause(RBRInstrument *instrument, RBRInstrumentPauseStatus *status)
 {
     RBR_TRY(RBRInstrument_converse(instrument, "pause"));
 

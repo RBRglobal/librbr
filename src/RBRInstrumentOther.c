@@ -71,12 +71,8 @@ int RBRInstrumentVersion_compare(const char *inA, const char *inB)
 
     /* The separators must be present, and there must be at least one character
      * before and after the separator. */
-    bool validA = separatorPosA != NULL
-                  && separatorPosA - a > 0
-                  && separatorPosA - a < lengthA - 1;
-    bool validB = separatorPosB != NULL
-                  && separatorPosB - b > 0
-                  && separatorPosB - b < lengthB - 1;
+    bool validA = separatorPosA != NULL && separatorPosA - a > 0 && separatorPosA - a < lengthA - 1;
+    bool validB = separatorPosB != NULL && separatorPosB - b > 0 && separatorPosB - b < lengthB - 1;
 
     if (!validA && !validB)
     {
@@ -121,8 +117,7 @@ int RBRInstrumentVersion_compare(const char *inA, const char *inB)
     return -(separatorA - separatorB);
 }
 
-RBRInstrumentError RBRInstrument_getId(RBRInstrument *instrument,
-                                       RBRInstrumentId *id)
+RBRInstrumentError RBRInstrument_getId(RBRInstrument *instrument, RBRInstrumentId *id)
 {
     memset(id, 0, sizeof(RBRInstrumentId));
 
@@ -130,11 +125,8 @@ RBRInstrumentError RBRInstrument_getId(RBRInstrument *instrument,
 
     char *command = NULL;
     RBRInstrumentResponseParameter parameter;
-    do
-    {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+    do {
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -142,17 +134,11 @@ RBRInstrumentError RBRInstrument_getId(RBRInstrument *instrument,
         }
         if (strcmp(parameter.key, "model") == 0)
         {
-            snprintf(id->model,
-                     sizeof(id->model),
-                     "%s",
-                     parameter.value);
+            snprintf(id->model, sizeof(id->model), "%s", parameter.value);
         }
         else if (strcmp(parameter.key, "version") == 0)
         {
-            snprintf(id->version,
-                     sizeof(id->version),
-                     "%s",
-                     parameter.value);
+            snprintf(id->version, sizeof(id->version), "%s", parameter.value);
         }
         else if (strcmp(parameter.key, "serial") == 0)
         {
@@ -164,10 +150,7 @@ RBRInstrumentError RBRInstrument_getId(RBRInstrument *instrument,
         }
         else if (strcmp(parameter.key, "mode") == 0)
         {
-            snprintf(id->mode,
-                     sizeof(id->mode),
-                     "%s",
-                     parameter.value);
+            snprintf(id->mode, sizeof(id->mode), "%s", parameter.value);
         }
     } while (true);
 
@@ -179,9 +162,8 @@ RBRInstrumentError RBRInstrument_getId(RBRInstrument *instrument,
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_getHardwareRevision(
-    RBRInstrument *instrument,
-    RBRInstrumentHardwareRevision *hwrev)
+RBRInstrumentError RBRInstrument_getHardwareRevision(RBRInstrument *instrument,
+                                                     RBRInstrumentHardwareRevision *hwrev)
 {
     memset(hwrev, 0, sizeof(RBRInstrumentHardwareRevision));
 
@@ -191,9 +173,7 @@ RBRInstrumentError RBRInstrument_getHardwareRevision(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -205,10 +185,7 @@ RBRInstrumentError RBRInstrument_getHardwareRevision(
         }
         else if (strcmp(parameter.key, "cpu") == 0)
         {
-            snprintf(hwrev->cpu,
-                     sizeof(hwrev->cpu),
-                     "%s",
-                     parameter.value);
+            snprintf(hwrev->cpu, sizeof(hwrev->cpu), "%s", parameter.value);
         }
         else if (strcmp(parameter.key, "bsl") == 0)
         {
@@ -237,8 +214,7 @@ const char *RBRInstrumentPowerSource_name(RBRInstrumentPowerSource source)
     }
 }
 
-RBRInstrumentError RBRInstrument_getPower(RBRInstrument *instrument,
-                                          RBRInstrumentPower *power)
+RBRInstrumentError RBRInstrument_getPower(RBRInstrument *instrument, RBRInstrumentPower *power)
 {
     memset(power, 0, sizeof(RBRInstrumentPower));
     power->source = RBRINSTRUMENT_UNKNOWN_POWER_SOURCE;
@@ -258,9 +234,7 @@ RBRInstrumentError RBRInstrument_getPower(RBRInstrument *instrument,
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -270,8 +244,7 @@ RBRInstrumentError RBRInstrument_getPower(RBRInstrument *instrument,
         {
             for (int i = 0; i < RBRINSTRUMENT_POWER_SOURCE_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentPowerSource_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentPowerSource_name(i), parameter.value) == 0)
                 {
                     power->source = i;
                     break;
@@ -304,8 +277,7 @@ RBRInstrumentError RBRInstrument_getPower(RBRInstrument *instrument,
     return RBRINSTRUMENT_SUCCESS;
 }
 
-const char *RBRInstrumentInternalBatteryType_name(
-    RBRInstrumentInternalBatteryType type)
+const char *RBRInstrumentInternalBatteryType_name(RBRInstrumentInternalBatteryType type)
 {
     switch (type)
     {
@@ -329,8 +301,7 @@ const char *RBRInstrumentInternalBatteryType_name(
     }
 }
 
-const char *RBRInstrumentInternalBatteryType_dispalyName(
-    RBRInstrumentInternalBatteryType type)
+const char *RBRInstrumentInternalBatteryType_dispalyName(RBRInstrumentInternalBatteryType type)
 {
     switch (type)
     {
@@ -354,9 +325,8 @@ const char *RBRInstrumentInternalBatteryType_dispalyName(
     }
 }
 
-RBRInstrumentError RBRInstrument_getPowerInternal(
-    RBRInstrument *instrument,
-    RBRInstrumentPowerInternal *power)
+RBRInstrumentError RBRInstrument_getPowerInternal(RBRInstrument *instrument,
+                                                  RBRInstrumentPowerInternal *power)
 {
     if (instrument->generation == RBRINSTRUMENT_LOGGER2)
     {
@@ -372,9 +342,7 @@ RBRInstrumentError RBRInstrument_getPowerInternal(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -384,8 +352,7 @@ RBRInstrumentError RBRInstrument_getPowerInternal(
         {
             for (int i = 0; i < RBRINSTRUMENT_INTERNAL_BATTERY_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentInternalBatteryType_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentInternalBatteryType_name(i), parameter.value) == 0)
                 {
                     power->batteryType = i;
                     break;
@@ -405,9 +372,8 @@ RBRInstrumentError RBRInstrument_getPowerInternal(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_setPowerInternalBatteryType(
-    RBRInstrument *instrument,
-    RBRInstrumentInternalBatteryType type)
+RBRInstrumentError RBRInstrument_setPowerInternalBatteryType(RBRInstrument *instrument,
+                                                             RBRInstrumentInternalBatteryType type)
 {
     if (type < 0 || type >= RBRINSTRUMENT_INTERNAL_BATTERY_COUNT)
     {
@@ -415,19 +381,15 @@ RBRInstrumentError RBRInstrument_setPowerInternalBatteryType(
     }
 
     return RBRInstrument_converse(
-        instrument,
-        "powerinternal batterytype = %s",
-        RBRInstrumentInternalBatteryType_name(type));
+        instrument, "powerinternal batterytype = %s", RBRInstrumentInternalBatteryType_name(type));
 }
 
-RBRInstrumentError RBRInstrument_resetPowerInternalUsed(
-    RBRInstrument *instrument)
+RBRInstrumentError RBRInstrument_resetPowerInternalUsed(RBRInstrument *instrument)
 {
     return RBRInstrument_converse(instrument, "powerinternal used = 0");
 }
 
-const char *RBRInstrumentExternalBatteryType_name(
-    RBRInstrumentExternalBatteryType type)
+const char *RBRInstrumentExternalBatteryType_name(RBRInstrumentExternalBatteryType type)
 {
     switch (type)
     {
@@ -457,8 +419,7 @@ const char *RBRInstrumentExternalBatteryType_name(
     }
 }
 
-const char *RBRInstrumentExternalBatteryType_displayName(
-    RBRInstrumentExternalBatteryType type)
+const char *RBRInstrumentExternalBatteryType_displayName(RBRInstrumentExternalBatteryType type)
 {
     switch (type)
     {
@@ -488,9 +449,8 @@ const char *RBRInstrumentExternalBatteryType_displayName(
     }
 }
 
-RBRInstrumentError RBRInstrument_getPowerExternal(
-    RBRInstrument *instrument,
-    RBRInstrumentPowerExternal *power)
+RBRInstrumentError RBRInstrument_getPowerExternal(RBRInstrument *instrument,
+                                                  RBRInstrumentPowerExternal *power)
 {
     if (instrument->generation == RBRINSTRUMENT_LOGGER2)
     {
@@ -506,9 +466,7 @@ RBRInstrumentError RBRInstrument_getPowerExternal(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -518,8 +476,7 @@ RBRInstrumentError RBRInstrument_getPowerExternal(
         {
             for (int i = 0; i < RBRINSTRUMENT_EXTERNAL_BATTERY_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentExternalBatteryType_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentExternalBatteryType_name(i), parameter.value) == 0)
                 {
                     power->batteryType = i;
                     break;
@@ -539,9 +496,8 @@ RBRInstrumentError RBRInstrument_getPowerExternal(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_setPowerExternalBatteryType(
-    RBRInstrument *instrument,
-    RBRInstrumentExternalBatteryType type)
+RBRInstrumentError RBRInstrument_setPowerExternalBatteryType(RBRInstrument *instrument,
+                                                             RBRInstrumentExternalBatteryType type)
 {
     if (type < 0 || type >= RBRINSTRUMENT_EXTERNAL_BATTERY_COUNT)
     {
@@ -549,20 +505,15 @@ RBRInstrumentError RBRInstrument_setPowerExternalBatteryType(
     }
 
     return RBRInstrument_converse(
-        instrument,
-        "powerexternal batterytype = %s",
-        RBRInstrumentExternalBatteryType_name(type));
+        instrument, "powerexternal batterytype = %s", RBRInstrumentExternalBatteryType_name(type));
 }
 
-RBRInstrumentError RBRInstrument_resetPowerExternalUsed(
-    RBRInstrument *instrument)
+RBRInstrumentError RBRInstrument_resetPowerExternalUsed(RBRInstrument *instrument)
 {
     return RBRInstrument_converse(instrument, "powerexternal used = 0");
 }
 
-RBRInstrumentError RBRInstrument_getInfo(
-    RBRInstrument *instrument,
-    RBRInstrumentInfo *info)
+RBRInstrumentError RBRInstrument_getInfo(RBRInstrument *instrument, RBRInstrumentInfo *info)
 {
     if (instrument->generation == RBRINSTRUMENT_LOGGER2)
     {
@@ -577,9 +528,7 @@ RBRInstrumentError RBRInstrument_getInfo(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -587,10 +536,7 @@ RBRInstrumentError RBRInstrument_getInfo(
         }
         else if (strcmp(parameter.key, "pn") == 0)
         {
-            snprintf(info->partNumber,
-                     sizeof(info->partNumber),
-                     "%s",
-                     parameter.value);
+            snprintf(info->partNumber, sizeof(info->partNumber), "%s", parameter.value);
         }
         else if (strcmp(parameter.key, "fwlock") == 0)
         {

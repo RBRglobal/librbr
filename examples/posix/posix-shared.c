@@ -31,8 +31,7 @@
 int openSerialFd(char *devicePath)
 {
     int instrumentFd;
-    if ((instrumentFd = open(devicePath, O_RDWR | O_NOCTTY)) < 0)
-    {
+    if ((instrumentFd = open(devicePath, O_RDWR | O_NOCTTY)) < 0) {
         return -1;
     }
 
@@ -58,7 +57,7 @@ int openSerialFd(char *devicePath)
  * doing so would break a vast number of existing applications). And this
  * approach is more platform-generic than an ioctl. */
 #define B115200 115200
-#define B9600 9600
+#define B9600   9600
 #endif
 
     /*important!!!
@@ -69,8 +68,7 @@ int openSerialFd(char *devicePath)
     /* Input baud rate of 0 causes the output baud rate to be used. */
     cfsetispeed(&portSettings, B0);
 
-    if (tcsetattr(instrumentFd, TCSANOW, &portSettings) < 0)
-    {
+    if (tcsetattr(instrumentFd, TCSANOW, &portSettings) < 0) {
         close(instrumentFd);
         return -1;
     }
@@ -95,17 +93,12 @@ RBRInstrumentError instrumentSleep(const struct RBRInstrument *instrument,
     /* Unused. */
     (void) instrument;
 
-    struct timespec sleep = {
-        .tv_sec  =  time / 1000,
-        .tv_nsec = (time % 1000) * 1000000
-    };
+    struct timespec sleep = {.tv_sec = time / 1000, .tv_nsec = (time % 1000) * 1000000};
     nanosleep(&sleep, NULL);
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError instrumentRead(const struct RBRInstrument *instrument,
-                                  void *data,
-                                  int32_t *size)
+RBRInstrumentError instrumentRead(const struct RBRInstrument *instrument, void *data, int32_t *size)
 {
     int *instrumentFd = (int *) RBRInstrument_getUserData(instrument);
 
@@ -115,25 +108,17 @@ RBRInstrumentError instrumentRead(const struct RBRInstrument *instrument,
      * read operations; on the other, it means timeouts can't conveniently be
      * changed based on context. For example, you might want to have a much
      * longer timeout for the `enable` or `memclear` commands than for `id`. */
-    *size = read(*instrumentFd,
-                 data,
-                 *size);
-    if (*size == 0)
-    {
+    *size = read(*instrumentFd, data, *size);
+    if (*size == 0) {
         return RBRINSTRUMENT_TIMEOUT;
-    }
-    else if (*size < 0)
-    {
+    } else if (*size < 0) {
         return RBRINSTRUMENT_CALLBACK_ERROR;
-    }
-    else
-    {
+    } else {
         return RBRINSTRUMENT_SUCCESS;
     }
 }
 
-RBRInstrumentError instrumentWrite(const struct RBRInstrument *instrument,
-                                   const void *const data,
+RBRInstrumentError instrumentWrite(const struct RBRInstrument *instrument, const void *const data,
                                    int32_t size)
 {
     int *instrumentFd = (int *) RBRInstrument_getUserData(instrument);
@@ -149,40 +134,29 @@ RBRInstrumentError instrumentWrite(const struct RBRInstrument *instrument,
 
     struct timeval writeTimeout;
 
-    while (written < size)
-    {
+    while (written < size) {
         /* select() may (and on Linux, does) update the timeout argument with
          * how much of the timeout remained upon return. We want every check to
          * have the same timeout, so we'll reset it before each use. */
-        writeTimeout = (struct timeval) {
-            .tv_sec  =  INSTRUMENT_CHARACTER_TIMEOUT_MSEC / 1000,
-            .tv_usec = (INSTRUMENT_CHARACTER_TIMEOUT_MSEC % 1000) * 1000000
-        };
+        writeTimeout =
+            (struct timeval) {.tv_sec = INSTRUMENT_CHARACTER_TIMEOUT_MSEC / 1000,
+                              .tv_usec = (INSTRUMENT_CHARACTER_TIMEOUT_MSEC % 1000) * 1000000};
 
         /* We could just loop on write(), but we want to enforce a timeout, so
          * select() kills two birds with one stone: making sure the output
          * device is ready to be written to, and handling the timeout. */
-        int instrumentReady = select(*instrumentFd + 1,
-                                     NULL,
-                                     &instrumentFdSet,
-                                     NULL,
-                                     &writeTimeout);
-        if (instrumentReady < 0)
-        {
+        int instrumentReady =
+            select(*instrumentFd + 1, NULL, &instrumentFdSet, NULL, &writeTimeout);
+        if (instrumentReady < 0) {
             return RBRINSTRUMENT_CALLBACK_ERROR;
-        }
-        else if (instrumentReady == 0)
-        {
+        } else if (instrumentReady == 0) {
             return RBRINSTRUMENT_TIMEOUT;
         }
 
-        int32_t chunkWritten = write(*instrumentFd,
-                                     byteData + written,
-                                     size - written);
+        int32_t chunkWritten = write(*instrumentFd, byteData + written, size - written);
         /* select() told us we were good to go, so a 0-byte write is probably
          * an error, not just an unready device. */
-        if (chunkWritten <= 0)
-        {
+        if (chunkWritten <= 0) {
             return RBRINSTRUMENT_CALLBACK_ERROR;
         }
 
@@ -197,63 +171,46 @@ RBRInstrumentError instrumentStart(RBRInstrument *instrument)
     RBRInstrumentError err;
 
     RBRInstrumentDeploymentStatus status;
-    if ((err = RBRInstrument_disable(instrument, &status))
-        != RBRINSTRUMENT_SUCCESS)
-    {
+    if ((err = RBRInstrument_disable(instrument, &status)) != RBRINSTRUMENT_SUCCESS) {
         return err;
     }
 
     RBRInstrumentSampling sampling;
-    if ((err = RBRInstrument_getSampling(instrument, &sampling))
-        != RBRINSTRUMENT_SUCCESS)
-    {
+    if ((err = RBRInstrument_getSampling(instrument, &sampling)) != RBRINSTRUMENT_SUCCESS) {
         return err;
     }
     sampling.mode = RBRINSTRUMENT_SAMPLING_CONTINUOUS;
     sampling.period = sampling.userPeriodLimit;
-    if ((err = RBRInstrument_setSampling(instrument, &sampling))
-        != RBRINSTRUMENT_SUCCESS)
-    {
+    if ((err = RBRInstrument_setSampling(instrument, &sampling)) != RBRINSTRUMENT_SUCCESS) {
         return err;
     }
 
-    RBRInstrumentDeployment deployment = {
-        .startTime = RBRINSTRUMENT_DATETIME_MIN,
-        .endTime = RBRINSTRUMENT_DATETIME_MAX
-    };
-    if ((err = RBRInstrument_setDeployment(instrument, &deployment))
-        != RBRINSTRUMENT_SUCCESS)
-    {
+    RBRInstrumentDeployment deployment = {.startTime = RBRINSTRUMENT_DATETIME_MIN,
+                                          .endTime = RBRINSTRUMENT_DATETIME_MAX};
+    if ((err = RBRInstrument_setDeployment(instrument, &deployment)) != RBRINSTRUMENT_SUCCESS) {
         return err;
     }
 
-    if ((err = RBRInstrument_setNewMemoryFormat(
-             instrument,
-             RBRINSTRUMENT_MEMFORMAT_CALBIN00))
-        != RBRINSTRUMENT_SUCCESS)
-    {
+    if ((err = RBRInstrument_setNewMemoryFormat(instrument, RBRINSTRUMENT_MEMFORMAT_CALBIN00)) !=
+        RBRINSTRUMENT_SUCCESS) {
         return err;
     }
 
     RBRInstrumentThresholding thresholding;
     err = RBRInstrument_getThresholding(instrument, &thresholding);
-    if (err == RBRINSTRUMENT_SUCCESS && thresholding.enabled)
-    {
+    if (err == RBRINSTRUMENT_SUCCESS && thresholding.enabled) {
         thresholding.enabled = false;
         RBRInstrument_setThresholding(instrument, &thresholding);
     }
 
     RBRInstrumentTwistActivation twistActivation;
     err = RBRInstrument_getTwistActivation(instrument, &twistActivation);
-    if (err == RBRINSTRUMENT_SUCCESS && twistActivation.enabled)
-    {
+    if (err == RBRINSTRUMENT_SUCCESS && twistActivation.enabled) {
         twistActivation.enabled = false;
         RBRInstrument_setTwistActivation(instrument, &twistActivation);
     }
 
-    if ((err = RBRInstrument_enable(instrument, true, &status))
-        != RBRINSTRUMENT_SUCCESS)
-    {
+    if ((err = RBRInstrument_enable(instrument, true, &status)) != RBRINSTRUMENT_SUCCESS) {
         return err;
     }
 

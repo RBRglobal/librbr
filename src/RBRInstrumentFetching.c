@@ -16,19 +16,16 @@
 #include "RBRInstrument.h"
 #include "RBRInstrumentInternal.h"
 
-RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument,
-                                       RBRInstrumentLabelsList *channels,
-                                       bool sleepAfter,
-                                       RBRInstrumentSample *sample)
+RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument, RBRInstrumentLabelsList *channels,
+                                       bool sleepAfter, RBRInstrumentSample *sample)
 {
     char *commandBuffer = (char *) instrument->commandBuffer;
     int32_t *commandBufferLength = &instrument->commandBufferLength;
 
-    *commandBufferLength = snprintf(
-        commandBuffer,
-        sizeof(instrument->commandBuffer),
-        "fetch sleepafter = %s",
-        sleepAfter ? "true" : "false");
+    *commandBufferLength = snprintf(commandBuffer,
+                                    sizeof(instrument->commandBuffer),
+                                    "fetch sleepafter = %s",
+                                    sleepAfter ? "true" : "false");
 
     /*
      * If we have channel labels to pass, we can quickly exceed the length of
@@ -43,46 +40,43 @@ RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument,
      * This function is currently the only case where we have to split a single
      * command across multiple callbacks.
      */
-    if (channels != NULL
-        && channels->count > 0
-        && instrument->generation != RBRINSTRUMENT_LOGGER2)
+    if (channels != NULL && channels->count > 0 &&
+        instrument->generation != RBRINSTRUMENT_LOGGER2)
     {
-        *commandBufferLength += snprintf(
-            commandBuffer + *commandBufferLength,
-            sizeof(instrument->commandBuffer) - *commandBufferLength,
-            ", channels =");
+        *commandBufferLength += snprintf(commandBuffer + *commandBufferLength,
+                                         sizeof(instrument->commandBuffer) - *commandBufferLength,
+                                         ", channels =");
 
         char separator = ' ';
         for (int32_t channel = 0; channel < channels->count; ++channel)
         {
-            if (*commandBufferLength + 1 + strlen(channels->labels[channel])
-                > sizeof(instrument->commandBuffer))
+            if (*commandBufferLength + 1 + strlen(channels->labels[channel]) >
+                sizeof(instrument->commandBuffer))
             {
                 RBR_TRY(RBRInstrument_sendBuffer(instrument));
                 *commandBufferLength = 0;
             }
 
-            *commandBufferLength += snprintf(
-                commandBuffer + *commandBufferLength,
-                sizeof(instrument->commandBuffer) - *commandBufferLength,
-                "%c%s",
-                separator,
-                channels->labels[channel]);
+            *commandBufferLength +=
+                snprintf(commandBuffer + *commandBufferLength,
+                         sizeof(instrument->commandBuffer) - *commandBufferLength,
+                         "%c%s",
+                         separator,
+                         channels->labels[channel]);
             separator = '|';
         }
     }
 
-    if ((size_t) *commandBufferLength + RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN
-        > sizeof(instrument->commandBuffer))
+    if ((size_t) *commandBufferLength + RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN >
+        sizeof(instrument->commandBuffer))
     {
         RBR_TRY(RBRInstrument_sendBuffer(instrument));
         *commandBufferLength = 0;
     }
 
-    *commandBufferLength += snprintf(
-        commandBuffer + *commandBufferLength,
-        sizeof(instrument->commandBuffer) - *commandBufferLength,
-        RBRINSTRUMENT_SEND_COMMAND_TERMINATOR);
+    *commandBufferLength += snprintf(commandBuffer + *commandBufferLength,
+                                     sizeof(instrument->commandBuffer) - *commandBufferLength,
+                                     RBRINSTRUMENT_SEND_COMMAND_TERMINATOR);
 
     RBR_TRY(RBRInstrument_sendBuffer(instrument));
 
@@ -91,8 +85,7 @@ RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument,
      * is read to the given sample pointer; a return of #RBRINSTRUMENT_SUCCESS
      * means that it found some other command response instead, so we'll loop
      * until we get a “failure” value (which we hope is SAMPLE). */
-    do
-    {
+    do {
         err = RBRInstrument_readResponse(instrument, true, sample);
     } while (err == RBRINSTRUMENT_SUCCESS);
     /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any

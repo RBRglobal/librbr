@@ -24,13 +24,13 @@ extern "C" {
 #define RBRINSTRUMENT_NO_ACTIVITY ((RBRInstrumentDateTime) - 1)
 
 /** \brief The terminator at the end of a command sent to the instrument. */
-#define RBRINSTRUMENT_SEND_COMMAND_TERMINATOR "\r"
+#define RBRINSTRUMENT_SEND_COMMAND_TERMINATOR     "\r"
 /** \brief The length of the command terminator. */
 #define RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN 1
 /** \brief The terminator at the end of a command received from the instrument. */
-#define RBRINSTRUMENT_COMMAND_TERMINATOR "\r\n"
+#define RBRINSTRUMENT_COMMAND_TERMINATOR          "\r\n"
 /** \brief The length of the command terminator. */
-#define RBRINSTRUMENT_COMMAND_TERMINATOR_LEN 2
+#define RBRINSTRUMENT_COMMAND_TERMINATOR_LEN      2
 
 /**
  * \brief The length of the timestamp of a streamed sample.
@@ -53,13 +53,13 @@ extern "C" {
  * than #RBRINSTRUMENT_SUCCESS, then that value is returned again. Useful for
  * forwarding errors from other API functions.
  */
-#define RBR_TRY(op) do { \
-        RBRInstrumentError _tryErr; \
-        if ((_tryErr = (op)) != RBRINSTRUMENT_SUCCESS) \
-        { \
-            return _tryErr; \
-        } \
-} while (0)
+#define RBR_TRY(op)                                      \
+        do {                                                 \
+            RBRInstrumentError _tryErr;                      \
+            if ((_tryErr = (op)) != RBRINSTRUMENT_SUCCESS) { \
+                return _tryErr;                              \
+            }                                                \
+        } while (0)
 
 /**
  * Send the first RBRInstrument.commandBufferLength bytes of
@@ -102,9 +102,7 @@ RBRInstrumentError RBRInstrument_sendBuffer(RBRInstrument *instrument);
  * \see RBRInstrument_readResponse() to read the command response
  * \see RBRInstrument_converse() for a send/receive shortcut
  */
-RBRInstrumentError RBRInstrument_sendCommand(RBRInstrument *instrument,
-                                             const char *command,
-                                             ...);
+RBRInstrumentError RBRInstrument_sendCommand(RBRInstrument *instrument, const char *command, ...);
 
 /**
  * Read a response from the instrument. This function will block until a
@@ -142,8 +140,7 @@ RBRInstrumentError RBRInstrument_sendCommand(RBRInstrument *instrument,
  * \see RBRInstrument_sendCommand() to send a command
  * \see RBRInstrument_converse() for a send/receive shortcut
  */
-RBRInstrumentError RBRInstrument_readResponse(RBRInstrument *instrument,
-                                              bool breakOnSample,
+RBRInstrumentError RBRInstrument_readResponse(RBRInstrument *instrument, bool breakOnSample,
                                               RBRInstrumentSample *sample);
 
 /**
@@ -167,9 +164,7 @@ RBRInstrumentError RBRInstrument_readResponse(RBRInstrument *instrument,
  * \see RBRInstrument_sendCommand() to send a command
  * \see RBRInstrument_readResponse() to read the command response
  */
-RBRInstrumentError RBRInstrument_converse(RBRInstrument *instrument,
-                                          const char *command,
-                                          ...);
+RBRInstrumentError RBRInstrument_converse(RBRInstrument *instrument, const char *command, ...);
 
 /**
  * \brief Read a single boolean parameter from the instrument.
@@ -193,10 +188,8 @@ RBRInstrumentError RBRInstrument_converse(RBRInstrument *instrument,
  * \see RBRInstrument_getFloat() for the float equivalent
  * \see RBRInstrument_getInt() for the integer equivalent
  */
-RBRInstrumentError RBRInstrument_getBool(RBRInstrument *instrument,
-                                         const char *command,
-                                         const char *parameter,
-                                         bool *value);
+RBRInstrumentError RBRInstrument_getBool(RBRInstrument *instrument, const char *command,
+                                         const char *parameter, bool *value);
 
 /**
  * \brief Read a single float parameter from the instrument.
@@ -220,10 +213,8 @@ RBRInstrumentError RBRInstrument_getBool(RBRInstrument *instrument,
  * \see RBRInstrument_getBool() for the boolean equivalent
  * \see RBRInstrument_getInt() for the integer equivalent
  */
-RBRInstrumentError RBRInstrument_getFloat(RBRInstrument *instrument,
-                                          const char *command,
-                                          const char *parameter,
-                                          float *value);
+RBRInstrumentError RBRInstrument_getFloat(RBRInstrument *instrument, const char *command,
+                                          const char *parameter, float *value);
 
 /**
  * \brief Read a single integer parameter from the instrument.
@@ -247,10 +238,8 @@ RBRInstrumentError RBRInstrument_getFloat(RBRInstrument *instrument,
  * \see RBRInstrument_getBool() for the boolean equivalent
  * \see RBRInstrument_getFloat() for the float equivalent
  */
-RBRInstrumentError RBRInstrument_getInt(RBRInstrument *instrument,
-                                        const char *command,
-                                        const char *parameter,
-                                        int32_t *value);
+RBRInstrumentError RBRInstrument_getInt(RBRInstrument *instrument, const char *command,
+                                        const char *parameter, int32_t *value);
 
 /** \brief A parameter (key/value pair) from an instrument response. */
 typedef struct RBRInstrumentResponseParameter
@@ -286,10 +275,8 @@ typedef struct RBRInstrumentResponseParameter
  * \param [in,out] command the name of the command as indicated by the response
  * \param [in,out] parameter the most-recently-parsed response parameter
  */
-void RBRInstrument_parseResponse(RBRInstrument *instrument,
-                                 char **command,
+void RBRInstrument_parseResponse(RBRInstrument *instrument, char **command,
                                  RBRInstrumentResponseParameter *parameter);
-
 
 /**
  * \brief Check for errors or warnings in an instrument response.
@@ -302,10 +289,8 @@ void RBRInstrument_parseResponse(RBRInstrument *instrument,
  * \return #RBRINSTRUMENT_SUCCESS when the response is a warning or success
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the response indicates an error
  */
-RBRInstrumentError RBRInstrument_errorCheckResponse(
-    RBRInstrument *instrument, 
-    char *beginning, 
-    char *end);
+RBRInstrumentError RBRInstrument_errorCheckResponse(RBRInstrument *instrument, char *beginning,
+                                                    char *end);
 
 /**
  * \brief Parse a date/time string from a sample (i.e.,
@@ -321,10 +306,7 @@ RBRInstrumentError RBRInstrument_errorCheckResponse(
  * \return #RBRINSTRUMENT_SUCCESS when the timestamp is successfully parsed
  * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when the time is invalid
  */
-RBRInstrumentError RBRInstrumentDateTime_parseSampleTime(
-    const char *s,
-    RBRInstrumentDateTime *timestamp,
-    char **end);
+RBRInstrumentError RBRInstrumentDateTime_parseSampleTime(const char *s, RBRInstrumentDateTime *timestamp, char **end);
 
 /**
  * \brief Parse a date/time string from a schedule setting (i.e.,
@@ -340,10 +322,9 @@ RBRInstrumentError RBRInstrumentDateTime_parseSampleTime(
  * \return #RBRINSTRUMENT_SUCCESS when the timestamp is successfully parsed
  * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when the time is invalid
  */
-RBRInstrumentError RBRInstrumentDateTime_parseScheduleTime(
-    const char *s,
-    RBRInstrumentDateTime *timestamp,
-    char **end);
+RBRInstrumentError RBRInstrumentDateTime_parseScheduleTime(const char *s,
+                                                           RBRInstrumentDateTime *timestamp,
+                                                           char **end);
 
 /**
  * \brief Convert a timestamp to a sample time/date string (i.e.,
@@ -355,8 +336,7 @@ RBRInstrumentError RBRInstrumentDateTime_parseScheduleTime(
  * \param [in] timestamp the timestamp
  * \param [out] s the destination buffer
  */
-void RBRInstrumentDateTime_toSampleTime(RBRInstrumentDateTime timestamp,
-                                        char *s);
+void RBRInstrumentDateTime_toSampleTime(RBRInstrumentDateTime timestamp, char *s);
 
 /**
  * \brief Convert a timestamp to a schedule setting time/date string (i.e.,
@@ -368,8 +348,7 @@ void RBRInstrumentDateTime_toSampleTime(RBRInstrumentDateTime timestamp,
  * \param [in] timestamp the timestamp
  * \param [out] s the destination buffer
  */
-void RBRInstrumentDateTime_toScheduleTime(RBRInstrumentDateTime timestamp,
-                                          char *s);
+void RBRInstrumentDateTime_toScheduleTime(RBRInstrumentDateTime timestamp, char *s);
 
 #ifdef __cplusplus
 }

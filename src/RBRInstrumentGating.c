@@ -34,8 +34,7 @@ const char *RBRInstrumentGatingState_name(RBRInstrumentGatingState state)
     }
 }
 
-const char *RBRInstrumentThresholdingChannelSelection_name(
-    RBRInstrumentThresholdingChannelSelection selection)
+const char *RBRInstrumentThresholdingChannelSelection_name(RBRInstrumentThresholdingChannelSelection selection)
 {
     switch (selection)
     {
@@ -48,8 +47,7 @@ const char *RBRInstrumentThresholdingChannelSelection_name(
     }
 }
 
-const char *RBRInstrumentThresholdingCondition_name(
-    RBRInstrumentThresholdingCondition condition)
+const char *RBRInstrumentThresholdingCondition_name(RBRInstrumentThresholdingCondition condition)
 {
     switch (condition)
     {
@@ -65,14 +63,12 @@ const char *RBRInstrumentThresholdingCondition_name(
     }
 }
 
-RBRInstrumentError RBRInstrument_getThresholding(
-    RBRInstrument *instrument,
-    RBRInstrumentThresholding *threshold)
+RBRInstrumentError RBRInstrument_getThresholding(RBRInstrument *instrument,
+                                                 RBRInstrumentThresholding *threshold)
 {
     memset(threshold, 0, sizeof(RBRInstrumentThresholding));
 
-    RBRInstrumentGatingState *state =
-        (RBRInstrumentGatingState *) &threshold->state;
+    RBRInstrumentGatingState *state = (RBRInstrumentGatingState *) &threshold->state;
     *state = RBRINSTRUMENT_UNKNOWN_GATING;
 
     RBRInstrumentThresholdingCondition *condition =
@@ -85,9 +81,7 @@ RBRInstrumentError RBRInstrument_getThresholding(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -105,12 +99,9 @@ RBRInstrumentError RBRInstrument_getThresholding(
             }
             else
             {
-                for (int i = RBRINSTRUMENT_GATING_NA;
-                     i < RBRINSTRUMENT_GATING_COUNT;
-                     i++)
+                for (int i = RBRINSTRUMENT_GATING_NA; i < RBRINSTRUMENT_GATING_COUNT; i++)
                 {
-                    if (strcmp(RBRInstrumentGatingState_name(i),
-                               parameter.value) == 0)
+                    if (strcmp(RBRInstrumentGatingState_name(i), parameter.value) == 0)
                     {
                         *state = i;
                         break;
@@ -118,26 +109,22 @@ RBRInstrumentError RBRInstrument_getThresholding(
                 }
             }
         }
-        else if (strcmp(parameter.key, "channelindex") == 0
-                 || strcmp(parameter.key, "channel") == 0)
+        else if (strcmp(parameter.key, "channelindex") == 0 ||
+                 strcmp(parameter.key, "channel") == 0)
         {
             threshold->channelIndex = strtol(parameter.value, NULL, 10);
         }
         else if (strcmp(parameter.key, "channellabel") == 0)
         {
-            snprintf(threshold->channelLabel,
-                     sizeof(threshold->channelLabel),
-                     "%s",
-                     parameter.value);
+            snprintf(
+                threshold->channelLabel, sizeof(threshold->channelLabel), "%s", parameter.value);
         }
         else if (strcmp(parameter.key, "condition") == 0)
         {
-            for (int i = RBRINSTRUMENT_THRESHOLDING_ABOVE;
-                 i < RBRINSTRUMENT_THRESHOLDING_COUNT;
+            for (int i = RBRINSTRUMENT_THRESHOLDING_ABOVE; i < RBRINSTRUMENT_THRESHOLDING_COUNT;
                  i++)
             {
-                if (strcmp(RBRInstrumentThresholdingCondition_name(i),
-                           parameter.value) == 0)
+                if (strcmp(RBRInstrumentThresholdingCondition_name(i), parameter.value) == 0)
                 {
                     *condition = i;
                     break;
@@ -157,26 +144,20 @@ RBRInstrumentError RBRInstrument_getThresholding(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_setThresholding(
-    RBRInstrument *instrument,
-    const RBRInstrumentThresholding *threshold)
+RBRInstrumentError RBRInstrument_setThresholding(RBRInstrument *instrument,
+                                                 const RBRInstrumentThresholding *threshold)
 {
-    if (threshold->channelSelection < RBRINSTRUMENT_THRESHOLD_CHANNEL_BY_INDEX
-        || threshold->channelSelection >
-        RBRINSTRUMENT_THRESHOLD_CHANNEL_BY_LABEL
-        || (threshold->channelSelection ==
-            RBRINSTRUMENT_THRESHOLD_CHANNEL_BY_INDEX
-            && (threshold->channelIndex < 1
-                || threshold->channelIndex > RBRINSTRUMENT_CHANNEL_MAX))
-        || (threshold->channelSelection ==
-            RBRINSTRUMENT_THRESHOLD_CHANNEL_BY_LABEL
-            && (instrument->generation == RBRINSTRUMENT_LOGGER2
-                || strlen(threshold->channelLabel) == 0))
-        || threshold->condition < RBRINSTRUMENT_THRESHOLDING_ABOVE
-        || threshold->condition > RBRINSTRUMENT_THRESHOLDING_BELOW
-        || threshold->interval <= 0
-        || threshold->interval > RBRINSTRUMENT_SAMPLING_PERIOD_MAX
-        || (threshold->interval >= 1000 && threshold->interval % 1000 != 0))
+    if (threshold->channelSelection < RBRINSTRUMENT_THRESHOLD_CHANNEL_BY_INDEX ||
+        threshold->channelSelection > RBRINSTRUMENT_THRESHOLD_CHANNEL_BY_LABEL ||
+        (threshold->channelSelection == RBRINSTRUMENT_THRESHOLD_CHANNEL_BY_INDEX &&
+         (threshold->channelIndex < 1 || threshold->channelIndex > RBRINSTRUMENT_CHANNEL_MAX)) ||
+        (threshold->channelSelection == RBRINSTRUMENT_THRESHOLD_CHANNEL_BY_LABEL &&
+         (instrument->generation == RBRINSTRUMENT_LOGGER2 ||
+          strlen(threshold->channelLabel) == 0)) ||
+        threshold->condition < RBRINSTRUMENT_THRESHOLDING_ABOVE ||
+        threshold->condition > RBRINSTRUMENT_THRESHOLDING_BELOW || threshold->interval <= 0 ||
+        threshold->interval > RBRINSTRUMENT_SAMPLING_PERIOD_MAX ||
+        (threshold->interval >= 1000 && threshold->interval % 1000 != 0))
     {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
@@ -199,44 +180,34 @@ RBRInstrumentError RBRInstrument_setThresholding(
         channelParameter = "channelindex";
     }
 
-    if (threshold->channelSelection ==
-        RBRINSTRUMENT_THRESHOLD_CHANNEL_BY_INDEX)
+    if (threshold->channelSelection == RBRINSTRUMENT_THRESHOLD_CHANNEL_BY_INDEX)
     {
-        snprintf(channelValue,
-                 sizeof(channelValue),
-                 "%" PRIi32,
-                 threshold->channelIndex);
+        snprintf(channelValue, sizeof(channelValue), "%" PRIi32, threshold->channelIndex);
     }
     else
     {
         channelParameter = "channellabel";
-        snprintf(channelValue,
-                 sizeof(channelValue),
-                 "%s",
-                 threshold->channelLabel);
+        snprintf(channelValue, sizeof(channelValue), "%s", threshold->channelLabel);
     }
 
-    return RBRInstrument_converse(
-        instrument,
-        "thresholding %s = %s, %s = %s, condition = %s, value = %0.4f, "
-        "interval = %d",
-        enabledParameter,
-        enabledValue,
-        channelParameter,
-        channelValue,
-        RBRInstrumentThresholdingCondition_name(threshold->condition),
-        threshold->value,
-        threshold->interval);
+    return RBRInstrument_converse(instrument,
+                                  "thresholding %s = %s, %s = %s, condition = %s, value = %0.4f, "
+                                  "interval = %d",
+                                  enabledParameter,
+                                  enabledValue,
+                                  channelParameter,
+                                  channelValue,
+                                  RBRInstrumentThresholdingCondition_name(threshold->condition),
+                                  (double) threshold->value,
+                                  threshold->interval);
 }
 
-RBRInstrumentError RBRInstrument_getTwistActivation(
-    RBRInstrument *instrument,
-    RBRInstrumentTwistActivation *twistActivation)
+RBRInstrumentError RBRInstrument_getTwistActivation(RBRInstrument *instrument,
+                                                    RBRInstrumentTwistActivation *twistActivation)
 {
     memset(twistActivation, 0, sizeof(RBRInstrumentTwistActivation));
 
-    RBRInstrumentGatingState *state =
-        (RBRInstrumentGatingState *) &twistActivation->state;
+    RBRInstrumentGatingState *state = (RBRInstrumentGatingState *) &twistActivation->state;
     *state = RBRINSTRUMENT_UNKNOWN_GATING;
 
     RBR_TRY(RBRInstrument_converse(instrument, "twistactivation"));
@@ -245,9 +216,7 @@ RBRInstrumentError RBRInstrument_getTwistActivation(
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
-        RBRInstrument_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+        RBRInstrument_parseResponse(instrument, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -261,17 +230,13 @@ RBRInstrumentError RBRInstrument_getTwistActivation(
         {
             if (instrument->generation == RBRINSTRUMENT_LOGGER2)
             {
-                twistActivation->enabled =
-                    (strcmp(parameter.value, "on") == 0);
+                twistActivation->enabled = (strcmp(parameter.value, "on") == 0);
             }
             else
             {
-                for (int i = RBRINSTRUMENT_GATING_NA;
-                     i < RBRINSTRUMENT_GATING_COUNT;
-                     i++)
+                for (int i = RBRINSTRUMENT_GATING_NA; i < RBRINSTRUMENT_GATING_COUNT; i++)
                 {
-                    if (strcmp(RBRInstrumentGatingState_name(i),
-                               parameter.value) == 0)
+                    if (strcmp(RBRInstrumentGatingState_name(i), parameter.value) == 0)
                     {
                         *state = i;
                         break;
@@ -284,9 +249,8 @@ RBRInstrumentError RBRInstrument_getTwistActivation(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_setTwistActivation(
-    RBRInstrument *instrument,
-    const RBRInstrumentTwistActivation *twistActivation)
+RBRInstrumentError RBRInstrument_setTwistActivation(RBRInstrument *instrument,
+                                                    const RBRInstrumentTwistActivation *twistActivation)
 {
     const char *enabledParameter;
     const char *enabledValue;
@@ -303,8 +267,5 @@ RBRInstrumentError RBRInstrument_setTwistActivation(
     }
 
     return RBRInstrument_converse(
-        instrument,
-        "twistactivation %s = %s",
-        enabledParameter,
-        enabledValue);
+        instrument, "twistactivation %s = %s", enabledParameter, enabledValue);
 }
