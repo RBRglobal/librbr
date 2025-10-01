@@ -1,56 +1,49 @@
+definitions:
+    steps:
+        - step:
+            name: Generic compilation
+            script: &compile
+                - make clean
+                - make lib libdynamiccorrection tests
+                - cd examples/posix
+                - make clean
+                - make nosdl
+
 pipelines:
     default:
         - parallel:
             - step:
                 name: GCC 7 compilation
                 image: gcc:7
-                script:
-                    - apt-get update && apt-get -y install libsdl2-dev
-                    - make clean
-                    - make lib tests
-                    - cd examples/posix
-                    - make clean
-                    - make
+                script: *compile
             - step:
                 name: GCC 8 compilation
                 image: gcc:8
-                script:
-                    - apt-get update && apt-get -y install libsdl2-dev
-                    - make clean
-                    - make lib tests
-                    - cd examples/posix
-                    - make clean
-                    - make
+                script: *compile
             - step:
                 name: GCC 9 compilation
                 image: gcc:9
-                script:
-                    - apt-get update && apt-get -y install libsdl2-dev
-                    - make clean
-                    - make lib tests
-                    - cd examples/posix
-                    - make clean
-                    - make
+                script: *compile
             - step:
                 name: GCC 10 compilation
                 image: gcc:10
-                script:
-                    - apt-get update && apt-get -y install libsdl2-dev
-                    - make clean
-                    - make lib tests
-                    - cd examples/posix
-                    - make clean
-                    - make
+                script: *compile
             - step:
                 name: GCC 11 compilation
                 image: gcc:11
+                script: *compile
+
+            # To save time, and to avoid the need to reconfigure APT to pull
+            # from the Debian Archives on the older images, we'll only build
+            # the SDL example on the latest version of GCC.
+            - step:
+                name: SDL example compilation
+                image: gcc:15
                 script:
                     - apt-get update && apt-get -y install libsdl2-dev
-                    - make clean
-                    - make lib tests
+                    - make lib
                     - cd examples/posix
-                    - make clean
-                    - make
+                    - make posix-stream-sdl
 
             # To save time, and under the assumption that the quality and
             # relevance of scan-build findings will only improve over time,
