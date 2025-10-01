@@ -14,23 +14,23 @@ pipelines:
         - parallel:
             - step:
                 name: GCC 7 compilation
-                image: gcc:7
+                image: docker.io/library/gcc:7
                 script: *compile
             - step:
                 name: GCC 8 compilation
-                image: gcc:8
+                image: docker.io/library/gcc:8
                 script: *compile
             - step:
                 name: GCC 9 compilation
-                image: gcc:9
+                image: docker.io/library/gcc:9
                 script: *compile
             - step:
                 name: GCC 10 compilation
-                image: gcc:10
+                image: docker.io/library/gcc:10
                 script: *compile
             - step:
                 name: GCC 11 compilation
-                image: gcc:11
+                image: docker.io/library/gcc:11
                 script: *compile
 
             # To save time, and to avoid the need to reconfigure APT to pull
@@ -38,7 +38,7 @@ pipelines:
             # the SDL example on the latest version of GCC.
             - step:
                 name: SDL example compilation
-                image: gcc:15
+                image: docker.io/library/gcc:15
                 script:
                     - apt-get update && apt-get -y install libsdl2-dev
                     - make lib
@@ -51,7 +51,7 @@ pipelines:
             # Clang.
             - step:
                 name: Clang 12 compilation and static analysis
-                image: silkeh/clang:12
+                image: docker.io/silkeh/clang:12
                 script:
                     - apt-get update && apt-get -y install libsdl2-dev
                     - export CC=clang CCC_CC=clang
@@ -64,7 +64,7 @@ pipelines:
 
             - step:
                 name: Documentation compilation
-                image: gcc:11
+                image: docker.io/library/gcc:11
                 script:
                     - apt-get update && apt-get -y install doxygen graphviz
                     - make clean
