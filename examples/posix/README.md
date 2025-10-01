@@ -30,7 +30,7 @@ make: Leaving directory '/path/to/librbr'
 ~~~
 
 To build examples,
-invoke one of two Make targets:
+invoke one of three Make targets:
 
 * To build all examples,
   invoke the default target, aka “all”:
@@ -38,6 +38,13 @@ invoke one of two Make targets:
   ~~~{.sh}
   $ make
   $ make all
+  ~~~
+
+* To build examples that do not depend on SDL,
+  invoke the “nosdl” target:
+
+  ~~~{.sh}
+  $ make nosdl
   ~~~
 
 * To build examples that do not depend on dynamic memory allocation,

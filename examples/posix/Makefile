@@ -6,40 +6,35 @@ CFLAGS := -I../../include \
           -pedantic-errors \
           -Wwrite-strings \
           -std=c99 \
-          -g 
+          -g
 LDFLAGS := -L../../bin
 LDLIBS := -lRBR -lm
 
-all: exampledynamiccorrection example
+ALWAYS_EXAMPLES := \
+    posix-download \
+    posix-download-wifi \
+    posix-fetch \
+    posix-parse-download \
+    posix-parse-download-dataset \
+    posix-parse-file \
+    posix-parse-file-dynamiccorrection \
+    posix-pauseresume \
+    posix-postprocessing \
+    posix-stream
+
+SDL_EXAMPLES := \
+    posix-stream-sdl
+
+DYNAMICCORRECTION_EXAMPLES := \
+    posix-parse-file-dynamiccorrection \
+    posix-stream-dynamiccorrection
+
+all: $(ALWAYS_EXAMPLES) $(SDL_EXAMPLES) $(DYNAMICCORRECTION_EXAMPLES)
+
+nosdl: $(ALWAYS_EXAMPLES) $(DYNAMICCORRECTION_EXAMPLES)
 
 nomalloc: CFLAGS += -DRBR_LIB_NODYNAMICMEMORYALLOCATION
-nomalloc: exampledynamiccorrection examplenomalloc
-
-example: posix-download \
-         posix-download-wifi \
-         posix-fetch \
-         posix-parse-download \
-         posix-parse-download-dataset \
-         posix-parse-file \
-         posix-parse-file-dynamiccorrection \
-         posix-postprocessing \
-         posix-pauseresume \
-         posix-stream \
-         posix-stream-sdl \
-
-examplenomalloc: posix-download \
-         posix-download-wifi \
-         posix-fetch \
-         posix-parse-download \
-         posix-parse-download-dataset \
-         posix-parse-file \
-         posix-parse-file-dynamiccorrection \
-         posix-postprocessing \
-         posix-pauseresume \
-         posix-stream
-
-exampledynamiccorrection: posix-parse-file-dynamiccorrection \
-           posix-stream-dynamiccorrection \
+nomalloc: $(ALWAYS_EXAMPLES) $(DYNAMICCORRECTION_EXAMPLES)
 
 posix-download: posix-shared.o posix-download.o ../../bin/libRBR.a
 
@@ -55,9 +50,9 @@ posix-parse-file: posix-shared.o posix-parse-file.o ../../bin/libRBR.a
 
 posix-parse-file-dynamiccorrection: posix-shared.o posix-parse-file-dynamiccorrection.o ../../bin/libRBR.a ../../bin/libRBRDynamicCorrection.a
 
-posix-postprocessing: posix-shared.o posix-postprocessing.o ../../bin/libRBR.a
+posix-pauseresume: posix-shared.o posix-pauseresume.o ../../bin/libRBR.a
 
-posix-pauseresume: posix-shared.o posix-pauseresume.o ../../bin/libRBR.a 
+posix-postprocessing: posix-shared.o posix-postprocessing.o ../../bin/libRBR.a
 
 posix-stream: posix-shared.o posix-stream.o ../../bin/libRBR.a
 
@@ -70,15 +65,6 @@ posix-stream-sdl: posix-shared.o posix-stream-sdl.o ../../bin/libRBR.a
 clean:
 	rm -Rf \
 		*.o \
-		posix-download \
-		posix-download-wifi \
-		posix-fetch \
-		posix-parse-download \
-        posix-parse-download-dataset \
-		posix-parse-file \
-		posix-parse-file-dynamiccorrection \
-		posix-postprocessing \
-        posix-pauseresume \
-		posix-stream \
-		posix-stream-dynamiccorrection \
-		posix-stream-sdl
+		$(ALWAYS_EXAMPLES) \
+		$(SDL_EXAMPLES) \
+		$(DYNAMICCORRECTION_EXAMPLES)

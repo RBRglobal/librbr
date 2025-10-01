@@ -6,8 +6,8 @@ posix-parse-download
 posix-parse-download-dataset
 posix-parse-file
 posix-parse-file-dynamiccorrection
-posix-postprocessing
 posix-pauseresume
+posix-postprocessing
 posix-stream
 posix-stream-dynamiccorrection
 posix-stream-sdl
