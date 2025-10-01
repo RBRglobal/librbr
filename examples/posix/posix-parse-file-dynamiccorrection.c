@@ -78,7 +78,7 @@ RBRInstrumentError parserSample(
     /* The channels to be defined in the following order (for this example) */
     /* channel id from 1 to 4 corresponds to C(mS/cm), T meas(°C), P meas(dbar), T cond(°C) */
     /* here the P meas means sea pressure */
-    meas.timestamp = (sample->timestamp - g_timeReference) / 1000.0f;
+    meas.timestamp = sample->timestamp - g_timeReference; //in millisecond
     meas.conductivity = sample->readings[CHANNEL_COND - 1];
     meas.marineTemperature = sample->readings[CHANNEL_T_MEAS - 1];
     meas.pressure = sample->readings[CHANNEL_P_MEAS - 1];
@@ -100,10 +100,10 @@ RBRInstrumentError parserSample(
         corrResult.corrTemperature = NAN;
         corrResult.corrSalinity = NAN;
     }
-    
+
     /* report the result. here pressure is sea pressure*/
     printf("%.3f, %.8f, %.8f, %.8f, %.8f\n",
-            corrResult.timestamp,
+            (double)(corrResult.timestamp/1000.0), //print in second.
             corrResult.corrTemperature,
             corrResult.pressure,
             corrResult.corrSalinity,
@@ -232,7 +232,7 @@ int main(int argc, char *argv[])
         RBRParser_parse(parser,
                         RBRINSTRUMENT_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
-                        &parsedSize);
+                        &parsedSize); //parserSample() gets called and prints the sample.
         bufSize -= parsedSize;
         memmove(buf, buf + parsedSize, bufSize);
     }

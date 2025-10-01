@@ -84,7 +84,7 @@ RBRInstrumentError streamCTD(RBRInstrument *instrument, int dynamicCorrection_ch
 
         /* we already pre-validated the channels to be
          * defined in the following order */
-        meas->timestamp = (g_sample.timestamp - g_timeReference) / 1000.0f;
+        meas->timestamp = g_sample.timestamp - g_timeReference; //in millisecond
         meas->conductivity = g_sample.readings[dynamicCorrection_channel[0]];
         meas->marineTemperature = g_sample.readings[dynamicCorrection_channel[1]];
         meas->pressure = g_sample.readings[dynamicCorrection_channel[2]]-isAbsolute*_AbsP_To_SeaP;
@@ -137,7 +137,7 @@ RBRInstrumentError applyCorrection(RBRInstrument *instrument, int dynamicCorrect
 
         /* report the result */
         printf("timestamp(s) | T_cor(°C) | P_meas(sea pressure, dbar) | S_cor(PSU) | T_cond(°C): %.3f, %.8f, %.8f, %.8f, %.8f\n", 
-                corrResult.timestamp,
+                (double)(corrResult.timestamp/1000.0),
                 corrResult.corrTemperature,
                 corrResult.pressure,
                 corrResult.corrSalinity,
@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
 
 
     RBRInstrumentCallbacks callbacks = {
-        .time = instrumentTime,
+        .time = instrumentTime, //in millisecond
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite,

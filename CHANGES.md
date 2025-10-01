@@ -1,12 +1,32 @@
 # Changes
 
-## v1.2.4
-Released TBD
+## v1.2.5
+
+Release TBD
 
 ### Changed
 
 * added support for no dynamic memory allocation.
 * fixed bug where wake up sequence not occuring after RBRInstrument_fetch() usage.
+
+## v1.2.4
+
+Released 2025-04-07
+
+### Added
+
+* fixed timestamp datatype in dynamiccorrection algorithm (RBRDynamicCorrection.c and .h files) so that they can batter span long periods without trancation /rounding errors.
+* fixed the timestamp comparision logic in dynamiccorrection algorithm (RBRDynamicCorrection.c and .h files) so that pressure velocity calculation starts with the second sample.
+
+### Changed
+
+* changed _isFasterSampling in dynamiccorrection algorithm to cached value to improve performance.
+* changed pressure velocity calculation in dynamiccorrection algorithm for one path with no unused calculation to improve performance.
+* changed calculation of RBRDynamicCorrectionParams in dynamiccorrection algorithm to eliminate duplicate conversions to improve performance.
+
+### Removed
+
+* Removed support for gcc6 compilation in pipeline due to Jessie(Debian 8) EOL (jessie/main amd64 Packages not found in http://deb.debian.org, which blocks installation of libsdl2-dev).
 
 ## v1.2.3
 

@@ -274,7 +274,7 @@ static RBRInstrumentError RBRParser_parseEPSamples(
 
         if (parser->callbacks.sample != NULL)
         {
-            RBR_TRY(parser->callbacks.sample(parser, sample));
+            RBR_TRY(parser->callbacks.sample(parser, sample)); //calls the parser-> callback.sample function.
         }
     }
 

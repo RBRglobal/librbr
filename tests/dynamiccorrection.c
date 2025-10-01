@@ -10,6 +10,7 @@
 
 #include "tests.h"
 #include <stdlib.h>
+#include <math.h>
 
 
 #define TEST_DYNCORR_DATASET_SIZE    7
@@ -17,7 +18,7 @@
 /* declaration of private functions */
 float RBRDynamicCorrection_PSS78(float C, float T, float P);
 
-float RBRDynamicCorrection_calcAscentRate(RBRDynamicCorrectionParams *params, float timestamp, float pressure);
+float RBRDynamicCorrection_calcAscentRate(RBRDynamicCorrectionParams *params, int64_t timestamp, float pressure);
 
 void RBRDynamicCorrection_updateVariables(RBRDynamicCorrectionParams *params, float Vp);
 
@@ -58,7 +59,7 @@ static bool test_verify_ascent_rate(void)
 {
     RBRDynamicCorrectionParams params;
     float pressure;
-    float t;
+    int64_t t;
     float Vp;
     float noise;
 
@@ -68,38 +69,40 @@ static bool test_verify_ascent_rate(void)
     params._lastPressure = -1.0f;
     params._lastPressureTime = -1.0f;
     params._ascentRate = (float)(0.0f/0.0f); // NAN macro may be not exist
+
+    int64_t step = (int64_t)llround(params.Fs *1000);
     
     /* seed for random number, allow repeatable test*/
     srand(1234);
 
-    for ( t = 0.0f; t < 600.0f; t += params.Fs )
+    for ( t = 0; t < 600000; t += step )
     {
         /* the C rand() isn't really good random source,
          * (but for a unit test, it will be okay) */
         noise = 0.1f*(rand() / (float)RAND_MAX) - 0.1f;
-        if ( t < 60.0f )
+        if ( t < 60000 )
         {
-            pressure = 3000.0f - 0.05f*t + noise;
+            pressure = 3000.0f - 0.05f*(t/1000.f) + noise;
         }
-        else if ( t > 120.0f && t < 133.0f )
+        else if ( t > 120000 && t < 133000 )
         {
             pressure = (float)(0.0f/0.0f);  // force a sequence of NAN
         }
-        else if ( t == 700.0f )
+        else if ( t == 700000 )
         {
             pressure = (float)(0.0f/0.0f);  // force a single NAN
         }
         else
         {
-            pressure = (3000.0f - 3.0f) - 0.1f*(t-60.0f) + noise;
+            pressure = (3000.0f - 3.0f) - 0.1f*((t-60000)/1000.0f) + noise;
         }
         
-        Vp = RBRDynamicCorrection_calcAscentRate(&params, t + 9000.0f, pressure);
+        Vp = RBRDynamicCorrection_calcAscentRate(&params, t + 9000000, pressure);
 
         /* since the filter is dynamic, it is difficult to make
         * a condition for each time step.  In this case, just wait until
         * the filter is stable (600s, filter bandwidth is 100s) */
-        if ( t >= 300.0f )
+        if ( t >= 300000 )
         {
             TEST_ASSERT_FLOAT_EQ(Vp, 0.1f, 1e-2f);
         }
@@ -162,7 +165,7 @@ static bool test_dynamic_correction(float *dataset, float Fs)
 
     while ( datasetPtr[0] >= 0.0f )
     {
-        measIn.timestamp = datasetPtr[0];
+        measIn.timestamp = (int64_t)llround(datasetPtr[0]*1000.0); //time in millisecond
         measIn.conductivity = datasetPtr[1];
         measIn.marineTemperature = datasetPtr[2];
         measIn.pressure = datasetPtr[3];

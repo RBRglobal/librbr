@@ -39,7 +39,7 @@
 typedef struct
 {
     int size;
-    double timestamp_sec[MAX_CSV_SIZE];
+    double timestamp_sec[MAX_CSV_SIZE]; //time in second
     float P_meas[MAX_CSV_SIZE]; //P_meas is sea pressure.
     float T_meas[MAX_CSV_SIZE];
     float C_meas[MAX_CSV_SIZE];
@@ -75,7 +75,7 @@ void RBRDynamicCorrection_replayData(FILE *file, csvData_t *data, float Fs)
     for (index = 0; index < data->size; index++)
     {
         /* input to algorithm */
-        meas.timestamp = data->timestamp_sec[index];
+        meas.timestamp = (int64_t)llround(data->timestamp_sec[index]*1000.0); //time in millisecond
         meas.conductivity = data->C_meas[index];
         meas.marineTemperature = data->T_meas[index];
         meas.condTemperature = data->T_cond[index];
@@ -100,7 +100,7 @@ void RBRDynamicCorrection_replayData(FILE *file, csvData_t *data, float Fs)
         }
         /* here the pressure is sea pressure */
         fprintf(file, "%.3f, %.8f, %.8f, %.8f, %.8f\n", 
-                corrResult.timestamp,
+                (double)(corrResult.timestamp)/1000.0, //maintain output time as second
                 corrResult.corrTemperature,
                 corrResult.pressure,
                 corrResult.corrSalinity,
@@ -162,7 +162,13 @@ int RBRDynamicCorrection_parseCsv(const char *filename, csvData_t *data)
                 entry[len-1] = '\0';
             }
 
-            value = atof(entry);
+            if(strstr(entry, "Error-")){
+                char *error_number = entry +6;
+                value = nan(error_number);
+            }
+            else{
+                value = strtod(entry,NULL);
+            }
             
             /*as mentioned, assuming column 0->4 corresponds to timestamp_sec, C_meas, T_meas, P_meas, T_cond
              *here the P_meas is sea pressure */
@@ -247,8 +253,8 @@ int main(int argc, char *argv[])
     }
 
 
-    strncpy(filename, argv[1], MAX_LINE_SIZE-1);
-    filename[MAX_LINE_SIZE-1] = '\0';
+    strncpy(filename, argv[1], sizeof(filename) - 1);
+    filename[sizeof(filename) - 1] = '\0';
 
     if ( RBRDynamicCorrection_parseCsv(filename, &data) < 0 )
     {
@@ -267,7 +273,12 @@ int main(int argc, char *argv[])
     if (file != NULL)
     {
         /* discover sampling rate using first two row of the data */
-        Fs = 1.0f / (data.timestamp_sec[1] - data.timestamp_sec[0]);
+        double deltaT = data.timestamp_sec[1] - data.timestamp_sec[0];
+        /* when sampling rate is 16Hz, 63 is specified instead of 62 */
+        if (fabs(deltaT - 0.062)< 1e-6){
+            deltaT = 0.063;
+        }
+        Fs = 1.0f / deltaT;
         printf("sampling rate is %.3f\n", Fs);
 
         printf("Correction written to %s\n", filenameOut);
