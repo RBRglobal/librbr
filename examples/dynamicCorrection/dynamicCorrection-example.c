@@ -220,7 +220,7 @@ int RBRDynamicCorrection_parseCsv(const char *filename, csvData_t *data)
     return EXIT_SUCCESS;
 }
 
-void usage()
+void usage(void)
 {
     printf("usage: <path>/dynamicCorrection-example <path_to_.csv_file>\r\n");
     printf("       %s\r\n","e.g: ./dynamicCorrection-example ../sampledata/dynamiccorrection-sample.csv");

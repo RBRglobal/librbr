@@ -54,7 +54,7 @@ static bool test_verify_pss78(Pss78Test *tests)
     return true;
 }
 
-static bool test_verify_ascent_rate()
+static bool test_verify_ascent_rate(void)
 {
     RBRDynamicCorrectionParams params;
     float pressure;

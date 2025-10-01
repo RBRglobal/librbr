@@ -88,7 +88,7 @@ RBRInstrumentError instrumentSample(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-static void recalculatePoints()
+static void recalculatePoints(void)
 {
     int width;
     int height;

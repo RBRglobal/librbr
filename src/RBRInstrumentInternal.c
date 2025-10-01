@@ -1104,7 +1104,7 @@ RBRInstrumentError RBRInstrument_getInt(RBRInstrument *instrument,
 }
 
 /** \brief Ensure localTimeOffset is initialized. */
-static inline void RBRInstrumentDateTime_initializeOffset()
+static inline void RBRInstrumentDateTime_initializeOffset(void)
 {
     if (localTimeOffset == OFFSET_UNINITIALIZED)
     {

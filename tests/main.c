@@ -216,8 +216,11 @@ const char *bool_name(bool value)
     }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    (void) argc;
+    (void) argv;
+
     RBRInstrumentError err;
     TestIOBuffers ioBuffers;
     RBRInstrumentCallbacks instrumentCallbacks = {
