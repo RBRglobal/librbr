@@ -13,6 +13,10 @@ pipelines:
     default:
         - parallel:
             - step:
+                name: GCC 6 compilation
+                image: docker.io/library/gcc:6
+                script: *compile
+            - step:
                 name: GCC 7 compilation
                 image: docker.io/library/gcc:7
                 script: *compile
@@ -32,6 +36,22 @@ pipelines:
                 name: GCC 11 compilation
                 image: docker.io/library/gcc:11
                 script: *compile
+            - step:
+                name: GCC 12 compilation
+                image: docker.io/library/gcc:12
+                script: *compile
+            - step:
+                name: GCC 13 compilation
+                image: docker.io/library/gcc:13
+                script: *compile
+            - step:
+                name: GCC 14 compilation
+                image: docker.io/library/gcc:14
+                script: *compile
+            - step:
+                name: GCC 15 compilation
+                image: docker.io/library/gcc:15
+                script: *compile
 
             # To save time, and to avoid the need to reconfigure APT to pull
             # from the Debian Archives on the older images, we'll only build
@@ -50,8 +70,8 @@ pipelines:
             # we'll perform static analysis with only the latest version of
             # Clang.
             - step:
-                name: Clang 12 compilation and static analysis
-                image: docker.io/silkeh/clang:12
+                name: Clang 20 compilation and static analysis
+                image: docker.io/silkeh/clang:20
                 script:
                     - apt-get update && apt-get -y install libsdl2-dev
                     - export CC=clang CCC_CC=clang
@@ -64,7 +84,7 @@ pipelines:
 
             - step:
                 name: Documentation compilation
-                image: docker.io/library/gcc:11
+                image: docker.io/library/gcc:15
                 script:
                     - apt-get update && apt-get -y install doxygen graphviz
                     - make clean
