@@ -8,6 +8,8 @@ tests/tests.c
 *.o
 
 # Temporary/output files.
+compile_commands.json
+.cache/
 *~
 *.log
 

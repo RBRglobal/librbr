@@ -1,8 +1,15 @@
 # Changes
 
-## v1.2.5
+## v1.3.0
 
 Release TBD
+
+### Added
+
+* Added Zephyr module definition
+  permitting inclusion in a Zephyr workspace via [West].
+
+[West]: https://docs.zephyrproject.org/latest/develop/west/index.html
 
 ### Changed
 

@@ -1,0 +1,26 @@
+# Copyright (c) 2025 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+# This is what you'll need to put in your own west.yml to use libRBR in your
+# Zephyr workspace:
+
+manifest:
+  projects:
+    - name: librbr
+      url: https://bitbucket.org/rbr/librbr.git
+      revision: v1.3.0
+      path: modules/lib/librbr/
+
+# Everything after this point is specific to this example. You will probably
+# have something very similar in your own west.yml, but it doesn't need to be
+# this exactly.
+
+    - name: zephyr
+      url: https://github.com/zephyrproject-rtos/zephyr.git
+      revision: v4.2.0
+      import:
+        name-allowlist:
+          # Required for Cortex-M support.
+          - cmsis_6
+          # Required for STM32 support.
+          - hal_stm32

@@ -65,6 +65,30 @@ pipelines:
                     - cd examples/posix
                     - make posix-stream-sdl
 
+            - step:
+                name: Zephyr example compilation
+                image: ghcr.io/zephyrproject-rtos/ci:main
+                script:
+                    - cd examples/zephyr/
+                    # We're in the unique position of trying to use a consume
+                    # this repository as a West module from a West manifest
+                    # stored within this repository. We'll rewrite the manifest
+                    # so that West pulls in the expected commit.
+                    - 'sed --in-place "0,/revision: .*/ { s//revision: $BITBUCKET_COMMIT/ }" application/west.yml'
+                    - west init --local application/
+                    - west update
+                    - cd application/
+                    - >-
+                        boards=$(ls -1 boards/ | cut --delimiter . --field 1 | sort | uniq);
+                        for board in $boards;
+                        do
+                            west build \
+                                --board=$board \
+                                --build-dir=build-$board/ \
+                                -- \
+                                -DEXTRA_CONF_FILE=debug.conf;
+                        done
+
             # To save time, and under the assumption that the quality and
             # relevance of scan-build findings will only improve over time,
             # we'll perform static analysis with only the latest version of

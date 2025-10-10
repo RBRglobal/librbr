@@ -1,0 +1,7 @@
+# Zephyr source and modules.
+.west/
+modules/
+zephyr/
+
+# Generated artifacts.
+build*/
