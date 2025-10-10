@@ -8,6 +8,11 @@ Release TBD
 
 * added support for no dynamic memory allocation.
 * fixed bug where wake up sequence not occuring after RBRInstrument_fetch() usage.
+* Updated CI targets:
+  reintroduced GCC 6;
+  added GCC 12–15;
+  updated to Clang 20;
+  updated documentation step to GCC 15.
 
 ## v1.2.4
 
