@@ -1,0 +1,51 @@
+# Copyright (c) 2025 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+config LIBRBR
+    bool "libRBR RBR instrument communication library"
+    default n
+    help
+        Enable the libRBR library for communication with RBR instruments.
+
+if LIBRBR
+
+# The following settings are reproduced from RBRInstrument.h. See
+# CMakeLists.txt for the Kconfig-to-precompiler-macro bindings.
+
+config RBRINSTRUMENT_COMMAND_BUFFER_MAX
+    int "The size of the buffer storing commands destined for the instrument."
+    default 120
+    help
+        Must be large enough to hold the largest command you will want to send
+        to the instrument plus the trailing line termination (`\r\n\0`).
+
+        A buffer of this size is included in RBRInstrument. Whether you let
+        RBRInstrument_open() perform its own allocation or you perform your own
+        allocation based on `sizeof(RBRInstrument)`, a buffer of this size is
+        included.
+
+config RBRINSTRUMENT_RESPONSE_BUFFER_MAX
+    int "The size of the buffer storing instrument responses."
+    default 1024
+    help
+        Must be large enough to hold the largest command response you will want
+        to receive. This does not include download data, which is read directly
+        into a user-managed buffer.
+
+        A buffer of this size is included in RBRInstrument. Whether you let
+        RBRInstrument_open() perform its own allocation or you perform your own
+        allocation based on `sizeof(RBRInstrument)`, a buffer of this size is
+        included.
+
+config RBRINSTRUMENT_CHANNEL_MAX
+    int "The maximum number of channels present on an instrument."
+    default 32
+    help
+        The default maximum of 32 channels is reflective of the maximum number
+        of channels supported by RBR instruments, but most instruments have far
+        fewer. Adjusting this value will dramatically affect the size of some
+        structures; notably RBRInstrumentSample, but also RBRInstrumentChannels
+        (used by RBRInstrument_getChannels()) and RBRInstrumentChannelsList
+        (used by RBRInstrument_getChannelsList()).
+
+endif # LIBRBR
