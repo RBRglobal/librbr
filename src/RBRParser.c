@@ -266,6 +266,7 @@ static RBRInstrumentError RBRParser_parseEPSamples(
         for (int32_t channel = 0; channel < channels; ++channel)
         {
             sample->readings[channel] =
+                (double)
                 *(float *) (data
                             + *size
                             + EP_SAMPLE_TIMESTAMP_SIZE

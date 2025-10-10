@@ -276,7 +276,7 @@ RBRInstrumentError RBRInstrument_readData(RBRInstrument *instrument,
     if(workingData.offset !=data->offset){
         return RBRINSTRUMENT_COMMUNICATION_ERROR;
     }
-    
+
     /* Fill the user-provided buffer. RBRInstrument_fixedRead() will first pull
      * leftover data from RBRInstrument.responseBuffer, then read from the
      * instrument. */
@@ -784,7 +784,7 @@ RBRInstrumentError RBRInstrument_setPostprocessing(
         "postprocessing binreference = %s, binfilter = %s, binsize = %.1f",
         postprocessing->binReference,
         RBRInstrumentPostprocessingBinFilter_name(postprocessing->binFilter),
-        postprocessing->binSize));
+        (double) postprocessing->binSize));
 
     char tstamp[RBRINSTRUMENT_SCHEDULE_TIME_LEN + 1];
 
@@ -803,8 +803,8 @@ RBRInstrumentError RBRInstrument_setPostprocessing(
     RBR_TRY(RBRInstrument_converse(
         instrument,
         "postprocessing depth_min = %.1f, depth_max = %.1f",
-        postprocessing->depthMin,
-        postprocessing->depthMax));
+        (double) postprocessing->depthMin,
+        (double) postprocessing->depthMax));
 
     /* on-board dynamic correction only available for firmware 1.134 and above */
     if ( instrument->id.fwtype == 104 && RBRInstrumentVersion_compare(instrument->id.version, "1.134") >= 0 )
@@ -812,10 +812,10 @@ RBRInstrumentError RBRInstrument_setPostprocessing(
        RBR_TRY(RBRInstrument_converse(
             instrument,
             "postprocessing dc_alpha = %.3f, dc_tau = %.3f, dc_tdelay = %.3f, dc_ctcoeff = %.4e",
-            postprocessing->dcAlpha,
-            postprocessing->dcTau,
-            postprocessing->dcTdelay,
-            postprocessing->dcCtCoeff));
+            (double) postprocessing->dcAlpha,
+            (double) postprocessing->dcTau,
+            (double) postprocessing->dcTdelay,
+            (double) postprocessing->dcCtCoeff));
     }
 
     char *commandBuffer = (char *) instrument->commandBuffer;

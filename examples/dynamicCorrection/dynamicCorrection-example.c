@@ -99,12 +99,13 @@ void RBRDynamicCorrection_replayData(FILE *file, csvData_t *data, float Fs)
             corrResult.corrSalinity = NAN;
         }
         /* here the pressure is sea pressure */
-        fprintf(file, "%.3f, %.8f, %.8f, %.8f, %.8f\n", 
-                (double)(corrResult.timestamp)/1000.0, //maintain output time as second
-                corrResult.corrTemperature,
-                corrResult.pressure,
-                corrResult.corrSalinity,
-                meas.condTemperature);
+        fprintf(file, "%.3f, %.8f, %.8f, %.8f, %.8f\n",
+                // maintain output time as second
+                (double) corrResult.timestamp / 1000.0,
+                (double) corrResult.corrTemperature,
+                (double) corrResult.pressure,
+                (double) corrResult.corrSalinity,
+                (double) meas.condTemperature);
     }
 }
 
@@ -278,8 +279,8 @@ int main(int argc, char *argv[])
         if (fabs(deltaT - 0.062)< 1e-6){
             deltaT = 0.063;
         }
-        Fs = 1.0f / deltaT;
-        printf("sampling rate is %.3f\n", Fs);
+        Fs = (float) (1.0 / deltaT);
+        printf("sampling rate is %.3f\n", (double) Fs);
 
         printf("Correction written to %s\n", filenameOut);
         RBRDynamicCorrection_replayData(file, &data, Fs);

@@ -39,9 +39,9 @@ static bool test_clock(RBRInstrument *instrument,
         }
         else
         {
-            TEST_ASSERT_EQ(tests[i].expected.offsetFromUtc,
-                           actual.offsetFromUtc,
-                           "%f");
+            TEST_ASSERT_FLOAT_EQ(tests[i].expected.offsetFromUtc,
+                                 actual.offsetFromUtc,
+                                 0.0f);
         }
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
     }

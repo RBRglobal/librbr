@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     RBRInstrument_getMemoryInfo(instrument, &meminfo);
     printf("Dataset %s is %0.2f%% full (%" PRIi32 "B used).\n",
            RBRInstrumentDataset_name(meminfo.dataset),
-           ((float) meminfo.used) / meminfo.size * 100,
+           ((double) meminfo.used) / meminfo.size * 100,
            meminfo.used);
 
     if (meminfo.used == 0)

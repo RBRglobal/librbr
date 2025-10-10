@@ -96,8 +96,8 @@ extern "C" {
                    " expected %f ; actual %f",  \
                    __FILE__, \
                    __LINE__, \
-                   _expected, \
-                   _actual); \
+                   (double) _expected, \
+                   (double) _actual); \
             return false; \
         } \
 } while (0)

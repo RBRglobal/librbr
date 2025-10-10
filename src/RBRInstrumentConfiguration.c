@@ -377,7 +377,7 @@ RBRInstrumentError RBRInstrument_setChannelGain(
         return RBRInstrument_converse(instrument,
                                       "channel %d gain = %0.1f",
                                       channel,
-                                      gain->currentGain);
+                                      (double) gain->currentGain);
     }
     else if (gain->rangingMode == RBRINSTRUMENT_RANGING_AUTO)
     {
@@ -413,7 +413,7 @@ RBRInstrumentError RBRInstrument_setCalibration(
                                        calibrationDateTime,
                                        'c',
                                        c,
-                                       calibration->c[c]));
+                                       (double) calibration->c[c]));
     }
     for (int32_t x = 0;
          x < RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX
@@ -426,7 +426,7 @@ RBRInstrumentError RBRInstrument_setCalibration(
                                        calibrationDateTime,
                                        'x',
                                        x,
-                                       calibration->x[x]));
+                                       (double) calibration->x[x]));
     }
 
     return RBRINSTRUMENT_SUCCESS;
@@ -580,7 +580,7 @@ RBRInstrumentError RBRInstrument_setValueSetting(
     RBR_TRY(RBRInstrument_converse(instrument,
                                    "settings %s = %f",
                                    RBRInstrumentValueSetting_name(setting),
-                                   value));
+                                   (double) value));
     return RBRINSTRUMENT_SUCCESS;
 }
 

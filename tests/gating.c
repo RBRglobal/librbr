@@ -43,7 +43,7 @@ static bool test_thresholding(RBRInstrument *instrument,
         TEST_ASSERT_ENUM_EQ(tests[i].expected.condition,
                             actual.condition,
                             RBRInstrumentThresholdingCondition);
-        TEST_ASSERT_EQ(tests[i].expected.value, actual.value, "%f");
+        TEST_ASSERT_FLOAT_EQ(tests[i].expected.value, actual.value, 0.0f);
         TEST_ASSERT_EQ(tests[i].expected.interval,
                        actual.interval,
                        "%" PRIi32);

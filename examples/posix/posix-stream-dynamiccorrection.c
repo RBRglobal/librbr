@@ -137,11 +137,11 @@ RBRInstrumentError applyCorrection(RBRInstrument *instrument, int dynamicCorrect
 
         /* report the result */
         printf("timestamp(s) | T_cor(°C) | P_meas(sea pressure, dbar) | S_cor(PSU) | T_cond(°C): %.3f, %.8f, %.8f, %.8f, %.8f\n", 
-                (double)(corrResult.timestamp/1000.0),
-                corrResult.corrTemperature,
-                corrResult.pressure,
-                corrResult.corrSalinity,
-                meas.condTemperature);
+                (double) corrResult.timestamp / 1000.0,
+                (double) corrResult.corrTemperature,
+                (double) corrResult.pressure,
+                (double) corrResult.corrSalinity,
+                (double) meas.condTemperature);
     }
 
     return RBRINSTRUMENT_SUCCESS;
@@ -357,7 +357,7 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
     /* sampling.period is in ms, samplingRate is in Hz */
-    float samplingRate = 1000.0 / (float)sampling.period;
+    float samplingRate = 1000.0f / (float) sampling.period;
 
     if(isCtd == true) {
         err = applyCorrection(instrument, dynamicCorrection_channel, _flagAbsP, samplingRate);

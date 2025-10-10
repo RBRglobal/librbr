@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     RBRInstrument_getMemoryInfo(instrument, &meminfo);
     printf("Dataset %s is %0.2f%% full (%" PRIi32 "B used).\n",
            RBRInstrumentDataset_name(meminfo.dataset),
-           ((float) meminfo.used) / meminfo.size * 100,
+           ((double) meminfo.used) / meminfo.size * 100,
            meminfo.used);
 
     RBRInstrumentMemoryFormat memformat;
@@ -216,7 +216,7 @@ int main(int argc, char *argv[])
 
         printf("\r%0.2f%% (%" PRIi32 "B/%" PRIi32 "B; %0.3fs elapsed; "
                "%0.3fB/s)",
-               (((float) data.offset) / meminfo.used) * 100,
+               (((double) data.offset) / meminfo.used) * 100,
                data.offset,
                meminfo.used,
                elapsed,

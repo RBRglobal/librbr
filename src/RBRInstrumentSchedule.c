@@ -158,7 +158,7 @@ static RBRInstrumentError RBRInstrument_setClockL2(
     RBRInstrumentError err;
     err = RBRInstrument_converse(instrument,
                                  "settings offsetfromutc = %02f",
-                                 offsetFromUtc);
+                                 (double) offsetFromUtc);
     /* Older Logger2 firmware didn't support the `offsetfromutc` setting,
      * so it will indicate an error when we go looking for it. Just swallow
      * the error and move on to setting the time. */
@@ -180,7 +180,7 @@ static RBRInstrumentError RBRInstrument_setClockL3(
             instrument,
             "clock datetime = %s, offsetfromutc = %02f",
             dateTime,
-            offsetFromUtc);
+            (double) offsetFromUtc);
     }
     else
     {
