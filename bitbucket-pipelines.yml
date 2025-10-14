@@ -3,6 +3,7 @@ definitions:
         - step:
             name: Generic compilation
             script: &compile
+                - export MAKEFLAGS=--jobs=$(nproc)
                 - make clean
                 - make lib libdynamiccorrection tests
                 - cd examples/posix
@@ -61,6 +62,7 @@ pipelines:
                 image: docker.io/library/gcc:15
                 script:
                     - apt-get update && apt-get -y install libsdl2-dev
+                    - export MAKEFLAGS=--jobs=$(nproc)
                     - make lib
                     - cd examples/posix
                     - make posix-stream-sdl
@@ -98,7 +100,7 @@ pipelines:
                 image: docker.io/silkeh/clang:20
                 script:
                     - apt-get update && apt-get -y install libsdl2-dev
-                    - export CC=clang CCC_CC=clang
+                    - export CC=clang CCC_CC=clang MAKEFLAGS=--jobs=$(nproc)
                     - make clean
                     - scan-build make lib libdynamiccorrection
                     - make tests

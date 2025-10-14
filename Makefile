@@ -103,6 +103,20 @@ libdynamiccorrection: bin/libRBRDynamicCorrection.a
 
 lib: bin/libRBR.a
 
+# Make archiving compatible with parallel builds (-j, --jobs).
+#
+# Based on “Dangers When Using Archives”:
+# https://www.gnu.org/software/make/manual/html_node/Archive-Pitfalls.html.
+#
+# Disable the default rule for updating a single archive object:
+(%): %;
+# Change the default rule for building an archive to replace all outdated
+# objects at once (and unlike the example in the GNU Make docs, filter for just
+# objects, and not any other files, so we don't try to stuff bin/ – which is
+# also a dependency of our archives – into the archive):
+%.a:
+	$(AR) $(ARFLAGS) $@ $(filter %o,$?)
+
 bin/libRBR.a: bin bin/libRBR.a(src/RBRInstrument.o \
                                src/RBRInstrumentCommunication.o \
                                src/RBRInstrumentConfiguration.o \
