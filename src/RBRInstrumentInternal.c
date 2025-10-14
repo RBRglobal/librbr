@@ -465,15 +465,15 @@ static RBRInstrumentError RBRInstrumentSample_parse(
 
         if (strcmp(token, SAMPLE_NAN) == 0)
         {
-            reading = NAN;
+            reading = nan("");
         }
         else if (strcmp(token, SAMPLE_INF) == 0)
         {
-            reading = INFINITY;
+            reading = HUGE_VAL;
         }
         else if (strcmp(token, SAMPLE_NINF) == 0)
         {
-            reading = -INFINITY;
+            reading = -HUGE_VAL;
         }
         else if (strcmp(token, SAMPLE_UNCAL) == 0)
         {

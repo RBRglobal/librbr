@@ -143,8 +143,12 @@ TEST_LOGGER3(regime)
         err = RBRInstrument_getRegime(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
         TEST_ASSERT_EQ(tests[i].expected.index, actual.index, "%" PRIi8);
-        TEST_ASSERT_EQ(tests[i].expected.boundary, actual.boundary, "%f");
-        TEST_ASSERT_EQ(tests[i].expected.binSize, actual.binSize, "%f");
+        TEST_ASSERT_FLOAT_EQ(tests[i].expected.boundary,
+                             actual.boundary,
+                             0.0f);
+        TEST_ASSERT_FLOAT_EQ(tests[i].expected.binSize,
+                             actual.binSize,
+                             0.0f);
         TEST_ASSERT_EQ(tests[i].expected.samplingPeriod,
                        actual.samplingPeriod,
                        "%" PRIi32);
@@ -233,12 +237,12 @@ TEST_LOGGER3(ddsampling)
         TEST_ASSERT_EQ(tests[i].expected.slowPeriod,
                        actual.slowPeriod,
                        "%" PRIi32);
-        TEST_ASSERT_EQ(tests[i].expected.fastThreshold,
-                       actual.fastThreshold,
-                       "%f");
-        TEST_ASSERT_EQ(tests[i].expected.slowThreshold,
-                       actual.slowThreshold,
-                       "%f");
+        TEST_ASSERT_FLOAT_EQ(tests[i].expected.fastThreshold,
+                             actual.fastThreshold,
+                             0.0f);
+        TEST_ASSERT_FLOAT_EQ(tests[i].expected.slowThreshold,
+                             actual.slowThreshold,
+                             0.0f);
     }
 
     return true;

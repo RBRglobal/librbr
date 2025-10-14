@@ -206,8 +206,8 @@ TEST_LOGGER2(powerstatus)
     TEST_ASSERT_ENUM_EQ(expected.source,
                         actual.source,
                         RBRInstrumentPowerSource);
-    TEST_ASSERT_EQ(expected.internal, actual.internal, "%f");
-    TEST_ASSERT_EQ(expected.external, actual.external, "%f");
+    TEST_ASSERT_FLOAT_EQ(expected.internal, actual.internal, 0.0f);
+    TEST_ASSERT_FLOAT_EQ(expected.external, actual.external, 0.0f);
     TEST_ASSERT(isnan(actual.regulator));
 
     return true;
@@ -232,8 +232,8 @@ TEST_LOGGER3(power)
     TEST_ASSERT_ENUM_EQ(expected.source,
                         actual.source,
                         RBRInstrumentPowerSource);
-    TEST_ASSERT_EQ(expected.internal, actual.internal, "%f");
-    TEST_ASSERT_EQ(expected.external, actual.external, "%f");
+    TEST_ASSERT_FLOAT_EQ(expected.internal, actual.internal, 0.0f);
+    TEST_ASSERT_FLOAT_EQ(expected.external, actual.external, 0.0f);
     TEST_ASSERT(isnan(actual.regulator));
 
     return true;
@@ -269,8 +269,8 @@ TEST_LOGGER3(powerinternal)
     TEST_ASSERT_ENUM_EQ(expected.batteryType,
                         actual.batteryType,
                         RBRInstrumentInternalBatteryType);
-    TEST_ASSERT_EQ(expected.capacity, actual.capacity, "%f");
-    TEST_ASSERT_EQ(expected.used, actual.used, "%f");
+    TEST_ASSERT_FLOAT_EQ(expected.capacity, actual.capacity, 0.0f);
+    TEST_ASSERT_FLOAT_EQ(expected.used, actual.used, 0.0f);
 
     return true;
 }
@@ -305,8 +305,8 @@ TEST_LOGGER3(powerexternal)
     TEST_ASSERT_ENUM_EQ(expected.batteryType,
                         actual.batteryType,
                         RBRInstrumentExternalBatteryType);
-    TEST_ASSERT_EQ(expected.capacity, actual.capacity, "%f");
-    TEST_ASSERT_EQ(expected.used, actual.used, "%f");
+    TEST_ASSERT_FLOAT_EQ(expected.capacity, actual.capacity, 0.0f);
+    TEST_ASSERT_FLOAT_EQ(expected.used, actual.used, 0.0f);
 
     return true;
 }

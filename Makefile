@@ -87,6 +87,7 @@ CFLAGS := -Werror \
           -Wextra \
           -pedantic \
           -pedantic-errors \
+          -Wdouble-promotion \
           -Wwrite-strings \
           -std=c99 \
           -g

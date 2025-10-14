@@ -397,15 +397,15 @@ TEST_LOGGER3(postprocessing)
     TEST_ASSERT_ENUM_EQ(expected.binFilter,
                         actual.binFilter,
                         RBRInstrumentPostprocessingBinFilter);
-    TEST_ASSERT_EQ(expected.binSize, actual.binSize, "%f");
+    TEST_ASSERT_FLOAT_EQ(expected.binSize, actual.binSize, 0.0f);
     TEST_ASSERT_EQ(expected.tstampMin, actual.tstampMin, "%" PRIi64);
     TEST_ASSERT_EQ(expected.tstampMax, actual.tstampMax, "%" PRIi64);
-    TEST_ASSERT_EQ(expected.depthMin, actual.depthMin, "%f");
-    TEST_ASSERT_EQ(expected.depthMax, actual.depthMax, "%f");
-    TEST_ASSERT_EQ(expected.dcAlpha, actual.dcAlpha, "%f");
-    TEST_ASSERT_EQ(expected.dcTau, actual.dcTau, "%f");
-    TEST_ASSERT_EQ(expected.dcTdelay, actual.dcTdelay, "%f");
-    TEST_ASSERT_EQ(expected.dcCtCoeff, actual.dcCtCoeff, "%f");
+    TEST_ASSERT_FLOAT_EQ(expected.depthMin, actual.depthMin, 0.0f);
+    TEST_ASSERT_FLOAT_EQ(expected.depthMax, actual.depthMax, 0.0f);
+    TEST_ASSERT_FLOAT_EQ(expected.dcAlpha, actual.dcAlpha, 0.0f);
+    TEST_ASSERT_FLOAT_EQ(expected.dcTau, actual.dcTau, 0.0f);
+    TEST_ASSERT_FLOAT_EQ(expected.dcTdelay, actual.dcTdelay, 0.0f);
+    TEST_ASSERT_FLOAT_EQ(expected.dcCtCoeff, actual.dcCtCoeff, 0.0f);
     TEST_ASSERT_STR_EQ("postprocessing all" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
 

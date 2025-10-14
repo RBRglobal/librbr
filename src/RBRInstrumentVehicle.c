@@ -197,8 +197,8 @@ RBRInstrumentError RBRInstrument_setRegime(
         instrument,
         "regime %d boundary = %.0f, binsize = %0.1f, samplingperiod = %i",
         regime->index,
-        regime->boundary,
-        regime->binSize,
+        (double) regime->boundary,
+        (double) regime->binSize,
         regime->samplingPeriod);
 }
 
@@ -282,6 +282,6 @@ RBRInstrumentError RBRInstrument_setDirectionDependentSampling(
         RBRInstrumentDirection_name(ddsampling->direction),
         ddsampling->fastPeriod,
         ddsampling->slowPeriod,
-        ddsampling->fastThreshold,
-        ddsampling->slowThreshold);
+        (double) ddsampling->fastThreshold,
+        (double) ddsampling->slowThreshold);
 }

@@ -24,7 +24,7 @@ extern "C" {
 #define RBRINSTRUMENT_REGIME_BOUNDARY_MAX 65535
 
 /** \brief The maximum regime bin size in dbar. */
-#define RBRINSTRUMENT_REGIME_BINSIZE_MAX 6553.5
+#define RBRINSTRUMENT_REGIME_BINSIZE_MAX 6553.5f
 
 /** \brief The maximum sampling period within a regime. */
 #define RBRINSTRUMENT_REGIME_SAMPLING_PERIOD_MAX 65000

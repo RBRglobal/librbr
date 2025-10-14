@@ -103,11 +103,12 @@ RBRInstrumentError parserSample(
 
     /* report the result. here pressure is sea pressure*/
     printf("%.3f, %.8f, %.8f, %.8f, %.8f\n",
-            (double)(corrResult.timestamp/1000.0), //print in second.
-            corrResult.corrTemperature,
-            corrResult.pressure,
-            corrResult.corrSalinity,
-            meas.condTemperature);
+            // output timestamp in seconds
+            (double) corrResult.timestamp / 1000.0,
+            (double) corrResult.corrTemperature,
+            (double) corrResult.pressure,
+            (double) corrResult.corrSalinity,
+            (double) meas.condTemperature);
 
     return RBRINSTRUMENT_SUCCESS;
 }
@@ -147,7 +148,8 @@ int main(int argc, char *argv[])
             RBRINSTRUMENT_LIB_VERSION,
             RBRINSTRUMENT_LIB_BUILD_DATE);
 
-    printf("warning: this example works for data file with a fixed sampling rate of %.1f Hz.\n", SAMPLING_RATE);
+    printf("warning: this example works for data file with a fixed sampling rate of %.1f Hz.\n",
+           (double) SAMPLING_RATE);
     /* write an header */
     printf("-----------------------------------------------------------------------------------\n");
     printf("timestamp(s) | T_cor(°C) | P_meas(sea pressure, dbar) | S_cor(PSU) | T_cond(°C)\n");

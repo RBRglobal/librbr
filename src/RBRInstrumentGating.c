@@ -225,7 +225,7 @@ RBRInstrumentError RBRInstrument_setThresholding(
         channelParameter,
         channelValue,
         RBRInstrumentThresholdingCondition_name(threshold->condition),
-        threshold->value,
+        (double) threshold->value,
         threshold->interval);
 }
 

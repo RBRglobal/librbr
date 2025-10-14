@@ -78,9 +78,9 @@ static bool test_channels(RBRInstrument *instrument,
             }
             else
             {
-                TEST_ASSERT_EQ(expectedChannel->gain.currentGain,
-                               actualChannel->gain.currentGain,
-                               "%f");
+                TEST_ASSERT_FLOAT_EQ(expectedChannel->gain.currentGain,
+                                     actualChannel->gain.currentGain,
+                                     0.0f);
             }
             int i = 0;
             while (true)
@@ -92,9 +92,9 @@ static bool test_channels(RBRInstrument *instrument,
                 }
                 else
                 {
-                    TEST_ASSERT_EQ(expectedChannel->gain.availableGains[i],
-                                   actualChannel->gain.availableGains[i],
-                                   "%f");
+                    TEST_ASSERT_FLOAT_EQ(expectedChannel->gain.availableGains[i],
+                                         actualChannel->gain.availableGains[i],
+                                         0.0f);
                 }
 
                 ++i;
@@ -117,9 +117,9 @@ static bool test_channels(RBRInstrument *instrument,
                 }
                 else
                 {
-                    TEST_ASSERT_EQ(expectedChannel->calibration.c[i],
-                                   actualChannel->calibration.c[i],
-                                   "%f");
+                    TEST_ASSERT_FLOAT_EQ(expectedChannel->calibration.c[i],
+                                         actualChannel->calibration.c[i],
+                                         0.0f);
                 }
 
                 ++i;
@@ -135,9 +135,9 @@ static bool test_channels(RBRInstrument *instrument,
                 }
                 else
                 {
-                    TEST_ASSERT_EQ(expectedChannel->calibration.x[i],
-                                   actualChannel->calibration.x[i],
-                                   "%f");
+                    TEST_ASSERT_FLOAT_EQ(expectedChannel->calibration.x[i],
+                                         actualChannel->calibration.x[i],
+                                         0.0f);
                 }
 
                 ++i;
@@ -864,7 +864,7 @@ TEST_LOGGER3(settings_atmosphere)
         RBRINSTRUMENT_SETTING_ATMOSPHERE,
         &atmosphere);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT(fabs(10.132501 - atmosphere) < 0.000001);
+    TEST_ASSERT_FLOAT_EQ(10.132501f, atmosphere, 0.000001f);
 
     return true;
 }

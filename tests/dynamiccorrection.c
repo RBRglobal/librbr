@@ -70,7 +70,7 @@ static bool test_verify_ascent_rate(void)
     params._lastPressureTime = -1.0f;
     params._ascentRate = (float)(0.0f/0.0f); // NAN macro may be not exist
 
-    int64_t step = (int64_t)llround(params.Fs *1000);
+    int64_t step = (int64_t)llroundf(params.Fs *1000);
     
     /* seed for random number, allow repeatable test*/
     srand(1234);
@@ -165,7 +165,7 @@ static bool test_dynamic_correction(float *dataset, float Fs)
 
     while ( datasetPtr[0] >= 0.0f )
     {
-        measIn.timestamp = (int64_t)llround(datasetPtr[0]*1000.0); //time in millisecond
+        measIn.timestamp = (int64_t)llroundf(datasetPtr[0]*1000.0f); //time in millisecond
         measIn.conductivity = datasetPtr[1];
         measIn.marineTemperature = datasetPtr[2];
         measIn.pressure = datasetPtr[3];
@@ -259,4 +259,3 @@ TEST_LOGGER3(verify_dynamic_correction)
 
     return test_dynamic_correction(dataset[0], 4.0f);
 }
-

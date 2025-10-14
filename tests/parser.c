@@ -134,27 +134,27 @@ TEST_PARSER(samples, two_channels)
         {
             .timestamp = 1541620083000LL,
             .channels = 2,
-            .readings = {1.0f, 2.0f}
+            .readings = {1.0, 2.0}
         },
         {
             .timestamp = 1541620084000LL,
             .channels = 2,
-            .readings = {3.0f, 4.0f}
+            .readings = {3.0, 4.0}
         },
         {
             .timestamp = 1541620085000LL,
             .channels = 2,
-            .readings = {5.0f, 6.0f}
+            .readings = {5.0, 6.0}
         },
         {
             .timestamp = 1541620086000LL,
             .channels = 2,
-            .readings = {7.0f, 8.0f}
+            .readings = {7.0, 8.0}
         },
         {
             .timestamp = 1541620087000LL,
             .channels = 2,
-            .readings = {9.0f, 10.0f}
+            .readings = {9.0, 10.0}
         }
     };
 
@@ -179,9 +179,9 @@ TEST_PARSER(samples, two_channels)
              channel < expected[sample].channels;
              ++channel)
         {
-            TEST_ASSERT_EQ(expected[sample].readings[channel],
-                           buffers->samples[sample].readings[channel],
-                           "%f");
+            TEST_ASSERT_FLOAT_EQ(expected[sample].readings[channel],
+                                 buffers->samples[sample].readings[channel],
+                                 0.000001);
         }
     }
 
