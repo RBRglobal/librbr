@@ -1,0 +1,44 @@
+# Copyright (c) 2025 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+if(CONFIG_LIBRBR)
+    zephyr_interface_library_named(librbr)
+
+    file(STRINGS ${ZEPHYR_CURRENT_MODULE_DIR}/VERSION RBR_LIB_VERSION_LIST LIMIT_COUNT 1)
+    list(GET RBR_LIB_VERSION_LIST 0 RBR_LIB_VERSION)
+
+    string(TIMESTAMP RBR_LIB_BUILD_DATE "%Y-%m-%dT%H:%M:%SZ" UTC)
+
+    zephyr_compile_definitions(
+        RBR_LIB_NAME="libRBR"
+        RBR_LIB_VERSION="${RBR_LIB_VERSION}"
+        RBR_LIB_BUILD_DATE="${RBR_LIB_BUILD_DATE}"
+
+        RBRINSTRUMENT_COMMAND_BUFFER_MAX=CONFIG_RBRINSTRUMENT_COMMAND_BUFFER_MAX
+        RBRINSTRUMENT_RESPONSE_BUFFER_MAX=CONFIG_RBRINSTRUMENT_RESPONSE_BUFFER_MAX
+        RBRINSTRUMENT_CHANNEL_MAX=CONFIG_RBRINSTRUMENT_CHANNEL_MAX
+    )
+
+    zephyr_system_include_directories(${ZEPHYR_CURRENT_MODULE_DIR}/include)
+
+    zephyr_library_sources(
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRDynamicCorrection.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrument.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentCommunication.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentConfiguration.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentDeployment.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentFetching.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGating.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentHardwareErrors.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentInternal.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentInternal.h
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentMemory.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentOther.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentPauseresume.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentSchedule.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentSecurity.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentStreaming.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentVehicle.c
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRParser.c
+    )
+endif()

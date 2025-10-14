@@ -1,0 +1,58 @@
+# Copyright (c) 2025 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+mainmenu "libRBR example"
+
+menu "Application configuration"
+
+module = IO
+module-str = I/O
+source "subsys/logging/Kconfig.template.log_config"
+
+config INSTRUMENT_RX_BUFFER_SIZE
+    int "Instrument RX buffer size"
+    default 256
+    help
+        Size of the instrument RX buffer. This buffer is continuously populated
+        by DMA before it is read by the RBRInstrumentReadCallback callback.
+
+        May be smaller than RBRINSTRUMENT_RESPONSE_BUFFER_MAX, depending on the
+        UART FIFO size, the baud, and if reading can occur quickly enough.
+
+config INSTRUMENT_INTER_CHARACTER_TIMEOUT_USEC
+    int "Instrument inter-character timeout"
+    default 868
+    help
+        UART RX DMA transfer timeout in microseconds. The UART RX DMA will
+        request a data availability interrupt after some data has been received
+        when no further characters arrive after this interval.
+
+        Default value is the transfer time for 10 8N1 characters at 115,200
+        baud: (1 start + 8 data + 1 stop) bits × 10 characters / 115,200 baud.
+
+config INSTRUMENT_COMMAND_TIMEOUT_MSEC
+    int "Instrument command timeout"
+    default 10000
+    help
+        Timeout in milliseconds for sending a command to or receiving a command
+        from the instrument.
+
+config TRACE_IO
+    bool "Trace instrument I/O"
+    help
+        Debug statements in the I/O module will print the bytes of each
+        successful read and write, not just their byte counts.
+
+        Has no effect without IO_LOG_LEVEL_DBG.
+
+module = MAIN
+module-str = main
+source "subsys/logging/Kconfig.template.log_config"
+
+module = TIME
+module-str = time
+source "subsys/logging/Kconfig.template.log_config"
+
+endmenu
+
+source "Kconfig.zephyr"

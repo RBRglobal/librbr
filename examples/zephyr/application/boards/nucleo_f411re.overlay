@@ -1,0 +1,30 @@
+/*
+ * Copyright (c) 2025 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/ {
+	chosen {
+		rbr,instrument = &usart6;
+	};
+};
+
+&dma2 {
+	status = "okay";
+};
+
+&usart6 {
+	status = "okay";
+
+	fifo-enable;
+
+	dmas = <&dma2 6 5 STM32_DMA_PERIPH_TX STM32_DMA_FIFO_FULL>,
+	       <&dma2 1 5 STM32_DMA_PERIPH_RX STM32_DMA_FIFO_FULL>;
+	dma-names = "tx", "rx";
+
+	pinctrl-0 = <&usart6_tx_pa11 &usart6_rx_pa12>;
+	pinctrl-names = "default";
+
+	current-speed = <115200>;
+};

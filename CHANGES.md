@@ -1,13 +1,25 @@
 # Changes
 
-## v1.2.5
+## v1.3.0
 
 Release TBD
+
+### Added
+
+* Added Zephyr module definition
+  permitting inclusion in a Zephyr workspace via [West].
+
+[West]: https://docs.zephyrproject.org/latest/develop/west/index.html
 
 ### Changed
 
 * added support for no dynamic memory allocation.
 * fixed bug where wake up sequence not occuring after RBRInstrument_fetch() usage.
+* Updated CI targets:
+  reintroduced GCC 6;
+  added GCC 12–15;
+  updated to Clang 20;
+  updated documentation step to GCC 15.
 
 ## v1.2.4
 
