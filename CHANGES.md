@@ -20,6 +20,7 @@ Release TBD
   added GCC 12–15;
   updated to Clang 20;
   updated documentation step to GCC 15.
+* Fixed parallel builds with Make `-j, --jobs`.
 
 ## v1.2.4
 
