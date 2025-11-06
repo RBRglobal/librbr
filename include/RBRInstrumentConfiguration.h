@@ -23,14 +23,14 @@ extern "C" {
  *
  * \see RBRInstrumentCalibration.c
  */
-#define RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX 24
+#define RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX 8
 
 /**
  * \brief The maximum number of X calibration coefficients.
  *
  * \see RBRInstrumentCalibration.x
  */
-#define RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX 8
+#define RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX 16
 
 /**
  * \brief The maximum number of input channel indices.

@@ -23,6 +23,10 @@ Release TBD
   This is a precursor to Gen4 support.
 * Parse RBR_coda_ timestamps
   (continuously-incrementing millisecond counter).
+* Revised default coefficient count limits
+  to better match the numbers used by calibration equations
+  (now 8/16/8 _c_/_x_/_n_ coefficients;
+  previously 24/8/8).
 * Updated CI targets:
   reintroduced GCC 6;
   added GCC 12–15;
