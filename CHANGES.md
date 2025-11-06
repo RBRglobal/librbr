@@ -19,6 +19,8 @@ Release TBD
   This reduces the minimum response buffer size
   when communicating with instruments with many channels
   (at the cost of slightly increased interrogation time).
+* Make “Ready: ” prompt matching case-insensitive.
+  This is a precursor to Gen4 support.
 * Updated CI targets:
   reintroduced GCC 6;
   added GCC 12–15;

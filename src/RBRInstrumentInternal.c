@@ -139,6 +139,25 @@ void *rbr_memmem(void *ptr1, size_t num1, const void *ptr2, size_t num2)
 }
 
 /**
+ * \brief Local implementation of strncasecmp, which is POSIX, but not C99.
+ */
+int rbr_strncasecmp(const char *s1, const char *s2, size_t n)
+{
+    int difference = 0;
+    for (; n; --n) {
+        difference = tolower(*s1) - tolower(*s2);
+        if (difference || !*s1) {
+            break;
+        }
+
+        ++s1;
+        ++s2;
+    }
+
+    return difference;
+}
+
+/**
  * \brief Wake the instrument from sleep, if necessary.
  *
  * \param [in] instrument the instrument connection
@@ -394,9 +413,9 @@ static void RBRInstrument_terminateResponse(
 
     /* Fast-forward leading “Ready: ” prompts in the buffer. */
     while (end - *beginning >= COMMAND_PROMPT_LEN
-           && memcmp(*beginning,
-                     COMMAND_PROMPT,
-                     COMMAND_PROMPT_LEN) == 0)
+           && rbr_strncasecmp(*beginning,
+                              COMMAND_PROMPT,
+                              COMMAND_PROMPT_LEN) == 0)
     {
         *beginning += COMMAND_PROMPT_LEN;
     }
