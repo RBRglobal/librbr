@@ -21,6 +21,8 @@ Release TBD
   (at the cost of slightly increased interrogation time).
 * Make “Ready: ” prompt matching case-insensitive.
   This is a precursor to Gen4 support.
+* Parse RBR_coda_ timestamps
+  (continuously-incrementing millisecond counter).
 * Updated CI targets:
   reintroduced GCC 6;
   added GCC 12–15;

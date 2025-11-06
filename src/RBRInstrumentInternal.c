@@ -10,6 +10,8 @@
 
 /* Required for isspace. */
 #include <ctype.h>
+/* Required for SCNi64. */
+#include <inttypes.h>
 /* Required for INFINITY, NAN. */
 #include <math.h>
 /* Required for vsnprintf, va_list, va_start, va_end. */
@@ -107,7 +109,7 @@ static const char *RBRInstrumentDateTime_sampleFormat
     = "%04d-%02d-%02d %02d:%02d:%02d.%03d";
 
 static const char *RBRInstrumentDateTime_sampleScanFormat
-    = "%04d-%02d-%02d %02d:%02d:%02d.%03d%n";
+    = "%04d-%02d-%02d %02d:%02d:%02d.%" SCNi64 "%n";
 
 static const char *RBRInstrumentDateTime_scheduleFormat
     = "%04d%02d%02d%02d%02d%02d";
@@ -1200,7 +1202,7 @@ RBRInstrumentError RBRInstrumentDateTime_parseSampleTime(
 
     int32_t timestampLength;
     struct tm split = {0};
-    int milliseconds;
+    int64_t milliseconds;
 
     if (sscanf(s,
                RBRInstrumentDateTime_sampleScanFormat,
@@ -1211,16 +1213,27 @@ RBRInstrumentError RBRInstrumentDateTime_parseSampleTime(
                &split.tm_min,
                &split.tm_sec,
                &milliseconds,
-               &timestampLength) < 7)
+               &timestampLength) == 7)
+    {
+        *timestamp = milliseconds;
+        RBR_TRY(RBRInstrumentDateTime_parse(&split, timestamp));
+        if (end != NULL)
+        {
+            *end = (char *) s + timestampLength;
+        }
+    }
+    else if (sscanf(s, "%" SCNi64, &milliseconds) == 1)
+    {
+        *timestamp = milliseconds;
+
+        if (end != NULL)
+        {
+            *end = strchr(s, ' ');
+        }
+    }
+    else
     {
         return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
-    }
-
-    *timestamp = milliseconds;
-    RBR_TRY(RBRInstrumentDateTime_parse(&split, timestamp));
-    if (end != NULL)
-    {
-        *end = (char *) s + timestampLength;
     }
 
     return RBRINSTRUMENT_SUCCESS;
