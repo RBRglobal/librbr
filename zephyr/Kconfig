@@ -48,4 +48,20 @@ config RBRINSTRUMENT_CHANNEL_MAX
         (used by RBRInstrument_getChannels()) and RBRInstrumentChannelsList
         (used by RBRInstrument_getChannelsList()).
 
+config RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX
+    int "The maximum number of C calibration coefficients per channel."
+    default 8
+
+config RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX
+    int "The maximum number of X calibration coefficients per channel."
+    default 16
+
+config RBRINSTRUMENT_CALIBRATION_N_COEFFICIENT_MAX
+    int "The maximum number of input channel indices per channel."
+    default 8
+
+config RBRINSTRUMENT_CHANNEL_GAINS_MAX
+    int "The maximum number of gain settings per channel."
+    default 8
+
 endif # LIBRBR

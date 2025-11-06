@@ -15,6 +15,20 @@ Release TBD
 
 * added support for no dynamic memory allocation.
 * fixed bug where wake up sequence not occuring after RBRInstrument_fetch() usage.
+* Poll each channel individually, rather than requesting `channel all`.
+  This reduces the minimum response buffer size
+  when communicating with instruments with many channels
+  (at the cost of slightly increased interrogation time).
+* Make “Ready: ” prompt matching case-insensitive.
+  This is a precursor to Gen4 support.
+* Parse RBR_coda_ timestamps
+  (continuously-incrementing millisecond counter).
+* Revised default coefficient count limits
+  to better match the numbers used by calibration equations
+  (now 8/16/8 _c_/_x_/_n_ coefficients;
+  previously 24/8/8).
+* Make the sizes of array fields on channels overrideable
+  without source modification.
 * Updated CI targets:
   reintroduced GCC 6;
   added GCC 12–15;

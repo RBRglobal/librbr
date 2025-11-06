@@ -37,39 +37,43 @@ const char *RBRInstrumentChannelRangingMode_name(
     }
 }
 
-static RBRInstrumentError RBRInstrument_getCalibrations(
-    RBRInstrument *instrument,
-    RBRInstrumentChannels *channels)
+static RBRInstrumentError RBRInstrument_clearChannel(RBRInstrumentChannel *channel)
 {
-    for (int32_t channel = 0; channel < channels->count; ++channel)
+    channel->gain.currentGain = NAN;
+
+    for (int32_t gain = 0; gain < RBRINSTRUMENT_CHANNEL_GAINS_MAX; ++gain)
     {
-        for (int32_t c = 0;
-             c < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX;
-             ++c)
-        {
-            channels->channels[channel].calibration.c[c] = NAN;
-        }
-        for (int32_t x = 0;
-             x < RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX;
-             ++x)
-        {
-            channels->channels[channel].calibration.x[x] = NAN;
-        }
+        channel->gain.availableGains[gain] = NAN;
     }
 
-    if (instrument->generation == RBRINSTRUMENT_LOGGER2)
+    snprintf(channel->label, sizeof(channel->label), "%s", "none");
+
+    for (int32_t c = 0;
+         c < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX;
+         ++c)
     {
-        RBR_TRY(RBRInstrument_converse(instrument, "calibration all"));
+        channel->calibration.c[c] = NAN;
     }
-    else
+    for (int32_t x = 0;
+         x < RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX;
+         ++x)
     {
-        RBR_TRY(RBRInstrument_converse(instrument, "calibration allindices"));
+        channel->calibration.x[x] = NAN;
     }
+
+    return RBRINSTRUMENT_SUCCESS;
+}
+
+static RBRInstrumentError RBRInstrument_getChannelCoefficients(
+    RBRInstrument *instrument,
+    int32_t channelIndex,
+    RBRInstrumentChannel *channel)
+{
+    RBR_TRY(RBRInstrument_converse(instrument, "calibration %d all",
+                                   channelIndex + 1));
 
     char *command = NULL;
     RBRInstrumentResponseParameter parameter;
-    int32_t channelIndex;
-    RBRInstrumentChannel *channel;
     while (true)
     {
         RBRInstrument_parseResponse(instrument,
@@ -79,20 +83,6 @@ static RBRInstrumentError RBRInstrument_getCalibrations(
         if (parameter.key == NULL || parameter.value == NULL)
         {
             break;
-        }
-
-        channelIndex = parameter.index - 1;
-        if (channelIndex < 0)
-        {
-            continue;
-        }
-        else if (channelIndex >= RBRINSTRUMENT_CHANNEL_MAX)
-        {
-            break;
-        }
-        else
-        {
-            channel = &channels->channels[channelIndex];
         }
 
         if (strcmp(parameter.key, "datetime") == 0)
@@ -112,16 +102,19 @@ static RBRInstrumentError RBRInstrument_getCalibrations(
         int32_t index = strtol(&parameter.key[1], NULL, 10);
 
         if (parameter.key[0] == 'c'
+            && index >= 0
             && index < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX)
         {
             channel->calibration.c[index] = strtod(parameter.value, NULL);
         }
         else if (parameter.key[0] == 'x'
+                 && index >= 0
                  && index < RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX)
         {
             channel->calibration.x[index] = strtod(parameter.value, NULL);
         }
         else if (parameter.key[0] == 'n'
+                 && index >= 0
                  && index < RBRINSTRUMENT_CALIBRATION_N_COEFFICIENT_MAX)
         {
             RBRInstrumentChannelIndex coefficient;
@@ -141,39 +134,27 @@ static RBRInstrumentError RBRInstrument_getCalibrations(
     return RBRINSTRUMENT_SUCCESS;
 }
 
-static RBRInstrumentError RBRInstrument_getChannelAll(
+static RBRInstrumentError RBRInstrument_getChannel(
     RBRInstrument *instrument,
-    RBRInstrumentChannels *channels)
+    int32_t channelIndex,
+    RBRInstrumentChannel *channel)
 {
-    for (int32_t channel = 0; channel < channels->count; ++channel)
-    {
-        channels->channels[channel].gain.currentGain = NAN;
-
-        for (int32_t gain = 0; gain < RBRINSTRUMENT_CHANNEL_GAINS_MAX; ++gain)
-        {
-            channels->channels[channel].gain.availableGains[gain] = NAN;
-        }
-
-        snprintf(channels->channels[channel].label,
-                 sizeof(channels->channels[channel].label),
-                 "%s",
-                 "none");
-    }
-
     if (instrument->generation == RBRINSTRUMENT_LOGGER2)
     {
         RBR_TRY(RBRInstrument_converse(
                     instrument,
-                    "channel all all derived gain gainsavailable"));
+                    "channel %d all derived gain gainsavailable",
+                    channelIndex + 1));
     }
     else
     {
-        RBR_TRY(RBRInstrument_converse(instrument, "channel allindices all"));
+        RBR_TRY(RBRInstrument_converse(
+                    instrument,
+                    "channel %d all",
+                    channelIndex + 1));
     }
 
     char *command = NULL;
-    int32_t channelIndex;
-    RBRInstrumentChannel *channel;
     RBRInstrumentResponseParameter parameter;
     while (true)
     {
@@ -184,20 +165,6 @@ static RBRInstrumentError RBRInstrument_getChannelAll(
         if (parameter.key == NULL || parameter.value == NULL)
         {
             break;
-        }
-
-        channelIndex = parameter.index - 1;
-        if (channelIndex < 0)
-        {
-            continue;
-        }
-        else if (channelIndex >= RBRINSTRUMENT_CHANNEL_MAX)
-        {
-            break;
-        }
-        else
-        {
-            channel = &channels->channels[channelIndex];
         }
 
         if (strcmp(parameter.key, "type") == 0)
@@ -288,6 +255,29 @@ static RBRInstrumentError RBRInstrument_getChannelAll(
     return RBRINSTRUMENT_SUCCESS;
 }
 
+static RBRInstrumentError RBRInstrument_getChannelAll(
+    RBRInstrument *instrument,
+    RBRInstrumentChannels *channels)
+{
+    int32_t channel_count = channels->count;
+    if (channel_count > RBRINSTRUMENT_CHANNEL_MAX)
+    {
+        channel_count = RBRINSTRUMENT_CHANNEL_MAX;
+    }
+
+    for (int32_t idx = 0; idx < channel_count; ++idx)
+    {
+        RBRInstrumentChannel *channel = &channels->channels[idx];
+        RBRInstrument_clearChannel(channel);
+        RBR_TRY(RBRInstrument_getChannel(instrument, idx, channel));
+        RBR_TRY(RBRInstrument_getChannelCoefficients(instrument,
+                                                     idx,
+                                                     channel));
+    }
+
+    return RBRINSTRUMENT_SUCCESS;
+}
+
 RBRInstrumentError RBRInstrument_getChannels(RBRInstrument *instrument,
                                              RBRInstrumentChannels *channels)
 {
@@ -332,7 +322,6 @@ RBRInstrumentError RBRInstrument_getChannels(RBRInstrument *instrument,
     }
 
     RBR_TRY(RBRInstrument_getChannelAll(instrument, channels));
-    RBR_TRY(RBRInstrument_getCalibrations(instrument, channels));
 
     return RBRINSTRUMENT_SUCCESS;
 }
