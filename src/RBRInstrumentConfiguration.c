@@ -102,16 +102,19 @@ static RBRInstrumentError RBRInstrument_getChannelCoefficients(
         int32_t index = strtol(&parameter.key[1], NULL, 10);
 
         if (parameter.key[0] == 'c'
+            && index >= 0
             && index < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX)
         {
             channel->calibration.c[index] = strtod(parameter.value, NULL);
         }
         else if (parameter.key[0] == 'x'
+                 && index >= 0
                  && index < RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX)
         {
             channel->calibration.x[index] = strtod(parameter.value, NULL);
         }
         else if (parameter.key[0] == 'n'
+                 && index >= 0
                  && index < RBRINSTRUMENT_CALIBRATION_N_COEFFICIENT_MAX)
         {
             RBRInstrumentChannelIndex coefficient;

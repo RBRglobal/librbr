@@ -27,6 +27,8 @@ Release TBD
   to better match the numbers used by calibration equations
   (now 8/16/8 _c_/_x_/_n_ coefficients;
   previously 24/8/8).
+* Make the sizes of array fields on channels overrideable
+  without source modification.
 * Updated CI targets:
   reintroduced GCC 6;
   added GCC 12–15;

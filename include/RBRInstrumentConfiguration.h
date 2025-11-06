@@ -19,25 +19,31 @@ extern "C" {
 #endif
 
 /**
- * \brief The maximum number of C calibration coefficients.
+ * \brief The maximum number of C calibration coefficients per channel.
  *
  * \see RBRInstrumentCalibration.c
  */
+#ifndef RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX
 #define RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX 8
+#endif
 
 /**
- * \brief The maximum number of X calibration coefficients.
+ * \brief The maximum number of X calibration coefficients per channel.
  *
  * \see RBRInstrumentCalibration.x
  */
+#ifndef RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX
 #define RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX 16
+#endif
 
 /**
- * \brief The maximum number of input channel indices.
+ * \brief The maximum number of input channel indices per channel.
  *
  * \see RBRInstrumentCalibration.n
  */
+#ifndef RBRINSTRUMENT_CALIBRATION_N_COEFFICIENT_MAX
 #define RBRINSTRUMENT_CALIBRATION_N_COEFFICIENT_MAX 8
+#endif
 
 /**
  * \brief An in-band representation of the special “value” calibration
@@ -55,9 +61,11 @@ extern "C" {
 #define RBRINSTRUMENT_CALIBRATION_EQUATION_MAX 31
 
 /**
- * \brief The maximum number of gain settings for a channel.
+ * \brief The maximum number of gain settings per channel.
  */
+#ifndef RBRINSTRUMENT_CHANNEL_GAINS_MAX
 #define RBRINSTRUMENT_CHANNEL_GAINS_MAX 8
+#endif
 
 /** \brief The minimum input timeout. */
 #define RBRINSTRUMENT_INPUT_TIMEOUT_MIN 10000
