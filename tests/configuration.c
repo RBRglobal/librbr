@@ -162,24 +162,34 @@ TEST_LOGGER2(channels)
         {
             "channels count = 3, on = 3, latency = 300, readtime = 350, "
             "minperiod = 480" RESPONSE_TERMINATOR
+
             "channel 1 type = temp09, module = 1, status = on, latency = 50, "
             "readtime = 260, equation = tmp, userunits = C, gain = none, "
-            "gainsavailable = none, derived = off | 2 type = pres19, "
-            "module = 2, status = on, latency = 50, readtime = 260, "
-            "equation = corr_pres2, userunits = dbar, gain = none, "
-            "gainsavailable = none, derived = off | 3 type = volt00, "
-            "module = 40, status = on, latency = 300, readtime = 350, "
-            "equation = lin, userunits = V, gain = none, "
             "gainsavailable = none, derived = off" RESPONSE_TERMINATOR
+
             "calibration 1 type = temp09, datetime = 20000401000000, "
             "c0 = 3.5000000e-003, c1 = -250.00002e-006, c2 = 2.7000000e-006, "
-            "c3 = 23.000000e-009 | 2 type = pres19, "
-            "datetime = 20000401000000, c0 = 0.0000000e+000, "
-            "c1 = 1.0000000e+000, c2 = 0.0000000e+000, c3 = 0.0000000e+000, "
-            "x0 = 0.0000000e+000, x1 = 0.0000000e+000, x2 = 0.0000000e+000, "
-            "x3 = 0.0000000e+000, x4 = 0.0000000e+000, x5 = 0.0000000e+000, "
-            "n0 = value | 3 type = volt00, datetime = 20000401000000, "
+            "c3 = 23.000000e-009" RESPONSE_TERMINATOR
+
+            "channel 2 type = pres19, module = 2, status = on, latency = 50, "
+            "readtime = 260, equation = corr_pres2, userunits = dbar, "
+            "gain = none, gainsavailable = none, derived = off"
+            RESPONSE_TERMINATOR
+
+            "calibration 2 type = pres19, datetime = 20000401000000, "
+            "c0 = 0.0000000e+000, c1 = 1.0000000e+000, c2 = 0.0000000e+000, "
+            "c3 = 0.0000000e+000, x0 = 0.0000000e+000, x1 = 0.0000000e+000, "
+            "x2 = 0.0000000e+000, x3 = 0.0000000e+000, x4 = 0.0000000e+000, "
+            "x5 = 0.0000000e+000, n0 = value" RESPONSE_TERMINATOR
+
+            "channel 3 type = volt00, module = 40, status = on, "
+            "latency = 300, readtime = 350, equation = lin, userunits = V, "
+            "gain = none, gainsavailable = none, derived = off"
+            RESPONSE_TERMINATOR
+
+            "calibration 3 type = volt00, datetime = 20000401000000, "
             "c0 = 0.0000000e+000, c1 = 1.0000000e+000" RESPONSE_TERMINATOR,
+
             {
                 .count = 3,
                 .on = 3,
@@ -341,36 +351,52 @@ TEST_LOGGER3(channels)
         {
             "channels count = 5, on = 5, settlingtime = 50, readtime = 290, "
             "minperiod = 450" RESPONSE_TERMINATOR
+
             "channel 1 type = temp09, module = 1, status = on, "
             "settlingtime = 50, readtime = 260, equation = tmp, "
             "userunits = C, gain = none, availablegains = none, "
-            "derived = off, label = temperature_00 || "
+            "derived = off, label = temperature_00" RESPONSE_TERMINATOR
+
+            "calibration 1 label = temperature_00, datetime = 20000401000000, "
+            "c0 = 3.5000000e-003, c1 = -250.00002e-006, c2 = 2.7000000e-006, "
+            "c3 = 23.000000e-009" RESPONSE_TERMINATOR
+
             "channel 2 type = pres24, module = 2, status = on, "
             "settlingtime = 50, readtime = 290, equation = corr_pres2, "
             "userunits = dbar, gain = none, availablegains = none, "
-            "derived = off, label = pressure_00 || channel 3 type = pres08, "
-            "module = 240, status = on, settlingtime = 0, readtime = 0, "
-            "equation = deri_seapres, userunits = dbar, gain = none, "
-            "availablegains = none, derived = on, label = seapressure_00 || "
-            "channel 4 type = dpth01, module = 241, status = on, "
-            "settlingtime = 0, readtime = 0, equation = deri_depth, "
-            "userunits = m, gain = none, availablegains = none, derived = on, "
-            "label = depth_00 || channel 5 type = cnt_00, module = 242, "
-            "status = on, settlingtime = 0, readtime = 0, equation = none, "
-            "userunits = counts, gain = none, availablegains = none, "
-            "derived = on, label = count_00" RESPONSE_TERMINATOR
-            "calibration 1 label = temperature_00, datetime = 20000401000000, "
-            "c0 = 3.5000000e-003, c1 = -250.00002e-006, c2 = 2.7000000e-006, "
-            "c3 = 23.000000e-009 || calibration 2 label = pressure_00, "
+            "derived = off, label = pressure_00" RESPONSE_TERMINATOR
+
+            "calibration 2 label = pressure_00, "
             "datetime = 20000401000000, c0 = 0.0000000e+000, "
             "c1 = 1.0000000e+000, c2 = 0.0000000e+000, c3 = 0.0000000e+000, "
             "x0 = 0.0000000e+000, x1 = 0.0000000e+000, x2 = 0.0000000e+000, "
             "x3 = 0.0000000e+000, x4 = 0.0000000e+000, x5 = 0.0000000e+000, "
-            "n0 = 6 || calibration 3 label = seapressure_00, "
-            "datetime = 20000401000000, n0 = 2, n1 = value || calibration 4 "
-            "label = depth_00, datetime = 20000401000000, n0 = 2, n1 = value "
-            "|| calibration 5 label = count_00, datetime = 20000401000000, "
+            "n0 = 6" RESPONSE_TERMINATOR
+
+            "channel 3 type = pres08, module = 240, status = on, "
+            "settlingtime = 0, readtime = 0, equation = deri_seapres, "
+            "userunits = dbar, gain = none, availablegains = none, "
+            "derived = on, label = seapressure_00" RESPONSE_TERMINATOR
+
+            "calibration 3 label = seapressure_00, datetime = 20000401000000, "
+            "n0 = 2, n1 = value" RESPONSE_TERMINATOR
+
+            "channel 4 type = dpth01, module = 241, status = on, "
+            "settlingtime = 0, readtime = 0, equation = deri_depth, "
+            "userunits = m, gain = none, availablegains = none, derived = on, "
+            "label = depth_00" RESPONSE_TERMINATOR
+
+            "calibration 4 label = depth_00, datetime = 20000401000000, "
+            "n0 = 2, n1 = value" RESPONSE_TERMINATOR
+
+            "channel 5 type = cnt_00, module = 242, status = on, "
+            "settlingtime = 0, readtime = 0, equation = none, "
+            "userunits = counts, gain = none, availablegains = none, "
+            "derived = on, label = count_00" RESPONSE_TERMINATOR
+
+            "calibration 5 label = count_00, datetime = 20000401000000, "
             "n0 = value" RESPONSE_TERMINATOR,
+
             {
                 .count = 5,
                 .on = 5,

@@ -15,6 +15,10 @@ Release TBD
 
 * added support for no dynamic memory allocation.
 * fixed bug where wake up sequence not occuring after RBRInstrument_fetch() usage.
+* Poll each channel individually, rather than requesting `channel all`.
+  This reduces the minimum response buffer size
+  when communicating with instruments with many channels
+  (at the cost of slightly increased interrogation time).
 * Updated CI targets:
   reintroduced GCC 6;
   added GCC 12–15;
