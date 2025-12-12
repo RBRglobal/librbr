@@ -419,17 +419,26 @@ RBRInstrumentError RBRInstrument_setCalibration(
     RBRInstrumentChannelIndex channel,
     const RBRInstrumentCalibration *calibration)
 {
+    if (calibration->dateTime < RBRINSTRUMENT_DATETIME_MIN
+        || calibration->dateTime > RBRINSTRUMENT_DATETIME_MAX)
+    {
+        return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
+    }
+
     char calibrationDateTime[RBRINSTRUMENT_SCHEDULE_TIME_LEN + 1];
     RBRInstrumentDateTime_toScheduleTime(calibration->dateTime,
                                          calibrationDateTime);
 
     const char *calibrationCommand = "calibration %d datetime = %s, %c%d = %g";
 
+    bool populated = false;
+
     for (int32_t c = 0;
          c < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX
          && !isnan(calibration->c[c]);
          ++c)
     {
+        populated = true;
         RBR_TRY(RBRInstrument_converse(instrument,
                                        calibrationCommand,
                                        channel,
@@ -443,6 +452,7 @@ RBRInstrumentError RBRInstrument_setCalibration(
          && !isnan(calibration->x[x]);
          ++x)
     {
+        populated = true;
         RBR_TRY(RBRInstrument_converse(instrument,
                                        calibrationCommand,
                                        channel,
@@ -450,6 +460,11 @@ RBRInstrumentError RBRInstrument_setCalibration(
                                        'x',
                                        x,
                                        (double) calibration->x[x]));
+    }
+
+    if (!populated)
+    {
+        return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
     return RBRINSTRUMENT_SUCCESS;

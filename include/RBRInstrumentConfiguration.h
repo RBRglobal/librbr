@@ -443,7 +443,9 @@ RBRInstrumentError RBRInstrument_setChannelGain(
  * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the calibration cannot be changed
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when no coefficients are
+ * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when the date/time of the
+ *                                                calibration is out of range,
+ *                                                or when no coefficients are
  *                                                populated
  * \see RBRInstrument_getChannels()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/calibration

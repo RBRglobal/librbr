@@ -39,6 +39,9 @@ Release TBD
   updated to Clang 20;
   updated documentation step to GCC 15.
 * Fixed parallel builds with Make `-j, --jobs`.
+* Improve error handling in `RBRInstrument_setCalibration()`
+  (validate that the date/time is in range,
+  and informing the user if no coefficients were set).
 
 ## v1.2.4
 
