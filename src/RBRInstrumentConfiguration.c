@@ -255,9 +255,18 @@ static RBRInstrumentError RBRInstrument_getChannel(
     return RBRINSTRUMENT_SUCCESS;
 }
 
+typedef enum RBRInstrumentChannelDensity
+{
+    /** Channel has no additional information populated. */
+    RBRINSTRUMENT_CHANNEL_SPARSE = 0,
+    /** Channel's calibration information is populated. */
+    RBRINSTRUMENT_CHANNEL_CALIBRATION = 1 << 0,
+} RBRInstrumentChannelDensity;
+
 static RBRInstrumentError RBRInstrument_getChannelAll(
     RBRInstrument *instrument,
-    RBRInstrumentChannels *channels)
+    RBRInstrumentChannels *channels,
+    RBRInstrumentChannelDensity density)
 {
     int32_t channel_count = channels->count;
     if (channel_count > RBRINSTRUMENT_CHANNEL_MAX)
@@ -270,16 +279,22 @@ static RBRInstrumentError RBRInstrument_getChannelAll(
         RBRInstrumentChannel *channel = &channels->channels[idx];
         RBRInstrument_clearChannel(channel);
         RBR_TRY(RBRInstrument_getChannel(instrument, idx, channel));
-        RBR_TRY(RBRInstrument_getChannelCoefficients(instrument,
-                                                     idx,
-                                                     channel));
+
+        if (density & RBRINSTRUMENT_CHANNEL_CALIBRATION)
+        {
+            RBR_TRY(RBRInstrument_getChannelCoefficients(instrument,
+                                                         idx,
+                                                         channel));
+        }
     }
 
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_getChannels(RBRInstrument *instrument,
-                                             RBRInstrumentChannels *channels)
+static RBRInstrumentError RBRInstrument_getChannelsWithDensity(
+    RBRInstrument *instrument,
+    RBRInstrumentChannels *channels,
+    RBRInstrumentChannelDensity density)
 {
     memset(channels, 0, sizeof(RBRInstrumentChannels));
 
@@ -321,9 +336,28 @@ RBRInstrumentError RBRInstrument_getChannels(RBRInstrument *instrument,
         }
     }
 
-    RBR_TRY(RBRInstrument_getChannelAll(instrument, channels));
+    RBR_TRY(RBRInstrument_getChannelAll(instrument, channels, density));
 
     return RBRINSTRUMENT_SUCCESS;
+}
+
+RBRInstrumentError RBRInstrument_getChannels(RBRInstrument *instrument,
+                                             RBRInstrumentChannels *channels)
+{
+    return RBRInstrument_getChannelsWithDensity(
+        instrument,
+        channels,
+        RBRINSTRUMENT_CHANNEL_CALIBRATION);
+}
+
+RBRInstrumentError RBRInstrument_getChannelsWithoutCalibrations(
+    RBRInstrument *instrument,
+    RBRInstrumentChannels *channels)
+{
+    return RBRInstrument_getChannelsWithDensity(
+        instrument,
+        channels,
+        RBRINSTRUMENT_CHANNEL_SPARSE);
 }
 
 RBRInstrumentError RBRInstrument_setChannelStatus(

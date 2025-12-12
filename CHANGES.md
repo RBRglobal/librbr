@@ -8,6 +8,10 @@ Release TBD
 
 * Added Zephyr module definition
   permitting inclusion in a Zephyr workspace via [West].
+* Added `RBRInstrument_getChannelsWithoutCalibrations()` method
+  to retrieve channel information without calibration data
+  to save bandwidth and time
+  when calibration information is unnecessary.
 
 [West]: https://docs.zephyrproject.org/latest/develop/west/index.html
 
