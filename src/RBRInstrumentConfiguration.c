@@ -255,9 +255,18 @@ static RBRInstrumentError RBRInstrument_getChannel(
     return RBRINSTRUMENT_SUCCESS;
 }
 
+typedef enum RBRInstrumentChannelDensity
+{
+    /** Channel has no additional information populated. */
+    RBRINSTRUMENT_CHANNEL_SPARSE = 0,
+    /** Channel's calibration information is populated. */
+    RBRINSTRUMENT_CHANNEL_CALIBRATION = 1 << 0,
+} RBRInstrumentChannelDensity;
+
 static RBRInstrumentError RBRInstrument_getChannelAll(
     RBRInstrument *instrument,
-    RBRInstrumentChannels *channels)
+    RBRInstrumentChannels *channels,
+    RBRInstrumentChannelDensity density)
 {
     int32_t channel_count = channels->count;
     if (channel_count > RBRINSTRUMENT_CHANNEL_MAX)
@@ -270,16 +279,22 @@ static RBRInstrumentError RBRInstrument_getChannelAll(
         RBRInstrumentChannel *channel = &channels->channels[idx];
         RBRInstrument_clearChannel(channel);
         RBR_TRY(RBRInstrument_getChannel(instrument, idx, channel));
-        RBR_TRY(RBRInstrument_getChannelCoefficients(instrument,
-                                                     idx,
-                                                     channel));
+
+        if (density & RBRINSTRUMENT_CHANNEL_CALIBRATION)
+        {
+            RBR_TRY(RBRInstrument_getChannelCoefficients(instrument,
+                                                         idx,
+                                                         channel));
+        }
     }
 
     return RBRINSTRUMENT_SUCCESS;
 }
 
-RBRInstrumentError RBRInstrument_getChannels(RBRInstrument *instrument,
-                                             RBRInstrumentChannels *channels)
+static RBRInstrumentError RBRInstrument_getChannelsWithDensity(
+    RBRInstrument *instrument,
+    RBRInstrumentChannels *channels,
+    RBRInstrumentChannelDensity density)
 {
     memset(channels, 0, sizeof(RBRInstrumentChannels));
 
@@ -321,9 +336,28 @@ RBRInstrumentError RBRInstrument_getChannels(RBRInstrument *instrument,
         }
     }
 
-    RBR_TRY(RBRInstrument_getChannelAll(instrument, channels));
+    RBR_TRY(RBRInstrument_getChannelAll(instrument, channels, density));
 
     return RBRINSTRUMENT_SUCCESS;
+}
+
+RBRInstrumentError RBRInstrument_getChannels(RBRInstrument *instrument,
+                                             RBRInstrumentChannels *channels)
+{
+    return RBRInstrument_getChannelsWithDensity(
+        instrument,
+        channels,
+        RBRINSTRUMENT_CHANNEL_CALIBRATION);
+}
+
+RBRInstrumentError RBRInstrument_getChannelsWithoutCalibrations(
+    RBRInstrument *instrument,
+    RBRInstrumentChannels *channels)
+{
+    return RBRInstrument_getChannelsWithDensity(
+        instrument,
+        channels,
+        RBRINSTRUMENT_CHANNEL_SPARSE);
 }
 
 RBRInstrumentError RBRInstrument_setChannelStatus(
@@ -385,17 +419,26 @@ RBRInstrumentError RBRInstrument_setCalibration(
     RBRInstrumentChannelIndex channel,
     const RBRInstrumentCalibration *calibration)
 {
+    if (calibration->dateTime < RBRINSTRUMENT_DATETIME_MIN
+        || calibration->dateTime > RBRINSTRUMENT_DATETIME_MAX)
+    {
+        return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
+    }
+
     char calibrationDateTime[RBRINSTRUMENT_SCHEDULE_TIME_LEN + 1];
     RBRInstrumentDateTime_toScheduleTime(calibration->dateTime,
                                          calibrationDateTime);
 
     const char *calibrationCommand = "calibration %d datetime = %s, %c%d = %g";
 
+    bool populated = false;
+
     for (int32_t c = 0;
          c < RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX
          && !isnan(calibration->c[c]);
          ++c)
     {
+        populated = true;
         RBR_TRY(RBRInstrument_converse(instrument,
                                        calibrationCommand,
                                        channel,
@@ -409,6 +452,7 @@ RBRInstrumentError RBRInstrument_setCalibration(
          && !isnan(calibration->x[x]);
          ++x)
     {
+        populated = true;
         RBR_TRY(RBRInstrument_converse(instrument,
                                        calibrationCommand,
                                        channel,
@@ -416,6 +460,11 @@ RBRInstrumentError RBRInstrument_setCalibration(
                                        'x',
                                        x,
                                        (double) calibration->x[x]));
+    }
+
+    if (!populated)
+    {
+        return RBRINSTRUMENT_INVALID_PARAMETER_VALUE;
     }
 
     return RBRINSTRUMENT_SUCCESS;

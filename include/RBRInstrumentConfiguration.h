@@ -276,6 +276,7 @@ typedef struct RBRInstrumentChannel
  * `channel`, and `calibration` commands.
  *
  * \see RBRInstrument_getChannels()
+ * \see RBRInstrument_getChannelsWithoutCalibrations()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channels
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/calibration
@@ -330,6 +331,7 @@ typedef struct RBRInstrumentChannels
  * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully read
  * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrument_getChannelsWithoutCalibrations()
  * \see RBRInstrument_getSensorParameters()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channels
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
@@ -337,6 +339,28 @@ typedef struct RBRInstrumentChannels
  */
 RBRInstrumentError RBRInstrument_getChannels(RBRInstrument *instrument,
                                              RBRInstrumentChannels *channels);
+
+/**
+ * \brief Get channel information for the instrument without calibration data.
+ *
+ * Channel information is composed from combining the `channels` and `channel`
+ * commands. Unlike RBRInstrument_getChannels(), calibration information is
+ * _not_ populated. This saves bandwidth and time communicating with the
+ * instrument when calibration information is unnecessary.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [out] channels the channel information
+ * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrument_getChannels()
+ * \see RBRInstrument_getSensorParameters()
+ * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channels
+ * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
+ */
+RBRInstrumentError RBRInstrument_getChannelsWithoutCalibrations(
+    RBRInstrument *instrument,
+    RBRInstrumentChannels *channels);
 
 /**
  * \brief Set the status of a channel.
@@ -419,7 +443,9 @@ RBRInstrumentError RBRInstrument_setChannelGain(
  * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENT_HARDWARE_ERROR when the calibration cannot be changed
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when no coefficients are
+ * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when the date/time of the
+ *                                                calibration is out of range,
+ *                                                or when no coefficients are
  *                                                populated
  * \see RBRInstrument_getChannels()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/calibration

@@ -8,6 +8,10 @@ Release TBD
 
 * Added Zephyr module definition
   permitting inclusion in a Zephyr workspace via [West].
+* Added `RBRInstrument_getChannelsWithoutCalibrations()` method
+  to retrieve channel information without calibration data
+  to save bandwidth and time
+  when calibration information is unnecessary.
 
 [West]: https://docs.zephyrproject.org/latest/develop/west/index.html
 
@@ -35,6 +39,9 @@ Release TBD
   updated to Clang 20;
   updated documentation step to GCC 15.
 * Fixed parallel builds with Make `-j, --jobs`.
+* Improve error handling in `RBRInstrument_setCalibration()`
+  (validate that the date/time is in range,
+  and informing the user if no coefficients were set).
 
 ## v1.2.4
 
