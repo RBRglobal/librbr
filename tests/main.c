@@ -273,13 +273,52 @@ int main(int argc, char *argv[])
     if (err != RBRINSTRUMENT_SUCCESS)
     {
         fprintf(stderr,
-                "Failure initializing Logger2 test instrument: %s.\n",
+                "Failure initializing Logger3 test instrument: %s.\n",
                 RBRInstrumentError_name(err));
         return EXIT_FAILURE;
     }
     else
     {
         printf("Initialized Logger3 test instrument.\n");
+    }
+
+    RBRInstrument instrumentL4Buffer;
+    RBRInstrument *instrumentL4 = &instrumentL4Buffer;
+    TestIOBuffers_init(
+        &ioBuffers,
+        "id model = RBRduet4, version = 1.0.0, serial = 999999, fwtype = 131"
+        RESPONSE_TERMINATOR,
+        0);
+    err = RBRInstrument_open(&instrumentL4,
+                             &instrumentCallbacks,
+                             /* command timeout */ 0,
+                             &ioBuffers);
+    if (err == RBRINSTRUMENT_SUCCESS)
+    {
+        fprintf(stderr,
+                "Unexpected success initializing Logger4 test instrument.\n");
+        return EXIT_FAILURE;
+    }
+    else if (err != RBRINSTRUMENT_UNSUPPORTED)
+    {
+        fprintf(stderr,
+                "Failure initializing Logger3 test instrument: %s.\n",
+                RBRInstrumentError_name(err));
+        return EXIT_FAILURE;
+    }
+    else /* RBRINSTRUMENT_UNSUPPORTED */
+    {
+        if (instrumentL4->generation != RBRINSTRUMENT_LOGGER4)
+        {
+            fprintf(stderr,
+                    "Unexpected generation Logger4 generation: %s.\n",
+                    RBRInstrumentGeneration_name(instrumentL4->generation));
+            return EXIT_FAILURE;
+        }
+        else
+        {
+            printf("Successfully rejected Logger4 test instrument.\n");
+        }
     }
 
     TestParserBuffers parserBuffers;
