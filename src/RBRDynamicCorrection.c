@@ -25,8 +25,8 @@
 #define ISNAN(x) (x != x)
 #endif
 
-#ifndef M_PI
-#define M_PI 3.14159265f
+#ifndef M_PI_F
+#define M_PI_F 3.14159265f
 #endif
 
 /* parameters for PSS-78 conversion */
@@ -341,7 +341,7 @@ float RBRDynamicCorrection_calcAscentRate(RBRDynamicCorrectionParams *params, in
                 deltaT = period;
             }
 
-            float a = 1.0f - expf(-2.0f * M_PI * params->Vp_fc * deltaT);
+            float a = 1.0f - expf(-2.0f * M_PI_F * params->Vp_fc * deltaT);
             Vp = (1.0f - a) * Vp + a * ((params->_lastPressure - pressure) / deltaT);
         }
 
