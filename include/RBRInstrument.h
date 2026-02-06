@@ -300,6 +300,8 @@ typedef enum RBRInstrumentGeneration
     RBRINSTRUMENT_LOGGER2,
     /** Logger3 (RBRvirtuoso³/duo³/concerto³/maestro³/solo³/duet³/coda³). */
     RBRINSTRUMENT_LOGGER3,
+    /** 4th generation instruments (RBRsolo⁴/duet⁴/coda⁴, etc.). */
+    RBRINSTRUMENT_LOGGER4,
     /** The number of known generations. */
     RBRINSTRUMENT_GENERATION_COUNT,
     /** An unknown or unrecognized instrument generation. */

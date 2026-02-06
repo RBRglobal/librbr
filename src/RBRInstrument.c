@@ -86,6 +86,8 @@ const char *RBRInstrumentGeneration_name(RBRInstrumentGeneration generation)
         return "Logger2";
     case RBRINSTRUMENT_LOGGER3:
         return "Logger3";
+    case RBRINSTRUMENT_LOGGER4:
+        return "Logger4";
     case RBRINSTRUMENT_GENERATION_COUNT:
         return "generation count";
     case RBRINSTRUMENT_UNKNOWN_GENERATION:
@@ -137,9 +139,16 @@ static RBRInstrumentError RBRInstrument_populateGeneration(
     {
         instrument->generation = RBRINSTRUMENT_LOGGER2;
     }
-    else
+    else if ((instrument->id.fwtype >= 104
+              && instrument->id.fwtype <= 110)
+              || (instrument->id.fwtype >= 202
+                  && instrument->id.fwtype <= 205))
     {
         instrument->generation = RBRINSTRUMENT_LOGGER3;
+    }
+    else
+    {
+        instrument->generation = RBRINSTRUMENT_LOGGER4;
     }
     return RBRINSTRUMENT_SUCCESS;
 }
