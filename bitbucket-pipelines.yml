@@ -69,7 +69,9 @@ pipelines:
 
             - step:
                 name: Zephyr example compilation
-                image: ghcr.io/zephyrproject-rtos/ci:main
+                # Container version pinned to provide an SDK compatible with
+                # the Zephyr version specified in west.yml.
+                image: ghcr.io/zephyrproject-rtos/ci:v0.28.8
                 script:
                     - cd examples/zephyr/
                     # We're in the unique position of trying to use a consume

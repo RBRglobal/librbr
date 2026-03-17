@@ -17,6 +17,8 @@ manifest:
 
     - name: zephyr
       url: https://github.com/zephyrproject-rtos/zephyr.git
+      # When updating, remember to ensure that the Zephyr CI container
+      # specified in bitbucket-pipelines.yml provides a compatible SDK.
       revision: v4.2.0
       import:
         name-allowlist:
