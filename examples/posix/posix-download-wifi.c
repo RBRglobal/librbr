@@ -39,6 +39,8 @@
 #include <arpa/inet.h> 
 #include <unistd.h> 
 #include <netdb.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 
 #include "posix-shared.h"
 
@@ -51,6 +53,9 @@
 #define NSEC_PER_SEC 1000000000LL
 #define ROLLING_WINDOW_NSEC (10LL * NSEC_PER_SEC)
 #define ROLLING_MAX_SAMPLES 1024
+
+/* Number of times a single chunk will be re-requested before giving up. */
+#define MAX_CHUNK_RETRIES 5
 
 typedef struct ThroughputSample
 {
@@ -73,6 +78,7 @@ static int listenUdp( void );
 static int openSocketFd( void );
 static void rollingPush(struct timespec ts, int32_t offset);
 static double rollingRateBps(struct timespec now, int32_t currentOffset);
+static bool isRetriableDownloadError(RBRInstrumentError err);
 /********************************/
 
 /**
@@ -264,7 +270,57 @@ static int openSocketFd( void )
         return -1; 
     } 
 
+    /* Set a short timeout for failing to receive a responses from the 
+     * instrument before triggering a re-request.
+     */
+    static const struct timeval recvTimeout = { 
+        .tv_sec = INSTRUMENT_CHARACTER_TIMEOUT_MSEC / 1000, 
+        .tv_usec = (INSTRUMENT_CHARACTER_TIMEOUT_MSEC % 1000) * 1000,
+    };
+    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &recvTimeout, sizeof(recvTimeout));
+
+    /* This is a command/response protocol: we send tiny commands and expect a
+     * reply. Nagle's algorithm holds back a small segment while an earlier
+     * small segment is still unacknowledged, so if a command packet is lost,
+     * our re-request commands queue up locally instead of going on the wire
+     * (they get coalesced into one packet once the stuck segment is finally
+     * ACKed). That also starves the duplicate ACKs that would otherwise trigger
+     * a fast retransmit, leaving us to wait out the full (RTT-variance-inflated)
+     * RTO. Disabling Nagle lets each re-request hit the wire immediately, so a
+     * lost command can be fast-retransmitted in ~1 RTT instead of seconds.
+     */
+    static const int optionEnabled = 1;
+    setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, &optionEnabled, sizeof(optionEnabled));
+
+    /* This connection is a "thin stream" (very few packets in flight at once),
+     * which is exactly what Linux's thin-stream options were added for.
+     * TCP_THIN_DUPACK triggers a fast retransmit after a single duplicate ACK
+     * instead of three (so recovery can happen on the first re-request), and
+     * TCP_THIN_LINEAR_TIMEOUTS avoids exponential RTO backoff. Both are
+     * Linux-specific, so guard them for portability.
+     */
+#ifdef TCP_THIN_DUPACK
+    setsockopt(sock, IPPROTO_TCP, TCP_THIN_DUPACK,
+               &optionEnabled, sizeof(optionEnabled));
+#endif
+#ifdef TCP_THIN_LINEAR_TIMEOUTS
+    setsockopt(sock, IPPROTO_TCP, TCP_THIN_LINEAR_TIMEOUTS,
+               &optionEnabled, sizeof(optionEnabled));
+#endif
     return sock;
+}
+
+/**
+ * Whether a readData error is the kind we can recover from by re-requesting the
+ * same chunk. These all indicate a transport-level problem with the chunk
+ * itself (short/garbled data) rather than something fatal to the connection.
+ */
+static bool isRetriableDownloadError(RBRInstrumentError err)
+{
+    return err == RBRINSTRUMENT_TIMEOUT
+           || err == RBRINSTRUMENT_CALLBACK_ERROR
+           || err == RBRINSTRUMENT_CHECKSUM_ERROR
+           || err == RBRINSTRUMENT_COMMUNICATION_ERROR;
 }
 
 int main(int argc, char *argv[])
@@ -420,25 +476,33 @@ int main(int argc, char *argv[])
     double elapsed = 0.0;
     double rate = 0.0;
     double rollingRate = 0.0;
+    int chunkRetries = 0;
     clock_gettime(CLOCK_MONOTONIC, &start);
     while (data.offset < meminfo.used)
     {
         data.size = sizeof(buf);
         err = RBRInstrument_readData(instrument, &data);
-        if (err == RBRINSTRUMENT_SUCCESS)
+        if (err != RBRINSTRUMENT_SUCCESS)
         {
-            write(downloadFd, data.data, data.size);
-            data.offset += data.size;
+            if (isRetriableDownloadError(err) && chunkRetries < MAX_CHUNK_RETRIES)
+            {
+                chunkRetries++;
+                printf("\n%s at offset %" PRIi32 "B; re-requesting chunk "
+                    "(attempt %d of %d)...\n",
+                    RBRInstrumentError_name(err),
+                    data.offset,
+                    chunkRetries,
+                    MAX_CHUNK_RETRIES);
+                continue;
+            } else {
+                printf("\nError: %s", RBRInstrumentError_name(err));
+                break;
+            }
         }
-        else if (err == RBRINSTRUMENT_TIMEOUT)
-        {
-            printf("\nWarning: timeout. Retrying...\n");
-        }
-        else
-        {
-            printf("\nError: %s", RBRInstrumentError_name(err));
-            break;
-        }
+
+        write(downloadFd, data.data, data.size);
+        data.offset += data.size;
+        chunkRetries = 0;
 
         clock_gettime(CLOCK_MONOTONIC, &now);
 
