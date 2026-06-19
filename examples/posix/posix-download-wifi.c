@@ -22,7 +22,7 @@
 #include <limits.h>
 /* Required for fprintf, printf, snprintf. */
 #include <stdio.h>
-/* Required for strerror. */
+/* Required for memmove, strerror. */
 #include <string.h>
 /* Required for open. */
 #include <sys/stat.h>
@@ -42,15 +42,90 @@
 
 #include "posix-shared.h"
 
-#define CHUNK_SIZE 4096
+/* Note: Using a larger chunk size (e.g. 34000 or 68000) can improve download
+ * throughput significantly on a good connection. */
+#define CHUNK_SIZE 34000
 #define HOST_SIZE 1024
+
+/* Rolling throughput window. */
+#define NSEC_PER_SEC 1000000000LL
+#define ROLLING_WINDOW_NSEC (10LL * NSEC_PER_SEC)
+#define ROLLING_MAX_SAMPLES 1024
+
+typedef struct ThroughputSample
+{
+    /* Timestamp when the chunk of bytes finished downloading. */
+    struct timespec ts;
+    /* Byte offset of the start of the chunk that was downloaded. */
+    int32_t offset;
+} ThroughputSample;
+
 static char host[HOST_SIZE];
 static uint16_t port = 0;
+
+/* Samples for calculating rolling throughput over the period specified by
+ * ROLLING_WINDOW_NSEC. Ordered oldest-first. Entries which have not been written
+ * yet are zeroed and will be ignored. */
+static ThroughputSample rollingSamples[ROLLING_MAX_SAMPLES];
 
 /**** Private functions.*********/
 static int listenUdp( void );
 static int openSocketFd( void );
+static void rollingPush(struct timespec ts, int32_t offset);
+static double rollingRateBps(struct timespec now, int32_t currentOffset);
 /********************************/
+
+/**
+ * Records a throughput sample.
+ *
+ * Shifts every existing sample one place towards the left of the array,
+ * discarding the oldest, and stores the new (timestamp, byte offset) pair in 
+ * the final element. Keeping the samples in oldest-first order lets
+ * rollingRateBps() scan them in a single pass.
+ */
+static void rollingPush(struct timespec ts, int32_t offset)
+{
+    memmove(&rollingSamples[0],
+            &rollingSamples[1],
+            sizeof(rollingSamples) - sizeof(rollingSamples[0]));
+    rollingSamples[ROLLING_MAX_SAMPLES - 1].ts = ts;
+    rollingSamples[ROLLING_MAX_SAMPLES - 1].offset = offset;
+}
+
+/**
+ * Computes the rolling download throughput in bytes per second.
+ *
+ * Finds the oldest sample which still falls within the ROLLING_WINDOW_NSEC
+ * window, then divides the number of bytes downloaded since that sample by the
+ * elapsed time. This yields an average rate over (approximately) the trailing 
+ * window rather than over the entire download.
+ */
+static double rollingRateBps(struct timespec now, int32_t currentOffset)
+{
+    const long long nowNs = (long long) now.tv_sec * NSEC_PER_SEC + now.tv_nsec;
+    const long long thresholdNs = nowNs - ROLLING_WINDOW_NSEC;
+
+    /* Scan from the oldest sample, skipping those which have fallen out of the
+     * window. Entries which have never been written hold a zero timestamp; they
+     * are outside the window too, but only once the machine has been up for
+     * ROLLING_WINDOW_NSEC, so exclude them explicitly rather than relying on
+     * thresholdNs being positive. */
+    for (int i = 0; i < ROLLING_MAX_SAMPLES; i++)
+    {
+        const ThroughputSample *const sample = &rollingSamples[i];
+        const long long tsNs = (long long) sample->ts.tv_sec * NSEC_PER_SEC
+                               + sample->ts.tv_nsec;
+        if (tsNs == 0 || tsNs <= thresholdNs)
+        {
+            continue;
+        }
+
+        const double dt = (nowNs - tsNs) / 1e9;
+        return dt > 0.0 ? (currentOffset - sample->offset) / dt : 0.0;
+    }
+
+    return 0.0;
+}
 
 /**
  * Data packets are broadcast over UDP, listen for this to determine if a logger is connected and to obtain 
@@ -344,6 +419,7 @@ int main(int argc, char *argv[])
     struct timespec now;
     double elapsed = 0.0;
     double rate = 0.0;
+    double rollingRate = 0.0;
     clock_gettime(CLOCK_MONOTONIC, &start);
     while (data.offset < meminfo.used)
     {
@@ -367,19 +443,23 @@ int main(int argc, char *argv[])
         clock_gettime(CLOCK_MONOTONIC, &now);
 
         elapsed  = now.tv_sec - start.tv_sec;
-        elapsed *= 1000000000L;
+        elapsed *= NSEC_PER_SEC;
         elapsed += now.tv_nsec - start.tv_nsec;
-        elapsed /= 1000000000L;
+        elapsed /= NSEC_PER_SEC;
 
         rate = elapsed > 0.0 ? (data.offset - initialOffset) / elapsed : 0.0;
 
+        rollingPush(now, data.offset);
+        rollingRate = rollingRateBps(now, data.offset);
+
         printf("\r%0.2f%% (%" PRIi32 "B/%" PRIi32 "B; %0.3fs elapsed; "
-               "%0.3fB/s)",
+               "%0.3fB/s avg; %0.3fB/s 10s rolling)",
                (((double) data.offset) / meminfo.used) * 100,
                data.offset,
                meminfo.used,
                elapsed,
-               rate);
+               rate,
+               rollingRate);
     }
 
     printf("\nDone. Downloaded %" PRIi32 "B in %0.3fs (%0.3fB/s).\n",
