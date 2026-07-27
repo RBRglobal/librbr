@@ -43,6 +43,19 @@ Release TBD
   (validate that the date/time is in range,
   and informing the user if no coefficients were set).
 
+### Fixed
+
+* The sample parsing helper function used internal by `RBRParser_parse()`
+  previously cleared an incorrect buffer size
+  before writing the parsed sample.
+  In the typical case
+  where `sizeof(RBRInstrumentSample) > sizeof(RBRInstrumentEvent)`,
+  this could have left stale data at the end of `sample->readings`;
+  in suitable a non-default configuration
+  (e.g., where `RBRINSTRUMENT_CHANNEL_MAX < 3`),
+  this could have resulted in writes
+  past the end of the `data` buffer.
+
 ## v1.2.4
 
 Released 2025-04-07
