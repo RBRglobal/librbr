@@ -259,7 +259,7 @@ static RBRInstrumentError RBRParser_parseEPSamples(
                          + EP_SAMPLE_READING_SIZE * channels;
     for (; *size + sampleSize <= maxSize; *size += sampleSize)
     {
-        memset(sample, 0, sizeof(RBRInstrumentEvent));
+        memset(sample, 0, sizeof(RBRInstrumentSample));
 
         sample->timestamp = *(RBRInstrumentDateTime *) (data + *size);
         sample->channels = channels;
