@@ -48,27 +48,7 @@ export LIB_VERSION ?= $(shell ./tools/version.sh)
 ## - `c`: create the archive if necessary
 ## - `r`: replace existing contents of archive
 ## - `s`: create/update archive index
-##
-## In pursuit of reproducible builds, recent versions of Debian (and therefore
-## derivatives, including Ubuntu) ship a version of ar(1) which produces
-## “deterministic” archives; i.e., the UID/GID/timestamp/mode file attributes
-## are 0'd out. Unfortunately, because make(1) decides whether or not a target
-## needs to be built by comparing target and dependency modification times,
-## this completely breaks incremental builds: with deterministic archives left
-## enabled, every invocation of `make lib` causes the entire library to be
-## rebuilt. As a workaround, we'll explicitly disable deterministic mode on
-## systems using GNU ar(1):
-##
-## - `U`: maintain original UID/GID/timestamp/mode of archive contents
-##
-## The build is nondeterministic anyway because of the embedded build date, so
-## we gain nothing from leaving deterministic mode on, and we save a lot of
-## developer time on the edit/compile/test loop by turning it off.
 ARFLAGS := -c -r -s
-ARFLAGS += $(shell \
-    ar --version 2>&1 | grep -q GNU \
-    && ar --help 2>&1 | grep -q '\[U\]' \
-    && echo -U)
 
 ## \brief C compilation flags.
 ##
@@ -107,38 +87,37 @@ libdynamiccorrection: bin/libRBRDynamicCorrection.a
 
 lib: bin/libRBR.a
 
-# Make archiving compatible with parallel builds (-j, --jobs).
+# Due to incompatibility between parallel builds (-j, --jobs) and Make's
+# archive syntax, and between incremental builds and deterministically-produced
+# archives (as written out by llvm-ar v10.0.0+ and most distro builds of GNU
+# binutils ar v2.23+), we'll not use “member” syntax at all, and define our
+# archive rules with normal prerequisites.
 #
-# Based on “Dangers When Using Archives”:
-# https://www.gnu.org/software/make/manual/html_node/Archive-Pitfalls.html.
-#
-# Disable the default rule for updating a single archive object:
-(%): %;
-# Change the default rule for building an archive to replace all outdated
-# objects at once (and unlike the example in the GNU Make docs, filter for just
-# objects, and not any other files, so we don't try to stuff bin/ – which is
-# also a dependency of our archives – into the archive):
+# We can, however, still share the recipe between both of our archive rules.
+# And we'll filter for objects, and not any other files, so we don't try to
+# stuff bin/ – which is also a dependency of our archives – into the archives:
 %.a:
-	$(AR) $(ARFLAGS) $@ $(filter %o,$?)
+	$(AR) $(ARFLAGS) $@ $(filter %.o,$?)
 
-bin/libRBR.a: bin bin/libRBR.a(src/RBRInstrument.o \
-                               src/RBRInstrumentCommunication.o \
-                               src/RBRInstrumentConfiguration.o \
-                               src/RBRInstrumentDeployment.o \
-                               src/RBRInstrumentFetching.o \
-                               src/RBRInstrumentGating.o \
-                               src/RBRInstrumentHardwareErrors.o \
-                               src/RBRInstrumentInternal.o \
-                               src/RBRInstrumentMemory.o \
-                               src/RBRInstrumentOther.o \
-                               src/RBRInstrumentPauseresume.o \
-                               src/RBRInstrumentSchedule.o \
-                               src/RBRInstrumentSecurity.o \
-                               src/RBRInstrumentStreaming.o \
-                               src/RBRInstrumentVehicle.o \
-                               src/RBRParser.o)
+bin/libRBR.a: src/RBRInstrument.o \
+              src/RBRInstrumentCommunication.o \
+              src/RBRInstrumentConfiguration.o \
+              src/RBRInstrumentDeployment.o \
+              src/RBRInstrumentFetching.o \
+              src/RBRInstrumentGating.o \
+              src/RBRInstrumentHardwareErrors.o \
+              src/RBRInstrumentInternal.o \
+              src/RBRInstrumentMemory.o \
+              src/RBRInstrumentOther.o \
+              src/RBRInstrumentPauseresume.o \
+              src/RBRInstrumentSchedule.o \
+              src/RBRInstrumentSecurity.o \
+              src/RBRInstrumentStreaming.o \
+              src/RBRInstrumentVehicle.o \
+              src/RBRParser.o \
+              | bin
 
-bin/libRBRDynamicCorrection.a: bin bin/libRBRDynamicCorrection.a(src/RBRDynamicCorrection.o)
+bin/libRBRDynamicCorrection.a: src/RBRDynamicCorrection.o | bin
 
 .PHONY: docs
 docs:

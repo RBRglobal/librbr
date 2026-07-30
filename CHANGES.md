@@ -38,7 +38,9 @@ Release TBD
   added GCC 12–15;
   updated to Clang 20;
   updated documentation step to GCC 15.
-* Fixed parallel builds with Make `-j, --jobs`.
+* Fixed parallel builds with Make `-j, --jobs`,
+  and made `.a`rchives compatible with deterministic archivers
+  (llvm-ar v10.0.0+, and most distro builds of GNU binutils ar v2.23+).
 * Improve error handling in `RBRInstrument_setCalibration()`
   (validate that the date/time is in range,
   and informing the user if no coefficients were set).
