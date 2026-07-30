@@ -53,7 +53,8 @@ extern const char *RBRINSTRUMENT_LIB_VERSION;
 /**
  * \brief The library build date.
  *
- * Stored in ISO 8601 format (“YYYY-mm-ddTHH:MM:SS±hhmm”).
+ * \deprecated As of libRBR v1.3.0, this builds with the value “unknown” to
+ *             support deterministic builds.
  */
 extern const char *RBRINSTRUMENT_LIB_BUILD_DATE;
 

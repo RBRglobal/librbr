@@ -36,9 +36,9 @@ export LIB_VERSION ?= $(shell ./tools/version.sh)
 
 ## \brief The project build date.
 ##
-## Embedded into the library. Probably shouldn't be overridden, unless you want
-## to match the build date or timestamp format of a containing project.
-export LIB_BUILD_DATE?=$(shell date '+%FT%T%z')
+## \deprecated As of libRBR v1.3.0, this builds with the value “unknown” to
+##             support deterministic builds.
+#export LIB_BUILD_DATE
 
 ## \brief Archiver flags.
 ##
@@ -95,8 +95,11 @@ CFLAGS := -Werror \
 
 CFLAGS += -DRBR_LIB_NAME=\""$(LIB_NAME)"\" \
           -DRBR_LIB_VERSION=\""$(LIB_VERSION)"\" \
-          -DRBR_LIB_BUILD_DATE=\"$(LIB_BUILD_DATE)\" \
           -Iinclude
+
+ifneq ($(LIB_BUILD_DATE),)
+CFLAGS += -DRBR_LIB_BUILD_DATE=\"$(LIB_BUILD_DATE)\"
+endif
 
 all: lib libdynamiccorrection docs tests
 

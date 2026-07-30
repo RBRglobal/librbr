@@ -49,6 +49,16 @@ Release TBD
   where possible.
   The `VERSION` file is still used as a fallback
   when Git or the repository metadata is unavailable.
+* The library build date
+  (stored in the string constant `RBRINSTRUMENT_LIB_BUILD_DATE`)
+  has been deprecated
+  to make library builds deterministic
+  and object contents compatible with reproducible build processes.
+  Per SemVer API compatibility guarantees,
+  the symbol will not be removed from the API surface
+  before the next major version increment;
+  however, when the library is built with the default, in-tree build process,
+  its value will always be “unknown”.
 
 ### Fixed
 

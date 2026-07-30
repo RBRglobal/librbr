@@ -54,11 +54,10 @@ int main(int argc, char *argv[])
     }
 
     fprintf(stderr,
-            "%s: Using %s v%s (built %s).\n",
+            "%s: Using %s v%s.\n",
             programName,
             RBRINSTRUMENT_LIB_NAME,
-            RBRINSTRUMENT_LIB_VERSION,
-            RBRINSTRUMENT_LIB_BUILD_DATE);
+            RBRINSTRUMENT_LIB_VERSION);
 
     RBRInstrumentCallbacks callbacks = {
         .time = instrumentTime,
