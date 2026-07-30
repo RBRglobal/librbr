@@ -25,13 +25,14 @@
 ## Project forks might like to override this by setting the `LIB_NAME`
 ## environment variable before invoking `make(1)` to easily identify which
 ## library variant is in use.
-export LIB_NAME?=libRBR
+export LIB_NAME ?= libRBR
 
 ## \brief The project version.
 ##
-## Embedded into the library and documentation. Determined from the contents of
-## the VERSION file.
-export LIB_VERSION?=$(shell head -n 1 VERSION)
+## Embedded into the library and documentation. Based on the output of the `git
+## describe --dirty` command where possible, or else the contents of the
+## VERSION file.
+export LIB_VERSION ?= $(shell ./tools/version.sh)
 
 ## \brief The project build date.
 ##

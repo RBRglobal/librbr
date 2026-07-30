@@ -1,3 +1,7 @@
+clone:
+    # Full clone so `git describe` can always see a tag.
+    depth: full
+
 definitions:
     steps:
         - step:

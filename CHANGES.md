@@ -42,6 +42,13 @@ Release TBD
 * Improve error handling in `RBRInstrument_setCalibration()`
   (validate that the date/time is in range,
   and informing the user if no coefficients were set).
+* The library version number
+  (stored in the string constant `RBRINSTRUMENT_LIB_VERSION`)
+  is now based on the Git version information
+  (`git describe --dirty`)
+  where possible.
+  The `VERSION` file is still used as a fallback
+  when Git or the repository metadata is unavailable.
 
 ### Fixed
 

@@ -37,8 +37,17 @@ extern const char *RBRINSTRUMENT_LIB_NAME;
 /**
  * \brief The library version.
  *
- * As shipped by RBR, this builds with a value based on the contents of the
+ * As shipped by RBR, this builds with a value based on the output of the `git
+ * describe --dirty` command where possible, or else the contents of the
  * VERSION file. Project forks might also like to override this at build time.
+ *
+ * For tagged, released library versions, this will be a string like “1.3.0”.
+ *
+ * For development versions where Git and the library's .git directory are
+ * available, this could be a string like “1.3.0-67-g0a1b2c3-dirty”. See `man
+ * git-describe` for details, particularly the EXAMPLES section. Note that any
+ * leading “v” is stripped from the tag name for consistency with the contents
+ * of the VERSION file.
  */
 extern const char *RBRINSTRUMENT_LIB_VERSION;
 /**
