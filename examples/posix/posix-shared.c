@@ -156,7 +156,7 @@ RBRInstrumentError instrumentWrite(const struct RBRInstrument *instrument,
          * have the same timeout, so we'll reset it before each use. */
         writeTimeout = (struct timeval) {
             .tv_sec  =  INSTRUMENT_CHARACTER_TIMEOUT_MSEC / 1000,
-            .tv_usec = (INSTRUMENT_CHARACTER_TIMEOUT_MSEC % 1000) * 1000000
+            .tv_usec = (INSTRUMENT_CHARACTER_TIMEOUT_MSEC % 1000) * 1000
         };
 
         /* We could just loop on write(), but we want to enforce a timeout, so
