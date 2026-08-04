@@ -12,6 +12,10 @@ Release TBD
   to retrieve channel information without calibration data
   to save bandwidth and time
   when calibration information is unnecessary.
+* Improved 
+  [examples/posix/posix-download-wifi.c](examples/posix/posix-download-wifi.c)
+  to show rolling average throughput and re-request chunks that fail to
+  download.
 
 [West]: https://docs.zephyrproject.org/latest/develop/west/index.html
 
