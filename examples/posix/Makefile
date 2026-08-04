@@ -62,6 +62,12 @@ posix-stream-dynamiccorrection: posix-shared.o posix-stream-dynamiccorrection.o 
 posix-stream-sdl: LDLIBS += -lSDL2
 posix-stream-sdl: posix-shared.o posix-stream-sdl.o ../../bin/libRBR.a
 
+../../bin/libRBR.a:
+	$(MAKE) -C ../../ lib
+
+../../bin/libRBRDynamicCorrection.a:
+	$(MAKE) -C ../../ libdynamiccorrection
+
 .PHONY: clean
 clean:
 	rm -Rf \

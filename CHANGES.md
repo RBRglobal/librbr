@@ -38,10 +38,29 @@ Release TBD
   added GCC 12–15;
   updated to Clang 20;
   updated documentation step to GCC 15.
-* Fixed parallel builds with Make `-j, --jobs`.
+* Fixed parallel builds with Make `-j, --jobs`,
+  and made `.a`rchives compatible with deterministic archivers
+  (llvm-ar v10.0.0+, and most distro builds of GNU binutils ar v2.23+).
 * Improve error handling in `RBRInstrument_setCalibration()`
   (validate that the date/time is in range,
   and informing the user if no coefficients were set).
+* The library version number
+  (stored in the string constant `RBRINSTRUMENT_LIB_VERSION`)
+  is now based on the Git version information
+  (`git describe --dirty`)
+  where possible.
+  The `VERSION` file is still used as a fallback
+  when Git or the repository metadata is unavailable.
+* The library build date
+  (stored in the string constant `RBRINSTRUMENT_LIB_BUILD_DATE`)
+  has been deprecated
+  to make library builds deterministic
+  and object contents compatible with reproducible build processes.
+  Per SemVer API compatibility guarantees,
+  the symbol will not be removed from the API surface
+  before the next major version increment;
+  however, when the library is built with the default, in-tree build process,
+  its value will always be “unknown”.
 
 ### Fixed
 

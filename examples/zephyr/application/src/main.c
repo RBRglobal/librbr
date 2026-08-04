@@ -65,10 +65,9 @@ int main(void)
         return 0;
     }
 
-    LOG_INF("using %s v%s (built %s)",
+    LOG_INF("using %s v%s",
             RBRINSTRUMENT_LIB_NAME,
-            RBRINSTRUMENT_LIB_VERSION,
-            RBRINSTRUMENT_LIB_BUILD_DATE);
+            RBRINSTRUMENT_LIB_VERSION);
 
     RBRInstrumentCallbacks callbacks = {
         .time = ZephyrRBRInstrumentTime_get,

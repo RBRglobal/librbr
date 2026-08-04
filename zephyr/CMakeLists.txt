@@ -4,8 +4,9 @@
 if(CONFIG_LIBRBR)
     zephyr_interface_library_named(librbr)
 
-    file(STRINGS ${ZEPHYR_CURRENT_MODULE_DIR}/VERSION RBR_LIB_VERSION_LIST LIMIT_COUNT 1)
-    list(GET RBR_LIB_VERSION_LIST 0 RBR_LIB_VERSION)
+    include(${ZEPHYR_CURRENT_MODULE_DIR}/tools/version.cmake)
+
+    librbr_version(${ZEPHYR_CURRENT_MODULE_DIR} RBR_LIB_VERSION)
 
     zephyr_compile_definitions(
         RBR_LIB_NAME="libRBR"

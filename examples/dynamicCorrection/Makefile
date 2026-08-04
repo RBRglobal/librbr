@@ -15,6 +15,8 @@ example: dynamicCorrection-example
 
 dynamicCorrection-example: dynamicCorrection-example.o ../../bin/libRBRDynamicCorrection.a
 
+../../bin/libRBRDynamicCorrection.a:
+	$(MAKE) -C ../../ libdynamiccorrection
 
 .PHONY: clean
 clean:
