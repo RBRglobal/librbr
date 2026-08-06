@@ -99,8 +99,11 @@ static RBRInstrumentGen4DateTime localTimeOffset = OFFSET_UNINITIALIZED;
 
 /**
  * \brief Like strstr, but for memory.
+ *
+ * Static: the Gen3 sources define an identical helper of the same name, and
+ * both generations can be linked into one image.
  */
-void *rbr_memmem(void *ptr1, size_t num1, const void *ptr2, size_t num2)
+static void *rbr_memmem(void *ptr1, size_t num1, const void *ptr2, size_t num2)
 {
     if (num2 > num1)
     {
@@ -525,15 +528,15 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
             else */
             if (memcmp(token, SAMPLE_NAN, 3) == 0)
             {
-                reading = NAN;
+                reading = (double) NAN;
             }
             else if (memcmp(token, SAMPLE_INF, 3) == 0)
             {
-                reading = INFINITY;
+                reading = (double) INFINITY;
             }
             else if (memcmp(token, SAMPLE_NINF, 4) == 0)
             {
-                reading = -INFINITY;
+                reading = -(double) INFINITY;
             }
             else if (memcmp(token, SAMPLE_UNCAL, 3) == 0)
             {
@@ -570,7 +573,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
                         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
                     }
                     uint16_t calCrc;
-                    calCrc = calculateCrc(response, token - response);
+                    calCrc = calculateCrcGen4(response, token - response);
                     if (calCrc != realCrc)
                     {
                         return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;
@@ -1109,7 +1112,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getInt(RBRInstrumentGen4 *instrument,
 }
 
 /** \brief Ensure localTimeOffset is initialized. */
-static inline void RBRInstrumentGen4DateTime_initializeOffset()
+static inline void RBRInstrumentGen4DateTime_initializeOffset(void)
 {
     if (localTimeOffset == OFFSET_UNINITIALIZED)
     {

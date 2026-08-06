@@ -160,8 +160,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setCalibration(
                                 "calibration %s datetime=%s, useroffset=%d, userslope=%d",
                                 parent->label,
                                 calibrationDateTime,
-                                calibration->userOffset,
-                                calibration->userSlope));
+                                (double) calibration->userOffset,
+                                (double) calibration->userSlope));
 
     for (int32_t c = 0;
          c < RBRINSTRUMENTGEN4_CALIBRATION_C_COEFFICIENT_MAX
@@ -174,7 +174,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setCalibration(
                                        calibrationDateTime,
                                        'c',
                                        c,
-                                       calibration->c[c]));
+                                       (double) calibration->c[c]));
     }
     for (int32_t x = 0;
          x < RBRINSTRUMENTGEN4_CALIBRATION_X_COEFFICIENT_MAX
@@ -187,7 +187,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setCalibration(
                                        calibrationDateTime,
                                        'x',
                                        x,
-                                       calibration->x[x]));
+                                       (double) calibration->x[x]));
     }
 
     return RBRINSTRUMENTGEN4_SUCCESS;

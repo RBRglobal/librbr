@@ -21,7 +21,7 @@
 
 #include "posix-shared.h"
 
-int main()
+int main(void)
 {
     RBRInstrumentGen4 instrument;
     printf("%ld\n", sizeof(instrument)); //in bytes

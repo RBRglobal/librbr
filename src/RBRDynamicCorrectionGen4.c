@@ -174,7 +174,8 @@ float RBRDynamicCorrectionGen4_applyTempCorr(RBRDynamicCorrectionGen4Params *par
     float T_cor;
 
     /* (first evaluation will be incorrect, but won't be used) */
-    T_cor = (1.0 - params->_phi)*params->_T_meas_lag + (params->_phi)*T_meas;
+    T_cor = (float) ((1.0 - (double) params->_phi)*(double) params->_T_meas_lag
+                     + ((double) params->_phi)*(double) T_meas);
 
     return T_cor;
 }
@@ -383,7 +384,8 @@ void RBRDynamicCorrectionGen4_updateVariables(RBRDynamicCorrectionGen4Params *pa
     params->CT_coeff = params->ctcoeff_a * powf(Vp, params->ctcoeff_e);
 
     F_nyquist = params->Fs / 2.0f;
-    params->_cte_a = (4.0f*F_nyquist * alpha * tau) / (1.0 + 4.0f*F_nyquist * tau);
+    params->_cte_a = (float) ((double) (4.0f*F_nyquist * alpha * tau)
+                              / (1.0 + (double) (4.0f*F_nyquist * tau)));
     params->_cte_b = 1.0f -  2.0f * params->_cte_a / alpha;
 }
 

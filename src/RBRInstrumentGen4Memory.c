@@ -216,7 +216,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_fixedRead(
 }
 
 /* CRC-CCITT */
-uint16_t calculateCrc(const void *data, int32_t size)
+uint16_t calculateCrcGen4(const void *data, int32_t size)
 {
 #define CRC_POLYNOMIAL 0x1021
 
@@ -289,7 +289,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_download(
 
     crc.value = (crc.value >> 8) | (crc.value << 8);
 
-    uint16_t calculatedCrc = calculateCrc(download->data, download->countValue);
+    uint16_t calculatedCrc = calculateCrcGen4(download->data, download->countValue);
     if (calculatedCrc != crc.value)
     {
         return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;
@@ -566,7 +566,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPostprocessing(
         "postprocessing binreference=%s binfilter=%s binsize=%.1f",
         postprocessing->binReference,
         RBRInstrumentGen4PostprocessingBinFilter_name(postprocessing->binFilter),
-        postprocessing->binSize));
+        (double) postprocessing->binSize));
 
     char tstamp[RBRINSTRUMENTGEN4_SCHEDULE_TIME_LEN + 1];
 
@@ -585,8 +585,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPostprocessing(
     RBR_TRY(RBRInstrumentGen4_converse(
         instrument,
         "postprocessing depth_min=%.1f depth_max=%.1f",
-        postprocessing->depthMin,
-        postprocessing->depthMax));
+        (double) postprocessing->depthMin,
+        (double) postprocessing->depthMax));
 
     /* on-board dynamic correction only available for firmware 1.134 and above */
     if ( instrument->id.fwtype == 104 && RBRInstrumentGen4Version_compare(instrument->id.fwversion, "1.134") >= 0 )
@@ -594,10 +594,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPostprocessing(
        RBR_TRY(RBRInstrumentGen4_converse(
             instrument,
             "postprocessing dc_alpha=%.3f dc_tau=%.3f dc_tdelay=%.3f dc_ctcoeff=%.4e",
-            postprocessing->dcAlpha,
-            postprocessing->dcTau,
-            postprocessing->dcTdelay,
-            postprocessing->dcCtCoeff));
+            (double) postprocessing->dcAlpha,
+            (double) postprocessing->dcTau,
+            (double) postprocessing->dcTdelay,
+            (double) postprocessing->dcCtCoeff));
     }
 
     char *commandBuffer = (char *) instrument->commandBuffer;

@@ -1,3 +1,7 @@
+# Unlike the library and the Gen3 examples, these examples are not yet built
+# with -Wdouble-promotion, and -Wformat-truncation is disabled: the example
+# code predates those policies. Both relaxations should go away with the
+# example alignment planned for libRBR 2.0 (SYS-1194).
 CFLAGS := -I../../include \
           -Werror \
           -Wall \
@@ -5,47 +9,57 @@ CFLAGS := -I../../include \
           -pedantic \
           -pedantic-errors \
           -Wwrite-strings \
+          -Wno-format-truncation \
           -std=c99 \
-          -g 
-
-CFLAGS += -Wno-sizeof-array-argument -Werror
-CFLAGS += -Wno-sizeof-pointer-div -Werror
-
+          -g
 LDFLAGS := -L../../bin
 LDLIBS := -lRBR -lm
 
-example: posix-test \
-         posix-communications \
+## \brief Gen4 example programs.
+##
+## Two examples are not listed and do not currently build; re-enabling them
+## is part of the example alignment planned for libRBR 2.0 (SYS-1194):
+##
+## - posix-multiScheduleDiffConfig predates the late-2024 API alignment (it
+##   still refers to the WiFi and old group/config pool interfaces);
+## - posix-parse-file calls RBRParserGen4_destroy(), which is declared but
+##   not implemented (the Gen4 sample parser is incomplete).
+EXAMPLES := \
+    posix-communications \
+    posix-download-datablock-bySchedule \
+    posix-footprint \
+    posix-generation \
+    posix-poll \
+    posix-profilingFloat \
+    posix-singleScheduleSingleConfig \
+    posix-stream \
+    posix-test
 
-posix-download-datablock-bySchedule: posix-download-datablock-bySchedule.o posix-shared.o ../../bin/libRBR.a
-posix-footprint: posix-footprint.o posix-shared.o ../../bin/libRBR.a
-posix-generation: posix-generation.o posix-shared.o ../../bin/libRBR.a
-posix-multiScheduleDiffConfig: posix-multiScheduleDiffConfig.o posix-shared.o ../../bin/libRBR.a
-posix-poll: posix-poll.o posix-shared.o ../../bin/libRBR.a
-posix-singleScheduleSingleConfig: posix-singleScheduleSingleConfig.o posix-shared.o ../../bin/libRBR.a
-posix-stream: posix-stream.o posix-shared.o ../../bin/libRBR.a
+all: $(EXAMPLES)
+
+posix-communications: posix-shared.o posix-communications.o ../../bin/libRBR.a
+
+posix-download-datablock-bySchedule: posix-shared.o posix-download-datablock-bySchedule.o ../../bin/libRBR.a
+
+posix-footprint: posix-shared.o posix-footprint.o ../../bin/libRBR.a
+
+posix-generation: posix-shared.o posix-generation.o ../../bin/libRBR.a
+
+posix-poll: posix-shared.o posix-poll.o ../../bin/libRBR.a
+
+posix-profilingFloat: posix-shared.o posix-profilingFloat.o ../../bin/libRBR.a
+
+posix-singleScheduleSingleConfig: posix-shared.o posix-singleScheduleSingleConfig.o ../../bin/libRBR.a
+
+posix-stream: posix-shared.o posix-stream.o ../../bin/libRBR.a
 
 posix-test: posix-test.o ../../bin/libRBR.a
-posix-communications: posix-communications.o posix-shared.o ../../bin/libRBR.a
 
+../../bin/libRBR.a:
+	$(MAKE) -C ../../ lib
 
 .PHONY: clean
 clean:
 	rm -Rf \
 		*.o \
-        posix-download-datablock-bySchedule \
-        posix-footprint \
-        posix-generation \
-        posix-multiScheduleDiffConfig \
-        posix-poll \
-        posix-singleScheduleSingleConfig \
-        posix-stream \
-        posix-parse-file \
-        posix-test
-
-
-
-
-
-
-
+		$(EXAMPLES)

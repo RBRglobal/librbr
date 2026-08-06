@@ -753,7 +753,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPostprocessingCommand(
  * \return calculated CRC
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
-uint16_t calculateCrc(
+uint16_t calculateCrcGen4(
     const void *data,
     int32_t size);   
 

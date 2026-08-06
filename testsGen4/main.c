@@ -220,7 +220,7 @@ const char *bool_name(bool value)
     }
 }
 
-int main()
+int main(void)
 {
     RBRInstrumentGen4Error err;
     TestIOBuffers ioBuffers;

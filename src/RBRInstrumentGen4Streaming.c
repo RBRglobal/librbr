@@ -150,7 +150,7 @@ inline double RBRInstrumentGen4Reading_setError(RBRInstrumentGen4ReadingFlag fla
         double reading;
         uint64_t raw;
     } alias;
-    alias.reading = NAN;
+    alias.reading = (double) NAN;
 
     alias.raw |= ((flag << READING_FLAG_OFFSET) & READING_FLAG_MASK) | ((error << READING_ERROR_OFFSET) & READING_ERROR_MASK);
 

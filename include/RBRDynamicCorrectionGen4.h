@@ -8,8 +8,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_DYNAMICCORRECTION_H
-#define LIBRBR_DYNAMICCORRECTION_H
+#ifndef LIBRBR_DYNAMICCORRECTIONGEN4_H
+#define LIBRBR_DYNAMICCORRECTIONGEN4_H
 
 #include <stdint.h>
 
@@ -267,4 +267,4 @@ RBRDynamicCorrectionGen4Error RBRDynamicCorrectionGen4_update_Fs(const float Fs,
 RBRDynamicCorrectionGen4Error RBRDynamicCorrectionGen4_addMeasurement(const RBRDynamicCorrectionGen4Measurement * measIn, RBRDynamicCorrectionGen4Params *params, RBRDynamicCorrectionGen4Result * corrMeasOut);
 
 
-#endif // LIBRBR_DYNAMICCORRECTION_H
+#endif // LIBRBR_DYNAMICCORRECTIONGEN4_H

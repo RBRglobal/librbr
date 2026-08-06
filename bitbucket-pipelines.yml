@@ -8,11 +8,22 @@ definitions:
             name: Generic compilation
             script: &compile
                 - export MAKEFLAGS=--jobs=$(nproc)
+                # Gen3-only configuration (equivalent to libRBR 1.x).
+                - make clean
+                - make GEN4=0 lib libdynamiccorrection tests
+                # Gen4-only configuration.
+                - make clean
+                - make GEN3=0 lib libdynamiccorrection tests
+                # Both generations (the default configuration). Built last so
+                # the examples below link against the both-generation archive.
                 - make clean
                 - make lib libdynamiccorrection tests
                 - cd examples/posix
                 - make clean
                 - make nosdl
+                - cd ../posixGen4
+                - make clean
+                - make
 
 pipelines:
     default:
@@ -111,6 +122,9 @@ pipelines:
                     - scan-build make lib libdynamiccorrection
                     - make tests
                     - cd examples/posix
+                    - make clean
+                    - scan-build make
+                    - cd ../posixGen4
                     - make clean
                     - scan-build make
 

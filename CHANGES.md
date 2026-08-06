@@ -1,5 +1,26 @@
 # Changes
 
+## v2.0.0
+
+Release TBD
+
+### Added
+
+* Unified the Gen3 (Logger2/Logger3) and Gen4 (Generation 4) instrument
+  APIs into a single source tree and library.
+  The Gen4 API (`RBRInstrumentGen4_…`, `RBRParserGen4_…`,
+  `RBRDynamicCorrectionGen4_…`),
+  harvested from the 2023–2024 Gen4 development branches,
+  now lives alongside the unchanged Gen3 API
+  and is under active development.
+* Added the `GEN3` and `GEN4` Makefile options
+  (and `CONFIG_LIBRBR_GEN3`/`CONFIG_LIBRBR_GEN4` Kconfig options
+  for Zephyr builds)
+  to select the instrument generations
+  compiled into `bin/libRBR.a`.
+  Both default to enabled;
+  a `GEN4=0` build is equivalent to the libRBR 1.x library.
+
 ## v1.3.0
 
 Release TBD

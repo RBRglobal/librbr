@@ -153,7 +153,7 @@ RBRInstrumentGen4Error TestIOBuffers_sample(
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-int main()
+int main(void)
 {
     RBRInstrumentGen4 *instrument = NULL;
     RBRInstrumentGen4 instrumentSpace;

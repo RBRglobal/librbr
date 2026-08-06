@@ -8,8 +8,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRPARSER_H
-#define LIBRBR_RBRPARSER_H
+#ifndef LIBRBR_RBRPARSERGEN4_H
+#define LIBRBR_RBRPARSERGEN4_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -359,4 +359,4 @@ RBRInstrumentGen4Error RBRParserGen4_parse(RBRParserGen4 *parser,
 }
 #endif
 
-#endif /* LIBRBR_RBRPARSER_H */
+#endif /* LIBRBR_RBRPARSERGEN4_H */

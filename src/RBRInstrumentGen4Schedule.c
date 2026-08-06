@@ -76,7 +76,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setClock(RBRInstrumentGen4 *instrument,
                 instrument,
                 "clock datetime=%s offsetfromutc=%02f",
                 dateTime,
-                offsetFromUtc);
+                (double) offsetFromUtc);
         }
         else
         {

@@ -13,8 +13,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTINTERNAL_H
-#define LIBRBR_RBRINSTRUMENTINTERNAL_H
+#ifndef LIBRBR_RBRINSTRUMENTGEN4INTERNAL_H
+#define LIBRBR_RBRINSTRUMENTGEN4INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -378,4 +378,4 @@ void RBRInstrumentGen4DateTime_toScheduleTime(RBRInstrumentGen4DateTime timestam
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTINTERNAL_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN4INTERNAL_H */
