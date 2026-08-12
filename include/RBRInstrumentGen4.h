@@ -361,6 +361,24 @@ typedef enum RBRInstrumentGen4DataType
 const char *RBRInstrumentGen4DataType_name(RBRInstrumentGen4DataType dataType);
 
 /**
+* \brief Instrument `id` command parameters.
+ *
+ * \see RBRInstrumentGen4_getId()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
+ */
+typedef struct RBRInstrumentGen4Id
+{
+    /** The instrument model. */
+    const char model[RBRINSTRUMENTGEN4_ID_MODEL_MAX + 1];
+    /** The instrument firmware version. */
+    const char fwversion[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
+    /** The serial number of the instrument. */
+    int32_t sn;
+    /** The firmware type of the instrument. */
+    int32_t fwtype;
+} RBRInstrumentGen4Id;
+
+/**
  * \brief Instrument `id4` command parameters.
  *
  * \see RBRInstrumentGen4_getId4()

@@ -73,6 +73,27 @@ typedef enum RBRInstrumentGen4FWVersionCompareResult
 int RBRInstrumentGen4Version_compare(const char *a, const char *b);
 
 /**
+ * \brief Get identification information using the legacy `id` command.
+ * \note Issues the `id` instrument command.
+ *
+ * `id` predates the Gen4 API and keeps its original grammar: parameters are
+ * separated by commas and assignments are padded with spaces. It reports the
+ * same information as `id4` less the Semantic Version; prefer
+ * RBRInstrumentGen4_getId4() unless the legacy command is specifically
+ * wanted.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [out] id the instrument information
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the information is successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen4_getId4()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
+                                       RBRInstrumentGen4Id *id);
+
+/**
  * \brief Get identification information from the instrument.
  * \note Issues the `id4` instrument command.
  *

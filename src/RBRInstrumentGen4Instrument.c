@@ -8,9 +8,11 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
+/* Required for isspace. */
+#include <ctype.h>
 /* Required for NAN. */
 #include <math.h>
-/* Required for memcpy, memset, strcmp. */
+/* Required for memcpy, memset, strchr, strcmp. */
 #include <string.h>
 /* Required for snprintf. */
 #include <stdio.h>
@@ -84,6 +86,129 @@ int RBRInstrumentGen4Version_compare(const char *version1, const char *version2)
         }
     }
     return RBRINSTRUMENTGEN4_FW_EQUAL;
+}
+
+/*
+ * The `id` command separates its parameters with commas and pads its
+ * assignments with spaces (`id model = L4, version = 2.0.0`), so the Gen4
+ * response tokenizer cannot be used on it.
+ */
+#define LEGACY_ID_PARAMETER_SEPARATOR ','
+#define LEGACY_ID_ASSIGNMENT '='
+
+/*
+ * The longest `id` parameter name is “version”, at seven characters. One
+ * character of headroom keeps an unrecognised longer name from truncating
+ * onto a name we look for: anything which does not fit is cut to the full
+ * eight characters, which matches none of them.
+ */
+#define LEGACY_ID_KEY_MAX 8
+
+/**
+ * \brief Copy a range of characters into a buffer, less any padding.
+ *
+ * Leading and trailing whitespace within the range is discarded. No more than
+ * \a size characters are written, inclusive of the null terminator.
+ *
+ * \param [out] destination the destination buffer
+ * \param [in] size the size of the destination buffer
+ * \param [in] begin the first character of the range
+ * \param [in] end one character past the end of the range
+ */
+static void RBRInstrumentGen4_copyTrimmed(char *destination,
+                                          size_t size,
+                                          const char *begin,
+                                          const char *end)
+{
+    while (begin < end && isspace((unsigned char) *begin))
+    {
+        ++begin;
+    }
+    while (end > begin && isspace((unsigned char) *(end - 1)))
+    {
+        --end;
+    }
+
+    size_t length = (size_t) (end - begin);
+    if (length > size - 1)
+    {
+        length = size - 1;
+    }
+    memcpy(destination, begin, length);
+    destination[length] = '\0';
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
+                                       RBRInstrumentGen4Id *id)
+{
+    memset(id, 0, sizeof(RBRInstrumentGen4Id));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "id"));
+
+    const char *cursor = instrument->response.response;
+    if (cursor == NULL)
+    {
+        return RBRINSTRUMENTGEN4_SUCCESS;
+    }
+
+    /* Step over the command name which the instrument echoes back. */
+    cursor = strchr(cursor, ' ');
+
+    while (cursor != NULL)
+    {
+        char key[LEGACY_ID_KEY_MAX + 1];
+        /* Long enough for any 32-bit decimal value and its sign. */
+        char number[12];
+
+        const char *assignment = strchr(cursor, LEGACY_ID_ASSIGNMENT);
+        if (assignment == NULL)
+        {
+            break;
+        }
+
+        const char *end = strchr(assignment, LEGACY_ID_PARAMETER_SEPARATOR);
+        if (end == NULL)
+        {
+            end = assignment + strlen(assignment);
+        }
+
+        RBRInstrumentGen4_copyTrimmed(key, sizeof(key), cursor, assignment);
+
+        if (strcmp(key, "model") == 0)
+        {
+            RBRInstrumentGen4_copyTrimmed((char *) (id->model),
+                                          sizeof(id->model),
+                                          assignment + 1,
+                                          end);
+        }
+        else if (strcmp(key, "version") == 0)
+        {
+            RBRInstrumentGen4_copyTrimmed((char *) (id->fwversion),
+                                          sizeof(id->fwversion),
+                                          assignment + 1,
+                                          end);
+        }
+        else if (strcmp(key, "serial") == 0)
+        {
+            RBRInstrumentGen4_copyTrimmed(number,
+                                          sizeof(number),
+                                          assignment + 1,
+                                          end);
+            id->sn = strtol(number, NULL, 10);
+        }
+        else if (strcmp(key, "fwtype") == 0)
+        {
+            RBRInstrumentGen4_copyTrimmed(number,
+                                          sizeof(number),
+                                          assignment + 1,
+                                          end);
+            id->fwtype = strtol(number, NULL, 10);
+        }
+
+        cursor = *end == '\0' ? NULL : end + 1;
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getId4(RBRInstrumentGen4 *instrument,
