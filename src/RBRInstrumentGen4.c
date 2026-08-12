@@ -146,7 +146,8 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_populateGeneration(
 
     /* If this isn't an RBR instrument, it'll just time out or the response
      * won't match. */
-    RBRInstrumentGen4Error err = RBRInstrumentGen4_getId(instrument, &instrument->id);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getId4(instrument,
+                                                          &instrument->id);
 
     if (err != RBRINSTRUMENTGEN4_SUCCESS)
     {

@@ -104,8 +104,8 @@ int main(int argc, char *argv[])
     }
 
     //******************seems unnecessary********************//
-    RBRInstrumentGen4Id id;
-    RBRInstrumentGen4_getId(instrument, &id);
+    RBRInstrumentGen4Id4 id;
+    RBRInstrumentGen4_getId4(instrument, &id);
     printf("The instrument is an %s (fwtype %d), serial number %06d, with "
            "firmware v%s.\n",
            id.model,

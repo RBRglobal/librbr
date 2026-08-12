@@ -86,12 +86,12 @@ int RBRInstrumentGen4Version_compare(const char *version1, const char *version2)
     return RBRINSTRUMENTGEN4_FW_EQUAL;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
-                                       RBRInstrumentGen4Id *id)
+RBRInstrumentGen4Error RBRInstrumentGen4_getId4(RBRInstrumentGen4 *instrument,
+                                       RBRInstrumentGen4Id4 *id)
 {
-    memset(id, 0, sizeof(RBRInstrumentGen4Id));
+    memset(id, 0, sizeof(RBRInstrumentGen4Id4));
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "id"));
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "id4"));
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     do
@@ -117,6 +117,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
                      "%s",
                      parameter.value);
         }
+        else if (strcmp(parameter.key, "semver") == 0)
+        {
+            snprintf((char *)(id->semver),
+                     sizeof(id->semver),
+                     "%s",
+                     parameter.value);
+        }
         else if (strcmp(parameter.key, "sn") == 0)
         {
             id->sn = strtol(parameter.value, NULL, 10);
@@ -128,7 +135,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
     } while (true);
     if (id != &instrument->id)
     {
-        memcpy(&instrument->id, id, sizeof(RBRInstrumentGen4Id));
+        memcpy(&instrument->id, id, sizeof(RBRInstrumentGen4Id4));
     }
 
     return RBRINSTRUMENTGEN4_SUCCESS;

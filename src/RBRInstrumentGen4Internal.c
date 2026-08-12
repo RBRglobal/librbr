@@ -63,7 +63,7 @@
  */
 #define WAKE_COMMAND_WAIT 50
 
-#define COMMAND_PROMPT "Ready: "
+#define COMMAND_PROMPT "ready: "
 #define COMMAND_PROMPT_LEN 7
 
 #define ARRAY_SEPARATOR_L4 '|'

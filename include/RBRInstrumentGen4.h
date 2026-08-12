@@ -160,6 +160,13 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
 #define RBRINSTRUMENTGEN4_ID_VERSION_MAX 29
 
 /**
+ * \brief The maximum number of characters in the instrument Semantic Version.
+ *
+ * Does not include any null terminator.
+ */
+#define RBRINSTRUMENTGEN4_ID_SEMVER_MAX 39
+
+/**
  * \brief The maximum number of characters in the instrument part number.
  *
  * Does not include any null terminator.
@@ -354,22 +361,28 @@ typedef enum RBRInstrumentGen4DataType
 const char *RBRInstrumentGen4DataType_name(RBRInstrumentGen4DataType dataType);
 
 /**
- * \brief Instrument `id` command parameters.
+ * \brief Instrument `id4` command parameters.
  *
- * \see RBRInstrumentGen4_getId()
+ * \see RBRInstrumentGen4_getId4()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
  */
-typedef struct RBRInstrumentGen4Id
+typedef struct RBRInstrumentGen4Id4
 {
     /** The instrument model. */
     const char model[RBRINSTRUMENTGEN4_ID_MODEL_MAX + 1];
     /** The instrument firmware version. */
     const char fwversion[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
+    /**
+     * \brief The instrument firmware version in Semantic Version form.
+     *
+     * For example, `2.0.0-rc1-10-g148bc5eb1`.
+     */
+    const char semver[RBRINSTRUMENTGEN4_ID_SEMVER_MAX + 1];
     /** The serial number of the instrument. */
     int32_t sn;
     /** The firmware type of the instrument. */
     int32_t fwtype;
-} RBRInstrumentGen4Id;
+} RBRInstrumentGen4Id4;
 
 /** 
  * \brief Generations of RBR instruments.
@@ -678,10 +691,10 @@ typedef struct RBRInstrumentGen4
     /**
      * \brief The instrument identifier.
      *
-     * \note Cached every time RBRInstrumentGen4_getId() is called.
-     * \see RBRInstrumentGen4_getId()
+     * \note Cached every time RBRInstrumentGen4_getId4() is called.
+     * \see RBRInstrumentGen4_getId4()
      */
-    RBRInstrumentGen4Id id;
+    RBRInstrumentGen4Id4 id;
 
     /**
      * \brief The generation of the instrument.

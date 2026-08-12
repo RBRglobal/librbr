@@ -74,7 +74,7 @@ int RBRInstrumentGen4Version_compare(const char *a, const char *b);
 
 /**
  * \brief Get identification information from the instrument.
- * \note Issues the `id` instrument command.
+ * \note Issues the `id4` instrument command.
  *
  * \param [in] instrument the instrument connection
  * \param [out] id the instrument information
@@ -84,8 +84,8 @@ int RBRInstrumentGen4Version_compare(const char *a, const char *b);
  * \see RBRInstrumentGen4_getInfo();
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
-                                       RBRInstrumentGen4Id *id);
+RBRInstrumentGen4Error RBRInstrumentGen4_getId4(RBRInstrumentGen4 *instrument,
+                                       RBRInstrumentGen4Id4 *id);
 
 /**
  * \brief Instrument `pcba <pcba_label>` command parameters.

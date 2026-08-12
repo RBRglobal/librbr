@@ -44,26 +44,29 @@ typedef struct IdTest
 {
     const char *response;
     RBRInstrumentGen4Error expectedError;
-    RBRInstrumentGen4Id expected;
+    RBRInstrumentGen4Id4 expected;
 } IdTest;
 
-TEST_LOGGER4(id)
+TEST_LOGGER4(id4)
 {
     IdTest tests[] = {
-        { "id model=RBRconcerto4 "
-          "sn=092431 "
-          "fwversion=1.14.5+202310150927 "
-          "fwtype=130"
+        { "id4 model=L4 "
+          "sn=999999 "
+          "fwversion=2.0.0 "
+          "semver=2.0.0-rc1-10-g148bc5eb1 "
+          "fwtype=150"
           RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { "RBRconcerto4",
-            "1.14.5+202310150927",
-            92431,
-            130 } },
-        { // replacing previous "id_short" test.
-          "id" RESPONSE_TERMINATOR,
+          { "L4",
+            "2.0.0",
+            "2.0.0-rc1-10-g148bc5eb1",
+            999999,
+            150 } },
+        /* A response carrying no parameters leaves the struct zeroed. */
+        { "id4" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           { "",
+            "",
             "",
             0,
             0 } },
@@ -71,16 +74,17 @@ TEST_LOGGER4(id)
     };
 
     RBRInstrumentGen4Error err;
-    RBRInstrumentGen4Id actual;
+    RBRInstrumentGen4Id4 actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen4_getId(instrument, &actual);
-        TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
+        err = RBRInstrumentGen4_getId4(instrument, &actual);
+        TEST_ASSERT_STR_EQ("id4" COMMAND_TERMINATOR, buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].expected.model, actual.model);
         TEST_ASSERT_STR_EQ(tests[i].expected.fwversion, actual.fwversion);
+        TEST_ASSERT_STR_EQ(tests[i].expected.semver, actual.semver);
         TEST_ASSERT_EQ(tests[i].expected.sn, actual.sn, "%" PRIi32);
         TEST_ASSERT_EQ(tests[i].expected.fwtype, actual.fwtype, "%" PRIi32);
     }
