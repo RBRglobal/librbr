@@ -609,3 +609,149 @@ TEST_LOGGER4(reboot)
 
     return true;
 }
+
+typedef struct OutputFormatTest
+{
+    const char *response;
+    RBRInstrumentGen4OutputFormat expected;
+} OutputFormatTest;
+
+static bool test_outputformat(RBRInstrumentGen4OutputFormat *expected,
+                              RBRInstrumentGen4OutputFormat *actual)
+{
+    TEST_ASSERT_EQ(expected->sn, actual->sn, "%d");
+    TEST_ASSERT_EQ(expected->scheduleLabel, actual->scheduleLabel, "%d");
+    TEST_ASSERT_EQ(expected->dateTime, actual->dateTime, "%d");
+    TEST_ASSERT_EQ(expected->crc, actual->crc, "%d");
+    TEST_ASSERT_ENUM_EQ(expected->encoding,
+                        actual->encoding,
+                        RBRInstrumentGen4Encoding);
+    TEST_ASSERT_ENUM_EQ(expected->dataType,
+                        actual->dataType,
+                        RBRInstrumentGen4DataType);
+
+    return true;
+}
+
+TEST_LOGGER4(outputformat)
+{
+    OutputFormatTest tests[] = {
+        /* The format an L4 reports out of the box. */
+        { "instrument outputformat sn=off schedulelabel=on datetime=on "
+          "crc=off encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
+          { false, true, true, false,
+            RBRINSTRUMENTGEN4_ENCODING_ASCII,
+            RBRINSTRUMENTGEN4_DATATYPE_FLOAT32 } },
+        { "instrument outputformat sn=on schedulelabel=on datetime=off "
+          "crc=on encoding=binary datatype=float64" RESPONSE_TERMINATOR,
+          { true, true, false, true,
+            RBRINSTRUMENTGEN4_ENCODING_BINARY,
+            RBRINSTRUMENTGEN4_DATATYPE_FLOAT64 } },
+        { "instrument outputformat sn=off schedulelabel=off datetime=off "
+          "crc=off encoding=ascii datatype=calfloat64" RESPONSE_TERMINATOR,
+          { false, false, false, false,
+            RBRINSTRUMENTGEN4_ENCODING_ASCII,
+            RBRINSTRUMENTGEN4_DATATYPE_CALFLOAT64 } },
+        { 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4OutputFormat actual;
+
+    for (int i = 0; tests[i].response != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4_getOutputFormat(instrument, &actual);
+        TEST_ASSERT_STR_EQ("instrument outputformat" COMMAND_TERMINATOR,
+                           buffers->writeBuffer);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+        if (!test_outputformat(&tests[i].expected, &actual))
+        {
+            return false;
+        }
+        /* The format is cached for the sample parser. */
+        if (!test_outputformat(&tests[i].expected, &instrument->outputFormat))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+TEST_LOGGER4(outputformat_set)
+{
+    RBRInstrumentGen4OutputFormat outputformat = {
+        .sn = false,
+        .scheduleLabel = true,
+        .dateTime = true,
+        .crc = false,
+        .encoding = RBRINSTRUMENTGEN4_ENCODING_ASCII,
+        .dataType = RBRINSTRUMENTGEN4_DATATYPE_FLOAT32
+    };
+
+    /* Every parameter of the command is sent. */
+    TestIOBuffers_init(buffers,
+                       "instrument outputformat sn=off schedulelabel=on "
+                       "datetime=on crc=off encoding=ascii datatype=float32"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setOutputFormat(
+        instrument,
+        &outputformat);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("instrument outputformat sn=off schedulelabel=on "
+                       "datetime=on crc=off encoding=ascii datatype=float32"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    if (!test_outputformat(&outputformat, &instrument->outputFormat))
+    {
+        return false;
+    }
+
+    /* Changing one parameter still sends them all. */
+    RBRInstrumentGen4OutputFormat modified = outputformat;
+    modified.crc = true;
+    TestIOBuffers_init(buffers,
+                       "instrument outputformat sn=off schedulelabel=on "
+                       "datetime=on crc=on encoding=ascii datatype=float32"
+                       RESPONSE_TERMINATOR,
+                       0);
+    err = RBRInstrumentGen4_setOutputFormat(instrument, &modified);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("instrument outputformat sn=off schedulelabel=on "
+                       "datetime=on crc=on encoding=ascii datatype=float32"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    if (!test_outputformat(&modified, &instrument->outputFormat))
+    {
+        return false;
+    }
+
+    /* An encoding or datatype which is not a real value is not sent. */
+    RBRInstrumentGen4OutputFormat unreported = modified;
+    unreported.encoding = RBRINSTRUMENTGEN4_UNKNOWN_ENCODING;
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRInstrumentGen4_setOutputFormat(instrument, &unreported);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    /* A value the instrument rejects must not update the cached format. */
+    RBRInstrumentGen4OutputFormat rejected = modified;
+    rejected.crc = false;
+    TestIOBuffers_init(buffers,
+                       "ERR-108 invalid argument to command: 'bogus'"
+                       RESPONSE_TERMINATOR,
+                       0);
+    err = RBRInstrumentGen4_setOutputFormat(instrument, &rejected);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+                        err,
+                        RBRInstrumentGen4Error);
+    if (!test_outputformat(&modified, &instrument->outputFormat))
+    {
+        return false;
+    }
+
+    return true;
+}

@@ -85,7 +85,6 @@
 #define ENDTIME "20991231235959"
 
 #define NEW_DATASET_LABEL "ds_ascent"
-#define OUTPUTFORMAT RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL | RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL | RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC
 
 //************************************* end of customer defined parameters *************************************//
 
@@ -293,11 +292,15 @@ int main(int argc, char *argv[])
                          &configPool,
                          &config_ascent);
 
-    // specify outputformat
-    RBRInstrumentGen4Outputformat outputformat = 0;
-    RBRInstrumentGen4_getOutputformat(instrument, &outputformat);
-    outputformat = OUTPUTFORMAT;
-    RBRInstrumentGen4_setOutputformat(instrument, outputformat);
+    // specify outputformat. The setter sends every parameter of the command,
+    // so read the current format and change only the sample fields.
+    RBRInstrumentGen4OutputFormat outputformat;
+    RBRInstrumentGen4_getOutputFormat(instrument, &outputformat);
+    outputformat.sn = true;
+    outputformat.scheduleLabel = true;
+    outputformat.dateTime = false;
+    outputformat.crc = true;
+    RBRInstrumentGen4_setOutputFormat(instrument, &outputformat);
 
     /************ deployment parameters ************/
     // need to stop if it's logging.

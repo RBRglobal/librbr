@@ -557,32 +557,47 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getInstrument(
 
 /**
  * \brief Get the current output format.
+ * \note Issues the `instrument outputformat` command.
  *
  * \param [in] instrument the instrument connection
  * \param [out] outputformat the current output format
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen4_setOutputFormat()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getOutputformat(
+RBRInstrumentGen4Error RBRInstrumentGen4_getOutputFormat(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Outputformat *outputformat);
+    RBRInstrumentGen4OutputFormat *outputformat);
 
 /**
  * \brief Set the current output format.
+ * \note Issues the `instrument outputformat` command.
+ *
+ * Every parameter of the command is sent, so \a outputformat must be fully
+ * populated: read the current format with RBRInstrumentGen4_getOutputFormat()
+ * and modify it if only some parameters are of interest.
+ *
+ * \warning RBRParserGen4 reads only #RBRINSTRUMENTGEN4_ENCODING_ASCII.
+ *          Selecting #RBRINSTRUMENTGEN4_ENCODING_BINARY will stop this library
+ *          from being able to interpret samples or command responses.
  *
  * \param [in] instrument the instrument connection
  * \param [in] outputformat the desired output format
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully written
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the encoding or
+ *                                                   datatype is not a real
+ *                                                   value
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the instrument refuses a value
+ * \see RBRInstrumentGen4_getOutputFormat()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
- * \see hhttps://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/meminfo
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setOutputformat(
+RBRInstrumentGen4Error RBRInstrumentGen4_setOutputFormat(
     RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Outputformat outputformat);
+    const RBRInstrumentGen4OutputFormat *outputformat);
 
 /**
  * \brief Reset the instrument CPU.

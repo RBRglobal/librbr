@@ -107,6 +107,22 @@ const char *RBRInstrumentGen4Generation_name(RBRInstrumentGen4Generation generat
     }
 }
 
+const char *RBRInstrumentGen4Encoding_name(RBRInstrumentGen4Encoding encoding)
+{
+    switch (encoding)
+    {
+    case RBRINSTRUMENTGEN4_ENCODING_ASCII:
+        return "ascii";
+    case RBRINSTRUMENTGEN4_ENCODING_BINARY:
+        return "binary";
+    case RBRINSTRUMENTGEN4_ENCODING_COUNT:
+        return "encoding count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_ENCODING:
+    default:
+        return "unknown encoding";
+    }
+}
+
 const char *RBRInstrumentGen4ResponseType_name(RBRInstrumentGen4ResponseType type)
 {
     switch (type)
@@ -197,10 +213,15 @@ RBRInstrumentGen4Error RBRInstrumentGen4_open(RBRInstrumentGen4 **instrument,
     (*instrument)->outputFormat      = RBRINSTRUMENTGEN4_DEFAULT_OUTPUTFORMAT;
 
     /**
-     * Note that because we assume a default output format,
-     * RBRInstrumentGen4Sample_parse in RBRInstrumentGen4_readResponse in
-     * RBRInstrumentGen4_converse in RBRInstrumentGen4_populateGeneration and
-     * RBRInstrumentGen4_getOutputformat will return an error if 
+     * Note that because we assume a default output format, there is a critical 
+     * window where conversing with the instrument can fail if it was previously
+     * configured to stream samples in a non-default output format. This is only
+     * an issue until we read the output format off of the instrument, at which
+     * point we will be able to parse the samples correctly.
+     * Consequently, the below function calls (RBRInstrumentGen4Sample_parse in 
+     * RBRInstrumentGen4_readResponse in RBRInstrumentGen4_converse in both 
+     * RBRInstrumentGen4_populateGeneration and 
+     * RBRInstrumentGen4_getOutputFormat) will return an error if 
      * RBRInstrumentGen4_open is called on an instrument that
      * is streaming samples that are *not* in the default output format.
      */
@@ -217,7 +238,9 @@ RBRInstrumentGen4Error RBRInstrumentGen4_open(RBRInstrumentGen4 **instrument,
         return RBRINSTRUMENTGEN4_UNSUPPORTED;
     }
 
-    err = RBRInstrumentGen4_getOutputformat(*instrument, &(*instrument)->outputFormat);
+    /* Caches the sample field flags into the instrument for the parser. */
+    err = RBRInstrumentGen4_getOutputFormat(*instrument,
+                                            &(*instrument)->outputFormat);
 
     if (err != RBRINSTRUMENTGEN4_SUCCESS)
     {

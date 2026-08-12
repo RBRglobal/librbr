@@ -811,67 +811,119 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getInstrument(
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getOutputformat(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Outputformat *outputformat)
-    {
-        //Assumption: customer doesn't need to know encoding = ascii/binary and dataType = float32/float64||calfloat64.
-        RBR_TRY(RBRInstrumentGen4_converse(instrument, "instrument outputformat"));
-
-        RBRInstrumentGen4Outputformat real_outputformat = 0;
-        char *command = NULL;
-        RBRInstrumentGen4ResponseParameter parameter;
-        while (true)
-        {
-            RBRInstrumentGen4_parseResponse(instrument,
-                                            &command,
-                                            &parameter);
-
-            if (parameter.key == NULL || parameter.value == NULL)
-            {
-                break;
-            }
-            else if (strcmp(parameter.key, "sn") == 0 && strcmp(parameter.value, "on") == 0)
-            {
-                real_outputformat |= RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL;
-            }
-            else if (strcmp(parameter.key, "schedulelabel") == 0 && strcmp(parameter.value, "on") == 0)
-            {
-                real_outputformat |= RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL;
-            }
-            else if (strcmp(parameter.key, "datetime") == 0 && strcmp(parameter.value, "on") == 0)
-            {
-                real_outputformat |= RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP;
-            }
-            else if (strcmp(parameter.key, "crc") == 0 && strcmp(parameter.value, "on") == 0)
-            {
-                real_outputformat |= RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC;
-            }
-        }
-        *outputformat = real_outputformat;
-        if (real_outputformat != instrument->outputFormat)
-        {
-            instrument->outputFormat = real_outputformat;
-        }
-        return RBRINSTRUMENTGEN4_SUCCESS;
-    }
-
-RBRInstrumentGen4Error RBRInstrumentGen4_setOutputformat(
-    RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Outputformat outputformat)
+/**
+ * \brief Resolve an `encoding` parameter value to its enum member.
+ *
+ * \param [in] value the parameter value reported by the instrument
+ * \return the corresponding encoding
+ * \return #RBRINSTRUMENTGEN4_UNKNOWN_ENCODING when the value is unrecognized
+ */
+static RBRInstrumentGen4Encoding RBRInstrumentGen4Encoding_parse(
+    const char *value)
 {
-    RBRInstrumentGen4Error err = RBRInstrumentGen4_converse(
-        instrument,
-        "instrument outputformat sn=%s schedulelabel=%s datetime=%s crc=%s",
-        outputformat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL?"on":"off",
-        outputformat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL?"on":"off",
-        outputformat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP?"on":"off",
-        outputformat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC?"on":"off");
-    if (err == RBRINSTRUMENTGEN4_SUCCESS)
+    for (int32_t encoding = 0;
+         encoding < RBRINSTRUMENTGEN4_ENCODING_COUNT;
+         ++encoding)
     {
-        instrument->outputFormat = outputformat;
+        if (strcmp(value,
+                   RBRInstrumentGen4Encoding_name(
+                       (RBRInstrumentGen4Encoding) encoding)) == 0)
+        {
+            return (RBRInstrumentGen4Encoding) encoding;
+        }
     }
-    return err;
+
+    return RBRINSTRUMENTGEN4_UNKNOWN_ENCODING;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getOutputFormat(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4OutputFormat *outputformat)
+{
+    memset(outputformat, 0, sizeof(RBRInstrumentGen4OutputFormat));
+    outputformat->encoding = RBRINSTRUMENTGEN4_UNKNOWN_ENCODING;
+    outputformat->dataType = RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE;
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "instrument outputformat"));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+
+        bool enabled = strcmp(parameter.value, "on") == 0;
+
+        if (strcmp(parameter.key, "sn") == 0)
+        {
+            outputformat->sn = enabled;
+        }
+        else if (strcmp(parameter.key, "schedulelabel") == 0)
+        {
+            outputformat->scheduleLabel = enabled;
+        }
+        else if (strcmp(parameter.key, "datetime") == 0)
+        {
+            outputformat->dateTime = enabled;
+        }
+        else if (strcmp(parameter.key, "crc") == 0)
+        {
+            outputformat->crc = enabled;
+        }
+        else if (strcmp(parameter.key, "encoding") == 0)
+        {
+            outputformat->encoding
+                = RBRInstrumentGen4Encoding_parse(parameter.value);
+        }
+        else if (strcmp(parameter.key, "datatype") == 0)
+        {
+            outputformat->dataType
+                = RBRInstrumentGen4DataType_parse(parameter.value);
+        }
+    }
+
+    /* The caller may have asked us to populate the cache itself. */
+    if (outputformat != &instrument->outputFormat)
+    {
+        instrument->outputFormat = *outputformat;
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_setOutputFormat(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4OutputFormat *outputformat)
+{
+    if (outputformat->encoding < 0
+        || outputformat->encoding >= RBRINSTRUMENTGEN4_ENCODING_COUNT
+        || outputformat->dataType < 0
+        || outputformat->dataType >= RBRINSTRUMENTGEN4_DATATYPE_COUNT)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    RBR_TRY(RBRInstrumentGen4_converse(
+                instrument,
+                "instrument outputformat sn=%s schedulelabel=%s datetime=%s"
+                " crc=%s encoding=%s datatype=%s",
+                outputformat->sn ? "on" : "off",
+                outputformat->scheduleLabel ? "on" : "off",
+                outputformat->dateTime ? "on" : "off",
+                outputformat->crc ? "on" : "off",
+                RBRInstrumentGen4Encoding_name(outputformat->encoding),
+                RBRInstrumentGen4DataType_name(outputformat->dataType)));
+
+    instrument->outputFormat = *outputformat;
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_reboot(RBRInstrumentGen4 *instrument,
