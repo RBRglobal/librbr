@@ -600,6 +600,20 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setOutputFormat(
     const RBRInstrumentGen4OutputFormat *outputformat);
 
 /**
+ * \brief Return the instrument's configuration to its factory state.
+ * \note Issues the `instrument factory reset` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the instrument has been reset
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the instrument refuses
+ * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/factory
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_factoryReset(
+    RBRInstrumentGen4 *instrument);
+
+/**
  * \brief Reset the instrument CPU.
  * \note Issues the `instrument reboot` command.
  *

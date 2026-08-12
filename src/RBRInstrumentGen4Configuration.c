@@ -462,16 +462,3 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfigAll(RBRInstrumentGen4 *inst
         (void)configPool;
         return RBRINSTRUMENTGEN4_SUCCESS;                                                
 }
-
-RBRInstrumentGen4Error RBRInstrumentGen4_factoryReset(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4GroupPool *groupPool,
-    RBRInstrumentGen4SchedulePool *schedulePool,
-    RBRInstrumentGen4ConfigPool *configPool)
-{
-        (void)instrument;
-        (void)groupPool;
-        (void)schedulePool;
-        (void)configPool;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-}

@@ -926,6 +926,12 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setOutputFormat(
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
+RBRInstrumentGen4Error RBRInstrumentGen4_factoryReset(
+    RBRInstrumentGen4 *instrument)
+{
+    return RBRInstrumentGen4_converse(instrument, "instrument factory reset");
+}
+
 RBRInstrumentGen4Error RBRInstrumentGen4_reboot(RBRInstrumentGen4 *instrument,
                                         const int32_t delay)
 {

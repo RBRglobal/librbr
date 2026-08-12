@@ -1621,30 +1621,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfigAll(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4ConfigPool *configPoolToDelete);
 
-/**
- * \brief Returns the logger's sampling configuration to a factory-set state.
- * \note Issues the `factory reset` instrument command.
- *
- * Not allowed while logging is enabled and requires the `permit` function to be issued.
- * \see RBRInstrumentGen4_permit()
- * 
- * ALL user-defined data relating to configurations, schedules and groups will 
- * be lost, although historical datasetPool stored in the logger's memory are not 
- * affected.
- *
- * \param [in] instrument the instrument connection
- * \return #RBRINSTRUMENTGEN4_SUCCESS when all groups, schedules, and configs are successfully deleted
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if any of the above cannot be deleted
- * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/factory
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_factoryReset(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4GroupPool *groupPool,
-    RBRInstrumentGen4SchedulePool *schedulePool,
-    RBRInstrumentGen4ConfigPool *configPool);
-
 #ifdef __cplusplus
 }
 #endif

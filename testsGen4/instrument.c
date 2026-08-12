@@ -610,6 +610,19 @@ TEST_LOGGER4(reboot)
     return true;
 }
 
+TEST_LOGGER4(factoryReset)
+{
+    TestIOBuffers_init(buffers,
+                       "instrument factory reset" RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_factoryReset(instrument);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("instrument factory reset" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
 typedef struct OutputFormatTest
 {
     const char *response;
