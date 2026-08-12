@@ -13,7 +13,6 @@
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Instrument.h"
 #include "RBRInstrumentGen4Internal.h"
-#include "RBRInstrumentGen4Streaming.h"
 //to be deleted:
 #include <stdio.h>
 

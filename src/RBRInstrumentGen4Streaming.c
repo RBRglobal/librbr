@@ -25,69 +25,6 @@
 #define READING_ERROR_OFFSET (0 * 8)
 
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getOutputformat(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Outputformat *outputformat)
-    {
-        //Assumption: customer doesn't need to know encoding = ascii/binary and dataType = float32/float64||calfloat64.
-        RBR_TRY(RBRInstrumentGen4_converse(instrument, "instrument outputformat"));
-
-        RBRInstrumentGen4Outputformat real_outputformat = 0;
-        char *command = NULL;
-        RBRInstrumentGen4ResponseParameter parameter;
-        while (true)
-        {
-            RBRInstrumentGen4_parseResponse(instrument,
-                                            &command,
-                                            &parameter);
-
-            if (parameter.key == NULL || parameter.value == NULL)
-            {
-                break;
-            }
-            else if (strcmp(parameter.key, "sn") == 0 && strcmp(parameter.value, "on") == 0)
-            {
-                real_outputformat |= RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL;
-            }
-            else if (strcmp(parameter.key, "schedulelabel") == 0 && strcmp(parameter.value, "on") == 0)
-            {
-                real_outputformat |= RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL;
-            }
-            else if (strcmp(parameter.key, "datetime") == 0 && strcmp(parameter.value, "on") == 0)
-            {
-                real_outputformat |= RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP;
-            }
-            else if (strcmp(parameter.key, "crc") == 0 && strcmp(parameter.value, "on") == 0)
-            {
-                real_outputformat |= RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC;
-            }
-        }
-        *outputformat = real_outputformat;
-        if (real_outputformat != instrument->outputFormat)
-        {
-            instrument->outputFormat = real_outputformat;
-        }
-        return RBRINSTRUMENTGEN4_SUCCESS;
-    }
-
-RBRInstrumentGen4Error RBRInstrumentGen4_setOutputformat(
-    RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Outputformat outputformat)
-{
-    RBRInstrumentGen4Error err = RBRInstrumentGen4_converse(
-        instrument,
-        "instrument outputformat sn=%s schedulelabel=%s datetime=%s crc=%s", 
-        outputformat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL?"on":"off",
-        outputformat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL?"on":"off",
-        outputformat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP?"on":"off",
-        outputformat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC?"on":"off");
-    if (err == RBRINSTRUMENTGEN4_SUCCESS)
-    {
-        instrument->outputFormat = outputformat;
-    }
-    return err;
-}
-
 const char *RBRInstrumentGen4ReadingFlag_name(RBRInstrumentGen4ReadingFlag flag)
 {
     switch (flag)
