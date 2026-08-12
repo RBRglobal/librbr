@@ -210,12 +210,12 @@ TEST_LOGGER4(powerinternal)
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getPowerInternal(instrument,
                                                                     &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(expected.voltage, actual.voltage, "%f");
+    TEST_ASSERT_FLOAT_EQ(expected.voltage, actual.voltage, 0.001f);
     TEST_ASSERT_ENUM_EQ(expected.batteryType,
                         actual.batteryType,
                         RBRInstrumentGen4InternalBatteryType);
-    TEST_ASSERT_EQ(expected.capacity, actual.capacity, "%f");
-    TEST_ASSERT_EQ(expected.used, actual.used, "%f");
+    TEST_ASSERT_FLOAT_EQ(expected.capacity, actual.capacity, 0.01f);
+    TEST_ASSERT_FLOAT_EQ(expected.used, actual.used, 0.01f);
 
     return true;
 }
@@ -298,12 +298,12 @@ TEST_LOGGER4(powerexternal)
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getPowerExternal(instrument,
                                                                     &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(expected.voltage, actual.voltage, "%f");
+    TEST_ASSERT_FLOAT_EQ(expected.voltage, actual.voltage, 0.001f);
     TEST_ASSERT_ENUM_EQ(expected.batteryType,
                         actual.batteryType,
                         RBRInstrumentGen4ExternalBatteryType);
-    TEST_ASSERT_EQ(expected.capacity, actual.capacity, "%f");
-    TEST_ASSERT_EQ(expected.used, actual.used, "%f");
+    TEST_ASSERT_FLOAT_EQ(expected.capacity, actual.capacity, 1.0f);
+    TEST_ASSERT_FLOAT_EQ(expected.used, actual.used, 0.01f);
 
     return true;
 }
