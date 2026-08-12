@@ -18,6 +18,23 @@ of waking the instrument,
 response parsing,
 etc.
 
+As of version 2.0.0,
+the library contains two independent APIs,
+one per instrument generation:
+the Gen3 API
+(`RBRInstrument_…`,
+for Logger2/Logger3 instruments,
+unchanged from libRBR 1.x)
+and the Gen4 API
+(`RBRInstrumentGen4_…`,
+for Generation 4 instruments,
+under active development).
+Applications choose the API to use per instrument;
+both generations are compiled
+into the same library
+by default
+(see the Building section below).
+
 For example:
 
 ~~~{.c}
@@ -62,6 +79,13 @@ are rare and made only when absolutely necessary.
 | ----------------------- | ---------- | ------- |
 | 103 (Logger2, standard) | Early 2015 |  v1.440 |
 | 104 (Logger3, standard) |  Late 2017 |  v1.102 and up |
+| 130/131 (RBRsolo⁴)      |       Gen4 | in development |
+| 140 (SEN⁴)              |       Gen4 | in development |
+| 150 (Logger4, standard) |       Gen4 | in development |
+
+The Gen4 API targets the Generation 4 instrument command set;
+it is under active development
+and its surface may still change.
 
 
 The standalone dynamic correction library supports:
@@ -76,6 +100,30 @@ The standalone dynamic correction library supports:
 The library can be built with GNU Make.
 For documentation on Make targets,
 see the [Makefile].
+
+Both instrument generation APIs
+are compiled into `bin/libRBR.a` by default.
+The `GEN3` and `GEN4` Makefile options
+select the generations to include:
+
+~~~{.sh}
+# Both generations (the default):
+$ make lib
+# Gen3 only — equivalent to the libRBR 1.x library:
+$ make GEN4=0 lib
+# Gen4 only:
+$ make GEN3=0 lib
+~~~
+
+At least one generation must be enabled.
+Coming from libRBR 1.2.x?
+Nothing changes for Gen3 applications:
+the Gen3 API is source-compatible,
+and `make GEN4=0` produces
+exactly the 1.x library contents.
+When building as a Zephyr module,
+the equivalent Kconfig options are
+`CONFIG_LIBRBR_GEN3` and `CONFIG_LIBRBR_GEN4`.
 
 Library compilation requires a C99-compliant C compiler;
 The library makes a few assumptions

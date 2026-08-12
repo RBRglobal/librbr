@@ -1,0 +1,203 @@
+@startuml
+
+allowmixing
+
+map legend {
+    R => read mandatory
+    r => read optional
+    W => input/write mandatory
+    w => input/write optional
+    U => unsafe
+    S => secured
+}
+
+package "Configuration information and calibration"
+{
+    class channel {
+        channelLabel {RWUS}
+        type {rwUS}
+        address {rwUS}
+        settlingTime {rwUS}
+        readTime {rwUS}
+        guardTime {rwUS}
+        equation {rwUS}
+        userUnits {rwUS}
+        gain {rwUS}
+        availableGains {rwUS}
+        derived {rwUS}
+        groupList {rwUS}
+        sensor {rwUS}
+    }
+
+    class calibration {
+        channelLabel {RWU}
+        equation {rwU}
+        datetime {rwU}
+        offset {rwU}
+        slope {rwU}
+        c0 ... cN {rwU}
+        x0 ... xN {rwU}
+        n0 ... nN {rwU}
+    }
+
+    class sensor {
+        sensorLabel {R}
+        sn {r}
+        pn {r}
+        fw {r}
+        hw {r}
+        channelList {r}
+    }
+
+    class group {
+        groupLabel {RW}
+        channelList {rw}
+        scheduleList {r}
+    }
+
+    class schedule {
+        scheduleLabel {RW}
+        groupList {rw}
+        configList {r}
+        stream {rw}
+        storage {rw}
+        mode {rw}
+        ...
+    }
+
+    class config {
+        configLabel {RW}
+        scheduleList {rw}
+    }
+
+    class settings {
+        prompt {rw}
+        confirmation {rw}
+    }
+
+    class parameters {
+        altitude {rwU}
+        atmosphere {rwU}
+        avgSoundSpeed {rwU}
+        density {rwU}
+        pressure {rwU}
+        salinity {rwU}
+        specCondTempCo {rwU}
+        temperature {rwU}
+    }
+
+    channel::channelLabel --* sensor::channelList
+    channel::channelLabel - calibration::channelLabel
+    channel::channelLabel --* group::channelList
+    group::groupLabel --* schedule::groupList
+    schedule::scheduleLabel --* config::scheduleList
+}
+
+package "Instrument details"
+{
+    class instrument {
+        state {r}
+        sn {r}
+        model {r}
+        pn {r}
+        fwVersion {r}
+        fwType {r}
+        fwLock {r}
+        dataType {r}
+    }
+
+    class pcba {
+        pcbaLabel {r}
+        sn {r}
+        pn {r}
+        fw {r}
+        hw {r}
+        address {r}
+    }
+}
+
+package "Memory and datasetPool"
+{
+    class dataset {
+        datasetLabel {R}
+        status {r}
+        scheduleList {r}
+        byteCount {r}
+        dataType {r}
+    }
+
+    class datasetInfo {
+        datasetLabel {R}
+        blockLabel {r}
+        byteLount {r}
+        sampleLount {r}
+        eventCount {r}
+    }
+
+    class download {
+        datasetLabel {R}
+        status {r}
+        scheduleList {r}
+        countKey {r}
+        countValue {r}
+        startKey {r}
+        startOffset {r}
+    }
+
+    download::datasetLabel <-- dataset::datasetLabel
+    datasetInfo::datasetLabel <-- dataset::datasetLabel
+}
+
+config::scheduleList - dataset::scheduleList
+config::scheduleList - download::scheduleList
+
+package "Deployments"
+{
+
+    class verify {
+        configLabel {RW}
+        datasetLabel {RW}
+        storageMode {Rw}
+        state {R}
+    }
+
+    class enable {
+        configLabel {RW}
+        datasetLabel {RW}
+        storageMode {Rw}
+        state {R}
+    }
+
+    class disable{
+        status {R}
+    }
+
+    class deployment {
+        startTime {rwU}
+        status {rU}
+        gate {rwU}
+        simulation {rU}
+    }
+
+    class pause {
+        status {R}
+    }
+
+    class resume{
+        status {R}
+    }
+
+    disable::status --> deployment::status
+    resume::status --> deployment::status
+    pause::status --> deployment::status
+}
+
+verify::state ---> instrument::state
+enable::state ---> instrument::state
+config::configLabel ---> verify::configLabel
+verify::datasetLabel ---> dataset::datasetLabel
+config::configLabel ---> enable::configLabel
+enable::datasetLabel ---> dataset::datasetLabel
+channel::address --* pcba::address
+
+@enduml

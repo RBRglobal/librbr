@@ -1,0 +1,67 @@
+@startuml
+
+:serial_num_prefix = "RBR ";
+:serial_num_prefix_len = 4;
+:serial_num_len = 6;
+:crc_prefix = "0x";
+:crc_prefix_len = 2;
+:error_prefix = "ERR";
+:error_prefix = "3";
+:token_idx = 0;
+
+if (response[token_idx : token_idx + serial_num_prefix_len] = rbr_prefix) then (true) 
+    :token_idx += serial_num_prefix_len + serial_num_len;
+else (false)
+endif
+
+while (is_number(response[token_idx])) is (false) 
+    while (response[token_idx] == " ") is (false)
+        if (response[token_idx] == "\0") then (true)
+            end
+        else (false)
+        endif
+        :token_idx++;
+    endwhile (true)
+    :token_idx++;
+endwhile (true)
+
+:token_idx = parse_timestamp(token_idx);
+
+while ()
+
+    while (response[token_idx] == " ") is (false)
+        if (response[token_idx] == "\0") then (true)
+            end
+        else (false)
+        endif
+        :token_idx++;
+    endwhile (true)
+    :token_idx++;
+
+    if (response[token_idx] == "\0") then (true)
+        end
+    else (false)
+        if (is_number(response[token_idx])) then (true)
+            :token_idx = parse_number(token_idx);
+        else (false)
+            if (response[token_idx : token_idx + crc_prefix_len]\n == crc_prefix") then (true)
+                :token_idx = calculate_crc(token_idx);
+            else (false)
+                if (response[token_idx : token_idx + err_prefix_len]\n == err_prefix") then (true)
+                    :token_idx = report_err(token_idx);
+                else (false)
+                endif
+            endif
+        endif
+    endif
+    :token_idx++;
+
+endwhile
+-[hidden]->
+
+@enduml
+
+[RBR <serial_number>] [<schedule_label>] [<timestamp>] <data> <data>... [<crc>]<CR><LF>
+timestamp: <YYYY>-<MM>-<DD> <hh>:<mm>:<ss>.<SSSS>
+data: <integer_part>.<fractional_part>e[+|-]<engineering_exponent>
+crc = 0x<HHHH>

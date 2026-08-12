@@ -6,7 +6,7 @@
 ##
 ## - `lib` will build the library (`bin/libRBR.a`)
 ## - `docs` will generate the documentation via Doxygen (in `docs/`)
-## - `tests` will run library tests (from `tests/`)
+## - `tests` will run library tests (from `tests/` and `testsGen4/`)
 ##
 ## Additional targets may be useful to developers:
 ##
@@ -39,6 +39,28 @@ export LIB_VERSION ?= $(shell ./tools/version.sh)
 ## \deprecated As of libRBR v1.3.0, this builds with the value “unknown” to
 ##             support deterministic builds.
 #export LIB_BUILD_DATE
+
+## \brief Instrument generation selection.
+##
+## The library contains two independent instrument APIs:
+##
+## - `GEN3`: the `RBRInstrument_`-prefixed API for Logger2/Logger3
+##   instruments — the same API shipped as libRBR 1.x;
+## - `GEN4`: the `RBRInstrumentGen4_`-prefixed API for Generation 4
+##   (SL4/SEN4/L4) instruments.
+##
+## Both are enabled (`1`) by default and both land in the same
+## `bin/libRBR.a`; disable one by passing `GEN3=0` or `GEN4=0` to `make(1)`.
+## A `GEN4=0` build is equivalent to the libRBR 1.x library. At least one
+## generation must be enabled.
+GEN3 ?= 1
+GEN4 ?= 1
+
+ifeq ($(GEN3),0)
+ifeq ($(GEN4),0)
+$(error At least one instrument generation must be enabled: set GEN3=1 and/or GEN4=1)
+endif
+endif
 
 ## \brief Archiver flags.
 ##
@@ -87,6 +109,51 @@ libdynamiccorrection: bin/libRBRDynamicCorrection.a
 
 lib: bin/libRBR.a
 
+## \brief Objects for the Gen3 (Logger2/Logger3) API.
+GEN3_OBJECTS := src/RBRInstrument.o \
+                src/RBRInstrumentCommunication.o \
+                src/RBRInstrumentConfiguration.o \
+                src/RBRInstrumentDeployment.o \
+                src/RBRInstrumentFetching.o \
+                src/RBRInstrumentGating.o \
+                src/RBRInstrumentHardwareErrors.o \
+                src/RBRInstrumentInternal.o \
+                src/RBRInstrumentMemory.o \
+                src/RBRInstrumentOther.o \
+                src/RBRInstrumentPauseresume.o \
+                src/RBRInstrumentSchedule.o \
+                src/RBRInstrumentSecurity.o \
+                src/RBRInstrumentStreaming.o \
+                src/RBRInstrumentVehicle.o \
+                src/RBRParser.o
+
+## \brief Objects for the Gen4 (SL4/SEN4/L4) API.
+GEN4_OBJECTS := src/RBRInstrumentGen4.o \
+                src/RBRInstrumentGen4Communication.o \
+                src/RBRInstrumentGen4Configuration.o \
+                src/RBRInstrumentGen4Deployment.o \
+                src/RBRInstrumentGen4Gating.o \
+                src/RBRInstrumentGen4HardwareErrors.o \
+                src/RBRInstrumentGen4Instrument.o \
+                src/RBRInstrumentGen4Internal.o \
+                src/RBRInstrumentGen4Memory.o \
+                src/RBRInstrumentGen4Polling.o \
+                src/RBRInstrumentGen4Schedule.o \
+                src/RBRInstrumentGen4Security.o \
+                src/RBRInstrumentGen4Streaming.o \
+                src/RBRParserGen4.o
+
+LIB_OBJECTS :=
+DYNAMICCORRECTION_OBJECTS :=
+ifeq ($(GEN3),1)
+LIB_OBJECTS += $(GEN3_OBJECTS)
+DYNAMICCORRECTION_OBJECTS += src/RBRDynamicCorrection.o
+endif
+ifeq ($(GEN4),1)
+LIB_OBJECTS += $(GEN4_OBJECTS)
+DYNAMICCORRECTION_OBJECTS += src/RBRDynamicCorrectionGen4.o
+endif
+
 # Due to incompatibility between parallel builds (-j, --jobs) and Make's
 # archive syntax, and between incremental builds and deterministically-produced
 # archives (as written out by llvm-ar v10.0.0+ and most distro builds of GNU
@@ -99,25 +166,9 @@ lib: bin/libRBR.a
 %.a:
 	$(AR) $(ARFLAGS) $@ $(filter %.o,$?)
 
-bin/libRBR.a: src/RBRInstrument.o \
-              src/RBRInstrumentCommunication.o \
-              src/RBRInstrumentConfiguration.o \
-              src/RBRInstrumentDeployment.o \
-              src/RBRInstrumentFetching.o \
-              src/RBRInstrumentGating.o \
-              src/RBRInstrumentHardwareErrors.o \
-              src/RBRInstrumentInternal.o \
-              src/RBRInstrumentMemory.o \
-              src/RBRInstrumentOther.o \
-              src/RBRInstrumentPauseresume.o \
-              src/RBRInstrumentSchedule.o \
-              src/RBRInstrumentSecurity.o \
-              src/RBRInstrumentStreaming.o \
-              src/RBRInstrumentVehicle.o \
-              src/RBRParser.o \
-              | bin
+bin/libRBR.a: $(LIB_OBJECTS) | bin
 
-bin/libRBRDynamicCorrection.a: src/RBRDynamicCorrection.o | bin
+bin/libRBRDynamicCorrection.a: $(DYNAMICCORRECTION_OBJECTS) | bin
 
 .PHONY: docs
 docs:
@@ -127,45 +178,71 @@ docs:
 devdocs:
 	doxygen tools/Doxyfile-devdocs
 
+TEST_BINARIES :=
+ifeq ($(GEN3),1)
+TEST_BINARIES += bin/tests
+endif
+ifeq ($(GEN4),1)
+TEST_BINARIES += bin/testsGen4
+endif
+
 tests: CFLAGS += -Wno-error=unused-parameter -Wno-unused-parameter
 tests: LDFLAGS += -Lbin
 tests: LDLIBS += -lRBR -lRBRDynamicCorrection -lm
 .PHONY: tests
-tests: bin bin/tests
-	./bin/tests
+tests: bin $(TEST_BINARIES)
+	$(foreach test,$(TEST_BINARIES),./$(test) &&) true
 
 nomalloc: CFLAGS += -DRBR_LIB_NODYNAMICMEMORYALLOCATION
 nomalloc: lib libdynamiccorrection docs tests
 
-## \brief Test modules.
+## \brief Gen3 test modules.
 ##
 ## Each one of these names corresponds to a C source file in the `tests/`
 ## directory. Tests declared within these files (using the `TEST_LOGGER2` and
 ## `TEST_LOGGER3` macros) are automatically discovered at build time and
 ## included in the test suite.
-TEST_MODULES := communication \
-                configuration \
-                deployment \
-                dynamiccorrection \
-                fetching \
-                gating \
-                memory \
-                other \
-                schedule \
-                security \
-                streaming \
-                vehicle \
-                parser \
-                pauseresume
+GEN3_TEST_MODULES := communication \
+                     configuration \
+                     deployment \
+                     dynamiccorrection \
+                     fetching \
+                     gating \
+                     memory \
+                     other \
+                     schedule \
+                     security \
+                     streaming \
+                     vehicle \
+                     parser \
+                     pauseresume
+
+## \brief Gen4 test modules.
+##
+## As for the Gen3 suite, each one of these names corresponds to a C source
+## file in the `testsGen4/` directory (using the `TEST_LOGGER4` macro).
+##
+## Modules not listed below exist in `testsGen4/` but predate the late-2024
+## L4 grammar/API alignment and do not currently build or pass against the
+## Gen4 sources; re-enabling them is part of the test alignment planned for
+## libRBR 2.0 (SYS-1194):
+##
+## - `instrument`: builds; one test (`pcba`) fails
+## - `configuration`: builds; the `calibration` test crashes
+## - `polling`, `streaming`: predate the `channels` to `channelCount` rename
+## - `deployment`: predates RBRInstrumentGen4Simulation struct changes
+## - `memory`: tests an incomplete implementation
+GEN4_TEST_MODULES := communication \
+                     security
 
 bin/tests: bin/libRBR.a \
            bin/libRBRDynamicCorrection.a \
            tests/main.o \
            tests/tests.o \
-           $(foreach module,$(TEST_MODULES),tests/$(module).o)
+           $(foreach module,$(GEN3_TEST_MODULES),tests/$(module).o)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
-tests/tests.c: $(foreach module,$(TEST_MODULES),tests/$(module).c)
+tests/tests.c: $(foreach module,$(GEN3_TEST_MODULES),tests/$(module).c)
 	@echo "/* This file is automatically generated. */" >$@
 	@echo '#include "tests.h"' >>$@
 	@grep -ho 'TEST_\(LOGGER[23]\|PARSER\)([A-Za-z_][A-Za-z0-9_]*\(, .*\)\?)' \
@@ -189,9 +266,40 @@ tests/tests.c: $(foreach module,$(TEST_MODULES),tests/$(module).c)
 	@echo "    {0}" >>$@
 	@echo "};" >>$@
 
+bin/testsGen4: bin/libRBR.a \
+               bin/libRBRDynamicCorrection.a \
+               testsGen4/main.o \
+               testsGen4/tests.o \
+               $(foreach module,$(GEN4_TEST_MODULES),testsGen4/$(module).o)
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+testsGen4/tests.c: $(foreach module,$(GEN4_TEST_MODULES),testsGen4/$(module).c)
+	@echo "/* This file is automatically generated. */" >$@
+	@echo '#include "tests.h"' >>$@
+	@grep -ho 'TEST_\(LOGGER[4]\|PARSER\)([A-Za-z_][A-Za-z0-9_]*\(, .*\)\?)' \
+			$^ \
+		| sed -e 's/$$/;/' >>$@
+	@echo "InstrumentTest instrumentTests[] = {" >>$@
+	@grep -ho 'TEST_LOGGER[4]([A-Za-z_][A-Za-z0-9_]*)' $^ \
+		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRINSTRUMENTGEN4_LOGGER\1, test_\2_l\1},/' \
+		>>$@
+	@echo "    {0}" >>$@
+	@echo "};" >>$@
+
+	@grep -ho 'TEST_PARSER_CONFIG([A-Za-z_][A-Za-z0-9_]*)' $^ \
+		| sed -e 's/^TEST_PARSER_CONFIG(\([^,]*\))/extern const RBRParserGen4Config test_\1_parser_config;/' \
+		>>$@
+
+	@echo "ParserTest parserTests[] = {" >>$@
+	@grep -ho 'TEST_PARSER([A-Za-z_][A-Za-z0-9_]*, .*)' $^ \
+		| sed -e 's/^TEST_PARSER(\([^,]*\), \(.*\))/    {"\1", \&test_\2_parser_config, test_\1_parser},/' \
+		>>$@
+	@echo "    {0}" >>$@
+	@echo "};" >>$@
+
 bin:
 	mkdir bin
 
 .PHONY: clean
 clean:
-	rm -Rf src/*.o bin/ tests/tests.c tests/*.o docs/
+	rm -Rf src/*.o bin/ tests/tests.c tests/*.o testsGen4/tests.c testsGen4/*.o docs/

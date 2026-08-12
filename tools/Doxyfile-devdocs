@@ -2,4 +2,4 @@
 
 # Developer documentation should include internal functions, the test
 # framework headers, and developer tools.
-INPUT += src/RBRInstrumentInternal.h tests/tests.h tools
+INPUT += src/RBRInstrumentInternal.h src/RBRInstrumentGen4Internal.h tests/tests.h tools

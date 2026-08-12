@@ -5,6 +5,7 @@
 bin/
 docs/
 tests/tests.c
+testsGen4/tests.c
 *.o
 
 # Temporary/output files.

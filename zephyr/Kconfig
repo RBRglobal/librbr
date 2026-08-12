@@ -9,6 +9,26 @@ config LIBRBR
 
 if LIBRBR
 
+# Mirrors the GEN3/GEN4 options of the standalone Makefile build: each
+# instrument generation has an independent API that can be compiled in or
+# out. At least one generation must be enabled.
+
+config LIBRBR_GEN3
+    bool "Gen3 (Logger2/Logger3) API"
+    default y
+    help
+        Compile the RBRInstrument_-prefixed API for Generation 3
+        (Logger2/Logger3) instruments — the same API shipped as libRBR 1.x.
+
+config LIBRBR_GEN4
+    bool "Gen4 (SL4/SEN4/L4) API"
+    default y
+    help
+        Compile the RBRInstrumentGen4_-prefixed API for Generation 4
+        (SL4/SEN4/L4) instruments.
+
+if LIBRBR_GEN3
+
 # The following settings are reproduced from RBRInstrument.h. See
 # CMakeLists.txt for the Kconfig-to-precompiler-macro bindings.
 
@@ -63,5 +83,42 @@ config RBRINSTRUMENT_CALIBRATION_N_COEFFICIENT_MAX
 config RBRINSTRUMENT_CHANNEL_GAINS_MAX
     int "The maximum number of gain settings per channel."
     default 8
+
+endif # LIBRBR_GEN3
+
+if LIBRBR_GEN4
+
+# The following settings are reproduced from RBRInstrumentGen4.h. See
+# CMakeLists.txt for the Kconfig-to-precompiler-macro bindings.
+
+config RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX
+    int "The size of the buffer storing commands destined for the instrument."
+    default 120
+    help
+        Must be large enough to hold the largest command you will want to send
+        to the instrument plus the trailing line termination (`\r\n\0`).
+
+        A buffer of this size is included in RBRInstrumentGen4.
+
+config RBRINSTRUMENTGEN4_RESPONSE_BUFFER_MAX
+    int "The size of the buffer storing instrument responses."
+    default 1024
+    help
+        Must be large enough to hold the largest command response you will want
+        to receive. This does not include download data, which is read directly
+        into a user-managed buffer.
+
+        A buffer of this size is included in RBRInstrumentGen4.
+
+config RBRINSTRUMENTGEN4_CHANNEL_MAX
+    int "The maximum number of channels present on an instrument."
+    default 32
+    help
+        The default maximum of 32 channels is reflective of the maximum number
+        of channels supported by RBR instruments, but most instruments have far
+        fewer. Adjusting this value will affect the size of some structures,
+        notably RBRInstrumentGen4Sample.
+
+endif # LIBRBR_GEN4
 
 endif # LIBRBR
