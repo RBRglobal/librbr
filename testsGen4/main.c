@@ -289,6 +289,13 @@ int main(void)
             printf("Error: only Logger4 test is covered!");
         }
 
+        /* Start every test from an awake instrument. Commands which end a
+         * session — `sleep`, `instrument reboot` — clear the activity time,
+         * which would otherwise make the next test see an unexpected wake
+         * sequence in its write buffer and leave the suite dependent on the
+         * order the modules happen to be listed in. */
+        testInstrument->lastActivityTime = 0;
+
         printf("Running %s test \"%s\"...",
                RBRInstrumentGen4Generation_name(instrumentTests[i].generation),
                instrumentTests[i].name);
