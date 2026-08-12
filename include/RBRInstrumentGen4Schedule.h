@@ -106,7 +106,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setClock(RBRInstrumentGen4 *instrument,
  * This tracks whether the deployment is running on the instrument.
  *
  * Returned by:
- * \see RBRInstrumentGen4_getInfo()
+ * \see RBRInstrumentGen4_getInstrument()
  * \see RBRInstrumentGen4_enable()
  * \see RBRInstrumentGen4_verify()
  *

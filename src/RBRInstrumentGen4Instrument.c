@@ -694,11 +694,41 @@ RBRInstrumentGen4Error RBRInstrumentGen4_resetPowerExternalUsed(
     return RBRInstrumentGen4_converse(instrument, "instrument power external used=0");
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getInfo(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Info *info)
+/**
+ * \brief Resolve a `datatype` parameter value to its enum member.
+ *
+ * Matched against RBRInstrumentGen4DataType_name() so that the accepted
+ * spellings cannot drift from the ones the library emits.
+ *
+ * \param [in] value the parameter value reported by the instrument
+ * \return the corresponding data type
+ * \return #RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE when the value is unrecognized
+ */
+static RBRInstrumentGen4DataType RBRInstrumentGen4DataType_parse(
+    const char *value)
 {
-    memset(info, 0, sizeof(RBRInstrumentGen4Info));
+    for (int32_t dataType = 0;
+         dataType < RBRINSTRUMENTGEN4_DATATYPE_COUNT;
+         ++dataType)
+    {
+        if (strcmp(value,
+                   RBRInstrumentGen4DataType_name(
+                       (RBRInstrumentGen4DataType) dataType)) == 0)
+        {
+            return (RBRInstrumentGen4DataType) dataType;
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getInstrument(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Instrument *instrumentInfo)
+{
+    memset(instrumentInfo, 0, sizeof(RBRInstrumentGen4Instrument));
+    instrumentInfo->state = RBRINSTRUMENTGEN4_UNKNOWN_LOGGING_STATE;
+    instrumentInfo->dataType = RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE;
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "instrument"));
 
@@ -714,31 +744,67 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getInfo(
         {
             break;
         }
-        else if (strcmp(parameter.key, "pn") == 0)
+        else if (strcmp(parameter.key, "state") == 0)
         {
-            snprintf(info->pn,
-                     sizeof(info->pn),
+            if (strcmp(parameter.value, "disabled") == 0)
+            {
+                instrumentInfo->state = RBRINSTRUMENTGEN4_LOGGING_STATE_DISABLED;
+            }
+            else if (strcmp(parameter.value, "enabled") == 0)
+            {
+                instrumentInfo->state = RBRINSTRUMENTGEN4_LOGGING_STATE_ENABLED;
+            }
+        }
+        else if (strcmp(parameter.key, "sn") == 0)
+        {
+            instrumentInfo->sn = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "model") == 0)
+        {
+            snprintf(instrumentInfo->model,
+                     sizeof(instrumentInfo->model),
                      "%s",
                      parameter.value);
         }
+        else if (strcmp(parameter.key, "pn") == 0)
+        {
+            snprintf(instrumentInfo->pn,
+                     sizeof(instrumentInfo->pn),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "fwversion") == 0)
+        {
+            snprintf(instrumentInfo->fwversion,
+                     sizeof(instrumentInfo->fwversion),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "semver") == 0)
+        {
+            snprintf(instrumentInfo->semver,
+                     sizeof(instrumentInfo->semver),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "fwtype") == 0)
+        {
+            instrumentInfo->fwtype = strtol(parameter.value, NULL, 10);
+        }
         else if (strcmp(parameter.key, "fwlock") == 0)
         {
-            info->fwLock = (strcmp(parameter.value, "on") == 0);
+            instrumentInfo->fwLock = (strcmp(parameter.value, "on") == 0);
         }
         else if (strcmp(parameter.key, "datatype") == 0)
         {
-            if (strcmp(parameter.value, "float32") == 0)
-            {
-                info->dataType = RBRINSTRUMENTGEN4_DATATYPE_FLOAT32;
-            }
-            else if (strcmp(parameter.value, "float64") == 0)
-            {
-                info->dataType = RBRINSTRUMENTGEN4_DATATYPE_FLOAT64;
-            }
-            else if (strcmp(parameter.value, "cal64") == 0)
-            {
-                info->dataType = RBRINSTRUMENTGEN4_DATATYPE_CALFLOAT64;
-            }
+            instrumentInfo->dataType = RBRInstrumentGen4DataType_parse(parameter.value);
+        }
+        else if (strcmp(parameter.key, "name") == 0)
+        {
+            snprintf(instrumentInfo->name,
+                     sizeof(instrumentInfo->name),
+                     "%s",
+                     parameter.value);
         }
     }
 

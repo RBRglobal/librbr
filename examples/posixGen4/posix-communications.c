@@ -179,8 +179,8 @@ int main(int argc, char *argv[])
            instrument->id.fwtype,
            name);
 
-    RBRInstrumentGen4Info info;
-    if ((err = RBRInstrumentGen4_getInfo(instrument, &info)) != RBRINSTRUMENTGEN4_SUCCESS)
+    RBRInstrumentGen4Instrument info;
+    if ((err = RBRInstrumentGen4_getInstrument(instrument, &info)) != RBRINSTRUMENTGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to get instrument info: %s!\n",
                 programName,

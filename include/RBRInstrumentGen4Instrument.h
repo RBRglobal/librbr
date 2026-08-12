@@ -14,9 +14,18 @@
 #define LIBRBR_RBRINSTRUMENTGEN4INSTRUMENT_H
 
 #include "RBRInstrumentGen4.h"
+/* Required for RBRInstrumentGen4LoggingState. */
+#include "RBRInstrumentGen4Schedule.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * \brief The maximum number of characters in the instrument name.
+ *
+ * Does not include any null terminator.
+ */
+#define RBRINSTRUMENTGEN4_INSTRUMENT_NAME_MAX 32
 
 /**
  * \brief The maximum number of PCBAs in the instrument.
@@ -88,7 +97,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the information is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_getInfo();
+ * \see RBRInstrumentGen4_getInstrument();
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getId4(RBRInstrumentGen4 *instrument,
@@ -486,37 +495,65 @@ RBRInstrumentGen4Error RBRInstrumentGen4_resetPowerExternalUsed(
     RBRInstrumentGen4 *instrument);
 
 /**
- * \brief Instrument `instrument` command parameters not included in the `id` command.
+ * \brief Instrument `instrument` command parameters.
  *
- * \see RBRInstrumentGen4_getInfo()
+ * Distinct from #RBRInstrumentGen4, which is the connection to an instrument.
+ *
+ * Fields are declared in the order the instrument reports them.
+ *
+ * \see RBRInstrumentGen4_getInstrument()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/41582593/instrument
  */
-typedef struct RBRInstrumentGen4Info
+typedef struct RBRInstrumentGen4Instrument
 {
+    /** \brief Whether a deployment is currently logging. */
+    RBRInstrumentGen4LoggingState state;
+    /** \brief The serial number of the instrument. */
+    int32_t sn;
+    /** \brief The instrument model. */
+    char model[RBRINSTRUMENTGEN4_ID_MODEL_MAX + 1];
     /** \brief The RBR part number of the instrument. */
     char pn[RBRINSTRUMENTGEN4_PART_NUMBER_MAX + 1];
+    /** \brief The instrument firmware version. */
+    char fwversion[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
+    /**
+     * \brief The instrument firmware version in Semantic Version form.
+     *
+     * For example, `2.0.0-rc1-10-g148bc5eb1`.
+     */
+    char semver[RBRINSTRUMENTGEN4_ID_SEMVER_MAX + 1];
+    /** \brief The firmware type of the instrument. */
+    int32_t fwtype;
     /** \brief Whether firmware upgrades are locked. */
     bool fwLock;
     /** \brief The data type used by the instrument's samples. */
     RBRInstrumentGen4DataType dataType;
-} RBRInstrumentGen4Info;
+    /**
+     * \brief The extended model name of the instrument.
+     *
+     * For example, `RBRsolo^4_T.D!fast32`.
+     */
+    char name[RBRINSTRUMENTGEN4_INSTRUMENT_NAME_MAX + 1];
+} RBRInstrumentGen4Instrument;
 
 /**
- * \brief Get more information about the instrument.
+ * \brief Get the instrument's identity and state.
  * \note Issues the `instrument` instrument command.
  *
+ * All of the parameters the command reports are returned. They are read-only,
+ * so there is no corresponding setter.
+ *
  * \param [in] instrument the instrument connection
- * \param [out] info the extended instrument information
- * \return #RBRINSTRUMENTGEN4_UNSUPPORTED for Logger2 instruments
+ * \param [out] instrumentInfo the instrument information
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the information is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_getId();
+ * \see RBRInstrumentGen4_getId4()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/41582593/instrument
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getInfo(
+RBRInstrumentGen4Error RBRInstrumentGen4_getInstrument(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Info *info);
+    RBRInstrumentGen4Instrument *instrumentInfo);
 
 #ifdef __cplusplus
 }

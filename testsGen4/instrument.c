@@ -481,42 +481,109 @@ TEST_LOGGER4(resetPowerExternalUsed)
     return true;
 }
 
-typedef struct InfoTest
+typedef struct InstrumentCommandTest
 {
     const char *response;
     RBRInstrumentGen4Error expectedError;
-    RBRInstrumentGen4Info expected;
-} InfoTest;
+    RBRInstrumentGen4Instrument expected;
+} InstrumentCommandTest;
 
-TEST_LOGGER4(info)
+TEST_LOGGER4(instrument)
 {
-    InfoTest tests[] = {
-        { "instrument pn=L3-M11-BEC11-SC11-ST11-SP11 fwlock=off datatype=float64" RESPONSE_TERMINATOR,
+    InstrumentCommandTest tests[] = {
+        { "instrument state=disabled sn=999999 model=L4 pn=9999999revA "
+          "fwversion=2.0.0 semver=2.0.0-rc1-10-g148bc5eb1 fwtype=150 "
+          "fwlock=off datatype=float64 name=L4"
+          RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { "L3-M11-BEC11-SC11-ST11-SP11",
+          { RBRINSTRUMENTGEN4_LOGGING_STATE_DISABLED,
+            999999,
+            "L4",
+            "9999999revA",
+            "2.0.0",
+            "2.0.0-rc1-10-g148bc5eb1",
+            150,
             false,
-            RBRINSTRUMENTGEN4_DATATYPE_FLOAT64 } },
-        { "instrument pn=012345revA fwlock=on datatype=float32" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN4_DATATYPE_FLOAT64,
+            "L4" } },
+        /* An enabled instrument with the firmware locked, and the extended
+         * name and part number populated. */
+        { "instrument state=enabled sn=210000 model=RBRsolo4 "
+          "pn=L3-M11-BEC11-SC11-ST11-SP11 fwversion=1.0.0 "
+          "semver=1.0.0-rc4-11-g941ae64 fwtype=130 fwlock=on "
+          "datatype=float32 name=RBRsolo^4_T.D!fast32"
+          RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { "012345revA",
+          { RBRINSTRUMENTGEN4_LOGGING_STATE_ENABLED,
+            210000,
+            "RBRsolo4",
+            "L3-M11-BEC11-SC11-ST11-SP11",
+            "1.0.0",
+            "1.0.0-rc4-11-g941ae64",
+            130,
             true,
-            RBRINSTRUMENTGEN4_DATATYPE_FLOAT32 } },
+            RBRINSTRUMENTGEN4_DATATYPE_FLOAT32,
+            "RBRsolo^4_T.D!fast32" } },
+        /* calfloat64 is reported only during a calibration-mode deployment. */
+        { "instrument state=enabled sn=210000 model=RBRsolo4 pn=012345revA "
+          "fwversion=1.0.0 semver=1.0.0 fwtype=130 fwlock=off "
+          "datatype=calfloat64 name=RBRsolo4"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { RBRINSTRUMENTGEN4_LOGGING_STATE_ENABLED,
+            210000,
+            "RBRsolo4",
+            "012345revA",
+            "1.0.0",
+            "1.0.0",
+            130,
+            false,
+            RBRINSTRUMENTGEN4_DATATYPE_CALFLOAT64,
+            "RBRsolo4" } },
+        /* An unrecognized data type must not be reported as float32, which is
+         * the zero value of the enum. */
+        { "instrument state=disabled sn=999999 model=L4 pn=9999999revA "
+          "fwversion=2.0.0 semver=2.0.0 fwtype=150 fwlock=off "
+          "datatype=float128 name=L4"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { RBRINSTRUMENTGEN4_LOGGING_STATE_DISABLED,
+            999999,
+            "L4",
+            "9999999revA",
+            "2.0.0",
+            "2.0.0",
+            150,
+            false,
+            RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE,
+            "L4" } },
         { 0 }
     };
     RBRInstrumentGen4Error err;
-    RBRInstrumentGen4Info actual;
+    RBRInstrumentGen4Instrument actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers,
                            tests[i].response,
                            0);
-        err = RBRInstrumentGen4_getInfo(instrument,
-                                        &actual);
+        err = RBRInstrumentGen4_getInstrument(instrument,
+                                              &actual);
+        TEST_ASSERT_STR_EQ("instrument" COMMAND_TERMINATOR,
+                           buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen4Error);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.state,
+                            actual.state,
+                            RBRInstrumentGen4LoggingState);
+        TEST_ASSERT_EQ(tests[i].expected.sn, actual.sn, "%" PRIi32);
+        TEST_ASSERT_STR_EQ(tests[i].expected.model, actual.model);
         TEST_ASSERT_STR_EQ(tests[i].expected.pn, actual.pn);
+        TEST_ASSERT_STR_EQ(tests[i].expected.fwversion, actual.fwversion);
+        TEST_ASSERT_STR_EQ(tests[i].expected.semver, actual.semver);
+        TEST_ASSERT_EQ(tests[i].expected.fwtype, actual.fwtype, "%" PRIi32);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.fwLock, actual.fwLock, bool);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.dataType, actual.dataType, RBRInstrumentGen4DataType);
+        TEST_ASSERT_STR_EQ(tests[i].expected.name, actual.name);
     }
     return true;
 }
