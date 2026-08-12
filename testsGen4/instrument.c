@@ -157,25 +157,24 @@ static bool test_pcba(RBRInstrumentGen4Pcba *expected, RBRInstrumentGen4Pcba *ac
     TEST_ASSERT_STR_EQ(expected->label, actual->label);
     TEST_ASSERT_EQ(expected->sn, actual->sn, "%" PRIi32);
     TEST_ASSERT_STR_EQ(expected->pn, actual->pn);
-    TEST_ASSERT_STR_EQ(expected->fw, actual->fw);
-    TEST_ASSERT_STR_EQ(expected->hw, actual->hw);
-    TEST_ASSERT_EQ(expected->address, actual->address, "%" PRIi32);
+    TEST_ASSERT_STR_EQ(expected->node, actual->node);
 
     return true;
 }
 
 TEST_LOGGER4(pcbalist)
 {
+    /* The pool getter reports only labels; the remaining fields come from
+     * RBRInstrumentGen4_getPcba(). */
     RBRInstrumentGen4PcbaPool expected = {
-        .count = 3,
-        .pool = { {"L3-CPU", 0, "", "", "", 0},
-                  {"FE-cond3", 0, "", "", "", 0},
-                  {"FE-v2", 0, "", "", "", 0} }
+        .count = 2,
+        .pool = { { "self", 0, "", "" },
+                  { "fe4_cond_00", 0, "", "" } }
     };
     RBRInstrumentGen4PcbaPool actual;
 
     TestIOBuffers_init(buffers,
-                       "pcba count=3 list=L3-CPU|FE-cond3|FE-v2" RESPONSE_TERMINATOR,
+                       "pcba count=2 list=self|fe4_cond_00" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getPcbaPool(instrument,
                                                                &actual);
@@ -195,24 +194,52 @@ TEST_LOGGER4(pcbalist)
 TEST_LOGGER4(pcba)
 {
     RBRInstrumentGen4Pcba expected = {
-        .label = "FE-cond3",
-        .sn = 123456,
-        .pn = "0123456revA",
-        .fw = "1.1.1",
-        .hw = "A01",
-        .address = 128
+        .label = "fe4_cond_00",
+        .sn = 0,
+        .pn = "na",
+        .node = "fe4_cond_00"
     };
 
     RBRInstrumentGen4Pcba actual = {
-        .label = "FE-cond3"
+        .label = "fe4_cond_00"
     };
 
     TestIOBuffers_init(buffers,
-                       "pcba FE-cond3 sn=123456 pn=0123456revA fw=1.1.1 hw=A01 address=128" RESPONSE_TERMINATOR,
+                       "pcba fe4_cond_00 sn=na pn=na node=fe4_cond_00"
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getPcba(instrument,
                                                            &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("pcba fe4_cond_00" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return test_pcba(&expected, &actual);
+}
+
+TEST_LOGGER4(pcbaSerialNumber)
+{
+    /* Zero stands for the `na` of the test above, so prove a real serial
+     * number is read rather than left at that zero. */
+    RBRInstrumentGen4Pcba expected = {
+        .label = "self",
+        .sn = 850032,
+        .pn = "na",
+        .node = "self"
+    };
+
+    RBRInstrumentGen4Pcba actual = {
+        .label = "self"
+    };
+
+    TestIOBuffers_init(buffers,
+                       "pcba self sn=850032 pn=na node=self"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getPcba(instrument,
+                                                           &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("pcba self" COMMAND_TERMINATOR, buffers->writeBuffer);
 
     return test_pcba(&expected, &actual);
 }

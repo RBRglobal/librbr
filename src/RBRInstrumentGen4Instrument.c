@@ -322,53 +322,51 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPcbaPool(
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getPcba(
-        RBRInstrumentGen4 *instrument,
-        RBRInstrumentGen4Pcba *pcba)
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Pcba *pcba)
+{
+    /* The label selects the PCBA to read, so it has to outlive the reset of
+     * the rest of the structure. */
+    char label[sizeof(pcba->label)];
+    snprintf(label, sizeof(label), "%s", pcba->label);
+
+    memset(pcba, 0, sizeof(RBRInstrumentGen4Pcba));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "pcba %s", label));
+
+    snprintf(pcba->label, sizeof(pcba->label), "%s", label);
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
     {
-        memset(pcba, 0, sizeof(RBRInstrumentGen4Pcba));
+        RBRInstrumentGen4_parseResponse(instrument,
+                                       &command,
+                                       &parameter);
 
-        RBR_TRY(RBRInstrumentGen4_converse(instrument, "pcba %s", pcba->label));
-
-        char *command = NULL;
-        RBRInstrumentGen4ResponseParameter parameter;
-        while (true)
+        if (parameter.key == NULL || parameter.value == NULL)
         {
-            RBRInstrumentGen4_parseResponse(instrument,
-                                        &command,
-                                        &parameter);
-
-            if (parameter.key == NULL || parameter.value == NULL)
-            {
-                break;
-            }
-            else if (strcmp(parameter.key, "sn") == 0)
-            {
-                pcba->sn = strtol(parameter.value, NULL, 10);
-            }
-            else if (strcmp(parameter.key, "pn") == 0)
-            {
-                snprintf(pcba->pn,
-                        sizeof(pcba->pn),
+            break;
+        }
+        else if (strcmp(parameter.key, "sn") == 0)
+        {
+            /* `na` is not a number, so it converts to the zero which stands
+             * for it. */
+            pcba->sn = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "pn") == 0)
+        {
+            snprintf(pcba->pn,
+                     sizeof(pcba->pn),
                      "%s",
                      parameter.value);
         }
-        else if (strcmp(parameter.key, "fw") == 0)
+        else if (strcmp(parameter.key, "node") == 0)
         {
-            snprintf(pcba->fw,
-                     sizeof(pcba->fw),
+            snprintf(pcba->node,
+                     sizeof(pcba->node),
                      "%s",
                      parameter.value);
-        }
-        else if (strcmp(parameter.key, "hw") == 0)
-        {
-            snprintf(pcba->hw,
-                     sizeof(pcba->fw),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "address") == 0)
-        {
-            pcba->address = strtol(parameter.value, NULL, 10);
         }
     }
 

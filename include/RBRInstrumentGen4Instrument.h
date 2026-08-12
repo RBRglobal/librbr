@@ -19,20 +19,6 @@ extern "C" {
 #endif
 
 /**
- * \brief The maximum number of characters in the PCBA firmware version number.
- *
- * Does not include any null terminator.
- */
-#define RBRINSTRUMENTGEN4_PCBA_FW_MAX 29
-
-/**
- * \brief The maximum number of characters in the PCBA hardware version number.
- *
- * Does not include any null terminator.
- */
-#define RBRINSTRUMENTGEN4_PCBA_HW_MAX 5
-
-/**
  * \brief The maximum number of PCBAs in the instrument.
  */
 #define RBRINSTRUMENTGEN4_PCBA_COUNT_MAX 12
@@ -116,18 +102,28 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getId4(RBRInstrumentGen4 *instrument,
  */
 typedef struct RBRInstrumentGen4Pcba
 {
-    /** \brief PCBA label. */
+    /**
+     * \brief PCBA label.
+     *
+     * Set by the caller to select the PCBA to read; see
+     * RBRInstrumentGen4_getPcba().
+     */
     char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
-    /** \brief PCBA serial number. */
-    uint32_t sn;
-    /** \brief PCBA part number. */
+    /**
+     * \brief PCBA serial number.
+     *
+     * Zero when the instrument has no serial number recorded for the PCBA,
+     * which it reports as `na`.
+     */
+    int32_t sn;
+    /**
+     * \brief PCBA part number.
+     *
+     * Reported as `na` when unrecorded.
+     */
     char pn[RBRINSTRUMENTGEN4_PART_NUMBER_MAX + 1];
-    /** \brief PCBA firmware version. */
-    char fw[RBRINSTRUMENTGEN4_PCBA_FW_MAX + 1];
-    /** \brief PCBA hardware version. */
-    char hw[RBRINSTRUMENTGEN4_PCBA_HW_MAX + 1];
-    /** PCBA's address on the instrument's bus. */
-    uint32_t address;
+    /** \brief The label of the node this PCBA belongs to. */
+    char node[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 } RBRInstrumentGen4Pcba;
 
 /**
@@ -162,9 +158,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPcbaPool(
 
 /**
  * \brief Get an instrument's PCBA's parameters.
+ * \note Issues the `pcba <pcba_label>` instrument command.
+ *
+ * RBRInstrumentGen4Pcba.label must be populated by the caller to select the
+ * PCBA to read; the remaining fields are overwritten. Labels can be
+ * discovered with RBRInstrumentGen4_getPcbaPool().
  *
  * \param [in] instrument the instrument connection
- * \param [inout] pcba the PCBA information
+ * \param [inout] pcba the label of the PCBA to read, and its information
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the information is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
