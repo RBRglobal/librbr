@@ -201,26 +201,56 @@ RBRInstrumentGen4Error instrumentWrite(const struct RBRInstrumentGen4 *instrumen
 
 /******************* posix helper functions ***********************/
 //---------------- define helper functions --------------------------------------------------
-// RBRInstrumentGen4DateTime_toScheduleTime() is available in L3 _setDeployment() function.
-// however it lives in RBRInstrumentInternal.c
+// Parses a schedule-format time string ("YYYYMMDDhhmmss", UTC) into a
+// millisecond Unix timestamp. The library's own parser,
+// RBRInstrumentGen4DateTime_parseScheduleTime(), lives in
+// RBRInstrumentGen4Internal.c and is not part of the public API.
 void str_to_deploymentDatetime(RBRInstrumentGen4DateTime *targetDatetime,
                                const char *sourceDatetime)
 {
-    int size = 15;                                   // RBRINSTRUMENTGEN4_SCHEDULE_TIME_LEN defined in internal.h as 14.
-    const char *format = "%04d%02d%02d%02d%02d%02d"; // RBRInstrumentGen4DateTime_scheduleFormat. Also in internal.c
-    time_t t = *targetDatetime / 1000;
-    struct tm *split = gmtime(&t);
-    int milliseconds = (int) (*targetDatetime % 1000);
-    snprintf((char *) sourceDatetime,
-             size,
-             format,
-             split->tm_year + 1900,
-             split->tm_mon + 1,
-             split->tm_mday,
-             split->tm_hour,
-             split->tm_min,
-             split->tm_sec,
-             milliseconds);
+    // Days from the start of the year to the start of each month (non-leap).
+    static const int daysBeforeMonth[12] = {
+        0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334
+    };
+
+    int year, month, day, hour, minute, second;
+    if (sscanf(sourceDatetime,
+               "%4d%2d%2d%2d%2d%2d",
+               &year,
+               &month,
+               &day,
+               &hour,
+               &minute,
+               &second) != 6
+        || year < 1970
+        || month < 1 || month > 12
+        || day < 1 || day > 31
+        || hour > 23 || minute > 59 || second > 59)
+    {
+        fprintf(stderr,
+                "Error: invalid deployment datetime '%s'!\n",
+                sourceDatetime);
+        *targetDatetime = 0;
+        return;
+    }
+
+    // Whole days since the Unix epoch, counting leap days: every fourth
+    // year, except century years not divisible by 400.
+    RBRInstrumentGen4DateTime days =
+        (RBRInstrumentGen4DateTime) (year - 1970) * 365
+        + (year - 1969) / 4
+        - (year - 1901) / 100
+        + (year - 1601) / 400
+        + daysBeforeMonth[month - 1]
+        + (day - 1);
+    if (month > 2
+        && ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0))
+    {
+        days += 1;
+    }
+
+    *targetDatetime =
+        (((days * 24 + hour) * 60 + minute) * 60 + second) * 1000;
 }
 
 // can be static.
@@ -264,9 +294,15 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
     const char specifiedChannelLabels[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX],
     int32_t specifiedChannelLabelCnt)
 {
+    if (specifiedChannelLabelCnt < 1
+        || specifiedChannelLabelCnt > RBRINSTRUMENTGEN4_CHANNEL_MAX)
+    {
+        fprintf(stderr, "Error: invalid channel label count!\n");
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
     // init pointer array pointing to sourceObjects
-    RBRInstrumentGen4Channel *_newPtrList[specifiedChannelLabelCnt]; // warning: modify according to sourceObjList structure.
-    _newPtrList[0] = NULL;
+    RBRInstrumentGen4Channel *_newPtrList[RBRINSTRUMENTGEN4_CHANNEL_MAX] = { NULL };
 
     // find out each label specified, and compare with all sourceObjList.
     // and fill the pointer array.
@@ -293,13 +329,15 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
         }
     }
 
-    if (_newPtrList[0] == NULL) // none of the label specified is valid.
+    if (_currentIndex == 0) // none of the label specified is valid.
     {
         fprintf(stderr, "Error: none of the specified labels exist!\n");
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    cpy_ptrArray_forChannel(group->channelList, _newPtrList, specifiedChannelLabelCnt); // warning: modify according to sourceObjList structure.
+    // Only the channels which were actually found are copied to the group.
+    cpy_ptrArray_forChannel(group->channelList, _newPtrList, _currentIndex);
+    group->count = _currentIndex;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 

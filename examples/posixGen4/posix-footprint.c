@@ -24,21 +24,21 @@
 int main(void)
 {
     RBRInstrumentGen4 instrument;
-    printf("%ld\n", sizeof(instrument)); //in bytes
+    printf("%zu\n", sizeof(instrument)); //in bytes
 
     RBRInstrumentGen4ConfigPool configPool;
-    printf("%ld, %ld\n", sizeof(configPool), sizeof(configPool.pool[0]));
+    printf("%zu, %zu\n", sizeof(configPool), sizeof(configPool.pool[0]));
 
     RBRInstrumentGen4SchedulePool schedulePool;
-    printf("%ld, %ld\n", sizeof(schedulePool), sizeof(schedulePool.pool[0]));
+    printf("%zu, %zu\n", sizeof(schedulePool), sizeof(schedulePool.pool[0]));
 
     RBRInstrumentGen4GroupPool groupPool;
-    printf("%ld, %ld\n", sizeof(groupPool), sizeof(groupPool.pool[0]));
+    printf("%zu, %zu\n", sizeof(groupPool), sizeof(groupPool.pool[0]));
 
     RBRInstrumentGen4ChannelPool channelPool;
-    printf("%ld, %ld, %ld\n", sizeof(channelPool), sizeof(channelPool.pool[0]), sizeof(channelPool.pool[0].calibration));
+    printf("%zu, %zu, %zu\n", sizeof(channelPool), sizeof(channelPool.pool[0]), sizeof(channelPool.pool[0].calibration));
 
     RBRInstrumentGen4DatasetPool datasetPool;
-    printf("%ld, %ld\n", sizeof(datasetPool), sizeof(datasetPool.pool[0]));
+    printf("%zu, %zu\n", sizeof(datasetPool), sizeof(datasetPool.pool[0]));
 
 }

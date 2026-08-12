@@ -58,8 +58,12 @@ extern "C"
                                            const void *const data,
                                            int32_t size);
 
-    // RBRInstrumentGen4DateTime_toScheduleTime() is available in L3 _setDeployment() function.
-    // however it lives in RBRInstrumentInternal.c
+    /**
+     * \brief Parse a schedule-format time string ("YYYYMMDDhhmmss", UTC)
+     * into a millisecond Unix timestamp.
+     *
+     * On invalid input, prints an error and sets \a targetDatetime to 0.
+     */
     void str_to_deploymentDatetime(RBRInstrumentGen4DateTime *targetDatetime,
                                    const char *sourceDatetime);
 

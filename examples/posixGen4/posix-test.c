@@ -1,7 +1,8 @@
 /**
- * \file posix-footprint.c
+ * \file posix-test.c
  *
- * \brief Get the footprint for different structures.
+ * \brief Test file for posix examples development, using simulated I/O
+ * buffers instead of a live instrument.
  *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.

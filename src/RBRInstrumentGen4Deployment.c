@@ -13,6 +13,8 @@
 #include <string.h>
 /* Required for snprintf. */
 #include <stdio.h>
+/* Required for PRId32. */
+#include <inttypes.h>
 
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Internal.h"
@@ -103,11 +105,18 @@ RBRInstrumentGen4Error RBRInstrumentGen4_enable(
         RBRInstrumentGen4Dataset **newDataset,
         RBRInstrumentGen4LoggingState *state)
 {
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                   "enable config=%s dataset=%s simulation=%s storagemode=%s", 
-                                   config->label, datasetLabel,
-                                   storageMode?"normal":"calibration"
-                                   ));
+    if (storageMode != RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL
+        && storageMode != RBRINSTRUMENTGEN4_STORAGEMODE_CALIBRATION)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    RBR_TRY(RBRInstrumentGen4_converse(
+        instrument,
+        "enable config=%s dataset=%s storagemode=%s",
+        config->label,
+        datasetLabel,
+        RBRInstrumentGen4DeploymentStoragemode_name(storageMode)));
 
     RBRInstrumentGen4_parseDeploymentResponse(instrument,
                                               "enable",
@@ -185,14 +194,44 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSimulation(
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
+    /* Build the pipe-separated channel label list. The command buffer caps
+     * the length of the entire command, so a longer list could never be sent
+     * anyway. */
+    char channelList[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX] = "";
+    int32_t channelListLength = 0;
+    for (int32_t channel = 0;
+         channel < RBRINSTRUMENTGEN4_CHANNEL_MAX
+         && simulation->channelList[channel] != NULL;
+         channel++)
+    {
+        channelListLength += snprintf(channelList + channelListLength,
+                                      sizeof(channelList) - channelListLength,
+                                      "%s%s",
+                                      channel > 0 ? "|" : "",
+                                      simulation->channelList[channel]->label);
+        if (channelListLength >= (int32_t) sizeof(channelList))
+        {
+            return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+        }
+    }
+
     RBR_TRY(RBRInstrumentGen4_permit(instrument, "simulation"));
-    /* Iterate over channel label list */
-    /*
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                   "simulation state=%s period=%i channellist=%s",
-                                   (simulation->state) ? "on" : "off",
-                                   simulation->period,
-                                   simulation->channelLabelList));
-    */
+    if (channelListLength > 0)
+    {
+        RBR_TRY(RBRInstrumentGen4_converse(
+            instrument,
+            "simulation state=%s period=%" PRId32 " channellist=%s",
+            simulation->state ? "on" : "off",
+            simulation->period,
+            channelList));
+    }
+    else
+    {
+        RBR_TRY(RBRInstrumentGen4_converse(
+            instrument,
+            "simulation state=%s period=%" PRId32,
+            simulation->state ? "on" : "off",
+            simulation->period));
+    }
     return RBRINSTRUMENTGEN4_SUCCESS;
 }

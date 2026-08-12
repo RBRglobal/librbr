@@ -1,7 +1,8 @@
 /**
- * \file posix-test.c
+ * \file posix-communications.c
  *
- * \brief test file for posix examples development.
+ * \brief Example of opening an instrument connection and exercising the
+ * communication commands (sleep, link).
  *
  * \copyright
  * Copyright (c) 2024 RBR Ltd.

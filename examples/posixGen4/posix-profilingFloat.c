@@ -1,7 +1,8 @@
 /**
- * \file posix-singleScheduleSingleConfig.c
+ * \file posix-profilingFloat.c
  *
- * \brief Example of using the library to enable instrument with sigle schedule and single configuration.
+ * \brief Example of using the library to enable an instrument with a
+ * regimes-mode (profiling float) schedule.
  * see Gen4 command reference quick start example 1.
  *
  * \copyright

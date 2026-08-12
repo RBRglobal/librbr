@@ -1,20 +1,23 @@
-# How to use posix examples
+# How to use the Gen4 posix examples
 
 ## Setup
-* Hardware: RBR L3 board stack, RS232/RS485/USB connection (~12V power supply if it's RS232/RS485)
-* Firmware: RBR firmware. (requires 1.135 or up for some dynamic correction examples)
-~~~{.sh}
-Info: not all examples requires hardware/firmware.
-~~~
-* Runtime environment: cygwin
+* Hardware: an RBR Generation 4 instrument (L3.5, SL4, SEN4, or L4) with a
+  serial or USB connection
+* Runtime environment: Linux, macOS, or cygwin
 
-## Build all posix example
-Assuming librbr is already built.(if not, go to librbr directory, and then use cygwin command "make")
-Go to librbr/examples/posix directory, then use sygwin command "make". Ignore the error you see.
+~~~{.sh}
+Info: not all examples require hardware (posix-footprint and posix-test run standalone).
+~~~
+
+## Build all posix examples
+Assuming libRBR is already built with Gen4 support
+(if not, go to the librbr directory, then run `make GEN4=1`).
+Go to the librbr/examples/posixGen4 directory, then run `make`.
 
 ## Tips before you start:
 (1) Check the baudrate:
-If it's 9600, it's all good. If not, you'll need to modify librbr/examples/posix/posix-shared.c:
+If it's 9600, it's all good. If not, you'll need to modify
+librbr/examples/posixGen4/posix-shared.c:
 ~~~{.c}
 #ifndef B115200
 #define B115200 115200
@@ -27,40 +30,30 @@ If it's 9600, it's all good. If not, you'll need to modify librbr/examples/posix
     cfsetospeed(&portSettings, B9600);
 ~~~
 (2) Confirm which port is in use:
-If terminal tool suggest COM6, it's most likely /dev/ttyS5 in cygwin.
-Alternatively, one can use cygwin command "ls /dev/ttyS*", then try it out. (ttyS5 is used as example below.)
+On Linux the instrument usually appears as /dev/ttyUSB0 or /dev/ttyACM0.
+In cygwin, if a terminal tool suggests COM6, it's most likely /dev/ttyS5;
+alternatively, run `ls /dev/ttyS*` and try each one.
 
 (3) How to clean the built files:
-To clean the .a, .o, .exe files one built, use cygwin command "$ make clean" in that folder directory.
-
-(4) For posix-stream-dynamiccorrection.c example, make sure these channelPool are ON:
-~~~{.sh}
-conductivity_00, temperature_00, pressure_00/seapressure_00, conductivitycelltemperature_00
-~~~
-(5) For posix-parse-download-dataset.c example, if downloading from dataset4, make sure the channelPool is set the same as number of channelPool in output.
-for example, if we set in firmware:
-~~~{.sh}
->> postprocessing channelPool = mean(temperature_00_dyn_corr)|mean(pressure_00)|mean(salinity_00_dyn_corr)|mean(salinity_00)|mean(conductivitycelltemperature_00)
-~~~
-Then we set:
-~~~{.c}
-RBRInstrumentGen4ChannelPool channelPool;
-    //important!!!
-    //channelPool.count should be set the same number with output channelPool.
-    channelPool.count = 5;
-    channelPool.on = 5;
-~~~
-
+To clean the built .o files and executables, run `make clean` in this
+directory.
 
 ## Usage for each example:
-File name     |  command to use it | things to know                     
+File name     |  command to use it | things to know
 ------------- | ------------- | -------------
-posix-parse-file-dynamiccorrection.c    | ./posix-parse-file-dynamiccorrection ../sampledata/dynamiccorrection-sample.bin 4 | the sample .bin file columns have to be: Cmeas(mS/cm), Tmeas(°C), Pmeas(sea pressure, dbar), Tcond(°C)
-posix-stream-dynamiccorrection.c |./posix-stream-dynamiccorrection /dev/ttyS5 | note (2) above
-posix-parse-download-dataset.c |./posix-parse-download-dataset /dev/ttyS5 1 | note (2) (5) above
+posix-communications.c | ./posix-communications /dev/ttyUSB0 | opens a connection and exercises the sleep and link commands
+posix-download-datablock-bySchedule.c | ./posix-download-datablock-bySchedule /dev/ttyUSB0 | downloads stored data one schedule at a time
+posix-footprint.c | ./posix-footprint | prints the memory footprint of the library structures; no instrument needed
+posix-generation.c | ./posix-generation /dev/ttyUSB0 | reports the instrument generation detected from its firmware type
+posix-poll.c | ./posix-poll /dev/ttyUSB0 | polls on-demand samples
+posix-profilingFloat.c | ./posix-profilingFloat /dev/ttyUSB0 | enables a regimes-mode (profiling float) deployment
+posix-singleScheduleSingleConfig.c | ./posix-singleScheduleSingleConfig /dev/ttyUSB0 | enables a deployment with a single schedule and configuration
+posix-stream.c | ./posix-stream /dev/ttyUSB0 | receives streamed samples
+posix-test.c | ./posix-test | runs against simulated I/O buffers; no instrument needed
 
-(to be continued...)
-
+Two more examples, posix-multiScheduleDiffConfig.c and posix-parse-file.c,
+do not currently build; re-enabling them is part of the example alignment
+planned for libRBR 2.0 (SYS-1194). See the Makefile for details.
 
 ## Contributing
 
