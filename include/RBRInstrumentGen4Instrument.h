@@ -585,11 +585,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setOutputformat(
     const RBRInstrumentGen4Outputformat outputformat);
 
 /**
- * \brief Reset the logger CPU.
+ * \brief Reset the instrument CPU.
+ * \note Issues the `instrument reboot` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] delay time in milliseconds to wait before rebooting
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the CPU has been rebooted
+ * \param [in] delay time in milliseconds to wait before rebooting; zero omits
+ *                   the parameter, rebooting without a delay. The command
+ *                   has no default delay of its own.
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the reboot has been requested
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/reboot

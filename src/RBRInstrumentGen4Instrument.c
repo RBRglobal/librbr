@@ -22,7 +22,6 @@
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Internal.h"
 #include "RBRInstrumentGen4Instrument.h"
-#include "RBRInstrumentGen4Security.h"
 
 /* The minimum length of a version string. */
 #define VERSION_MIN 3
@@ -878,8 +877,17 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setOutputformat(
 RBRInstrumentGen4Error RBRInstrumentGen4_reboot(RBRInstrumentGen4 *instrument,
                                         const int32_t delay)
 {
-    RBR_TRY(RBRInstrumentGen4_permit(instrument, "reboot"));
-    RBR_TRY(RBRInstrumentGen4_sendCommand(instrument, "reboot %" PRId32, delay));
+    if (delay == 0)
+    {
+        RBR_TRY(RBRInstrumentGen4_sendCommand(instrument, "instrument reboot"));
+    }
+    else
+    {
+        RBR_TRY(RBRInstrumentGen4_sendCommand(instrument,
+                                              "instrument reboot delay=%"
+                                              PRId32,
+                                              delay));
+    }
 
     instrument->lastActivityTime = RBRINSTRUMENTGEN4_NO_ACTIVITY;
     return RBRINSTRUMENTGEN4_SUCCESS;

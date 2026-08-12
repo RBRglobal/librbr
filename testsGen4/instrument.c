@@ -590,13 +590,20 @@ TEST_LOGGER4(instrument)
 
 TEST_LOGGER4(reboot)
 {
-    TestIOBuffers_init(buffers,
-                       "permit command=reboot" RESPONSE_TERMINATOR,
-                       0);
-    RBRInstrumentGen4Error err = RBRInstrumentGen4_reboot(instrument, 123);
+    TestIOBuffers_init(buffers, "", 0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_reboot(instrument, 10000);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_STR_EQ("permit command=reboot" COMMAND_TERMINATOR
-                       "reboot 123" COMMAND_TERMINATOR,
+    TEST_ASSERT_STR_EQ("instrument reboot delay=10000" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT(instrument->lastActivityTime < 0);
+
+    /* A delay of zero omits the parameter entirely; the command defines no
+     * default delay of its own. */
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRInstrumentGen4_reboot(instrument, 0);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ(RESPONSE_TERMINATOR RESPONSE_TERMINATOR
+                       "instrument reboot" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
     TEST_ASSERT(instrument->lastActivityTime < 0);
 
