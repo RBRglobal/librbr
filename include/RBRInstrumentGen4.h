@@ -215,15 +215,6 @@ typedef enum RBRInstrumentGen4Outputformat
 #define RBRINSTRUMENTGEN4_DEFAULT_OUTPUTFORMAT RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP
 
 /**
- * \brief Get a human-readable list of enabled output format fields.
- *
- * \param [in] outputFormat the output format
- * \param [out] name a buffer for the output string - must be at least 46 characters long
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
- */
-void RBRInstrumentGen4OutputFormat_name(RBRInstrumentGen4Outputformat outputFormat, char* name);
-
-/**
  * A date and time in milliseconds since the Unix epoch
  * (1970-01-01T00:00:00.000Z). Instrument functions operating on time (e.g.,
  * RBRInstrumentGen4_getClock(), RBRInstrumentGen4_setClock()) will automatically

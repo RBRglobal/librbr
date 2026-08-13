@@ -13,8 +13,6 @@
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Instrument.h"
 #include "RBRInstrumentGen4Internal.h"
-//to be deleted:
-#include <stdio.h>
 
 const char *RBRINSTRUMENTGEN4_LIB_NAME =
 #ifdef RBR_LIB_NAME
@@ -107,17 +105,6 @@ const char *RBRInstrumentGen4Generation_name(RBRInstrumentGen4Generation generat
     default:
         return "unknown generation";
     }
-}
-
-void RBRInstrumentGen4OutputFormat_name(RBRInstrumentGen4Outputformat outputFormat, char *name)
-{
-    sprintf(
-        name,
-        "sn=%s schedulelabel=%s datetime=%s crc=%s", 
-        (outputFormat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL) ? "on" : "off",
-        (outputFormat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL) ? "on" : "off",
-        (outputFormat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP) ? "on" : "off",
-        (outputFormat & RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC) ? "on" : "off");
 }
 
 const char *RBRInstrumentGen4ResponseType_name(RBRInstrumentGen4ResponseType type)

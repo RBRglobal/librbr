@@ -169,15 +169,21 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    char name[64];
-    RBRInstrumentGen4OutputFormat_name(instrument->outputFormat, name);
-    printf("generation: %s, id: model=%s version=%s serial=%u fwtype=%u, outputformat: %s\n",
+    printf("generation: %s, id: model=%s version=%s serial=%u fwtype=%u,"
+           " outputformat: sn=%s schedulelabel=%s datetime=%s crc=%s\n",
            RBRInstrumentGen4Generation_name(instrument->generation),
            instrument->id.model,
            instrument->id.fwversion,
            instrument->id.sn,
            instrument->id.fwtype,
-           name);
+           (instrument->outputFormat
+            & RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL) ? "on" : "off",
+           (instrument->outputFormat
+            & RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL) ? "on" : "off",
+           (instrument->outputFormat
+            & RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP) ? "on" : "off",
+           (instrument->outputFormat
+            & RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC) ? "on" : "off");
 
     RBRInstrumentGen4Instrument info;
     if ((err = RBRInstrumentGen4_getInstrument(instrument, &info)) != RBRINSTRUMENTGEN4_SUCCESS)
