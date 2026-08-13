@@ -9,11 +9,12 @@
  */
 
 #include "tests.h"
+#include "RBRInstrumentGen4Communication.h"
 
 typedef struct LinkTest
 {
     const char *response;
-    RBRInstrumentGen4Link expected;
+    RBRInstrumentGen4LinkType expected;
 } LinkTest;
 
 static bool test_link(RBRInstrumentGen4 *instrument,
@@ -29,7 +30,9 @@ static bool test_link(RBRInstrumentGen4 *instrument,
         err = RBRInstrumentGen4_getLink(instrument, &actual);
         TEST_ASSERT_STR_EQ("link" COMMAND_TERMINATOR, buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, RBRInstrumentGen4Link);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected,
+                            actual.type,
+                            RBRInstrumentGen4LinkType);
     }
 
     return true;
@@ -38,9 +41,12 @@ static bool test_link(RBRInstrumentGen4 *instrument,
 TEST_LOGGER4(link)
 {
     LinkTest tests[] = {
-        { "link type=usb" RESPONSE_TERMINATOR, RBRINSTRUMENTGEN4_LINK_USB },
-        { "link type=serial" RESPONSE_TERMINATOR, RBRINSTRUMENTGEN4_LINK_SERIAL },
-        { "link type=wifi" RESPONSE_TERMINATOR, RBRINSTRUMENTGEN4_LINK_WIFI },
+        { "link type=usb" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_LINK_TYPE_USB },
+        { "link type=serial" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL },
+        /* { "link type=wifi" RESPONSE_TERMINATOR,
+             RBRINSTRUMENTGEN4_LINK_TYPE_WIFI }, */
         { 0 }
     };
 
@@ -168,7 +174,9 @@ TEST_LOGGER4(sleep)
         RESPONSE_TERMINATOR RESPONSE_TERMINATOR "link" COMMAND_TERMINATOR,
         buffers->writeBuffer);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_LINK_USB, actual, RBRInstrumentGen4Link);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_LINK_TYPE_USB,
+                        actual.type,
+                        RBRInstrumentGen4LinkType);
 
     return true;
 }

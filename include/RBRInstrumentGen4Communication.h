@@ -23,48 +23,59 @@ extern "C" {
 /**
  * \brief Instrument link types.
  *
+ * \see RBRInstrumentGen4Link
  * \see RBRInstrumentGen4_getLink()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830279/link
  */
-typedef enum RBRInstrumentGen4Link
+typedef enum RBRInstrumentGen4LinkType
 {
-    /** No link connectivity. */
-    RBRINSTRUMENTGEN4_LINK_OFF,
     /** USB CDC connectivity. */
-    RBRINSTRUMENTGEN4_LINK_USB,
+    RBRINSTRUMENTGEN4_LINK_TYPE_USB,
     /** Serial connectivity. */
-    RBRINSTRUMENTGEN4_LINK_SERIAL,
+    RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL,
     /** Wi-Fi connectivity. */
-    RBRINSTRUMENTGEN4_LINK_WIFI,
+    /* RBRINSTRUMENTGEN4_LINK_TYPE_WIFI, */
+    
     /** The number of specific link types. */
-    RBRINSTRUMENTGEN4_LINK_COUNT,
+    RBRINSTRUMENTGEN4_LINK_TYPE_COUNT,
     /** An unknown or unrecognized link type. */
-    RBRINSTRUMENTGEN4_UNKNOWN_LINK
-} RBRInstrumentGen4Link;
+    RBRINSTRUMENTGEN4_UNKNOWN_LINK_TYPE
+} RBRInstrumentGen4LinkType;
 
 /**
- * \brief Get a human-readable string name for a communication link.
+ * \brief Get a human-readable string name for a type of communication link.
  *
- * \param [in] link the communication link
+ * \param [in] linkType the type of communication link
  * \return a string name for the communication link
  * \see RBRInstrumentGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4Link_name(RBRInstrumentGen4Link link);
+const char *RBRInstrumentGen4LinkType_name(RBRInstrumentGen4LinkType linkType);
 
 /**
- * \brief Get the type of connectivity for the instrument connection.
+ * \brief Instrument `link` command parameters.
+ *
+ * \see RBRInstrumentGen4_getLink()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830279/link
+ */
+typedef struct RBRInstrumentGen4Link
+{
+    /** \brief The type of communication link carrying the connection. */
+    RBRInstrumentGen4LinkType type;
+} RBRInstrumentGen4Link;
+
+/**
+ * \brief Get the connectivity of the instrument connection.
  * \note Issues the `link` command.
  *
  * \param [in] instrument the instrument connection
- * \param [out] link the link type
+ * \param [out] link the link parameters
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830279/link
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getLink(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Link *link);
+RBRInstrumentGen4Error RBRInstrumentGen4_getLink(RBRInstrumentGen4 *instrument,
+                                                RBRInstrumentGen4Link *link);
 
 /**
  * \brief Instrument serial baud rates.

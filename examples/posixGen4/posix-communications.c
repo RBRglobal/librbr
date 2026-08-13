@@ -131,7 +131,8 @@ int main(int argc, char *argv[])
     }
 
     RBRInstrumentGen4Link link;
-    if ((err = RBRInstrumentGen4_getLink(instrument, &link)) != RBRINSTRUMENTGEN4_SUCCESS)
+    if ((err = RBRInstrumentGen4_getLink(instrument, &link))
+        != RBRINSTRUMENTGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to get instrument link: %s!\n",
                 programName,
@@ -140,17 +141,16 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
     printf("Connected to the instrument via %s.\n",
-           RBRInstrumentGen4Link_name(link));
+           RBRInstrumentGen4LinkType_name(link.type));
 
-    switch (link)
+    switch (link.type)
     {
-    case RBRINSTRUMENTGEN4_LINK_USB:
+    case RBRINSTRUMENTGEN4_LINK_TYPE_USB:
     #if 0
         RBRInstrumentGen4_setUSBStreamingState(instrument, true);
     #endif
         break;
-    case RBRINSTRUMENTGEN4_LINK_SERIAL:
-    case RBRINSTRUMENTGEN4_LINK_WIFI:
+    case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
         {
             RBRInstrumentGen4Serial serial;
             RBRInstrumentGen4_getSerial(instrument, &serial);

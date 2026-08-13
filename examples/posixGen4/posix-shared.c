@@ -479,7 +479,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewSchedule(
     RBRInstrumentGen4_createSchedule(instrument, newScheduleLabel, schedulePool, newSchedule);
     RBRInstrumentGen4_populateScheduleGroups(*newSchedule, groupPool, specifiedGroupLabels, specifiedGroupLabelCnt); // warning: read err!!!
     (*newSchedule)->mode = mode;
-    (*newSchedule)->stream = RBRINSTRUMENTGEN4_LINK_OFF; // default value.
+    (*newSchedule)->stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_OFF; // default value.
     (*newSchedule)->storage = false;                     // default value.
     RBRInstrumentGen4_setSchedule(instrument, *newSchedule); // warning: read err!!!
     return RBRINSTRUMENTGEN4_SUCCESS;

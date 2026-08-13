@@ -194,6 +194,25 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setCalibration(
 }
 
 
+const char *RBRInstrumentGen4ScheduleStream_name(
+    RBRInstrumentGen4ScheduleStream stream)
+{
+    switch (stream)
+    {
+    case RBRINSTRUMENTGEN4_SCHEDULE_STREAM_OFF:
+        return "off";
+    case RBRINSTRUMENTGEN4_SCHEDULE_STREAM_USB:
+        return "usb";
+    case RBRINSTRUMENTGEN4_SCHEDULE_STREAM_SERIAL:
+        return "serial";
+    case RBRINSTRUMENTGEN4_SCHEDULE_STREAM_COUNT:
+        return "stream destination count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STREAM:
+    default:
+        return "unknown stream destination";
+    }
+}
+
 const char *RBRInstrumentGen4ChannelGainMode_name(
     RBRInstrumentGen4ChannelGainMode mode)
 {

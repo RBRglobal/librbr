@@ -306,16 +306,16 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4Link link;
     RBRInstrumentGen4_getLink(instrument, &link);
     printf("Connected to the instrument via %s.\n",
-           RBRInstrumentGen4Link_name(link));
+           RBRInstrumentGen4LinkType_name(link.type));
 
     RBRInstrumentGen4Serial serial;
     RBRInstrumentGen4WiFi wifi;
 
-    switch (link)
+    switch (link.type)
     {
-    case RBRINSTRUMENTGEN4_LINK_USB:
+    case RBRINSTRUMENTGEN4_LINK_TYPE_USB:
         break;
-    case RBRINSTRUMENTGEN4_LINK_SERIAL:
+    case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
     {
         RBRInstrumentGen4_getSerial(instrument, &serial);
         printf("Connected in %s mode at %s baud.\n",
@@ -323,7 +323,7 @@ int main(int argc, char *argv[])
                RBRInstrumentGen4SerialBaudRate_name(serial.baudRate));
         break;
     }
-    case RBRINSTRUMENTGEN4_LINK_WIFI:
+    case RBRINSTRUMENTGEN4_LINK_TYPE_WIFI:
     {
         RBRInstrumentGen4_getWiFi(instrument, &wifi);
         printf("Connected in WiFi mode at %s baud. Timeout is %d\n",

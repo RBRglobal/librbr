@@ -15,28 +15,29 @@
 #include "RBRInstrumentGen4Internal.h"
 #include "RBRInstrumentGen4Communication.h"
 
-const char *RBRInstrumentGen4Link_name(RBRInstrumentGen4Link link)
+const char *RBRInstrumentGen4LinkType_name(RBRInstrumentGen4LinkType linkType)
 {
-    switch (link)
+    switch (linkType)
     {
-    case RBRINSTRUMENTGEN4_LINK_USB:
+    case RBRINSTRUMENTGEN4_LINK_TYPE_USB:
         return "usb";
-    case RBRINSTRUMENTGEN4_LINK_SERIAL:
+    case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
         return "serial";
-    case RBRINSTRUMENTGEN4_LINK_WIFI:
-        return "wifi";
-    case RBRINSTRUMENTGEN4_LINK_COUNT:
-        return "link count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_LINK:
+    /* case RBRINSTRUMENTGEN4_LINK_TYPE_WIFI:
+        return "wifi"; */
+    case RBRINSTRUMENTGEN4_LINK_TYPE_COUNT:
+        return "link type count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_LINK_TYPE:
     default:
-        return "unknown link";
+        return "unknown link type";
     }
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getLink(RBRInstrumentGen4 *instrument,
-                                                 RBRInstrumentGen4Link *link)
+                                                RBRInstrumentGen4Link *link)
 {
-    *link = RBRINSTRUMENTGEN4_UNKNOWN_LINK;
+    memset(link, 0, sizeof(RBRInstrumentGen4Link));
+    link->type = RBRINSTRUMENTGEN4_UNKNOWN_LINK_TYPE;
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "link"));
 
@@ -52,14 +53,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getLink(RBRInstrumentGen4 *instrument,
         {
             break;
         }
-        else if (strcmp(parameter.key, "link") == 0 || strcmp(parameter.key, "type") == 0)
+        else if (strcmp(parameter.key, "type") == 0)
         {
-            for (int i = 0; i < RBRINSTRUMENTGEN4_LINK_COUNT; i++)
+            for (int i = 0; i < RBRINSTRUMENTGEN4_LINK_TYPE_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentGen4Link_name(i),
+                if (strcmp(RBRInstrumentGen4LinkType_name(i),
                            parameter.value) == 0)
                 {
-                    *link = i;
+                    link->type = i;
                     break;
                 }
             }
