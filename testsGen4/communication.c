@@ -219,9 +219,16 @@ TEST_LOGGER4(sleep)
     TEST_ASSERT_STR_EQ("sleep" COMMAND_TERMINATOR, buffers->writeBuffer);
     TEST_ASSERT(instrument->lastActivityTime < 0);
 
-    /* Wake up the simulated instrument, expecting the two wakeup sequences. */
+    /* Wake up the simulated instrument, expecting the two wakeup sequences.
+     * The instrument acknowledges the sleep command when confirmation is on,
+     * but the command is not one we wait for a response to, so that
+     * acknowledgement is still unread: it must be skipped in favour of the
+     * response to the next command. */
     RBRInstrumentGen4Link actual;
-    TestIOBuffers_init(buffers, "link type=usb" RESPONSE_TERMINATOR, 0);
+    TestIOBuffers_init(buffers,
+                       "sleep" RESPONSE_TERMINATOR
+                       "link type=usb" RESPONSE_TERMINATOR,
+                       0);
     err = RBRInstrumentGen4_getLink(instrument, &actual);
     TEST_ASSERT_STR_EQ(
         RESPONSE_TERMINATOR RESPONSE_TERMINATOR "link" COMMAND_TERMINATOR,
