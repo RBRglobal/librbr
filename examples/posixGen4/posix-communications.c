@@ -152,11 +152,11 @@ int main(int argc, char *argv[])
         break;
     case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
         {
-            RBRInstrumentGen4Serial serial;
-            RBRInstrumentGen4_getSerial(instrument, &serial);
+            RBRInstrumentGen4LinkSerial serial;
+            RBRInstrumentGen4_getLinkSerial(instrument, &serial);
             printf("Connected in %s mode at %s baud.\n",
-                   RBRInstrumentGen4SerialMode_name(serial.mode),
-                   RBRInstrumentGen4SerialBaudRate_name(serial.baudRate));
+                   RBRInstrumentGen4LinkSerialMode_name(serial.mode),
+                   RBRInstrumentGen4LinkSerialBaudRate_name(serial.baudRate));
 #if 0
             RBRInstrumentGen4_setSerialStreamingState(instrument, true);
 #endif

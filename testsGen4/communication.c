@@ -53,95 +53,148 @@ TEST_LOGGER4(link)
     return test_link(instrument, buffers, tests);
 }
 
-typedef struct SerialTest
+typedef struct LinkSerialTest
 {
     const char *response;
-    RBRInstrumentGen4Serial expected;
+    RBRInstrumentGen4LinkSerial expected;
     RBRInstrumentGen4Error expectedError;
-} SerialTest;
+} LinkSerialTest;
 
-TEST_LOGGER4(serial)
+/* The baud rates and modes an L4 reports as available. */
+#define L4_AVAILABLE_BAUD_RATES \
+    "4800|9600|19200|38400|57600|115200|230400"
+#define L4_AVAILABLE_MODES "rs232|rs485f|uart|uart_idlelow"
+
+#define L4_AVAILABLE_BAUD_RATE_MASK \
+    (RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_4800 \
+     | RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_9600 \
+     | RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_19200 \
+     | RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_38400 \
+     | RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_57600 \
+     | RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_115200 \
+     | RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_230400)
+#define L4_AVAILABLE_MODE_MASK \
+    (RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232 \
+     | RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS485F \
+     | RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_UART \
+     | RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW)
+
+TEST_LOGGER4(linkSerial)
 {
-    SerialTest tests[] = {
-        { "link serial baudrate=19200 mode=rs232 availablebaudrates="
-          "115200|19200|9600|4800|2400|1200|230400|460800 availablemodes="
-          "rs232|rs485f|uart|uart_idlelow" RESPONSE_TERMINATOR,
-          { RBRINSTRUMENTGEN4_SERIAL_BAUD_19200,
-            RBRINSTRUMENTGEN4_SERIAL_MODE_RS232,
-            RBRINSTRUMENTGEN4_SERIAL_BAUD_1200 | RBRINSTRUMENTGEN4_SERIAL_BAUD_2400 | RBRINSTRUMENTGEN4_SERIAL_BAUD_4800 | RBRINSTRUMENTGEN4_SERIAL_BAUD_9600 | RBRINSTRUMENTGEN4_SERIAL_BAUD_19200 | RBRINSTRUMENTGEN4_SERIAL_BAUD_115200 | RBRINSTRUMENTGEN4_SERIAL_BAUD_230400 | RBRINSTRUMENTGEN4_SERIAL_BAUD_460800,
-            RBRINSTRUMENTGEN4_SERIAL_MODE_RS232 | RBRINSTRUMENTGEN4_SERIAL_MODE_RS485F | RBRINSTRUMENTGEN4_SERIAL_MODE_UART | RBRINSTRUMENTGEN4_SERIAL_MODE_UART_IDLE_LOW },
+    LinkSerialTest tests[] = {
+        { "link serial baudrate=230400 mode=rs232 availablebaudrates="
+          L4_AVAILABLE_BAUD_RATES " availablemodes="
+          L4_AVAILABLE_MODES RESPONSE_TERMINATOR,
+          { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_230400,
+            .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232,
+            .availableBaudRates = L4_AVAILABLE_BAUD_RATE_MASK,
+            .availableModes = L4_AVAILABLE_MODE_MASK },
           RBRINSTRUMENTGEN4_SUCCESS },
-        { "link serial baudrate=115200 mode=rs485f availablebaudrates="
-          "115200|19200|9600|4800|2400|1200|230400|460800 availablemodes="
-          "rs232|rs485f|uart|uart_idlelow" RESPONSE_TERMINATOR,
-          { RBRINSTRUMENTGEN4_SERIAL_BAUD_115200,
-            RBRINSTRUMENTGEN4_SERIAL_MODE_RS485F,
-            RBRINSTRUMENTGEN4_SERIAL_BAUD_1200 | RBRINSTRUMENTGEN4_SERIAL_BAUD_2400 | RBRINSTRUMENTGEN4_SERIAL_BAUD_4800 | RBRINSTRUMENTGEN4_SERIAL_BAUD_9600 | RBRINSTRUMENTGEN4_SERIAL_BAUD_19200 | RBRINSTRUMENTGEN4_SERIAL_BAUD_115200 | RBRINSTRUMENTGEN4_SERIAL_BAUD_230400 | RBRINSTRUMENTGEN4_SERIAL_BAUD_460800,
-            RBRINSTRUMENTGEN4_SERIAL_MODE_RS232 | RBRINSTRUMENTGEN4_SERIAL_MODE_RS485F | RBRINSTRUMENTGEN4_SERIAL_MODE_UART | RBRINSTRUMENTGEN4_SERIAL_MODE_UART_IDLE_LOW },
+        { "link serial baudrate=115200 mode=uart_idlelow availablebaudrates="
+          L4_AVAILABLE_BAUD_RATES " availablemodes="
+          L4_AVAILABLE_MODES RESPONSE_TERMINATOR,
+          { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_115200,
+            .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW,
+            .availableBaudRates = L4_AVAILABLE_BAUD_RATE_MASK,
+            .availableModes = L4_AVAILABLE_MODE_MASK },
+          RBRINSTRUMENTGEN4_SUCCESS },
+        /* An instrument which offers only one mode. */
+        { "link serial baudrate=19200 mode=rs232 availablebaudrates="
+          "9600|19200 availablemodes=rs232" RESPONSE_TERMINATOR,
+          { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_19200,
+            .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232,
+            .availableBaudRates =
+                RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_9600
+                | RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_19200,
+            .availableModes = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232 },
+          RBRINSTRUMENTGEN4_SUCCESS },
+        /* Values the library does not know are reported as unknown, and are
+         * left out of the available lists. */
+        { "link serial baudrate=921600 mode=rs485h availablebaudrates="
+          "9600|921600 availablemodes=rs232|rs485h" RESPONSE_TERMINATOR,
+          { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_NONE,
+            .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_NONE,
+            .availableBaudRates = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_9600,
+            .availableModes = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232 },
           RBRINSTRUMENTGEN4_SUCCESS },
         { 0 }
     };
 
     RBRInstrumentGen4Error err;
-    RBRInstrumentGen4Serial actual;
+    RBRInstrumentGen4LinkSerial actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen4_getSerial(instrument, &actual);
+        err = RBRInstrumentGen4_getLinkSerial(instrument, &actual);
         TEST_ASSERT_STR_EQ(
             "link serial baudrate mode availablebaudrates availablemodes" COMMAND_TERMINATOR,
             buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen4Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate,
                             actual.baudRate,
-                            RBRInstrumentGen4SerialBaudRate);
+                            RBRInstrumentGen4LinkSerialBaudRate);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.mode,
                             actual.mode,
-                            RBRInstrumentGen4SerialMode);
+                            RBRInstrumentGen4LinkSerialMode);
+
         TEST_ASSERT_EQ(tests[i].expected.availableBaudRates,
                        actual.availableBaudRates,
-                       "0x%04X");
+                       "%d");
         TEST_ASSERT_EQ(tests[i].expected.availableModes,
                        actual.availableModes,
-                       "0x%04X");
+                       "%d");
     }
 
     return true;
 }
 
-typedef struct SetSerialTest
+typedef struct SetLinkSerialTest
 {
     const char *command;
     const char *response;
     RBRInstrumentGen4Error expectedError;
-    RBRInstrumentGen4Serial serial;
-} SetSerialTest;
+    RBRInstrumentGen4LinkSerial serial;
+} SetLinkSerialTest;
 
-TEST_LOGGER4(setSerial)
+TEST_LOGGER4(setLinkSerial)
 {
-    SetSerialTest tests[] = {
+    SetLinkSerialTest tests[] = {
         { "link serial baudrate=19200 mode=rs232" COMMAND_TERMINATOR,
           "link serial baudrate=19200 mode=rs232" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { RBRINSTRUMENTGEN4_SERIAL_BAUD_19200,
-            RBRINSTRUMENTGEN4_SERIAL_MODE_RS232,
-            RBRINSTRUMENTGEN4_SERIAL_BAUD_NONE,
-            RBRINSTRUMENTGEN4_SERIAL_MODE_NONE } },
+          { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_19200,
+            .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232 } },
         { "link serial baudrate=9600 mode=uart" COMMAND_TERMINATOR,
           "link serial baudrate=9600 mode=uart" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { RBRINSTRUMENTGEN4_SERIAL_BAUD_9600,
-            RBRINSTRUMENTGEN4_SERIAL_MODE_UART,
-            RBRINSTRUMENTGEN4_SERIAL_BAUD_NONE,
-            RBRINSTRUMENTGEN4_SERIAL_MODE_NONE } },
-        { "link serial baudrate=115200 mode=rs485f" COMMAND_TERMINATOR,
-          "link serial baudrate=115200 mode=rs485f" RESPONSE_TERMINATOR,
-          RBRINSTRUMENTGEN4_SUCCESS,
-          { RBRINSTRUMENTGEN4_SERIAL_BAUD_115200,
-            RBRINSTRUMENTGEN4_SERIAL_MODE_RS485F,
-            RBRINSTRUMENTGEN4_SERIAL_BAUD_NONE,
-            RBRINSTRUMENTGEN4_SERIAL_MODE_NONE } },
+          { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_9600,
+            .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_UART } },
+        /* A value the getter could not read reaches the setter as `none`, a
+         * value out of range is a mistake, and the command takes one rate and
+         * one mode so a combination of flags is a mistake too: none of the
+         * three is sent. */
+        { "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+          { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_NONE,
+            .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232 } },
+        { "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+          { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_115200,
+            .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_NONE } },
+        { "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+          { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_MAX << 1,
+            .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232 } },
+        { "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+          { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_9600
+                        | RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_19200,
+            .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232 } },
         { 0 }
     };
 
@@ -149,7 +202,7 @@ TEST_LOGGER4(setSerial)
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen4_setSerial(instrument, &(tests[i].serial));
+        err = RBRInstrumentGen4_setLinkSerial(instrument, &(tests[i].serial));
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].command,
                            buffers->writeBuffer);

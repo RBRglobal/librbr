@@ -190,11 +190,11 @@ int main(int argc, char *argv[])
         break;
     case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
     {
-        RBRInstrumentGen4Serial serial;
-        RBRInstrumentGen4_getSerial(instrument, &serial);
+        RBRInstrumentGen4LinkSerial serial;
+        RBRInstrumentGen4_getLinkSerial(instrument, &serial);
         printf("Connected in %s mode at %s baud.\n",
-               RBRInstrumentGen4SerialMode_name(serial.mode),
-               RBRInstrumentGen4SerialBaudRate_name(serial.baudRate));
+               RBRInstrumentGen4LinkSerialMode_name(serial.mode),
+               RBRInstrumentGen4LinkSerialBaudRate_name(serial.baudRate));
         break;
     }
     /* WiFi is not yet implemented */
@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
         RBRInstrumentGen4WiFi wifi;
         RBRInstrumentGen4_getWiFi(instrument, &wifi);
         printf("Connected in WiFi mode at %s baud. Timeout is %d\n",
-               RBRInstrumentGen4SerialBaudRate_name(wifi.baudRate),
+               RBRInstrumentGen4LinkSerialBaudRate_name(wifi.baudRate),
                wifi.commandTimeout);
         break;
     }

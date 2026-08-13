@@ -80,50 +80,37 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getLink(RBRInstrumentGen4 *instrument,
 /**
  * \brief Instrument serial baud rates.
  *
- * Most of these baud rates are unsupported by the instrument, but are included
- * for sake of completeness. Call RBRInstrumentGen4_getBaudRates() to determine
- * which rates are supported by a given instrument.
+ * Not every instrument supports every baud rate. Consult
+ * RBRInstrumentGen4LinkSerial.availableBaudRates for the rates a given
+ * instrument can use.
  *
- * \see RBRInstrumentGen4Serial
- * \see RBRInstrumentGen4_getSerial()
- * \see RBRInstrumentGen4_setSerial()
+ * \see RBRInstrumentGen4LinkSerial
+ * \see RBRInstrumentGen4_getLinkSerial()
+ * \see RBRInstrumentGen4_setLinkSerial()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
-typedef enum RBRInstrumentGen4SerialBaudRate
+typedef enum RBRInstrumentGen4LinkSerialBaudRate
 {
-    /** None */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_NONE   =       0,
-    /** 300 Bd */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_300    = 1 <<  0,
-    /** 600 Bd */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_600    = 1 <<  1,
-    /** 1,200 Bd */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_1200   = 1 <<  2,
-    /** 2,400 Bd */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_2400   = 1 <<  3,
+    /** An unrecognized baud rate, or none being set. */
+    RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_NONE    =      0,
     /** 4,800 Bd */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_4800   = 1 <<  4,
+    RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_4800    = 1 << 0,
     /** 9,600 Bd */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_9600   = 1 <<  5,
+    RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_9600    = 1 << 1,
     /** 19,200 Bd */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_19200  = 1 <<  6,
-    /** 28,800 Bd */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_28800  = 1 <<  7,
+    RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_19200   = 1 << 2,
     /** 38,400 Bd */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_38400  = 1 <<  8,
+    RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_38400   = 1 << 3,
     /** 57,600 Bd */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_57600  = 1 <<  9,
+    RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_57600   = 1 << 4,
     /** 115,200 Bd */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_115200 = 1 << 10,
+    RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_115200  = 1 << 5,
     /** 230,400 Bd */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_230400 = 1 << 11,
-    /** 460,800 Bd */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_460800 = 1 << 12,
-    /** 921,600 Bd */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_921600 = 1 << 13,
+    RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_230400  = 1 << 6,
     /** Corresponds to the largest baud rate enum value. */
-    RBRINSTRUMENTGEN4_SERIAL_BAUD_MAX    = RBRINSTRUMENTGEN4_SERIAL_BAUD_921600
-} RBRInstrumentGen4SerialBaudRate;
+    RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_MAX
+        = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_230400
+} RBRInstrumentGen4LinkSerialBaudRate;
 
 /**
  * \brief Get a human-readable string name for a baud rate.
@@ -132,7 +119,8 @@ typedef enum RBRInstrumentGen4SerialBaudRate
  * \return a string name for the baud rate
  * \see RBRInstrumentGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4SerialBaudRate_name(RBRInstrumentGen4SerialBaudRate baud);
+const char *RBRInstrumentGen4LinkSerialBaudRate_name(
+    RBRInstrumentGen4LinkSerialBaudRate baud);
 
 /**
  * \brief Instrument serial modes.
@@ -140,28 +128,27 @@ const char *RBRInstrumentGen4SerialBaudRate_name(RBRInstrumentGen4SerialBaudRate
  * All modes are 8N1, use no flow control, and are full-duplex unless otherwise
  * noted.
  *
- * \see RBRInstrumentGen4Serial
- * \see RBRInstrumentGen4_getSerial()
- * \see RBRInstrumentGen4_setSerial()
+ * \see RBRInstrumentGen4LinkSerial
+ * \see RBRInstrumentGen4_getLinkSerial()
+ * \see RBRInstrumentGen4_setLinkSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-typedef enum RBRInstrumentGen4SerialMode
+typedef enum RBRInstrumentGen4LinkSerialMode
 {
-    /** No serial mode */
-    RBRINSTRUMENTGEN4_SERIAL_MODE_NONE          =      0,
+    /** An unrecognized serial mode, or none being set. */
+    RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_NONE          =      0,
     /** RS-232/EIA-232/TIA-232. */
-    RBRINSTRUMENTGEN4_SERIAL_MODE_RS232         = 1 << 0,
+    RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232         = 1 << 0,
     /** RS-485/EIA-485/TIA-485. */
-    RBRINSTRUMENTGEN4_SERIAL_MODE_RS485F        = 1 << 1,
-    /** RS-485/EIA-485/TIA-485 (half-duplex). Unimplemented by the logger. */
-    RBRINSTRUMENTGEN4_SERIAL_MODE_RS485H        = 1 << 2,
+    RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS485F        = 1 << 1,
     /** 0-3.3V logic, idle high. */
-    RBRINSTRUMENTGEN4_SERIAL_MODE_UART          = 1 << 3,
+    RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_UART          = 1 << 2,
     /** 0-3.3V logic, idle low. */
-    RBRINSTRUMENTGEN4_SERIAL_MODE_UART_IDLE_LOW = 1 << 4,
-    /** Corresponds to the largest UART mode enum value. */
-    RBRINSTRUMENTGEN4_SERIAL_MODE_MAX = RBRINSTRUMENTGEN4_SERIAL_MODE_UART_IDLE_LOW
-} RBRInstrumentGen4SerialMode;
+    RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW = 1 << 3,
+    /** Corresponds to the largest serial mode enum value. */
+    RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_MAX
+        = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW
+} RBRInstrumentGen4LinkSerialMode;
 
 /**
  * \brief Get a human-readable string name for a serial mode.
@@ -170,65 +157,75 @@ typedef enum RBRInstrumentGen4SerialMode
  * \return a string name for the serial mode
  * \see RBRInstrumentGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4SerialMode_name(RBRInstrumentGen4SerialMode mode);
+const char *RBRInstrumentGen4LinkSerialMode_name(
+    RBRInstrumentGen4LinkSerialMode mode);
 
 /**
- * \brief Instrument `serial` command parameters.
+ * \brief Instrument `link serial` command parameters.
  *
- * \see RBRInstrumentGen4_getSerial()
- * \see RBRInstrumentGen4_setSerial()
+ * \see RBRInstrumentGen4_getLinkSerial()
+ * \see RBRInstrumentGen4_setLinkSerial()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
-typedef struct RBRInstrumentGen4Serial
+typedef struct RBRInstrumentGen4LinkSerial
 {
     /** \brief The baud rate of the instrument. */
-    RBRInstrumentGen4SerialBaudRate baudRate;
+    RBRInstrumentGen4LinkSerialBaudRate baudRate;
     /** \brief The serial mode of the instrument. */
-    RBRInstrumentGen4SerialMode mode;
+    RBRInstrumentGen4LinkSerialMode mode;
     /**
-     * \brief Serial baud rates which the instrument can use.
+     * \brief Baud rates which the instrument can use.
      *
-     * Treated as a bit field representation of available baud rates as defined
-     * by RBRInstrumentGen4SerialBaudRate. For details, consult
+     * Treated as a bit field representation of available baud rates as
+     * defined by RBRInstrumentGen4LinkSerialBaudRate. For details, consult
      * [Working with Bit Fields](bitfields.md).
      *
      * \readonly
      */
-    const RBRInstrumentGen4SerialBaudRate availableBaudRates;
+    const RBRInstrumentGen4LinkSerialBaudRate availableBaudRates;
     /**
      * \brief Serial modes which the instrument can use.
      *
      * Treated as a bit field representation of available modes as defined by
-     * RBRInstrumentGen4SerialMode. For details, consult
+     * RBRInstrumentGen4LinkSerialMode. For details, consult
      * [Working with Bit Fields](bitfields.md).
      *
      * \readonly
      */
-    const RBRInstrumentGen4SerialMode availableModes;
-} RBRInstrumentGen4Serial;
+    const RBRInstrumentGen4LinkSerialMode availableModes;
+} RBRInstrumentGen4LinkSerial;
 
 /**
  * \brief Retrieve the current and available serial baud rates and modes.
  * \note Issues the `link serial` command.
+ *
+ * The instrument reports the available baud rates and modes only when they are
+ * requested by name, so all four parameters are requested explicitly.
  *
  * \param [in] instrument the instrument connection
  * \param [out] serial the current and available serial parameters
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_setSerial()
+ * \see RBRInstrumentGen4_setLinkSerial()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getSerial(RBRInstrumentGen4 *instrument,
-                                           RBRInstrumentGen4Serial *serial);
+RBRInstrumentGen4Error RBRInstrumentGen4_getLinkSerial(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4LinkSerial *serial);
 
 /**
  * \brief Reconfigure the instrument serial baud rate and mode.
  * \note Issues the `link serial` command.
  *
+ * Every parameter of the command is sent, so \a serial must be fully
+ * populated: read the current parameters with
+ * RBRInstrumentGen4_getLinkSerial() and modify them if only one is of
+ * interest.
+ *
  * A hardware error will occur if the baud rate or mode is unsupported by the
- * instrument. See RBRInstrumentGen4Serial.availableBaudRates and
- * RBRInstrumentGen4Serial.availableSerialModes to determine supported
+ * instrument. See RBRInstrumentGen4LinkSerial.availableBaudRates and
+ * RBRInstrumentGen4LinkSerial.availableModes to determine supported
  * rates/modes.
  *
  * The new serial mode and/or baud rate will take effect immediately after the
@@ -241,12 +238,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSerial(RBRInstrumentGen4 *instrument
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when a value is not supported
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the baud/mode is invalid
- * \see RBRInstrumentGen4_getSerial()
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the baud rate or
+ *                                                   mode is not a real value
+ * \see RBRInstrumentGen4_getLinkSerial()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setSerial(RBRInstrumentGen4 *instrument,
-                                            const RBRInstrumentGen4Serial *serial);
+RBRInstrumentGen4Error RBRInstrumentGen4_setLinkSerial(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4LinkSerial *serial);
 
 /**
  * \brief Immediately shut down communications and implement any possible
@@ -345,9 +344,9 @@ typedef struct RBRInstrumentGen4WiFi
      *
      * \readonly
      *
-     * \nol2 Will be retrieved as #RBRINSTRUMENTGEN4_SERIAL_BAUD_NONE.
+     * \nol2 Will be retrieved as #RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_NONE.
      */
-    const RBRInstrumentGen4SerialBaudRate baudRate;
+    const RBRInstrumentGen4LinkSerialBaudRate baudRate;
 } RBRInstrumentGen4WiFi;
 
 /**

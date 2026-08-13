@@ -374,6 +374,18 @@ void RBRInstrumentGen4DateTime_toSampleTime(RBRInstrumentGen4DateTime timestamp,
 void RBRInstrumentGen4DateTime_toScheduleTime(RBRInstrumentGen4DateTime timestamp,
                                           char *s);
 
+/**
+ * \brief Terminate the first value of a list, and find the next one.
+ *
+ * Instrument responses separate the values of a list-valued parameter with
+ * vertical bars: `availablebaudrates=4800|9600`, `list=self|fe4_cond_00`.
+ * Iterate over one by walking the value returned until it is `NULL`.
+ *
+ * \param [in,out] value the list, terminated after its first value
+ * \return the next value in the list, or NULL at the end of the list
+ */
+char *RBRInstrumentGen4_splitListValue(char *value);
+
 #ifdef __cplusplus
 }
 #endif

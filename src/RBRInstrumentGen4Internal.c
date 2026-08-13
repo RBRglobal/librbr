@@ -1279,3 +1279,16 @@ void RBRInstrumentGen4DateTime_toScheduleTime(RBRInstrumentGen4DateTime timestam
                                        RBRINSTRUMENTGEN4_SCHEDULE_TIME_LEN + 1,
                                        RBRInstrumentGen4DateTime_scheduleFormat);
 }
+
+char *RBRInstrumentGen4_splitListValue(char *value)
+{
+    char *nextValue = strchr(value, ARRAY_SEPARATOR_L4);
+
+    if (nextValue != NULL)
+    {
+        *nextValue = '\0';
+        ++nextValue;
+    }
+
+    return nextValue;
+}
