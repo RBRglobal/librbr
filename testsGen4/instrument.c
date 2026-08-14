@@ -290,14 +290,13 @@ TEST_LOGGER4(powerinternal)
     RBRInstrumentGen4PowerInternal expected = {
         .voltage = 14.21,
         .batteryType = RBRINSTRUMENTGEN4_INTERNAL_BATTERY_NIMH,
-        .capacity = 138000,
         .used = 100100
     };
     RBRInstrumentGen4PowerInternal actual;
 
     TestIOBuffers_init(buffers,
                        "instrument power internal voltage=14.21 batterytype=nimh "
-                       "capacity=138.000e+003 used=100.100e+003" RESPONSE_TERMINATOR,
+                       "used=100.100e+003" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getPowerInternal(instrument,
                                                                     &actual);
@@ -306,7 +305,6 @@ TEST_LOGGER4(powerinternal)
     TEST_ASSERT_ENUM_EQ(expected.batteryType,
                         actual.batteryType,
                         RBRInstrumentGen4InternalBatteryType);
-    TEST_ASSERT_FLOAT_EQ(expected.capacity, actual.capacity, 0.01f);
     TEST_ASSERT_FLOAT_EQ(expected.used, actual.used, 0.01f);
 
     return true;
@@ -378,14 +376,14 @@ TEST_LOGGER4(powerexternal)
     RBRInstrumentGen4PowerExternal expected = {
         .voltage = 14.21,
         .batteryType = RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMATA_LISOCL2,
-        .capacity = 22000000,
         .used = 100100
     };
     RBRInstrumentGen4PowerExternal actual;
 
     TestIOBuffers_init(buffers,
-                       "instrument power external voltage=14.21 batterytype=fermata_lisocl2 "
-                       "capacity=22.000e+006 used=100.100e+003" RESPONSE_TERMINATOR,
+                       "instrument power external voltage=14.21 "
+                       "batterytype=fermata_lisocl2 used=100.100e+003"
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getPowerExternal(instrument,
                                                                     &actual);
@@ -394,7 +392,6 @@ TEST_LOGGER4(powerexternal)
     TEST_ASSERT_ENUM_EQ(expected.batteryType,
                         actual.batteryType,
                         RBRInstrumentGen4ExternalBatteryType);
-    TEST_ASSERT_FLOAT_EQ(expected.capacity, actual.capacity, 1.0f);
     TEST_ASSERT_FLOAT_EQ(expected.used, actual.used, 0.01f);
 
     return true;

@@ -519,10 +519,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPowerInternal(
                 }
             }
         }
-        else if (strcmp(parameter.key, "capacity") == 0)
-        {
-            *(float *) &power->capacity = strtod(parameter.value, NULL);
-        }
         else if (strcmp(parameter.key, "used") == 0)
         {
             power->used = strtod(parameter.value, NULL);
@@ -659,10 +655,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPowerExternal(
                     break;
                 }
             }
-        }
-        else if (strcmp(parameter.key, "capacity") == 0)
-        {
-            *(float *) &power->capacity = strtod(parameter.value, NULL);
         }
         else if (strcmp(parameter.key, "used") == 0)
         {

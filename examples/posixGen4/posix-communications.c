@@ -242,11 +242,10 @@ int main(int argc, char *argv[])
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
-    printf("powerInternal: voltage=%f, batteryType=%s (%s), capacity=%f, used=%f\n",
+    printf("powerInternal: voltage=%f, batteryType=%s (%s), used=%f\n",
            powerInternal.voltage,
            RBRInstrumentGen4InternalBatteryType_name(powerInternal.batteryType),
            RBRInstrumentGen4InternalBatteryType_displayName(powerInternal.batteryType),
-           powerInternal.capacity,
            powerInternal.used);
 
     /* External battery */
@@ -280,11 +279,10 @@ int main(int argc, char *argv[])
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
-    printf("powerExternal: voltage=%f, batteryType=%s (%s), capacity=%f, used=%f",
+    printf("powerExternal: voltage=%f, batteryType=%s (%s), used=%f",
            powerExternal.voltage,
            RBRInstrumentGen4ExternalBatteryType_name(powerExternal.batteryType),
            RBRInstrumentGen4ExternalBatteryType_displayName(powerExternal.batteryType),
-           powerExternal.capacity,
            powerExternal.used);
 
 

@@ -292,12 +292,6 @@ typedef struct RBRInstrumentGen4PowerInternal
     /** \brief The type of battery. */
     RBRInstrumentGen4InternalBatteryType batteryType;
     /**
-     * \brief The capacity of the battery.
-     *
-     * \readonly
-     */
-    const float capacity;
-    /**
      * \brief The accumulated energy used from the internal battery since the
      * value was last reset.
      */
@@ -426,16 +420,10 @@ const char *RBRInstrumentGen4ExternalBatteryType_displayName(
  */
 typedef struct RBRInstrumentGen4PowerExternal
 {
-    /** \brief The measured voltage of any internal power source. */
+    /** \brief The measured voltage of any external power source. */
     const float voltage;
     /** \brief The type of battery. */
     RBRInstrumentGen4ExternalBatteryType batteryType;
-    /**
-     * \brief The capacity of the battery.
-     *
-     * \readonly
-     */
-    const float capacity;
     /**
      * \brief The accumulated energy used from the external battery since the
      * value was last reset.
