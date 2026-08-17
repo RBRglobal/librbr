@@ -133,6 +133,181 @@ TEST_LOGGER4(nodeWithoutPorts)
     return test_node(&expected, &actual);
 }
 
+static bool test_port(RBRInstrumentGen4Port *expected,
+                      RBRInstrumentGen4Port *actual)
+{
+    TEST_ASSERT_STR_EQ(expected->label, actual->label);
+    TEST_ASSERT_STR_EQ(expected->node, actual->node);
+    TEST_ASSERT_ENUM_EQ(expected->portClass,
+                        actual->portClass,
+                        RBRInstrumentGen4PortClass);
+    TEST_ASSERT_EQ(expected->protocol, actual->protocol, "%d");
+    TEST_ASSERT_EQ(expected->availableProtocols,
+                   actual->availableProtocols,
+                   "%d");
+    TEST_ASSERT_EQ(expected->baudRate, actual->baudRate, "%" PRIi32);
+    TEST_ASSERT_EQ(expected->deviceCount, actual->deviceCount, "%" PRIi32);
+    for (int32_t device = 0; device < expected->deviceCount; ++device)
+    {
+        TEST_ASSERT_STR_EQ(expected->deviceList[device],
+                           actual->deviceList[device]);
+    }
+    TEST_ASSERT_EQ(expected->powerUpTime, actual->powerUpTime, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(portlist)
+{
+    /* The pool getter reports only labels; the remaining fields come from
+     * RBRInstrumentGen4_getPort(). */
+    RBRInstrumentGen4PortPool expected = {
+        .count = 6,
+        .pool = {
+            { .label = "thermistor_00",
+              .portClass = RBRINSTRUMENTGEN4_UNKNOWN_PORT_CLASS },
+            { .label = "pres_serial_00",
+              .portClass = RBRINSTRUMENTGEN4_UNKNOWN_PORT_CLASS },
+            { .label = "internal_adc_00",
+              .portClass = RBRINSTRUMENTGEN4_UNKNOWN_PORT_CLASS },
+            { .label = "serial_00",
+              .portClass = RBRINSTRUMENTGEN4_UNKNOWN_PORT_CLASS },
+            { .label = "serial_01",
+              .portClass = RBRINSTRUMENTGEN4_UNKNOWN_PORT_CLASS },
+            { .label = "serial_02",
+              .portClass = RBRINSTRUMENTGEN4_UNKNOWN_PORT_CLASS }
+        }
+    };
+    RBRInstrumentGen4PortPool actual;
+
+    TestIOBuffers_init(buffers,
+                       "port count=6 list=thermistor_00|pres_serial_00|"
+                       "internal_adc_00|serial_00|serial_01|serial_02"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getPortPool(instrument,
+                                                               &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("port" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(expected.count, actual.count, "%" PRIi32);
+    for (int32_t port = 0; port < actual.count; ++port)
+    {
+        if (!test_port(&expected.pool[port], &actual.pool[port]))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+TEST_LOGGER4(port)
+{
+    RBRInstrumentGen4Port expected = {
+        .label = "thermistor_00",
+        .node = "self",
+        .portClass = RBRINSTRUMENTGEN4_PORT_CLASS_VIRTUAL,
+        .protocol = RBRINSTRUMENTGEN4_PORT_PROTOCOL_NONE,
+        .availableProtocols = RBRINSTRUMENTGEN4_PORT_PROTOCOL_NONE,
+        .baudRate = 0,
+        .deviceCount = 1,
+        .deviceList = { "thermistor_00" },
+        .powerUpTime = 0
+    };
+
+    RBRInstrumentGen4Port actual = {
+        .label = "thermistor_00"
+    };
+
+    TestIOBuffers_init(buffers,
+                       "port thermistor_00 class=virtual protocol=none "
+                       "availableprotocols=none baudrate=0 node=self "
+                       "devicelist=thermistor_00 poweruptime=0"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getPort(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("port thermistor_00" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return test_port(&expected, &actual);
+}
+
+TEST_LOGGER4(portWithoutDevices)
+{
+    /* A port nothing has been discovered on reports `devicelist=none`. */
+    RBRInstrumentGen4Port expected = {
+        .label = "serial_00",
+        .node = "self",
+        .portClass = RBRINSTRUMENTGEN4_PORT_CLASS_VIRTUAL,
+        .protocol = RBRINSTRUMENTGEN4_PORT_PROTOCOL_NONE,
+        .availableProtocols = RBRINSTRUMENTGEN4_PORT_PROTOCOL_NONE,
+        .baudRate = 0,
+        .deviceCount = 0,
+        .powerUpTime = 0
+    };
+
+    RBRInstrumentGen4Port actual = {
+        .label = "serial_00"
+    };
+
+    TestIOBuffers_init(buffers,
+                       "port serial_00 class=virtual protocol=none "
+                       "availableprotocols=none baudrate=0 node=self "
+                       "devicelist=none poweruptime=0"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getPort(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("port serial_00" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return test_port(&expected, &actual);
+}
+
+TEST_LOGGER4(portSerial)
+{
+    /*
+     * No port on the development instrument is bus-attached, so unlike the
+     * other port tests this response is constructed from the command
+     * reference rather than captured. It covers the paths the captured
+     * responses cannot reach: a non-`virtual` class, a selected protocol, a
+     * multi-valued `availableprotocols` bit field, a non-zero baud rate, and
+     * a multidrop bus reporting more than one device.
+     */
+    RBRInstrumentGen4Port expected = {
+        .label = "serial_01",
+        .node = "self",
+        .portClass = RBRINSTRUMENTGEN4_PORT_CLASS_SERIAL,
+        .protocol = RBRINSTRUMENTGEN4_PORT_PROTOCOL_RBRMULTIDROP,
+        .availableProtocols = RBRINSTRUMENTGEN4_PORT_PROTOCOL_RBRSERIAL
+                              | RBRINSTRUMENTGEN4_PORT_PROTOCOL_RBRMODEM
+                              | RBRINSTRUMENTGEN4_PORT_PROTOCOL_RBRMULTIDROP,
+        .baudRate = 9600,
+        .deviceCount = 2,
+        .deviceList = { "cond_cell_00", "pres_sensor_01" },
+        .powerUpTime = 50
+    };
+
+    RBRInstrumentGen4Port actual = {
+        .label = "serial_01"
+    };
+
+    TestIOBuffers_init(buffers,
+                       "port serial_01 class=serial protocol=rbrmultidrop "
+                       "availableprotocols=rbrserial|rbrmodem|rbrmultidrop "
+                       "baudrate=9600 node=self "
+                       "devicelist=cond_cell_00|pres_sensor_01 poweruptime=50"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getPort(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("port serial_01" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return test_port(&expected, &actual);
+}
+
 bool test_calibration(RBRInstrumentGen4Calibration *expected,
                          RBRInstrumentGen4Calibration *actual)
 {

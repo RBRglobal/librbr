@@ -119,6 +119,12 @@ extern "C" {
 #define RBRINSTRUMENTGEN4_PORT_COUNT_MAX 16
 
 /**
+ * \brief The maximum number of devices.
+ * \see RBRInstrumentGen4Port.deviceList
+ */
+#define RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX 16
+
+/**
  * \brief `node <node_label>` command parameters.
  *
  * A node is a front-end PCBA, plus the `self` node standing for the main CPU
@@ -226,6 +232,181 @@ typedef struct RBRInstrumentGen4NodePool
 RBRInstrumentGen4Error RBRInstrumentGen4_getNodePool(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4NodePool *nodePool);
+
+/**
+ * \brief The classes of port.
+ *
+ * \see RBRInstrumentGen4Port.portClass
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+typedef enum RBRInstrumentGen4PortClass
+{
+    /** A direct ADC connection with no bus; typical of on-board sensors. */
+    RBRINSTRUMENTGEN4_PORT_CLASS_VIRTUAL,
+    /** A bus-attached port, which speaks one of the port protocols. */
+    RBRINSTRUMENTGEN4_PORT_CLASS_SERIAL,
+
+    /** The number of specific port classes. */
+    RBRINSTRUMENTGEN4_PORT_CLASS_COUNT,
+    /** An unknown or unrecognized port class. */
+    RBRINSTRUMENTGEN4_UNKNOWN_PORT_CLASS
+} RBRInstrumentGen4PortClass;
+
+/**
+ * \brief Get a human-readable string name for a port class.
+ *
+ * \param [in] portClass the port class
+ * \return a string name for the port class
+ * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ */
+const char *RBRInstrumentGen4PortClass_name(
+    RBRInstrumentGen4PortClass portClass);
+
+/**
+ * \brief The protocols a port can speak.
+ *
+ * A `virtual` port speaks none of these. Consult
+ * RBRInstrumentGen4Port.availableProtocols for the protocols a given port is
+ * capable of.
+ *
+ * \see RBRInstrumentGen4Port
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+typedef enum RBRInstrumentGen4PortProtocol
+{
+    /** An unrecognized protocol, or none being spoken. */
+    RBRINSTRUMENTGEN4_PORT_PROTOCOL_NONE         =      0,
+    /** Pressure. */
+    RBRINSTRUMENTGEN4_PORT_PROTOCOL_PRESSURE = 1 << 0,
+    /** RBR serial. */
+    RBRINSTRUMENTGEN4_PORT_PROTOCOL_RBRSERIAL    = 1 << 1,
+    /** RBR modem. */
+    RBRINSTRUMENTGEN4_PORT_PROTOCOL_RBRMODEM     = 1 << 2,
+    /** RBR multidrop. */
+    RBRINSTRUMENTGEN4_PORT_PROTOCOL_RBRMULTIDROP = 1 << 3,
+    /** Corresponds to the largest port protocol enum value. */
+    RBRINSTRUMENTGEN4_PORT_PROTOCOL_MAX
+        = RBRINSTRUMENTGEN4_PORT_PROTOCOL_RBRMULTIDROP
+} RBRInstrumentGen4PortProtocol;
+
+/**
+ * \brief Get a human-readable string name for a port protocol.
+ *
+ * \param [in] protocol the port protocol
+ * \return a string name for the port protocol
+ * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ */
+const char *RBRInstrumentGen4PortProtocol_name(
+    RBRInstrumentGen4PortProtocol protocol);
+
+/**
+ * \brief `port <port_label>` command parameters.
+ *
+ * A port is an attachment point on a node to which devices attach.
+ *
+ * \see RBRInstrumentGen4PortPool
+ * \see RBRInstrumentGen4_getPort()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+typedef struct RBRInstrumentGen4Port
+{
+    /**
+     * \brief Port label.
+     *
+     * Set by the caller to select the port to read; see
+     * RBRInstrumentGen4_getPort().
+     */
+    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+
+    /** \brief The label of the node the port belongs to. */
+    char node[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+
+    /** \brief The class of the port. */
+    RBRInstrumentGen4PortClass portClass;
+
+    /** \brief The protocol currently selected on the port. */
+    RBRInstrumentGen4PortProtocol protocol;
+
+    /**
+     * \brief Protocols the port is capable of speaking.
+     *
+     * Treated as a bit field representation of available protocols as defined
+     * by RBRInstrumentGen4PortProtocol. For details, consult
+     * [Working with Bit Fields](bitfields.md).
+     */
+    RBRInstrumentGen4PortProtocol availableProtocols;
+
+    /**
+     * \brief The baud rate of the port.
+     *
+     * Zero for a `virtual` port.
+     */
+    int32_t baudRate;
+
+    /** \brief The number of devices attached to the port. */
+    int32_t deviceCount;
+
+    /** \brief The labels of the devices attached to the port. */
+    char deviceList[RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX]
+                   [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+
+    /** \brief The time in milliseconds to bring power to the port. */
+    int32_t powerUpTime;
+} RBRInstrumentGen4Port;
+
+/**
+ * \brief Populate the parameters of a port.
+ *
+ * The caller sets RBRInstrumentGen4Port.label to select the port to read.
+ *
+ * \note Issues the `port <port_label>` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in,out] port the port to read
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the port is successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen4_getPortPool()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_getPort(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Port *port);
+
+/**
+ * \brief `port` command parameters.
+ *
+ * \see RBRInstrumentGen4_getPortPool()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+typedef struct RBRInstrumentGen4PortPool
+{
+    /** \brief The number of ports across all nodes. */
+    int32_t count;
+
+    /** \brief The pool of ports. */
+    RBRInstrumentGen4Port pool[RBRINSTRUMENTGEN4_PORT_COUNT_MAX];
+} RBRInstrumentGen4PortPool;
+
+/**
+ * \brief Populate the pool of the instrument's ports.
+ *
+ * Only the labels are reported; read the rest of a port's parameters with
+ * RBRInstrumentGen4_getPort().
+ *
+ * \note Issues the `port` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [out] portPool the populated pool of ports
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the ports are successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen4_getPort()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_getPortPool(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4PortPool *portPool);
 
 /**
  * \brief `calibration` command parameters.
