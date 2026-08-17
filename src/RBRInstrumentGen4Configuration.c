@@ -20,6 +20,148 @@
 #include "RBRInstrumentGen4Internal.h"
 #include "RBRInstrumentGen4Configuration.h"
 
+RBRInstrumentGen4Error RBRInstrumentGen4_getNode(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Node *node)
+{
+    /* The label selects the node to read, so it has to outlive the reset of
+     * the rest of the structure. */
+    char label[sizeof(node->label)];
+    snprintf(label, sizeof(label), "%s", node->label);
+
+    memset(node, 0, sizeof(RBRInstrumentGen4Node));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "node %s", label));
+
+    snprintf(node->label, sizeof(node->label), "%s", label);
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "pcba") == 0)
+        {
+            snprintf(node->pcba,
+                     sizeof(node->pcba),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "portlist") == 0)
+        {
+            /* A node with no ports reports `none`, not an empty list. */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
+
+            char *value = parameter.value;
+            while (value != NULL
+                   && node->portCount < RBRINSTRUMENTGEN4_PORT_COUNT_MAX)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+                snprintf(node->portList[node->portCount],
+                         sizeof(node->portList[node->portCount]),
+                         "%s",
+                         value);
+                node->portCount++;
+
+                value = nextValue;
+            }
+        }
+        else if (strcmp(parameter.key, "fwversion") == 0)
+        {
+            snprintf(node->fwVersion,
+                     sizeof(node->fwVersion),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "semver") == 0)
+        {
+            snprintf(node->semver,
+                     sizeof(node->semver),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "fwtype") == 0)
+        {
+            /* `na` is not a number, so it converts to the zero which stands
+             * for it. */
+            node->fwType = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "poweruptime") == 0)
+        {
+            node->powerUpTime = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "inrushoffsettime") == 0)
+        {
+            node->inrushOffsetTime = strtol(parameter.value, NULL, 10);
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getNodePool(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4NodePool *nodePool)
+{
+    memset(nodePool, 0, sizeof(RBRInstrumentGen4NodePool));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "node"));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "count") == 0)
+        {
+            nodePool->count = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "list") == 0)
+        {
+            /* An instrument with no nodes reports `none` to indicate an empty list */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
+
+            char *value = parameter.value;
+            for (int32_t node = 0;
+                 value != NULL && node < RBRINSTRUMENTGEN4_NODE_COUNT_MAX;
+                 node++)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+                snprintf(nodePool->pool[node].label,
+                         sizeof(nodePool->pool[node].label),
+                         "%s",
+                         value);
+
+                value = nextValue;
+            }
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
 /*
 RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
     RBRInstrumentGen4 *instrument,

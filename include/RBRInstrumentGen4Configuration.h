@@ -107,6 +107,127 @@ extern "C" {
 #define RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX 4
 
 /**
+ * \brief The maximum number of nodes.
+ * \see RBRInstrumentGen4NodePool.pool
+ */
+#define RBRINSTRUMENTGEN4_NODE_COUNT_MAX 12
+
+/**
+ * \brief The maximum number of ports.
+ * \see RBRInstrumentGen4Node.portList
+ */
+#define RBRINSTRUMENTGEN4_PORT_COUNT_MAX 16
+
+/**
+ * \brief `node <node_label>` command parameters.
+ *
+ * A node is a front-end PCBA, plus the `self` node standing for the main CPU
+ * board. Nodes are the top of the instrument's configuration hierarchy: a node
+ * carries ports, a port carries devices, and a device exposes channels.
+ *
+ * \see RBRInstrumentGen4NodePool
+ * \see RBRInstrumentGen4_getNode()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+typedef struct RBRInstrumentGen4Node
+{
+    /**
+     * \brief Node label.
+     *
+     * Set by the caller to select the node to read; see
+     * RBRInstrumentGen4_getNode().
+     */
+    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+
+    /** \brief The label of the PCBA implementing the node. */
+    char pcba[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+
+    /** \brief The number of ports on the node. */
+    int32_t portCount;
+
+    /** \brief The labels of the ports on the node. */
+    char portList[RBRINSTRUMENTGEN4_PORT_COUNT_MAX]
+                 [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+
+    /** \brief The firmware version running on the node. */
+    char fwVersion[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
+
+    /** \brief The node firmware version in semantic-version form. */
+    char semver[RBRINSTRUMENTGEN4_ID_SEMVER_MAX + 1];
+
+    /**
+     * \brief The firmware type running on the node.
+     *
+     * Zero when the node runs no firmware of its own, which it reports as
+     * `na`.
+     */
+    int32_t fwType;
+
+    /** \brief The time in milliseconds the node takes to power up. */
+    int32_t powerUpTime;
+
+    /**
+     * \brief The time in milliseconds to wait after powering the node up
+     * before powering anything beneath it.
+     */
+    int32_t inrushOffsetTime;
+} RBRInstrumentGen4Node;
+
+/**
+ * \brief Populate the parameters of a node.
+ *
+ * The caller sets RBRInstrumentGen4Node.label to select the node to read.
+ *
+ * \note Issues the `node <node_label>` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in,out] node the node to read
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the node is successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen4_getNodePool()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_getNode(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Node *node);
+
+/**
+ * \brief `node` command parameters.
+ *
+ * \see RBRInstrumentGen4_getNodePool()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+typedef struct RBRInstrumentGen4NodePool
+{
+    /** \brief The number of nodes on the instrument. */
+    int32_t count;
+
+    /** \brief The pool of nodes. */
+    RBRInstrumentGen4Node pool[RBRINSTRUMENTGEN4_NODE_COUNT_MAX];
+} RBRInstrumentGen4NodePool;
+
+/**
+ * \brief Populate the pool of the instrument's nodes.
+ *
+ * Only the labels are reported; read the rest of a node's parameters with
+ * RBRInstrumentGen4_getNode().
+ *
+ * \note Issues the `node` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [out] nodePool the populated pool of nodes
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the nodes are successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen4_getNode()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_getNodePool(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4NodePool *nodePool);
+
+/**
  * \brief `calibration` command parameters.
  *
  * \see RBRInstrumentGen4Channel
