@@ -50,7 +50,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_parseDeploymentResponse(
             continue;
         }
 
-        for (int i = 0; i < RBRINSTRUMENTGEN4_STATUS_COUNT; i++)
+        for (int i = 0; i < RBRINSTRUMENTGEN4_INSTRUMENT_STATE_COUNT; i++)
         {
             if (strcmp(RBRInstrumentGen4InstrumentState_name(i),
                        parameter.value) == 0)
