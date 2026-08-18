@@ -211,8 +211,10 @@ int main(int argc, char *argv[])
     #endif
     default:
         fprintf(stderr,
-                "Warning: connection method to the instrument is unclear, so"
-                " streaming can't be enabled. Stop. \n");
+                "%s: connection method to the instrument is unclear, so"
+                " streaming can't be enabled.\n",
+                programName);
+        status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
 
