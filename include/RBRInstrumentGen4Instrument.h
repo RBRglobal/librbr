@@ -14,7 +14,7 @@
 #define LIBRBR_RBRINSTRUMENTGEN4INSTRUMENT_H
 
 #include "RBRInstrumentGen4.h"
-/* Required for RBRInstrumentGen4LoggingState. */
+/* Required for RBRInstrumentGen4InstrumentState. */
 #include "RBRInstrumentGen4Schedule.h"
 #ifdef __cplusplus
 extern "C" {
@@ -495,7 +495,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_resetPowerExternalUsed(
 typedef struct RBRInstrumentGen4Instrument
 {
     /** \brief Whether a deployment is currently logging. */
-    RBRInstrumentGen4LoggingState state;
+    RBRInstrumentGen4InstrumentState state;
     /** \brief The serial number of the instrument. */
     int32_t sn;
     /** \brief The instrument model. */

@@ -493,7 +493,7 @@ TEST_LOGGER4(instrument)
           "fwlock=off datatype=float64 name=L4"
           RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { RBRINSTRUMENTGEN4_LOGGING_STATE_DISABLED,
+          { RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED,
             999999,
             "L4",
             "9999999revA",
@@ -511,7 +511,7 @@ TEST_LOGGER4(instrument)
           "datatype=float32 name=RBRsolo^4_T.D!fast32"
           RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { RBRINSTRUMENTGEN4_LOGGING_STATE_ENABLED,
+          { RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED,
             210000,
             "RBRsolo4",
             "L3-M11-BEC11-SC11-ST11-SP11",
@@ -527,7 +527,7 @@ TEST_LOGGER4(instrument)
           "datatype=calfloat64 name=RBRsolo4"
           RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { RBRINSTRUMENTGEN4_LOGGING_STATE_ENABLED,
+          { RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED,
             210000,
             "RBRsolo4",
             "012345revA",
@@ -544,7 +544,7 @@ TEST_LOGGER4(instrument)
           "datatype=float128 name=L4"
           RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { RBRINSTRUMENTGEN4_LOGGING_STATE_DISABLED,
+          { RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED,
             999999,
             "L4",
             "9999999revA",
@@ -571,7 +571,7 @@ TEST_LOGGER4(instrument)
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen4Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.state,
                             actual.state,
-                            RBRInstrumentGen4LoggingState);
+                            RBRInstrumentGen4InstrumentState);
         TEST_ASSERT_EQ(tests[i].expected.sn, actual.sn, "%" PRIi32);
         TEST_ASSERT_STR_EQ(tests[i].expected.model, actual.model);
         TEST_ASSERT_STR_EQ(tests[i].expected.pn, actual.pn);

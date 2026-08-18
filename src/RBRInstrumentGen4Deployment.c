@@ -25,7 +25,7 @@
 static RBRInstrumentGen4Error RBRInstrumentGen4_parseDeploymentResponse(
     RBRInstrumentGen4 *instrument,
     const char *deploymentCommand,
-    RBRInstrumentGen4LoggingState *state)
+    RBRInstrumentGen4InstrumentState *state)
 {
     //GEN4 todo: maybe make this consistent with other code, like get xxx name function.
     /** 
@@ -52,7 +52,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_parseDeploymentResponse(
 
         for (int i = 0; i < RBRINSTRUMENTGEN4_STATUS_COUNT; i++)
         {
-            if (strcmp(RBRInstrumentGen4LoggingState_name(i),
+            if (strcmp(RBRInstrumentGen4InstrumentState_name(i),
                        parameter.value) == 0)
             {
                 *state = i;
@@ -70,7 +70,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_verify(
         RBRInstrumentGen4 *instrument,
         const RBRInstrumentGen4Config *config, 
         const char datasetLabel[],
-        RBRInstrumentGen4LoggingState *status)
+        RBRInstrumentGen4InstrumentState *status)
 {
     RBR_TRY(RBRInstrumentGen4_converse(instrument,
                                    "verify config=%s dataset=%s", config->label, datasetLabel));
@@ -103,7 +103,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_enable(
         const RBRInstrumentGen4DeploymentStoragemode storageMode, 
         RBRInstrumentGen4DatasetPool *datasetPool,
         RBRInstrumentGen4Dataset **newDataset,
-        RBRInstrumentGen4LoggingState *state)
+        RBRInstrumentGen4InstrumentState *state)
 {
     if (storageMode != RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL
         && storageMode != RBRINSTRUMENTGEN4_STORAGEMODE_CALIBRATION)
@@ -131,7 +131,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_enable(
 
 RBRInstrumentGen4Error RBRInstrumentGen4_disable(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4LoggingState *state)
+    RBRInstrumentGen4InstrumentState *state)
 {
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "disable"));
 

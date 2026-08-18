@@ -213,7 +213,8 @@ int main(void)
             .label = "profiling"
         };
         char datasetLabel[] = "test";
-        RBRInstrumentGen4LoggingState verifyStatus = RBRINSTRUMENTGEN4_UNKNOWN_LOGGING_STATE;
+        RBRInstrumentGen4InstrumentState verifyStatus
+            = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
 
    if ((err = RBRInstrumentGen4_verify(
                   instrument, &config, datasetLabel, &verifyStatus)) != RBRINSTRUMENTGEN4_SUCCESS)

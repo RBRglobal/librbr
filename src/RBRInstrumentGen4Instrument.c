@@ -719,7 +719,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getInstrument(
     RBRInstrumentGen4Instrument *instrumentInfo)
 {
     memset(instrumentInfo, 0, sizeof(RBRInstrumentGen4Instrument));
-    instrumentInfo->state = RBRINSTRUMENTGEN4_UNKNOWN_LOGGING_STATE;
+    instrumentInfo->state = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
     instrumentInfo->dataType = RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE;
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "instrument"));
@@ -740,11 +740,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getInstrument(
         {
             if (strcmp(parameter.value, "disabled") == 0)
             {
-                instrumentInfo->state = RBRINSTRUMENTGEN4_LOGGING_STATE_DISABLED;
+                instrumentInfo->state
+                    = RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED;
             }
             else if (strcmp(parameter.value, "enabled") == 0)
             {
-                instrumentInfo->state = RBRINSTRUMENTGEN4_LOGGING_STATE_ENABLED;
+                instrumentInfo->state
+                    = RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED;
             }
         }
         else if (strcmp(parameter.key, "sn") == 0)

@@ -91,19 +91,20 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setClock(RBRInstrumentGen4 *instrument,
     }
 }
 
-const char *RBRInstrumentGen4LoggingState_name(RBRInstrumentGen4LoggingState state)
+const char *RBRInstrumentGen4InstrumentState_name(
+    RBRInstrumentGen4InstrumentState state)
 {
     switch (state)
     {
-    case RBRINSTRUMENTGEN4_LOGGING_STATE_DISABLED:
+    case RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED:
         return "disabled";
-    case RBRINSTRUMENTGEN4_LOGGING_STATE_ENABLED:
+    case RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED:
         return "enabled";
-    case RBRINSTRUMENTGEN4_LOGGING_STATE_COUNT:
-        return "logging state count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_LOGGING_STATE:
+    case RBRINSTRUMENTGEN4_INSTRUMENT_STATE_COUNT:
+        return "instrument state count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE:
     default:
-        return "unknown logging state";
+        return "unknown instrument state";
     }
 }
 

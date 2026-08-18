@@ -102,7 +102,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setClock(RBRInstrumentGen4 *instrument,
                                           const RBRInstrumentGen4Clock *clock);
 
 /**
- * \brief Possible instrument logging states.
+ * \brief Possible instrument instrument states.
  * This tracks whether the deployment is running on the instrument.
  *
  * Returned by:
@@ -114,26 +114,27 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setClock(RBRInstrumentGen4 *instrument,
  * \see RBRInstrumentGen4DeploymentStatus
  * \see RBRInstrumentGen4Deployment
  */
-typedef enum RBRInstrumentGen4LoggingState
+typedef enum RBRInstrumentGen4InstrumentState
 {
     /** Logging is not enabled. */
-    RBRINSTRUMENTGEN4_LOGGING_STATE_DISABLED,
+    RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED,
     /** Logging for at least one deployment is enabled. */
-    RBRINSTRUMENTGEN4_LOGGING_STATE_ENABLED,
-    /** The number of specific logging states. */
-    RBRINSTRUMENTGEN4_LOGGING_STATE_COUNT,
-    /** An unknown or unrecognized logging state. */
-    RBRINSTRUMENTGEN4_UNKNOWN_LOGGING_STATE
-} RBRInstrumentGen4LoggingState;
+    RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED,
+    /** The number of specific instrument states. */
+    RBRINSTRUMENTGEN4_INSTRUMENT_STATE_COUNT,
+    /** An unknown or unrecognized instrument state. */
+    RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE
+} RBRInstrumentGen4InstrumentState;
 
 /**
- * \brief Get a human-readable string name for a logging state.
+ * \brief Get a human-readable string name for a instrument state.
  *
- * \param [in] state the logging state
- * \return a string name for the logging state
+ * \param [in] state the instrument state
+ * \return a string name for the instrument state
  * \see RBRInstrumentGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4LoggingState_name(RBRInstrumentGen4LoggingState status);
+const char *RBRInstrumentGen4InstrumentState_name(
+    RBRInstrumentGen4InstrumentState status);
 
 /**
  * \brief Possible deployment statuses.

@@ -196,7 +196,8 @@ int main(int argc, char *argv[])
     }
 
     /************ ensure default state ************/
-    RBRInstrumentGen4LoggingState loggingState = RBRINSTRUMENTGEN4_UNKNOWN_LOGGING_STATE;
+    RBRInstrumentGen4InstrumentState loggingState
+        = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
     RBRInstrumentGen4_disable(instrument, &loggingState);
 
     RBRInstrumentGen4DatasetPool datasetPool;
