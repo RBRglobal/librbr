@@ -409,6 +409,188 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPortPool(
     RBRInstrumentGen4PortPool *portPool);
 
 /**
+ * \brief The classes of device.
+ *
+ * \see RBRInstrumentGen4Device.deviceClass
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+typedef enum RBRInstrumentGen4DeviceClass
+{
+    /** A device which measures. */
+    RBRINSTRUMENTGEN4_DEVICE_CLASS_SENSOR,
+    /** A device which acts, such as a valve or a UV LED. */
+    RBRINSTRUMENTGEN4_DEVICE_CLASS_ACTUATOR,
+    /** A device which raises asynchronous events. */
+    RBRINSTRUMENTGEN4_DEVICE_CLASS_EVENTGEN,
+    /** A device which carries other devices on a multidrop bus. */
+    RBRINSTRUMENTGEN4_DEVICE_CLASS_MODEM,
+
+    /** The number of specific device classes. */
+    RBRINSTRUMENTGEN4_DEVICE_CLASS_COUNT,
+    /** An unknown or unrecognized device class. */
+    RBRINSTRUMENTGEN4_UNKNOWN_DEVICE_CLASS
+} RBRInstrumentGen4DeviceClass;
+
+/**
+ * \brief Get a human-readable string name for a device class.
+ *
+ * \param [in] deviceClass the device class
+ * \return a string name for the device class
+ * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ */
+const char *RBRInstrumentGen4DeviceClass_name(
+    RBRInstrumentGen4DeviceClass deviceClass);
+
+/**
+ * \brief `device <device_label>` command parameters.
+ *
+ * A device is a logical sensor, actuator, event source, or modem attached to a
+ * port. Devices are produced by discovery: there is no command to create one.
+ *
+ * \see RBRInstrumentGen4DevicePool
+ * \see RBRInstrumentGen4_getDevice()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+typedef struct RBRInstrumentGen4Device
+{
+    /**
+     * \brief Device label.
+     *
+     * Set by the caller to select the device to read; see
+     * RBRInstrumentGen4_getDevice().
+     */
+    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+
+    /** \brief The label of the port the device is attached to. */
+    char port[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+
+    /** \brief The class of the device. */
+    RBRInstrumentGen4DeviceClass deviceClass;
+
+    /**
+     * \brief Device serial number.
+     *
+     * Zero when the instrument has no serial number recorded for the device,
+     * which it reports as `na`.
+     */
+    int32_t sn;
+
+    /**
+     * \brief Device part number.
+     *
+     * Reported as `na` when unrecorded.
+     */
+    char pn[RBRINSTRUMENTGEN4_PART_NUMBER_MAX + 1];
+
+    /** \brief The firmware version running on the device. */
+    char fwVersion[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
+
+    /**
+     * \brief The firmware type running on the device.
+     *
+     * Zero when the device runs no firmware of its own, which it reports as
+     * `na`.
+     */
+    int32_t fwType;
+
+    /** \brief The generic name of the kind of device installed. */
+    char name[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+
+    /** \brief The number of channels the device exposes. */
+    int32_t channelCount;
+
+    /**
+     * \brief The labels of the channels the device exposes.
+     *
+     * A device can name a channel which the `channel` command does not
+     * enumerate and will not accept, so a label found here is not
+     * necessarily readable with RBRInstrumentGen4_getChannel().
+     */
+    char channelList[RBRINSTRUMENTGEN4_CHANNEL_MAX]
+                    [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+
+    /**
+     * \brief Whether the device is protected from being overridden by a
+     * subsequent device discovery.
+     */
+    bool lock;
+
+    /** \brief The time in milliseconds the device takes to power up. */
+    int32_t powerUpTime;
+
+    /** \brief The time in milliseconds the device needs between samples. */
+    int32_t coolDownTime;
+
+    /** \brief The time in milliseconds the device takes to power down. */
+    int32_t powerDownTime;
+
+    /**
+     * \brief The time in milliseconds to wait after powering the device up
+     * before drawing on it.
+     */
+    int32_t inrushOffsetTime;
+} RBRInstrumentGen4Device;
+
+/**
+ * \brief Populate the parameters of a device.
+ *
+ * The caller sets RBRInstrumentGen4Device.label to select the device to read.
+ *
+ * \note Issues the `device <device_label> <param1> <param2> ...` command
+ * \note This getter is special: the `device <device_label>` command has a
+ * hidden `lock` parameter which does not appear unless queried by name, so this
+ * getter explicitly requests *every* parameter of the command by name. This 
+ * results in a larger command string than most getters, and therefore it may
+ * take slightly longer to converse. 
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in,out] device the device to read
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the device is successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen4_getDevicePool()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_getDevice(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Device *device);
+
+/**
+ * \brief `device` command parameters.
+ *
+ * \see RBRInstrumentGen4_getDevicePool()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+typedef struct RBRInstrumentGen4DevicePool
+{
+    /** \brief The number of devices across all ports. */
+    int32_t count;
+
+    /** \brief The pool of devices. */
+    RBRInstrumentGen4Device pool[RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX];
+} RBRInstrumentGen4DevicePool;
+
+/**
+ * \brief Populate the pool of the instrument's devices.
+ *
+ * Only the labels are reported; read the rest of a device's parameters with
+ * RBRInstrumentGen4_getDevice().
+ *
+ * \note Issues the `device` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [out] devicePool the populated pool of devices
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the devices are successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen4_getDevice()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_getDevicePool(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4DevicePool *devicePool);
+
+/**
  * \brief `calibration` command parameters.
  *
  * \see RBRInstrumentGen4Channel

@@ -379,6 +379,220 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPortPool(
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
+const char *RBRInstrumentGen4DeviceClass_name(
+    RBRInstrumentGen4DeviceClass deviceClass)
+{
+    switch (deviceClass)
+    {
+    case RBRINSTRUMENTGEN4_DEVICE_CLASS_SENSOR:
+        return "sensor";
+    case RBRINSTRUMENTGEN4_DEVICE_CLASS_ACTUATOR:
+        return "actuator";
+    case RBRINSTRUMENTGEN4_DEVICE_CLASS_EVENTGEN:
+        return "eventgen";
+    case RBRINSTRUMENTGEN4_DEVICE_CLASS_MODEM:
+        return "modem";
+    case RBRINSTRUMENTGEN4_DEVICE_CLASS_COUNT:
+        return "device class count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_DEVICE_CLASS:
+    default:
+        return "unknown device class";
+    }
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getDevice(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Device *device)
+{
+    /* The label selects the device to read, so it has to outlive the reset of
+     * the rest of the structure. */
+    char label[sizeof(device->label)];
+    snprintf(label, sizeof(label), "%s", device->label);
+
+    memset(device, 0, sizeof(RBRInstrumentGen4Device));
+    device->deviceClass = RBRINSTRUMENTGEN4_UNKNOWN_DEVICE_CLASS;
+
+    /* `lock` is deliberately absent from the response to a bare
+     * `device <label>`, so name every parameter rather than take the
+     * defaults. */
+    RBR_TRY(RBRInstrumentGen4_converse(
+        instrument,
+        "device %s port class sn pn fwversion fwtype name channellist lock"
+        " poweruptime cooldowntime powerdowntime inrushoffsettime",
+        label));
+
+    snprintf(device->label, sizeof(device->label), "%s", label);
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "port") == 0)
+        {
+            snprintf(device->port,
+                     sizeof(device->port),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "class") == 0)
+        {
+            for (int32_t i = 0; i < RBRINSTRUMENTGEN4_DEVICE_CLASS_COUNT; i++)
+            {
+                if (strcmp(RBRInstrumentGen4DeviceClass_name(i),
+                           parameter.value) == 0)
+                {
+                    device->deviceClass = i;
+                    break;
+                }
+            }
+        }
+        else if (strcmp(parameter.key, "sn") == 0)
+        {
+            /* `na` is not a number, so it converts to the zero which stands
+             * for it, as it does for the firmware type below. */
+            device->sn = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "pn") == 0)
+        {
+            snprintf(device->pn, sizeof(device->pn), "%s", parameter.value);
+        }
+        else if (strcmp(parameter.key, "fwversion") == 0)
+        {
+            snprintf(device->fwVersion,
+                     sizeof(device->fwVersion),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "fwtype") == 0)
+        {
+            device->fwType = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "name") == 0)
+        {
+            snprintf(device->name,
+                     sizeof(device->name),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "channellist") == 0)
+        {
+            /* A device with no channels reports `none`, not an empty list. */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
+
+            char *value = parameter.value;
+            while (value != NULL
+                   && device->channelCount < RBRINSTRUMENTGEN4_CHANNEL_MAX)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+                snprintf(device->channelList[device->channelCount],
+                         sizeof(device->channelList[device->channelCount]),
+                         "%s",
+                         value);
+                device->channelCount++;
+
+                value = nextValue;
+            }
+        }
+        else if (strcmp(parameter.key, "lock") == 0)
+        {
+            device->lock = (strcmp(parameter.value, "on") == 0);
+        }
+        else if (strcmp(parameter.key, "poweruptime") == 0)
+        {
+            device->powerUpTime = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "cooldowntime") == 0)
+        {
+            device->coolDownTime = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "powerdowntime") == 0)
+        {
+            device->powerDownTime = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "inrushoffsettime") == 0)
+        {
+            device->inrushOffsetTime = strtol(parameter.value, NULL, 10);
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getDevicePool(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4DevicePool *devicePool)
+{
+    memset(devicePool, 0, sizeof(RBRInstrumentGen4DevicePool));
+
+    /* Zero is a real device class, so say the class is unknown until
+     * RBRInstrumentGen4_getDevice() reads it. */
+    for (int32_t device = 0;
+         device < RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX;
+         device++)
+    {
+        devicePool->pool[device].deviceClass
+            = RBRINSTRUMENTGEN4_UNKNOWN_DEVICE_CLASS;
+    }
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "device"));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "count") == 0)
+        {
+            devicePool->count = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "list") == 0)
+        {
+            /* An instrument with no devices reports `none`, not an empty
+             * list. */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
+
+            char *value = parameter.value;
+            for (int32_t device = 0;
+                 value != NULL && device < RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX;
+                 device++)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+                snprintf(devicePool->pool[device].label,
+                         sizeof(devicePool->pool[device].label),
+                         "%s",
+                         value);
+
+                value = nextValue;
+            }
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
 /*
 RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
     RBRInstrumentGen4 *instrument,

@@ -308,6 +308,215 @@ TEST_LOGGER4(portSerial)
     return test_port(&expected, &actual);
 }
 
+#define DEVICE_KEYS \
+    " port class sn pn fwversion fwtype name channellist lock poweruptime" \
+    " cooldowntime powerdowntime inrushoffsettime"
+
+static bool test_device(RBRInstrumentGen4Device *expected,
+                        RBRInstrumentGen4Device *actual)
+{
+    TEST_ASSERT_STR_EQ(expected->label, actual->label);
+    TEST_ASSERT_STR_EQ(expected->port, actual->port);
+    TEST_ASSERT_ENUM_EQ(expected->deviceClass,
+                        actual->deviceClass,
+                        RBRInstrumentGen4DeviceClass);
+    TEST_ASSERT_EQ(expected->sn, actual->sn, "%" PRIi32);
+    TEST_ASSERT_STR_EQ(expected->pn, actual->pn);
+    TEST_ASSERT_STR_EQ(expected->fwVersion, actual->fwVersion);
+    TEST_ASSERT_EQ(expected->fwType, actual->fwType, "%" PRIi32);
+    TEST_ASSERT_STR_EQ(expected->name, actual->name);
+    TEST_ASSERT_EQ(expected->channelCount, actual->channelCount, "%" PRIi32);
+    for (int32_t channel = 0; channel < expected->channelCount; ++channel)
+    {
+        TEST_ASSERT_STR_EQ(expected->channelList[channel],
+                           actual->channelList[channel]);
+    }
+    TEST_ASSERT_ENUM_EQ(expected->lock, actual->lock, bool);
+    TEST_ASSERT_EQ(expected->powerUpTime, actual->powerUpTime, "%" PRIi32);
+    TEST_ASSERT_EQ(expected->coolDownTime, actual->coolDownTime, "%" PRIi32);
+    TEST_ASSERT_EQ(expected->powerDownTime, actual->powerDownTime, "%" PRIi32);
+    TEST_ASSERT_EQ(expected->inrushOffsetTime,
+                   actual->inrushOffsetTime,
+                   "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(devicelist)
+{
+    /* The pool getter reports only labels; the remaining fields come from
+     * RBRInstrumentGen4_getDevice(). */
+    RBRInstrumentGen4DevicePool expected = {
+        .count = 3,
+        .pool = {
+            { .label = "thermistor_00",
+              .deviceClass = RBRINSTRUMENTGEN4_UNKNOWN_DEVICE_CLASS },
+            { .label = "pres_sensor_00",
+              .deviceClass = RBRINSTRUMENTGEN4_UNKNOWN_DEVICE_CLASS },
+            { .label = "internal_adc_00",
+              .deviceClass = RBRINSTRUMENTGEN4_UNKNOWN_DEVICE_CLASS }
+        }
+    };
+    RBRInstrumentGen4DevicePool actual;
+
+    TestIOBuffers_init(buffers,
+                       "device count=3 list=thermistor_00|pres_sensor_00|"
+                       "internal_adc_00"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getDevicePool(instrument,
+                                                                 &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("device" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(expected.count, actual.count, "%" PRIi32);
+    for (int32_t device = 0; device < actual.count; ++device)
+    {
+        if (!test_device(&expected.pool[device], &actual.pool[device]))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+TEST_LOGGER4(device)
+{
+    RBRInstrumentGen4Device expected = {
+        .label = "thermistor_00",
+        .port = "thermistor_00",
+        .deviceClass = RBRINSTRUMENTGEN4_DEVICE_CLASS_SENSOR,
+        .sn = 0,
+        .pn = "na",
+        .fwVersion = "0.0.0",
+        .fwType = 0,
+        .name = "thermistor",
+        .channelCount = 1,
+        .channelList = { "temperature_00" },
+        .lock = false,
+        .powerUpTime = 12,
+        .coolDownTime = 0,
+        .powerDownTime = 0,
+        .inrushOffsetTime = 10
+    };
+
+    RBRInstrumentGen4Device actual = {
+        .label = "thermistor_00"
+    };
+
+    TestIOBuffers_init(buffers,
+                       "device thermistor_00 port=thermistor_00 class=sensor "
+                       "sn=na pn=na fwversion=0.0.0 fwtype=na "
+                       "name=thermistor channellist=temperature_00 lock=off "
+                       "poweruptime=12 cooldowntime=0 powerdowntime=0 "
+                       "inrushoffsettime=10"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getDevice(instrument,
+                                                             &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("device thermistor_00" DEVICE_KEYS COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return test_device(&expected, &actual);
+}
+
+TEST_LOGGER4(deviceIdentity)
+{
+    /*
+     * Zero stands for the `na` every device on the development instrument
+     * reports, so prove a real serial number and firmware type are read
+     * rather than left at that zero. The serial number is the one
+     * `device.adoc` uses in its worked example; no device to hand reports
+     * either.
+     */
+    RBRInstrumentGen4Device expected = {
+        .label = "internal_adc_00",
+        .port = "internal_adc_00",
+        .deviceClass = RBRINSTRUMENTGEN4_DEVICE_CLASS_SENSOR,
+        .sn = 850032,
+        .pn = "na",
+        .fwVersion = "1.0.0",
+        .fwType = 170,
+        .name = "internal_adc",
+        .channelCount = 1,
+        .channelList = { "vmon_bat_input_00" },
+        .lock = true,
+        .powerUpTime = 0,
+        .coolDownTime = 0,
+        .powerDownTime = 0,
+        .inrushOffsetTime = 0
+    };
+
+    RBRInstrumentGen4Device actual = {
+        .label = "internal_adc_00"
+    };
+
+    TestIOBuffers_init(buffers,
+                       "device internal_adc_00 port=internal_adc_00 "
+                       "class=sensor sn=850032 pn=na fwversion=1.0.0 "
+                       "fwtype=170 name=internal_adc "
+                       "channellist=vmon_bat_input_00 lock=on poweruptime=0 "
+                       "cooldowntime=0 powerdowntime=0 inrushoffsettime=0"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getDevice(instrument,
+                                                             &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("device internal_adc_00" DEVICE_KEYS COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return test_device(&expected, &actual);
+}
+
+TEST_LOGGER4(deviceWithUnlistedChannels)
+{
+    /*
+     * `channellist` can name channels the `channel` command does not
+     * enumerate and will not accept: on the development instrument this
+     * device reports `temperature_01`, which `channel temperature_01`
+     * answers with `ERR-117`.
+     */
+    RBRInstrumentGen4Device expected = {
+        .label = "pres_sensor_00",
+        .port = "pres_serial_00",
+        .deviceClass = RBRINSTRUMENTGEN4_DEVICE_CLASS_SENSOR,
+        .sn = 0,
+        .pn = "na",
+        .fwVersion = "0.0.0",
+        .fwType = 0,
+        .name = "pres_sensor",
+        .channelCount = 2,
+        .channelList = { "pressure_00", "temperature_01" },
+        .lock = false,
+        .powerUpTime = 0,
+        .coolDownTime = 0,
+        .powerDownTime = 0,
+        .inrushOffsetTime = 75
+    };
+
+    RBRInstrumentGen4Device actual = {
+        .label = "pres_sensor_00"
+    };
+
+    TestIOBuffers_init(buffers,
+                       "device pres_sensor_00 port=pres_serial_00 "
+                       "class=sensor sn=na pn=na fwversion=0.0.0 fwtype=na "
+                       "name=pres_sensor "
+                       "channellist=pressure_00|temperature_01 lock=off "
+                       "poweruptime=0 cooldowntime=0 powerdowntime=0 "
+                       "inrushoffsettime=75"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getDevice(instrument,
+                                                             &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("device pres_sensor_00" DEVICE_KEYS COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return test_device(&expected, &actual);
+}
+
 bool test_calibration(RBRInstrumentGen4Calibration *expected,
                          RBRInstrumentGen4Calibration *actual)
 {
