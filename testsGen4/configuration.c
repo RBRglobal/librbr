@@ -632,3 +632,96 @@ TEST_LOGGER4(calibration)
 
     return test_calibration(&expected, &actual);
 }
+
+TEST_LOGGER4(settings)
+{
+    RBRInstrumentGen4Settings expected = {
+        .prompt = true,
+        .confirmation = true,
+        .pollPowerOffDelay = 8000
+    };
+    RBRInstrumentGen4Settings actual;
+
+    TestIOBuffers_init(
+        buffers,
+        "settings prompt=on confirmation=on pollpoweroffdelay=8000"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getSettings(instrument,
+                                                               &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("settings" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_ENUM_EQ(expected.prompt, actual.prompt, bool);
+    TEST_ASSERT_ENUM_EQ(expected.confirmation, actual.confirmation, bool);
+    TEST_ASSERT_EQ(expected.pollPowerOffDelay,
+                   actual.pollPowerOffDelay,
+                   "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(settingsSet)
+{
+    RBRInstrumentGen4Settings settings = {
+        .prompt = true,
+        .confirmation = true,
+        .pollPowerOffDelay = 9000
+    };
+
+    TestIOBuffers_init(
+        buffers,
+        "settings prompt=on confirmation=on pollpoweroffdelay=9000"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setSettings(instrument,
+                                                               &settings);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ(
+        "settings prompt=on confirmation=on pollpoweroffdelay=9000"
+        COMMAND_TERMINATOR,
+        buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(settingsSetConfirmationOff)
+{
+    RBRInstrumentGen4Settings settings = {
+        .prompt = true,
+        .confirmation = false,
+        .pollPowerOffDelay = 8000
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setSettings(instrument,
+                                                               &settings);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ(
+        "settings prompt=on confirmation=off pollpoweroffdelay=8000"
+        COMMAND_TERMINATOR,
+        buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(settingsSetInvalidPollPowerOffDelay)
+{
+    RBRInstrumentGen4Settings settings = {
+        .prompt = true,
+        .confirmation = true,
+        .pollPowerOffDelay = -1
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setSettings(instrument,
+                                                               &settings);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    return true;
+}

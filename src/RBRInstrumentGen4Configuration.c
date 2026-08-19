@@ -8,6 +8,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
+/* Required for PRId32. */
+#include <inttypes.h>
 /* Required for NAN. */
 #include <math.h>
 /* Required for snprintf. */
@@ -882,20 +884,67 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(RBRInstrumentGen4 *instr
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4Settings_getSettings(
+RBRInstrumentGen4Error RBRInstrumentGen4_getSettings(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Settings *settings){
-        (void)instrument;
-        (void)settings;
-        return RBRINSTRUMENTGEN4_SUCCESS;
+    RBRInstrumentGen4Settings *settings)
+{
+    memset(settings, 0, sizeof(RBRInstrumentGen4Settings));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "settings"));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "prompt") == 0)
+        {
+            settings->prompt = (strcmp(parameter.value, "on") == 0);
+        }
+        else if (strcmp(parameter.key, "confirmation") == 0)
+        {
+            settings->confirmation = (strcmp(parameter.value, "on") == 0);
+        }
+        else if (strcmp(parameter.key, "pollpoweroffdelay") == 0)
+        {
+            settings->pollPowerOffDelay = strtol(parameter.value, NULL, 10);
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4Settings_setSettings(
+RBRInstrumentGen4Error RBRInstrumentGen4_setSettings(
     RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Settings *settings){
-        (void)instrument;
-        (void)settings;
-        return RBRINSTRUMENTGEN4_SUCCESS;
+    const RBRInstrumentGen4Settings *settings)
+{
+    if (settings->pollPowerOffDelay < 0)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    /* The instrument answers with nothing at all once confirmation is off. */
+    if (!settings->confirmation)
+    {
+        return RBRInstrumentGen4_sendCommand(
+            instrument,
+            "settings prompt=%s confirmation=off pollpoweroffdelay=%" PRId32,
+            settings->prompt ? "on" : "off",
+            settings->pollPowerOffDelay);
+    }
+
+    return RBRInstrumentGen4_converse(
+        instrument,
+        "settings prompt=%s confirmation=on pollpoweroffdelay=%" PRId32,
+        settings->prompt ? "on" : "off",
+        settings->pollPowerOffDelay);
 }
 
 #if 0

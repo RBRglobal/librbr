@@ -944,7 +944,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setCalibration(
  * \see RBRInstrumentGen4_getSettings()
  * \see RBRInstrumentGen4_setSettings()
  */
-typedef struct RBRInstrumentGen4Settings{
+typedef struct RBRInstrumentGen4Settings
+{
     /**
      * \brief Whether the instrument returns the “Ready:” prompt following a
      * response. The as-shipped default value is on.
@@ -959,6 +960,12 @@ typedef struct RBRInstrumentGen4Settings{
      * requested.
      */
     bool confirmation;
+
+    /**
+     * \brief The delay in milliseconds between the completion of a poll and
+     * the removal of sensor power. The as-shipped default value is 8000.
+     */
+    RBRInstrumentGen4Period pollPowerOffDelay;
 } RBRInstrumentGen4Settings;
 
 /**
@@ -987,6 +994,11 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSettings(
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the power-off delay
+ *                                                    is negative
+ * \warning The library expects both \a prompt and \a confirmation to be on.
+ *          With \a confirmation off the instrument answers a set with nothing
+ *          at all, and every later setter blocks until the command timeout.
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828508/settings
  * \see RBRInstrumentGen4_getSettings()
  */
