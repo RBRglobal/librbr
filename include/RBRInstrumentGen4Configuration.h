@@ -591,6 +591,30 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDevicePool(
     RBRInstrumentGen4DevicePool *devicePool);
 
 /**
+ * \brief Sweep every port and repopulate the devices attached to them.
+ *
+ * Discovery reports every device present after the sweep, not only the ones it
+ * has just added, so it fills the same pool RBRInstrumentGen4_getDevicePool()
+ * does. Both report nothing but the labels; read a device's parameters with
+ * RBRInstrumentGen4_getDevice().
+ *
+ * \note Issues the `device discover` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [out] devicePool the labels of the devices present after the sweep
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when discovery completes
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the instrument refuses
+ * \see RBRInstrumentGen4_getDevice()
+ * \see RBRInstrumentGen4_getDevicePool()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_discoverDevices(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4DevicePool *devicePool);
+
+/**
  * \brief `calibration` command parameters.
  *
  * \see RBRInstrumentGen4Channel

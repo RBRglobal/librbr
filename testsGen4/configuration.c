@@ -380,6 +380,55 @@ TEST_LOGGER4(devicelist)
     return true;
 }
 
+TEST_LOGGER4(discoverDevices)
+{
+    /* Discovery reports every device present after the sweep, not only the
+     * ones it has just added, so the result has the same shape as the pool
+     * getter's and carries labels only. */
+    const char *expected[] = {
+        "thermistor_00", "pres_sensor_00", "internal_adc_00"
+    };
+    RBRInstrumentGen4DevicePool actual;
+
+    TestIOBuffers_init(buffers,
+                       "device discover found=thermistor_00|pres_sensor_00|"
+                       "internal_adc_00"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_discoverDevices(instrument,
+                                                                   &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("device discover" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_EQ(3, actual.count, "%" PRIi32);
+    for (int32_t device = 0; device < actual.count; ++device)
+    {
+        TEST_ASSERT_STR_EQ(expected[device], actual.pool[device].label);
+    }
+
+    return true;
+}
+
+TEST_LOGGER4(discoverDevicesFindingNothing)
+{
+    /* An instrument with nothing attached reports `found=none`, which is no
+     * devices rather than one called `none`. */
+    RBRInstrumentGen4DevicePool actual;
+
+    TestIOBuffers_init(buffers,
+                       "device discover found=none" RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_discoverDevices(instrument,
+                                                                   &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("device discover" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_EQ(0, actual.count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("", actual.pool[0].label);
+
+    return true;
+}
+
 TEST_LOGGER4(device)
 {
     RBRInstrumentGen4Device expected = {

@@ -593,6 +593,65 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDevicePool(
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
+RBRInstrumentGen4Error RBRInstrumentGen4_discoverDevices(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4DevicePool *devicePool)
+{
+    memset(devicePool, 0, sizeof(RBRInstrumentGen4DevicePool));
+
+    /* Zero is a real device class, so say the class is unknown until
+     * RBRInstrumentGen4_getDevice() reads it. */
+    for (int32_t device = 0;
+         device < RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX;
+         device++)
+    {
+        devicePool->pool[device].deviceClass
+            = RBRINSTRUMENTGEN4_UNKNOWN_DEVICE_CLASS;
+    }
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "device discover"));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "found") == 0)
+        {
+            /* Discovery finding nothing reports `none`, not an empty list.
+             * There is no count to read: the list is the whole answer. */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
+
+            char *value = parameter.value;
+            while (value != NULL
+                   && devicePool->count < RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+                snprintf(devicePool->pool[devicePool->count].label,
+                         sizeof(devicePool->pool[devicePool->count].label),
+                         "%s",
+                         value);
+                devicePool->count++;
+
+                value = nextValue;
+            }
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
 /*
 RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
     RBRInstrumentGen4 *instrument,
