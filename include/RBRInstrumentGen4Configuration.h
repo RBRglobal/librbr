@@ -67,12 +67,6 @@ extern "C" {
  */
 #define RBRINSTRUMENTGEN4_CALIBRATION_EQUATION_MAX 32
 
-/**
- * \brief The maximum number of gain settings for a channel.
- * \see RBRInstrumentGen4ChannelGain.availableGains
- */
-#define RBRINSTRUMENTGEN4_CHANNEL_GAINS_MAX 8
-
 /** \brief The minimum input timeout. */
 #define RBRINSTRUMENTGEN4_INPUT_TIMEOUT_MIN 10000
 
@@ -666,170 +660,156 @@ typedef struct RBRInstrumentGen4Calibration
 typedef uint8_t RBRInstrumentGen4ModuleAddress;
 
 /**
- * \brief Possible channel gain ranging modes.
+ * \brief Whether a channel carries a measurement or an instrument housekeeping
+ * value.
  *
  * \see RBRInstrumentGen4Channel
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
-typedef enum RBRInstrumentGen4ChannelGainMode
+typedef enum RBRInstrumentGen4ChannelNature
 {
-    /** No gain ranging is available. */
-    RBRINSTRUMENTGEN4_GAIN_NONE,
-    /** A fixed gain is used. */
-    RBRINSTRUMENTGEN4_GAIN_FIXED,
-    /** The channel auto-ranges over the available gain settings. */
-    RBRINSTRUMENTGEN4_GAIN_AUTO,
-    /** The number of specific gain modes. */
-    RBRINSTRUMENTGEN4_GAIN_COUNT,
-    /** An unknown or unrecognized gain mode. */
-    RBRINSTRUMENTGEN4_UNKNOWN_GAIN
-} RBRInstrumentGen4ChannelGainMode;
+    /** The channel measures a physical parameter. */
+    RBRINSTRUMENTGEN4_CHANNEL_NATURE_SCIENTIFIC,
+    /** The channel reports an instrument housekeeping value. */
+    RBRINSTRUMENTGEN4_CHANNEL_NATURE_SYSTEM,
+    /** The number of specific channel natures. */
+    RBRINSTRUMENTGEN4_CHANNEL_NATURE_COUNT,
+    /** An unknown or unrecognized channel nature. */
+    RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE
+} RBRInstrumentGen4ChannelNature;
 
 /**
- * \brief Get a human-readable string name for a channel gain ranging mode.
+ * \brief Get a human-readable string name for a channel nature.
  *
- * \param [in] mode the gain mode or current value
- * \return a string name for the gain mode
+ * \param [in] nature the channel nature
+ * \return a string name for the channel nature
  * \see RBRInstrumentGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4ChannelGainMode_name(
-    RBRInstrumentGen4ChannelGainMode mode);
+const char *RBRInstrumentGen4ChannelNature_name(
+    RBRInstrumentGen4ChannelNature nature);
 
 /**
- * \brief Gain parameters for a channel.
+ * \brief Instrument `channel <channel_label>` command parameters.
  *
- * \see RBRInstrumentGen4Channel
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
- */
-typedef struct RBRInstrumentGen4ChannelGain
-{
-    /** \brief The gain selection mode employed by the sensor. */
-    RBRInstrumentGen4ChannelGainMode mode;
-    /**
-     * \brief The gain value in use by the sensor.
-     *
-     * Only applies when RBRInstrumentGen4ChannelGain.rangingMode is
-     * RBRINSTRUMENTGEN4_RANGING_MANUAL. Otherwise set to NaN.
-     */
-    float currentGain;
-
-    /**
-     * \brief The gain settings supported by the sensor.
-     *
-     * Only applies where RBRInstrumentGen4ChannelGain.rangingMode is
-     * RBRINSTRUMENTGEN4_RANGING_MANUAL or RBRINSTRUMENTGEN4_RANGING_AUTO. Otherwise
-     * all values are set to NaN.
-     *
-     * Unused entries are set to NaN.
-     */
-    const float availableGains[RBRINSTRUMENTGEN4_CHANNEL_GAINS_MAX];
-
-} RBRInstrumentGen4ChannelGain;
-
-/**
- * \brief Instrument `channel <channel_label>` command parameters. 
- * \see RBRInstrumentGen4Group
  * \see RBRInstrumentGen4ChannelPool
  * \see RBRInstrumentGen4_getChannel()
+ * \see RBRInstrumentGen4_setChannel()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
 typedef struct RBRInstrumentGen4Channel
 {
     /**
-     * \brief An alphanumeric description of the physical parameter measured.
-     * Stored as a null-terminated C string.
-     * \readonly
+     * \brief The channel's label.
+     *
+     * Set by the caller to select the channel to read; see
+     * RBRInstrumentGen4_getChannel().
      */
     char label[RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX + 1];
 
     /**
-     * \brief A short, pre-defined “generic” name for the installed channel.
-     * Stored as a null-terminated C string.
-     * E.g., “temp09”, “pres19”, “cond05”.
-     * \readonly
+     * \brief A short, pre-defined generic name for the installed channel.
+     *
+     * E.g. `temp006`, `pres003`, `dpth001`.
      */
-    char type[RBRINSTRUMENTGEN4_CHANNEL_TYPE_MAX + 1];
+    const char type[RBRINSTRUMENTGEN4_CHANNEL_TYPE_MAX + 1];
+
+    /** \brief Settling time in milliseconds; zero on a derived channel. */
+    const RBRInstrumentGen4Period settlingTime;
+
+    /** \brief Measuring time in milliseconds; zero on a derived channel. */
+    const RBRInstrumentGen4Period measuringTime;
+
+    /** \brief Read-out time in milliseconds; zero on a derived channel. */
+    const RBRInstrumentGen4Period readOutTime;
 
     /**
-     * \brief The internal address to which the channel responds.
-     * \readonly
-     */
-    RBRInstrumentGen4ModuleAddress address;
-
-    /**
-     * \brief The minimum power-on settling delay required by this channel.
-     * Specified in milliseconds.
-     * \readonly
-     */
-    RBRInstrumentGen4Period settlingTime;
-
-    /**
-     * \brief The typical data acquisition time required by this channel.
-     * Specified in milliseconds.
-     * \readonly
-     */
-    RBRInstrumentGen4Period readTime;
-
-    /**
-     * \brief The minimum time for which the power must remain off once the
-     * channel has been powered down. The logger will not turn the channel
-     * back on again until this delay has expired.
-     * Specified in milliseconds.
-     * \readonly
-    */
-   int32_t guardTime;
-
-    /**
-     * \brief The type of formula used to convert raw readings to physical
-     * measurement units.
-     * Stored as a null-terminated C string.
-     * \readonly
-     * \see RBRInstrumentGen4Calibration
-     */
-    char equation[RBRINSTRUMENTGEN4_CALIBRATION_EQUATION_MAX + 1];
-
-    /**
-     * \brief The unit in which processed data is normally reported from the
-     * logger.
-     * E.g., “C” for Celsius, “V” for Volts, “dbar” for decibars.
-     * Stored as a null-terminated C string.
-     * \readonly
+     * \brief The unit in which processed data is reported.
+     *
+     * The only parameter of the command a caller may change.
      */
     char userUnits[RBRINSTRUMENTGEN4_CHANNEL_UNIT_MAX + 1];
 
+    /** \brief The number of groups this channel belongs to. */
+    const int32_t groupCount;
+
     /**
-     * \brief Whether the channel is a derived channel.
-     * \readonly
+     * \brief The labels of the groups this channel belongs to.
+     *
+     * Membership is changed through the `group` command, not here.
+     * \see RBRInstrumentGen4_setGroup()
+     */
+    const char groupList[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX]
+                        [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+
+    /** \brief Whether the channel measures or reports housekeeping. */
+    const RBRInstrumentGen4ChannelNature nature;
+
+    /**
+     * \brief Whether the channel is computed from other channels rather than
+     * measured.
      */
     const bool derived;
 
-    /** 
-     * \brief The gain setting currently in use by the channel.
-     * \see RBRInstrumentGen4ChannelGain
+    /**
+     * \brief The label of the node the channel is reached through.
+     *
+     * `self` for a channel of the instrument itself, and empty for a derived
+     * channel, which the instrument reports as `na`.
      */
-    const RBRInstrumentGen4ChannelGain gain;
-
-    /** \brief The calibration for the channel. */
-    RBRInstrumentGen4Calibration calibration;
+    const char node[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
     /**
-     * \brief Pointer to the parent channel pool.
-     * \readonly
+     * \brief The label of the port the channel is reached through.
+     *
+     * Empty for a derived channel, which the instrument reports as `na`.
      */
-    void *parent;
+    const char port[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+
+    /**
+     * \brief The label of the device the channel belongs to.
+     *
+     * Empty for a derived channel, which the instrument reports as `na`.
+     */
+    const char device[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 } RBRInstrumentGen4Channel;
 
 /**
- * \brief Populate a channel with channel parameters from the logger.
+ * \brief Instrument `channel` command parameters.
+ *
+ * \see RBRInstrumentGen4_getChannelPool()
+ * \see RBRInstrumentGen4_getChannelPoolByNature()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
+ */
+typedef struct RBRInstrumentGen4ChannelPool
+{
+    /** \brief The number of channels reported. */
+    int32_t count;
+
+    /**
+     * \brief The channels reported.
+     *
+     * Discovery reports nothing but the labels; read a channel's parameters
+     * with RBRInstrumentGen4_getChannel().
+     */
+    RBRInstrumentGen4Channel pool[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+} RBRInstrumentGen4ChannelPool;
+
+/**
+ * \brief Populate the parameters of a channel.
+ *
+ * The caller sets RBRInstrumentGen4Channel.label to select the channel to
+ * read.
+ *
  * \note Issues the `channel <channel_label>` command.
  *
  * \param [in] instrument the instrument connection
- * \param [inout] channel a pointer to the specified channel
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully written
+ * \param [in,out] channel the channel to read, selected by its label
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the channel is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the channel cannot be read
- * \see RBRInstrumentGen4_getChannel()
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the channel does not exist
+ * \see RBRInstrumentGen4_getChannelPool()
+ * \see RBRInstrumentGen4_setChannel()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
@@ -837,35 +817,73 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
     RBRInstrumentGen4Channel *channel);
 
 /**
- * \brief Instrument `channel` command parameters.
- * Serves as a persistent cache of channels configured on the logger.
+ * \brief Update a channel's user units.
  *
- * \see RBRInstrumentGen4_getChannelPool()
- * \see RBRInstrumentGen4_getGroup()
+ * RBRInstrumentGen4Channel.userUnits is the only parameter of the command a
+ * caller may change; every other field of the structure is `const`. Read the
+ * channel with RBRInstrumentGen4_getChannel(), change the units, and write the
+ * structure back.
+ *
+ * \note Issues the `channel <channel_label>` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] channel the channel to write, selected by its label
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the channel is successfully written
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the channel cannot be changed
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the units are empty
+ * \see RBRInstrumentGen4_getChannel()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
-typedef struct RBRInstrumentGen4ChannelPool
-{
-    /** \brief The number of channels configured on an instrument. */
-    int32_t count;
-
-    /** \brief List of channel objects. */
-    RBRInstrumentGen4Channel pool[RBRINSTRUMENTGEN4_CHANNEL_MAX];
-} RBRInstrumentGen4ChannelPool;
+RBRInstrumentGen4Error RBRInstrumentGen4_setChannel(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Channel *channel);
 
 /**
- * \brief Populate the pool of channels with the labels of the schedules defined on the logger.
+ * \brief Populate the pool of channels configured on the instrument.
+ *
+ * Reports nothing but the labels; read a channel's parameters with
+ * RBRInstrumentGen4_getChannel().
+ *
  * \note Issues the `channel` command.
  *
- * \param [in] instrument the instrument connection.
- * \param [out] channelPool the populated pool of supported channels.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
+ * \param [in] instrument the instrument connection
+ * \param [out] channelPool the labels of the channels present
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the pool is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the channel pool cannot be read
+ * \see RBRInstrumentGen4_getChannelPoolByNature()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(
     RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4ChannelPool *channelPool);
+
+/**
+ * \brief Populate the pool of channels of one nature.
+ *
+ * Reports nothing but the labels; read a channel's parameters with
+ * RBRInstrumentGen4_getChannel().
+ *
+ * \note Issues the `channel scientific` or `channel system` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] nature the nature of the channels to report
+ * \param [out] channelPool the labels of the channels present
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the pool is successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the channel pool cannot be read
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the nature is not
+ *                                                    one the command accepts
+ * \see RBRInstrumentGen4_getChannelPool()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPoolByNature(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4ChannelNature nature,
     RBRInstrumentGen4ChannelPool *channelPool);
 
 /**

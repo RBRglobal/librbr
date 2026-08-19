@@ -847,41 +847,268 @@ const char *RBRInstrumentGen4ScheduleStream_name(
     }
 }
 
-const char *RBRInstrumentGen4ChannelGainMode_name(
-    RBRInstrumentGen4ChannelGainMode mode)
+const char *RBRInstrumentGen4ChannelNature_name(
+    RBRInstrumentGen4ChannelNature nature)
 {
-    switch (mode)
+    switch (nature)
     {
-    case RBRINSTRUMENTGEN4_GAIN_NONE:
-        return "none";
-    case RBRINSTRUMENTGEN4_GAIN_FIXED:
-        return "manual";
-    case RBRINSTRUMENTGEN4_GAIN_AUTO:
-        return "auto";
-    case RBRINSTRUMENTGEN4_GAIN_COUNT:
-        return "gain mode count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_GAIN:
+    case RBRINSTRUMENTGEN4_CHANNEL_NATURE_SCIENTIFIC:
+        return "scientific";
+    case RBRINSTRUMENTGEN4_CHANNEL_NATURE_SYSTEM:
+        return "system";
+    case RBRINSTRUMENTGEN4_CHANNEL_NATURE_COUNT:
+        return "channel nature count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE:
     default:
-        return "unknown gain mode";
+        return "unknown channel nature";
     }
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(RBRInstrumentGen4 *instrument,
-                                                    RBRInstrumentGen4Channel *channel){
-    //GEN4 todo: add logic
-    (void)instrument;
-    (void)channel;
+static RBRInstrumentGen4ChannelNature RBRInstrumentGen4ChannelNature_parse(
+    const char *value)
+{
+    for (int32_t nature = 0;
+         nature < RBRINSTRUMENTGEN4_CHANNEL_NATURE_COUNT;
+         ++nature)
+    {
+        if (strcmp(value,
+                   RBRInstrumentGen4ChannelNature_name(nature)) == 0)
+        {
+            return nature;
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE;
+}
+
+/**
+ * \brief Copy a label the instrument reports as `na` as an empty string.
+ *
+ * A derived channel has no node, port, or device.
+ */
+static void RBRInstrumentGen4_copyOptionalLabel(char *destination,
+                                                size_t size,
+                                                const char *value)
+{
+    if (strcmp(value, "na") == 0)
+    {
+        destination[0] = '\0';
+        return;
+    }
+
+    snprintf(destination, size, "%s", value);
+}
+
+/**
+ * \brief Read the labels of a `channel` response into a pool.
+ */
+static RBRInstrumentGen4Error RBRInstrumentGen4_parseChannelPool(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4ChannelPool *channelPool)
+{
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "count") == 0)
+        {
+            channelPool->count = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "list") == 0)
+        {
+            /* An instrument with no channels reports `none`, not an empty
+             * list. */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
+
+            char *value = parameter.value;
+            for (int32_t channel = 0;
+                 value != NULL && channel < RBRINSTRUMENTGEN4_CHANNEL_MAX;
+                 channel++)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+                snprintf(channelPool->pool[channel].label,
+                         sizeof(channelPool->pool[channel].label),
+                         "%s",
+                         value);
+
+                value = nextValue;
+            }
+        }
+    }
+
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(RBRInstrumentGen4 *instrument,
-                                             RBRInstrumentGen4ChannelPool *channelPool)
+RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Channel *channel)
 {
-    //GEN4 todo: add logic.
-    //populate all channel instances, which included the calbration instances.
-    (void)instrument;
-    (void)channelPool;
+    /* The label selects the channel to read, so it has to outlive the reset of
+     * the rest of the structure. */
+    char label[sizeof(channel->label)];
+    snprintf(label, sizeof(label), "%s", channel->label);
+
+    memset(channel, 0, sizeof(RBRInstrumentGen4Channel));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "channel %s", label));
+
+    snprintf(channel->label, sizeof(channel->label), "%s", label);
+    *(RBRInstrumentGen4ChannelNature *) &channel->nature =
+        RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE;
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "type") == 0)
+        {
+            snprintf((char *) channel->type,
+                     sizeof(channel->type),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "settlingtime") == 0)
+        {
+            *(RBRInstrumentGen4Period *) &channel->settlingTime =
+                strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "measuringtime") == 0)
+        {
+            *(RBRInstrumentGen4Period *) &channel->measuringTime =
+                strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "readouttime") == 0)
+        {
+            *(RBRInstrumentGen4Period *) &channel->readOutTime =
+                strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "userunits") == 0)
+        {
+            snprintf(channel->userUnits,
+                     sizeof(channel->userUnits),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "grouplist") == 0)
+        {
+            /* A channel in no groups reports `none`, not an empty list. */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
+
+            char *value = parameter.value;
+            while (value != NULL
+                   && channel->groupCount < RBRINSTRUMENTGEN4_GROUP_COUNT_MAX)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+                snprintf((char *) channel->groupList[channel->groupCount],
+                         sizeof(channel->groupList[channel->groupCount]),
+                         "%s",
+                         value);
+                (*(int32_t *) &channel->groupCount)++;
+
+                value = nextValue;
+            }
+        }
+        else if (strcmp(parameter.key, "nature") == 0)
+        {
+            *(RBRInstrumentGen4ChannelNature *) &channel->nature =
+                RBRInstrumentGen4ChannelNature_parse(parameter.value);
+        }
+        else if (strcmp(parameter.key, "derived") == 0)
+        {
+            *(bool *) &channel->derived = (strcmp(parameter.value,
+                                                  "true") == 0);
+        }
+        else if (strcmp(parameter.key, "node") == 0)
+        {
+            RBRInstrumentGen4_copyOptionalLabel((char *) channel->node,
+                                                sizeof(channel->node),
+                                                parameter.value);
+        }
+        else if (strcmp(parameter.key, "port") == 0)
+        {
+            RBRInstrumentGen4_copyOptionalLabel((char *) channel->port,
+                                                sizeof(channel->port),
+                                                parameter.value);
+        }
+        else if (strcmp(parameter.key, "device") == 0)
+        {
+            RBRInstrumentGen4_copyOptionalLabel((char *) channel->device,
+                                                sizeof(channel->device),
+                                                parameter.value);
+        }
+    }
+
     return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_setChannel(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Channel *channel)
+{
+    if (channel->userUnits[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    return RBRInstrumentGen4_converse(instrument,
+                                      "channel %s userunits=%s",
+                                      channel->label,
+                                      channel->userUnits);
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4ChannelPool *channelPool)
+{
+    memset(channelPool, 0, sizeof(RBRInstrumentGen4ChannelPool));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "channel"));
+
+    return RBRInstrumentGen4_parseChannelPool(instrument, channelPool);
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPoolByNature(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4ChannelNature nature,
+    RBRInstrumentGen4ChannelPool *channelPool)
+{
+    if (nature < 0 || nature >= RBRINSTRUMENTGEN4_CHANNEL_NATURE_COUNT)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    memset(channelPool, 0, sizeof(RBRInstrumentGen4ChannelPool));
+
+    RBR_TRY(RBRInstrumentGen4_converse(
+                instrument,
+                "channel %s",
+                RBRInstrumentGen4ChannelNature_name(nature)));
+
+    return RBRInstrumentGen4_parseChannelPool(instrument, channelPool);
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getSettings(

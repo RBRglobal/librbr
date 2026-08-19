@@ -797,3 +797,256 @@ TEST_LOGGER4(parametersSet)
 
     return true;
 }
+
+static bool test_channel(RBRInstrumentGen4Channel *expected,
+                         RBRInstrumentGen4Channel *actual)
+{
+    TEST_ASSERT_STR_EQ(expected->label, actual->label);
+    TEST_ASSERT_STR_EQ(expected->type, actual->type);
+    TEST_ASSERT_EQ(expected->settlingTime, actual->settlingTime, "%" PRIi32);
+    TEST_ASSERT_EQ(expected->measuringTime, actual->measuringTime, "%" PRIi32);
+    TEST_ASSERT_EQ(expected->readOutTime, actual->readOutTime, "%" PRIi32);
+    TEST_ASSERT_STR_EQ(expected->userUnits, actual->userUnits);
+    TEST_ASSERT_EQ(expected->groupCount, actual->groupCount, "%" PRIi32);
+    for (int32_t group = 0; group < expected->groupCount; ++group)
+    {
+        TEST_ASSERT_STR_EQ(expected->groupList[group],
+                           actual->groupList[group]);
+    }
+    TEST_ASSERT_ENUM_EQ(expected->nature,
+                        actual->nature,
+                        RBRInstrumentGen4ChannelNature);
+    TEST_ASSERT_ENUM_EQ(expected->derived, actual->derived, bool);
+    TEST_ASSERT_STR_EQ(expected->node, actual->node);
+    TEST_ASSERT_STR_EQ(expected->port, actual->port);
+    TEST_ASSERT_STR_EQ(expected->device, actual->device);
+
+    return true;
+}
+
+TEST_LOGGER4(channellist)
+{
+    const char *expected[] = {
+        "temperature_00", "pressure_00", "seapressure_00", "depth_00"
+    };
+    RBRInstrumentGen4ChannelPool actual;
+
+    TestIOBuffers_init(
+        buffers,
+        "channel count=4 "
+        "list=temperature_00|pressure_00|seapressure_00|depth_00"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getChannelPool(instrument,
+                                                                  &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("channel" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(4, actual.count, "%" PRIi32);
+    for (int32_t channel = 0; channel < actual.count; ++channel)
+    {
+        TEST_ASSERT_STR_EQ(expected[channel], actual.pool[channel].label);
+    }
+
+    return true;
+}
+
+TEST_LOGGER4(channellistScientific)
+{
+    RBRInstrumentGen4ChannelPool actual;
+
+    TestIOBuffers_init(
+        buffers,
+        "channel scientific count=4 "
+        "list=temperature_00|pressure_00|seapressure_00|depth_00"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getChannelPoolByNature(
+        instrument,
+        RBRINSTRUMENTGEN4_CHANNEL_NATURE_SCIENTIFIC,
+        &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("channel scientific" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_EQ(4, actual.count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("temperature_00", actual.pool[0].label);
+
+    return true;
+}
+
+TEST_LOGGER4(channellistWithoutChannels)
+{
+    RBRInstrumentGen4ChannelPool actual;
+
+    TestIOBuffers_init(buffers,
+                       "channel system count=0 list=none" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getChannelPoolByNature(
+        instrument,
+        RBRINSTRUMENTGEN4_CHANNEL_NATURE_SYSTEM,
+        &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("channel system" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_EQ(0, actual.count, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(channellistUnknownNature)
+{
+    RBRInstrumentGen4ChannelPool actual;
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getChannelPoolByNature(
+        instrument,
+        RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE,
+        &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    return true;
+}
+
+TEST_LOGGER4(channel)
+{
+    RBRInstrumentGen4Channel expected = {
+        .label = "temperature_00",
+        .type = "temp006",
+        .settlingTime = 100,
+        .measuringTime = 13,
+        .readOutTime = 1,
+        .userUnits = "C",
+        .groupCount = 0,
+        .nature = RBRINSTRUMENTGEN4_CHANNEL_NATURE_SCIENTIFIC,
+        .derived = false,
+        .node = "self",
+        .port = "thermistor_00",
+        .device = "thermistor_00"
+    };
+    RBRInstrumentGen4Channel actual = {
+        .label = "temperature_00"
+    };
+
+    TestIOBuffers_init(
+        buffers,
+        "channel temperature_00 type=temp006 settlingtime=100 "
+        "measuringtime=13 readouttime=1 userunits=C grouplist=none "
+        "nature=scientific derived=false node=self port=thermistor_00 "
+        "device=thermistor_00"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getChannel(instrument,
+                                                              &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("channel temperature_00" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return test_channel(&expected, &actual);
+}
+
+TEST_LOGGER4(channelDerived)
+{
+    RBRInstrumentGen4Channel expected = {
+        .label = "depth_00",
+        .type = "dpth001",
+        .settlingTime = 0,
+        .measuringTime = 0,
+        .readOutTime = 0,
+        .userUnits = "m",
+        .groupCount = 0,
+        .nature = RBRINSTRUMENTGEN4_CHANNEL_NATURE_SCIENTIFIC,
+        .derived = true,
+        .node = "",
+        .port = "",
+        .device = ""
+    };
+    RBRInstrumentGen4Channel actual = {
+        .label = "depth_00"
+    };
+
+    TestIOBuffers_init(
+        buffers,
+        "channel depth_00 type=dpth001 userunits=m grouplist=none "
+        "nature=scientific derived=true node=na port=na device=na"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getChannel(instrument,
+                                                              &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("channel depth_00" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return test_channel(&expected, &actual);
+}
+
+TEST_LOGGER4(channelWithGroups)
+{
+    RBRInstrumentGen4Channel actual = {
+        .label = "temperature_00"
+    };
+
+    TestIOBuffers_init(
+        buffers,
+        "channel temperature_00 type=temp006 settlingtime=100 "
+        "measuringtime=13 readouttime=1 userunits=C "
+        "grouplist=surface|profile nature=scientific derived=false "
+        "node=self port=thermistor_00 device=thermistor_00"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getChannel(instrument,
+                                                              &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(2, actual.groupCount, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("surface", actual.groupList[0]);
+    TEST_ASSERT_STR_EQ("profile", actual.groupList[1]);
+
+    return true;
+}
+
+TEST_LOGGER4(channelSet)
+{
+    RBRInstrumentGen4Channel channel = {
+        .label = "temperature_00",
+        .userUnits = "C"
+    };
+
+    TestIOBuffers_init(buffers,
+                       "channel temperature_00 userunits=C"
+                       RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setChannel(instrument,
+                                                              &channel);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("channel temperature_00 userunits=C"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(channelSetEmptyUserUnits)
+{
+    RBRInstrumentGen4Channel channel = {
+        .label = "temperature_00",
+        .userUnits = ""
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setChannel(instrument,
+                                                              &channel);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    return true;
+}
