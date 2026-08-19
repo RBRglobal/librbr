@@ -196,7 +196,8 @@ int main(int argc, char *argv[])
     }
 
     /************ ensure default state ************/
-    RBRInstrumentGen4LoggingState loggingState = RBRINSTRUMENTGEN4_UNKNOWN_LOGGING_STATE;
+    RBRInstrumentGen4InstrumentState loggingState
+        = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
     RBRInstrumentGen4_disable(instrument, &loggingState);
 
     RBRInstrumentGen4DatasetPool datasetPool;
@@ -305,8 +306,8 @@ int main(int argc, char *argv[])
         dataset_ascent,
         &dataset_asc_info);
     /* Get the data type */
-    RBRInstrumentGen4Info info;
-    RBRInstrumentGen4_getInfo(instrument, &info);
+    RBRInstrumentGen4Instrument info;
+    RBRInstrumentGen4_getInstrument(instrument, &info);
     /* Prepare the parser */
     RBRParserGen4 parserSpace;
     RBRParserGen4* parser = &parserSpace;

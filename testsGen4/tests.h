@@ -90,14 +90,15 @@ extern "C" {
  * \param [in] _eps the precision range for comparison
  */
 #define TEST_ASSERT_FLOAT_EQ(_expected, _actual, _eps) do { \
-        if ( ((_expected) < (_actual - _eps)) || ((_expected) > (_actual + _eps)) ) \
+        if (((_expected) < ((_actual) - (_eps))) \
+            || ((_expected) > ((_actual) + (_eps)))) \
         { \
             printf(" assertion failure at %s:%d:" \
-                   " expected %f ; actual %f",  \
+                   " expected %f ; actual %f", \
                    __FILE__, \
                    __LINE__, \
-                   _expected, \
-                   _actual); \
+                   (double) (_expected), \
+                   (double) (_actual)); \
             return false; \
         } \
 } while (0)

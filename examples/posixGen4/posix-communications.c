@@ -169,18 +169,23 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    char name[64];
-    RBRInstrumentGen4OutputFormat_name(instrument->outputFormat, name);
-    printf("generation: %s, id: model=%s version=%s serial=%u fwtype=%u, outputformat: %s\n",
+    printf("generation: %s, id: model=%s version=%s serial=%u fwtype=%u,"
+           " outputformat: sn=%s schedulelabel=%s datetime=%s crc=%s"
+           " encoding=%s datatype=%s\n",
            RBRInstrumentGen4Generation_name(instrument->generation),
            instrument->id.model,
            instrument->id.fwversion,
            instrument->id.sn,
            instrument->id.fwtype,
-           name);
+           instrument->outputFormat.sn ? "on" : "off",
+           instrument->outputFormat.scheduleLabel ? "on" : "off",
+           instrument->outputFormat.dateTime ? "on" : "off",
+           instrument->outputFormat.crc ? "on" : "off",
+           RBRInstrumentGen4Encoding_name(instrument->outputFormat.encoding),
+           RBRInstrumentGen4DataType_name(instrument->outputFormat.dataType));
 
-    RBRInstrumentGen4Info info;
-    if ((err = RBRInstrumentGen4_getInfo(instrument, &info)) != RBRINSTRUMENTGEN4_SUCCESS)
+    RBRInstrumentGen4Instrument info;
+    if ((err = RBRInstrumentGen4_getInstrument(instrument, &info)) != RBRINSTRUMENTGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to get instrument info: %s!\n",
                 programName,
@@ -237,11 +242,10 @@ int main(int argc, char *argv[])
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
-    printf("powerInternal: voltage=%f, batteryType=%s (%s), capacity=%f, used=%f\n",
+    printf("powerInternal: voltage=%f, batteryType=%s (%s), used=%f\n",
            powerInternal.voltage,
            RBRInstrumentGen4InternalBatteryType_name(powerInternal.batteryType),
            RBRInstrumentGen4InternalBatteryType_displayName(powerInternal.batteryType),
-           powerInternal.capacity,
            powerInternal.used);
 
     /* External battery */
@@ -275,11 +279,10 @@ int main(int argc, char *argv[])
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
-    printf("powerExternal: voltage=%f, batteryType=%s (%s), capacity=%f, used=%f",
+    printf("powerExternal: voltage=%f, batteryType=%s (%s), used=%f",
            powerExternal.voltage,
            RBRInstrumentGen4ExternalBatteryType_name(powerExternal.batteryType),
            RBRInstrumentGen4ExternalBatteryType_displayName(powerExternal.batteryType),
-           powerExternal.capacity,
            powerExternal.used);
 
 

@@ -11,23 +11,23 @@
 #include "tests.h"
 
 
-typedef struct OutputformatTest
+typedef struct OutputFormatTest
 {
     const char *response;
-    RBRInstrumentGen4Outputformat expected;
-}OutputformatTest;
+    RBRInstrumentGen4OutputFormat expected;
+}OutputFormatTest;
 
 static bool test_outputformat(RBRInstrumentGen4 *instrument,
                             TestIOBuffers *buffers,
-                            OutputformatTest *tests)
+                            OutputFormatTest *tests)
 {
     RBRInstrumentGen4Error err;
-    RBRInstrumentGen4Outputformat actual;
+    RBRInstrumentGen4OutputFormat actual;
 
     for(int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen4_getOutputformat(instrument, &actual);
+        err = RBRInstrumentGen4_getOutputFormat(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
         TEST_ASSERT_EQ(tests[i].expected, instrument->outputFormat, "%" PRIi32);
         TEST_ASSERT_EQ(tests[i].expected, actual, "%" PRIi32);
@@ -37,7 +37,7 @@ static bool test_outputformat(RBRInstrumentGen4 *instrument,
 
 TEST_LOGGER4(outputformat)
 {
-    OutputformatTest tests[] = {
+    OutputFormatTest tests[] = {
         {
             "instrument outputformat sn=on schedulelabel=on datetime=off crc=on "
             "encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
@@ -63,25 +63,25 @@ TEST_LOGGER4(outputformat)
     return test_outputformat(instrument, buffers, tests);
 }
 
-typedef struct SetOutputformatTest
+typedef struct SetOutputFormatTest
 {
     const char *command;
     const char *response;
     RBRInstrumentGen4Error expectedError;
-    RBRInstrumentGen4Outputformat outputformat;
-}SetOutputformatTest;
+    RBRInstrumentGen4OutputFormat outputformat;
+}SetOutputFormatTest;
 
 static bool test_setoutputformat(RBRInstrumentGen4 *instrument,
                             TestIOBuffers *buffers,
-                            SetOutputformatTest *tests)
+                            SetOutputFormatTest *tests)
 {
     RBRInstrumentGen4Error err;
 
     for(int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        RBRInstrumentGen4Outputformat priorformat = instrument->outputFormat;
-        err = RBRInstrumentGen4_setOutputformat(instrument, tests[i].outputformat);
+        RBRInstrumentGen4OutputFormat priorformat = instrument->outputFormat;
+        err = RBRInstrumentGen4_setOutputFormat(instrument, tests[i].outputformat);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen4Error);
         if (err == RBRINSTRUMENTGEN4_SUCCESS)
         {
@@ -96,9 +96,9 @@ static bool test_setoutputformat(RBRInstrumentGen4 *instrument,
     return true;
 }
 
-TEST_LOGGER4(setOutputformat)
+TEST_LOGGER4(setOutputFormat)
 {
-    SetOutputformatTest tests[] = {
+    SetOutputFormatTest tests[] = {
         {
             "instrument outputformat sn=on schedulelabel=on datetime=on crc=on" COMMAND_TERMINATOR,
 
@@ -136,7 +136,7 @@ TEST_LOGGER4(setOutputformat)
 typedef struct ReadSampleTest
 {
     const char *response;
-    RBRInstrumentGen4Outputformat outputFormat;
+    RBRInstrumentGen4OutputFormat outputFormat;
     RBRInstrumentGen4Error expectedError;
     RBRInstrumentGen4Sample expected;
 }ReadSampleTest;

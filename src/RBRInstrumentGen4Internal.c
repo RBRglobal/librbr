@@ -63,7 +63,7 @@
  */
 #define WAKE_COMMAND_WAIT 50
 
-#define COMMAND_PROMPT "Ready: "
+#define COMMAND_PROMPT "ready: "
 #define COMMAND_PROMPT_LEN 7
 
 #define ARRAY_SEPARATOR_L4 '|'
@@ -460,7 +460,7 @@ char *seek(const char *str, char delimiter)
 
 static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
     RBRInstrumentGen4Sample *sample,
-    RBRInstrumentGen4Outputformat *outputFormat,
+    RBRInstrumentGen4OutputFormat *outputFormat,
     char *response)
 {
     memset(sample, 0, sizeof(RBRInstrumentGen4Sample));
@@ -477,7 +477,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
     if (strchr(response, PARAMETER_SEPARATOR_L4) != NULL)
     {
         char *token = response;
-        if ((*outputFormat) & RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL)
+        if (outputFormat->sn)
         {
             if (memcmp(token, "RBR", 3) != 0)
             {
@@ -497,7 +497,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
             }
         }
 
-        if ((*outputFormat) & RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL)
+        if (outputFormat->scheduleLabel)
         {
             if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
             {
@@ -505,7 +505,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
             }
         }
 
-        if ((*outputFormat) & RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP)
+        if (outputFormat->dateTime)
         {
             char* timestamp_end;
             RBR_TRY(RBRInstrumentGen4DateTime_parseSampleTime(token,
@@ -559,7 +559,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
             }
             else if (memcmp(token, "0x", 2) == 0)
             {
-                if ((*outputFormat) & RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC)
+                if (outputFormat->crc)
                 {
                     /*
                     * calculate CRC.

@@ -238,9 +238,8 @@ int main(void)
 
     TestIOBuffers_init(
         &ioBuffers,
-        /* This will actually cause a segfault: */
-        // "id model = RBRconcerto4, version = 1.14.5+202310150927, serial = 092431, fwtype = 130"
-        "id model=RBRconcerto4 version=1.14.5+202310150927 serial=092431 fwtype=130"
+        "id4 model=L4 sn=999999 fwversion=2.0.0 "
+        "semver=2.0.0-rc1-10-g148bc5eb1 fwtype=150"
         RESPONSE_TERMINATOR
         "instrument outputformat sn=off schedulelabel=on datetime=on crc=off encoding=ascii datatype=float32"
         RESPONSE_TERMINATOR,
@@ -289,6 +288,13 @@ int main(void)
         {
             printf("Error: only Logger4 test is covered!");
         }
+
+        /* Start every test from an awake instrument. Commands which end a
+         * session — `sleep`, `instrument reboot` — clear the activity time,
+         * which would otherwise make the next test see an unexpected wake
+         * sequence in its write buffer and leave the suite dependent on the
+         * order the modules happen to be listed in. */
+        testInstrument->lastActivityTime = 0;
 
         printf("Running %s test \"%s\"...",
                RBRInstrumentGen4Generation_name(instrumentTests[i].generation),

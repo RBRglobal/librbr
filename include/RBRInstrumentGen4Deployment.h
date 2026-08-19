@@ -47,7 +47,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_verify(
     RBRInstrumentGen4 *instrument,
     const RBRInstrumentGen4Config *config, 
     const char datasetLabel[],
-    RBRInstrumentGen4LoggingState *state);
+    RBRInstrumentGen4InstrumentState *state);
 
 /** \brief Possible storage modes in `enable` command.
  * \see RBRInstrumentGen4DeploymentEnable
@@ -110,7 +110,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_enable(
     const RBRInstrumentGen4DeploymentStoragemode storageMode,
     RBRInstrumentGen4DatasetPool *datasetPool,
     RBRInstrumentGen4Dataset **newDataset,
-    RBRInstrumentGen4LoggingState *state);
+    RBRInstrumentGen4InstrumentState *state);
 
 /**
  * \brief If the instrument is logging, terminate the current deployment.
@@ -126,7 +126,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_enable(
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_disable(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4LoggingState *state);
+    RBRInstrumentGen4InstrumentState *state);
 
 /**
  * \brief Instrument `simulation` command parameters.

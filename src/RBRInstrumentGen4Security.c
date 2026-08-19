@@ -63,13 +63,3 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setConfirmation(RBRInstrumentGen4 *inst
                                          "confirmation state=off");
     }
 }
-
-RBRInstrumentGen4Error RBRInstrumentGen4_reboot(RBRInstrumentGen4 *instrument,
-                                        const int32_t delay)
-{
-    RBR_TRY(RBRInstrumentGen4_permit(instrument, "reboot"));
-    RBR_TRY(RBRInstrumentGen4_sendCommand(instrument, "reboot %" PRId32, delay));
-
-    instrument->lastActivityTime = RBRINSTRUMENTGEN4_NO_ACTIVITY;
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}

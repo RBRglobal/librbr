@@ -101,19 +101,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getConfirmation(RBRInstrumentGen4 *inst
 RBRInstrumentGen4Error RBRInstrumentGen4_setConfirmation(RBRInstrumentGen4 *instrument,
                                                  const bool confirmation);
 
-/**
- * \brief Reset the logger CPU.
- *
- * \param [in] instrument the instrument connection
- * \param [in] delay time in milliseconds to wait before rebooting
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the CPU has been rebooted
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/reboot
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_reboot(RBRInstrumentGen4 *instrument,
-                                        const int32_t delay);
-
 #ifdef __cplusplus
 }
 #endif

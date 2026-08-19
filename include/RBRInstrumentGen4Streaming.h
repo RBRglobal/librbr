@@ -20,35 +20,6 @@ extern "C" {
 
 #include "RBRInstrumentGen4.h"
 
-/**
- * \brief Get the current output format.
- *
- * \param [in] instrument the instrument connection
- * \param [out] outputformat the current output format
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_getOutputformat(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Outputformat *outputformat);
-
-/**
- * \brief Set the current output format.
- *
- * \param [in] instrument the instrument connection
- * \param [in] outputformat the desired output format
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
- * \see hhttps://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/meminfo
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_setOutputformat(
-    RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Outputformat outputformat);
-
 /*************************************************************************************************/
 /**
  * \brief A flag set on a sample reading.

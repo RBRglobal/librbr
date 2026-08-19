@@ -38,7 +38,6 @@
         SALINITY_DYNCORR \
 }
 
-#define OUTPUTFORMAT RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL | RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL | RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC
 
 int main(int argc, char *argv[])
 {
@@ -128,11 +127,15 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4GroupPool groupPool;
     RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
 
-    // specify outputformat
-    RBRInstrumentGen4Outputformat outputformat = 0;
-    RBRInstrumentGen4_getOutputformat(instrument, &outputformat);
-    outputformat = OUTPUTFORMAT;
-    RBRInstrumentGen4_setOutputformat(instrument, outputformat);
+    // specify outputformat. The setter sends every parameter of the command,
+    // so read the current format and change only the sample fields.
+    RBRInstrumentGen4OutputFormat outputformat;
+    RBRInstrumentGen4_getOutputFormat(instrument, &outputformat);
+    outputformat.sn = true;
+    outputformat.scheduleLabel = true;
+    outputformat.dateTime = false;
+    outputformat.crc = true;
+    RBRInstrumentGen4_setOutputFormat(instrument, &outputformat);
 
     // poll data and print in console
     RBRInstrumentGen4Sample sample;

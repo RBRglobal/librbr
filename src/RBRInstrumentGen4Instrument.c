@@ -8,9 +8,11 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
+/* Required for isspace. */
+#include <ctype.h>
 /* Required for NAN. */
 #include <math.h>
-/* Required for memcpy, memset, strcmp. */
+/* Required for memcpy, memset, strchr, strcmp. */
 #include <string.h>
 /* Required for snprintf. */
 #include <stdio.h>
@@ -86,12 +88,135 @@ int RBRInstrumentGen4Version_compare(const char *version1, const char *version2)
     return RBRINSTRUMENTGEN4_FW_EQUAL;
 }
 
+/*
+ * The `id` command separates its parameters with commas and pads its
+ * assignments with spaces (`id model = L4, version = 2.0.0`), so the Gen4
+ * response tokenizer cannot be used on it.
+ */
+#define LEGACY_ID_PARAMETER_SEPARATOR ','
+#define LEGACY_ID_ASSIGNMENT '='
+
+/*
+ * The longest `id` parameter name is “version”, at seven characters. One
+ * character of headroom keeps an unrecognised longer name from truncating
+ * onto a name we look for: anything which does not fit is cut to the full
+ * eight characters, which matches none of them.
+ */
+#define LEGACY_ID_KEY_MAX 8
+
+/**
+ * \brief Copy a range of characters into a buffer, less any padding.
+ *
+ * Leading and trailing whitespace within the range is discarded. No more than
+ * \a size characters are written, inclusive of the null terminator.
+ *
+ * \param [out] destination the destination buffer
+ * \param [in] size the size of the destination buffer
+ * \param [in] begin the first character of the range
+ * \param [in] end one character past the end of the range
+ */
+static void RBRInstrumentGen4_copyTrimmed(char *destination,
+                                          size_t size,
+                                          const char *begin,
+                                          const char *end)
+{
+    while (begin < end && isspace((unsigned char) *begin))
+    {
+        ++begin;
+    }
+    while (end > begin && isspace((unsigned char) *(end - 1)))
+    {
+        --end;
+    }
+
+    size_t length = (size_t) (end - begin);
+    if (length > size - 1)
+    {
+        length = size - 1;
+    }
+    memcpy(destination, begin, length);
+    destination[length] = '\0';
+}
+
 RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
                                        RBRInstrumentGen4Id *id)
 {
     memset(id, 0, sizeof(RBRInstrumentGen4Id));
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "id"));
+
+    const char *cursor = instrument->response.response;
+    if (cursor == NULL)
+    {
+        return RBRINSTRUMENTGEN4_SUCCESS;
+    }
+
+    /* Step over the command name which the instrument echoes back. */
+    cursor = strchr(cursor, ' ');
+
+    while (cursor != NULL)
+    {
+        char key[LEGACY_ID_KEY_MAX + 1];
+        /* Long enough for any 32-bit decimal value and its sign. */
+        char number[12];
+
+        const char *assignment = strchr(cursor, LEGACY_ID_ASSIGNMENT);
+        if (assignment == NULL)
+        {
+            break;
+        }
+
+        const char *end = strchr(assignment, LEGACY_ID_PARAMETER_SEPARATOR);
+        if (end == NULL)
+        {
+            end = assignment + strlen(assignment);
+        }
+
+        RBRInstrumentGen4_copyTrimmed(key, sizeof(key), cursor, assignment);
+
+        if (strcmp(key, "model") == 0)
+        {
+            RBRInstrumentGen4_copyTrimmed((char *) (id->model),
+                                          sizeof(id->model),
+                                          assignment + 1,
+                                          end);
+        }
+        else if (strcmp(key, "version") == 0)
+        {
+            RBRInstrumentGen4_copyTrimmed((char *) (id->fwversion),
+                                          sizeof(id->fwversion),
+                                          assignment + 1,
+                                          end);
+        }
+        else if (strcmp(key, "serial") == 0)
+        {
+            RBRInstrumentGen4_copyTrimmed(number,
+                                          sizeof(number),
+                                          assignment + 1,
+                                          end);
+            id->sn = strtol(number, NULL, 10);
+        }
+        else if (strcmp(key, "fwtype") == 0)
+        {
+            RBRInstrumentGen4_copyTrimmed(number,
+                                          sizeof(number),
+                                          assignment + 1,
+                                          end);
+            id->fwtype = strtol(number, NULL, 10);
+        }
+
+        cursor = *end == '\0' ? NULL : end + 1;
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getId4(RBRInstrumentGen4 *instrument,
+                                       RBRInstrumentGen4Id4 *id)
+{
+    memset(id, 0, sizeof(RBRInstrumentGen4Id4));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "id4"));
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     do
@@ -117,6 +242,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
                      "%s",
                      parameter.value);
         }
+        else if (strcmp(parameter.key, "semver") == 0)
+        {
+            snprintf((char *)(id->semver),
+                     sizeof(id->semver),
+                     "%s",
+                     parameter.value);
+        }
         else if (strcmp(parameter.key, "sn") == 0)
         {
             id->sn = strtol(parameter.value, NULL, 10);
@@ -128,7 +260,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
     } while (true);
     if (id != &instrument->id)
     {
-        memcpy(&instrument->id, id, sizeof(RBRInstrumentGen4Id));
+        memcpy(&instrument->id, id, sizeof(RBRInstrumentGen4Id4));
     }
 
     return RBRINSTRUMENTGEN4_SUCCESS;
@@ -190,53 +322,51 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPcbaPool(
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getPcba(
-        RBRInstrumentGen4 *instrument,
-        RBRInstrumentGen4Pcba *pcba)
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Pcba *pcba)
+{
+    /* The label selects the PCBA to read, so it has to outlive the reset of
+     * the rest of the structure. */
+    char label[sizeof(pcba->label)];
+    snprintf(label, sizeof(label), "%s", pcba->label);
+
+    memset(pcba, 0, sizeof(RBRInstrumentGen4Pcba));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "pcba %s", label));
+
+    snprintf(pcba->label, sizeof(pcba->label), "%s", label);
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
     {
-        memset(pcba, 0, sizeof(RBRInstrumentGen4Pcba));
+        RBRInstrumentGen4_parseResponse(instrument,
+                                       &command,
+                                       &parameter);
 
-        RBR_TRY(RBRInstrumentGen4_converse(instrument, "pcba %s", pcba->label));
-
-        char *command = NULL;
-        RBRInstrumentGen4ResponseParameter parameter;
-        while (true)
+        if (parameter.key == NULL || parameter.value == NULL)
         {
-            RBRInstrumentGen4_parseResponse(instrument,
-                                        &command,
-                                        &parameter);
-
-            if (parameter.key == NULL || parameter.value == NULL)
-            {
-                break;
-            }
-            else if (strcmp(parameter.key, "sn") == 0)
-            {
-                pcba->sn = strtol(parameter.value, NULL, 10);
-            }
-            else if (strcmp(parameter.key, "pn") == 0)
-            {
-                snprintf(pcba->pn,
-                        sizeof(pcba->pn),
+            break;
+        }
+        else if (strcmp(parameter.key, "sn") == 0)
+        {
+            /* `na` is not a number, so it converts to the zero which stands
+             * for it. */
+            pcba->sn = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "pn") == 0)
+        {
+            snprintf(pcba->pn,
+                     sizeof(pcba->pn),
                      "%s",
                      parameter.value);
         }
-        else if (strcmp(parameter.key, "fw") == 0)
+        else if (strcmp(parameter.key, "node") == 0)
         {
-            snprintf(pcba->fw,
-                     sizeof(pcba->fw),
+            snprintf(pcba->node,
+                     sizeof(pcba->node),
                      "%s",
                      parameter.value);
-        }
-        else if (strcmp(parameter.key, "hw") == 0)
-        {
-            snprintf(pcba->hw,
-                     sizeof(pcba->fw),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "address") == 0)
-        {
-            pcba->address = strtol(parameter.value, NULL, 10);
         }
     }
 
@@ -389,10 +519,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPowerInternal(
                 }
             }
         }
-        else if (strcmp(parameter.key, "capacity") == 0)
-        {
-            *(float *) &power->capacity = strtod(parameter.value, NULL);
-        }
         else if (strcmp(parameter.key, "used") == 0)
         {
             power->used = strtod(parameter.value, NULL);
@@ -530,10 +656,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPowerExternal(
                 }
             }
         }
-        else if (strcmp(parameter.key, "capacity") == 0)
-        {
-            *(float *) &power->capacity = strtod(parameter.value, NULL);
-        }
         else if (strcmp(parameter.key, "used") == 0)
         {
             power->used = strtod(parameter.value, NULL);
@@ -564,11 +686,41 @@ RBRInstrumentGen4Error RBRInstrumentGen4_resetPowerExternalUsed(
     return RBRInstrumentGen4_converse(instrument, "instrument power external used=0");
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getInfo(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Info *info)
+/**
+ * \brief Resolve a `datatype` parameter value to its enum member.
+ *
+ * Matched against RBRInstrumentGen4DataType_name() so that the accepted
+ * spellings cannot drift from the ones the library emits.
+ *
+ * \param [in] value the parameter value reported by the instrument
+ * \return the corresponding data type
+ * \return #RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE when the value is unrecognized
+ */
+static RBRInstrumentGen4DataType RBRInstrumentGen4DataType_parse(
+    const char *value)
 {
-    memset(info, 0, sizeof(RBRInstrumentGen4Info));
+    for (int32_t dataType = 0;
+         dataType < RBRINSTRUMENTGEN4_DATATYPE_COUNT;
+         ++dataType)
+    {
+        if (strcmp(value,
+                   RBRInstrumentGen4DataType_name(
+                       (RBRInstrumentGen4DataType) dataType)) == 0)
+        {
+            return (RBRInstrumentGen4DataType) dataType;
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getInstrument(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Instrument *instrumentInfo)
+{
+    memset(instrumentInfo, 0, sizeof(RBRInstrumentGen4Instrument));
+    instrumentInfo->state = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
+    instrumentInfo->dataType = RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE;
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "instrument"));
 
@@ -584,33 +736,211 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getInfo(
         {
             break;
         }
-        else if (strcmp(parameter.key, "pn") == 0)
+        else if (strcmp(parameter.key, "state") == 0)
         {
-            snprintf(info->pn,
-                     sizeof(info->pn),
+            if (strcmp(parameter.value, "disabled") == 0)
+            {
+                instrumentInfo->state
+                    = RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED;
+            }
+            else if (strcmp(parameter.value, "enabled") == 0)
+            {
+                instrumentInfo->state
+                    = RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED;
+            }
+        }
+        else if (strcmp(parameter.key, "sn") == 0)
+        {
+            instrumentInfo->sn = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "model") == 0)
+        {
+            snprintf(instrumentInfo->model,
+                     sizeof(instrumentInfo->model),
                      "%s",
                      parameter.value);
         }
+        else if (strcmp(parameter.key, "pn") == 0)
+        {
+            snprintf(instrumentInfo->pn,
+                     sizeof(instrumentInfo->pn),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "fwversion") == 0)
+        {
+            snprintf(instrumentInfo->fwversion,
+                     sizeof(instrumentInfo->fwversion),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "semver") == 0)
+        {
+            snprintf(instrumentInfo->semver,
+                     sizeof(instrumentInfo->semver),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "fwtype") == 0)
+        {
+            instrumentInfo->fwtype = strtol(parameter.value, NULL, 10);
+        }
         else if (strcmp(parameter.key, "fwlock") == 0)
         {
-            info->fwLock = (strcmp(parameter.value, "on") == 0);
+            instrumentInfo->fwLock = (strcmp(parameter.value, "on") == 0);
         }
         else if (strcmp(parameter.key, "datatype") == 0)
         {
-            if (strcmp(parameter.value, "float32") == 0)
-            {
-                info->dataType = RBRINSTRUMENTGEN4_DATATYPE_FLOAT32;
-            }
-            else if (strcmp(parameter.value, "float64") == 0)
-            {
-                info->dataType = RBRINSTRUMENTGEN4_DATATYPE_FLOAT64;
-            }
-            else if (strcmp(parameter.value, "cal64") == 0)
-            {
-                info->dataType = RBRINSTRUMENTGEN4_DATATYPE_CALFLOAT64;
-            }
+            instrumentInfo->dataType = RBRInstrumentGen4DataType_parse(parameter.value);
+        }
+        else if (strcmp(parameter.key, "name") == 0)
+        {
+            snprintf(instrumentInfo->name,
+                     sizeof(instrumentInfo->name),
+                     "%s",
+                     parameter.value);
         }
     }
 
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+/**
+ * \brief Resolve an `encoding` parameter value to its enum member.
+ *
+ * \param [in] value the parameter value reported by the instrument
+ * \return the corresponding encoding
+ * \return #RBRINSTRUMENTGEN4_UNKNOWN_ENCODING when the value is unrecognized
+ */
+static RBRInstrumentGen4Encoding RBRInstrumentGen4Encoding_parse(
+    const char *value)
+{
+    for (int32_t encoding = 0;
+         encoding < RBRINSTRUMENTGEN4_ENCODING_COUNT;
+         ++encoding)
+    {
+        if (strcmp(value,
+                   RBRInstrumentGen4Encoding_name(
+                       (RBRInstrumentGen4Encoding) encoding)) == 0)
+        {
+            return (RBRInstrumentGen4Encoding) encoding;
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_UNKNOWN_ENCODING;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getOutputFormat(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4OutputFormat *outputformat)
+{
+    memset(outputformat, 0, sizeof(RBRInstrumentGen4OutputFormat));
+    outputformat->encoding = RBRINSTRUMENTGEN4_UNKNOWN_ENCODING;
+    outputformat->dataType = RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE;
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "instrument outputformat"));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+
+        bool enabled = strcmp(parameter.value, "on") == 0;
+
+        if (strcmp(parameter.key, "sn") == 0)
+        {
+            outputformat->sn = enabled;
+        }
+        else if (strcmp(parameter.key, "schedulelabel") == 0)
+        {
+            outputformat->scheduleLabel = enabled;
+        }
+        else if (strcmp(parameter.key, "datetime") == 0)
+        {
+            outputformat->dateTime = enabled;
+        }
+        else if (strcmp(parameter.key, "crc") == 0)
+        {
+            outputformat->crc = enabled;
+        }
+        else if (strcmp(parameter.key, "encoding") == 0)
+        {
+            outputformat->encoding
+                = RBRInstrumentGen4Encoding_parse(parameter.value);
+        }
+        else if (strcmp(parameter.key, "datatype") == 0)
+        {
+            outputformat->dataType
+                = RBRInstrumentGen4DataType_parse(parameter.value);
+        }
+    }
+
+    /* The caller may have asked us to populate the cache itself. */
+    if (outputformat != &instrument->outputFormat)
+    {
+        instrument->outputFormat = *outputformat;
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_setOutputFormat(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4OutputFormat *outputformat)
+{
+    if (outputformat->encoding < 0
+        || outputformat->encoding >= RBRINSTRUMENTGEN4_ENCODING_COUNT
+        || outputformat->dataType < 0
+        || outputformat->dataType >= RBRINSTRUMENTGEN4_DATATYPE_COUNT)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    RBR_TRY(RBRInstrumentGen4_converse(
+                instrument,
+                "instrument outputformat sn=%s schedulelabel=%s datetime=%s"
+                " crc=%s encoding=%s datatype=%s",
+                outputformat->sn ? "on" : "off",
+                outputformat->scheduleLabel ? "on" : "off",
+                outputformat->dateTime ? "on" : "off",
+                outputformat->crc ? "on" : "off",
+                RBRInstrumentGen4Encoding_name(outputformat->encoding),
+                RBRInstrumentGen4DataType_name(outputformat->dataType)));
+
+    instrument->outputFormat = *outputformat;
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_factoryReset(
+    RBRInstrumentGen4 *instrument)
+{
+    return RBRInstrumentGen4_converse(instrument, "instrument factory reset");
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_reboot(RBRInstrumentGen4 *instrument,
+                                        const int32_t delay)
+{
+    if (delay == 0)
+    {
+        RBR_TRY(RBRInstrumentGen4_sendCommand(instrument, "instrument reboot"));
+    }
+    else
+    {
+        RBR_TRY(RBRInstrumentGen4_sendCommand(instrument,
+                                              "instrument reboot delay=%"
+                                              PRId32,
+                                              delay));
+    }
+
+    instrument->lastActivityTime = RBRINSTRUMENTGEN4_NO_ACTIVITY;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }

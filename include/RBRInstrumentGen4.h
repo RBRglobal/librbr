@@ -160,6 +160,13 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
 #define RBRINSTRUMENTGEN4_ID_VERSION_MAX 29
 
 /**
+ * \brief The maximum number of characters in the instrument Semantic Version.
+ *
+ * Does not include any null terminator.
+ */
+#define RBRINSTRUMENTGEN4_ID_SEMVER_MAX 39
+
+/**
  * \brief The maximum number of characters in the instrument part number.
  *
  * Does not include any null terminator.
@@ -171,50 +178,6 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
 
 /** \brief The maximum length of characters within a dataset block name.*/
 #define RBRINSTRUMENTGEN4_DATABLOCK_NAME_MAX 6
-
-/**
- * \brief Instrument `outputformat` command parameters.
- *
- * \see RBRInstrumentGen4_getOutputformat()
- * \see RBRInstrumentGen4_setOutputformat()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828467/outputformat
- */
-typedef enum RBRInstrumentGen4Outputformat
-{
-    /**
-     * \brief Determines whether or not the output begins with "RBR" followed
-     * by the logger's 6-digit serial number.
-     * The default state is off.
-     */
-    RBRINSTRUMENTGEN4_OUTPUTFORMAT_SERIAL = 1 << 0,
-    /** 
-     * \brief Determines whether or not the schedule label appears before the timestamp.
-     * The default state is on.
-     */
-    RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL = 1 << 1,
-    /**
-     * \brief Determines whether or not a timestamp appears before the data.
-     * The default state is on.
-     */
-    RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP = 1 << 2,
-    /**
-     * Determines whether or not a cyclic redudant check (CRC) appears after the
-     * data and immediately before the terminating "\r""\n".
-     * The default state is off.
-     */
-    RBRINSTRUMENTGEN4_OUTPUTFORMAT_CRC = 1 << 3
-} RBRInstrumentGen4Outputformat;
-
-#define RBRINSTRUMENTGEN4_DEFAULT_OUTPUTFORMAT RBRINSTRUMENTGEN4_OUTPUTFORMAT_SCHEDULELABEL | RBRINSTRUMENTGEN4_OUTPUTFORMAT_TIMESTAMP
-
-/**
- * \brief Get a human-readable list of enabled output format fields.
- *
- * \param [in] outputFormat the output format
- * \param [out] name a buffer for the output string - must be at least 46 characters long
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
- */
-void RBRInstrumentGen4OutputFormat_name(RBRInstrumentGen4Outputformat outputFormat, char* name);
 
 /**
  * A date and time in milliseconds since the Unix epoch
@@ -354,6 +317,91 @@ typedef enum RBRInstrumentGen4DataType
 const char *RBRInstrumentGen4DataType_name(RBRInstrumentGen4DataType dataType);
 
 /**
+ * \brief Sample encodings reported by `instrument outputformat`.
+ *
+ * \see RBRInstrumentGen4_getOutputFormat()
+ */
+typedef enum RBRInstrumentGen4Encoding
+{
+    /** Human-readable text. */
+    RBRINSTRUMENTGEN4_ENCODING_ASCII,
+    /** A more compact machine-readable form. */
+    RBRINSTRUMENTGEN4_ENCODING_BINARY,
+    /** The number of specific encodings. */
+    RBRINSTRUMENTGEN4_ENCODING_COUNT,
+    /** An unknown or unrecognized encoding. */
+    RBRINSTRUMENTGEN4_UNKNOWN_ENCODING
+} RBRInstrumentGen4Encoding;
+
+/**
+ * \brief Get a human-readable string name for an encoding.
+ *
+ * \param [in] encoding the encoding
+ * \return a string name for the encoding
+ * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ */
+const char *RBRInstrumentGen4Encoding_name(RBRInstrumentGen4Encoding encoding);
+
+/**
+ * \brief Instrument `instrument outputformat` command parameters.
+ *
+ * \see RBRInstrumentGen4_getOutputFormat()
+ * \see RBRInstrumentGen4_setOutputFormat()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828467/outputformat
+ */
+typedef struct RBRInstrumentGen4OutputFormat
+{
+    /**
+     * \brief Whether the output begins with “RBR” followed by the
+     * instrument's 6-digit serial number.
+     *
+     * The `sn` parameter. Off by default. Retrieved as `false` when the
+     * instrument does not report it.
+     */
+    bool sn;
+    /**
+     * \brief Whether the schedule label appears before the timestamp.
+     *
+     * The `schedulelabel` parameter. On by default. Retrieved as `false` when
+     * the instrument does not report it.
+     */
+    bool scheduleLabel;
+    /**
+     * \brief Whether a timestamp appears before the data.
+     *
+     * The `datetime` parameter. On by default. Retrieved as `false` when the
+     * instrument does not report it.
+     */
+    bool dateTime;
+    /**
+     * \brief Whether a cyclic redundancy check appears after the data and
+     * immediately before the terminating `\r\n`.
+     *
+     * The `crc` parameter. Off by default. Retrieved as `false` when the
+     * instrument does not report it.
+     */
+    bool crc;
+    /** \brief The encoding used to report samples. */
+    RBRInstrumentGen4Encoding encoding;
+    /** \brief The numeric format used to report data values. */
+    RBRInstrumentGen4DataType dataType;
+} RBRInstrumentGen4OutputFormat;
+
+/**
+ * \brief The output format assumed before the instrument has been asked.
+ *
+ * \see RBRInstrumentGen4_open()
+ */
+#define RBRINSTRUMENTGEN4_DEFAULT_OUTPUTFORMAT \
+    ((RBRInstrumentGen4OutputFormat) { \
+         .sn = false, \
+         .scheduleLabel = true, \
+         .dateTime = true, \
+         .crc = false, \
+         .encoding = RBRINSTRUMENTGEN4_ENCODING_ASCII, \
+         .dataType = RBRINSTRUMENTGEN4_DATATYPE_FLOAT32 })
+
+/**
  * \brief Instrument `id` command parameters.
  *
  * \see RBRInstrumentGen4_getId()
@@ -370,6 +418,30 @@ typedef struct RBRInstrumentGen4Id
     /** The firmware type of the instrument. */
     int32_t fwtype;
 } RBRInstrumentGen4Id;
+
+/**
+ * \brief Instrument `id4` command parameters.
+ *
+ * \see RBRInstrumentGen4_getId4()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
+ */
+typedef struct RBRInstrumentGen4Id4
+{
+    /** The instrument model. */
+    const char model[RBRINSTRUMENTGEN4_ID_MODEL_MAX + 1];
+    /** The instrument firmware version. */
+    const char fwversion[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
+    /**
+     * \brief The instrument firmware version in Semantic Version form.
+     *
+     * For example, `2.0.0-rc1-10-g148bc5eb1`.
+     */
+    const char semver[RBRINSTRUMENTGEN4_ID_SEMVER_MAX + 1];
+    /** The serial number of the instrument. */
+    int32_t sn;
+    /** The firmware type of the instrument. */
+    int32_t fwtype;
+} RBRInstrumentGen4Id4;
 
 /** 
  * \brief Generations of RBR instruments.
@@ -678,10 +750,10 @@ typedef struct RBRInstrumentGen4
     /**
      * \brief The instrument identifier.
      *
-     * \note Cached every time RBRInstrumentGen4_getId() is called.
-     * \see RBRInstrumentGen4_getId()
+     * \note Cached every time RBRInstrumentGen4_getId4() is called.
+     * \see RBRInstrumentGen4_getId4()
      */
-    RBRInstrumentGen4Id id;
+    RBRInstrumentGen4Id4 id;
 
     /**
      * \brief The generation of the instrument.
@@ -765,7 +837,7 @@ typedef struct RBRInstrumentGen4
     /**
      * \brief The format of the instrument's polled and streamed samples.
      */
-    RBRInstrumentGen4Outputformat outputFormat;
+    RBRInstrumentGen4OutputFormat outputFormat;
 
 } RBRInstrumentGen4;
 

@@ -40,30 +40,51 @@ TEST_LOGGER4(version_comparison)
     return true;
 }
 
-typedef struct IdTest
+typedef struct LegacyIdTest
 {
     const char *response;
     RBRInstrumentGen4Error expectedError;
     RBRInstrumentGen4Id expected;
+} LegacyIdTest;
+
+typedef struct IdTest
+{
+    const char *response;
+    RBRInstrumentGen4Error expectedError;
+    RBRInstrumentGen4Id4 expected;
 } IdTest;
 
 TEST_LOGGER4(id)
 {
-    IdTest tests[] = {
-        { "id model=RBRconcerto4 "
-          "sn=092431 "
-          "fwversion=1.14.5+202310150927 "
-          "fwtype=130"
+    LegacyIdTest tests[] = {
+        { "id model = L4, "
+          "version = 2.0.0, "
+          "serial = 999999, "
+          "fwtype = 150"
           RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { "RBRconcerto4",
-            "1.14.5+202310150927",
-            92431,
-            130 } },
-        { // replacing previous "id_short" test.
-          "id" RESPONSE_TERMINATOR,
+          { "L4",
+            "2.0.0",
+            999999,
+            150 } },
+        /* A response carrying no parameters leaves the struct zeroed. */
+        { "id" RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
           { "",
+            "",
+            0,
+            0 } },
+        /*
+         * A name too long for the key buffer must not truncate onto one of
+         * the names we look for: `versionfoo` would become `version` in a
+         * buffer sized to the longest name exactly. Only `model` is read
+         * here.
+         */
+        { "id model = L4, "
+          "versionfoo = 9.9.9"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { "L4",
             "",
             0,
             0 } },
@@ -87,30 +108,73 @@ TEST_LOGGER4(id)
     return true;
 }
 
+TEST_LOGGER4(id4)
+{
+    IdTest tests[] = {
+        { "id4 model=L4 "
+          "sn=999999 "
+          "fwversion=2.0.0 "
+          "semver=2.0.0-rc1-10-g148bc5eb1 "
+          "fwtype=150"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { "L4",
+            "2.0.0",
+            "2.0.0-rc1-10-g148bc5eb1",
+            999999,
+            150 } },
+        /* A response carrying no parameters leaves the struct zeroed. */
+        { "id4" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { "",
+            "",
+            "",
+            0,
+            0 } },
+        { 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Id4 actual;
+
+    for (int i = 0; tests[i].response != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4_getId4(instrument, &actual);
+        TEST_ASSERT_STR_EQ("id4" COMMAND_TERMINATOR, buffers->writeBuffer);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].expected.model, actual.model);
+        TEST_ASSERT_STR_EQ(tests[i].expected.fwversion, actual.fwversion);
+        TEST_ASSERT_STR_EQ(tests[i].expected.semver, actual.semver);
+        TEST_ASSERT_EQ(tests[i].expected.sn, actual.sn, "%" PRIi32);
+        TEST_ASSERT_EQ(tests[i].expected.fwtype, actual.fwtype, "%" PRIi32);
+    }
+    return true;
+}
+
 static bool test_pcba(RBRInstrumentGen4Pcba *expected, RBRInstrumentGen4Pcba *actual)
 {
     TEST_ASSERT_STR_EQ(expected->label, actual->label);
     TEST_ASSERT_EQ(expected->sn, actual->sn, "%" PRIi32);
     TEST_ASSERT_STR_EQ(expected->pn, actual->pn);
-    TEST_ASSERT_STR_EQ(expected->fw, actual->fw);
-    TEST_ASSERT_STR_EQ(expected->hw, actual->hw);
-    TEST_ASSERT_EQ(expected->address, actual->address, "%" PRIi32);
+    TEST_ASSERT_STR_EQ(expected->node, actual->node);
 
     return true;
 }
 
 TEST_LOGGER4(pcbalist)
 {
+    /* The pool getter reports only labels; the remaining fields come from
+     * RBRInstrumentGen4_getPcba(). */
     RBRInstrumentGen4PcbaPool expected = {
-        .count = 3,
-        .pool = { {"L3-CPU", 0, "", "", "", 0},
-                  {"FE-cond3", 0, "", "", "", 0},
-                  {"FE-v2", 0, "", "", "", 0} }
+        .count = 2,
+        .pool = { { "self", 0, "", "" },
+                  { "fe4_cond_00", 0, "", "" } }
     };
     RBRInstrumentGen4PcbaPool actual;
 
     TestIOBuffers_init(buffers,
-                       "pcba count=3 list=L3-CPU|FE-cond3|FE-v2" RESPONSE_TERMINATOR,
+                       "pcba count=2 list=self|fe4_cond_00" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getPcbaPool(instrument,
                                                                &actual);
@@ -130,24 +194,52 @@ TEST_LOGGER4(pcbalist)
 TEST_LOGGER4(pcba)
 {
     RBRInstrumentGen4Pcba expected = {
-        .label = "FE-cond3",
-        .sn = 123456,
-        .pn = "0123456revA",
-        .fw = "1.1.1",
-        .hw = "A01",
-        .address = 128
+        .label = "fe4_cond_00",
+        .sn = 0,
+        .pn = "na",
+        .node = "fe4_cond_00"
     };
 
     RBRInstrumentGen4Pcba actual = {
-        .label = "FE-cond3"
+        .label = "fe4_cond_00"
     };
 
     TestIOBuffers_init(buffers,
-                       "pcba FE-cond3 sn=123456 pn=0123456revA fw=1.1.1 hw=A01 address=128" RESPONSE_TERMINATOR,
+                       "pcba fe4_cond_00 sn=na pn=na node=fe4_cond_00"
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getPcba(instrument,
                                                            &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("pcba fe4_cond_00" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return test_pcba(&expected, &actual);
+}
+
+TEST_LOGGER4(pcbaSerialNumber)
+{
+    /* Zero stands for the `na` of the test above, so prove a real serial
+     * number is read rather than left at that zero. */
+    RBRInstrumentGen4Pcba expected = {
+        .label = "self",
+        .sn = 850032,
+        .pn = "na",
+        .node = "self"
+    };
+
+    RBRInstrumentGen4Pcba actual = {
+        .label = "self"
+    };
+
+    TestIOBuffers_init(buffers,
+                       "pcba self sn=850032 pn=na node=self"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getPcba(instrument,
+                                                           &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("pcba self" COMMAND_TERMINATOR, buffers->writeBuffer);
 
     return test_pcba(&expected, &actual);
 }
@@ -198,24 +290,22 @@ TEST_LOGGER4(powerinternal)
     RBRInstrumentGen4PowerInternal expected = {
         .voltage = 14.21,
         .batteryType = RBRINSTRUMENTGEN4_INTERNAL_BATTERY_NIMH,
-        .capacity = 138000,
         .used = 100100
     };
     RBRInstrumentGen4PowerInternal actual;
 
     TestIOBuffers_init(buffers,
                        "instrument power internal voltage=14.21 batterytype=nimh "
-                       "capacity=138.000e+003 used=100.100e+003" RESPONSE_TERMINATOR,
+                       "used=100.100e+003" RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getPowerInternal(instrument,
                                                                     &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(expected.voltage, actual.voltage, "%f");
+    TEST_ASSERT_FLOAT_EQ(expected.voltage, actual.voltage, 0.001f);
     TEST_ASSERT_ENUM_EQ(expected.batteryType,
                         actual.batteryType,
                         RBRInstrumentGen4InternalBatteryType);
-    TEST_ASSERT_EQ(expected.capacity, actual.capacity, "%f");
-    TEST_ASSERT_EQ(expected.used, actual.used, "%f");
+    TEST_ASSERT_FLOAT_EQ(expected.used, actual.used, 0.01f);
 
     return true;
 }
@@ -286,24 +376,23 @@ TEST_LOGGER4(powerexternal)
     RBRInstrumentGen4PowerExternal expected = {
         .voltage = 14.21,
         .batteryType = RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMATA_LISOCL2,
-        .capacity = 22000000,
         .used = 100100
     };
     RBRInstrumentGen4PowerExternal actual;
 
     TestIOBuffers_init(buffers,
-                       "instrument power external voltage=14.21 batterytype=fermata_lisocl2 "
-                       "capacity=22.000e+006 used=100.100e+003" RESPONSE_TERMINATOR,
+                       "instrument power external voltage=14.21 "
+                       "batterytype=fermata_lisocl2 used=100.100e+003"
+                       RESPONSE_TERMINATOR,
                        0);
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getPowerExternal(instrument,
                                                                     &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(expected.voltage, actual.voltage, "%f");
+    TEST_ASSERT_FLOAT_EQ(expected.voltage, actual.voltage, 0.001f);
     TEST_ASSERT_ENUM_EQ(expected.batteryType,
                         actual.batteryType,
                         RBRInstrumentGen4ExternalBatteryType);
-    TEST_ASSERT_EQ(expected.capacity, actual.capacity, "%f");
-    TEST_ASSERT_EQ(expected.used, actual.used, "%f");
+    TEST_ASSERT_FLOAT_EQ(expected.used, actual.used, 0.01f);
 
     return true;
 }
@@ -389,42 +478,290 @@ TEST_LOGGER4(resetPowerExternalUsed)
     return true;
 }
 
-typedef struct InfoTest
+typedef struct InstrumentCommandTest
 {
     const char *response;
     RBRInstrumentGen4Error expectedError;
-    RBRInstrumentGen4Info expected;
-} InfoTest;
+    RBRInstrumentGen4Instrument expected;
+} InstrumentCommandTest;
 
-TEST_LOGGER4(info)
+TEST_LOGGER4(instrument)
 {
-    InfoTest tests[] = {
-        { "instrument pn=L3-M11-BEC11-SC11-ST11-SP11 fwlock=off datatype=float64" RESPONSE_TERMINATOR,
+    InstrumentCommandTest tests[] = {
+        { "instrument state=disabled sn=999999 model=L4 pn=9999999revA "
+          "fwversion=2.0.0 semver=2.0.0-rc1-10-g148bc5eb1 fwtype=150 "
+          "fwlock=off datatype=float64 name=L4"
+          RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { "L3-M11-BEC11-SC11-ST11-SP11",
+          { RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED,
+            999999,
+            "L4",
+            "9999999revA",
+            "2.0.0",
+            "2.0.0-rc1-10-g148bc5eb1",
+            150,
             false,
-            RBRINSTRUMENTGEN4_DATATYPE_FLOAT64 } },
-        { "instrument pn=012345revA fwlock=on datatype=float32" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN4_DATATYPE_FLOAT64,
+            "L4" } },
+        /* An enabled instrument with the firmware locked, and the extended
+         * name and part number populated. */
+        { "instrument state=enabled sn=210000 model=RBRsolo4 "
+          "pn=L3-M11-BEC11-SC11-ST11-SP11 fwversion=1.0.0 "
+          "semver=1.0.0-rc4-11-g941ae64 fwtype=130 fwlock=on "
+          "datatype=float32 name=RBRsolo^4_T.D!fast32"
+          RESPONSE_TERMINATOR,
           RBRINSTRUMENTGEN4_SUCCESS,
-          { "012345revA",
+          { RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED,
+            210000,
+            "RBRsolo4",
+            "L3-M11-BEC11-SC11-ST11-SP11",
+            "1.0.0",
+            "1.0.0-rc4-11-g941ae64",
+            130,
             true,
-            RBRINSTRUMENTGEN4_DATATYPE_FLOAT32 } },
+            RBRINSTRUMENTGEN4_DATATYPE_FLOAT32,
+            "RBRsolo^4_T.D!fast32" } },
+        /* calfloat64 is reported only during a calibration-mode deployment. */
+        { "instrument state=enabled sn=210000 model=RBRsolo4 pn=012345revA "
+          "fwversion=1.0.0 semver=1.0.0 fwtype=130 fwlock=off "
+          "datatype=calfloat64 name=RBRsolo4"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED,
+            210000,
+            "RBRsolo4",
+            "012345revA",
+            "1.0.0",
+            "1.0.0",
+            130,
+            false,
+            RBRINSTRUMENTGEN4_DATATYPE_CALFLOAT64,
+            "RBRsolo4" } },
+        /* An unrecognized data type must not be reported as float32, which is
+         * the zero value of the enum. */
+        { "instrument state=disabled sn=999999 model=L4 pn=9999999revA "
+          "fwversion=2.0.0 semver=2.0.0 fwtype=150 fwlock=off "
+          "datatype=float128 name=L4"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED,
+            999999,
+            "L4",
+            "9999999revA",
+            "2.0.0",
+            "2.0.0",
+            150,
+            false,
+            RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE,
+            "L4" } },
         { 0 }
     };
     RBRInstrumentGen4Error err;
-    RBRInstrumentGen4Info actual;
+    RBRInstrumentGen4Instrument actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers,
                            tests[i].response,
                            0);
-        err = RBRInstrumentGen4_getInfo(instrument,
-                                        &actual);
+        err = RBRInstrumentGen4_getInstrument(instrument,
+                                              &actual);
+        TEST_ASSERT_STR_EQ("instrument" COMMAND_TERMINATOR,
+                           buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen4Error);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.state,
+                            actual.state,
+                            RBRInstrumentGen4InstrumentState);
+        TEST_ASSERT_EQ(tests[i].expected.sn, actual.sn, "%" PRIi32);
+        TEST_ASSERT_STR_EQ(tests[i].expected.model, actual.model);
         TEST_ASSERT_STR_EQ(tests[i].expected.pn, actual.pn);
+        TEST_ASSERT_STR_EQ(tests[i].expected.fwversion, actual.fwversion);
+        TEST_ASSERT_STR_EQ(tests[i].expected.semver, actual.semver);
+        TEST_ASSERT_EQ(tests[i].expected.fwtype, actual.fwtype, "%" PRIi32);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.fwLock, actual.fwLock, bool);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.dataType, actual.dataType, RBRInstrumentGen4DataType);
+        TEST_ASSERT_STR_EQ(tests[i].expected.name, actual.name);
     }
+    return true;
+}
+
+TEST_LOGGER4(reboot)
+{
+    TestIOBuffers_init(buffers, "", 0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_reboot(instrument, 10000);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("instrument reboot delay=10000" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT(instrument->lastActivityTime < 0);
+
+    /* A delay of zero omits the parameter entirely; the command defines no
+     * default delay of its own. */
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRInstrumentGen4_reboot(instrument, 0);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ(RESPONSE_TERMINATOR RESPONSE_TERMINATOR
+                       "instrument reboot" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT(instrument->lastActivityTime < 0);
+
+    return true;
+}
+
+TEST_LOGGER4(factoryReset)
+{
+    TestIOBuffers_init(buffers,
+                       "instrument factory reset" RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_factoryReset(instrument);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("instrument factory reset" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+typedef struct OutputFormatTest
+{
+    const char *response;
+    RBRInstrumentGen4OutputFormat expected;
+} OutputFormatTest;
+
+static bool test_outputformat(RBRInstrumentGen4OutputFormat *expected,
+                              RBRInstrumentGen4OutputFormat *actual)
+{
+    TEST_ASSERT_EQ(expected->sn, actual->sn, "%d");
+    TEST_ASSERT_EQ(expected->scheduleLabel, actual->scheduleLabel, "%d");
+    TEST_ASSERT_EQ(expected->dateTime, actual->dateTime, "%d");
+    TEST_ASSERT_EQ(expected->crc, actual->crc, "%d");
+    TEST_ASSERT_ENUM_EQ(expected->encoding,
+                        actual->encoding,
+                        RBRInstrumentGen4Encoding);
+    TEST_ASSERT_ENUM_EQ(expected->dataType,
+                        actual->dataType,
+                        RBRInstrumentGen4DataType);
+
+    return true;
+}
+
+TEST_LOGGER4(outputformat)
+{
+    OutputFormatTest tests[] = {
+        /* The format an L4 reports out of the box. */
+        { "instrument outputformat sn=off schedulelabel=on datetime=on "
+          "crc=off encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
+          { false, true, true, false,
+            RBRINSTRUMENTGEN4_ENCODING_ASCII,
+            RBRINSTRUMENTGEN4_DATATYPE_FLOAT32 } },
+        { "instrument outputformat sn=on schedulelabel=on datetime=off "
+          "crc=on encoding=binary datatype=float64" RESPONSE_TERMINATOR,
+          { true, true, false, true,
+            RBRINSTRUMENTGEN4_ENCODING_BINARY,
+            RBRINSTRUMENTGEN4_DATATYPE_FLOAT64 } },
+        { "instrument outputformat sn=off schedulelabel=off datetime=off "
+          "crc=off encoding=ascii datatype=calfloat64" RESPONSE_TERMINATOR,
+          { false, false, false, false,
+            RBRINSTRUMENTGEN4_ENCODING_ASCII,
+            RBRINSTRUMENTGEN4_DATATYPE_CALFLOAT64 } },
+        { 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4OutputFormat actual;
+
+    for (int i = 0; tests[i].response != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4_getOutputFormat(instrument, &actual);
+        TEST_ASSERT_STR_EQ("instrument outputformat" COMMAND_TERMINATOR,
+                           buffers->writeBuffer);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+        if (!test_outputformat(&tests[i].expected, &actual))
+        {
+            return false;
+        }
+        /* The format is cached for the sample parser. */
+        if (!test_outputformat(&tests[i].expected, &instrument->outputFormat))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+TEST_LOGGER4(outputformat_set)
+{
+    RBRInstrumentGen4OutputFormat outputformat = {
+        .sn = false,
+        .scheduleLabel = true,
+        .dateTime = true,
+        .crc = false,
+        .encoding = RBRINSTRUMENTGEN4_ENCODING_ASCII,
+        .dataType = RBRINSTRUMENTGEN4_DATATYPE_FLOAT32
+    };
+
+    /* Every parameter of the command is sent. */
+    TestIOBuffers_init(buffers,
+                       "instrument outputformat sn=off schedulelabel=on "
+                       "datetime=on crc=off encoding=ascii datatype=float32"
+                       RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setOutputFormat(
+        instrument,
+        &outputformat);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("instrument outputformat sn=off schedulelabel=on "
+                       "datetime=on crc=off encoding=ascii datatype=float32"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    if (!test_outputformat(&outputformat, &instrument->outputFormat))
+    {
+        return false;
+    }
+
+    /* Changing one parameter still sends them all. */
+    RBRInstrumentGen4OutputFormat modified = outputformat;
+    modified.crc = true;
+    TestIOBuffers_init(buffers,
+                       "instrument outputformat sn=off schedulelabel=on "
+                       "datetime=on crc=on encoding=ascii datatype=float32"
+                       RESPONSE_TERMINATOR,
+                       0);
+    err = RBRInstrumentGen4_setOutputFormat(instrument, &modified);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("instrument outputformat sn=off schedulelabel=on "
+                       "datetime=on crc=on encoding=ascii datatype=float32"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    if (!test_outputformat(&modified, &instrument->outputFormat))
+    {
+        return false;
+    }
+
+    /* An encoding or datatype which is not a real value is not sent. */
+    RBRInstrumentGen4OutputFormat unreported = modified;
+    unreported.encoding = RBRINSTRUMENTGEN4_UNKNOWN_ENCODING;
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRInstrumentGen4_setOutputFormat(instrument, &unreported);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    /* A value the instrument rejects must not update the cached format. */
+    RBRInstrumentGen4OutputFormat rejected = modified;
+    rejected.crc = false;
+    TestIOBuffers_init(buffers,
+                       "ERR-108 invalid argument to command: 'bogus'"
+                       RESPONSE_TERMINATOR,
+                       0);
+    err = RBRInstrumentGen4_setOutputFormat(instrument, &rejected);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+                        err,
+                        RBRInstrumentGen4Error);
+    if (!test_outputformat(&modified, &instrument->outputFormat))
+    {
+        return false;
+    }
+
     return true;
 }

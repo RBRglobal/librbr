@@ -148,18 +148,3 @@ TEST_LOGGER4(confirmation_set_off)
 
     return true;
 }
-
-TEST_LOGGER4(reboot)
-{
-    TestIOBuffers_init(buffers,
-                       "permit command=reboot" RESPONSE_TERMINATOR,
-                       0);
-    RBRInstrumentGen4Error err = RBRInstrumentGen4_reboot(instrument, 123);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_STR_EQ("permit command=reboot" COMMAND_TERMINATOR
-                       "reboot 123" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
-    TEST_ASSERT(instrument->lastActivityTime < 0);
-
-    return true;
-}

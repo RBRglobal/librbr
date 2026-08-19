@@ -16,7 +16,7 @@ typedef struct PollAllChannelsTest
 {
     const char *expectedCommand;
     const char *response;
-    RBRInstrumentGen4Outputformat outputFormat;
+    RBRInstrumentGen4OutputFormat outputFormat;
     RBRInstrumentGen4Sample expected;
 } PollAllChannelsTest;
 
@@ -179,7 +179,7 @@ typedef struct PollOneChannelTest
     const char *expectedCommand;
     const char *response;
     const char *channelLabel;
-    RBRInstrumentGen4Outputformat outputFormat;
+    RBRInstrumentGen4OutputFormat outputFormat;
     RBRInstrumentGen4Sample expected;
 } PollOneChannelTest;
 
@@ -323,7 +323,7 @@ typedef struct PollOneGroupTest
     const char *expectedCommand;
     const char *response;
     const char *groupLabel;
-    RBRInstrumentGen4Outputformat outputFormat;
+    RBRInstrumentGen4OutputFormat outputFormat;
     RBRInstrumentGen4Sample expected;
 } PollOneGroupTest;
 
