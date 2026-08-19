@@ -79,13 +79,6 @@ extern "C" {
 /** \brief The maximum input timeout. */
 #define RBRINSTRUMENTGEN4_INPUT_TIMEOUT_MAX 240000
 
-/**
- * \brief The maximum number of characters in a sensor parameter key.
- *
- * Does not include any null terminator.
- */
-#define RBRINSTRUMENTGEN4_SENSOR_PARAMETER_KEY_MAX 63
-
 /** 
  * \brief The maximum number of configs count.
  * \see RBRInstrumentGen4ConfigPool.pool
@@ -1012,7 +1005,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSettings(
  * \see RBRInstrumentGen4_getParameters()
  * \see RBRInstrumentGen4_setParameters()
  */
-typedef struct RBRInstrumentGen4Parameters{
+typedef struct RBRInstrumentGen4Parameters
+{
     /**
      * \brief the temperature coefficient used to correct the derived channel 
      * for specific conductivity to 25°C. Its value depends on the ionic 
@@ -1049,8 +1043,8 @@ typedef struct RBRInstrumentGen4Parameters{
  * \note Issues the instrument `parameters` command.
  *
  * \param [in] instrument the instrument connection
- * \param [out] settings the settings in the logger.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully read
+ * \param [out] parameters the parameters in the logger
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/42729486/parameters
@@ -1064,22 +1058,22 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getParameters(
  * \brief Set parameters which may be required when computing calibrated output.
  * \note Issues the instrument `parameters` command.
  *
- * \warning Hardware errors may occur if:
- * - the instrument is logging
- * - you set an out-of-bounds value the library fails to detect
+ * \warning Hardware errors may occur if the instrument is logging.
  *
  * \param [in] instrument the instrument connection
- * \param [in] settings the values for the settings in the logger
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully written
+ * \param [in] parameters the values for the parameters in the logger
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully
+ *                                    written
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the parameters cannot be
+ *                                           changed
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/42729486/parameters
  * \see RBRInstrumentGen4_getParameters
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_setParameters(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Parameters *parameters);
+    const RBRInstrumentGen4Parameters *parameters);
 
 /**
  * \brief Commands that can be sent to the UV LED device.

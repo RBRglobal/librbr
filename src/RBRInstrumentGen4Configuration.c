@@ -947,92 +947,82 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSettings(
         settings->pollPowerOffDelay);
 }
 
-#if 0
-RBRInstrumentGen4Error RBRInstrumentGen4_getSensorParameter(
+RBRInstrumentGen4Error RBRInstrumentGen4_getParameters(
     RBRInstrumentGen4 *instrument,
-    char *channelLabel,
-    RBRInstrumentGen4SensorParameter *parameter)
+    RBRInstrumentGen4Parameters *parameters)
 {
-    memset(parameter->value, 0, sizeof(parameter->value));
+    memset(parameters, 0, sizeof(RBRInstrumentGen4Parameters));
 
-    RBRInstrumentGen4Error err;
-    /* Logger2 returns “E0501 item is not configured” when the requested
-     * parameter doesn't exist, so we can't wrap the conversation in RBR_TRY
-     * because we need to suppress that error. */
-    err = RBRInstrumentGen4_converse(instrument,
-                                 "sensor %s %s",
-                                 channelLabel,
-                                 parameter->key);
-
-    if (instrument->generation == RBRINSTRUMENTGEN4_LOGGER2
-        && err == RBRINSTRUMENTGEN4_HARDWARE_ERROR
-        && (instrument->response.error ==
-            RBRINSTRUMENTGEN4_HARDWARE_ERROR_ITEM_IS_NOT_CONFIGURED))
-    {
-        snprintf(parameter->value,
-                 sizeof(parameter->value),
-                 "n/a");
-        instrument->response.type = RBRINSTRUMENTGEN4_RESPONSE_INFO;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-    }
-    else if (err != RBRINSTRUMENTGEN4_SUCCESS)
-    {
-        return err;
-    }
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "parameters"));
 
     char *command = NULL;
-    RBRInstrumentGen4ResponseParameter responseParameter;
+    RBRInstrumentGen4ResponseParameter parameter;
     while (true)
     {
         RBRInstrumentGen4_parseResponse(instrument,
-                                    &command,
-                                    &responseParameter);
+                                        &command,
+                                        &parameter);
 
-        if (responseParameter.key == NULL)
+        if (parameter.key == NULL || parameter.value == NULL)
         {
             break;
         }
-
-        snprintf(parameter->key,
-                 sizeof(parameter->key),
-                 "%s",
-                 responseParameter.key);
-
-        snprintf(parameter->value,
-                 sizeof(parameter->value),
-                 "%s",
-                 responseParameter.value);
+        else if (strcmp(parameter.key, "altitude") == 0)
+        {
+            parameters->altitude = strtof(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "atmosphere") == 0)
+        {
+            parameters->atmosphere = strtof(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "avgsoundspeed") == 0)
+        {
+            parameters->avgSoundSpeed = strtof(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "density") == 0)
+        {
+            parameters->density = strtof(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "pressure") == 0)
+        {
+            parameters->pressure = strtof(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "salinity") == 0)
+        {
+            parameters->salinity = strtof(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "speccondtempco") == 0)
+        {
+            parameters->specCondTempCo = strtof(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "temperature") == 0)
+        {
+            parameters->temperature = strtof(parameter.value, NULL);
+        }
     }
 
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-
-RBRInstrumentGen4Error RBRInstrumentGen4_getSensorParameters(
+RBRInstrumentGen4Error RBRInstrumentGen4_setParameters(
     RBRInstrumentGen4 *instrument,
-    const char *channelLabel,
-    int32_t *size,
-    RBRInstrumentGen4SensorParameter *parameters)
+    const RBRInstrumentGen4Parameters *parameters)
 {
-    (void)instrument;
-    (void)channelLabel;
-    (void)size;
-    (void)parameters;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    /* The instrument bounds these values; %.9g round-trips a float. */
+    return RBRInstrumentGen4_converse(
+        instrument,
+        "parameters altitude=%.9g atmosphere=%.9g avgsoundspeed=%.9g "
+        "density=%.9g pressure=%.9g salinity=%.9g speccondtempco=%.9g "
+        "temperature=%.9g",
+        (double) parameters->altitude,
+        (double) parameters->atmosphere,
+        (double) parameters->avgSoundSpeed,
+        (double) parameters->density,
+        (double) parameters->pressure,
+        (double) parameters->salinity,
+        (double) parameters->specCondTempCo,
+        (double) parameters->temperature);
 }
-
-RBRInstrumentGen4Error RBRInstrumentGen4_setSensorParameter(
-    RBRInstrumentGen4 *instrument,
-    const char *channelLabel,
-    const RBRInstrumentGen4SensorParameter *parameter)
-{
-    return RBRInstrumentGen4_converse(instrument,
-                                  "sensor %s %s=%s",
-                                  channelLabel,
-                                  parameter->key,
-                                  parameter->value);
-}
-#endif
 
 const char *RBRInstrumentGen4UvledCommand_name(RBRInstrumentGen4UvledCommand uvledCommand)
 {

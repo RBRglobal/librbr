@@ -725,3 +725,75 @@ TEST_LOGGER4(settingsSetInvalidPollPowerOffDelay)
 
     return true;
 }
+
+TEST_LOGGER4(parameters)
+{
+    RBRInstrumentGen4Parameters expected = {
+        .specCondTempCo = 0.0191f,
+        .altitude = 0.0f,
+        .temperature = 15.0f,
+        .pressure = 10.1325006f,
+        .atmosphere = 10.1325006f,
+        .density = 1.0260210f,
+        .salinity = 35.0f,
+        .avgSoundSpeed = 1506.8f
+    };
+    RBRInstrumentGen4Parameters actual;
+
+    TestIOBuffers_init(
+        buffers,
+        "parameters altitude=0.0000 atmosphere=10.1325006 "
+        "avgsoundspeed=1506.8000 density=1.0260210 pressure=10.1325006 "
+        "salinity=35.0000 speccondtempco=0.0191 temperature=15.0000"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getParameters(instrument,
+                                                                 &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("parameters" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_FLOAT_EQ(expected.altitude, actual.altitude, 1e-9f);
+    TEST_ASSERT_FLOAT_EQ(expected.atmosphere, actual.atmosphere, 1e-6f);
+    TEST_ASSERT_FLOAT_EQ(expected.avgSoundSpeed, actual.avgSoundSpeed, 1e-3f);
+    TEST_ASSERT_FLOAT_EQ(expected.density, actual.density, 1e-7f);
+    TEST_ASSERT_FLOAT_EQ(expected.pressure, actual.pressure, 1e-6f);
+    TEST_ASSERT_FLOAT_EQ(expected.salinity, actual.salinity, 1e-4f);
+    TEST_ASSERT_FLOAT_EQ(expected.specCondTempCo, actual.specCondTempCo, 1e-7f);
+    TEST_ASSERT_FLOAT_EQ(expected.temperature, actual.temperature, 1e-4f);
+
+    return true;
+}
+
+TEST_LOGGER4(parametersSet)
+{
+    RBRInstrumentGen4Parameters parameters = {
+        .specCondTempCo = 0.0191f,
+        .altitude = 0.0f,
+        .temperature = 15.0f,
+        .pressure = 10.1325006f,
+        .atmosphere = 10.1325006f,
+        .density = 1.0260210f,
+        .salinity = 35.0f,
+        .avgSoundSpeed = 1506.8f
+    };
+
+    TestIOBuffers_init(
+        buffers,
+        "parameters altitude=0.0000 atmosphere=10.1325006 "
+        "avgsoundspeed=1506.8000 density=1.0260210 pressure=10.1325006 "
+        "salinity=35.0000 speccondtempco=0.0191 temperature=15.0000"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setParameters(instrument,
+                                                                 &parameters);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ(
+        "parameters altitude=0 atmosphere=10.1325006 "
+        "avgsoundspeed=1506.80005 density=1.026021 pressure=10.1325006 "
+        "salinity=35 speccondtempco=0.0190999992 temperature=15"
+        COMMAND_TERMINATOR,
+        buffers->writeBuffer);
+
+    return true;
+}
