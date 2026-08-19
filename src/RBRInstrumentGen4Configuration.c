@@ -654,127 +654,170 @@ RBRInstrumentGen4Error RBRInstrumentGen4_discoverDevices(
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-/*
 RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
     RBRInstrumentGen4 *instrument,
-    const char *channelLabel,
     RBRInstrumentGen4Calibration *calibration)
 {
+    /* The label selects the calibration to read, so it has to outlive the
+     * reset of the rest of the structure. */
+    char label[sizeof(calibration->label)];
+    snprintf(label, sizeof(label), "%s", calibration->label);
+
     memset(calibration, 0, sizeof(RBRInstrumentGen4Calibration));
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                       "calibration %s",
-                                       channelLabel));
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "calibration %s", label));
+
+    snprintf(calibration->label, sizeof(calibration->label), "%s", label);
+
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
-    do
+    while (true)
     {
         RBRInstrumentGen4_parseResponse(instrument,
                                         &command,
                                         &parameter);
+
         if (parameter.key == NULL || parameter.value == NULL)
         {
             break;
         }
-        else if (strcmp(parameter.key, "fwversion") == 0)
+
+        /* A coefficient key is a group letter and an index: `a0`, `m11`. */
+        char *end = NULL;
+        char group = parameter.key[0];
+        int32_t index = strtol(parameter.key + 1, &end, 10);
+        bool coefficient =
+            (parameter.key[1] != '\0'
+             && *end == '\0'
+             && index >= 0
+             && index < RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX);
+
+        if (strcmp(parameter.key, "equation") == 0)
         {
-            snprintf((char *)(id->fwversion),
-                     sizeof(id->fwversion),
+            snprintf((char *) calibration->equation,
+                     sizeof(calibration->equation),
                      "%s",
                      parameter.value);
-        }
-        else if (strcmp(parameter.key, "sn") == 0)
-        {
-            id->sn = strtol(parameter.value, NULL, 10);
-        }
-    } while (true);
-
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}
-*/
-
-RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Calibration *calibration)
-{
-    memset(calibration, 0, sizeof(RBRInstrumentGen4Calibration));
-
-    calibration->userOffset = NAN;
-    calibration->userSlope = NAN;
-
-    for (int32_t c = 0;
-         c < RBRINSTRUMENTGEN4_CALIBRATION_C_COEFFICIENT_MAX;
-         ++c)
-    {
-        calibration->c[c] = NAN;
-    }
-    for (int32_t x = 0;
-         x < RBRINSTRUMENTGEN4_CALIBRATION_X_COEFFICIENT_MAX;
-         ++x)
-    {
-        calibration->x[x] = NAN;
-    }
-
-    RBRInstrumentGen4Channel *parent = (RBRInstrumentGen4Channel *)(calibration->parent);
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                       "calibration %s",
-                                       parent->label));
-    char *command = NULL;
-    RBRInstrumentGen4ResponseParameter parameter;
-    do
-    {
-        RBRInstrumentGen4_parseResponse(instrument,
-                                        &command,
-                                        &parameter);
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
-            break;
         }
         else if (strcmp(parameter.key, "datetime") == 0)
         {
-            calibration->dateTime = strtol(parameter.value, NULL, 10);
+            calibration->dateTime = strtoll(parameter.value, NULL, 10);
         }
         else if (strcmp(parameter.key, "offset") == 0)
         {
-            calibration->userOffset = strtol(parameter.value, NULL, 10);
+            calibration->userOffset = strtof(parameter.value, NULL);
         }
         else if (strcmp(parameter.key, "slope") == 0)
         {
-            calibration->userSlope = strtol(parameter.value, NULL, 10);
+            calibration->userSlope = strtof(parameter.value, NULL);
         }
-        else if (parameter.key[0] != 'c'
-                 && parameter.key[0] != 'x'
-                 && parameter.key[0] != 'n')
+        else if (coefficient && group == 'a')
         {
-            continue;
+            calibration->a[index] = strtof(parameter.value, NULL);
+            if (index >= calibration->aCount)
+            {
+                calibration->aCount = index + 1;
+            }
         }
+        else if (coefficient && group == 'b')
+        {
+            calibration->b[index] = strtof(parameter.value, NULL);
+            if (index >= calibration->bCount)
+            {
+                calibration->bCount = index + 1;
+            }
+        }
+        else if (coefficient && group == 'm')
+        {
+            /* An unused reference is reported as `none`. */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
 
-        int32_t index = strtol(&parameter.key[1], NULL, 10);
-
-        if (parameter.key[0] == 'c'
-            && index < RBRINSTRUMENTGEN4_CALIBRATION_C_COEFFICIENT_MAX)
-        {
-            calibration->c[index] = strtod(parameter.value, NULL);
-        }
-        else if (parameter.key[0] == 'x'
-                 && index < RBRINSTRUMENTGEN4_CALIBRATION_X_COEFFICIENT_MAX)
-        {
-            calibration->x[index] = strtod(parameter.value, NULL);
-        }
-        else if (parameter.key[0] == 'n'
-                 && index < RBRINSTRUMENTGEN4_CALIBRATION_N_COEFFICIENT_MAX)
-        {
-            /* GEN4TODO: Get the dependents by reference */
-            /*
-            snprintf(calibration->n[index],
-                     sizeof(calibration->n[index]),
+            snprintf(calibration->m[index],
+                     sizeof(calibration->m[index]),
                      "%s",
                      parameter.value);
-            */
+            if (index >= calibration->mCount)
+            {
+                calibration->mCount = index + 1;
+            }
         }
+    }
 
-    } while (true);
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
 
+/**
+ * \brief Append one `<group><index>=<value>` coefficient to a command.
+ *
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the coefficient does not
+ *                                             fit
+ */
+static RBRInstrumentGen4Error RBRInstrumentGen4Calibration_appendCoefficient(
+    char *command,
+    int32_t size,
+    int32_t *length,
+    char group,
+    int32_t index,
+    float value)
+{
+    /* Checked before appending: the remaining space is only meaningful while
+     * the length is still within the buffer. */
+    if (*length < 0 || *length >= size)
+    {
+        return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+    }
+
+    int32_t written = snprintf(command + *length,
+                               size - *length,
+                               " %c%" PRId32 "=%.9g",
+                               group,
+                               index,
+                               (double) value);
+
+    if (written < 0 || *length + written >= size)
+    {
+        return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+    }
+
+    *length += written;
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+/**
+ * \brief Append one `m<index>=<label>` reference to a command.
+ *
+ * An empty label is sent as `none`, which is how the instrument reports a
+ * reference the equation does not use.
+ *
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the reference does not fit
+ */
+static RBRInstrumentGen4Error RBRInstrumentGen4Calibration_appendReference(
+    char *command,
+    int32_t size,
+    int32_t *length,
+    int32_t index,
+    const char *label)
+{
+    if (*length < 0 || *length >= size)
+    {
+        return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+    }
+
+    int32_t written = snprintf(command + *length,
+                               size - *length,
+                               " m%" PRId32 "=%s",
+                               index,
+                               label[0] == '\0' ? "none" : label);
+
+    if (written < 0 || *length + written >= size)
+    {
+        return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+    }
+
+    *length += written;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
@@ -782,51 +825,58 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setCalibration(
     RBRInstrumentGen4 *instrument,
     const RBRInstrumentGen4Calibration *calibration)
 {
-    //GEN4 todo: add logic.
-    char calibrationDateTime[RBRINSTRUMENTGEN4_SCHEDULE_TIME_LEN + 1];
-    RBRInstrumentGen4DateTime_toScheduleTime(calibration->dateTime,
-                                         calibrationDateTime);
-
-    const char *calibrationCommand = "calibration %s datetime = %s, %c%d = %g";
-
-    RBRInstrumentGen4Channel *parent = (RBRInstrumentGen4Channel *)(calibration->parent);
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                "calibration %s datetime=%s, useroffset=%d, userslope=%d",
-                                parent->label,
-                                calibrationDateTime,
-                                (double) calibration->userOffset,
-                                (double) calibration->userSlope));
-
-    for (int32_t c = 0;
-         c < RBRINSTRUMENTGEN4_CALIBRATION_C_COEFFICIENT_MAX
-         && !isnan(calibration->c[c]);
-         ++c)
+    if (calibration->aCount < 0
+        || calibration->aCount > RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX
+        || calibration->bCount < 0
+        || calibration->bCount > RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX
+        || calibration->mCount < 0
+        || calibration->mCount > RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX)
     {
-        RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                       calibrationCommand,
-                                       parent->label,
-                                       calibrationDateTime,
-                                       'c',
-                                       c,
-                                       (double) calibration->c[c]));
-    }
-    for (int32_t x = 0;
-         x < RBRINSTRUMENTGEN4_CALIBRATION_X_COEFFICIENT_MAX
-         && !isnan(calibration->x[x]);
-         ++x)
-    {
-        RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                       calibrationCommand,
-                                       parent->label,
-                                       calibrationDateTime,
-                                       'x',
-                                       x,
-                                       (double) calibration->x[x]));
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    char coefficients[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX] = "";
+    int32_t length = 0;
+
+    for (int32_t a = 0; a < calibration->aCount; ++a)
+    {
+        RBR_TRY(RBRInstrumentGen4Calibration_appendCoefficient(
+                    coefficients,
+                    (int32_t) sizeof(coefficients),
+                    &length,
+                    'a',
+                    a,
+                    calibration->a[a]));
+    }
+    for (int32_t b = 0; b < calibration->bCount; ++b)
+    {
+        RBR_TRY(RBRInstrumentGen4Calibration_appendCoefficient(
+                    coefficients,
+                    (int32_t) sizeof(coefficients),
+                    &length,
+                    'b',
+                    b,
+                    calibration->b[b]));
+    }
+    for (int32_t m = 0; m < calibration->mCount; ++m)
+    {
+        RBR_TRY(RBRInstrumentGen4Calibration_appendReference(
+                    coefficients,
+                    (int32_t) sizeof(coefficients),
+                    &length,
+                    m,
+                    calibration->m[m]));
+    }
+
+    return RBRInstrumentGen4_converse(
+        instrument,
+        "calibration %s datetime=%014" PRId64 " offset=%.9g slope=%.9g%s",
+        calibration->label,
+        calibration->dateTime,
+        (double) calibration->userOffset,
+        (double) calibration->userSlope,
+        coefficients);
 }
-
 
 const char *RBRInstrumentGen4ScheduleStream_name(
     RBRInstrumentGen4ScheduleStream stream)

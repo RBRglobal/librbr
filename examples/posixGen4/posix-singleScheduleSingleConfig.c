@@ -205,9 +205,11 @@ int main(int argc, char *argv[])
     }
     for (int32_t i = 0; i < channelPool.count; i++)
     {
-        RBRInstrumentGen4Calibration calibration = {
-            .parent = &channelPool.pool[i]
-        };
+        RBRInstrumentGen4Calibration calibration;
+        snprintf(calibration.label,
+                 sizeof(calibration.label),
+                 "%s",
+                 channelPool.pool[i].label);
         RBRInstrumentGen4_getCalibration(instrument, &calibration);
     }
 

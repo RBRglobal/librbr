@@ -39,31 +39,22 @@ extern "C" {
 #define RBRINSTRUMENTGEN4_REGIME_SAMPLING_PERIOD_MAX 65000
 
 /**
- * \brief The maximum number of C calibration coefficients.
+ * \brief The maximum number of coefficients in a calibration group.
  *
- * \see RBRInstrumentGen4Calibration.c
- */
-#define RBRINSTRUMENTGEN4_CALIBRATION_C_COEFFICIENT_MAX 24
-
-/**
- * \brief The maximum number of X calibration coefficients.
+ * All three groups share one pool of this size on the instrument, so the
+ * three counts sum to no more than this.
  *
- * \see RBRInstrumentGen4Calibration.x
+ * \see RBRInstrumentGen4Calibration.a
+ * \see RBRInstrumentGen4Calibration.b
+ * \see RBRInstrumentGen4Calibration.m
  */
-#define RBRINSTRUMENTGEN4_CALIBRATION_X_COEFFICIENT_MAX 8
-
-/**
- * \brief The maximum number of input channel indices.
- *
- * \see RBRInstrumentGen4Calibration.n
- */
-#define RBRINSTRUMENTGEN4_CALIBRATION_N_COEFFICIENT_MAX 8
+#define RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX 14
 
 /**
  * \brief The maximum number of characters in a calibration equation name.
  *
  * Does not include any null terminator.
- * \see RBRInstrumentGen4Channel.equation
+ * \see RBRInstrumentGen4Calibration.equation
  */
 #define RBRINSTRUMENTGEN4_CALIBRATION_EQUATION_MAX 32
 
@@ -602,7 +593,11 @@ RBRInstrumentGen4Error RBRInstrumentGen4_discoverDevices(
     RBRInstrumentGen4DevicePool *devicePool);
 
 /**
- * \brief `calibration` command parameters.
+ * \brief `calibration <channel_label>` command parameters.
+ *
+ * The number and kind of coefficients depend on the channel's equation.
+ * Coefficients the equation does not use are absent from the response and the
+ * instrument rejects them, so a group's count bounds what is present.
  *
  * \see RBRInstrumentGen4Channel
  * \see RBRInstrumentGen4_getCalibration()
@@ -612,48 +607,77 @@ RBRInstrumentGen4Error RBRInstrumentGen4_discoverDevices(
 typedef struct RBRInstrumentGen4Calibration
 {
     /**
-     * \brief The date/time of the calibration.
-     * Unused entries should be set to 0.
+     * \brief The label of the channel the calibration belongs to.
+     *
+     * Set by the caller to select the calibration to read; see
+     * RBRInstrumentGen4_getCalibration(). Calibrations are one to one with
+     * channels and cannot be created or deleted.
+     */
+    char label[RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX + 1];
+
+    /**
+     * \brief The formula used to convert raw readings to physical units.
+     *
+     * E.g. `temperature`, `linear`, `deri_depth`.
+     */
+    const char equation[RBRINSTRUMENTGEN4_CALIBRATION_EQUATION_MAX + 1];
+
+    /**
+     * \brief The date and time of the calibration.
+     *
+     * `20000101000000` means the channel has never been calibrated. The
+     * instrument restamps this with the current time when coefficients change
+     * and no date is sent with them.
      */
     RBRInstrumentGen4DateTime dateTime;
 
     /**
-     * \brief userOffset is provided to permit users to apply a simple linear adjustment to 
-     * the final value. It is to give a rough correction in the field when a proper
-     * re-calbiration is not possible.
-    */
+     * \brief A linear offset applied to the final value.
+     *
+     * Not part of the calibration proper; provided for a rough field
+     * correction when a recalibration is not possible.
+     */
     float userOffset;
 
-    /** 
-     * \brief userSlope is provided to permit users to apply a simple linear adjustment to 
-     * the final value. It is to give a rough correction in the field when a proper
-     * re-calbiration is not possible.
-    */
+    /**
+     * \brief A linear slope applied to the final value.
+     *
+     * Not part of the calibration proper; provided for a rough field
+     * correction when a recalibration is not possible.
+     */
     float userSlope;
 
-    /**
-     * \brief Calibration C coefficients.
-     * Unused entries should be set to NaN.
-     */
-    float c[RBRINSTRUMENTGEN4_CALIBRATION_C_COEFFICIENT_MAX];
+    /** \brief The number of a coefficients the equation uses. */
+    int32_t aCount;
+
+    /** \brief The a coefficients, which any user may change. */
+    float a[RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX];
+
+    /** \brief The number of b coefficients the equation uses. */
+    int32_t bCount;
 
     /**
-     * \brief Calibration X coefficients.
-     * Unused entries should be set to NaN.
+     * \brief The b coefficients.
+     *
+     * \warning Intended to be changed by RBR or an expert user only.
      */
-    float x[RBRINSTRUMENTGEN4_CALIBRATION_X_COEFFICIENT_MAX];
+    float b[RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX];
+
+    /** \brief The number of m references the equation uses. */
+    int32_t mCount;
 
     /**
-     * \brief Pointers to input channels.
-     * \readonly
+     * \brief The cross-channel references the equation takes as inputs.
+     *
+     * Each is the label of another channel, a `param_`-prefixed name from the
+     * `parameters` command, or `internal`. An entry the equation leaves unused
+     * is empty, and is sent as `none`. Whether a label names something the
+     * equation can use is for the instrument to decide.
+     *
+     * \see RBRInstrumentGen4_getParameters()
      */
-    void *n[RBRINSTRUMENTGEN4_CHANNEL_MAX];
-
-    /**
-     * \brief Pointers to parent channel.
-     * \readonly
-     */
-    void *parent;
+    char m[RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX]
+          [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 } RBRInstrumentGen4Calibration;
 
 /** \brief An internal module identifier. */
@@ -887,62 +911,51 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPoolByNature(
     RBRInstrumentGen4ChannelPool *channelPool);
 
 /**
- * \brief Reports a channel's calibration coefficients.
- * \note Issues the `calibration <channel_label>` instrument command.
+ * \brief Read a channel's calibration.
  *
- * If coefficients used by the channel are omitted from the set sent, then
- * those coefficients will retain their current values. You can call
- * RBRInstrumentGen4_getChannels() after updating coefficients to confirm the
- * values written.
+ * The caller sets RBRInstrumentGen4Calibration.label to select the channel.
  *
- * Values of in the _n_ coefficient group (RBRInstrumentGen4Calibration.n) are
- * ignored.
+ * \note Issues the `calibration <channel_label>` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] channelPool the pool of channels supported by the logger to search for dependent channels
- * \param [out] calibration the calibration coefficients for the channel
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully written
+ * \param [in,out] calibration the calibration to read, selected by its label
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the calibration is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the calibration cannot be read
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when no coefficients are
- *                                                populated
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828510/calibration
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the channel does not exist
  * \see RBRInstrumentGen4_setCalibration()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828510/calibration
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4Calibration *calibration);
 
 /**
- * \brief Update a channel's calibration coefficients.
- * \note Issues the `calibration <calibration_label>` command.
+ * \brief Update a channel's calibration.
  *
- * Hardware errors may occur if:
+ * Sends the date, the offset and slope, and every a, b, and m coefficient the
+ * equation uses. Read the calibration with RBRInstrumentGen4_getCalibration(),
+ * change what you need, and write the structure back: the counts read there
+ * are what bounds the coefficients sent.
  *
- * - the instrument is logging
- * - you set an out-of-range or incorrect coefficient
- * - you set too many coefficients
- * - you set the wrong types of coefficients
+ * The equation is `const` and never sent; the instrument rejects a write to it.
  *
- * If coefficients used by the channel are omitted from the set sent, then
- * those coefficients will retain their current values. You can call
- * RBRInstrumentGen4_getChannels() after updating coefficients to confirm the
- * values written.
- *
- * Values of in the _n_ coefficient group (RBRInstrumentGen4Calibration.n) are
- * ignored.
+ * \warning Hardware errors may occur if the instrument is logging, a
+ *          coefficient is out of range for the equation, or an m reference
+ *          does not name something the equation can use.
  *
  * \param [in] instrument the instrument connection
- * \param [in] calibration the new calibration coefficients for the channel
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully written
+ * \param [in] calibration the calibration to write, selected by its label
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the calibration is successfully
+ *                                    written
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the calibration cannot be changed
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when no coefficients are
- *                                                populated
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828510/calibration
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the calibration cannot be
+ *                                           changed
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when a coefficient count
+ *                                                    is out of range
  * \see RBRInstrumentGen4_getCalibration()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828510/calibration
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_setCalibration(
     RBRInstrumentGen4 *instrument,
