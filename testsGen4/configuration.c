@@ -1499,3 +1499,220 @@ TEST_LOGGER4(groupDeleteAll)
 
     return true;
 }
+
+TEST_LOGGER4(configlist)
+{
+    RBRInstrumentGen4ConfigPool actual;
+
+    TestIOBuffers_init(buffers,
+                       "config count=1 maxcount=2 list=c_a"
+                       RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getConfigPool(instrument,
+                                                                &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("config" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(1, actual.count, "%" PRIi32);
+    TEST_ASSERT_EQ(2, actual.maxCount, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("c_a", actual.pool[0].label);
+
+    return true;
+}
+
+TEST_LOGGER4(configlistWithoutConfigs)
+{
+    RBRInstrumentGen4ConfigPool actual;
+
+    TestIOBuffers_init(buffers,
+                       "config count=0 maxcount=2 list=none"
+                       RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getConfigPool(instrument,
+                                                                &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(0, actual.count, "%" PRIi32);
+    TEST_ASSERT_EQ(2, actual.maxCount, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("", actual.pool[0].label);
+
+    return true;
+}
+
+TEST_LOGGER4(config)
+{
+    RBRInstrumentGen4Config actual = {
+        .label = "c_a"
+    };
+
+    TestIOBuffers_init(buffers,
+                       "config c_a schedulelist=s_a" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getConfig(instrument,
+                                                            &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("config c_a" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("c_a", actual.label);
+    TEST_ASSERT_EQ(1, actual.scheduleCount, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("s_a", actual.scheduleList[0]);
+
+    return true;
+}
+
+TEST_LOGGER4(configWithoutSchedules)
+{
+    RBRInstrumentGen4Config actual = {
+        .label = "c_a"
+    };
+
+    TestIOBuffers_init(buffers,
+                       "config c_a schedulelist=none" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getConfig(instrument,
+                                                            &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(0, actual.scheduleCount, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(configSet)
+{
+    RBRInstrumentGen4Config config = {
+        .label = "cfgPrimary",
+        .scheduleCount = 2,
+        .scheduleList = { "schedule_fast", "schedule_burst" }
+    };
+
+    TestIOBuffers_init(
+        buffers,
+        "config cfgPrimary schedulelist=schedule_fast|schedule_burst"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setConfig(instrument,
+                                                            &config);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("config cfgPrimary "
+                       "schedulelist=schedule_fast|schedule_burst"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(configSetClearingSchedules)
+{
+    RBRInstrumentGen4Config config = {
+        .label = "c_a",
+        .scheduleCount = 0
+    };
+
+    TestIOBuffers_init(buffers,
+                       "config c_a schedulelist=none" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setConfig(instrument,
+                                                            &config);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("config c_a schedulelist=none" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(configSetEmptyLabel)
+{
+    RBRInstrumentGen4Config config = {
+        .label = "",
+        .scheduleCount = 1,
+        .scheduleList = { "s_a" }
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setConfig(instrument,
+                                                            &config);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    return true;
+}
+
+TEST_LOGGER4(configSetEmptyScheduleLabel)
+{
+    RBRInstrumentGen4Config config = {
+        .label = "c_a",
+        .scheduleCount = 2,
+        .scheduleList = { "s_a", "" }
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setConfig(instrument,
+                                                            &config);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    return true;
+}
+
+TEST_LOGGER4(configCreate)
+{
+    TestIOBuffers_init(buffers,
+                       "config create c_a" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_createConfig(instrument,
+                                                               "c_a");
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("config create c_a" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(configDelete)
+{
+    TestIOBuffers_init(buffers,
+                       "config delete c_a" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_deleteConfig(instrument,
+                                                               "c_a");
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("config delete c_a" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(configDeleteAll)
+{
+    TestIOBuffers_init(buffers,
+                       "config delete all" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_deleteConfigAll(instrument);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("config delete all" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(configDeleteEmptyLabel)
+{
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_deleteConfig(instrument, "");
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    return true;
+}

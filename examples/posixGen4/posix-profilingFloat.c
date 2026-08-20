@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_deleteDatasetAll(instrument, &datasetPool);
 
     RBRInstrumentGen4ConfigPool configPool;
-    RBRInstrumentGen4_deleteConfigAll(instrument, &configPool);
+    RBRInstrumentGen4_deleteConfigAll(instrument);
 
     RBRInstrumentGen4SchedulePool schedulePool;
     RBRInstrumentGen4_deleteScheduleAll(instrument, &schedulePool);
@@ -266,13 +266,12 @@ int main(int argc, char *argv[])
                          &schedule_asc_pts);
 
     /************ configuration definition ************/
-    RBRInstrumentGen4Config* config_ascent;
+    RBRInstrumentGen4Config config_ascent;
     RBRInstrumentGen4_initNewConfig(instrument,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         GROUP_PTS_CHANNEL_COUNT,
                         &schedulePool,
-                        &configPool,
                         &config_ascent);
 
     /************ deployment parameters ************/
@@ -287,7 +286,7 @@ int main(int argc, char *argv[])
     /* enable the instrument */
     RBRInstrumentGen4Dataset *dataset_ascent;
     RBRInstrumentGen4_enable(instrument,
-                             config_ascent,
+                             &config_ascent,
                              NEW_DATASET_LABEL,
                              RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
                              &datasetPool,

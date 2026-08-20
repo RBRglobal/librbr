@@ -588,12 +588,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewConfig(
     const char specifiedScheduleLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
     int32_t specifiedScheduleLabelCnt,
     RBRInstrumentGen4SchedulePool *schedulePool,
-    RBRInstrumentGen4ConfigPool *configPool,
-    RBRInstrumentGen4Config **newConfig)
+    RBRInstrumentGen4Config *newConfig)
 {
-    RBRInstrumentGen4_createConfig(instrument, newConfigLabel, configPool, newConfig); // warning: read err!!!
-    RBRInstrumentGen4_populateConfigSchedules(*newConfig, schedulePool, specifiedScheduleLabels, specifiedScheduleLabelCnt); // warning: read err!!!
-    RBRInstrumentGen4_setConfig(instrument, *newConfig); // warning: read err!!!
+    memset(newConfig, 0, sizeof(RBRInstrumentGen4Config));
+    snprintf(newConfig->label, sizeof(newConfig->label), "%s", newConfigLabel);
+
+    RBRInstrumentGen4_createConfig(instrument, newConfigLabel); // warning: read err!!!
+    RBRInstrumentGen4_populateConfigSchedules(newConfig, schedulePool, specifiedScheduleLabels, specifiedScheduleLabelCnt); // warning: read err!!!
+    RBRInstrumentGen4_setConfig(instrument, newConfig); // warning: read err!!!
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 //-------------------------------------------------------------------------------

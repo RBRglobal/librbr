@@ -369,8 +369,7 @@ extern "C"
         const char specifiedScheduleLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
         int32_t specifiedScheduleLabelCnt,
         RBRInstrumentGen4SchedulePool *schedulePool,
-        RBRInstrumentGen4ConfigPool *configPool,
-        RBRInstrumentGen4Config **newConfig);
+        RBRInstrumentGen4Config *newConfig);
 
 #ifdef __cplusplus
 }

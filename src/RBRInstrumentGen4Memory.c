@@ -262,7 +262,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_download(
     RBR_TRY(RBRInstrumentGen4_converse(instrument,
                                    generationCommand,
                                    download->dataset->label,
-                                   download->dataset->config->scheduleList[0]->label,
+                                   download->dataset->config->scheduleList[0],
                                    block,
                                    countKey,
                                    download->countValue,

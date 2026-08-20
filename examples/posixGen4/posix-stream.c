@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
 
     RBRInstrumentGen4ConfigPool configPool;
     RBRInstrumentGen4_getConfigPool(instrument, &configPool);
-    RBRInstrumentGen4_deleteConfigAll(instrument, &configPool);
+    RBRInstrumentGen4_deleteConfigAll(instrument);
 
     RBRInstrumentGen4SchedulePool schedulePool;
     RBRInstrumentGen4_getSchedulePool(instrument, &schedulePool);
@@ -307,13 +307,12 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_setSchedule(instrument, schedule_pts);
 
     /************ configuration definition ************/
-    RBRInstrumentGen4Config *config_ascent;
+    RBRInstrumentGen4Config config_ascent;
     RBRInstrumentGen4_initNewConfig(instrument,
                          CONFIG_ASCENT_LABEL,
                          CONFIG_ASCENT_SCHEDULES,
                         CONFIG_ASCENT_SCHEDULE_COUNT,
                          &schedulePool,
-                         &configPool,
                          &config_ascent);
 
     // specify outputformat. The setter sends every parameter of the command,
@@ -336,7 +335,7 @@ int main(int argc, char *argv[])
 
     // verify the configurations for enable
     RBRInstrumentGen4_verify(instrument,
-                             config_ascent,
+                             &config_ascent,
                              NEW_DATASET_LABEL,
                              &loggingState);
 
@@ -344,7 +343,7 @@ int main(int argc, char *argv[])
            programName);
     RBRInstrumentGen4Dataset *dataset;
     if ((err = RBRInstrumentGen4_enable(instrument,
-                                        config_ascent,
+                                        &config_ascent,
                                         NEW_DATASET_LABEL,
                                         RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
                                         &datasetPool,

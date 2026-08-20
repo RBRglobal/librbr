@@ -166,19 +166,18 @@ int main(int argc, char *argv[])
                                  &configPool,
                                  targetDataset);
 
-    // Get the pool of available schedules to associate with the dataset's config.
+    // Get the pool of available schedules to look the dataset's schedules up in.
     RBRInstrumentGen4SchedulePool schedulePool;
     RBRInstrumentGen4_getSchedulePool(instrument, &schedulePool);
-    // Associate the target dataset's config with available schedules.
-    // This will fail if it cannot find the schedules specified in the dataset's config.
-    RBRInstrumentGen4_getConfig(instrument,
-                                &schedulePool,
-                                targetDataset->config);
+    // Read the target dataset's config, which names its schedules by label.
+    RBRInstrumentGen4_getConfig(instrument, targetDataset->config);
 
     printf("Dataset %s contains data from following schedules: ", targetDataset->label);
-    for (int32_t schedule_idx = 0; schedule_idx < targetDataset->config->count; schedule_idx++)
+    for (int32_t schedule_idx = 0;
+         schedule_idx < targetDataset->config->scheduleCount;
+         schedule_idx++)
     {
-        printf("%s ", targetDataset->config->scheduleList[schedule_idx]->label);
+        printf("%s ", targetDataset->config->scheduleList[schedule_idx]);
     }
 
     // Get the target schedule to download from.

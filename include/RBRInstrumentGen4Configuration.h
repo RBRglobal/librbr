@@ -2142,128 +2142,116 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteScheduleAll(
     RBRInstrumentGen4SchedulePool *schedulePoolToDelete);
 
 /**
- * \brief Instrument `config <config_label>` command parameters.
+ * \brief `config <config_label>` command parameters.
  *
  * \see RBRInstrumentGen4ConfigPool
  * \see RBRInstrumentGen4_getConfig()
  * \see RBRInstrumentGen4_setConfig()
- * \see RBRInstrumentGen4_createConfig()
- * \see RBRInstrumentGen4_deleteConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-typedef struct RBRInstrumentGen4Config {
-    /** \brief the configuration's label. */
-    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX+1];
-
-    /** \brief The number of schedules in this config. */
-    int32_t count;
-
+typedef struct RBRInstrumentGen4Config
+{
     /**
-     * \brief A list of schedules to be executed when this configuration is used to 
-     * enable a deployment.
-     * \note The order of schedules does not matter.
-     * \note Any modifications made to a configuration will apply only when it
-     * is used for future deployments; historical datasetPool in the logger's
-     * memory are not affected.
+     * \brief The configuration's label.
+     *
+     * Set by the caller to select the configuration to read.
      */
-    RBRInstrumentGen4Schedule *scheduleList[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
+    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
-    /**
-     * \brief Pointer to the parent config pool.
-     * \readonly
-     */
-    void *parent;
+    /** \brief The number of schedules in the configuration. */
+    int32_t scheduleCount;
+
+    /** \brief The labels of the schedules in the configuration. */
+    char scheduleList[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX]
+                     [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 } RBRInstrumentGen4Config;
 
-/** 
- * \brief Instrument `config` channel parameters.
- * Serves as a persistent cache of config structs.
+/**
+ * \brief Populate the parameters of a configuration.
  *
+ * The caller sets RBRInstrumentGen4Config.label to select the configuration.
+ *
+ * \note Issues the `config <config_label>` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in,out] config the configuration to read, selected by its label
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the configuration is read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the configuration does not
+ *                                           exist
  * \see RBRInstrumentGen4_getConfigPool()
- * \see RBRInstrumentGen4_createConfig()
- * \see RBRInstrumentGen4_deleteConfig()
- * \see RBRInstrumentGen4_deleteConfigAll()
+ * \see RBRInstrumentGen4_setConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-typedef struct RBRInstrumentGen4ConfigPool{
-    /** \brief The number of all defined configurations. */
+RBRInstrumentGen4Error RBRInstrumentGen4_getConfig(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Config *config);
+
+/**
+ * \brief Set the schedules in a configuration.
+ *
+ * Sends `schedulelist`, the command's only parameter. A zero
+ * RBRInstrumentGen4Config.scheduleCount sends `none`.
+ *
+ * \note Issues the `config <config_label>` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] config the configuration to write
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the configuration is written
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the configuration cannot be
+ *                                           written
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty,
+ *                                                    the schedule count is out
+ *                                                    of range, or a schedule
+ *                                                    label is empty
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit
+ * \see RBRInstrumentGen4_getConfig()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_setConfig(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Config *config);
+
+/**
+ * \brief `config` command parameters.
+ *
+ * \see RBRInstrumentGen4_getConfigPool()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
+ */
+typedef struct RBRInstrumentGen4ConfigPool
+{
+    /** \brief The number of configurations defined on the instrument. */
     int32_t count;
 
     /**
-     * \brief The array of pointers for the label of each defined configuration as null-terminated C strings.
+     * \brief `maxcount`.
+     *
+     * When it exceeds #RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX, only that many
+     * configurations are reported.
      */
+    int32_t maxCount;
+
+    /** \brief The pool of configurations. */
     RBRInstrumentGen4Config pool[RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX];
 } RBRInstrumentGen4ConfigPool;
 
 /**
- * \brief Reports the properties of the specified configuration. 
- * \note Issues the `config <config_label>` instrument command.
+ * \brief Populate the pool of the instrument's configurations.
  *
- * Hardware errors may occur if:
+ * Only the labels are reported; read a configuration's parameters with
+ * RBRInstrumentGen4_getConfig().
  *
- * - you specify a config that does not exist
- *
- * \param [in] instrument the instrument connection
- * \param [in] schedulePool the pool of the logger's schedules to associate with the config
- * \param [out] config the configuration reported
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the config is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the config cannot be read
- * \see RBRInstrumentGen4_getConfigPool()
- * \see RBRInstrumentGen4_setConfig()
- * \see RBRInstrumentGen4_createConfig()
- * \see RBRInstrumentGen4_deleteConfig()
- * \see RBRInstrumentGen4_deleteConfigAll()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_getConfig(
-    RBRInstrumentGen4 *instrument, 
-    RBRInstrumentGen4SchedulePool *schedulePool,
-    RBRInstrumentGen4Config *config);
-
-/**
- * \brief Modifies the properties of the specified configuration. 
- * \note Issues the `config <config_label>` instrument command.
- *
- * Hardware errors may occur if:
- *
- * - you include a schedule that does not exist
- * - you include a schedule multiple times
- * - you include too many schedules
+ * \note Issues the `config` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] config the configuration to be modified by label
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the config is successfully changed
+ * \param [out] configPool the populated pool of configurations
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the configurations are read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the config cannot be changed
- * \see RBRInstrumentGen4_getConfigPool()
  * \see RBRInstrumentGen4_getConfig()
- * \see RBRInstrumentGen4_createConfig()
- * \see RBRInstrumentGen4_deleteConfig()
- * \see RBRInstrumentGen4_deleteConfigAll()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_setConfig(
-    RBRInstrumentGen4 *instrument, 
-    RBRInstrumentGen4Config *config);
-
-/**
- * \brief Reports information about the pool of logger configurations.
- * \note Issues the `config` instrument command.
- *
- * \param [in] instrument the instrument connection
- * \param [out] configPool the pool of logger configurations
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the configs are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if any config cannot be read
- * \see RBRInstrumentGen4_getConfig()
- * \see RBRInstrumentGen4_setConfig()
- * \see RBRInstrumentGen4_createConfig()
- * \see RBRInstrumentGen4_deleteConfig()
- * \see RBRInstrumentGen4_deleteConfigAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getConfigPool(
@@ -2271,85 +2259,60 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getConfigPool(
     RBRInstrumentGen4ConfigPool *configPool);
 
 /**
- * \brief Creates a new empty configuration.
- * \note Issues the `config create <config_label>` instrument command.
- * 
- * Hardware errors may occur if:
+ * \brief Create an empty configuration.
  *
- * - you specify a config label that already exists
- * - you specify an invalid config label
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
+ * Add schedules with RBRInstrumentGen4_setConfig().
+ *
+ * \note Issues the `config create <config_label>` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] newConfigLabel the label to give the new config
- * \param [out] config a pointer to the new config
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the config is successfully created
+ * \param [in] label the label to give the new configuration
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the configuration is created
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the config cannot be created
- * \see RBRInstrumentGen4_getConfigPool()
- * \see RBRInstrumentGen4_getConfig()
- * \see RBRInstrumentGen4_setConfig()
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when it cannot be created
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRInstrumentGen4_deleteConfig()
- * \see RBRInstrumentGen4_deleteConfigAll()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_createConfig(
-    RBRInstrumentGen4 *instrument, 
-    const char *newConfigLabel,
-    RBRInstrumentGen4ConfigPool *configPool,
-    RBRInstrumentGen4Config **newConfig);
+    RBRInstrumentGen4 *instrument,
+    const char *label);
 
 /**
- * \brief Deletes a configuration with optional user defined parameters.
- * \note Issues the `config delete <config_label>` instrument command.
+ * \brief Delete a configuration.
  *
- * Hardware errors may occur if:
- *
- * - you specify a config that does not exist
+ * \note Issues the `config delete <config_label>` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] configToDelete the single configuration to delete
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the config is successfully deleted
+ * \param [in] label the label of the configuration to delete
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the configuration is deleted
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the config cannot be deleted
- * \see RBRInstrumentGen4_getConfigPool()
- * \see RBRInstrumentGen4_getConfig()
- * \see RBRInstrumentGen4_setConfig()
- * \see RBRInstrumentGen4_createConfig()
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when it does not exist
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRInstrumentGen4_deleteConfigAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfig(
-    RBRInstrumentGen4 *instrument, 
-    RBRInstrumentGen4Config *configToDelete);
+    RBRInstrumentGen4 *instrument,
+    const char *label);
 
 /**
- * \brief Deletes all configurations.
- * \note Issues the `config delete all` instrument command.
+ * \brief Delete every configuration.
  *
- * Deleted configurations can no longer be used to enable deployments.
- * Historical deployments in the logger memory that used the deleted
- * configuration are not affected; all datasetPool include as part of their metadata
- * a snapshot of the configuration when the logger was enabled.
+ * \note Issues the `config delete all` command.
  *
  * \param [in] instrument the instrument connection
- * \param [inout] configPoolToDelete the pool of configs defined on the logger
- * \return #RBRINSTRUMENTGEN4_SUCCESS when all the configs are successfully deleted
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the configurations are deleted
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if any config cannot be deleted
- * \see RBRInstrumentGen4_getConfigPool()
- * \see RBRInstrumentGen4_getConfig()
- * \see RBRInstrumentGen4_setConfig()
- * \see RBRInstrumentGen4_createConfig()
  * \see RBRInstrumentGen4_deleteConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfigAll(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4ConfigPool *configPoolToDelete);
+    RBRInstrumentGen4 *instrument);
 
 #ifdef __cplusplus
 }

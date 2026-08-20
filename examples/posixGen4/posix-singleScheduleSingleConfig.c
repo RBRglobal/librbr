@@ -173,8 +173,7 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4DatasetPool datasetPool;
     RBRInstrumentGen4_deleteDatasetAll(instrument, &datasetPool);
 
-    RBRInstrumentGen4ConfigPool configPool;
-    RBRInstrumentGen4_deleteConfigAll(instrument, &configPool);
+    RBRInstrumentGen4_deleteConfigAll(instrument);
 
     RBRInstrumentGen4SchedulePool schedulePool;
     RBRInstrumentGen4_deleteScheduleAll(instrument, &schedulePool);
@@ -236,13 +235,12 @@ int main(int argc, char *argv[])
                          &schedule);
 
     /************ configuration definition ************/
-    RBRInstrumentGen4Config* config;
+    RBRInstrumentGen4Config config;
     RBRInstrumentGen4_initNewConfig(instrument,
                         CONFIG_ASCENT_LABEL,
                         CONFIG_ASCENT_SCHEDULES,
                         CONFIG_ASCENT_SCHEDULE_COUNT,
                         &schedulePool,
-                        &configPool,
                         &config);
 
     /************ deployment parameters ************/
@@ -255,14 +253,14 @@ int main(int argc, char *argv[])
     /************ start of ascent ************/
     /* verify the configurations for enable */
     RBRInstrumentGen4_verify(instrument,
-                             config,
+                             &config,
                              NEW_DATASET_LABEL,
                              &loggingState);
 
     /* enable the instrument */
     RBRInstrumentGen4Dataset *dataset;
     RBRInstrumentGen4_enable(instrument,
-                             config,
+                             &config,
                              NEW_DATASET_LABEL,
                              RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
                              &datasetPool,

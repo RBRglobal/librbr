@@ -1487,55 +1487,151 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteGroupAll(
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getConfig(
-    RBRInstrumentGen4 *instrument, 
-    RBRInstrumentGen4SchedulePool *schedulePool,
-    RBRInstrumentGen4Config *config){
-        (void)instrument;
-        (void)schedulePool;
-        (void)config;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_setConfig(RBRInstrumentGen4 *instrument, 
-                                                   RBRInstrumentGen4Config *config)
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Config *config)
 {
-        (void)instrument;
-        (void)config;
-        return RBRINSTRUMENTGEN4_SUCCESS;
+    /* The label selects the configuration, so it outlives the reset. */
+    char label[sizeof(config->label)];
+    snprintf(label, sizeof(label), "%s", config->label);
+
+    memset(config, 0, sizeof(RBRInstrumentGen4Config));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "config %s", label));
+
+    snprintf(config->label, sizeof(config->label), "%s", label);
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "schedulelist") == 0)
+        {
+            RBRInstrumentGen4_parseLabelList(
+                config->scheduleList,
+                RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX,
+                &config->scheduleCount,
+                parameter.value);
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getConfigPool(RBRInstrumentGen4 *instrument, RBRInstrumentGen4ConfigPool *configPool){
-        (void)instrument;
-        (void)configPool;
-        return RBRINSTRUMENTGEN4_SUCCESS;
+RBRInstrumentGen4Error RBRInstrumentGen4_setConfig(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Config *config)
+{
+    if (config->label[0] == '\0'
+        || config->scheduleCount < 0
+        || config->scheduleCount > RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    char scheduleList[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX];
+    RBR_TRY(RBRInstrumentGen4_formatLabelList(scheduleList,
+                                              (int32_t) sizeof(scheduleList),
+                                              config->scheduleList,
+                                              config->scheduleCount));
+
+    return RBRInstrumentGen4_converse(instrument,
+                                      "config %s schedulelist=%s",
+                                      config->label,
+                                      scheduleList);
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getConfigPool(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4ConfigPool *configPool)
+{
+    memset(configPool, 0, sizeof(RBRInstrumentGen4ConfigPool));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "config"));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "count") == 0)
+        {
+            configPool->count = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "maxcount") == 0)
+        {
+            configPool->maxCount = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "list") == 0)
+        {
+            /* An empty pool reports `none`. */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
+
+            char *value = parameter.value;
+            for (int32_t config = 0;
+                 value != NULL && config < RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX;
+                 config++)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+                snprintf(configPool->pool[config].label,
+                         sizeof(configPool->pool[config].label),
+                         "%s",
+                         value);
+
+                value = nextValue;
+            }
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_createConfig(
-    RBRInstrumentGen4 *instrument, 
-    const char *newConfigLabel,
-    RBRInstrumentGen4ConfigPool *configPool,
-    RBRInstrumentGen4Config **newConfig)
+    RBRInstrumentGen4 *instrument,
+    const char *label)
 {
-        (void)instrument;
-        (void)newConfigLabel;
-        (void)configPool;
-        (void)newConfig;
-        return RBRINSTRUMENTGEN4_SUCCESS;
+    if (label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    return RBRInstrumentGen4_converse(instrument, "config create %s", label);
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfig(RBRInstrumentGen4 *instrument, 
-                                                    RBRInstrumentGen4Config *config)
+RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfig(
+    RBRInstrumentGen4 *instrument,
+    const char *label)
 {
-        (void)instrument;
-        (void)config;
-        return RBRINSTRUMENTGEN4_SUCCESS;
+    if (label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    return RBRInstrumentGen4_converse(instrument, "config delete %s", label);
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfigAll(RBRInstrumentGen4 *instrument,
-                                                    RBRInstrumentGen4ConfigPool *configPool){
-        (void)instrument;
-        (void)configPool;
-        return RBRINSTRUMENTGEN4_SUCCESS;                                                
+RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfigAll(
+    RBRInstrumentGen4 *instrument)
+{
+    return RBRInstrumentGen4_converse(instrument, "config delete all");
 }
 
 const char *RBRInstrumentGen4SamplingMode_name(RBRInstrumentGen4SamplingMode mode)
