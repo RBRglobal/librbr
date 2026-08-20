@@ -19,7 +19,6 @@ extern "C" {
 #endif
 
 #include "RBRInstrumentGen4.h"
-#include "RBRInstrumentGen4Communication.h"
 
 /** \brief The maximum number of schedules count. */
 #define RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX 16
@@ -1261,6 +1260,36 @@ typedef struct RBRInstrumentGen4Regimes
 } RBRInstrumentGen4Regimes;
 
 /**
+ * \brief Destinations for a schedule's real-time data.
+ *
+ * \see RBRInstrumentGen4Schedule.stream
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
+ */
+typedef enum RBRInstrumentGen4ScheduleStream
+{
+    /** Data for this schedule is not streamed in real time. */
+    RBRINSTRUMENTGEN4_SCHEDULE_STREAM_OFF,
+    /** Data for this schedule is streamed over the USB CDC link. */
+    RBRINSTRUMENTGEN4_SCHEDULE_STREAM_USB,
+    /** Data for this schedule is streamed over the serial link. */
+    RBRINSTRUMENTGEN4_SCHEDULE_STREAM_SERIAL,
+    /** The number of specific stream destinations. */
+    RBRINSTRUMENTGEN4_SCHEDULE_STREAM_COUNT,
+    /** An unknown or unrecognized stream destination. */
+    RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STREAM
+} RBRInstrumentGen4ScheduleStream;
+
+/**
+ * \brief Get a human-readable string name for a stream destination.
+ *
+ * \param [in] stream the stream destination
+ * \return a string name for the stream destination
+ * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ */
+const char *RBRInstrumentGen4ScheduleStream_name(
+    RBRInstrumentGen4ScheduleStream stream);
+
+/**
  * \brief Instrument `schedule <schedule_label>` parameters.
  *
  * \see RBRInstrumentGen4SchedulePool
@@ -1293,9 +1322,10 @@ typedef struct RBRInstrumentGen4Schedule
      * \brief The communication link over which data for this schedule will be
      * streamed in real time during the deployment. At most one link may be
      * active for each schedule.
-     * Defaults to RBRINSTRUMENTGEN4_LINK_OFF when the schedule is created.
+     * Defaults to #RBRINSTRUMENTGEN4_SCHEDULE_STREAM_OFF when the schedule is
+     * created.
      */
-    RBRInstrumentGen4Link stream;
+    RBRInstrumentGen4ScheduleStream stream;
 
     /** 
      * \brief Whether data for this schedule will be sored in memory during the

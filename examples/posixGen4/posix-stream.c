@@ -181,38 +181,40 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4Link link;
     RBRInstrumentGen4_getLink(instrument, &link);
     printf("Connected to the instrument via %s.\n",
-           RBRInstrumentGen4Link_name(link));
+           RBRInstrumentGen4LinkType_name(link.type));
 
     //(optional) get details about the connection.
-    switch (link)
+    switch (link.type)
     {
-    case RBRINSTRUMENTGEN4_LINK_USB:
+    case RBRINSTRUMENTGEN4_LINK_TYPE_USB:
         break;
-    case RBRINSTRUMENTGEN4_LINK_SERIAL:
+    case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
     {
-        RBRInstrumentGen4Serial serial;
-        RBRInstrumentGen4_getSerial(instrument, &serial);
+        RBRInstrumentGen4LinkSerial serial;
+        RBRInstrumentGen4_getLinkSerial(instrument, &serial);
         printf("Connected in %s mode at %s baud.\n",
-               RBRInstrumentGen4SerialMode_name(serial.mode),
-               RBRInstrumentGen4SerialBaudRate_name(serial.baudRate));
+               RBRInstrumentGen4LinkSerialMode_name(serial.mode),
+               RBRInstrumentGen4LinkSerialBaudRate_name(serial.baudRate));
         break;
     }
     /* WiFi is not yet implemented */
     #if 0
-    case RBRINSTRUMENTGEN4_LINK_WIFI:
+    case RBRINSTRUMENTGEN4_LINK_TYPE_WIFI:
     {
         RBRInstrumentGen4WiFi wifi;
         RBRInstrumentGen4_getWiFi(instrument, &wifi);
         printf("Connected in WiFi mode at %s baud. Timeout is %d\n",
-               RBRInstrumentGen4SerialBaudRate_name(wifi.baudRate),
+               RBRInstrumentGen4LinkSerialBaudRate_name(wifi.baudRate),
                wifi.commandTimeout);
         break;
     }
     #endif
     default:
         fprintf(stderr,
-                "Warning: connection method to the instrument is unclear, so"
-                " streaming can't be enabled. Stop. \n");
+                "%s: connection method to the instrument is unclear, so"
+                " streaming can't be enabled.\n",
+                programName);
+        status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
 
@@ -279,7 +281,29 @@ int main(int argc, char *argv[])
                           &schedulePool,
                           &schedule_pts);
 
-    schedule_pts->stream = link;
+    /* The link we are connected over is where this schedule should stream. */
+    switch (link.type)
+    {
+    case RBRINSTRUMENTGEN4_LINK_TYPE_USB:
+        schedule_pts->stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_USB;
+        break;
+    case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
+        schedule_pts->stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_SERIAL;
+        break;
+    default:
+        /*
+         * Unreachable: the switch above stops on any other link type. The
+         * case has to exist for the compiler, so make it fatal rather than
+         * quietly configure a schedule which streams nowhere, which would
+         * leave this example with nothing to show.
+         */
+        fprintf(stderr,
+                "%s: cannot stream over link type %s.\n",
+                programName,
+                RBRInstrumentGen4LinkType_name(link.type));
+        status = EXIT_FAILURE;
+        goto instrumentCleanup;
+    }
     // warning: read error for RBRInstrumentGen4_initNewSchedule!!!
     RBRInstrumentGen4_setSchedule(instrument, schedule_pts);
 

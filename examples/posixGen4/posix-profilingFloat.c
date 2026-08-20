@@ -172,20 +172,20 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4Link link;
     RBRInstrumentGen4_getLink(instrument, &link);
     printf("Connected to the instrument via %s.\n",
-           RBRInstrumentGen4Link_name(link));
+           RBRInstrumentGen4LinkType_name(link.type));
 
-    RBRInstrumentGen4Serial serial;
+    RBRInstrumentGen4LinkSerial serial;
 
-    switch (link)
+    switch (link.type)
     {
-    case RBRINSTRUMENTGEN4_LINK_USB:
+    case RBRINSTRUMENTGEN4_LINK_TYPE_USB:
         break;
-    case RBRINSTRUMENTGEN4_LINK_SERIAL:
+    case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
     {
-        RBRInstrumentGen4_getSerial(instrument, &serial);
+        RBRInstrumentGen4_getLinkSerial(instrument, &serial);
         printf("Connected in %s mode at %s baud.\n",
-               RBRInstrumentGen4SerialMode_name(serial.mode),
-               RBRInstrumentGen4SerialBaudRate_name(serial.baudRate));
+               RBRInstrumentGen4LinkSerialMode_name(serial.mode),
+               RBRInstrumentGen4LinkSerialBaudRate_name(serial.baudRate));
         break;
     }
     default:
