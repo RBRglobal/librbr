@@ -335,25 +335,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_resume(
     RBRInstrumentGen4DeploymentStatus *status);
 
 
-/**
- * \brief Get a human-readable string name for an instrument direction.
- *
- * \param [in] direction the direction
- * \return a string name for the direction
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
- */
-const char *RBRInstrumentGen4Direction_name(RBRInstrumentGen4Direction direction);
-
-/**
- * \brief Get a human-readable string name for a regime pressure reference.
- *
- * \param [in] reference the pressure reference
- * \return a string name for the pressure reference
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
- */
-const char *RBRInstrumentGen4RegimesReference_name(
-    RBRInstrumentGen4RegimesReference reference);
-
 #ifdef __cplusplus
 }
 #endif

@@ -44,10 +44,9 @@
 #define GROUP_PTS_CHANNEL_COUNT 3
 
 #define SCHEDULE_PTS_LABEL "sch_asc_pts"
-#define SCHEDULE_PTS_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES
-#define SCHEDULE_PTS_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
-#define SCHEDULE_PTS_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
-#define SCHEDULE_PTS_COUNT 3
+#define SCHEDULE_PTS_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS
+#define SCHEDULE_PTS_PERIOD 1000
+#define SCHEDULE_PTS_CASTDETECTION false
 
 #define SCHEDULE_PTS_GROUPS                          \
     (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
@@ -55,22 +54,6 @@
         GROUP_PTS_LABEL                              \
     }
 #define SCHEDULE_PTS_GROUP_COUNT 1
-#define SCHEDULE_PTS_REGIMES           \
-    (RBRInstrumentGen4Regimes)         \
-    {                                  \
-        .direction = SCHEDULE_PTS_DIR, \
-        .count = SCHEDULE_PTS_COUNT,   \
-        .reference = SCHEDULE_PTS_REF, \
-        .boundary1 = 500.0,            \
-        .binSize1 = 50.0,              \
-        .period1 = 10000,              \
-        .boundary2 = 200.0,            \
-        .binSize2 = 20.0,              \
-        .period2 = 1000,               \
-        .boundary3 = 50.0,             \
-        .binSize3 = 0.0,               \
-        .period3 = 1000                \
-    }
 
 #define CONFIG_ASCENT_LABEL "cf_ascent"
 #define CONFIG_ASCENT_SCHEDULES                      \
@@ -176,7 +159,7 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_deleteConfigAll(instrument);
 
     RBRInstrumentGen4SchedulePool schedulePool;
-    RBRInstrumentGen4_deleteScheduleAll(instrument, &schedulePool);
+    RBRInstrumentGen4_deleteScheduleAll(instrument);
 
     RBRInstrumentGen4GroupPool groupPool;
     RBRInstrumentGen4_deleteGroupAll(instrument);
@@ -223,15 +206,15 @@ int main(int argc, char *argv[])
                         &group_pts);
 
     /************ schedule definition ************/
-    RBRInstrumentGen4Schedule* schedule;
-    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
+    RBRInstrumentGen4Schedule schedule;
+    RBRInstrumentGen4_initNewScheduleContinuous(instrument,
                          SCHEDULE_PTS_LABEL,
                          SCHEDULE_PTS_GROUPS,
                          SCHEDULE_PTS_GROUP_COUNT,
                          SCHEDULE_PTS_MODE,
-                         SCHEDULE_PTS_REGIMES,
+                         SCHEDULE_PTS_PERIOD,
+                         SCHEDULE_PTS_CASTDETECTION,
                          &groupPool,
-                         &schedulePool,
                          &schedule);
 
     /************ configuration definition ************/

@@ -1659,77 +1659,385 @@ const char *RBRInstrumentGen4ScheduleMode_name(
     }
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4SchedulePool *schedulePool)
+const char *RBRInstrumentGen4ScheduleStorage_name(
+    RBRInstrumentGen4ScheduleStorage storage)
 {
-    //GEN4 todo: add logic about it.
-    (void)instrument;
-    (void)schedulePool;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    switch (storage)
+    {
+    case RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_OFF:
+        return "off";
+    case RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_ON:
+        return "on";
+    case RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_COUNT:
+        return "schedule storage count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE:
+    default:
+        return "unknown schedule storage";
+    }
+}
+
+/**
+ * \brief Find the stream destination a response value names.
+ *
+ * \param [in] value the response value
+ * \return the destination, or #RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STREAM
+ */
+static RBRInstrumentGen4ScheduleStream RBRInstrumentGen4ScheduleStream_parse(
+    const char *value)
+{
+    for (int i = 0; i < RBRINSTRUMENTGEN4_SCHEDULE_STREAM_COUNT; i++)
+    {
+        if (strcmp(RBRInstrumentGen4ScheduleStream_name(i), value) == 0)
+        {
+            return i;
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STREAM;
+}
+
+/**
+ * \brief Find the schedule mode a response value names.
+ *
+ * \param [in] value the response value
+ * \return the mode, or #RBRINSTRUMENTGEN4_SCHEDULE_MODE_NONE
+ */
+static RBRInstrumentGen4ScheduleMode RBRInstrumentGen4ScheduleMode_parse(
+    const char *value)
+{
+    for (int i = RBRINSTRUMENTGEN4_SCHEDULE_MODE_NONE + 1;
+         i <= RBRINSTRUMENTGEN4_SCHEDULE_MODE_MAX;
+         i <<= 1)
+    {
+        if (strcmp(RBRInstrumentGen4ScheduleMode_name(i), value) == 0)
+        {
+            return i;
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_SCHEDULE_MODE_NONE;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4GroupPool *groupPool,
     RBRInstrumentGen4Schedule *schedule)
 {
-    (void)instrument;
-    (void)groupPool;
-    (void)schedule;
+    /* The label selects the schedule, so it outlives the reset. */
+    char label[sizeof(schedule->label)];
+    snprintf(label, sizeof(label), "%s", schedule->label);
+
+    memset(schedule, 0, sizeof(RBRInstrumentGen4Schedule));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "schedule %s", label));
+
+    snprintf(schedule->label, sizeof(schedule->label), "%s", label);
+    schedule->stream = RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STREAM;
+    schedule->storage = RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE;
+    schedule->mode = RBRINSTRUMENTGEN4_SCHEDULE_MODE_NONE;
+
+    RBRInstrumentGen4Period period = 0;
+    RBRInstrumentGen4Period measurementPeriod = 0;
+    int32_t measurementCount = 0;
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "grouplist") == 0)
+        {
+            RBRInstrumentGen4_parseLabelList(schedule->groupList,
+                                             RBRINSTRUMENTGEN4_GROUP_COUNT_MAX,
+                                             &schedule->groupCount,
+                                             parameter.value);
+        }
+        else if (strcmp(parameter.key, "configlist") == 0)
+        {
+            RBRInstrumentGen4_parseLabelList(
+                (RBRInstrumentGen4Label *) schedule->configList,
+                RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX,
+                (int32_t *) &schedule->configCount,
+                parameter.value);
+        }
+        else if (strcmp(parameter.key, "stream") == 0)
+        {
+            schedule->stream = RBRInstrumentGen4ScheduleStream_parse(
+                parameter.value);
+        }
+        else if (strcmp(parameter.key, "storage") == 0)
+        {
+            schedule->storage = strcmp(parameter.value, "on") == 0
+                                ? RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_ON
+                                : RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_OFF;
+        }
+        else if (strcmp(parameter.key, "castdetection") == 0)
+        {
+            schedule->castDetection = strcmp(parameter.value, "on") == 0;
+        }
+        else if (strcmp(parameter.key, "mode") == 0)
+        {
+            schedule->mode = RBRInstrumentGen4ScheduleMode_parse(
+                parameter.value);
+        }
+        else if (strcmp(parameter.key, "period") == 0)
+        {
+            period = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "measurementperiod") == 0)
+        {
+            measurementPeriod = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "measurementcount") == 0)
+        {
+            measurementCount = strtol(parameter.value, NULL, 10);
+        }
+    }
+
+    switch (schedule->mode)
+    {
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS:
+        schedule->parameters.continuous.period = period;
+        break;
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_AVERAGE:
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_BURST:
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_TIDE:
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_WAVE:
+        schedule->parameters.bursting.period = period;
+        schedule->parameters.bursting.measurementPeriod = measurementPeriod;
+        schedule->parameters.bursting.measurementCount = measurementCount;
+        break;
+    default:
+        break;
+    }
+
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedule *schedule)
+    const RBRInstrumentGen4Schedule *schedule)
 {
-    //GEN4 todo: Question: do we want to validate period with deployment values?
-    //RBR_TRY(RBRInstrumentGen4Schedule_validateSchedulePeriod(schedule, scheduleLabel, deployment));
-
-    /* A schedule runs in exactly one mode, so a value with no flags, more
-     * than one flag, or a flag the library does not define cannot be sent. */
-    if (schedule->mode == RBRINSTRUMENTGEN4_SCHEDULE_MODE_NONE
+    /* A schedule runs in exactly one mode. */
+    if (schedule->label[0] == '\0'
+        || schedule->groupCount < 0
+        || schedule->groupCount > RBRINSTRUMENTGEN4_GROUP_COUNT_MAX
+        || schedule->stream >= RBRINSTRUMENTGEN4_SCHEDULE_STREAM_COUNT
+        || schedule->storage > RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE
+        || schedule->storage == RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_COUNT
+        || schedule->mode == RBRINSTRUMENTGEN4_SCHEDULE_MODE_NONE
         || schedule->mode > RBRINSTRUMENTGEN4_SCHEDULE_MODE_MAX
         || (schedule->mode & (schedule->mode - 1)) != 0)
     {
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    //GEN4 todo: generate a command which is mode-dependent.
-    const char *setScheduleCommand=NULL;
+    RBRInstrumentGen4Period period;
+    RBRInstrumentGen4Period measurementPeriod = 0;
+    int32_t measurementCount = 0;
+
+    switch (schedule->mode)
+    {
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS:
+        period = schedule->parameters.continuous.period;
+        break;
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_AVERAGE:
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_BURST:
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_TIDE:
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_WAVE:
+        period = schedule->parameters.bursting.period;
+        measurementPeriod = schedule->parameters.bursting.measurementPeriod;
+        measurementCount = schedule->parameters.bursting.measurementCount;
+        break;
+    default:
+        /* No parameters are modelled for `ddsampling` or `regimes`, so
+         * writing either would silently drop them. */
+        return RBRINSTRUMENTGEN4_UNSUPPORTED;
+    }
+
+    char groupList[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX];
+    RBR_TRY(RBRInstrumentGen4_formatLabelList(groupList,
+                                              (int32_t) sizeof(groupList),
+                                              schedule->groupList,
+                                              schedule->groupCount));
+
+    /* Sending a `storage` the getter never read would be an error. */
+    const char *storage = "";
+    if (schedule->storage != RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE)
+    {
+        storage = schedule->storage == RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_ON
+                  ? "storage=on "
+                  : "storage=off ";
+    }
+
+/* The parameters every mode sends, shared by the two forms below so the
+ * spelling cannot drift between them. */
+#define SCHEDULE_COMMON \
+    "schedule %s grouplist=%s stream=%s %scastdetection=%s mode=%s"
+
+    if (schedule->mode == RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS)
+    {
+        return RBRInstrumentGen4_converse(
+            instrument,
+            SCHEDULE_COMMON " period=%" PRId32,
+            schedule->label,
+            groupList,
+            RBRInstrumentGen4ScheduleStream_name(schedule->stream),
+            storage,
+            schedule->castDetection ? "on" : "off",
+            RBRInstrumentGen4ScheduleMode_name(schedule->mode),
+            period);
+    }
+
     return RBRInstrumentGen4_converse(
         instrument,
-        setScheduleCommand);
+        SCHEDULE_COMMON
+        " period=%" PRId32
+        " measurementcount=%" PRId32
+        " measurementperiod=%" PRId32,
+        schedule->label,
+        groupList,
+        RBRInstrumentGen4ScheduleStream_name(schedule->stream),
+        storage,
+        schedule->castDetection ? "on" : "off",
+        RBRInstrumentGen4ScheduleMode_name(schedule->mode),
+        period,
+        measurementCount,
+        measurementPeriod);
+
+#undef SCHEDULE_COMMON
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4SchedulePool *schedulePool)
+{
+    memset(schedulePool, 0, sizeof(RBRInstrumentGen4SchedulePool));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "schedule"));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "count") == 0)
+        {
+            schedulePool->count = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "maxcount") == 0)
+        {
+            schedulePool->maxCount = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "maxregimes") == 0)
+        {
+            schedulePool->maxRegimes = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "list") == 0)
+        {
+            /* An empty pool reports `none`. */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
+
+            char *value = parameter.value;
+            for (int32_t schedule = 0;
+                 value != NULL
+                 && schedule < RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX;
+                 schedule++)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+                snprintf(schedulePool->pool[schedule].label,
+                         sizeof(schedulePool->pool[schedule].label),
+                         "%s",
+                         value);
+
+                value = nextValue;
+            }
+        }
+        else if (strcmp(parameter.key, "availablemodes") == 0)
+        {
+            char *value = parameter.value;
+            while (value != NULL)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+                /* An unrecognized mode parses to `NONE` and drops out. */
+                schedulePool->availableModes |=
+                    RBRInstrumentGen4ScheduleMode_parse(value);
+
+                value = nextValue;
+            }
+        }
+        else if (strcmp(parameter.key, "availablefastperiods") == 0)
+        {
+            /* No fast periods reports `none`. */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
+
+            char *value = parameter.value;
+            while (value != NULL
+                   && schedulePool->availableFastPeriodCount
+                   < RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+                schedulePool->availableFastPeriods[
+                    schedulePool->availableFastPeriodCount] =
+                    strtol(value, NULL, 10);
+                schedulePool->availableFastPeriodCount++;
+
+                value = nextValue;
+            }
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_createSchedule(
     RBRInstrumentGen4 *instrument,
-    const char *newScheduleLabel,
-    RBRInstrumentGen4SchedulePool *schedulePool,
-    RBRInstrumentGen4Schedule **newSchedule){
-        //GEN4 todo: add logic about it.
-    (void)instrument;
-    (void)newScheduleLabel;
-    (void)schedulePool;
-    (void)newSchedule;
-        return RBRINSTRUMENTGEN4_SUCCESS;
+    const char *label)
+{
+    if (label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    return RBRInstrumentGen4_converse(instrument, "schedule create %s", label);
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteSchedule(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedule *schedule){
-        //GEN4 todo: add logic about it.
-    (void)instrument;
-    (void)schedule;
-        return RBRINSTRUMENTGEN4_SUCCESS;
+    const char *label)
+{
+    if (label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    return RBRInstrumentGen4_converse(instrument, "schedule delete %s", label);
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteScheduleAll(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4SchedulePool *schedulePool){
-        //GEN4 todo: add logic about it.
-        (void)instrument;
-        (void)schedulePool;
-        return RBRINSTRUMENTGEN4_SUCCESS;
+    RBRInstrumentGen4 *instrument)
+{
+    return RBRInstrumentGen4_converse(instrument, "schedule delete all");
 }

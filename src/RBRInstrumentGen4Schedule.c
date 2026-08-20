@@ -204,36 +204,3 @@ RBRInstrumentGen4Error RBRInstrumentGen4_resume(
     (void)status;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
-
-const char *RBRInstrumentGen4Direction_name(RBRInstrumentGen4Direction direction)
-{
-    switch (direction)
-    {
-    case RBRINSTRUMENTGEN4_DIRECTION_ASCENDING:
-        return "ascending";
-    case RBRINSTRUMENTGEN4_DIRECTION_DESCENDING:
-        return "descending";
-    case RBRINSTRUMENTGEN4_DIRECTION_COUNT:
-        return "direction count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_DIRECTION:
-    default:
-        return "unknown direction";
-    }
-}
-
-const char *RBRInstrumentGen4RegimesReference_name(
-    RBRInstrumentGen4RegimesReference reference)
-{
-    switch (reference)
-    {
-    case RBRINSTRUMENTGEN4_REFERENCE_ABSOLUTE:
-        return "absolute";
-    case RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE:
-        return "seapressure";
-    case RBRINSTRUMENTGEN4_REFERENCE_COUNT:
-        return "regimes reference count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_REFERENCE:
-    default:
-        return "unknown regimes reference";
-    }
-}

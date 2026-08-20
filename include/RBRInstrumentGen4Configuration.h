@@ -1477,321 +1477,69 @@ typedef enum RBRInstrumentGen4ScheduleMode
 } RBRInstrumentGen4ScheduleMode;
 
 /**
- * \brief Defines schedule mode-dependent-parameters: continuous mode.
- * \see RBRInstrumentGen4Schedule
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
- */
-typedef struct RBRInstrumentGen4Continuous
-{
-    /** \brief Time between measurements.
-     *
-     * Specified in milliseconds. Must be in the range
-     * RBRInstrumentGen4Sampling.userPeriodLimit—86,400,000.
-     *
-     * - When < 1,000, must be in RBRInstrumentGen4Sampling.availableFastPeriods.
-     * - When ≥ 1,000, must be an integer multiple of 1,000.
-     */
-    RBRInstrumentGen4Period period;
-
-    /** \brief Get/set automatic upcast and downcast detection in profiling deployment.
-     * Options: on|off. Defaults to off.
-    */
-    bool castDetection;
-} RBRInstrumentGen4Continuous;
-
-/**
- * \brief Defines schedule mode-dependent-parameters: average mode.
- * \see RBRInstrumentGen4Schedule
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
- */
-typedef struct RBRInstrumentGen4Average
-{
-    /**
-     * \brief Time between measurements.
-     *
-     * Specified in milliseconds. Must be in the range
-     * RBRInstrumentGen4Sampling.userPeriodLimit—86,400,000.
-     *
-     * - When < 1,000, must be in RBRInstrumentGen4Sampling.availableFastPeriods.
-     * - When ≥ 1,000, must be an integer multiple of 1,000.
-     */
-    RBRInstrumentGen4Period period;
-    /**
-     * \brief The time between the first measurement of two consecutive bursts.
-     *
-     * Specified in milliseconds. Must be in the range 1,000—86,400,000 and
-     * must be an integer multiple of 1,000. The burst interval is additionally
-     * constrained by the sampling period (RBRInstrumentGen4Schedule.period) and
-     * burst count (RBRInstrumentGen4Schedule.burstCount):
-     *
-     *     burst interval > (burst count × sampling period)
-     */
-    RBRInstrumentGen4Period burstInterval;
-
-    /**
-     * \brief The number of measurements taken in each burst.
-     *
-     * Specified in numbers of samples. Must be in the range 2—65,535.
-     */
-    int32_t burstCount;
-} RBRInstrumentGen4Average;
-
-/**
- * \brief Defines schedule mode-dependent-parameters: tide mode.
- * \see RBRInstrumentGen4Schedule
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
- */
-typedef struct RBRInstrumentGen4Tide
-{
-    /**
-     * \brief Time between measurements.
-     *
-     * Specified in milliseconds. Must be in the range
-     * RBRInstrumentGen4Sampling.userPeriodLimit—86,400,000.
-     *
-     * - When < 1,000, must be in RBRInstrumentGen4Sampling.availableFastPeriods.
-     * - When ≥ 1,000, must be an integer multiple of 1,000.
-     */
-    RBRInstrumentGen4Period period;
-    /**
-     * \brief The time between the first measurement of two consecutive bursts.
-     *
-     * Specified in milliseconds. Must be in the range 1,000—86,400,000 and
-     * must be an integer multiple of 1,000. The burst interval is additionally
-     * constrained by the sampling period (RBRInstrumentGen4Schedule.period) and
-     * burst count (RBRInstrumentGen4Schedule.burstCount):
-     *
-     *     burst interval > (burst count × sampling period)
-     */
-    RBRInstrumentGen4Period burstInterval;
-
-    /**
-     * \brief The number of measurements taken in each burst.
-     *
-     * Specified in numbers of samples. Must be in the range 2—65,535.
-     */
-    int32_t burstCount;
-} RBRInstrumentGen4Tide;
-
-/**
- * \brief Defines schedule mode-dependent-parameters: burst modes.
- * \see RBRInstrumentGen4Schedule
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
- */
-typedef struct RBRInstrumentGen4Burst
-{
-    /**
-     * \brief Time between measurements.
-     *
-     * Specified in milliseconds. Must be in the range
-     * RBRInstrumentGen4Sampling.userPeriodLimit—86,400,000.
-     *
-     * - When < 1,000, must be in RBRInstrumentGen4Sampling.availableFastPeriods.
-     * - When ≥ 1,000, must be an integer multiple of 1,000.
-     */
-    RBRInstrumentGen4Period period;
-    /**
-     * \brief The time between the first measurement of two consecutive bursts.
-     *
-     * Specified in milliseconds. Must be in the range 1,000—86,400,000 and
-     * must be an integer multiple of 1,000. The burst interval is additionally
-     * constrained by the sampling period (RBRInstrumentGen4Schedule.period) and
-     * burst count (RBRInstrumentGen4Schedule.burstCount):
-     *
-     *     burst interval > (burst count × sampling period)
-     */
-    RBRInstrumentGen4Period burstInterval;
-
-    /**
-     * \brief The number of measurements taken in each burst.
-     *
-     * Specified in numbers of samples. Must be in the range 2—65,535.
-     */
-    int32_t burstCount;
-} RBRInstrumentGen4Burst;
-
-/**
- * \brief Defines schedule mode-dependent-parameters: wave modes.
- * \see RBRInstrumentGen4Schedule
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
- */
-typedef struct RBRInstrumentGen4Wave
-{
-    /**
-     * \brief Time between measurements.
-     *
-     * Specified in milliseconds. Must be in the range
-     * RBRInstrumentGen4Sampling.userPeriodLimit—86,400,000.
-     *
-     * - When < 1,000, must be in RBRInstrumentGen4Sampling.availableFastPeriods.
-     * - When ≥ 1,000, must be an integer multiple of 1,000.
-     */
-    RBRInstrumentGen4Period period;
-    /**
-     * \brief The time between the first measurement of two consecutive bursts.
-     *
-     * Specified in milliseconds. Must be in the range 1,000—86,400,000 and
-     * must be an integer multiple of 1,000. The burst interval is additionally
-     * constrained by the sampling period (RBRInstrumentGen4Schedule.period) and
-     * burst count (RBRInstrumentGen4Schedule.burstCount):
-     *
-     *     burst interval > (burst count × sampling period)
-     */
-    RBRInstrumentGen4Period burstInterval;
-
-    /**
-     * \brief The number of measurements taken in each burst.
-     *
-     * Specified in numbers of samples. Must be in the range 2—65,535.
-     */
-    int32_t burstCount;
-} RBRInstrumentGen4Wave;
-
-/**
- * \brief Whether settings apply to ascent or descent.
- * \see RBRInstrumentGen4Regimes
- * \see RBRInstrumentGen4DirectionDependentSampling
- * \see RBRInstrumentGen4Schedule
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
- */
-typedef enum RBRInstrumentGen4Direction
-{
-    /** The settings apply while ascending. */
-    RBRINSTRUMENTGEN4_DIRECTION_ASCENDING,
-    /** The settings apply while descending. */
-    RBRINSTRUMENTGEN4_DIRECTION_DESCENDING,
-    /** The number of specific directions. */
-    RBRINSTRUMENTGEN4_DIRECTION_COUNT,
-    /** An unknown or unrecognized direction. */
-    RBRINSTRUMENTGEN4_UNKNOWN_DIRECTION
-} RBRInstrumentGen4Direction;
-
-/**
- * \brief Defines schedule mode-dependent-parameters: ddsampling mode.
- * \see RBRInstrumentGen4Schedule
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
- */
-typedef struct RBRInstrumentGen4DirectionDependentSampling
-{
-    /** \brief In which direction the instrument samples at the fast rate. */
-    RBRInstrumentGen4Direction direction;
-
-    /** \brief Get/set the auto upcasts and downcasts detection in proviling deployment.
-     * and will generate cast detection events in the stored data.
-     * This option must be set to ON for the ddsampling mode. 
-     * Options: on|off. Defaults to on.
-    */
-   bool castDetection;
-
-    /**
-     * \brief The same meaning as RBRInstrumentGen4Sampling.period, but applies
-     * only when the instrument is moving in the preferred direction.
-     *
-     * Must be shorter than RBRInstrumentGen4DirectionDependentSampling.slowPeriod.
-     */
-    RBRInstrumentGen4Period fastPeriod;
-    /**
-     * \brief The same meaning as RBRInstrumentGen4Sampling.period, but applies
-     * only when the instrument is not moving in the preferred direction.
-     *
-     * Must be longer than RBRInstrumentGen4DirectionDependentSampling.fastPeriod.
-     */
-    RBRInstrumentGen4Period slowPeriod;
-    /**
-     * \brief Sets the boundary, based on the previous profile, where the
-     * instrument should switch to the fast period sampling.
-     *
-     * Specified in dbar. The minimum precision is 0.1 and the value should be
-     * greater than 0.
-     */
-    float fastThreshold;
-    /**
-     * \brief Sets the boundary, based on the previous profile, where the
-     * instrument should switch to the slow period sampling.
-     *
-     * Specified in dbar. The minimum precision is 0.1 and the value should be
-     * greater than 0.
-     */
-    float slowThreshold;
-} RBRInstrumentGen4DirectionDependentSampling;
-
-/**
- * \brief The types of pressure available for use a reference for the
- * determination of the current regime and bin.
+ * \brief Whether a schedule's data is stored in memory.
  *
- * \see RBRInstrumentGen4Regimes
- * \see RBRInstrumentGen4Schedule
+ * \see RBRInstrumentGen4Schedule.storage
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-typedef enum RBRInstrumentGen4RegimesReference
+typedef enum RBRInstrumentGen4ScheduleStorage
 {
-    /** Absolute pressure is used as the reference. */
-    RBRINSTRUMENTGEN4_REFERENCE_ABSOLUTE,
-    /** Sea pressure is used as the reference. */
-    RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE,
-    /** The number of specific regime reference types. */
-    RBRINSTRUMENTGEN4_REFERENCE_COUNT,
-    /** An unknown or unrecognized regime reference type. */
-    RBRINSTRUMENTGEN4_UNKNOWN_REFERENCE
-} RBRInstrumentGen4RegimesReference;
+    /** Data for this schedule is not stored in memory. */
+    RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_OFF,
+    /** Data for this schedule is stored in memory. */
+    RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_ON,
+    /** The number of specific storage states. */
+    RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_COUNT,
+    /** The parameter was not reported. */
+    RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE
+} RBRInstrumentGen4ScheduleStorage;
 
-/** \brief Defines schedule mode-dependent-parameters: Regimes mode.
- * \see RBRInstrumentGen4Schedule
+/**
+ * \brief Get a human-readable string name for a storage state.
+ *
+ * \param [in] storage the storage state
+ * \return a string name for the storage state
+ * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ */
+const char *RBRInstrumentGen4ScheduleStorage_name(
+    RBRInstrumentGen4ScheduleStorage storage);
+
+/**
+ * \brief A schedule's parameters in
+ *        #RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS.
+ *
+ * \see RBRInstrumentGen4Schedule.parameters
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-typedef struct RBRInstrumentGen4Regimes
+typedef struct RBRInstrumentGen4ScheduleModeContinuous
 {
-    /** \brief The regimes-relevant direction through the water column. */
-    RBRInstrumentGen4Direction direction;
+    /** \brief `period`, in milliseconds. */
+    RBRInstrumentGen4Period period;
+} RBRInstrumentGen4ScheduleModeContinuous;
 
-    /**
-     * \brief The number of regimes that are set.
-     * Options: 1|2|3.
-     */
-    int32_t count;
-    /** \brief The pressure type used for regime and bin determination. */
-    RBRInstrumentGen4RegimesReference reference;
+/**
+ * \brief A schedule's parameters in the bursting modes.
+ *
+ * #RBRINSTRUMENTGEN4_SCHEDULE_MODE_AVERAGE,
+ * #RBRINSTRUMENTGEN4_SCHEDULE_MODE_BURST,
+ * #RBRINSTRUMENTGEN4_SCHEDULE_MODE_TIDE and
+ * #RBRINSTRUMENTGEN4_SCHEDULE_MODE_WAVE take the same parameters and so share
+ * one structure.
+ *
+ * \see RBRInstrumentGen4Schedule.parameters
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
+ */
+typedef struct RBRInstrumentGen4ScheduleModeBursting
+{
+    /** \brief `period`, in milliseconds. */
+    RBRInstrumentGen4Period period;
 
-    /** \brief The first boundary in a region. Specified in dbar.*/
-    float boundary1;
+    /** \brief `measurementperiod`, in milliseconds. */
+    RBRInstrumentGen4Period measurementPeriod;
 
-    /** \brief The size used for each averaged bin.Specified in dbar.*/
-    float binSize1;
-    /**
-     * \brief The same meaning as RBRInstrumentGen4Sampling.period, but applies
-     * only to this particular regime.
-     *
-     * May not be greater than 65,000.
-     */
-    RBRInstrumentGen4Period period1;
-
-    /** \brief The second boundary in a region. Specified in dbar.*/
-    float boundary2;
-
-    /** \brief The size used for each averaged bin.Specified in dbar.*/
-    float binSize2;
-    /**
-     * \brief The same meaning as RBRInstrumentGen4Sampling.period, but applies
-     * only to this particular regime.
-     *
-     * May not be greater than 65,000.
-     */
-    RBRInstrumentGen4Period period2;
-
-    /** \brief The first boundary in a region. Specified in dbar.*/
-    float boundary3;
-
-    /** \brief The size used for each averaged bin.Specified in dbar.*/
-    float binSize3;
-    /**
-     * \brief The same meaning as RBRInstrumentGen4Sampling.period, but applies
-     * only to this particular regime.
-     *
-     * May not be greater than 65,000.
-     */
-    RBRInstrumentGen4Period period3;
-
-} RBRInstrumentGen4Regimes;
+    /** \brief `measurementcount`. */
+    int32_t measurementCount;
+} RBRInstrumentGen4ScheduleModeBursting;
 
 /**
  * \brief Destinations for a schedule's real-time data.
@@ -1824,121 +1572,182 @@ const char *RBRInstrumentGen4ScheduleStream_name(
     RBRInstrumentGen4ScheduleStream stream);
 
 /**
- * \brief Instrument `schedule <schedule_label>` parameters.
+ * \brief `schedule <schedule_label>` command parameters.
  *
  * \see RBRInstrumentGen4SchedulePool
- * \see RBRInstrumentGen4Config
  * \see RBRInstrumentGen4_getSchedule()
  * \see RBRInstrumentGen4_setSchedule()
- * \see RBRInstrumentGen4_createSchedule()
- * \see RBRInstrumentGen4_deleteSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 typedef struct RBRInstrumentGen4Schedule
 {
     /**
      * \brief The schedule's label.
-     * \warning It is subject to naming constraints.
-     * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
+     *
+     * Set by the caller to select the schedule to read.
      */
-    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX+1];
+    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
-    /** \brief The number of groups in this schedule. */
-    int32_t count;
+    /** \brief The number of groups the schedule samples. */
+    int32_t groupCount;
+
+    /** \brief The labels of the groups the schedule samples. */
+    char groupList[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX]
+                  [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
     /**
-     * \brief A list of groups defining the channels that will be sampled
-     * according to this schedule.
-     */
-    RBRInstrumentGen4Group *groupList[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX];
-
-    /**
-     * \brief The communication link over which data for this schedule will be
-     * streamed in real time during the deployment. At most one link may be
-     * active for each schedule.
-     * Defaults to #RBRINSTRUMENTGEN4_SCHEDULE_STREAM_OFF when the schedule is
-     * created.
-     */
-    RBRInstrumentGen4ScheduleStream stream;
-
-    /** 
-     * \brief Whether data for this schedule will be sored in memory during the
-     * deployment. 
-     * For data logging instruments which can store data, this parameter
-     * defaults to on when the schedule is created. For sensor instruments that
-     * do not store data, schedules are created with this parameter set to off,
-     * and the value can not be changed.
-     */
-    bool storage;
-
-    /** \brief The sampling mode to be used by this schedule. */
-    RBRInstrumentGen4ScheduleMode mode;
-
-    /** \brief Defines schedule Mode-dependent-parameters. 
-     */
-    union {
-        /** \brief continuous mode struct*/
-        RBRInstrumentGen4Continuous continuous;
-        /** \brief average mode struct*/
-        RBRInstrumentGen4Average average;
-        /** \brief tide mode struct*/
-        RBRInstrumentGen4Tide tide;
-        /** \brief burst mode struct*/
-        RBRInstrumentGen4Burst burst;
-        /** \brief wave mode struct*/
-        RBRInstrumentGen4Wave wave;
-        /** \brief ddsampling mode struct*/
-        RBRInstrumentGen4DirectionDependentSampling ddsampling;
-        /** \brief regimes mode struct*/
-        RBRInstrumentGen4Regimes regimes;
-    } modeDependentParameters;
-
-    /**
-     * \brief Pointer to the parent schedule pool.
+     * \brief The number of configurations using the schedule.
+     *
      * \readonly
      */
-    void *parent;
+    const int32_t configCount;
+
+    /**
+     * \brief The labels of the configurations using the schedule.
+     *
+     * \readonly
+     * \see RBRInstrumentGen4_setConfig()
+     */
+    const char configList[RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX]
+                         [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+
+    /** \brief Where the schedule's data is streamed in real time. */
+    RBRInstrumentGen4ScheduleStream stream;
+
+    /**
+     * \brief Whether the schedule's data is stored in memory.
+     *
+     * Some instrument configurations do not support data storage, in which case
+     * this field should be left as #RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE.
+     * 
+     * \see RBRInstrumentGen4ScheduleStorage
+     */
+    RBRInstrumentGen4ScheduleStorage storage;
+
+    /** \brief `castdetection`, which applies in every mode. */
+    bool castDetection;
+
+    /**
+     * \brief The mode the schedule runs in.
+     *
+     * Exactly one mode flag.
+     */
+    RBRInstrumentGen4ScheduleMode mode;
+
+    /**
+     * \brief The parameters belonging to #mode.
+     *
+     * Only the member matching #mode is populated; a getter zeroes the rest.
+     * #RBRINSTRUMENTGEN4_SCHEDULE_MODE_DDSAMPLING and
+     * #RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES have no member: a getter
+     * leaves this zeroed and a setter gives #RBRINSTRUMENTGEN4_UNSUPPORTED.
+     */
+    union
+    {
+        /**
+         * \brief Parameters for
+         *        #RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS.
+         */
+        RBRInstrumentGen4ScheduleModeContinuous continuous;
+
+        /** \brief Parameters for the bursting modes. */
+        RBRInstrumentGen4ScheduleModeBursting bursting;
+    } parameters;
 } RBRInstrumentGen4Schedule;
 
 /**
- * \brief Instrument `schedule` command parameters.
- * Serves as a persistent cache of channel structs.
+ * \brief Populate the parameters of a schedule.
  *
+ * The caller sets RBRInstrumentGen4Schedule.label to select the schedule.
+ * 
+ * \p schedule.storage is set to #RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE for 
+ * instruments that do not report the `storage` parameter
+ *
+ * \note Issues the `schedule <schedule_label>` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in,out] schedule the schedule to read, selected by its label
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the schedule does not exist
  * \see RBRInstrumentGen4_getSchedulePool()
- * \see RBRInstrumentGen4_createSchedule()
- * \see RBRInstrumentGen4_deleteSchedule()
- * \see RBRInstrumentGen4_deleteScheduleAll()
- * \see RBRInstrumentGen4_getConfig()
+ * \see RBRInstrumentGen4_setSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-typedef struct RBRInstrumentGen4SchedulePool{
-    /** \brief The number of schedules currently defined. */
-    const int32_t count;
+RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Schedule *schedule);
 
-    /** \brief List of schedule objects. */
+/**
+ * \brief Set the parameters of a schedule.
+ *
+ * `storage` is only available on some instrument configurations.
+ *
+ * \note Issues the `schedule <schedule_label>` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] schedule the schedule to write
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully written
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the schedule cannot be
+ *                                           written, or when `storage` is set
+ *                                           where it is unavailable
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty,
+ *                                                    a count is out of range,
+ *                                                    a group label is empty,
+ *                                                    or the mode is not a
+ *                                                    single known flag
+ * \return #RBRINSTRUMENTGEN4_UNSUPPORTED when the mode is `ddsampling` or
+ *                                        `regimes`
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the command does not fit
+ * \see RBRInstrumentGen4_getSchedule()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Schedule *schedule);
+
+/**
+ * \brief `schedule` command parameters.
+ *
+ * \see RBRInstrumentGen4_getSchedulePool()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
+ */
+typedef struct RBRInstrumentGen4SchedulePool
+{
+    /** \brief The number of schedules defined on the instrument. */
+    int32_t count;
+
+    /**
+     * \brief `maxcount`.
+     *
+     * When it exceeds #RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX, only that many
+     * schedules are reported.
+     */
+    int32_t maxCount;
+
+    /** \brief The pool of schedules. */
     RBRInstrumentGen4Schedule pool[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
 
-    /**
-     * \brief The sampling modes the instrument offers.
-     *
-     * Any combination of the mode flags. Which modes are offered depends on
-     * how the instrument is provisioned, so a mode absent here cannot be set
-     * on a schedule.
-     */
+    /** \brief The modes the instrument offers. */
     RBRInstrumentGen4ScheduleMode availableModes;
 
+    /** \brief The number of entries in #availableFastPeriods. */
+    int32_t availableFastPeriodCount;
+
     /**
-     * \brief Fast measurement periods available for the logger for sampling
-     * rates faster than 1Hz.
+     * \brief `availablefastperiods`, in the order reported.
      *
-     * Available fast periods are stored in the array in the order reported by
-     * the instrument. Unused array elements are populated with `0`. If more
-     * than #RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX are available, trailing
-     * entries are discarded.
-     *
-     * \readonly
+     * Entries past #RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX are
+     * discarded.
      */
-    const RBRInstrumentGen4Period availableFastPeriods[RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX];
+    RBRInstrumentGen4Period
+        availableFastPeriods[RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX];
+
+    /** \brief `maxregimes`. */
+    int32_t maxRegimes;
 } RBRInstrumentGen4SchedulePool;
 
 /**
@@ -1952,20 +1761,19 @@ const char *RBRInstrumentGen4ScheduleMode_name(
     RBRInstrumentGen4ScheduleMode mode);
 
 /**
- * \brief Populate the pool of schedules with the labels of the schedules defined on the logger.
- * \note Issues the `schedule` instrument command.
+ * \brief Populate the pool of the instrument's schedules.
+ *
+ * Only the labels are reported; read a schedule's parameters with
+ * RBRInstrumentGen4_getSchedule().
+ *
+ * \note Issues the `schedule` command.
  *
  * \param [in] instrument the instrument connection
- * \param [out] schedulePool the pool of schedules defined on the logger
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedules are all successfully read
+ * \param [out] schedulePool the populated pool of schedules
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedules are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if any schedule cannot be read
  * \see RBRInstrumentGen4_getSchedule()
- * \see RBRInstrumentGen4_setSchedule()
- * \see RBRInstrumentGen4_createSchedule()
- * \see RBRInstrumentGen4_deleteSchedule()
- * \see RBRInstrumentGen4_deleteScheduleAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
@@ -1973,147 +1781,60 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
     RBRInstrumentGen4SchedulePool *schedulePool);
 
 /**
- * \brief Populate a schedule with schedule parameters from the logger.
- * \note Issues the `schedule <schedule_label>` instrument command.
+ * \brief Create a schedule with default parameters.
  *
- * Hardware errors may occur if:
+ * Configure it with RBRInstrumentGen4_setSchedule().
  *
- * - you specify a schedule that does not exist
- *
- * \param [in] instrument the instrument connection
- * \param [in] groupPool the pool of groups defined on the logger, to associate with the schedule
- * \param [inout] schedule a pointer to the specified schedule
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the schedule cannot be read
- * \see RBRInstrumentGen4_getSchedulePool()
- * \see RBRInstrumentGen4_setSchedule()
- * \see RBRInstrumentGen4_createSchedule()
- * \see RBRInstrumentGen4_deleteSchedule()
- * \see RBRInstrumentGen4_deleteScheduleAll()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4GroupPool *groupPool,
-    RBRInstrumentGen4Schedule *schedule);
-
-/**
- * \brief Set the instrument schedule.
- * \note Issues the `schedule <schedule_label>` instrument command.
- *
- * The values of RBRInstrumentGen4Deployment.availableFastPeriods are not sent to the instrument,
- * but they are used to validate the chosen period in RBRInstrumentGen4Schedule.
- * If the period is less than 1,000 and the RBRInstrumentGen4Deployment.availableFastPeriods are populated, then
- * the period must be one of those available fast periods.
- *
- * Periods greater than or equal to 1,000 (one second) must be an integer
- * multiple of 1,000 and must be less than or equal to 86,400,000 (24 hours).
- *
- * Hardware errors may occur if:
- *
- * - you include a group that does not exist
- * - you include a group multiple times
- * - you include too many groups
- * - you specify a sampling mode which is not supported
- * - you specify a sampling rate which is not supported
+ * \note Issues the `schedule create <schedule_label>` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] schedule the schedule to be set
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully changed
+ * \param [in] label the label to give the new schedule
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully created
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the schedule cannot be changed
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when parameter values are out
- *                                                of range
- * \see RBRInstrumentGen4_getSchedulePool()
- * \see RBRInstrumentGen4_getSchedule()
- * \see RBRInstrumentGen4_createSchedule()
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when it cannot be created
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRInstrumentGen4_deleteSchedule()
- * \see RBRInstrumentGen4_deleteScheduleAll()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedule *schedule);
-
-/**
- * \brief Creates a schedule with default parameters and the provided label.
- * \note Issues the `schedule create <schedule_label>` instrument command.
- *
- * Hardware errors may occur if:
- *
- * - you specify a schedule label that already exists
- * - you specify an invalid schedule label
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
- *
- * \param [in] instrument the instrument connection
- * \param [in] newScheduleLabel the label to give the new schedule
- * \param [inout] schedulePool the pool of schedules defined on the logger
- * \param [out] newSchedule a pointer to the new schedule in schedulePool
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfuly created
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the schedule cannot be created
- * \see RBRInstrumentGen4_getSchedulePool()
- * \see RBRInstrumentGen4_getSchedule()
- * \see RBRInstrumentGen4_setSchedule()
- * \see RBRInstrumentGen4_deleteSchedule()
- * \see RBRInstrumentGen4_deleteScheduleAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_createSchedule(
     RBRInstrumentGen4 *instrument,
-    const char *newScheduleLabel,
-    RBRInstrumentGen4SchedulePool *schedulePool,
-    RBRInstrumentGen4Schedule **newSchedule);
+    const char *label);
 
 /**
- * \brief Deletes one schedule defined on the logger.
- * \note Issues the `schedule delete <schedule_label>` instrument command.
+ * \brief Delete a schedule.
  *
- * Hardware errors may occur if:
- *
- * - you specify a schedule that does not exist
+ * \note Issues the `schedule delete <schedule_label>` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] scheduleToDelete the single schedule to delete from the pool
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfuly deleted
+ * \param [in] label the label of the schedule to delete
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully deleted
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the schedule cannot be deleted
- * \see RBRInstrumentGen4_getSchedulePool()
- * \see RBRInstrumentGen4_getSchedule()
- * \see RBRInstrumentGen4_setSchedule()
- * \see RBRInstrumentGen4_createSchedule()
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when it does not exist
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRInstrumentGen4_deleteScheduleAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteSchedule(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedule *scheduleToDelete);
+    const char *label);
 
 /**
- * \brief Deletes all the schedules defined on the logger.
- * \note Issues the `schedule delete all` instrument command.
+ * \brief Delete every schedule.
+ *
+ * \note Issues the `schedule delete all` command.
  *
  * \param [in] instrument the instrument connection
- * \param [inout] schedulePoolToDelete the pool of schedules defined on the logger
- * \return #RBRINSTRUMENTGEN4_SUCCESS when all configs are successfully deleted
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedules are deleted
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if any schedule cannot be deleted
- * \see RBRInstrumentGen4_getSchedulePool()
- * \see RBRInstrumentGen4_getSchedule()
- * \see RBRInstrumentGen4_setSchedule()
- * \see RBRInstrumentGen4_createSchedule()
  * \see RBRInstrumentGen4_deleteSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteScheduleAll(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4SchedulePool *schedulePoolToDelete);
+    RBRInstrumentGen4 *instrument);
 
 /**
  * \brief `config <config_label>` command parameters.
