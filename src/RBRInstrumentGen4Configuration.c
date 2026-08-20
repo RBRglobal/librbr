@@ -1634,29 +1634,28 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfigAll(
     return RBRInstrumentGen4_converse(instrument, "config delete all");
 }
 
-const char *RBRInstrumentGen4SamplingMode_name(RBRInstrumentGen4SamplingMode mode)
+const char *RBRInstrumentGen4ScheduleMode_name(
+    RBRInstrumentGen4ScheduleMode mode)
 {
     switch (mode)
     {
-    case RBRINSTRUMENTGEN4_SAMPLING_CONTINUOUS:
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS:
         return "continuous";
-    case RBRINSTRUMENTGEN4_SAMPLING_BURST:
-        return "burst";
-    case RBRINSTRUMENTGEN4_SAMPLING_WAVE:
-        return "wave";
-    case RBRINSTRUMENTGEN4_SAMPLING_AVERAGE:
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_AVERAGE:
         return "average";
-    case RBRINSTRUMENTGEN4_SAMPLING_TIDE:
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_BURST:
+        return "burst";
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_TIDE:
         return "tide";
-    case RBRINSTRUMENTGEN4_SAMPLING_REGIMES:
-        return "regimes";
-    case RBRINSTRUMENTGEN4_SAMPLING_DDSAMPLING:
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_WAVE:
+        return "wave";
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_DDSAMPLING:
         return "ddsampling";
-    case RBRINSTRUMENTGEN4_SAMPLING_COUNT:
-        return "sampling mode count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_SAMPLING:
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES:
+        return "regimes";
+    case RBRINSTRUMENTGEN4_SCHEDULE_MODE_NONE:
     default:
-        return "unknown sampling mode";
+        return "unknown schedule mode";
     }
 }
 
@@ -1688,7 +1687,11 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
     //GEN4 todo: Question: do we want to validate period with deployment values?
     //RBR_TRY(RBRInstrumentGen4Schedule_validateSchedulePeriod(schedule, scheduleLabel, deployment));
 
-    if (schedule->mode < 0 || schedule->mode >= RBRINSTRUMENTGEN4_SAMPLING_COUNT)
+    /* A schedule runs in exactly one mode, so a value with no flags, more
+     * than one flag, or a flag the library does not define cannot be sent. */
+    if (schedule->mode == RBRINSTRUMENTGEN4_SCHEDULE_MODE_NONE
+        || schedule->mode > RBRINSTRUMENTGEN4_SCHEDULE_MODE_MAX
+        || (schedule->mode & (schedule->mode - 1)) != 0)
     {
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }

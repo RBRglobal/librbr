@@ -1442,32 +1442,39 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteGroupAll(
     RBRInstrumentGen4 *instrument);
 
 /**
- * \brief Possible instrument sampling modes for a schedule.
+ * \brief The modes of a schedule.
  *
- * \see RBRInstrumentGen4Schedule
+ * Flags, so one type serves both a schedule's mode and the set of modes the
+ * instrument offers. A schedule's mode must be a single flag;
+ * RBRInstrumentGen4_setSchedule() rejects any other value.
+ *
+ * \see RBRInstrumentGen4Schedule.mode
+ * \see RBRInstrumentGen4SchedulePool.availableModes
+ * \see bitfields.md
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-typedef enum RBRInstrumentGen4SamplingMode
+typedef enum RBRInstrumentGen4ScheduleMode
 {
-    /** Continuous schedule mode. */
-    RBRINSTRUMENTGEN4_SAMPLING_CONTINUOUS,
-    /** Direction-dependent schedule mode.  */
-    RBRINSTRUMENTGEN4_SAMPLING_DDSAMPLING,
-    /** Regime schedule mode. */
-    RBRINSTRUMENTGEN4_SAMPLING_REGIMES,
-    /** Average schedule mode. */
-    RBRINSTRUMENTGEN4_SAMPLING_AVERAGE,
-    /** Tide schedule mode. */
-    RBRINSTRUMENTGEN4_SAMPLING_TIDE,
-    /** Burst schedule mode. */
-    RBRINSTRUMENTGEN4_SAMPLING_BURST,
-    /** Wave schedule mode. */
-    RBRINSTRUMENTGEN4_SAMPLING_WAVE,
-    /** The number of specific schedule modes. */
-    RBRINSTRUMENTGEN4_SAMPLING_COUNT,
-    /** An unknown or unrecognized schedule mode. */
-    RBRINSTRUMENTGEN4_UNKNOWN_SAMPLING
-} RBRInstrumentGen4SamplingMode;
+    /** \brief No mode, and any mode the library does not recognize. */
+    RBRINSTRUMENTGEN4_SCHEDULE_MODE_NONE = 0,
+    /** \brief Continuous mode. */
+    RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS = 1 << 0,
+    /** \brief Average mode. */
+    RBRINSTRUMENTGEN4_SCHEDULE_MODE_AVERAGE = 1 << 1,
+    /** \brief Burst mode. */
+    RBRINSTRUMENTGEN4_SCHEDULE_MODE_BURST = 1 << 2,
+    /** \brief Tide mode. */
+    RBRINSTRUMENTGEN4_SCHEDULE_MODE_TIDE = 1 << 3,
+    /** \brief Wave mode. */
+    RBRINSTRUMENTGEN4_SCHEDULE_MODE_WAVE = 1 << 4,
+    /** \brief Direction-dependent mode. */
+    RBRINSTRUMENTGEN4_SCHEDULE_MODE_DDSAMPLING = 1 << 5,
+    /** \brief Regimes mode. */
+    RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES = 1 << 6,
+    /** \brief The greatest mode flag. */
+    RBRINSTRUMENTGEN4_SCHEDULE_MODE_MAX =
+        RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES
+} RBRInstrumentGen4ScheduleMode;
 
 /**
  * \brief Defines schedule mode-dependent-parameters: continuous mode.
@@ -1865,7 +1872,7 @@ typedef struct RBRInstrumentGen4Schedule
     bool storage;
 
     /** \brief The sampling mode to be used by this schedule. */
-    RBRInstrumentGen4SamplingMode mode;
+    RBRInstrumentGen4ScheduleMode mode;
 
     /** \brief Defines schedule Mode-dependent-parameters. 
      */
@@ -1894,42 +1901,6 @@ typedef struct RBRInstrumentGen4Schedule
 } RBRInstrumentGen4Schedule;
 
 /**
- * \brief The sampling modes currently available in the instruments.
- * \see RBRInstrumentGen4SchedulePool
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
- */
-typedef enum RBRInstrumentGen4Availablemodes{
-    /** \brief Prompt*/
-    RBRINSTRUMENTGEN4_PROMPT= 1 << 0,
-    /** \brief confirmation*/
-    RBRINSTRUMENTGEN4_CONFIRMATION= 1 << 1,
-    /** \brief streamusb*/
-    RBRINSTRUMENTGEN4_STREAMUSB= 1 << 2,
-    /** \brief streamserial*/
-    RBRINSTRUMENTGEN4_STREAMSERIAL= 1 << 3,
-    /** \brief average mode*/
-    RBRINSTRUMENTGEN4_AVERAGE= 1 << 4,
-    /** \brief burst mode*/
-    RBRINSTRUMENTGEN4_BURST= 1 << 5,
-    /** \brief tide mode*/
-    RBRINSTRUMENTGEN4_TIDE= 1 << 6,
-    /** \brief wave mode*/
-    RBRINSTRUMENTGEN4_WAVE= 1 << 7,
-    /** \brief thresholding*/
-    RBRINSTRUMENTGEN4_THRESHOLDING= 1 << 8,
-    /** \brief twistactivation*/
-    RBRINSTRUMENTGEN4_TWISTACTIVATION= 1 << 9,
-    /** \brief regimes mode*/
-    RBRINSTRUMENTGEN4_REGIMES= 1 << 10,
-    /** \brief ddsampling mode*/
-    RBRINSTRUMENTGEN4_DDSAMPLING= 1 << 11,
-    /** \brief wifi*/
-    RBRINSTRUMENTGEN4_WIFI= 1 << 12,
-    /** \brief pauseresume*/
-    RBRINSTRUMENTGEN4_PAUSERESUME= 1 << 13
-}RBRInstrumentGen4Availablemodes;
-
-/**
  * \brief Instrument `schedule` command parameters.
  * Serves as a persistent cache of channel structs.
  *
@@ -1947,12 +1918,14 @@ typedef struct RBRInstrumentGen4SchedulePool{
     /** \brief List of schedule objects. */
     RBRInstrumentGen4Schedule pool[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
 
-    /** \brief lists all the sampling modes configured to be available in the instruments.
-     * Items are specified as a bitfield.
+    /**
+     * \brief The sampling modes the instrument offers.
      *
-     * \readonly
+     * Any combination of the mode flags. Which modes are offered depends on
+     * how the instrument is provisioned, so a mode absent here cannot be set
+     * on a schedule.
      */
-    const RBRInstrumentGen4Availablemodes availableModes;
+    RBRInstrumentGen4ScheduleMode availableModes;
 
     /**
      * \brief Fast measurement periods available for the logger for sampling
@@ -1975,7 +1948,8 @@ typedef struct RBRInstrumentGen4SchedulePool{
  * \return a string name for the schedule mode
  * \see RBRInstrumentGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4SamplingMode_name(RBRInstrumentGen4SamplingMode mode);
+const char *RBRInstrumentGen4ScheduleMode_name(
+    RBRInstrumentGen4ScheduleMode mode);
 
 /**
  * \brief Populate the pool of schedules with the labels of the schedules defined on the logger.
