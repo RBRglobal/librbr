@@ -74,9 +74,6 @@ extern "C"
      * \param source source array
      * \param count the number of elements to copy
      */
-    void cpy_ptrArray_forChannel(RBRInstrumentGen4Channel *target[],
-                                 RBRInstrumentGen4Channel *source[],
-                                 int count);
 
     /**
      * \brief Copy an array of pointers to group structs.
@@ -222,7 +219,6 @@ extern "C"
      * \param [in] specifiedChannelLabels the labels of the channels to include in the group
      * \param [in] specifiedChannelLabelCnt the number of channels to include in the group
      * \param [in] channelPool the pool to search in
-     * \param [inout] groupPool the pool to add to
      * \param [out] newGroup the new group
      */
     RBRInstrumentGen4Error RBRInstrumentGen4_initNewGroup(
@@ -231,8 +227,7 @@ extern "C"
         const char specifiedChannelLabels[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX],
         int32_t specifiedChannelLabelCnt,
         RBRInstrumentGen4ChannelPool *channelPool,
-        RBRInstrumentGen4GroupPool *groupPool,
-        RBRInstrumentGen4Group **newGroup);
+        RBRInstrumentGen4Group *newGroup);
 
     /**
      * \brief Create and populate a new parent.

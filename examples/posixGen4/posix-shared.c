@@ -254,17 +254,6 @@ void str_to_deploymentDatetime(RBRInstrumentGen4DateTime *targetDatetime,
 }
 
 // can be static.
-void cpy_ptrArray_forChannel(RBRInstrumentGen4Channel *target[],
-                             RBRInstrumentGen4Channel *source[],
-                             int count)
-{
-    for (int i = 0; i < count; i++)
-    {
-        target[i] = source[i];
-    }
-}
-
-// can be static.
 void cpy_ptrArray_forGroup(RBRInstrumentGen4Group *target[],
                            RBRInstrumentGen4Group *source[],
                            int count)
@@ -336,8 +325,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
     }
 
     // Only the channels which were actually found are copied to the group.
-    cpy_ptrArray_forChannel(group->channelList, _newPtrList, _currentIndex);
-    group->count = _currentIndex;
+    for (int32_t i = 0; i < _currentIndex; i++)
+    {
+        snprintf(group->channelList[i],
+                 sizeof(group->channelList[i]),
+                 "%s",
+                 _newPtrList[i]->label);
+    }
+    group->channelCount = _currentIndex;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
@@ -452,15 +447,17 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewGroup(
     const char specifiedChannelLabels[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX],
     int32_t specifiedChannelLabelCnt,
     RBRInstrumentGen4ChannelPool *channelPool,
-    RBRInstrumentGen4GroupPool *groupPool,
-    RBRInstrumentGen4Group **newGroup)
+    RBRInstrumentGen4Group *newGroup)
 {
-    RBRInstrumentGen4_createGroup(instrument, newGroupLabel, groupPool, newGroup);
-    RBRInstrumentGen4_populateGroupChannels(*newGroup,
+    memset(newGroup, 0, sizeof(RBRInstrumentGen4Group));
+    snprintf(newGroup->label, sizeof(newGroup->label), "%s", newGroupLabel);
+
+    RBRInstrumentGen4_createGroup(instrument, newGroupLabel);
+    RBRInstrumentGen4_populateGroupChannels(newGroup,
                                     channelPool,
                                     specifiedChannelLabels,
                                     specifiedChannelLabelCnt);
-    RBRInstrumentGen4_setGroup(instrument, *newGroup);
+    RBRInstrumentGen4_setGroup(instrument, newGroup);
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 // can be static

@@ -1255,209 +1255,191 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getUvled(RBRInstrumentGen4 *instrument,
 RBRInstrumentGen4Error RBRInstrumentGen4Uvled_setUvled(RBRInstrumentGen4 *instrument, const RBRInstrumentGen4Uvled *uvled);
 
 /**
- * \brief Instrument `group <group_label>` command parameters.
+ * \brief `group <group_label>` command parameters.
  *
  * \see RBRInstrumentGen4GroupPool
- * \see RBRInstrumentGen4Schedule
  * \see RBRInstrumentGen4_getGroup()
  * \see RBRInstrumentGen4_setGroup()
- * \see RBRInstrumentGen4_createGroup()
- * \see RBRInstrumentGen4_deleteGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-typedef struct RBRInstrumentGen4Group {
+typedef struct RBRInstrumentGen4Group
+{
     /**
      * \brief The group's label.
-     * \warning It is subject to naming constraints.
-     * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
+     *
+     * Set by the caller to select the group to read.
      */
-    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX+1];
+    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
-    /** \brief The number of channels in this group. */
-    int32_t count;
+    /** \brief The number of channels in the group. */
+    int32_t channelCount;
+
+    /** \brief The labels of the channels in the group. */
+    char channelList[RBRINSTRUMENTGEN4_CHANNEL_MAX]
+                    [RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX + 1];
 
     /**
-     * \brief A list of all channel labels.
-     * \note The order of this list is arbitrary and defined by the logger.
-     */
-    RBRInstrumentGen4Channel *channelList[RBRINSTRUMENTGEN4_CHANNEL_MAX];
-
-    /**
-     * \brief Pointer to the parent group pool.
+     * \brief The number of schedules using the group.
+     *
      * \readonly
      */
-    void *parent;
-}RBRInstrumentGen4Group;
+    const int32_t scheduleCount;
+
+    /**
+     * \brief The labels of the schedules using the group.
+     *
+     * \readonly
+     * \see RBRInstrumentGen4_setSchedule()
+     */
+    const char scheduleList[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX]
+                           [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+} RBRInstrumentGen4Group;
 
 /**
- * \brief Instrument `group` command parameters.
- * Serves as a persistent cache of channel groupings configured on the logger.
+ * \brief Populate the parameters of a group.
  *
- * \see RBRInstrumentGen4_getGroupPool()
- * \see RBRInstrumentGen4_createGroup()
- * \see RBRInstrumentGen4_deleteGroup()
- * \see RBRInstrumentGen4_deleteGroupAll()
- * \see RBRInstrumentGen4_getSchedule()
- */
-typedef struct RBRInstrumentGen4GroupPool {
-    /** \brief The number of groups currently defined. */
-    int32_t count;
-
-    /** \brief List of channel objects. */
-    RBRInstrumentGen4Group pool[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX];
-} RBRInstrumentGen4GroupPool;
-
-/**
- * \brief Reports the properties of the specified channel grouping.
- * \note Issues the `group <group_label>` instrument command.
+ * The caller sets RBRInstrumentGen4Group.label to select the group to read.
  *
- * Hardware errors may occur if:
- * - you specify a group that does not exist.
+ * \note Issues the `group <group_label>` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] channelPool the pool of the logger's channels to associate with the group
- * \param [inout] group the information of specified group
+ * \param [in,out] group the group to read, selected by its label
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the group cannot be read
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the group does not exist
  * \see RBRInstrumentGen4_getGroupPool()
  * \see RBRInstrumentGen4_setGroup()
- * \see RBRInstrumentGen4_createGroup()
- * \see RBRInstrumentGen4_deleteGroup()
- * \see RBRInstrumentGen4_deleteGroupAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getGroup(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4ChannelPool *channelPool,
     RBRInstrumentGen4Group *group);
 
 /**
- * \brief Modifies the properties of the specified channel grouping.
- * \note Issues the `group <group_label>` instrument command.
+ * \brief Set the channels in a group.
  *
- * Hardware errors may occur if:
+ * Sends `channellist`, the only writable parameter. A zero
+ * RBRInstrumentGen4Group.channelCount sends `none`.
  *
- * - you include a channel that does not exist
- * - you include a channel multiple times
- * - you include too many channels
+ * \note Issues the `group <group_label>` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] group the information of the specified group
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully changed
+ * \param [in] group the group to write
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully written
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the group cannot be changed
- * \see RBRInstrumentGen4_getGroupPool()
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the group cannot be written
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty,
+ *                                                    the channel count is out
+ *                                                    of range, or a channel
+ *                                                    label is empty
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit
  * \see RBRInstrumentGen4_getGroup()
- * \see RBRInstrumentGen4_createGroup()
- * \see RBRInstrumentGen4_deleteGroup()
- * \see RBRInstrumentGen4_deleteGroupAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_setGroup(
-    RBRInstrumentGen4 *instrument, 
-    RBRInstrumentGen4Group *group);
-
-/**
- * \brief Creates a new empty group of channels.
- * \note Issues the `group create <group_label>` instrument command.
- *
- * Hardware errors may occur if:
- *
- * - you specify a group label that already exists
- * - you specify an invalid group label
- *
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
- *
- * \param [in] instrument the instrument connection
- * \param [in] newGroupLabel the label to give the new group
- * \param [inout] groupPool the pool of groups defined on the logger
- * \param [out] newGroup a pointer to the new group in groupPool
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully created
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the group cannot be created
- * \see RBRInstrumentGen4_getGroupPool()
- * \see RBRInstrumentGen4_getGroup()
- * \see RBRInstrumentGen4_setGroup()
- * \see RBRInstrumentGen4_deleteGroup()
- * \see RBRInstrumentGen4_deleteGroupAll()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_createGroup(
     RBRInstrumentGen4 *instrument,
-    const char *newGroupLabel,
-    RBRInstrumentGen4GroupPool *groupPool,
-    RBRInstrumentGen4Group **newGroup);
+    const RBRInstrumentGen4Group *group);
 
 /**
- * \brief Deletes a specific channel group.
- * \note Issues the `group delete <group_label>` instrument command.
+ * \brief `group` command parameters.
  *
- * Hardware errors may occur if:
- *
- * - you specify a group that does not exist
- *
- * \param [in] instrument the instrument connection
- * \param [in] groupToDelete the single group to delete from the pool
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully deleted
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the group cannot be deleted
  * \see RBRInstrumentGen4_getGroupPool()
- * \see RBRInstrumentGen4_getGroup()
- * \see RBRInstrumentGen4_setGroup()
- * \see RBRInstrumentGen4_createGroup()
- * \see RBRInstrumentGen4_deleteGroupAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteGroup(
-    RBRInstrumentGen4 *instrument, 
-    RBRInstrumentGen4Group *groupToDelete);
+typedef struct RBRInstrumentGen4GroupPool
+{
+    /** \brief The number of groups defined on the instrument. */
+    int32_t count;
+
+    /**
+     * \brief `maxcount`.
+     *
+     * When it exceeds #RBRINSTRUMENTGEN4_GROUP_COUNT_MAX, only that many
+     * groups are reported.
+     */
+    int32_t maxCount;
+
+    /** \brief The pool of groups. */
+    RBRInstrumentGen4Group pool[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX];
+} RBRInstrumentGen4GroupPool;
 
 /**
- * \brief Deletes all channel groups.
- * \note Issues the `group delete all` instrument command.
+ * \brief Populate the pool of the instrument's groups.
  *
- * \param [in] instrument the instrument connection 
- * \param [inout] groupPoolToDelete the pool of groups defined on the logger
- * \return #RBRINSTRUMENTGEN4_SUCCESS when all groups are successfully deleted
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if any group cannot be deleted
- * \see RBRInstrumentGen4_getGroupPool()
- * \see RBRInstrumentGen4_getGroup()
- * \see RBRInstrumentGen4_setGroup()
- * \see RBRInstrumentGen4_createGroup()
- * \see RBRInstrumentGen4_deleteGroup()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteGroupAll(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4GroupPool *groupPoolToDelete);
-
-/**
- * \brief Populate the pool of channel groupings wuth the labels of the groups defined on the logger.
- * \note Issues the `group` instrument command.
+ * Only the labels are reported; read a group's parameters with
+ * RBRInstrumentGen4_getGroup().
+ *
+ * \note Issues the `group` command.
  *
  * \param [in] instrument the instrument connection
- * \param [out] groupPool the pool of groups defined on the logger
- * \return #RBRINSTRUMENTGEN4_SUCCESS when all groups are successfully read
+ * \param [out] groupPool the populated pool of groups
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the groups are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if any group cannot be read
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  * \see RBRInstrumentGen4_getGroup()
- * \see RBRInstrumentGen4_setGroup()
- * \see RBRInstrumentGen4_createGroup()
- * \see RBRInstrumentGen4_deleteGroup()
- * \see RBRInstrumentGen4_deleteGroupAll()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getGroupPool(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4GroupPool *groupPool);
+
+/**
+ * \brief Create an empty group.
+ *
+ * Add channels with RBRInstrumentGen4_setGroup().
+ *
+ * \note Issues the `group create <group_label>` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] label the label to give the new group
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully created
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the group cannot be created
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \see RBRInstrumentGen4_deleteGroup()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_createGroup(
+    RBRInstrumentGen4 *instrument,
+    const char *label);
+
+/**
+ * \brief Delete a group.
+ *
+ * \note Issues the `group delete <group_label>` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] label the label of the group to delete
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully deleted
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the group does not exist
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \see RBRInstrumentGen4_deleteGroupAll()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_deleteGroup(
+    RBRInstrumentGen4 *instrument,
+    const char *label);
+
+/**
+ * \brief Delete every group.
+ *
+ * \note Issues the `group delete all` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the groups are successfully deleted
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen4_deleteGroup()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_deleteGroupAll(
+    RBRInstrumentGen4 *instrument);
 
 /**
  * \brief Possible instrument sampling modes for a schedule.

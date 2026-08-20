@@ -1239,3 +1239,263 @@ TEST_LOGGER4(channelSetEmptyUserUnits)
 
     return true;
 }
+
+TEST_LOGGER4(grouplist)
+{
+    RBRInstrumentGen4GroupPool actual;
+
+    TestIOBuffers_init(buffers,
+                       "group count=2 maxcount=16 list=g_a|g_b"
+                       RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getGroupPool(instrument,
+                                                               &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("group" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(2, actual.count, "%" PRIi32);
+    TEST_ASSERT_EQ(16, actual.maxCount, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("g_a", actual.pool[0].label);
+    TEST_ASSERT_STR_EQ("g_b", actual.pool[1].label);
+
+    return true;
+}
+
+TEST_LOGGER4(grouplistWithoutGroups)
+{
+    RBRInstrumentGen4GroupPool actual;
+
+    TestIOBuffers_init(buffers,
+                       "group count=0 maxcount=16 list=none"
+                       RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getGroupPool(instrument,
+                                                               &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(0, actual.count, "%" PRIi32);
+    TEST_ASSERT_EQ(16, actual.maxCount, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("", actual.pool[0].label);
+
+    return true;
+}
+
+TEST_LOGGER4(group)
+{
+    RBRInstrumentGen4Group actual = {
+        .label = "g_a"
+    };
+
+    TestIOBuffers_init(
+        buffers,
+        "group g_a channellist=temperature_00|pressure_00 schedulelist=s_a"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getGroup(instrument,
+                                                           &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("group g_a" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("g_a", actual.label);
+    TEST_ASSERT_EQ(2, actual.channelCount, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("temperature_00", actual.channelList[0]);
+    TEST_ASSERT_STR_EQ("pressure_00", actual.channelList[1]);
+    TEST_ASSERT_EQ(1, actual.scheduleCount, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("s_a", actual.scheduleList[0]);
+
+    return true;
+}
+
+TEST_LOGGER4(groupWithoutChannels)
+{
+    RBRInstrumentGen4Group actual = {
+        .label = "g_b"
+    };
+
+    TestIOBuffers_init(buffers,
+                       "group g_b channellist=none schedulelist=s_a"
+                       RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getGroup(instrument,
+                                                           &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(0, actual.channelCount, "%" PRIi32);
+    TEST_ASSERT_EQ(1, actual.scheduleCount, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("s_a", actual.scheduleList[0]);
+
+    return true;
+}
+
+TEST_LOGGER4(groupWithoutSchedules)
+{
+    RBRInstrumentGen4Group actual = {
+        .label = "g_test"
+    };
+
+    TestIOBuffers_init(
+        buffers,
+        "group g_test channellist=temperature_00|pressure_00 schedulelist=none"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getGroup(instrument,
+                                                           &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(2, actual.channelCount, "%" PRIi32);
+    TEST_ASSERT_EQ(0, actual.scheduleCount, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(groupSet)
+{
+    RBRInstrumentGen4Group group = {
+        .label = "g_a",
+        .channelCount = 2,
+        .channelList = { "temperature_00", "pressure_00" }
+    };
+
+    TestIOBuffers_init(
+        buffers,
+        "group g_a channellist=temperature_00|pressure_00"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument, &group);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("group g_a channellist=temperature_00|pressure_00"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(groupSetClearingChannels)
+{
+    RBRInstrumentGen4Group group = {
+        .label = "g_a",
+        .channelCount = 0
+    };
+
+    TestIOBuffers_init(buffers,
+                       "group g_a channellist=none" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument, &group);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("group g_a channellist=none" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(groupSetEmptyLabel)
+{
+    RBRInstrumentGen4Group group = {
+        .label = "",
+        .channelCount = 1,
+        .channelList = { "temperature_00" }
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument, &group);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    return true;
+}
+
+TEST_LOGGER4(groupSetInvalidChannelCount)
+{
+    RBRInstrumentGen4Group group = {
+        .label = "g_a",
+        .channelCount = RBRINSTRUMENTGEN4_CHANNEL_MAX + 1
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument, &group);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    return true;
+}
+
+TEST_LOGGER4(groupSetEmptyChannelLabel)
+{
+    /* An empty label would produce a malformed list. */
+    RBRInstrumentGen4Group group = {
+        .label = "g_a",
+        .channelCount = 2,
+        .channelList = { "temperature_00", "" }
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument, &group);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    return true;
+}
+
+TEST_LOGGER4(groupCreate)
+{
+    TestIOBuffers_init(buffers,
+                       "group create g_a" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_createGroup(instrument,
+                                                              "g_a");
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("group create g_a" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(groupCreateEmptyLabel)
+{
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_createGroup(instrument, "");
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    return true;
+}
+
+TEST_LOGGER4(groupDelete)
+{
+    TestIOBuffers_init(buffers,
+                       "group delete g_a" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_deleteGroup(instrument,
+                                                              "g_a");
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("group delete g_a" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(groupDeleteAll)
+{
+    TestIOBuffers_init(buffers,
+                       "group delete all" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_deleteGroupAll(instrument);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("group delete all" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}

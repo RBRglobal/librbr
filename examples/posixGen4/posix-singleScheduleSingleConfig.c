@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_deleteScheduleAll(instrument, &schedulePool);
 
     RBRInstrumentGen4GroupPool groupPool;
-    RBRInstrumentGen4_deleteGroupAll(instrument, &groupPool);
+    RBRInstrumentGen4_deleteGroupAll(instrument);
 
     /************ group definition ************/
     /* populate all channelPool and calibrations */
@@ -214,14 +214,13 @@ int main(int argc, char *argv[])
     }
 
     /* specify groupLabel, channel labels, and create group instance */
-    RBRInstrumentGen4Group* group_pts = NULL;
+    RBRInstrumentGen4Group group_pts;
 
     RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         GROUP_PTS_CHANNEL_COUNT,
                         &channelPool,
-                        &groupPool,
                         &group_pts);
 
     /************ schedule definition ************/
