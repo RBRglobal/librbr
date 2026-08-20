@@ -205,33 +205,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_resume(
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-/******************************************************************/
-const char *RBRInstrumentGen4SamplingMode_name(RBRInstrumentGen4SamplingMode mode)
-{
-    switch (mode)
-    {
-    case RBRINSTRUMENTGEN4_SAMPLING_CONTINUOUS:
-        return "continuous";
-    case RBRINSTRUMENTGEN4_SAMPLING_BURST:
-        return "burst";
-    case RBRINSTRUMENTGEN4_SAMPLING_WAVE:
-        return "wave";
-    case RBRINSTRUMENTGEN4_SAMPLING_AVERAGE:
-        return "average";
-    case RBRINSTRUMENTGEN4_SAMPLING_TIDE:
-        return "tide";
-    case RBRINSTRUMENTGEN4_SAMPLING_REGIMES:
-        return "regimes";
-    case RBRINSTRUMENTGEN4_SAMPLING_DDSAMPLING:
-        return "ddsampling";
-    case RBRINSTRUMENTGEN4_SAMPLING_COUNT:
-        return "sampling mode count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_SAMPLING:
-    default:
-        return "unknown sampling mode";
-    }
-}
-
 const char *RBRInstrumentGen4Direction_name(RBRInstrumentGen4Direction direction)
 {
     switch (direction)
@@ -263,75 +236,4 @@ const char *RBRInstrumentGen4RegimesReference_name(
     default:
         return "unknown regimes reference";
     }
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4SchedulePool *schedulePool)
-{
-    //GEN4 todo: add logic about it.
-    (void)instrument;
-    (void)schedulePool;
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4GroupPool *groupPool,
-    RBRInstrumentGen4Schedule *schedule)
-{
-    (void)instrument;
-    (void)groupPool;
-    (void)schedule;
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedule *schedule)
-{
-    //GEN4 todo: Question: do we want to validate period with deployment values?
-    //RBR_TRY(RBRInstrumentGen4Schedule_validateSchedulePeriod(schedule, scheduleLabel, deployment));
-
-    if (schedule->mode < 0 || schedule->mode >= RBRINSTRUMENTGEN4_SAMPLING_COUNT)
-    {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-    }
-
-    //GEN4 todo: generate a command which is mode-dependent.
-    const char *setScheduleCommand=NULL;
-    return RBRInstrumentGen4_converse(
-        instrument,
-        setScheduleCommand);
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_createSchedule(
-    RBRInstrumentGen4 *instrument,
-    const char *newScheduleLabel,
-    RBRInstrumentGen4SchedulePool *schedulePool,
-    RBRInstrumentGen4Schedule **newSchedule){
-        //GEN4 todo: add logic about it.
-    (void)instrument;
-    (void)newScheduleLabel;
-    (void)schedulePool;
-    (void)newSchedule;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteSchedule(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedule *schedule){
-        //GEN4 todo: add logic about it.
-    (void)instrument;
-    (void)schedule;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteScheduleAll(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4SchedulePool *schedulePool){
-        //GEN4 todo: add logic about it.
-        (void)instrument;
-        (void)schedulePool;
-        return RBRINSTRUMENTGEN4_SUCCESS;
 }
