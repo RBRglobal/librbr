@@ -184,7 +184,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getNode(
  */
 typedef struct RBRInstrumentGen4NodePool
 {
-    /** \brief The number of nodes on the instrument. */
+    /**
+     * \brief The number of nodes on the instrument.
+     *
+     * \warning Use `min(count, RBRINSTRUMENTGEN4_NODE_COUNT_MAX)` to avoid an
+     * out-of-bounds error when accessing #pool if 
+     * #count > #RBRINSTRUMENTGEN4_NODE_COUNT_MAX.
+     */
     int32_t count;
 
     /** \brief The pool of nodes. */
@@ -359,7 +365,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPort(
  */
 typedef struct RBRInstrumentGen4PortPool
 {
-    /** \brief The number of ports across all nodes. */
+    /**
+     * \brief The number of ports across all nodes.
+     *
+     * \warning Use `min(count, RBRINSTRUMENTGEN4_PORT_COUNT_MAX)` to avoid an
+     * out-of-bounds error when accessing #pool if 
+     * #count > #RBRINSTRUMENTGEN4_PORT_COUNT_MAX.
+     */
     int32_t count;
 
     /** \brief The pool of ports. */
@@ -541,7 +553,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDevice(
  */
 typedef struct RBRInstrumentGen4DevicePool
 {
-    /** \brief The number of devices across all ports. */
+    /**
+     * \brief The number of devices across all ports.
+     *
+     * \warning Use `min(count, RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX)` to avoid
+     * an out-of-bounds error when accessing #pool if 
+     * #count > #RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX.
+     */
     int32_t count;
 
     /** \brief The pool of devices. */
@@ -806,7 +824,13 @@ typedef struct RBRInstrumentGen4Channel
  */
 typedef struct RBRInstrumentGen4ChannelPool
 {
-    /** \brief The number of channels reported. */
+    /**
+     * \brief The number of channels reported.
+     *
+     * \warning Use `min(count, RBRINSTRUMENTGEN4_CHANNEL_MAX)` to avoid an
+     * out-of-bounds error when accessing #pool if 
+     * #count > #RBRINSTRUMENTGEN4_CHANNEL_MAX.
+     */
     int32_t count;
 
     /**
@@ -1350,15 +1374,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setGroup(
  */
 typedef struct RBRInstrumentGen4GroupPool
 {
-    /** \brief The number of groups defined on the instrument. */
+    /**
+     * \brief The number of groups defined on the instrument.
+     *
+     * \warning Use `min(count, RBRINSTRUMENTGEN4_GROUP_COUNT_MAX)` to avoid an 
+     * out-of-bounds error when accessing #pool if 
+     * #maxCount > RBRINSTRUMENTGEN4_GROUP_COUNT_MAX.
+     */
     int32_t count;
 
-    /**
-     * \brief `maxcount`.
-     *
-     * When it exceeds #RBRINSTRUMENTGEN4_GROUP_COUNT_MAX, only that many
-     * groups are reported.
-     */
+    /** \brief The maximum number of groups that can exist on the instrument. */
     int32_t maxCount;
 
     /** \brief The pool of groups. */
@@ -1717,14 +1742,18 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
  */
 typedef struct RBRInstrumentGen4SchedulePool
 {
-    /** \brief The number of schedules defined on the instrument. */
+    /**
+     * \brief The number of schedules defined on the instrument.
+     *
+     * \warning Use `min(count, RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX)` to
+     * avoid an out-of-bounds error when accessing #pool if 
+     * #maxCount > #RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX.
+     */
     int32_t count;
 
     /**
-     * \brief `maxcount`.
-     *
-     * When it exceeds #RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX, only that many
-     * schedules are reported.
+     * \brief The maximum number of schedules that can exist on the
+     * instrument.
      */
     int32_t maxCount;
 
@@ -1734,7 +1763,15 @@ typedef struct RBRInstrumentGen4SchedulePool
     /** \brief The modes the instrument offers. */
     RBRInstrumentGen4ScheduleMode availableModes;
 
-    /** \brief The number of entries in #availableFastPeriods. */
+    /**
+     * \brief The number of entries in #availableFastPeriods.
+     *
+     * \warning Use `min(availableFastPeriodCount,
+     * RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX)` to avoid an
+     * out-of-bounds error when accessing #availableFastPeriods if
+     * #availableFastPeriodCount >
+     * RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX.
+     */
     int32_t availableFastPeriodCount;
 
     /**
@@ -1918,14 +1955,18 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setConfig(
  */
 typedef struct RBRInstrumentGen4ConfigPool
 {
-    /** \brief The number of configurations defined on the instrument. */
+    /**
+     * \brief The number of configurations defined on the instrument.
+     *
+     * \warning Use `min(count, RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX)` to avoid
+     * an out-of-bounds error when accessing #pool if 
+     * #maxCount > #RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX.
+     */
     int32_t count;
 
     /**
-     * \brief `maxcount`.
-     *
-     * When it exceeds #RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX, only that many
-     * configurations are reported.
+     * \brief The maximum number of configurations that can exist on the
+     * instrument.
      */
     int32_t maxCount;
 
