@@ -241,13 +241,10 @@ int main(int argc, char *argv[])
                              &loggingState);
 
     /* enable the instrument */
-    RBRInstrumentGen4Dataset *dataset;
     RBRInstrumentGen4_enable(instrument,
                              &config,
                              NEW_DATASET_LABEL,
                              RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
-                             &datasetPool,
-                             &dataset,
                              &loggingState);
 
 instrumentCleanup:

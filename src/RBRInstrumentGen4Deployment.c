@@ -380,32 +380,24 @@ const char *RBRInstrumentGen4DeploymentStoragemode_name(RBRInstrumentGen4Deploym
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_enable(
-        RBRInstrumentGen4 *instrument,
-        const RBRInstrumentGen4Config *config,
-        const char datasetLabel[], 
-        const RBRInstrumentGen4DeploymentStoragemode storageMode, 
-        RBRInstrumentGen4DatasetPool *datasetPool,
-        RBRInstrumentGen4Dataset **newDataset,
-        RBRInstrumentGen4InstrumentState *state)
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Config *config,
+    const char *datasetLabel,
+    RBRInstrumentGen4DeploymentStoragemode storageMode,
+    RBRInstrumentGen4InstrumentState *state)
 {
-    if (storageMode != RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL
-        && storageMode != RBRINSTRUMENTGEN4_STORAGEMODE_CALIBRATION)
-    {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-    }
+    RBR_TRY(RBRInstrumentGen4_checkDeploymentParameters(config,
+                                                        datasetLabel,
+                                                        storageMode));
 
     RBR_TRY(RBRInstrumentGen4_converse(
-        instrument,
-        "enable config=%s dataset=%s storagemode=%s",
-        config->label,
-        datasetLabel,
-        RBRInstrumentGen4DeploymentStoragemode_name(storageMode)));
+                instrument,
+                "enable config=%s dataset=%s storagemode=%s",
+                config->label,
+                datasetLabel,
+                RBRInstrumentGen4DeploymentStoragemode_name(storageMode)));
 
     RBRInstrumentGen4_parseInstrumentState(instrument, state);
-    
-    *newDataset = &datasetPool->pool[datasetPool->count];
-    datasetPool->count += 1;
-    strcpy((*newDataset)->label, datasetLabel);
 
     return RBRINSTRUMENTGEN4_SUCCESS;
 }

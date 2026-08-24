@@ -20,7 +20,6 @@ extern "C"
 
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Configuration.h"
-#include "RBRInstrumentGen4Memory.h"
 /* Required for RBRInstrumentGen4InstrumentState. */
 #include "RBRInstrumentGen4Instrument.h"
 
@@ -322,36 +321,36 @@ RBRInstrumentGen4Error RBRInstrumentGen4_verify(
     RBRInstrumentGen4InstrumentState *state);
 
 /**
- * \brief Enable the instrument to sample according to the programmed schedule.
+ * \brief Enable the instrument to sample for a new deployment.
  * \note Issues the `enable` instrument command.
  *
+ * All three parameters of the command are sent. The command reports no
+ * dataset, so read the deployment's dataset back with
+ * RBRInstrumentGen4_getDatasetPool().
+ *
  * \param [in] instrument the instrument connection
- * \param [in] config specifies the configuration which will define this deployment.
- * \param [in] datasetLabel the new datasetLabel.
- * \param [in] storageMode (opional) default to normal.
- * determines whether calibration equations will 
- * be applied to all channel data (normal), or not (calibration).  The 
- * setting applies only to the current deployment.  
- * When storageMode = calibration, all data 
- * values are stored as IEEE double precision floating point numbers in 
- * the nominal range 0.0 to 1.0, regardless of the normal storage format used. 
- * \param [inout] datasetPool datasetPool.
- * \param [out] newDataset the new dataset.
- * \param [out] state the status of the logger.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
+ * \param [in] config the configuration which defines this deployment
+ * \param [in] datasetLabel the label for the deployment's dataset
+ * \param [in] storageMode the data storage mode for this deployment
+ * \param [out] state the state of the instrument; untouched unless the command
+ *                    succeeds
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the instrument is enabled
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when an error occurs enabling logging
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the instrument cannot be
+ *         enabled
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the configuration or
+ *         dataset label is empty or too long, or the storage mode is not a
+ *         specific mode
+ * \see RBRInstrumentGen4_verify()
  * \see RBRInstrumentGen4_disable()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828476/enable
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_enable(
     RBRInstrumentGen4 *instrument,
     const RBRInstrumentGen4Config *config,
-    const char datasetLabel[],
-    const RBRInstrumentGen4DeploymentStoragemode storageMode,
-    RBRInstrumentGen4DatasetPool *datasetPool,
-    RBRInstrumentGen4Dataset **newDataset,
+    const char *datasetLabel,
+    RBRInstrumentGen4DeploymentStoragemode storageMode,
     RBRInstrumentGen4InstrumentState *state);
 
 /**
