@@ -51,7 +51,7 @@
 #define GROUP_PTS_CHANNEL_COUNT 3
 
 #define SCHEDULE_PTS_LABEL "sch_asc_pts"
-#define SCHEDULE_PTS_MODE RBRINSTRUMENTGEN4_SAMPLING_REGIMES
+#define SCHEDULE_PTS_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES
 #define SCHEDULE_PTS_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
 #define SCHEDULE_PTS_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
 #define SCHEDULE_PTS_COUNT 3
@@ -204,13 +204,13 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_deleteDatasetAll(instrument, &datasetPool);
 
     RBRInstrumentGen4ConfigPool configPool;
-    RBRInstrumentGen4_deleteConfigAll(instrument, &configPool);
+    RBRInstrumentGen4_deleteConfigAll(instrument);
 
     RBRInstrumentGen4SchedulePool schedulePool;
     RBRInstrumentGen4_deleteScheduleAll(instrument, &schedulePool);
 
     RBRInstrumentGen4GroupPool groupPool;
-    RBRInstrumentGen4_deleteGroupAll(instrument, &groupPool);
+    RBRInstrumentGen4_deleteGroupAll(instrument);
 
     /************ group definition ************/
     /* populate all channels and calibrations */
@@ -244,14 +244,13 @@ int main(int argc, char *argv[])
     }
 
     /* specify groupLabel, channel labels, and create group instance */
-    RBRInstrumentGen4Group* group_pts = NULL;
+    RBRInstrumentGen4Group group_pts;
 
     RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         GROUP_PTS_CHANNEL_COUNT,
                         &channelPool,
-                        &groupPool,
                         &group_pts);
 
     /************ schedule definition ************/
@@ -267,13 +266,12 @@ int main(int argc, char *argv[])
                          &schedule_asc_pts);
 
     /************ configuration definition ************/
-    RBRInstrumentGen4Config* config_ascent;
+    RBRInstrumentGen4Config config_ascent;
     RBRInstrumentGen4_initNewConfig(instrument,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         GROUP_PTS_CHANNEL_COUNT,
                         &schedulePool,
-                        &configPool,
                         &config_ascent);
 
     /************ deployment parameters ************/
@@ -288,7 +286,7 @@ int main(int argc, char *argv[])
     /* enable the instrument */
     RBRInstrumentGen4Dataset *dataset_ascent;
     RBRInstrumentGen4_enable(instrument,
-                             config_ascent,
+                             &config_ascent,
                              NEW_DATASET_LABEL,
                              RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
                              &datasetPool,
@@ -316,7 +314,7 @@ int main(int argc, char *argv[])
     RBRParserGen4 parserSpace;
     RBRParserGen4* parser = &parserSpace;
     RBRParserGen4Config config = {
-        .channelCount = group_pts->count,
+        .channelCount = group_pts.channelCount,
         .datatype = info.dataType
     };
     RBRInstrumentGen4Sample sampleBuffer;

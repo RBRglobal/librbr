@@ -74,9 +74,6 @@ extern "C"
      * \param source source array
      * \param count the number of elements to copy
      */
-    void cpy_ptrArray_forChannel(RBRInstrumentGen4Channel *target[],
-                                 RBRInstrumentGen4Channel *source[],
-                                 int count);
 
     /**
      * \brief Copy an array of pointers to group structs.
@@ -222,7 +219,6 @@ extern "C"
      * \param [in] specifiedChannelLabels the labels of the channels to include in the group
      * \param [in] specifiedChannelLabelCnt the number of channels to include in the group
      * \param [in] channelPool the pool to search in
-     * \param [inout] groupPool the pool to add to
      * \param [out] newGroup the new group
      */
     RBRInstrumentGen4Error RBRInstrumentGen4_initNewGroup(
@@ -231,8 +227,7 @@ extern "C"
         const char specifiedChannelLabels[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX],
         int32_t specifiedChannelLabelCnt,
         RBRInstrumentGen4ChannelPool *channelPool,
-        RBRInstrumentGen4GroupPool *groupPool,
-        RBRInstrumentGen4Group **newGroup);
+        RBRInstrumentGen4Group *newGroup);
 
     /**
      * \brief Create and populate a new parent.
@@ -256,10 +251,9 @@ extern "C"
         const char newScheduleLabel[],
         const char specifiedGroupLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
         int32_t specifiedGroupLabelCnt,
-        RBRInstrumentGen4SamplingMode mode,
+        RBRInstrumentGen4ScheduleMode mode,
         RBRInstrumentGen4GroupPool *groupPool,
-        RBRInstrumentGen4SchedulePool *schedulePool,
-        RBRInstrumentGen4Schedule **newSchedule);
+        RBRInstrumentGen4Schedule *newSchedule);
 
     /**
      * \brief Configure \a targetSchedule to sample continuously.
@@ -276,49 +270,6 @@ extern "C"
         RBRInstrumentGen4Schedule *targetSchedule,
         RBRInstrumentGen4Period period,
         bool castDetection);
-
-    /**
-     * \brief Configure \a targetSchedule to sample by pressure regimes.
-     * \param [inout] targetSchedule the target schedule
-     * \param [in] regimes the regimes to configure the schedule with
-     * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully configured
-     * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
-     * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
-     * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the schedule cannot be configured
-     * \see RBRInstrumentGen4_setSchedule()
-     */
-    RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleRegimes(
-        RBRInstrumentGen4Schedule *targetSchedule,
-        RBRInstrumentGen4Regimes regimes);
-
-    /**
-     * \brief Create and populate a new schedule configured for regime sampling.
-     * \note Issues the `schedule create` and `schedule <schedule_label>` instrument commands.
-     * \param [in] instrument the instrument connection
-     * \param [in] newScheduleLabel the label to give the parent
-     * \param [in] specifiedGroupLabels the labels of the children to give the parent
-     * \param [in] specifiedGroupLabelCnt the number of children to give the parent
-     * \param [in] groupPool the pool to search for children in
-     * \param [in] regimes the regimes to configure the schedule with
-     * \param [inout] groupPool the pool to add the parent to
-     * \param [out] newSchedule the new parent
-     * \return #RBRINSTRUMENTGEN4_SUCCESS when the parent is successfully created and populated
-     * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
-     * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
-     * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the parent cannot be created or populated
-     * \see RBRInstrumentGen4_createSchedule()
-     * \see RBRInstrumentGen4_setSchedule()
-     */
-    RBRInstrumentGen4Error RBRInstrumentGen4_initNewScheduleRegimes(
-        RBRInstrumentGen4 *instrument,
-        const char newScheduleLabel[],
-        const char specifiedGroupLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
-        int32_t specifiedGroupLabelCnt,
-        RBRInstrumentGen4SamplingMode mode,
-        RBRInstrumentGen4Regimes regimes,
-        RBRInstrumentGen4GroupPool *groupPool,
-        RBRInstrumentGen4SchedulePool *schedulePool,
-        RBRInstrumentGen4Schedule **newSchedule);
 
     /**
      * \brief Create and populate a new schedule configured for continous sampling.
@@ -344,12 +295,11 @@ extern "C"
         const char newScheduleLabel[],
         const char specifiedGroupLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
         int32_t specifiedGroupLabelCnt,
-        RBRInstrumentGen4SamplingMode mode,
+        RBRInstrumentGen4ScheduleMode mode,
         RBRInstrumentGen4Period period,
         bool castDetection,
         RBRInstrumentGen4GroupPool *groupPool,
-        RBRInstrumentGen4SchedulePool *schedulePool,
-        RBRInstrumentGen4Schedule **newSchedule);
+        RBRInstrumentGen4Schedule *newSchedule);
 
     /**
      * \brief Create and populate a new parent.
@@ -374,8 +324,7 @@ extern "C"
         const char specifiedScheduleLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
         int32_t specifiedScheduleLabelCnt,
         RBRInstrumentGen4SchedulePool *schedulePool,
-        RBRInstrumentGen4ConfigPool *configPool,
-        RBRInstrumentGen4Config **newConfig);
+        RBRInstrumentGen4Config *newConfig);
 
 #ifdef __cplusplus
 }

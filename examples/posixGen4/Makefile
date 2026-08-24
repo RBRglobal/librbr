@@ -17,20 +17,22 @@ LDLIBS := -lRBR -lm
 
 ## \brief Gen4 example programs.
 ##
-## Two examples are not listed and do not currently build; re-enabling them
+## Three examples are not listed and do not currently build; re-enabling them
 ## is part of the example alignment planned for libRBR 2.0 (SYS-1194):
 ##
 ## - posix-multiScheduleDiffConfig predates the late-2024 API alignment (it
 ##   still refers to the WiFi and old group/config pool interfaces);
 ## - posix-parse-file calls RBRParserGen4_destroy(), which is declared but
-##   not implemented (the Gen4 sample parser is incomplete).
+##   not implemented (the Gen4 sample parser is incomplete);
+## - posix-profilingFloat configures a `regimes` schedule; the `regimes` and
+##   `ddsampling` modes are not modelled (SYS-1234). Its source is otherwise
+##   untouched, so re-enabling it is the only change needed.
 EXAMPLES := \
     posix-communications \
     posix-download-datablock-bySchedule \
     posix-footprint \
     posix-generation \
     posix-poll \
-    posix-profilingFloat \
     posix-singleScheduleSingleConfig \
     posix-stream \
     posix-test

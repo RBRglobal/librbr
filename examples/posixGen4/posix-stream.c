@@ -45,10 +45,9 @@
 #define GROUP_PTS_CHANNEL_COUNT 3
 
 #define SCHEDULE_PTS_LABEL "sch_asc_pts"
-#define SCHEDULE_PTS_MODE RBRINSTRUMENTGEN4_SAMPLING_REGIMES
-#define SCHEDULE_PTS_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
-#define SCHEDULE_PTS_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
-#define SCHEDULE_PTS_COUNT 3
+#define SCHEDULE_PTS_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS
+#define SCHEDULE_PTS_PERIOD 1000
+#define SCHEDULE_PTS_CASTDETECTION false
 
 #define SCHEDULE_PTS_GROUPS                          \
     (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
@@ -56,22 +55,6 @@
         GROUP_PTS_LABEL                              \
     }
 #define SCHEDULE_PTS_GROUP_COUNT 1
-#define SCHEDULE_PTS_REGIMES           \
-    (RBRInstrumentGen4Regimes)         \
-    {                                  \
-        .direction = SCHEDULE_PTS_DIR, \
-        .count = SCHEDULE_PTS_COUNT,   \
-        .reference = SCHEDULE_PTS_REF, \
-        .boundary1 = 500.0,            \
-        .binSize1 = 50.0,              \
-        .period1 = 10000,              \
-        .boundary2 = 200.0,            \
-        .binSize2 = 20.0,              \
-        .period2 = 1000,               \
-        .boundary3 = 50.0,             \
-        .binSize3 = 0.0,               \
-        .period3 = 1000                \
-    }
 
 #define CONFIG_ASCENT_LABEL "cf_ascent"
 #define CONFIG_ASCENT_SCHEDULES                      \
@@ -244,15 +227,15 @@ int main(int argc, char *argv[])
 
     RBRInstrumentGen4ConfigPool configPool;
     RBRInstrumentGen4_getConfigPool(instrument, &configPool);
-    RBRInstrumentGen4_deleteConfigAll(instrument, &configPool);
+    RBRInstrumentGen4_deleteConfigAll(instrument);
 
     RBRInstrumentGen4SchedulePool schedulePool;
     RBRInstrumentGen4_getSchedulePool(instrument, &schedulePool);
-    RBRInstrumentGen4_deleteScheduleAll(instrument, &schedulePool);
+    RBRInstrumentGen4_deleteScheduleAll(instrument);
 
     RBRInstrumentGen4GroupPool groupPool;
     RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
-    RBRInstrumentGen4_deleteGroupAll(instrument, &groupPool);
+    RBRInstrumentGen4_deleteGroupAll(instrument);
 
     /************ group definition ************/
     // populate all channelPool and calibrations
@@ -260,35 +243,34 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
 
     // specify groupLabel, channel labels, and create group instance
-    RBRInstrumentGen4Group* group_pts;
+    RBRInstrumentGen4Group group_pts;
     RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         GROUP_PTS_CHANNEL_COUNT,
                         &channelPool,
-                        &groupPool,
                         &group_pts); // warning: need to read error!!!
 
     /************ schedule definition ************/
-    RBRInstrumentGen4Schedule* schedule_pts;
-    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
+    RBRInstrumentGen4Schedule schedule_pts;
+    RBRInstrumentGen4_initNewScheduleContinuous(instrument,
                           SCHEDULE_PTS_LABEL,
                           SCHEDULE_PTS_GROUPS,
                           SCHEDULE_PTS_GROUP_COUNT,
                           SCHEDULE_PTS_MODE,
-                          SCHEDULE_PTS_REGIMES,
+                          SCHEDULE_PTS_PERIOD,
+                          SCHEDULE_PTS_CASTDETECTION,
                           &groupPool,
-                          &schedulePool,
                           &schedule_pts);
 
     /* The link we are connected over is where this schedule should stream. */
     switch (link.type)
     {
     case RBRINSTRUMENTGEN4_LINK_TYPE_USB:
-        schedule_pts->stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_USB;
+        schedule_pts.stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_USB;
         break;
     case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
-        schedule_pts->stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_SERIAL;
+        schedule_pts.stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_SERIAL;
         break;
     default:
         /*
@@ -305,16 +287,15 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
     // warning: read error for RBRInstrumentGen4_initNewSchedule!!!
-    RBRInstrumentGen4_setSchedule(instrument, schedule_pts);
+    RBRInstrumentGen4_setSchedule(instrument, &schedule_pts);
 
     /************ configuration definition ************/
-    RBRInstrumentGen4Config *config_ascent;
+    RBRInstrumentGen4Config config_ascent;
     RBRInstrumentGen4_initNewConfig(instrument,
                          CONFIG_ASCENT_LABEL,
                          CONFIG_ASCENT_SCHEDULES,
                         CONFIG_ASCENT_SCHEDULE_COUNT,
                          &schedulePool,
-                         &configPool,
                          &config_ascent);
 
     // specify outputformat. The setter sends every parameter of the command,
@@ -337,7 +318,7 @@ int main(int argc, char *argv[])
 
     // verify the configurations for enable
     RBRInstrumentGen4_verify(instrument,
-                             config_ascent,
+                             &config_ascent,
                              NEW_DATASET_LABEL,
                              &loggingState);
 
@@ -345,7 +326,7 @@ int main(int argc, char *argv[])
            programName);
     RBRInstrumentGen4Dataset *dataset;
     if ((err = RBRInstrumentGen4_enable(instrument,
-                                        config_ascent,
+                                        &config_ascent,
                                         NEW_DATASET_LABEL,
                                         RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
                                         &datasetPool,

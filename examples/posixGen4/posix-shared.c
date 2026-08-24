@@ -254,17 +254,6 @@ void str_to_deploymentDatetime(RBRInstrumentGen4DateTime *targetDatetime,
 }
 
 // can be static.
-void cpy_ptrArray_forChannel(RBRInstrumentGen4Channel *target[],
-                             RBRInstrumentGen4Channel *source[],
-                             int count)
-{
-    for (int i = 0; i < count; i++)
-    {
-        target[i] = source[i];
-    }
-}
-
-// can be static.
 void cpy_ptrArray_forGroup(RBRInstrumentGen4Group *target[],
                            RBRInstrumentGen4Group *source[],
                            int count)
@@ -336,8 +325,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
     }
 
     // Only the channels which were actually found are copied to the group.
-    cpy_ptrArray_forChannel(group->channelList, _newPtrList, _currentIndex);
-    group->count = _currentIndex;
+    for (int32_t i = 0; i < _currentIndex; i++)
+    {
+        snprintf(group->channelList[i],
+                 sizeof(group->channelList[i]),
+                 "%s",
+                 _newPtrList[i]->label);
+    }
+    group->channelCount = _currentIndex;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
@@ -452,15 +447,17 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewGroup(
     const char specifiedChannelLabels[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX],
     int32_t specifiedChannelLabelCnt,
     RBRInstrumentGen4ChannelPool *channelPool,
-    RBRInstrumentGen4GroupPool *groupPool,
-    RBRInstrumentGen4Group **newGroup)
+    RBRInstrumentGen4Group *newGroup)
 {
-    RBRInstrumentGen4_createGroup(instrument, newGroupLabel, groupPool, newGroup);
-    RBRInstrumentGen4_populateGroupChannels(*newGroup,
+    memset(newGroup, 0, sizeof(RBRInstrumentGen4Group));
+    snprintf(newGroup->label, sizeof(newGroup->label), "%s", newGroupLabel);
+
+    RBRInstrumentGen4_createGroup(instrument, newGroupLabel);
+    RBRInstrumentGen4_populateGroupChannels(newGroup,
                                     channelPool,
                                     specifiedChannelLabels,
                                     specifiedChannelLabelCnt);
-    RBRInstrumentGen4_setGroup(instrument, *newGroup);
+    RBRInstrumentGen4_setGroup(instrument, newGroup);
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 // can be static
@@ -469,19 +466,22 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewSchedule(
     const char newScheduleLabel[],
     const char specifiedGroupLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
     int32_t specifiedGroupLabelCnt,
-    RBRInstrumentGen4SamplingMode mode,
+    RBRInstrumentGen4ScheduleMode mode,
     RBRInstrumentGen4GroupPool *groupPool,
-    RBRInstrumentGen4SchedulePool *schedulePool,
-    RBRInstrumentGen4Schedule **newSchedule)
+    RBRInstrumentGen4Schedule *newSchedule)
 {
-    // depending on mode, create a mode-dependent structure.
-    // Warning: in this example, i'll just create a regimes structure. But this function should handle all other modes as well.
-    RBRInstrumentGen4_createSchedule(instrument, newScheduleLabel, schedulePool, newSchedule);
-    RBRInstrumentGen4_populateScheduleGroups(*newSchedule, groupPool, specifiedGroupLabels, specifiedGroupLabelCnt); // warning: read err!!!
-    (*newSchedule)->mode = mode;
-    (*newSchedule)->stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_OFF; // default value.
-    (*newSchedule)->storage = false;                     // default value.
-    RBRInstrumentGen4_setSchedule(instrument, *newSchedule); // warning: read err!!!
+    memset(newSchedule, 0, sizeof(RBRInstrumentGen4Schedule));
+    snprintf(newSchedule->label,
+             sizeof(newSchedule->label),
+             "%s",
+             newScheduleLabel);
+
+    RBRInstrumentGen4_createSchedule(instrument, newScheduleLabel);
+    RBRInstrumentGen4_populateScheduleGroups(newSchedule, groupPool, specifiedGroupLabels, specifiedGroupLabelCnt); // warning: read err!!!
+    newSchedule->mode = mode;
+    newSchedule->stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_OFF; // default value.
+    newSchedule->storage = RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE;
+    // The caller fills in the mode's parameters before writing the schedule.
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 // can be static
@@ -490,87 +490,20 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleContinuous(
     RBRInstrumentGen4Period period,
     bool castDetection)
 {
-    targetSchedule->modeDependentParameters.continuous.period = period;
-    targetSchedule->modeDependentParameters.continuous.castDetection = castDetection;
+    targetSchedule->parameters.continuous.period = period;
+    targetSchedule->castDetection = castDetection;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
-// can be static
-RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleRegimes(
-    RBRInstrumentGen4Schedule *targetSchedule,
-    RBRInstrumentGen4Regimes regimes)
-{
-
-    targetSchedule->modeDependentParameters.regimes.direction = regimes.direction;
-    targetSchedule->modeDependentParameters.regimes.count = regimes.count;
-    targetSchedule->modeDependentParameters.regimes.reference = regimes.reference;
-    int count = regimes.count;
-    if ((count < 1) || (count > 3))
-    {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-    }
-    else
-    {
-        // if the regimes provided more than what count specified, populate according to count.
-        // If less, already returned error in above case.
-
-        // code below: if count==1, setup only regime1. etc.
-        // sacrifised some code readability.
-        targetSchedule->modeDependentParameters.regimes.boundary1 = regimes.boundary1;
-        targetSchedule->modeDependentParameters.regimes.binSize1 = regimes.binSize1;
-        targetSchedule->modeDependentParameters.regimes.period1 = regimes.period1;
-
-        if ((count == 2) || (count == 3))
-        {
-            targetSchedule->modeDependentParameters.regimes.boundary2 = regimes.boundary2;
-            targetSchedule->modeDependentParameters.regimes.binSize2 = regimes.binSize2;
-            targetSchedule->modeDependentParameters.regimes.period2 = regimes.period2;
-        }
-
-        if (count == 3)
-        {
-            targetSchedule->modeDependentParameters.regimes.boundary3 = regimes.boundary3;
-            targetSchedule->modeDependentParameters.regimes.binSize3 = regimes.binSize3;
-            targetSchedule->modeDependentParameters.regimes.period3 = regimes.period3;
-        }
-    }
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_initNewScheduleRegimes(
-    RBRInstrumentGen4 *instrument,
-    const char newScheduleLabel[],
-    const char specifiedGroupLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
-    int32_t specifiedGroupLabelCnt,
-    RBRInstrumentGen4SamplingMode mode,
-    RBRInstrumentGen4Regimes regimes,
-    RBRInstrumentGen4GroupPool *groupPool,
-    RBRInstrumentGen4SchedulePool *schedulePool,
-    RBRInstrumentGen4Schedule **newSchedule)
-{
-    RBRInstrumentGen4_initNewSchedule(instrument,
-                           newScheduleLabel,
-                           specifiedGroupLabels,
-                           specifiedGroupLabelCnt,
-                           mode,
-                           groupPool,
-                           schedulePool,
-                           newSchedule);
-    RBRInstrumentGen4_populateScheduleRegimes(*newSchedule, regimes);
-    RBRInstrumentGen4_setSchedule(instrument, *newSchedule); // warning: read err!!!
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
 RBRInstrumentGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
     RBRInstrumentGen4 *instrument,
     const char newScheduleLabel[],
     const char specifiedGroupLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
     int32_t specifiedGroupLabelCnt,
-    RBRInstrumentGen4SamplingMode mode,
+    RBRInstrumentGen4ScheduleMode mode,
     RBRInstrumentGen4Period period,
     bool castDetection,
     RBRInstrumentGen4GroupPool *groupPool,
-    RBRInstrumentGen4SchedulePool *schedulePool,
-    RBRInstrumentGen4Schedule **newSchedule)
+    RBRInstrumentGen4Schedule *newSchedule)
 {
     RBRInstrumentGen4_initNewSchedule(instrument,
                            newScheduleLabel,
@@ -578,10 +511,9 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
                            specifiedGroupLabelCnt,
                            mode,
                            groupPool,
-                           schedulePool,
                            newSchedule);
-    RBRInstrumentGen4_populateScheduleContinuous(*newSchedule, period, castDetection);
-    RBRInstrumentGen4_setSchedule(instrument, *newSchedule); // warning: read err!!!
+    RBRInstrumentGen4_populateScheduleContinuous(newSchedule, period, castDetection);
+    RBRInstrumentGen4_setSchedule(instrument, newSchedule); // warning: read err!!!
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
@@ -591,12 +523,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewConfig(
     const char specifiedScheduleLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
     int32_t specifiedScheduleLabelCnt,
     RBRInstrumentGen4SchedulePool *schedulePool,
-    RBRInstrumentGen4ConfigPool *configPool,
-    RBRInstrumentGen4Config **newConfig)
+    RBRInstrumentGen4Config *newConfig)
 {
-    RBRInstrumentGen4_createConfig(instrument, newConfigLabel, configPool, newConfig); // warning: read err!!!
-    RBRInstrumentGen4_populateConfigSchedules(*newConfig, schedulePool, specifiedScheduleLabels, specifiedScheduleLabelCnt); // warning: read err!!!
-    RBRInstrumentGen4_setConfig(instrument, *newConfig); // warning: read err!!!
+    memset(newConfig, 0, sizeof(RBRInstrumentGen4Config));
+    snprintf(newConfig->label, sizeof(newConfig->label), "%s", newConfigLabel);
+
+    RBRInstrumentGen4_createConfig(instrument, newConfigLabel); // warning: read err!!!
+    RBRInstrumentGen4_populateConfigSchedules(newConfig, schedulePool, specifiedScheduleLabels, specifiedScheduleLabelCnt); // warning: read err!!!
+    RBRInstrumentGen4_setConfig(instrument, newConfig); // warning: read err!!!
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 //-------------------------------------------------------------------------------

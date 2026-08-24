@@ -1291,3 +1291,67 @@ char *RBRInstrumentGen4_splitListValue(char *value)
 
     return nextValue;
 }
+
+RBRInstrumentGen4Error RBRInstrumentGen4_formatLabelList(
+    char *value,
+    int32_t size,
+    const RBRInstrumentGen4Label *labels,
+    int32_t count)
+{
+    int32_t length = 0;
+
+    if (count == 0)
+    {
+        length = snprintf(value, size, "none");
+        return length > 0 && length < size
+               ? RBRINSTRUMENTGEN4_SUCCESS
+               : RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+    }
+
+    for (int32_t label = 0; label < count; ++label)
+    {
+        if (labels[label][0] == '\0')
+        {
+            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        }
+
+        int32_t written = snprintf(value + length,
+                                   size - length,
+                                   "%s%s",
+                                   label == 0 ? "" : "|",
+                                   labels[label]);
+
+        if (written < 0 || length + written >= size)
+        {
+            return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+        }
+
+        length += written;
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+void RBRInstrumentGen4_parseLabelList(
+    RBRInstrumentGen4Label *labels,
+    int32_t max,
+    int32_t *count,
+    char *value)
+{
+    *count = 0;
+
+    if (strcmp(value, "none") == 0)
+    {
+        return;
+    }
+
+    while (value != NULL && *count < max)
+    {
+        char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+        snprintf(labels[*count], sizeof(labels[*count]), "%s", value);
+        (*count)++;
+
+        value = nextValue;
+    }
+}

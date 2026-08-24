@@ -386,6 +386,41 @@ void RBRInstrumentGen4DateTime_toScheduleTime(RBRInstrumentGen4DateTime timestam
  */
 char *RBRInstrumentGen4_splitListValue(char *value);
 
+/**
+ * \brief Format an array of labels as a pipe-separated parameter value.
+ *
+ * An empty list is written as `none`.
+ *
+ * \param [out] value the buffer to write the list into
+ * \param [in] size the size of \a value
+ * \param [in] labels the labels to write
+ * \param [in] count the number of labels
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the list is formatted
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when a label is empty
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_formatLabelList(
+    char *value,
+    int32_t size,
+    const RBRInstrumentGen4Label *labels,
+    int32_t count);
+
+/**
+ * \brief Parse a pipe-separated parameter value into an array of labels.
+ *
+ * `none` yields a zero count. Labels past \a max are discarded.
+ *
+ * \param [out] labels the labels read
+ * \param [in] max the number of labels \a labels holds
+ * \param [out] count the number of labels read
+ * \param [in,out] value the response value, consumed in place
+ */
+void RBRInstrumentGen4_parseLabelList(
+    RBRInstrumentGen4Label *labels,
+    int32_t max,
+    int32_t *count,
+    char *value);
+
 #ifdef __cplusplus
 }
 #endif

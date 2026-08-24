@@ -176,6 +176,15 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
 /** \brief The maximum length of characters within a label.*/
 #define RBRINSTRUMENTGEN4_LABEL_NAME_MAX 31
 
+/**
+ * \brief One label in a list of labels.
+ *
+ * Gives the list helpers a single type to work in. Structure members are
+ * declared with their own label constants rather than this type; a label type
+ * wider than this makes the call a type error rather than a silent misread.
+ */
+typedef char RBRInstrumentGen4Label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+
 /** \brief The maximum length of characters within a dataset block name.*/
 #define RBRINSTRUMENTGEN4_DATABLOCK_NAME_MAX 6
 
