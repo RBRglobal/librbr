@@ -36,7 +36,10 @@ int main(void)
     printf("%zu, %zu\n", sizeof(groupPool), sizeof(groupPool.pool[0]));
 
     RBRInstrumentGen4ChannelPool channelPool;
-    printf("%zu, %zu, %zu\n", sizeof(channelPool), sizeof(channelPool.pool[0]), sizeof(channelPool.pool[0].calibration));
+    printf("%zu, %zu\n", sizeof(channelPool), sizeof(channelPool.pool[0]));
+
+    RBRInstrumentGen4Calibration calibration;
+    printf("%zu\n", sizeof(calibration));
 
     RBRInstrumentGen4DatasetPool datasetPool;
     printf("%zu, %zu\n", sizeof(datasetPool), sizeof(datasetPool.pool[0]));

@@ -8,6 +8,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
+/* Required for PRId32. */
+#include <inttypes.h>
 /* Required for NAN. */
 #include <math.h>
 /* Required for snprintf. */
@@ -652,127 +654,170 @@ RBRInstrumentGen4Error RBRInstrumentGen4_discoverDevices(
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-/*
 RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
     RBRInstrumentGen4 *instrument,
-    const char *channelLabel,
     RBRInstrumentGen4Calibration *calibration)
 {
+    /* The label selects the calibration to read, so it has to outlive the
+     * reset of the rest of the structure. */
+    char label[sizeof(calibration->label)];
+    snprintf(label, sizeof(label), "%s", calibration->label);
+
     memset(calibration, 0, sizeof(RBRInstrumentGen4Calibration));
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                       "calibration %s",
-                                       channelLabel));
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "calibration %s", label));
+
+    snprintf(calibration->label, sizeof(calibration->label), "%s", label);
+
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
-    do
+    while (true)
     {
         RBRInstrumentGen4_parseResponse(instrument,
                                         &command,
                                         &parameter);
+
         if (parameter.key == NULL || parameter.value == NULL)
         {
             break;
         }
-        else if (strcmp(parameter.key, "fwversion") == 0)
+
+        /* A coefficient key is a group letter and an index: `a0`, `m11`. */
+        char *end = NULL;
+        char group = parameter.key[0];
+        int32_t index = strtol(parameter.key + 1, &end, 10);
+        bool coefficient =
+            (parameter.key[1] != '\0'
+             && *end == '\0'
+             && index >= 0
+             && index < RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX);
+
+        if (strcmp(parameter.key, "equation") == 0)
         {
-            snprintf((char *)(id->fwversion),
-                     sizeof(id->fwversion),
+            snprintf((char *) calibration->equation,
+                     sizeof(calibration->equation),
                      "%s",
                      parameter.value);
-        }
-        else if (strcmp(parameter.key, "sn") == 0)
-        {
-            id->sn = strtol(parameter.value, NULL, 10);
-        }
-    } while (true);
-
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}
-*/
-
-RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Calibration *calibration)
-{
-    memset(calibration, 0, sizeof(RBRInstrumentGen4Calibration));
-
-    calibration->userOffset = NAN;
-    calibration->userSlope = NAN;
-
-    for (int32_t c = 0;
-         c < RBRINSTRUMENTGEN4_CALIBRATION_C_COEFFICIENT_MAX;
-         ++c)
-    {
-        calibration->c[c] = NAN;
-    }
-    for (int32_t x = 0;
-         x < RBRINSTRUMENTGEN4_CALIBRATION_X_COEFFICIENT_MAX;
-         ++x)
-    {
-        calibration->x[x] = NAN;
-    }
-
-    RBRInstrumentGen4Channel *parent = (RBRInstrumentGen4Channel *)(calibration->parent);
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                       "calibration %s",
-                                       parent->label));
-    char *command = NULL;
-    RBRInstrumentGen4ResponseParameter parameter;
-    do
-    {
-        RBRInstrumentGen4_parseResponse(instrument,
-                                        &command,
-                                        &parameter);
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
-            break;
         }
         else if (strcmp(parameter.key, "datetime") == 0)
         {
-            calibration->dateTime = strtol(parameter.value, NULL, 10);
+            calibration->dateTime = strtoll(parameter.value, NULL, 10);
         }
         else if (strcmp(parameter.key, "offset") == 0)
         {
-            calibration->userOffset = strtol(parameter.value, NULL, 10);
+            calibration->userOffset = strtof(parameter.value, NULL);
         }
         else if (strcmp(parameter.key, "slope") == 0)
         {
-            calibration->userSlope = strtol(parameter.value, NULL, 10);
+            calibration->userSlope = strtof(parameter.value, NULL);
         }
-        else if (parameter.key[0] != 'c'
-                 && parameter.key[0] != 'x'
-                 && parameter.key[0] != 'n')
+        else if (coefficient && group == 'a')
         {
-            continue;
+            calibration->a[index] = strtof(parameter.value, NULL);
+            if (index >= calibration->aCount)
+            {
+                calibration->aCount = index + 1;
+            }
         }
+        else if (coefficient && group == 'b')
+        {
+            calibration->b[index] = strtof(parameter.value, NULL);
+            if (index >= calibration->bCount)
+            {
+                calibration->bCount = index + 1;
+            }
+        }
+        else if (coefficient && group == 'm')
+        {
+            /* An unused reference is reported as `none`. */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
 
-        int32_t index = strtol(&parameter.key[1], NULL, 10);
-
-        if (parameter.key[0] == 'c'
-            && index < RBRINSTRUMENTGEN4_CALIBRATION_C_COEFFICIENT_MAX)
-        {
-            calibration->c[index] = strtod(parameter.value, NULL);
-        }
-        else if (parameter.key[0] == 'x'
-                 && index < RBRINSTRUMENTGEN4_CALIBRATION_X_COEFFICIENT_MAX)
-        {
-            calibration->x[index] = strtod(parameter.value, NULL);
-        }
-        else if (parameter.key[0] == 'n'
-                 && index < RBRINSTRUMENTGEN4_CALIBRATION_N_COEFFICIENT_MAX)
-        {
-            /* GEN4TODO: Get the dependents by reference */
-            /*
-            snprintf(calibration->n[index],
-                     sizeof(calibration->n[index]),
+            snprintf(calibration->m[index],
+                     sizeof(calibration->m[index]),
                      "%s",
                      parameter.value);
-            */
+            if (index >= calibration->mCount)
+            {
+                calibration->mCount = index + 1;
+            }
         }
+    }
 
-    } while (true);
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
 
+/**
+ * \brief Append one `<group><index>=<value>` coefficient to a command.
+ *
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the coefficient does not
+ *                                             fit
+ */
+static RBRInstrumentGen4Error RBRInstrumentGen4Calibration_appendCoefficient(
+    char *command,
+    int32_t size,
+    int32_t *length,
+    char group,
+    int32_t index,
+    float value)
+{
+    /* Checked before appending: the remaining space is only meaningful while
+     * the length is still within the buffer. */
+    if (*length < 0 || *length >= size)
+    {
+        return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+    }
+
+    int32_t written = snprintf(command + *length,
+                               size - *length,
+                               " %c%" PRId32 "=%.9g",
+                               group,
+                               index,
+                               (double) value);
+
+    if (written < 0 || *length + written >= size)
+    {
+        return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+    }
+
+    *length += written;
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+/**
+ * \brief Append one `m<index>=<label>` reference to a command.
+ *
+ * An empty label is sent as `none`, which is how the instrument reports a
+ * reference the equation does not use.
+ *
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the reference does not fit
+ */
+static RBRInstrumentGen4Error RBRInstrumentGen4Calibration_appendReference(
+    char *command,
+    int32_t size,
+    int32_t *length,
+    int32_t index,
+    const char *label)
+{
+    if (*length < 0 || *length >= size)
+    {
+        return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+    }
+
+    int32_t written = snprintf(command + *length,
+                               size - *length,
+                               " m%" PRId32 "=%s",
+                               index,
+                               label[0] == '\0' ? "none" : label);
+
+    if (written < 0 || *length + written >= size)
+    {
+        return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+    }
+
+    *length += written;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
@@ -780,51 +825,58 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setCalibration(
     RBRInstrumentGen4 *instrument,
     const RBRInstrumentGen4Calibration *calibration)
 {
-    //GEN4 todo: add logic.
-    char calibrationDateTime[RBRINSTRUMENTGEN4_SCHEDULE_TIME_LEN + 1];
-    RBRInstrumentGen4DateTime_toScheduleTime(calibration->dateTime,
-                                         calibrationDateTime);
-
-    const char *calibrationCommand = "calibration %s datetime = %s, %c%d = %g";
-
-    RBRInstrumentGen4Channel *parent = (RBRInstrumentGen4Channel *)(calibration->parent);
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                "calibration %s datetime=%s, useroffset=%d, userslope=%d",
-                                parent->label,
-                                calibrationDateTime,
-                                (double) calibration->userOffset,
-                                (double) calibration->userSlope));
-
-    for (int32_t c = 0;
-         c < RBRINSTRUMENTGEN4_CALIBRATION_C_COEFFICIENT_MAX
-         && !isnan(calibration->c[c]);
-         ++c)
+    if (calibration->aCount < 0
+        || calibration->aCount > RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX
+        || calibration->bCount < 0
+        || calibration->bCount > RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX
+        || calibration->mCount < 0
+        || calibration->mCount > RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX)
     {
-        RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                       calibrationCommand,
-                                       parent->label,
-                                       calibrationDateTime,
-                                       'c',
-                                       c,
-                                       (double) calibration->c[c]));
-    }
-    for (int32_t x = 0;
-         x < RBRINSTRUMENTGEN4_CALIBRATION_X_COEFFICIENT_MAX
-         && !isnan(calibration->x[x]);
-         ++x)
-    {
-        RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                       calibrationCommand,
-                                       parent->label,
-                                       calibrationDateTime,
-                                       'x',
-                                       x,
-                                       (double) calibration->x[x]));
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    char coefficients[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX] = "";
+    int32_t length = 0;
+
+    for (int32_t a = 0; a < calibration->aCount; ++a)
+    {
+        RBR_TRY(RBRInstrumentGen4Calibration_appendCoefficient(
+                    coefficients,
+                    (int32_t) sizeof(coefficients),
+                    &length,
+                    'a',
+                    a,
+                    calibration->a[a]));
+    }
+    for (int32_t b = 0; b < calibration->bCount; ++b)
+    {
+        RBR_TRY(RBRInstrumentGen4Calibration_appendCoefficient(
+                    coefficients,
+                    (int32_t) sizeof(coefficients),
+                    &length,
+                    'b',
+                    b,
+                    calibration->b[b]));
+    }
+    for (int32_t m = 0; m < calibration->mCount; ++m)
+    {
+        RBR_TRY(RBRInstrumentGen4Calibration_appendReference(
+                    coefficients,
+                    (int32_t) sizeof(coefficients),
+                    &length,
+                    m,
+                    calibration->m[m]));
+    }
+
+    return RBRInstrumentGen4_converse(
+        instrument,
+        "calibration %s datetime=%014" PRId64 " offset=%.9g slope=%.9g%s",
+        calibration->label,
+        calibration->dateTime,
+        (double) calibration->userOffset,
+        (double) calibration->userSlope,
+        coefficients);
 }
-
 
 const char *RBRInstrumentGen4ScheduleStream_name(
     RBRInstrumentGen4ScheduleStream stream)
@@ -845,145 +897,409 @@ const char *RBRInstrumentGen4ScheduleStream_name(
     }
 }
 
-const char *RBRInstrumentGen4ChannelGainMode_name(
-    RBRInstrumentGen4ChannelGainMode mode)
+const char *RBRInstrumentGen4ChannelNature_name(
+    RBRInstrumentGen4ChannelNature nature)
 {
-    switch (mode)
+    switch (nature)
     {
-    case RBRINSTRUMENTGEN4_GAIN_NONE:
-        return "none";
-    case RBRINSTRUMENTGEN4_GAIN_FIXED:
-        return "manual";
-    case RBRINSTRUMENTGEN4_GAIN_AUTO:
-        return "auto";
-    case RBRINSTRUMENTGEN4_GAIN_COUNT:
-        return "gain mode count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_GAIN:
+    case RBRINSTRUMENTGEN4_CHANNEL_NATURE_SCIENTIFIC:
+        return "scientific";
+    case RBRINSTRUMENTGEN4_CHANNEL_NATURE_SYSTEM:
+        return "system";
+    case RBRINSTRUMENTGEN4_CHANNEL_NATURE_COUNT:
+        return "channel nature count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE:
     default:
-        return "unknown gain mode";
+        return "unknown channel nature";
     }
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(RBRInstrumentGen4 *instrument,
-                                                    RBRInstrumentGen4Channel *channel){
-    //GEN4 todo: add logic
-    (void)instrument;
-    (void)channel;
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(RBRInstrumentGen4 *instrument,
-                                             RBRInstrumentGen4ChannelPool *channelPool)
+static RBRInstrumentGen4ChannelNature RBRInstrumentGen4ChannelNature_parse(
+    const char *value)
 {
-    //GEN4 todo: add logic.
-    //populate all channel instances, which included the calbration instances.
-    (void)instrument;
-    (void)channelPool;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    for (int32_t nature = 0;
+         nature < RBRINSTRUMENTGEN4_CHANNEL_NATURE_COUNT;
+         ++nature)
+    {
+        if (strcmp(value,
+                   RBRInstrumentGen4ChannelNature_name(nature)) == 0)
+        {
+            return nature;
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4Settings_getSettings(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Settings *settings){
-        (void)instrument;
-        (void)settings;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4Settings_setSettings(
-    RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Settings *settings){
-        (void)instrument;
-        (void)settings;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-#if 0
-RBRInstrumentGen4Error RBRInstrumentGen4_getSensorParameter(
-    RBRInstrumentGen4 *instrument,
-    char *channelLabel,
-    RBRInstrumentGen4SensorParameter *parameter)
+/**
+ * \brief Copy a label the instrument reports as `na` as an empty string.
+ *
+ * A derived channel has no node, port, or device.
+ */
+static void RBRInstrumentGen4_copyOptionalLabel(char *destination,
+                                                size_t size,
+                                                const char *value)
 {
-    memset(parameter->value, 0, sizeof(parameter->value));
-
-    RBRInstrumentGen4Error err;
-    /* Logger2 returns “E0501 item is not configured” when the requested
-     * parameter doesn't exist, so we can't wrap the conversation in RBR_TRY
-     * because we need to suppress that error. */
-    err = RBRInstrumentGen4_converse(instrument,
-                                 "sensor %s %s",
-                                 channelLabel,
-                                 parameter->key);
-
-    if (instrument->generation == RBRINSTRUMENTGEN4_LOGGER2
-        && err == RBRINSTRUMENTGEN4_HARDWARE_ERROR
-        && (instrument->response.error ==
-            RBRINSTRUMENTGEN4_HARDWARE_ERROR_ITEM_IS_NOT_CONFIGURED))
+    if (strcmp(value, "na") == 0)
     {
-        snprintf(parameter->value,
-                 sizeof(parameter->value),
-                 "n/a");
-        instrument->response.type = RBRINSTRUMENTGEN4_RESPONSE_INFO;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-    }
-    else if (err != RBRINSTRUMENTGEN4_SUCCESS)
-    {
-        return err;
+        destination[0] = '\0';
+        return;
     }
 
+    snprintf(destination, size, "%s", value);
+}
+
+/**
+ * \brief Read the labels of a `channel` response into a pool.
+ */
+static RBRInstrumentGen4Error RBRInstrumentGen4_parseChannelPool(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4ChannelPool *channelPool)
+{
     char *command = NULL;
-    RBRInstrumentGen4ResponseParameter responseParameter;
+    RBRInstrumentGen4ResponseParameter parameter;
     while (true)
     {
         RBRInstrumentGen4_parseResponse(instrument,
-                                    &command,
-                                    &responseParameter);
+                                        &command,
+                                        &parameter);
 
-        if (responseParameter.key == NULL)
+        if (parameter.key == NULL || parameter.value == NULL)
         {
             break;
         }
+        else if (strcmp(parameter.key, "count") == 0)
+        {
+            channelPool->count = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "list") == 0)
+        {
+            /* An instrument with no channels reports `none`, not an empty
+             * list. */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
 
-        snprintf(parameter->key,
-                 sizeof(parameter->key),
-                 "%s",
-                 responseParameter.key);
+            char *value = parameter.value;
+            for (int32_t channel = 0;
+                 value != NULL && channel < RBRINSTRUMENTGEN4_CHANNEL_MAX;
+                 channel++)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
 
-        snprintf(parameter->value,
-                 sizeof(parameter->value),
-                 "%s",
-                 responseParameter.value);
+                snprintf(channelPool->pool[channel].label,
+                         sizeof(channelPool->pool[channel].label),
+                         "%s",
+                         value);
+
+                value = nextValue;
+            }
+        }
     }
 
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-
-RBRInstrumentGen4Error RBRInstrumentGen4_getSensorParameters(
+RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
     RBRInstrumentGen4 *instrument,
-    const char *channelLabel,
-    int32_t *size,
-    RBRInstrumentGen4SensorParameter *parameters)
+    RBRInstrumentGen4Channel *channel)
 {
-    (void)instrument;
-    (void)channelLabel;
-    (void)size;
-    (void)parameters;
+    /* The label selects the channel to read, so it has to outlive the reset of
+     * the rest of the structure. */
+    char label[sizeof(channel->label)];
+    snprintf(label, sizeof(label), "%s", channel->label);
+
+    memset(channel, 0, sizeof(RBRInstrumentGen4Channel));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "channel %s", label));
+
+    snprintf(channel->label, sizeof(channel->label), "%s", label);
+    *(RBRInstrumentGen4ChannelNature *) &channel->nature =
+        RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE;
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "type") == 0)
+        {
+            snprintf((char *) channel->type,
+                     sizeof(channel->type),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "settlingtime") == 0)
+        {
+            *(RBRInstrumentGen4Period *) &channel->settlingTime =
+                strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "measuringtime") == 0)
+        {
+            *(RBRInstrumentGen4Period *) &channel->measuringTime =
+                strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "readouttime") == 0)
+        {
+            *(RBRInstrumentGen4Period *) &channel->readOutTime =
+                strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "userunits") == 0)
+        {
+            snprintf(channel->userUnits,
+                     sizeof(channel->userUnits),
+                     "%s",
+                     parameter.value);
+        }
+        else if (strcmp(parameter.key, "grouplist") == 0)
+        {
+            /* A channel in no groups reports `none`, not an empty list. */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
+
+            char *value = parameter.value;
+            while (value != NULL
+                   && channel->groupCount < RBRINSTRUMENTGEN4_GROUP_COUNT_MAX)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+                snprintf((char *) channel->groupList[channel->groupCount],
+                         sizeof(channel->groupList[channel->groupCount]),
+                         "%s",
+                         value);
+                (*(int32_t *) &channel->groupCount)++;
+
+                value = nextValue;
+            }
+        }
+        else if (strcmp(parameter.key, "nature") == 0)
+        {
+            *(RBRInstrumentGen4ChannelNature *) &channel->nature =
+                RBRInstrumentGen4ChannelNature_parse(parameter.value);
+        }
+        else if (strcmp(parameter.key, "derived") == 0)
+        {
+            *(bool *) &channel->derived = (strcmp(parameter.value,
+                                                  "true") == 0);
+        }
+        else if (strcmp(parameter.key, "node") == 0)
+        {
+            RBRInstrumentGen4_copyOptionalLabel((char *) channel->node,
+                                                sizeof(channel->node),
+                                                parameter.value);
+        }
+        else if (strcmp(parameter.key, "port") == 0)
+        {
+            RBRInstrumentGen4_copyOptionalLabel((char *) channel->port,
+                                                sizeof(channel->port),
+                                                parameter.value);
+        }
+        else if (strcmp(parameter.key, "device") == 0)
+        {
+            RBRInstrumentGen4_copyOptionalLabel((char *) channel->device,
+                                                sizeof(channel->device),
+                                                parameter.value);
+        }
+    }
+
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_setSensorParameter(
+RBRInstrumentGen4Error RBRInstrumentGen4_setChannel(
     RBRInstrumentGen4 *instrument,
-    const char *channelLabel,
-    const RBRInstrumentGen4SensorParameter *parameter)
+    const RBRInstrumentGen4Channel *channel)
 {
+    if (channel->userUnits[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
     return RBRInstrumentGen4_converse(instrument,
-                                  "sensor %s %s=%s",
-                                  channelLabel,
-                                  parameter->key,
-                                  parameter->value);
+                                      "channel %s userunits=%s",
+                                      channel->label,
+                                      channel->userUnits);
 }
-#endif
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4ChannelPool *channelPool)
+{
+    memset(channelPool, 0, sizeof(RBRInstrumentGen4ChannelPool));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "channel"));
+
+    return RBRInstrumentGen4_parseChannelPool(instrument, channelPool);
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPoolByNature(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4ChannelNature nature,
+    RBRInstrumentGen4ChannelPool *channelPool)
+{
+    if (nature < 0 || nature >= RBRINSTRUMENTGEN4_CHANNEL_NATURE_COUNT)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    memset(channelPool, 0, sizeof(RBRInstrumentGen4ChannelPool));
+
+    RBR_TRY(RBRInstrumentGen4_converse(
+                instrument,
+                "channel %s",
+                RBRInstrumentGen4ChannelNature_name(nature)));
+
+    return RBRInstrumentGen4_parseChannelPool(instrument, channelPool);
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getSettings(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Settings *settings)
+{
+    memset(settings, 0, sizeof(RBRInstrumentGen4Settings));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "settings"));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "prompt") == 0)
+        {
+            settings->prompt = (strcmp(parameter.value, "on") == 0);
+        }
+        else if (strcmp(parameter.key, "confirmation") == 0)
+        {
+            settings->confirmation = (strcmp(parameter.value, "on") == 0);
+        }
+        else if (strcmp(parameter.key, "pollpoweroffdelay") == 0)
+        {
+            settings->pollPowerOffDelay = strtol(parameter.value, NULL, 10);
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_setSettings(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Settings *settings)
+{
+    if (settings->pollPowerOffDelay < 0)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    /* The instrument answers with nothing at all once confirmation is off. */
+    if (!settings->confirmation)
+    {
+        return RBRInstrumentGen4_sendCommand(
+            instrument,
+            "settings prompt=%s confirmation=off pollpoweroffdelay=%" PRId32,
+            settings->prompt ? "on" : "off",
+            settings->pollPowerOffDelay);
+    }
+
+    return RBRInstrumentGen4_converse(
+        instrument,
+        "settings prompt=%s confirmation=on pollpoweroffdelay=%" PRId32,
+        settings->prompt ? "on" : "off",
+        settings->pollPowerOffDelay);
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_getParameters(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Parameters *parameters)
+{
+    memset(parameters, 0, sizeof(RBRInstrumentGen4Parameters));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "parameters"));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "altitude") == 0)
+        {
+            parameters->altitude = strtof(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "atmosphere") == 0)
+        {
+            parameters->atmosphere = strtof(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "avgsoundspeed") == 0)
+        {
+            parameters->avgSoundSpeed = strtof(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "density") == 0)
+        {
+            parameters->density = strtof(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "pressure") == 0)
+        {
+            parameters->pressure = strtof(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "salinity") == 0)
+        {
+            parameters->salinity = strtof(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "speccondtempco") == 0)
+        {
+            parameters->specCondTempCo = strtof(parameter.value, NULL);
+        }
+        else if (strcmp(parameter.key, "temperature") == 0)
+        {
+            parameters->temperature = strtof(parameter.value, NULL);
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_setParameters(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Parameters *parameters)
+{
+    /* The instrument bounds these values; %.9g round-trips a float. */
+    return RBRInstrumentGen4_converse(
+        instrument,
+        "parameters altitude=%.9g atmosphere=%.9g avgsoundspeed=%.9g "
+        "density=%.9g pressure=%.9g salinity=%.9g speccondtempco=%.9g "
+        "temperature=%.9g",
+        (double) parameters->altitude,
+        (double) parameters->atmosphere,
+        (double) parameters->avgSoundSpeed,
+        (double) parameters->density,
+        (double) parameters->pressure,
+        (double) parameters->salinity,
+        (double) parameters->specCondTempCo,
+        (double) parameters->temperature);
+}
 
 const char *RBRInstrumentGen4UvledCommand_name(RBRInstrumentGen4UvledCommand uvledCommand)
 {

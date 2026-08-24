@@ -221,22 +221,26 @@ int main(int argc, char *argv[])
     {
         RBRInstrumentGen4_getChannel(instrument, &channelPool.pool[i]);
         printf(
-            "%s,%s,%u,%d,%d,%d,%s,%s,%f,%u", 
+            "%s,%s,%d,%d,%d,%s,%s,%s,%u",
             channelPool.pool[i].label,
             channelPool.pool[i].type,
-            channelPool.pool[i].address,
             channelPool.pool[i].settlingTime,
-            channelPool.pool[i].readTime,
-            channelPool.pool[i].guardTime,
-            channelPool.pool[i].equation,
+            channelPool.pool[i].measuringTime,
+            channelPool.pool[i].readOutTime,
             channelPool.pool[i].userUnits,
-            channelPool.pool[i].gain.currentGain,
+            RBRInstrumentGen4ChannelNature_name(channelPool.pool[i].nature),
+            channelPool.pool[i].device,
             channelPool.pool[i].derived
         );
     }
     for (int32_t i = 0; i < channelPool.count; i++)
     {
-        RBRInstrumentGen4_getCalibration(instrument, &channelPool.pool[i].calibration);
+        RBRInstrumentGen4Calibration calibration;
+        snprintf(calibration.label,
+                 sizeof(calibration.label),
+                 "%s",
+                 channelPool.pool[i].label);
+        RBRInstrumentGen4_getCalibration(instrument, &calibration);
     }
 
     /* specify groupLabel, channel labels, and create group instance */
