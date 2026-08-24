@@ -354,16 +354,22 @@ RBRInstrumentGen4Error RBRInstrumentGen4_enable(
     RBRInstrumentGen4InstrumentState *state);
 
 /**
- * \brief If the instrument is logging, terminate the current deployment.
+ * \brief Terminate the current deployment.
  * \note Issues the `disable` instrument command.
  *
+ * A warning from the instrument is reported as
+ * #RBRINSTRUMENTGEN4_HARDWARE_ERROR with the response type set to
+ * #RBRINSTRUMENTGEN4_RESPONSE_WARNING.
+ *
  * \param [in] instrument the instrument connection
- * \param [inout] state the status of logger
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
+ * \param [out] state the state of the instrument; untouched unless the command
+ *                    succeeds
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the deployment is terminated
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the instrument was not enabled
  * \see RBRInstrumentGen4_enable()
- * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/disable
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828481/disable
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_disable(
     RBRInstrumentGen4 *instrument,

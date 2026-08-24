@@ -701,3 +701,72 @@ TEST_LOGGER4(enable)
 
     return true;
 }
+
+typedef struct DisableTest
+{
+    const char *response;
+    RBRInstrumentGen4Error expectedError;
+    RBRInstrumentGen4ResponseType expectedType;
+    RBRInstrumentGen4HardwareError expectedHardwareError;
+    RBRInstrumentGen4InstrumentState expectedState;
+} DisableTest;
+
+TEST_LOGGER4(disable)
+{
+    DisableTest tests[] = {
+        /* The command reports an instrument state, not a deployment status. */
+        { "disable state=disabled" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_RESPONSE_INFO,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR_NONE,
+          RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED },
+        /*
+         * Disabling an instrument that is already disabled is a warning, which
+         * the library surfaces as a hardware error with the response type
+         * distinguishing it.
+         */
+        { "WRN-435 instrument state is already disabled" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+          RBRINSTRUMENTGEN4_RESPONSE_WARNING,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR_INSTRUMENT_STATE_IS_ALREADY_DISABLED,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        /* A state the library does not model reads as unknown. */
+        { "disable state=bogus" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_RESPONSE_INFO,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR_NONE,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        { "disable" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_RESPONSE_INFO,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR_NONE,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        { 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4InstrumentState actual;
+
+    for (int i = 0; tests[i].response != NULL; i++)
+    {
+        actual = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4_disable(instrument, &actual);
+        TEST_ASSERT_STR_EQ("disable" COMMAND_TERMINATOR,
+                           buffers->writeBuffer);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedType,
+                            instrument->response.type,
+                            RBRInstrumentGen4ResponseType);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedHardwareError,
+                            instrument->response.error,
+                            RBRInstrumentGen4HardwareError);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedState,
+                            actual,
+                            RBRInstrumentGen4InstrumentState);
+    }
+
+    return true;
+}
