@@ -770,3 +770,98 @@ TEST_LOGGER4(disable)
 
     return true;
 }
+
+typedef struct PauseResumeTest
+{
+    const char *response;
+    RBRInstrumentGen4Error expectedError;
+    RBRInstrumentGen4DeploymentStatus expectedStatus;
+} PauseResumeTest;
+
+static bool test_pauseResume(
+    RBRInstrumentGen4 *instrument,
+    TestIOBuffers *buffers,
+    const char *command,
+    RBRInstrumentGen4Error (*call)(RBRInstrumentGen4 *,
+                                   RBRInstrumentGen4DeploymentStatus *),
+    PauseResumeTest *tests)
+{
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4DeploymentStatus actual;
+
+    for (int i = 0; tests[i].response != NULL; i++)
+    {
+        actual = RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS;
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = call(instrument, &actual);
+        TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedStatus,
+                            actual,
+                            RBRInstrumentGen4DeploymentStatus);
+    }
+
+    return true;
+}
+
+TEST_LOGGER4(pause)
+{
+    PauseResumeTest tests[] = {
+        { "pause status=paused" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_PAUSED },
+        /*
+         * Pausing a deployment that is waiting on its gating condition
+         * succeeds and leaves it gated, not paused.
+         */
+        { "pause status=gated" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_GATED },
+        { "ERR-406 cannot pause while disabled" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+          RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS },
+        { "pause status=bogus" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS },
+        { "pause" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS },
+        { 0 }
+    };
+
+    return test_pauseResume(instrument,
+                            buffers,
+                            "pause" COMMAND_TERMINATOR,
+                            RBRInstrumentGen4_pause,
+                            tests);
+}
+
+TEST_LOGGER4(resume)
+{
+    PauseResumeTest tests[] = {
+        { "resume status=sampling" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_SAMPLING },
+        { "resume status=gated" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_GATED },
+        { "ERR-407 cannot resume while disabled" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+          RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS },
+        { "resume status=bogus" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS },
+        { "resume" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS },
+        { 0 }
+    };
+
+    return test_pauseResume(instrument,
+                            buffers,
+                            "resume" COMMAND_TERMINATOR,
+                            RBRInstrumentGen4_resume,
+                            tests);
+}

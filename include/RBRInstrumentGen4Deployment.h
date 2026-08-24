@@ -225,15 +225,17 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setDeployment(
     const RBRInstrumentGen4Deployment *deployment);
 
 /**
- * \brief Pauses an enabled deloyment.
+ * \brief Pause an enabled deployment.
  * \note Issues the `pause` instrument command.
- * 
+ *
  * \param [in] instrument the instrument connection
- * \param [out] status the deployment status
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the status is "paused".
- * \return #RBRINSTRUMENTGEN4_UNSUPPORTED when the current firmware doesn't support
- * pauseresume feature, or pauseresume is not allowed.
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the response indicates an error.
+ * \param [out] status the deployment status; untouched unless the command
+ *                     succeeds
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the deployment is paused
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the instrument is not
+ *         enabled
  * \see RBRInstrumentGen4_resume()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828461/pause
  */
@@ -242,19 +244,19 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pause(
     RBRInstrumentGen4DeploymentStatus *status);
 
 /**
- * \brief Resumes an enabled deployment which was previously
- * paused using the pause command
+ * \brief Resume a paused deployment.
  * \note Issues the `resume` instrument command.
- * 
+ *
  * \param [in] instrument the instrument connection
- * \param [out] status the deployment status
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the state is one of the following:
- * "sampling", "gated".
- * \return #RBRINSTRUMENTGEN4_UNSUPPORTED when the current firmware doesn't support
- * pauseresume feature, or pauseresume is not allowed.
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the response indicates an error.
+ * \param [out] status the deployment status; untouched unless the command
+ *                     succeeds
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the deployment is resumed
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the instrument is not
+ *         enabled
  * \see RBRInstrumentGen4_pause()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828461/pause
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828463/resume
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_resume(
     RBRInstrumentGen4 *instrument,

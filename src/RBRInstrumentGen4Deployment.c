@@ -249,12 +249,46 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setDeployment(
         startTime);
 }
 
+/**
+ * \brief Read the deployment status a `pause` or `resume` response reports.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [out] status the reported status
+ */
+static void RBRInstrumentGen4_parseDeploymentStatus(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4DeploymentStatus *status)
+{
+    *status = RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS;
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "status") == 0)
+        {
+            *status = RBRInstrumentGen4DeploymentStatus_parse(parameter.value);
+            break;
+        }
+    }
+}
+
 RBRInstrumentGen4Error RBRInstrumentGen4_pause(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4DeploymentStatus *status)
 {
-    (void)instrument;
-    (void)status;
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "pause"));
+
+    RBRInstrumentGen4_parseDeploymentStatus(instrument, status);
+
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
@@ -262,8 +296,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_resume(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4DeploymentStatus *status)
 {
-    (void)instrument;
-    (void)status;
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "resume"));
+
+    RBRInstrumentGen4_parseDeploymentStatus(instrument, status);
+
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
