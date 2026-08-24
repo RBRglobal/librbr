@@ -20,7 +20,6 @@
 
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Internal.h"
-#include "RBRInstrumentGen4Security.h"
 #include "RBRInstrumentGen4Deployment.h"
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getClock(RBRInstrumentGen4 *instrument,
@@ -307,100 +306,4 @@ RBRInstrumentGen4Error RBRInstrumentGen4_disable(
     return RBRInstrumentGen4_parseDeploymentResponse(instrument,
                                                  "disable",
                                                  state);
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_getSimulation(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4ChannelPool *channelPool,
-    RBRInstrumentGen4Simulation *simulation)
-{
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "simulation"));
-
-    char *command = NULL;
-    RBRInstrumentGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRInstrumentGen4_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
-
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
-            break;
-        }
-        else if (strcmp(parameter.key, "state") == 0)
-        {
-            simulation->state = (strcmp(parameter.value, "on") == 0);
-        }
-        else if (strcmp(parameter.key, "period") == 0)
-        {
-            simulation->period = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "channellist") == 0)
-        {
-            /* Match the labels to channels from the pool */
-            /* TODO: This would be great as a helper function */
-            for (int32_t channel_idx = 0; channel_idx < channelPool->count; channel_idx++)
-            {
-                if (strcmp(channelPool->pool[channel_idx].label,
-                       parameter.key) == 0)
-                {
-                    strcpy(channelPool->pool[channel_idx].label,
-                           parameter.key);
-                }
-            }
-        }
-    }
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_setSimulation(
-    RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Simulation *simulation)
-{
-    if (simulation->period <= 0)
-    {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-    }
-
-    /* Build the pipe-separated channel label list. The command buffer caps
-     * the length of the entire command, so a longer list could never be sent
-     * anyway. */
-    char channelList[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX] = "";
-    int32_t channelListLength = 0;
-    for (int32_t channel = 0;
-         channel < RBRINSTRUMENTGEN4_CHANNEL_MAX
-         && simulation->channelList[channel] != NULL;
-         channel++)
-    {
-        channelListLength += snprintf(channelList + channelListLength,
-                                      sizeof(channelList) - channelListLength,
-                                      "%s%s",
-                                      channel > 0 ? "|" : "",
-                                      simulation->channelList[channel]->label);
-        if (channelListLength >= (int32_t) sizeof(channelList))
-        {
-            return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
-        }
-    }
-
-    RBR_TRY(RBRInstrumentGen4_permit(instrument, "simulation"));
-    if (channelListLength > 0)
-    {
-        RBR_TRY(RBRInstrumentGen4_converse(
-            instrument,
-            "simulation state=%s period=%" PRId32 " channellist=%s",
-            simulation->state ? "on" : "off",
-            simulation->period,
-            channelList));
-    }
-    else
-    {
-        RBR_TRY(RBRInstrumentGen4_converse(
-            instrument,
-            "simulation state=%s period=%" PRId32,
-            simulation->state ? "on" : "off",
-            simulation->period));
-    }
-    return RBRINSTRUMENTGEN4_SUCCESS;
 }
