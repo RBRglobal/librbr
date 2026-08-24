@@ -227,11 +227,11 @@ GEN3_TEST_MODULES := communication \
 ## Gen4 sources; re-enabling them is part of the test alignment planned for
 ## libRBR 2.0 (SYS-1194):
 ##
-## - `configuration`: builds; the `calibration` test crashes
 ## - `polling`, `streaming`: predate the `channels` to `channelCount` rename
 ## - `deployment`: predates RBRInstrumentGen4Simulation struct changes
 ## - `memory`: tests an incomplete implementation
 GEN4_TEST_MODULES := communication \
+                     configuration \
                      instrument \
                      security
 
