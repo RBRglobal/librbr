@@ -87,22 +87,40 @@ const char *RBRInstrumentGen4DeploymentStatus_name(
 {
     switch (status)
     {
-    case RBRINSTRUMENTGEN4_STATUS_SAMPLING:
+    case RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_SAMPLING:
         return "sampling";
-    case RBRINSTRUMENTGEN4_STATUS_GATED:
+    case RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_GATED:
         return "gated";
-    case RBRINSTRUMENTGEN4_STATUS_PAUSED:
+    case RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_PAUSED:
         return "paused";
-    case RBRINSTRUMENTGEN4_STATUS_INACTIVE:
+    case RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE:
         return "inactive";
-    case RBRINSTRUMENTGEN4_STATUS_UNKNOWN:
-        return "unknown";
-    case RBRINSTRUMENTGEN4_STATUS_COUNT:
-        return "status count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_STATUS:
+    case RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_COUNT:
+        return "deployment status count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS:
     default:
-        return "unknown status";
+        return "unknown deployment status";
     }
+}
+
+/**
+ * \brief Find the deployment status a response value names.
+ *
+ * \param [in] value the response value
+ * \return the status, or #RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS
+ */
+static RBRInstrumentGen4DeploymentStatus
+RBRInstrumentGen4DeploymentStatus_parse(const char *value)
+{
+    for (int i = 0; i < RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_COUNT; i++)
+    {
+        if (strcmp(RBRInstrumentGen4DeploymentStatus_name(i), value) == 0)
+        {
+            return i;
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS;
 }
 
 const char *RBRInstrumentGen4Gate_name(RBRInstrumentGen4Gate gate)
@@ -111,12 +129,12 @@ const char *RBRInstrumentGen4Gate_name(RBRInstrumentGen4Gate gate)
     {
     case RBRINSTRUMENTGEN4_GATE_NONE:
         return "none";
-    case RBRINSTRUMENTGEN4_GATE_THRESHOLDING:
-        return "thresholding";
+    case RBRINSTRUMENTGEN4_GATE_TIME:
+        return "time";
     case RBRINSTRUMENTGEN4_GATE_TWISTACTIVATION:
         return "twistactivation";
-    case RBRINSTRUMENTGEN4_GATE_INVALID:
-        return "invalid";
+    case RBRINSTRUMENTGEN4_GATE_WETSWITCH:
+        return "wetswitch";
     case RBRINSTRUMENTGEN4_GATE_COUNT:
         return "gate count";
     case RBRINSTRUMENTGEN4_UNKNOWN_GATE:
@@ -125,12 +143,74 @@ const char *RBRInstrumentGen4Gate_name(RBRInstrumentGen4Gate gate)
     }
 }
 
+/**
+ * \brief Find the gating condition a response value names.
+ *
+ * \param [in] value the response value
+ * \return the condition, or #RBRINSTRUMENTGEN4_UNKNOWN_GATE
+ */
+static RBRInstrumentGen4Gate RBRInstrumentGen4Gate_parse(const char *value)
+{
+    for (int i = 0; i < RBRINSTRUMENTGEN4_GATE_COUNT; i++)
+    {
+        if (strcmp(RBRInstrumentGen4Gate_name(i), value) == 0)
+        {
+            return i;
+        }
+    }
+
+    return RBRINSTRUMENTGEN4_UNKNOWN_GATE;
+}
+
 RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4Deployment *deployment)
 {
-    (void)instrument;
-    (void)deployment;
+    memset(deployment, 0, sizeof(RBRInstrumentGen4Deployment));
+
+    /* Cast away const to reach the read-only parameters of the response. */
+    RBRInstrumentGen4DeploymentStatus *status =
+        (RBRInstrumentGen4DeploymentStatus *) &deployment->status;
+    bool *simulation = (bool *) &deployment->simulation;
+
+    *status = RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS;
+    deployment->gate = RBRINSTRUMENTGEN4_UNKNOWN_GATE;
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "deployment"));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "starttime") == 0)
+        {
+            RBR_TRY(RBRInstrumentGen4DateTime_parseScheduleTime(
+                        parameter.value,
+                        &deployment->startTime,
+                        NULL));
+        }
+        else if (strcmp(parameter.key, "status") == 0)
+        {
+            *status = RBRInstrumentGen4DeploymentStatus_parse(parameter.value);
+        }
+        else if (strcmp(parameter.key, "gate") == 0)
+        {
+            deployment->gate = RBRInstrumentGen4Gate_parse(parameter.value);
+        }
+        else if (strcmp(parameter.key, "simulation") == 0)
+        {
+            *simulation = strcmp(parameter.value, "on") == 0;
+        }
+    }
+
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
@@ -138,6 +218,21 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setDeployment(
     RBRInstrumentGen4 *instrument,
     const RBRInstrumentGen4Deployment *deployment)
 {
+    if (deployment->gate < 0
+        || deployment->gate >= RBRINSTRUMENTGEN4_GATE_COUNT)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    /* `starttime` is only available under time gating. */
+    if (deployment->gate != RBRINSTRUMENTGEN4_GATE_TIME)
+    {
+        return RBRInstrumentGen4_converse(
+            instrument,
+            "deployment gate=%s",
+            RBRInstrumentGen4Gate_name(deployment->gate));
+    }
+
     if (deployment->startTime < RBRINSTRUMENTGEN4_DATETIME_MIN
         || deployment->startTime > RBRINSTRUMENTGEN4_DATETIME_MAX)
     {
@@ -147,18 +242,11 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setDeployment(
     char startTime[RBRINSTRUMENTGEN4_SCHEDULE_TIME_LEN + 1];
     RBRInstrumentGen4DateTime_toScheduleTime(deployment->startTime, startTime);
 
-    if (instrument->generation == RBRINSTRUMENTGEN4_LOGGER4)
-    {
-        RBR_TRY(RBRInstrumentGen4_converse(
-                    instrument,
-                    "deployment starttime=%s",
-                    startTime));
-        return RBRINSTRUMENTGEN4_SUCCESS;
-    }
-    else
-    {
-        return RBRINSTRUMENTGEN4_UNSUPPORTED;
-    }
+    return RBRInstrumentGen4_converse(
+        instrument,
+        "deployment gate=%s starttime=%s",
+        RBRInstrumentGen4Gate_name(deployment->gate),
+        startTime);
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_pause(

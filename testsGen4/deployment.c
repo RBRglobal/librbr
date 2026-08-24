@@ -171,3 +171,227 @@ TEST_LOGGER4(setClock)
 
     return true;
 }
+
+typedef struct GetDeploymentTest
+{
+    const char *response;
+    RBRInstrumentGen4Error expectedError;
+    RBRInstrumentGen4Deployment expected;
+} GetDeploymentTest;
+
+TEST_LOGGER4(getDeployment)
+{
+    GetDeploymentTest tests[] = {
+        /* No gating condition, so no start time is reported. */
+        { "deployment status=inactive gate=none simulation=off"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 0,
+            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_GATE_NONE,
+            false } },
+        /* Time gating adds the start time, ahead of the other parameters. */
+        { "deployment starttime=20270101000000 status=inactive gate=time "
+          "simulation=off" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 1798761600000LL,
+            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_GATE_TIME,
+            false } },
+        { "deployment status=sampling gate=none simulation=off"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 0,
+            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_SAMPLING,
+            RBRINSTRUMENTGEN4_GATE_NONE,
+            false } },
+        { "deployment status=paused gate=none simulation=off"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 0,
+            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_PAUSED,
+            RBRINSTRUMENTGEN4_GATE_NONE,
+            false } },
+        { "deployment starttime=20270101000000 status=gated gate=time "
+          "simulation=off" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 1798761600000LL,
+            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_GATED,
+            RBRINSTRUMENTGEN4_GATE_TIME,
+            false } },
+        { "deployment status=inactive gate=twistactivation simulation=on"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 0,
+            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_GATE_TWISTACTIVATION,
+            true } },
+        { "deployment status=inactive gate=wetswitch simulation=off"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 0,
+            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_GATE_WETSWITCH,
+            false } },
+        /*
+         * A value the library does not model reads as unknown rather than as
+         * the first member.
+         */
+        { "deployment status=bogus gate=bogus simulation=off"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 0,
+            RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+            RBRINSTRUMENTGEN4_UNKNOWN_GATE,
+            false } },
+        /* An unreported parameter is left unknown, not zero. */
+        { "deployment" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 0,
+            RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+            RBRINSTRUMENTGEN4_UNKNOWN_GATE,
+            false } },
+        /* Keys the library does not model are ignored. */
+        { "deployment status=inactive gate=none simulation=off bogus=1"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 0,
+            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_GATE_NONE,
+            false } },
+        { 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Deployment actual;
+
+    for (int i = 0; tests[i].response != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4_getDeployment(instrument, &actual);
+        TEST_ASSERT_STR_EQ("deployment" COMMAND_TERMINATOR,
+                           buffers->writeBuffer);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_EQ(tests[i].expected.startTime,
+                       actual.startTime,
+                       "%" PRIi64);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.status,
+                            actual.status,
+                            RBRInstrumentGen4DeploymentStatus);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.gate,
+                            actual.gate,
+                            RBRInstrumentGen4Gate);
+        TEST_ASSERT_EQ(tests[i].expected.simulation,
+                       actual.simulation,
+                       "%d");
+    }
+
+    return true;
+}
+
+typedef struct SetDeploymentTest
+{
+    RBRInstrumentGen4Deployment deployment;
+    const char *command;
+    const char *response;
+    RBRInstrumentGen4Error expectedError;
+} SetDeploymentTest;
+
+TEST_LOGGER4(setDeployment)
+{
+    SetDeploymentTest tests[] = {
+        /*
+         * Without time gating only `gate` is sent: the instrument answers
+         * `ERR-108` for `starttime` under any other condition.
+         */
+        { { 0, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_GATE_NONE, false },
+          "deployment gate=none" COMMAND_TERMINATOR,
+          "deployment gate=none" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS },
+        /* A start time left over from a previous read is not sent either. */
+        { { 1798761600000LL, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_GATE_WETSWITCH, false },
+          "deployment gate=wetswitch" COMMAND_TERMINATOR,
+          "deployment gate=wetswitch" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS },
+        { { 0, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_GATE_TWISTACTIVATION, false },
+          "deployment gate=twistactivation" COMMAND_TERMINATOR,
+          "deployment gate=twistactivation" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS },
+        /* Time gating takes both parameters in one command. */
+        { { 1798761600000LL, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_GATE_TIME, false },
+          "deployment gate=time starttime=20270101000000"
+          COMMAND_TERMINATOR,
+          "deployment gate=time starttime=20270101000000"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS },
+        /*
+         * A start time is range-checked only when it is going to be sent, so
+         * an out-of-range value under time gating fails and the same value
+         * under any other condition does not.
+         */
+        { { RBRINSTRUMENTGEN4_DATETIME_MIN - 1,
+            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_GATE_TIME, false },
+          "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE },
+        { { RBRINSTRUMENTGEN4_DATETIME_MAX + 1,
+            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_GATE_TIME, false },
+          "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE },
+        { { RBRINSTRUMENTGEN4_DATETIME_MAX + 1,
+            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_GATE_NONE, false },
+          "deployment gate=none" COMMAND_TERMINATOR,
+          "deployment gate=none" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS },
+        /* The sentinels a getter can leave behind never reach the command. */
+        { { 0, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_UNKNOWN_GATE, false },
+          "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE },
+        { { 0, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_GATE_COUNT, false },
+          "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE },
+        /* Both writable parameters are unavailable while logging. */
+        { { 0, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_SAMPLING,
+            RBRINSTRUMENTGEN4_GATE_NONE, false },
+          "deployment gate=none" COMMAND_TERMINATOR,
+          "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR },
+        /* A gating condition the instrument does not offer is refused. */
+        { { 0, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRINSTRUMENTGEN4_GATE_WETSWITCH, false },
+          "deployment gate=wetswitch" COMMAND_TERMINATOR,
+          "ERR-108 invalid argument to command: 'wetswitch'"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR },
+        { { 0 }, NULL, NULL, 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4_setDeployment(instrument,
+                                              &tests[i].deployment);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+    }
+
+    return true;
+}

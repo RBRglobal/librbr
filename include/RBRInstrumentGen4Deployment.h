@@ -81,8 +81,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setClock(
 
 /**
  * \brief Possible deployment statuses.
- * This tracks the status of the deployment running on the instrument.
  *
+ * \see RBRInstrumentGen4InstrumentState
  * \see RBRInstrumentGen4Deployment
  * \see RBRInstrumentGen4_getDeployment()
  * \see RBRInstrumentGen4_pause()
@@ -91,24 +91,18 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setClock(
  */
 typedef enum RBRInstrumentGen4DeploymentStatus
 {
-    /** Logging is in progress. */
-    RBRINSTRUMENTGEN4_STATUS_SAMPLING,
-    /** Logging paused; awaiting satisfaction of a gating condition. */
-    RBRINSTRUMENTGEN4_STATUS_GATED,
-    /** Logging paused, waiting for a resume command. */
-    RBRINSTRUMENTGEN4_STATUS_PAUSED,
-    /**
-     * A `disable` command was received.
-     *
-     * \see RBRInstrumentGen4_disable()
-     */
-    RBRINSTRUMENTGEN4_STATUS_INACTIVE,
-    /** Memory full; logging has stopped. */
-    RBRINSTRUMENTGEN4_STATUS_UNKNOWN,
-    /** The number of specific statuses. */
-    RBRINSTRUMENTGEN4_STATUS_COUNT,
-    /** An unknown or unrecognized status. */
-    RBRINSTRUMENTGEN4_UNKNOWN_STATUS
+    /** The deployment is sampling. */
+    RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_SAMPLING,
+    /** The deployment is waiting on its gating condition. */
+    RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_GATED,
+    /** The deployment is paused. */
+    RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_PAUSED,
+    /** No deployment is active. */
+    RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+    /** The number of specific deployment statuses. */
+    RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_COUNT,
+    /** An unknown or unrecognized deployment status. */
+    RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS
 } RBRInstrumentGen4DeploymentStatus;
 
 /**
@@ -122,34 +116,24 @@ const char *RBRInstrumentGen4DeploymentStatus_name(
     RBRInstrumentGen4DeploymentStatus status);
 
 /**
- * \brief Possible instrument gating conditions.
+ * \brief Possible deployment gating conditions.
  *
  * \see RBRInstrumentGen4Deployment
- * \see RBRInstrumentGen4Gating.h
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/schedule
- * \see https://docs.rbr-global.com/L3commandreference/commands/gated-schedule
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
 typedef enum RBRInstrumentGen4Gate
 {
-    /** No gating. */
+    /** No gating condition. */
     RBRINSTRUMENTGEN4_GATE_NONE,
-    /**
-     * Threshold gating.
-     *
-     * \see RBRInstrumentGen4_setThresholding()
-     */
-    RBRINSTRUMENTGEN4_GATE_THRESHOLDING,
-    /**
-     * Twist-activated gating.
-     *
-     * \see RBRInstrumentGen4_setTwistActivation()
-     */
+    /** Gated on the deployment start time. */
+    RBRINSTRUMENTGEN4_GATE_TIME,
+    /** Gated on the end cap position. */
     RBRINSTRUMENTGEN4_GATE_TWISTACTIVATION,
-    /** The instrument considers its gating condition to be invalid. */
-    RBRINSTRUMENTGEN4_GATE_INVALID,
-    /** The number of specific schedule modes. */
+    /** Gated on the instrument being in the water. */
+    RBRINSTRUMENTGEN4_GATE_WETSWITCH,
+    /** The number of specific gating conditions. */
     RBRINSTRUMENTGEN4_GATE_COUNT,
-    /** An unknown or unrecognized schedule mode. */
+    /** An unknown or unrecognized gating condition. */
     RBRINSTRUMENTGEN4_UNKNOWN_GATE
 } RBRInstrumentGen4Gate;
 
@@ -162,7 +146,8 @@ typedef enum RBRInstrumentGen4Gate
  */
 const char *RBRInstrumentGen4Gate_name(RBRInstrumentGen4Gate gate);
 
-/** \brief Instrument `deployment` command parameters.
+/**
+ * \brief Instrument `deployment` command parameters.
  *
  * \see RBRInstrumentGen4_getDeployment()
  * \see RBRInstrumentGen4_setDeployment()
@@ -170,7 +155,12 @@ const char *RBRInstrumentGen4Gate_name(RBRInstrumentGen4Gate gate);
  */
 typedef struct RBRInstrumentGen4Deployment
 {
-    /** \brief The deployment start date and time.  */
+    /**
+     * \brief The start date and time of the next deployment.
+     *
+     * Only available while RBRInstrumentGen4Deployment.gate is
+     * #RBRINSTRUMENTGEN4_GATE_TIME.
+     */
     RBRInstrumentGen4DateTime startTime;
 
     /**
@@ -178,16 +168,13 @@ typedef struct RBRInstrumentGen4Deployment
      *
      * \readonly
      */
-    RBRInstrumentGen4DeploymentStatus status;
+    const RBRInstrumentGen4DeploymentStatus status;
 
-    /** \brief Gets any gating condition currently enabled.
-     * options: none|wetswitch|twistactivation|invalid
-     */
+    /** \brief The gating condition of the next deployment. */
     RBRInstrumentGen4Gate gate;
 
-    /** \brief Gets whether any of the instrument's channels are being simulated (on),
-     * or whether they are all reporting true measure data(off).
-     * Options: on|off.
+    /**
+     * \brief Whether any of the instrument's channels are being simulated.
      *
      * \readonly
      */
@@ -214,26 +201,23 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
  * \brief Set the instrument deployment parameters.
  * \note Issues the `deployment` instrument command.
  *
- * As noted in the description of RBRInstrumentGen4Deployment.status, that field is
- * ignored when setting the deployment.
- * 
- * The value RBRInstrumentGen4Deployment.gate is ignored. The gating mode is
- * controlled via commands for the individual gating mechanisms: see
- * RBRInstrumentGen4_setTwistActivation() and RBRInstrumentGen4_setThresholding().
- *
- * Hardware errors may occur if:
- *
- * - the instrument is logging
- * - you set an out-of-bounds parameter the library fails to detect
+ * RBRInstrumentGen4Deployment.startTime is sent only when
+ * RBRInstrumentGen4Deployment.gate is #RBRINSTRUMENTGEN4_GATE_TIME.
+ * RBRInstrumentGen4Deployment.status and
+ * RBRInstrumentGen4Deployment.simulation are never sent.
  *
  * \param [in] instrument the instrument connection
  * \param [in] deployment the deployment parameters
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the deployment is successfully changed
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the deployment is successfully
+ *         changed
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the deployment cannot be changed
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the start or end time
- *                                                values are out of range
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the deployment cannot be
+ *         changed
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the gating condition
+ *         is set to more than one condition, or the start time is being sent 
+ *         and is outside #RBRINSTRUMENTGEN4_DATETIME_MIN to 
+ *         #RBRINSTRUMENTGEN4_DATETIME_MAX
  * \see RBRInstrumentGen4_getDeployment()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
