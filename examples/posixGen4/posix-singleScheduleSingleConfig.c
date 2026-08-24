@@ -237,6 +237,7 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_verify(instrument,
                              &config,
                              NEW_DATASET_LABEL,
+                             RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
                              &loggingState);
 
     /* enable the instrument */

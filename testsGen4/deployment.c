@@ -395,3 +395,173 @@ TEST_LOGGER4(setDeployment)
 
     return true;
 }
+
+typedef struct VerifyTest
+{
+    const RBRInstrumentGen4Config config;
+    const char *datasetLabel;
+    RBRInstrumentGen4DeploymentStoragemode storageMode;
+    const char *command;
+    const char *response;
+    RBRInstrumentGen4Error expectedError;
+    RBRInstrumentGen4InstrumentState expectedState;
+} VerifyTest;
+
+TEST_LOGGER4(verify)
+{
+    VerifyTest tests[] = {
+        /* All three parameters are always sent. */
+        { { .label = "c_test" },
+          "d1",
+          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          "verify config=c_test dataset=d1 storagemode=normal"
+          COMMAND_TERMINATOR,
+          "verify config=c_test dataset=d1 storagemode=normal state=enabled"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED },
+        { { .label = "pH_cal" },
+          "d_pHcal_20260824",
+          RBRINSTRUMENTGEN4_STORAGEMODE_CALIBRATION,
+          "verify config=pH_cal dataset=d_pHcal_20260824 "
+          "storagemode=calibration" COMMAND_TERMINATOR,
+          "verify config=pH_cal dataset=d_pHcal_20260824 "
+          "storagemode=calibration state=enabled" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED },
+        /*
+         * The response echoes the parameters in whatever order they were
+         * sent, and `state` need not come last.
+         */
+        { { .label = "c_test" },
+          "d1",
+          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          "verify config=c_test dataset=d1 storagemode=normal"
+          COMMAND_TERMINATOR,
+          "verify state=disabled dataset=d1 config=c_test storagemode=normal"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED },
+        /* A state the library does not model reads as unknown. */
+        { { .label = "c_test" },
+          "d1",
+          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          "verify config=c_test dataset=d1 storagemode=normal"
+          COMMAND_TERMINATOR,
+          "verify config=c_test dataset=d1 state=bogus" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        /* A response with no state at all leaves it unknown. */
+        { { .label = "c_test" },
+          "d1",
+          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          "verify config=c_test dataset=d1 storagemode=normal"
+          COMMAND_TERMINATOR,
+          "verify config=c_test dataset=d1" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        /* Out-of-range parameters never reach the instrument. */
+        { { .label = "" },
+          "d1",
+          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        { { .label = "c_test" },
+          "",
+          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        { { .label = "c_test" },
+          "0123456789012345678901234567890123",
+          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        { { .label = "c_test" },
+          "d1",
+          RBRINSTRUMENTGEN4_UNKNOWN_STORAGEMODE,
+          "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        { { .label = "c_test" },
+          "d1",
+          RBRINSTRUMENTGEN4_STORAGEMODE_COUNT,
+          "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        /* Every failing check the instrument makes. */
+        { { .label = "nope" },
+          "d1",
+          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          "verify config=nope dataset=d1 storagemode=normal"
+          COMMAND_TERMINATOR,
+          "ERR-108 invalid argument to command: 'nope'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        { { .label = "c_test" },
+          "d.1",
+          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          "verify config=c_test dataset=d.1 storagemode=normal"
+          COMMAND_TERMINATOR,
+          "ERR-131 illegal character in label 'd.1'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        { { .label = "c_test" },
+          "d1",
+          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          "verify config=c_test dataset=d1 storagemode=normal"
+          COMMAND_TERMINATOR,
+          "ERR-120 'd1' is already in use" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        { { .label = "c_test" },
+          "d5",
+          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          "verify config=c_test dataset=d5 storagemode=normal"
+          COMMAND_TERMINATOR,
+          "ERR-431 dataset limit of '4' reached, delete dataset(s) to make "
+          "space" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        { { .label = "c_test" },
+          "d2",
+          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          "verify config=c_test dataset=d2 storagemode=normal"
+          COMMAND_TERMINATOR,
+          "ERR-436 instrument was already enabled with different settings"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+        { { .label = "" }, NULL, 0, NULL, NULL, 0, 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4InstrumentState actual;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        actual = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4_verify(instrument,
+                                       &tests[i].config,
+                                       tests[i].datasetLabel,
+                                       tests[i].storageMode,
+                                       &actual);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedState,
+                            actual,
+                            RBRInstrumentGen4InstrumentState);
+    }
+
+    return true;
+}

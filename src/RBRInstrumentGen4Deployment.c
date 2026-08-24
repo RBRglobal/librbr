@@ -267,30 +267,33 @@ RBRInstrumentGen4Error RBRInstrumentGen4_resume(
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-static RBRInstrumentGen4Error RBRInstrumentGen4_parseDeploymentResponse(
+/**
+ * \brief Read the instrument state a deployment response reports.
+ *
+ * Every other parameter of the response is an echo of what was sent.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [out] state the reported state
+ */
+static void RBRInstrumentGen4_parseInstrumentState(
     RBRInstrumentGen4 *instrument,
-    const char *deploymentCommand,
     RBRInstrumentGen4InstrumentState *state)
 {
-    //GEN4 todo: maybe make this consistent with other code, like get xxx name function.
-    /** 
-     * This function gets a human readable name for status. 
-     * used in functions RBRInstrumentGen4_verify(),RBRInstrumentGen4_enable(), RBRInstrumentGen4_disable()
-     * */
+    *state = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
+
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
     {
         RBRInstrumentGen4_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+                                        &command,
+                                        &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
             break;
         }
-        else if (strcmp(parameter.key, "status") != 0
-                 && strcmp(parameter.key, deploymentCommand) != 0)
+        else if (strcmp(parameter.key, "state") != 0)
         {
             continue;
         }
@@ -307,22 +310,57 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_parseDeploymentResponse(
 
         break;
     }
+}
+
+/**
+ * \brief Check the parameters `verify` and `enable` share.
+ *
+ * \param [in] config the configuration to deploy
+ * \param [in] datasetLabel the label for the deployment's dataset
+ * \param [in] storageMode the data storage mode
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are all in range
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE otherwise
+ */
+static RBRInstrumentGen4Error RBRInstrumentGen4_checkDeploymentParameters(
+    const RBRInstrumentGen4Config *config,
+    const char *datasetLabel,
+    RBRInstrumentGen4DeploymentStoragemode storageMode)
+{
+    if (config == NULL
+        || config->label[0] == '\0'
+        || datasetLabel == NULL
+        || datasetLabel[0] == '\0'
+        || strlen(datasetLabel) > RBRINSTRUMENTGEN4_LABEL_NAME_MAX
+        || (storageMode != RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL
+            && storageMode != RBRINSTRUMENTGEN4_STORAGEMODE_CALIBRATION))
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
 
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_verify(
-        RBRInstrumentGen4 *instrument,
-        const RBRInstrumentGen4Config *config, 
-        const char datasetLabel[],
-        RBRInstrumentGen4InstrumentState *status)
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Config *config,
+    const char *datasetLabel,
+    RBRInstrumentGen4DeploymentStoragemode storageMode,
+    RBRInstrumentGen4InstrumentState *state)
 {
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                   "verify config=%s dataset=%s", config->label, datasetLabel));
+    RBR_TRY(RBRInstrumentGen4_checkDeploymentParameters(config,
+                                                        datasetLabel,
+                                                        storageMode));
 
-    return RBRInstrumentGen4_parseDeploymentResponse(instrument,
-                                                 "verify",
-                                                 status);
+    RBR_TRY(RBRInstrumentGen4_converse(
+                instrument,
+                "verify config=%s dataset=%s storagemode=%s",
+                config->label,
+                datasetLabel,
+                RBRInstrumentGen4DeploymentStoragemode_name(storageMode)));
+
+    RBRInstrumentGen4_parseInstrumentState(instrument, state);
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 const char *RBRInstrumentGen4DeploymentStoragemode_name(RBRInstrumentGen4DeploymentStoragemode storageMode)
@@ -334,10 +372,10 @@ const char *RBRInstrumentGen4DeploymentStoragemode_name(RBRInstrumentGen4Deploym
     case RBRINSTRUMENTGEN4_STORAGEMODE_CALIBRATION:
         return "calibration";
     case RBRINSTRUMENTGEN4_STORAGEMODE_COUNT:
-        return "sampling mode count";
+        return "storage mode count";
     case RBRINSTRUMENTGEN4_UNKNOWN_STORAGEMODE:
     default:
-        return "unknown sampling mode";
+        return "unknown storage mode";
     }
 }
 
@@ -363,9 +401,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_enable(
         datasetLabel,
         RBRInstrumentGen4DeploymentStoragemode_name(storageMode)));
 
-    RBRInstrumentGen4_parseDeploymentResponse(instrument,
-                                              "enable",
-                                              state);
+    RBRInstrumentGen4_parseInstrumentState(instrument, state);
     
     *newDataset = &datasetPool->pool[datasetPool->count];
     datasetPool->count += 1;
@@ -380,7 +416,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_disable(
 {
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "disable"));
 
-    return RBRInstrumentGen4_parseDeploymentResponse(instrument,
-                                                 "disable",
-                                                 state);
+    RBRInstrumentGen4_parseInstrumentState(instrument, state);
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
 }

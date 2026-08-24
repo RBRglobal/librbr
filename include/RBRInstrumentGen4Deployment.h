@@ -262,44 +262,17 @@ RBRInstrumentGen4Error RBRInstrumentGen4_resume(
     RBRInstrumentGen4DeploymentStatus *status);
 
 /**
- * \brief Performs all the same deployment consistency checks which the
- * enable command performs.It then reports the same response which the enable
- * command would produce, However, it does not actually enable the logger for
- * sampling.
- * \note Issues the `verify` instrument command.
+ * \brief Possible data storage modes for a deployment.
  *
- * \param [in] instrument the instrument connection
- * \param [in] config specifies the configuration which will define this 
- * deployment.  The configuration must be valid.
- * \param [in] datasetLabel new dataset label for this deployment. It needs to be new name.
- * \param [out] state the state which would be assumed by logger if the enable
- * command were issued. If a warning or an error occurs, this parameter not modified.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if an error or a warning would occur when enabling logging
+ * \see RBRInstrumentGen4_verify()
  * \see RBRInstrumentGen4_enable()
- * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/verify
- */
-RBRInstrumentGen4Error RBRInstrumentGen4_verify(
-    RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Config *config, 
-    const char datasetLabel[],
-    RBRInstrumentGen4InstrumentState *state);
-
-/** \brief Possible storage modes in `enable` command.
- * \see RBRInstrumentGen4DeploymentEnable
- * \see RBRInstrumentGen4_enable()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828472/verify
- * \see meminfo dataType command for more details.
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828476/enable
  */
 typedef enum RBRInstrumentGen4DeploymentStoragemode
 {
-    /** Calibration equations will be applied to all channel data. */
+    /** Calibration equations are applied to all channel data. */
     RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
-    /** All data values are stored as IEEE double precision floating point
-     *  numbers in the nominal range 0.0 to 1.0
-     */
+    /** Calibration equations are not applied. */
     RBRINSTRUMENTGEN4_STORAGEMODE_CALIBRATION,
     /** The number of specific storage modes. */
     RBRINSTRUMENTGEN4_STORAGEMODE_COUNT,
@@ -316,7 +289,38 @@ typedef enum RBRInstrumentGen4DeploymentStoragemode
  */
 const char *RBRInstrumentGen4DeploymentStoragemode_name(
     RBRInstrumentGen4DeploymentStoragemode storageMode);
- 
+
+/**
+ * \brief Perform the deployment consistency checks of the `enable` command
+ * without enabling the instrument (a dry run).
+ * \note Issues the `verify` instrument command.
+ *
+ * All three parameters of the command are sent.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] config the configuration which would define this deployment
+ * \param [in] datasetLabel the label which would be given to the deployment's
+ *                          dataset
+ * \param [in] storageMode the data storage mode which would be used
+ * \param [out] state the state the instrument would assume; untouched unless
+ *                    the command succeeds
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the checks all pass
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when a check fails
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the configuration or
+ *         dataset label is empty or too long, or the storage mode is not a
+ *         specific mode
+ * \see RBRInstrumentGen4_enable()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828472/verify
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_verify(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Config *config,
+    const char *datasetLabel,
+    RBRInstrumentGen4DeploymentStoragemode storageMode,
+    RBRInstrumentGen4InstrumentState *state);
+
 /**
  * \brief Enable the instrument to sample according to the programmed schedule.
  * \note Issues the `enable` instrument command.
