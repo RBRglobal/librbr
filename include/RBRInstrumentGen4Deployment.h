@@ -33,65 +33,35 @@ extern "C"
  */
 typedef struct RBRInstrumentGen4Clock
 {
-    /**
-     * \brief The instrument's date and time.
-     */
+    /** \brief The instrument's date and time. */
     RBRInstrumentGen4DateTime dateTime;
+
     /**
      * \brief The offset of the instrument's date and time from UTC.
      *
-     * Specified in hours.
-     *
-     * When passing a date and time to the instrument, a `NAN` value will cause
-     * the `offsetfromutc` parameter to be omitted from the command sent to the
-     * instrument; otherwise, the parameter will be sent as the string
-     * representation of the number to two decimal places.
-     *
-     * When receiving a date and time from the instrument, a `NAN` value
-     * indicates that an offset from UTC was not provided when the instrument
-     * clock was most recently set. Otherwise, the value will correspond to the
-     * instrument clock offset from UTC.
+     * Specified in hours. Fractional offsets are accepted.
      */
     float offsetFromUtc;
 } RBRInstrumentGen4Clock;
 
 /**
- * \note Issues the `clock` instrument command.
  * \brief Get the instrument clock.
- *
- * Because UTC offset is tracked as a setting on Logger2 instruments, not as a
- * parameter of the `now` command (as it is of `clock` on Logger3), this
- * function will internally issue two commands to Logger2 instruments to
- * separately receive the time and UTC offset. When retrieving the clock from
- * older Logger2 instruments which do not support the `offsetfromutc` setting,
- * RBRInstrumentGen4Clock.offsetFromUtc will always be `NAN`.
+ * \note Issues the `clock` instrument command.
  *
  * \param [in] instrument the instrument connection
  * \param [out] clock the clock value
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_setClock
+ * \see RBRInstrumentGen4_setClock()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getClock(RBRInstrumentGen4 *instrument,
-                                          RBRInstrumentGen4Clock *clock);
+                                                 RBRInstrumentGen4Clock *clock);
 
 /**
  * \brief Set the instrument clock.
  * \note Issues the `clock` instrument command.
- *
- * Because UTC offset is tracked as a setting on Logger2 instruments, not as a
- * parameter of the `now` command (as it is of `clock` on Logger3), this
- * function will internally issue two commands to Logger2 instruments to
- * separately set the time and UTC offset. When setting the clock on older
- * Logger2 instruments which do not support the `offsetfromutc` setting, the
- * value of the RBRInstrumentGen4Clock.offsetFromUtc field will be ignored.
- *
- * Hardware errors may occur if:
- *
- * - the instrument is logging
- * - you set an out-of-bounds time the library fails to detect
  *
  * \param [in] instrument the instrument connection
  * \param [in] clock the clock value
@@ -99,13 +69,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getClock(RBRInstrumentGen4 *instrument,
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the settings cannot be changed
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the clock values are out
- *                                                of range
- * \see RBRInstrumentGen4_getClock
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the date and time is
+ *         outside #RBRINSTRUMENTGEN4_DATETIME_MIN to
+ *         #RBRINSTRUMENTGEN4_DATETIME_MAX, or the UTC offset is `NAN`
+ * \see RBRInstrumentGen4_getClock()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setClock(RBRInstrumentGen4 *instrument,
-                                          const RBRInstrumentGen4Clock *clock);
+RBRInstrumentGen4Error RBRInstrumentGen4_setClock(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Clock *clock);
+
 /**
  * \brief Possible deployment statuses.
  * This tracks the status of the deployment running on the instrument.

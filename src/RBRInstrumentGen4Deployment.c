@@ -23,20 +23,20 @@
 #include "RBRInstrumentGen4Deployment.h"
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getClock(RBRInstrumentGen4 *instrument,
-                                          RBRInstrumentGen4Clock *clock)
+                                                 RBRInstrumentGen4Clock *clock)
 {
     clock->dateTime = 0;
     clock->offsetFromUtc = NAN;
 
-RBR_TRY(RBRInstrumentGen4_converse(instrument, "clock"));
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "clock"));
 
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
     {
         RBRInstrumentGen4_parseResponse(instrument,
-                                    &command,
-                                    &parameter);
+                                        &command,
+                                        &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -44,12 +44,12 @@ RBR_TRY(RBRInstrumentGen4_converse(instrument, "clock"));
         }
         else if (strcmp(parameter.key, "datetime") == 0)
         {
-            RBR_TRY(RBRInstrumentGen4DateTime_parseScheduleTime(parameter.value,
-                                                            &clock->dateTime,
-                                                            NULL));
+            RBR_TRY(RBRInstrumentGen4DateTime_parseScheduleTime(
+                        parameter.value,
+                        &clock->dateTime,
+                        NULL));
         }
-        else if (strcmp(parameter.key, "offsetfromutc") == 0
-                 && strcmp(parameter.value, "unknown") != 0)
+        else if (strcmp(parameter.key, "offsetfromutc") == 0)
         {
             clock->offsetFromUtc = strtod(parameter.value, NULL);
         }
@@ -58,8 +58,9 @@ RBR_TRY(RBRInstrumentGen4_converse(instrument, "clock"));
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_setClock(RBRInstrumentGen4 *instrument,
-                                          const RBRInstrumentGen4Clock *clock)
+RBRInstrumentGen4Error RBRInstrumentGen4_setClock(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Clock *clock)
 {
     if (clock->dateTime < RBRINSTRUMENTGEN4_DATETIME_MIN
         || clock->dateTime > RBRINSTRUMENTGEN4_DATETIME_MAX)
@@ -67,32 +68,20 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setClock(RBRInstrumentGen4 *instrument,
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
+    if (isnan(clock->offsetFromUtc))
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
     char dateTime[RBRINSTRUMENTGEN4_SCHEDULE_TIME_LEN + 1];
     RBRInstrumentGen4DateTime_toScheduleTime(clock->dateTime, dateTime);
 
-    if (instrument->generation == RBRINSTRUMENTGEN4_LOGGER4)
-    {
-        float offsetFromUtc = (clock->offsetFromUtc);
-        if (!isnan(offsetFromUtc))
-        {
-            return RBRInstrumentGen4_converse(
-                instrument,
-                "clock datetime=%s offsetfromutc=%02f",
-                dateTime,
-                (double) offsetFromUtc);
-        }
-        else
-        {
-            return RBRInstrumentGen4_converse(instrument,
-                                        "clock datetime=%s",
-                                        dateTime);
-        }
-    }
-    else
-    {
-        return RBRINSTRUMENTGEN4_UNSUPPORTED;
-    }
+    return RBRInstrumentGen4_converse(instrument,
+                                      "clock datetime=%s offsetfromutc=%.2f",
+                                      dateTime,
+                                      (double) clock->offsetFromUtc);
 }
+
 const char *RBRInstrumentGen4DeploymentStatus_name(
     RBRInstrumentGen4DeploymentStatus status)
 {
