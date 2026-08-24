@@ -138,7 +138,6 @@ GEN4_OBJECTS := src/RBRInstrumentGen4.o \
                 src/RBRInstrumentGen4Internal.o \
                 src/RBRInstrumentGen4Memory.o \
                 src/RBRInstrumentGen4Polling.o \
-                src/RBRInstrumentGen4Schedule.o \
                 src/RBRInstrumentGen4Security.o \
                 src/RBRInstrumentGen4Streaming.o \
                 src/RBRParserGen4.o

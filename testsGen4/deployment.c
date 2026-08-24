@@ -10,7 +10,6 @@
 
 #include "tests.h"
 #include "RBRInstrumentGen4Deployment.h"
-#include "RBRInstrumentGen4Schedule.h"
 
 typedef struct VerifyTest
 {

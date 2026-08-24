@@ -14,11 +14,45 @@
 #define LIBRBR_RBRINSTRUMENTGEN4INSTRUMENT_H
 
 #include "RBRInstrumentGen4.h"
-/* Required for RBRInstrumentGen4InstrumentState. */
-#include "RBRInstrumentGen4Schedule.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * \brief Possible instrument instrument states.
+ * This tracks whether the deployment is running on the instrument.
+ *
+ * Returned by:
+ * \see RBRInstrumentGen4_getInstrument()
+ * \see RBRInstrumentGen4_enable()
+ * \see RBRInstrumentGen4_verify()
+ *
+ * For the deployment state:
+ * \see RBRInstrumentGen4DeploymentStatus
+ * \see RBRInstrumentGen4Deployment
+ */
+typedef enum RBRInstrumentGen4InstrumentState
+{
+    /** Logging is not enabled. */
+    RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED,
+    /** Logging for at least one deployment is enabled. */
+    RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED,
+    /** The number of specific instrument states. */
+    RBRINSTRUMENTGEN4_INSTRUMENT_STATE_COUNT,
+    /** An unknown or unrecognized instrument state. */
+    RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE
+} RBRInstrumentGen4InstrumentState;
+
+/**
+ * \brief Get a human-readable string name for a instrument state.
+ *
+ * \param [in] state the instrument state
+ * \return a string name for the instrument state
+ * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ */
+const char *RBRInstrumentGen4InstrumentState_name(
+    RBRInstrumentGen4InstrumentState status);
 
 /**
  * \brief The maximum number of characters in the instrument name.

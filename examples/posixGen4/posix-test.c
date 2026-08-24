@@ -22,7 +22,6 @@
 /* Required for close. */
 #include <unistd.h>
 
-#include "RBRInstrumentGen4Schedule.h"
 #include "posix-shared.h"
 
 #define RESPONSE_TERMINATOR "\r\n"

@@ -31,7 +31,6 @@
 #include "RBRInstrumentGen4Deployment.h"
 #include "RBRInstrumentGen4Instrument.h"
 #include "RBRInstrumentGen4Memory.h"
-#include "RBRInstrumentGen4Schedule.h"
 #include "RBRParserGen4.h"
 #include "posix-shared.h"
 

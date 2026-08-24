@@ -25,7 +25,6 @@
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Configuration.h"
 #include "RBRInstrumentGen4Memory.h"
-#include "RBRInstrumentGen4Schedule.h"
 #include "posix-shared.h"
 
 //************************************* customer defined parameters *************************************//
