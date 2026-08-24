@@ -227,10 +227,10 @@ GEN3_TEST_MODULES := communication \
 ## libRBR 2.0 (SYS-1194):
 ##
 ## - `polling`, `streaming`: predate the `channels` to `channelCount` rename
-## - `deployment`: predates RBRInstrumentGen4Simulation struct changes
 ## - `memory`: tests an incomplete implementation
 GEN4_TEST_MODULES := communication \
                      configuration \
+                     deployment \
                      instrument \
                      security
 
