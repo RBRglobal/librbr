@@ -32,48 +32,101 @@ extern "C" {
 #define RBRINSTRUMENTGEN4_DATASET_COUNT_MAX 32
 
 /**
- * \brief Instrument `storage` command parameters. Read-only.
- * \readonly
+ * \brief Possible storage access modes for the instrument's data memory.
+ *
+ * \see RBRInstrumentGen4Storage
+ */
+typedef enum RBRInstrumentGen4StorageAccess
+{
+    /** The instrument currently has access to its own data memory. */
+    RBRINSTRUMENTGEN4_STORAGE_ACCESS_INSTRUMENT,
+    /**
+     * A USB host currently has access to the instrument's data memory as
+     * a mass storage device.
+     */
+    RBRINSTRUMENTGEN4_STORAGE_ACCESS_USBHOST,
+    /** The number of storage access modes. */
+    RBRINSTRUMENTGEN4_STORAGE_ACCESS_COUNT,
+    /** An unknown or unrecognized storage access mode. */
+    RBRINSTRUMENTGEN4_UNKNOWN_STORAGE_ACCESS
+} RBRInstrumentGen4StorageAccess;
+
+/**
+ * \brief Get a human-readable string name for a storage access mode.
+ *
+ * \param [in] access the storage access mode
+ * \return a string name for the storage access mode
+ * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ */
+const char *RBRInstrumentGen4StorageAccess_name(
+    RBRInstrumentGen4StorageAccess access);
+
+/**
+ * \brief Instrument `storage` command parameters.
  *
  * \see RBRInstrumentGen4_getStorage()
+ * \see RBRInstrumentGen4_setStorage()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828279/storage
  */
 typedef struct RBRInstrumentGen4Storage
 {
-    /** 
-     * \brief The number of bytes being used to store data in the dataset.
-     * \readonly
-     */
-    const int32_t used;
     /**
-     * \brief The number of bytes available for data storage.
+     * \brief The number of bytes used for storage.
      * \readonly
      */
-    const int32_t remaining;
+    int64_t used;
     /**
-     * \brief The maximum total size of the dataset in bytes.
+     * \brief The number of bytes still available for storage.
      * \readonly
      */
-    const int32_t size;
+    int64_t remaining;
+    /**
+     * \brief The maximum total size of the memory in bytes.
+     * \readonly
+     */
+    int64_t size;
+    /** \brief The storage access mode of the instrument's data memory. */
+    RBRInstrumentGen4StorageAccess access;
 } RBRInstrumentGen4Storage;
 
 /**
  * \brief Get information about the usage and characteristics of data memory.
- * \note Issues `storage` instrument command.
+ *
+ * \note Issues the `storage` command.
  *
  * \param [in] instrument the instrument connection
  * \param [out] storage data memory information
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when an invalid dataset is
- *                                                requested
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the dataset is unsupported
+ * \see RBRInstrumentGen4_setStorage()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828279/storage
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getStorage(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4Storage *storage);
+
+/**
+ * \brief Set the instrument storage parameters.
+ *
+ * Sends `access`, the command's only writable parameter.
+ *
+ * \note Issues the `storage` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] storage the storage parameters to write
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully
+ *                                    written
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the storage access
+ *                                                    mode is invalid
+ * \see RBRInstrumentGen4_getStorage()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828279/storage
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_setStorage(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Storage *storage);
 
 /**
  * \brief Possible dataset states.

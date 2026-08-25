@@ -21,14 +21,89 @@
 #include "RBRInstrumentGen4Internal.h"
 #include "RBRInstrumentGen4Memory.h"
 
+const char *RBRInstrumentGen4StorageAccess_name(
+    RBRInstrumentGen4StorageAccess access)
+{
+    switch (access)
+    {
+    case RBRINSTRUMENTGEN4_STORAGE_ACCESS_INSTRUMENT:
+        return "instrument";
+    case RBRINSTRUMENTGEN4_STORAGE_ACCESS_USBHOST:
+        return "usbhost";
+    case RBRINSTRUMENTGEN4_STORAGE_ACCESS_COUNT:
+        return "storage access count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_STORAGE_ACCESS:
+    default:
+        return "unknown storage access";
+    }
+}
+
 RBRInstrumentGen4Error RBRInstrumentGen4_getStorage(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4Storage *storage)
 {
-    //GEN4 todo: revisit the logic. Seems alright now.
-        (void)instrument;
-        (void)storage;
+    memset(storage, 0, sizeof(RBRInstrumentGen4Storage));
+    storage->access = RBRINSTRUMENTGEN4_UNKNOWN_STORAGE_ACCESS;
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "storage"));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "used") == 0)
+        {
+            storage->used = strtoll(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "remaining") == 0)
+        {
+            storage->remaining = strtoll(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "size") == 0)
+        {
+            storage->size = strtoll(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "access") == 0)
+        {
+            for (int i = 0;
+                 i < RBRINSTRUMENTGEN4_STORAGE_ACCESS_COUNT;
+                 i++)
+            {
+                if (strcmp(parameter.value,
+                           RBRInstrumentGen4StorageAccess_name(i)) == 0)
+                {
+                    storage->access = i;
+                    break;
+                }
+            }
+        }
+    }
+
     return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_setStorage(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Storage *storage)
+{
+    if (storage->access < 0
+        || storage->access >= RBRINSTRUMENTGEN4_STORAGE_ACCESS_COUNT)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    return RBRInstrumentGen4_converse(
+        instrument,
+        "storage access=%s",
+        RBRInstrumentGen4StorageAccess_name(storage->access));
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetPool(
