@@ -185,17 +185,6 @@ typedef struct RBRInstrumentGen4Dataset
     const RBRInstrumentGen4DataType dataType;
 } RBRInstrumentGen4Dataset;
 
-typedef struct RBRInstrumentGen4DatasetInfo{
-    /** \brief The memory usage for this schedule in bytes. */
-    int32_t byteCount;
-
-    /** \brief The memory usage for this schedule in samples. */
-    int32_t sampleCount;
-
-    /** \brief The memory usage for this schedule in events. */
-    int32_t eventCount;
-} RBRInstrumentGen4DatasetInfo;
-
 /** \brief `dataset` command parameters. 
 * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
 */
@@ -254,8 +243,6 @@ typedef enum RBRInstrumentGen4Block{
     RBRINSTRUMENTGEN4_BLOCK_META,
     /** The number of specific type of blocks.*/
     RBRINSTRUMENTGEN4_BLOCK_COUNT,
-    /** */
-    RBRINSTRUMENTGEN4_BLOCK_ALL,
     /** The unknown or unrecognized block. */
     RBRINSTRUMENTGEN4_BLOCK_UNKNOWN
 }RBRInstrumentGen4Block;
@@ -266,62 +253,6 @@ typedef enum RBRInstrumentGen4Block{
  * \see RBRInstrumentGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4Block_name(RBRInstrumentGen4Block block);
-
-/**
- * \brief Get information about the specified dataset in storage by block.
- * \param [in] instrument the instrument connection.
- * \param [in] block the dataset block.
- * \param [in] dataset the dataset in storage.
- * \param [out] datasetInfo the information about the specified dataset's block.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the feature is unavailable
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/dataset
-*/
-RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetByBlock(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Block block,
-    RBRInstrumentGen4Dataset *dataset,
-    RBRInstrumentGen4DatasetInfo *datasetInfo);
-
-/**
- * \brief Get information about the specified dataset in storage by block.
- * \param [in] instrument the instrument connection.
- * \param [in] schedule the schedule.
- * \param [in] dataset the dataset in storage.
- * \param [out] datasetInfo the information about the specified dataset's block.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the feature is unavailable
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/dataset
-*/
-RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetBySchedule(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedule *schedule,
-    RBRInstrumentGen4Dataset *dataset,
-    RBRInstrumentGen4DatasetInfo *datasetInfo);
-
-/**
- * \brief Get information about the specified dataset in storage by block.
- * \param [in] instrument the instrument connection.
- * \param [in] schedule the schedule.
- * \param [in] block the dataset block.
- * \param [in] dataset the dataset in storage.
- * \param [out] datasetInfo the dataset's block's memory consumption.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the feature is unavailable
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/dataset
-*/
-RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetByScheduleBlock(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedule *schedule,
-    RBRInstrumentGen4Block block,
-    RBRInstrumentGen4Dataset *dataset,
-    RBRInstrumentGen4DatasetInfo *datasetInfo);
 
 /** \brief Delete specified dataset in storage.
  * \param [in] instrument the instrument connection.
@@ -349,103 +280,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteDataset(
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteDatasetAll(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4DatasetPool *datasetPool);
-
-/** \brief The countKey for `download` command. It specifies the quantity of information that
- * the instrument should attempt to retrieve and report. 
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/download
-*/
-typedef enum RBRInstrumentGen4CountKey{
-    /** Indicates that the information is measured in bytes. This option is
-     * available for all three block types: data|events|meta.
-    */
-    RBRINSTRUMENTGEN4_COUNTKEY_BYTECOUNT,
-    /** Can be used only with the data block type, and indicates that the 
-     * information is measured in samples.
-    */
-    RBRINSTRUMENTGEN4_COUNTKEY_SAMPLECOUNT,
-    /** Can be used only with events block type, and indicates that the information
-     * is measured in events.
-    */
-    RBRINSTRUMENTGEN4_COUNTKEY_EVENTCOUNT,
-    /** The number of specific type of countKey. */
-    RBRINSTRUMENTGEN4_COUNTKEY_COUNT,
-    /** Unknown or unrecognized countKey. */
-    RBRINSTRUMENTGEN4_UNKNOWN_COUNTKEY
-}RBRInstrumentGen4CountKey;
-
-/** \brief Get a human-readable countKey name.
- * \param [in] countKey the countKey.
- * \return a string name for the countKey.
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
- */
-const char *RBRInstrumentGen4CountKey_name(RBRInstrumentGen4CountKey countKey);
-
-/**
- * \brief Instrument `download` command parameters.
- *
- * \see RBRInstrumentGen4_download()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
- */
-typedef struct RBRInstrumentGen4Download{
-    /** \brief Identifies the complete dataset corresponding to the deployment of interest. */
-    RBRInstrumentGen4Dataset *dataset;
-
-    /** \brief identifies the sampling schedule used to acquire the data.  For a list of available schedules, use dataset dataset_label scheduleList.*/
-    RBRInstrumentGen4Schedule *schedule;
-
-    /** \brief It is one of the three keywords data, events, or meta, and determines the type of data retrieved for the specified schedule.*/
-    RBRInstrumentGen4Block block;
-
-    /** \brief The quantity of information that the instrument should attempt to retrieve and report.
-     * It also determines the 'units' in which the information will be measured:
-     * 
-     * The bytecount count_key indicates that the information is measured in bytes; 
-     * this option is available for all three block types, data, events and meta.
-     * 
-     * The sampleCount count_key can be used only with the data block type, and 
-     * indicates that the information is measured in samples.
-     * 
-     * The eventCount count_key can be used only with the events block type, 
-     * and indicates that the information is measured in events.
-     * Any transfer from a given storage object that uses multiple download 
-     * commands must all use the same measurement units.
-    */
-    RBRInstrumentGen4CountKey countKey;
-
-    /** \brief The response for count_key. */
-    int32_t countValue;
-
-    /** \brief An offset from the beginning of the storage object where 
-     * reading should begin.  It is measured in the same units used for the 
-     * count_key; one of bytes, samples, or events.  The first item always 
-     * has start = 1.*/
-    RBRInstrumentGen4CountKey startKey;
-
-    /** \brief The response for start_key. */
-    int32_t startOffset;
-
-    /** \brief The data read from the instrument. */
-    void *data;
-}RBRInstrumentGen4Download;
-
-/** \brief Reads all or part of specified storage object. For the initial use
- * of the `download` command, all parameters are required. 
- * 
- * In all cases, if the requested amount of data would overrun the boundary of 
- * the target object, a valid transfer still occurs, but the amount of data 
- * actually returned will be less than the request.  This is reflected in the 
- * instrument's response to the command.
- * 
- * \param [in] instrument the instrument connection.
- * \param [inout] download all or part of a specified storage object.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the feature is unavailable
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/datasetPool
-*/
-RBRInstrumentGen4Error RBRInstrumentGen4_download(RBRInstrumentGen4 *instrument,
-                                          RBRInstrumentGen4Download *download);
 
 /*****************************************************************************************************************/
 /**

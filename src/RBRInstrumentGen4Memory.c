@@ -135,69 +135,13 @@ const char *RBRInstrumentGen4Block_name(RBRInstrumentGen4Block block){
             return "events";
         case RBRINSTRUMENTGEN4_BLOCK_META:
             return "meta";
+        case RBRINSTRUMENTGEN4_BLOCK_COUNT:
+            return "block count";
         case RBRINSTRUMENTGEN4_BLOCK_UNKNOWN:
         default:
             return "unknown block";
     }
 }
-
-RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetByBlock(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Block block,
-    RBRInstrumentGen4Dataset *dataset,
-    RBRInstrumentGen4DatasetInfo *datasetInfo)
-{
-    char _blockname[RBRINSTRUMENTGEN4_DATABLOCK_NAME_MAX+1];
-    switch(block){
-        //need end to be \0. 
-        case RBRINSTRUMENTGEN4_BLOCK_DATA:
-            strncpy(_blockname, "data", sizeof(_blockname));
-            break;
-        case RBRINSTRUMENTGEN4_BLOCK_EVENTS:
-            strncpy(_blockname, "events", sizeof(_blockname));
-            break;
-        case RBRINSTRUMENTGEN4_BLOCK_META:
-            strncpy(_blockname, "meta", sizeof(_blockname));
-            break;
-        case RBRINSTRUMENTGEN4_BLOCK_UNKNOWN:
-        default:
-            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-    }
-    (void)instrument;
-    (void)dataset;
-    (void)datasetInfo;
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-
-RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetBySchedule(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedule *schedule,
-    RBRInstrumentGen4Dataset *dataset,
-    RBRInstrumentGen4DatasetInfo *datasetInfo)
-{
-        (void)instrument;
-        (void)schedule;
-        (void)dataset;
-        (void)datasetInfo;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetByScheduleBlock(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedule *schedule,
-    RBRInstrumentGen4Block block,
-    RBRInstrumentGen4Dataset *dataset,
-    RBRInstrumentGen4DatasetInfo *datasetInfo)
-{
-    (void)instrument;
-    (void)schedule;
-    (void)block;
-    (void)dataset;
-    (void)datasetInfo;
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
 
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteDataset(
     RBRInstrumentGen4 *instrument,
@@ -217,76 +161,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteDatasetAll(
     //need to "permit command=deletedataset" first.
         (void)instrument;
         (void)datasetPool;
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-const char *RBRInstrumentGen4CountKey_name(RBRInstrumentGen4CountKey countKey)
-{
-    switch(countKey){
-        case RBRINSTRUMENTGEN4_COUNTKEY_BYTECOUNT:
-            return "bytecount";
-        case RBRINSTRUMENTGEN4_COUNTKEY_SAMPLECOUNT:
-            return "samplecount";
-        case RBRINSTRUMENTGEN4_COUNTKEY_COUNT:
-            return "eventcount";
-        case RBRINSTRUMENTGEN4_UNKNOWN_COUNTKEY:
-        default:
-            return "unknown countkey";
-    }
-}
-
-/*********************************************************************/
-/**
- * \brief Keep retrying reads until we retrieve a fixed amount of data.
- *
- * This function first drains data out of RBRInstrument.responseBuffer, then
- * begins to read from the instrument. As a result, \a data must not be
- * RBRInstrument.responseBuffer!
- *
- * \param [in] instrument the instrument connection
- * \param [out] data the buffer to write into
- * \param [in] size the amount of data to write into the buffer
- */
-static RBRInstrumentGen4Error RBRInstrumentGen4_fixedRead(
-    struct RBRInstrumentGen4 *instrument,
-    void *data,
-    int32_t size)
-{
-    int32_t bufferLength = 0;
-    int32_t readLength;
-
-    /* Can we steal from the response buffer? */
-    if (instrument->lastResponseLength < instrument->responseBufferLength)
-    {
-        readLength = instrument->responseBufferLength
-                     - instrument->lastResponseLength;
-        if (readLength > size)
-        {
-            readLength = size;
-        }
-
-        memcpy(data,
-               ((uint8_t *) instrument->responseBuffer)
-               + instrument->lastResponseLength,
-               readLength);
-
-        bufferLength = readLength;
-        instrument->lastResponseLength += readLength;
-    }
-
-    /* Now poll the instrument. */
-    while (bufferLength < size)
-    {
-        readLength = size - bufferLength;
-
-        RBR_TRY(instrument->callbacks.read(
-                    instrument,
-                    ((uint8_t *) data) + bufferLength,
-                    &readLength));
-
-        bufferLength += readLength;
-    }
-
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
@@ -317,63 +191,6 @@ uint16_t calculateCrcGen4(const void *data, int32_t size)
 
     return crc;
 }
-/**********************************************************************/
-/** If using multiple instances of the command, one can use only
- * `download` or `download start=value` or `download countKey=value`. 
- * However, if any portion of source is changed, or countKey is changed, ALL
- * parameters are required.
-*/
-RBRInstrumentGen4Error RBRInstrumentGen4_download(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Download *download)
-{
-    const char *generationCommand;
-    generationCommand = "download source=%s/%s/%s"
-                        "%s=%" PRId32
-                        "start=%" PRId32;
-
-    const char *block = RBRInstrumentGen4Block_name(download->block);
-    const char *countKey = RBRInstrumentGen4CountKey_name(download->countKey);
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
-                                   generationCommand,
-                                   download->dataset->label,
-                                   download->dataset->config->scheduleList[0],
-                                   block,
-                                   countKey,
-                                   download->countValue,
-                                   download->startOffset));
-    
-    /* Fill the user-provided buffer. RBRInstrumentGen4_fixedRead() will first pull
-     * leftover data from RBRInstrument.responseBuffer, then read from the
-     * instrument. */
-    RBR_TRY(RBRInstrumentGen4_fixedRead(instrument, download->data, download->startOffset));
-
-    /* CRC check the last two bytes. */
-    union
-    {
-        uint8_t buf[2];
-        uint16_t value;
-    }
-    crc;
-
-    RBR_TRY(RBRInstrumentGen4_fixedRead(instrument, crc.buf, 2));
-    /* The logger reports the CRC as big-endian. Under the assumption that the
-     * host is little-endian, we'll byte swap it before using it for
-     * comparison. ntohs() is POSIX but not part of the C standard, and we want
-     * to target pure C99, so we can't use it here. */
-
-    crc.value = (crc.value >> 8) | (crc.value << 8);
-
-    uint16_t calculatedCrc = calculateCrcGen4(download->data, download->countValue);
-    if (calculatedCrc != crc.value)
-    {
-        return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;
-    }
-
-    return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-/***************************************************************************/
 const char *RBRInstrumentGen4PostprocessingAggregate_name(
     RBRInstrumentGen4PostprocessingAggregate function)
 {
