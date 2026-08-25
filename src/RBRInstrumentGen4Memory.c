@@ -106,23 +106,160 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setStorage(
         RBRInstrumentGen4StorageAccess_name(storage->access));
 }
 
+const char *RBRInstrumentGen4DatasetStatus_name(
+    RBRInstrumentGen4DatasetStatus status)
+{
+    switch (status)
+    {
+    case RBRINSTRUMENTGEN4_DATASET_STATUS_OPEN:
+        return "open";
+    case RBRINSTRUMENTGEN4_DATASET_STATUS_CLOSED:
+        return "closed";
+    case RBRINSTRUMENTGEN4_DATASET_STATUS_COUNT:
+        return "dataset status count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_DATASET_STATUS:
+    default:
+        return "unknown dataset status";
+    }
+}
+
 RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetPool(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4DatasetPool *datasetPool){
-        (void)instrument;
-        (void)datasetPool;
-        return RBRINSTRUMENTGEN4_SUCCESS;
+    RBRInstrumentGen4DatasetPool *datasetPool)
+{
+    memset(datasetPool, 0, sizeof(RBRInstrumentGen4DatasetPool));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "dataset"));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "count") == 0)
+        {
+            datasetPool->count = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "maxcount") == 0)
+        {
+            datasetPool->maxCount = strtol(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "list") == 0)
+        {
+            /* An empty pool reports `none`. */
+            if (strcmp(parameter.value, "none") == 0)
+            {
+                continue;
+            }
+
+            char *value = parameter.value;
+            for (int32_t dataset = 0;
+                 value != NULL
+                 && dataset < RBRINSTRUMENTGEN4_DATASET_COUNT_MAX;
+                 dataset++)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+                snprintf(datasetPool->pool[dataset].label,
+                         sizeof(datasetPool->pool[dataset].label),
+                         "%s",
+                         value);
+
+                value = nextValue;
+            }
+        }
     }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getDataset(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4ConfigPool *configPool,
     RBRInstrumentGen4Dataset *dataset)
 {
-    //GEN4 todo: need to add logic.
-    (void)instrument;
-    (void)configPool;
-    (void)dataset;
+    if (dataset->label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    dataset->status = RBRINSTRUMENTGEN4_UNKNOWN_DATASET_STATUS;
+    dataset->scheduleCount = 0;
+    memset(dataset->scheduleList, 0, sizeof(dataset->scheduleList));
+    dataset->byteCount = 0;
+    dataset->dataType = RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE;
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "dataset %s",
+                                       dataset->label));
+
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "status") == 0)
+        {
+            for (int i = 0; i < RBRINSTRUMENTGEN4_DATASET_STATUS_COUNT; i++)
+            {
+                if (strcmp(parameter.value,
+                           RBRInstrumentGen4DatasetStatus_name(i)) == 0)
+                {
+                    dataset->status = i;
+                    break;
+                }
+            }
+        }
+        else if (strcmp(parameter.key, "schedulelist") == 0)
+        {
+            char *value = parameter.value;
+            int32_t schedule = 0;
+            while (value != NULL
+                   && schedule < RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX)
+            {
+                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+                snprintf(dataset->scheduleList[schedule],
+                         sizeof(dataset->scheduleList[schedule]),
+                         "%s",
+                         value);
+
+                value = nextValue;
+                schedule++;
+            }
+            dataset->scheduleCount = schedule;
+        }
+        else if (strcmp(parameter.key, "bytecount") == 0)
+        {
+            dataset->byteCount = strtoll(parameter.value, NULL, 10);
+        }
+        else if (strcmp(parameter.key, "datatype") == 0)
+        {
+            for (int i = 0; i < RBRINSTRUMENTGEN4_DATATYPE_COUNT; i++)
+            {
+                if (strcmp(parameter.value,
+                           RBRInstrumentGen4DataType_name(i)) == 0)
+                {
+                    dataset->dataType = i;
+                    break;
+                }
+            }
+        }
+    }
+
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 

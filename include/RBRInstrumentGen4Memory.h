@@ -26,9 +26,7 @@ extern "C" {
  */
 #define RBRINSTRUMENTGEN4_POSTPROCESSING_CHANNEL_MAX 24
 
-/** \brief The maximum number of datasetPool currently stored in the logger's memory.
- * The DATASET_MAX is defined in makefile CFLAGS.
-*/
+/** \brief The maximum number of datasets the library can enumerate. */
 #define RBRINSTRUMENTGEN4_DATASET_COUNT_MAX 32
 
 /**
@@ -129,7 +127,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setStorage(
     const RBRInstrumentGen4Storage *storage);
 
 /**
- * \brief Possible dataset states.
+ * \brief Possible dataset statuses.
  *
  * \see RBRInstrumentGen4Dataset
  */
@@ -137,7 +135,7 @@ typedef enum RBRInstrumentGen4DatasetStatus
 {
     /** The dataset is for a deployment currently in progress. */
     RBRINSTRUMENTGEN4_DATASET_STATUS_OPEN,
-    /** For a historical dataset in memory which is no longer being updated because its deployment has stopped. */
+    /** The dataset is for a deployment that has ended. */
     RBRINSTRUMENTGEN4_DATASET_STATUS_CLOSED,
     /** The number of specific dataset statuses. */
     RBRINSTRUMENTGEN4_DATASET_STATUS_COUNT,
@@ -148,86 +146,118 @@ typedef enum RBRInstrumentGen4DatasetStatus
 /**
  * \brief Get a human-readable string name for a dataset status.
  *
- * \param [in] state the dataset status
+ * \param [in] status the dataset status
  * \return a string name for the dataset status
  * \see RBRInstrumentGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4DatasetStatus_name(RBRInstrumentGen4DatasetStatus status);
-
+const char *RBRInstrumentGen4DatasetStatus_name(
+    RBRInstrumentGen4DatasetStatus status);
 
 /**
  * \brief `dataset <dataset_label>` command parameters.
- * Reports read-only information about the specified dataset in storage.
+ *
+ * \see RBRInstrumentGen4_getDataset()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 typedef struct RBRInstrumentGen4Dataset
 {
-    /** \brief the dataset label. */
-    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX+1];
-
-    /** \brief "open" if the dataset is for a deployment currently in progress,
-     * or "closed" for a historical dataset in memory which is no longer being updated
-     * because its deployment has stopped.
+    /**
+     * \brief The dataset's label.
+     *
+     * Set by the caller to select the dataset to read.
      */
-    const RBRInstrumentGen4DatasetStatus status;
+    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
-    /** 
-     * \brief The schedules executed during the deployment associated with this dataset. 
-     * \note Note: the logger reports the dataset's schedules as they were when the specified dataset was started, not as they are presently defined, so the schedule objects used should not be edited/renamed/deleted after a deployment has finished.
+    /** \brief Whether the dataset's deployment is still in progress. */
+    RBRInstrumentGen4DatasetStatus status;
+
+    /** \brief The number of schedules run by the dataset's deployment. */
+    int32_t scheduleCount;
+
+    /**
+     * \brief The labels of the schedules run by the dataset's deployment.
+     *
+     * The instrument reports the schedules as they were when the dataset
+     * was started, not as they are presently defined: a label listed here
+     * can name a schedule which no longer exists in the schedule pool.
      */
-    RBRInstrumentGen4Config *config;
+    char scheduleList[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX]
+                     [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
-    /** \brief The memory usage in bytes. */
-    int32_t byteCount;
+    /** \brief The total memory usage of the dataset in bytes. */
+    int64_t byteCount;
 
-    /** \brief The numerical format used for data storage in this dataset.
-     * \see RBRInstrumentGen4DataType
-     */
-    const RBRInstrumentGen4DataType dataType;
+    /** \brief The numerical format used for data storage in this dataset. */
+    RBRInstrumentGen4DataType dataType;
 } RBRInstrumentGen4Dataset;
 
-/** \brief `dataset` command parameters. 
-* \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
-*/
-typedef struct RBRInstrumentGen4DatasetPool {
-    /** \brief The number of active datasetPool. Starts from 1. */
+/**
+ * \brief `dataset` command parameters.
+ *
+ * \see RBRInstrumentGen4_getDatasetPool()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
+ */
+typedef struct RBRInstrumentGen4DatasetPool
+{
+    /**
+     * \brief The number of datasets stored in the instrument's memory.
+     *
+     * \warning Use `min(count, RBRINSTRUMENTGEN4_DATASET_COUNT_MAX)` to
+     * avoid an out-of-bounds error when accessing #pool if
+     * #maxCount > #RBRINSTRUMENTGEN4_DATASET_COUNT_MAX.
+     */
     int32_t count;
 
     /**
-     * \brief The pointer array to all datasetPool.
+     * \brief The maximum number of datasets that the instrument can store
+     * in its memory.
      */
-    RBRInstrumentGen4Dataset pool[RBRINSTRUMENTGEN4_DATASET_COUNT_MAX];
-}RBRInstrumentGen4DatasetPool;
+    int32_t maxCount;
 
-/** \brief Populate the pool of datasets with the labels of the datasets stored in the logger.
- * \param [in] instrument the instrument connection.
- * \param [inout] datasetPool the populated pool of datasets in storage.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
+    /** \brief The pool of datasets. */
+    RBRInstrumentGen4Dataset pool[RBRINSTRUMENTGEN4_DATASET_COUNT_MAX];
+} RBRInstrumentGen4DatasetPool;
+
+/**
+ * \brief Populate the pool of datasets with the labels of the datasets
+ * stored in the instrument's memory.
+ *
+ * Only the labels are populated: read the remaining parameters of a pool
+ * entry with RBRInstrumentGen4_getDataset().
+ *
+ * \note Issues the `dataset` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [out] datasetPool the pool of datasets in storage
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the feature is unavailable
+ * \see RBRInstrumentGen4_getDataset()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
-*/
+ */
 RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetPool(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4DatasetPool *datasetPool);
 
-/** \brief Get information about the specified dataset in storage.
- * \param [in] instrument the instrument connection.
- * \param [in] configPool the list of available configs to associate the dataset with.
- * \param [inout] dataset the information about specified dataset in storage.
- * Note if one wants to get the memory use of a specific schedule or block, 
- * \see RBRInstrumentGen4_getDatasetByBlock 
- * \see RBRInstrumentGen4_getDatasetBySchedule
- * \see RBRInstrumentGen4_getDatasetByScheduleBlock
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
+/**
+ * \brief Populate the parameters of a dataset.
+ *
+ * The caller sets RBRInstrumentGen4Dataset.label to select the dataset.
+ *
+ * \note Issues the `dataset <dataset_label>` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in,out] dataset the dataset to read, selected by its label
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the dataset does not exist
+ * \see RBRInstrumentGen4_getDatasetPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
-*/
+ */
 RBRInstrumentGen4Error RBRInstrumentGen4_getDataset(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4ConfigPool *configPool,
     RBRInstrumentGen4Dataset *dataset);
 
 /** \brief It determines the type of information retrieved for the specific schedule. 
