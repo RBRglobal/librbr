@@ -140,81 +140,77 @@ int main(int argc, char *argv[])
     //*******************download data from instrument. Support only bytecount. *******************//
     // quit if there's no dataset available.
     RBRInstrumentGen4DatasetPool datasetPool;
-    RBRInstrumentGen4_getDatasetPool(instrument, &datasetPool);
-    if (datasetPool.count <= 0)
+    err = RBRInstrumentGen4_getDatasetPool(instrument, &datasetPool);
+    if (err != RBRINSTRUMENTGEN4_SUCCESS || datasetPool.count <= 0)
     {
         printf("Error: There's no dataset available in this instrument. Quit.\n");
         status = EXIT_FAILURE;
-        goto instrumentCleanup;
+        goto fileCleanup;
     }
 
     // Need dataset struct instance to find out the bytecount.
     RBRInstrumentGen4Dataset *targetDataset;
-    RBRInstrumentGen4_getDatasetFromPool(&targetDataset,
-                           &datasetPool,
-                           DATASET_LABEL);
+    if (RBRInstrumentGen4_getDatasetFromPool(&targetDataset,
+                                             &datasetPool,
+                                             DATASET_LABEL)
+        != RBRINSTRUMENTGEN4_SUCCESS)
+    {
+        printf("Error: Dataset %s not found. Quit.\n", DATASET_LABEL);
+        status = EXIT_FAILURE;
+        goto fileCleanup;
+    }
 
-    RBRInstrumentGen4DatasetInfo targetDatasetInfo;
-    RBRInstrumentGen4Schedule *targetSchedule = NULL;
-
-    // Get the pool of available configs to associate with the dataset.
-    RBRInstrumentGen4ConfigPool configPool;
-    RBRInstrumentGen4_getConfigPool(instrument, &configPool);
-    // Associate the target dataset with an available config.
-    // This will fail if it cannot find the config specified in the dataset.
-    RBRInstrumentGen4_getDataset(instrument,
-                                 &configPool,
-                                 targetDataset);
-
-    // Get the pool of available schedules to look the dataset's schedules up in.
-    RBRInstrumentGen4SchedulePool schedulePool;
-    RBRInstrumentGen4_getSchedulePool(instrument, &schedulePool);
-    // Read the target dataset's config, which names its schedules by label.
-    RBRInstrumentGen4_getConfig(instrument, targetDataset->config);
+    // Read the dataset's parameters, including the schedules it ran.
+    err = RBRInstrumentGen4_getDataset(instrument, targetDataset);
+    if (err != RBRINSTRUMENTGEN4_SUCCESS)
+    {
+        printf("Error: Failed to read dataset %s: %s. Quit.\n",
+               DATASET_LABEL,
+               RBRInstrumentGen4Error_name(err));
+        status = EXIT_FAILURE;
+        goto fileCleanup;
+    }
 
     printf("Dataset %s contains data from following schedules: ", targetDataset->label);
     for (int32_t schedule_idx = 0;
-         schedule_idx < targetDataset->config->scheduleCount;
+         schedule_idx < targetDataset->scheduleCount;
          schedule_idx++)
     {
-        printf("%s ", targetDataset->config->scheduleList[schedule_idx]);
+        printf("%s ", targetDataset->scheduleList[schedule_idx]);
     }
+    printf("\n");
 
-    // Get the target schedule to download from.
-    // This will fail if it cannot find the schedule specified in the pool.
-    RBRInstrumentGen4_getScheduleFromPool(&targetSchedule,
-                                          &schedulePool,
-                                          SCHEDULE_LABEL);
     // Get the data block info of specified dataset and schedule.
     // This will fail if the target schedule is not in the target dataset.
-    RBRInstrumentGen4_getDatasetByScheduleBlock(instrument,
-                                                targetSchedule,
-                                                RBRINSTRUMENTGEN4_BLOCK_DATA,
-                                                targetDataset,
-                                                &targetDatasetInfo);
-    printf("Dataset %s config %s schedule %s %s contains: "
-           "%" PRIi32 "B data, "
-           "%" PRIi32 "samples, "
-           "%" PRIi32 "events, "
+    RBRInstrumentGen4DatasetDataBlock dataBlock;
+    err = RBRInstrumentGen4Dataset_getScheduleDataBlock(instrument,
+                                                        targetDataset,
+                                                        SCHEDULE_LABEL,
+                                                        &dataBlock);
+    if (err != RBRINSTRUMENTGEN4_SUCCESS)
+    {
+        printf("Error: Failed to read schedule %s data block: %s. Quit.\n",
+               SCHEDULE_LABEL,
+               RBRInstrumentGen4Error_name(err));
+        status = EXIT_FAILURE;
+        goto fileCleanup;
+    }
+    printf("Dataset %s schedule %s data contains: "
+           "%" PRIi64 "B data, "
+           "%" PRIi64 " samples. "
            "Data format is %s.\n",
            targetDataset->label,
-           targetDataset->config->label,
-           targetSchedule->label,
-           RBRInstrumentGen4Block_name(RBRINSTRUMENTGEN4_BLOCK_DATA),
-           targetDatasetInfo.byteCount,
-           targetDatasetInfo.sampleCount,
-           targetDatasetInfo.eventCount,
+           SCHEDULE_LABEL,
+           dataBlock.byteCount,
+           dataBlock.sampleCount,
            RBRInstrumentGen4DataType_name(targetDataset->dataType));
 
     uint8_t buf[CHUNK_SIZE];
-    // meaning: datablock, bytecount, download from beginning.
-    // comparing to L3: data_L3{..., size, offset, *data}; download_data_gen4{..., countValue, start, *data};
-    RBRInstrumentGen4Download download_data_pts = {
-        .block = RBRINSTRUMENTGEN4_BLOCK_DATA,
-        .countKey = RBRINSTRUMENTGEN4_COUNTKEY_BYTECOUNT,
-        .startKey = RBRINSTRUMENTGEN4_COUNTKEY_BYTECOUNT,
-        .startOffset = 1,
-        .data = buf
+    RBRInstrumentGen4DownloadData download = {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES,
+        .start = 0,
+        .data = buf,
+        .dataSize = sizeof(buf)
     };
 
     printf("Downloading:\n");
@@ -224,14 +220,17 @@ int main(int argc, char *argv[])
     double elapsed = 0.0;
     double rate = 0.0;
     clock_gettime(CLOCK_MONOTONIC, &start);
-    while (download_data_pts.startOffset < targetDataset->byteCount) // if not downloaded all data from targetDataset/schedule/datablock
+    while (download.start < dataBlock.byteCount) // if not downloaded all data from targetDataset/schedule/datablock
     {
-        download_data_pts.countValue = sizeof(buf);                       // specify download bytes
-        err = RBRInstrumentGen4_download(instrument, &download_data_pts); // comparing with L3: RBRInstrument_readdata(instrument, &data);
+        download.count = sizeof(buf); // specify download bytes
+        err = RBRInstrumentGen4Dataset_downloadScheduleData(instrument,
+                                                            targetDataset,
+                                                            SCHEDULE_LABEL,
+                                                            &download);
         if (err == RBRINSTRUMENTGEN4_SUCCESS)
         {
-            write(downloadFd, download_data_pts.data, download_data_pts.countValue);
-            download_data_pts.startOffset += download_data_pts.countValue;
+            write(downloadFd, download.data, download.count);
+            download.start += download.count;
         }
         else if (err == RBRINSTRUMENTGEN4_TIMEOUT)
         {
@@ -250,19 +249,19 @@ int main(int argc, char *argv[])
         elapsed += now.tv_nsec - start.tv_nsec;
         elapsed /= 1000000000L;
 
-        rate = elapsed > 0.0 ? (download_data_pts.startOffset - 0) / elapsed : 0.0;
+        rate = elapsed > 0.0 ? (download.start - 0) / elapsed : 0.0;
 
-        printf("\r%0.2f%% (%" PRIi32 "B/%" PRIi32 "B; %0.3fs elapsed; "
+        printf("\r%0.2f%% (%" PRIi64 "B/%" PRIi64 "B; %0.3fs elapsed; "
                "%0.3fB/s)",
-               (((float) download_data_pts.startOffset) / targetDataset->byteCount) * 100,
-               download_data_pts.startOffset,
-               targetDataset->byteCount,
+               (((float) download.start) / dataBlock.byteCount) * 100,
+               download.start,
+               dataBlock.byteCount,
                elapsed,
                rate);
     }
 
-    printf("\nDone. Downloaded %" PRIi32 "B in %0.3fs (%0.3fB/s).\n",
-           download_data_pts.startOffset,
+    printf("\nDone. Downloaded %" PRIi64 "B in %0.3fs (%0.3fB/s).\n",
+           download.start,
            elapsed,
            rate);
 
