@@ -533,3 +533,64 @@ TEST_LOGGER4(datasetGetScheduleDataBlock)
 
     return true;
 }
+
+typedef struct DeleteDatasetTest
+{
+    const char *label;
+    const char *command;
+    const char *response;
+    RBRInstrumentGen4Error expectedError;
+} DeleteDatasetTest;
+
+TEST_LOGGER4(deleteDataset)
+{
+    DeleteDatasetTest tests[] = {
+        { "d5",
+          "dataset delete d5" COMMAND_TERMINATOR,
+          "dataset delete d5" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS },
+        { "nosuch",
+          "dataset delete nosuch" COMMAND_TERMINATOR,
+          "ERR-304 dataset not found: 'nosuch'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR },
+        { NULL, NULL, NULL, 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4_deleteDataset(instrument, tests[i].label);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+    }
+
+    /* An empty label is refused before the command. */
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRInstrumentGen4_deleteDataset(instrument, "");
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(deleteDatasetAll)
+{
+    TestIOBuffers_init(buffers,
+                       "dataset delete all" RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_deleteDatasetAll(
+        instrument);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("dataset delete all" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}

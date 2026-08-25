@@ -457,32 +457,38 @@ typedef enum RBRInstrumentGen4Block{
  */
 const char *RBRInstrumentGen4Block_name(RBRInstrumentGen4Block block);
 
-/** \brief Delete specified dataset in storage.
- * \param [in] instrument the instrument connection.
- * \param [in] dataset the dataset to be deleted.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
+/**
+ * \brief Delete one dataset from the instrument's memory.
+ * \note Issues the `dataset delete <dataset_label>` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] label the label of the dataset to delete
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the dataset is deleted
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the feature is unavailable
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/datasetPool
-*/
-
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the dataset does not exist
+ * \see RBRInstrumentGen4_deleteDatasetAll()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
+ */
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteDataset(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Dataset *dataset);
+    const char *label);
 
-/** \brief Delete all datasetPool in memory.
- * \param [in] instrument the instrument connection.
- * \param [inout] datasetPool the datasetPool.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
+/**
+ * \brief Delete every dataset from the instrument's memory.
+ *
+ * \note Issues the `dataset delete all` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the datasets are deleted
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the feature is unavailable
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/datasetPool
-*/
+ * \see RBRInstrumentGen4_deleteDataset()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
+ */
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteDatasetAll(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4DatasetPool *datasetPool);
+    RBRInstrumentGen4 *instrument);
 
 /*****************************************************************************************************************/
 /**

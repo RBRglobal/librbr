@@ -450,23 +450,22 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleDataBlock(
 
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteDataset(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Dataset *dataset)
+    const char *label)
 {
-    //GEN4 todo: need to add logic.
-        (void)instrument;
-        (void)dataset;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    if (label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    return RBRInstrumentGen4_converse(instrument,
+                                      "dataset delete %s",
+                                      label);
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteDatasetAll(
-    RBRInstrumentGen4 *instrument, 
-    RBRInstrumentGen4DatasetPool *datasetPool)
+    RBRInstrumentGen4 *instrument)
 {
-    //GEN4 todo: need to add logic.
-    //need to "permit command=deletedataset" first.
-        (void)instrument;
-        (void)datasetPool;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRInstrumentGen4_converse(instrument, "dataset delete all");
 }
 
 /* CRC-CCITT */
