@@ -594,3 +594,244 @@ TEST_LOGGER4(deleteDatasetAll)
 
     return true;
 }
+
+TEST_LOGGER4(datasetDownloadScheduleData)
+{
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    char data[16];
+
+    /* A transfer in bytes: the payload follows the echo, then the CRC. */
+    const char *response =
+        "download d1/s_cont/data bytecount=8 bytestart=0" RESPONSE_TERMINATOR
+        "AAAAAAAA\x25\x94";
+    RBRInstrumentGen4DownloadData download = {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES,
+        .count = 8,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadScheduleData(instrument,
+                                                        &dataset,
+                                                        "s_cont",
+                                                        &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("download d1/s_cont/data bytecount=8 bytestart=0"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_EQ(INT64_C(8), download.count, "%" PRId64);
+    TEST_ASSERT_EQ(INT64_C(8), download.byteCount, "%" PRId64);
+    TEST_ASSERT(memcmp(data, "AAAAAAAA", 8) == 0);
+
+    /*
+     * A transfer in samples: the echo appends the byte count, and an
+     * overrunning request is clamped to what the schedule holds.
+     */
+    response =
+        "download d1/s_cont/data samplecount=2 samplestart=0 bytecount=8"
+        RESPONSE_TERMINATOR
+        "AAAAAAAA\x25\x94";
+    download = (RBRInstrumentGen4DownloadData) {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_SAMPLES,
+        .count = 100,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadScheduleData(instrument,
+                                                        &dataset,
+                                                        "s_cont",
+                                                        &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("download d1/s_cont/data samplecount=100 samplestart=0"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_EQ(INT64_C(2), download.count, "%" PRId64);
+    TEST_ASSERT_EQ(INT64_C(8), download.byteCount, "%" PRId64);
+
+    /* A corrupted transfer fails its CRC check. */
+    response =
+        "download d1/s_cont/data bytecount=8 bytestart=0" RESPONSE_TERMINATOR
+        "AAAAAAAB\x25\x94";
+    download = (RBRInstrumentGen4DownloadData) {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES,
+        .count = 8,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadScheduleData(instrument,
+                                                        &dataset,
+                                                        "s_cont",
+                                                        &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_CHECKSUM_ERROR,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    /* A response larger than the buffer is refused before writing it. */
+    char small[4];
+    response =
+        "download d1/s_cont/data bytecount=8 bytestart=0" RESPONSE_TERMINATOR
+        "AAAAAAAA\x25\x94";
+    download = (RBRInstrumentGen4DownloadData) {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES,
+        .count = 8,
+        .start = 0,
+        .data = small,
+        .dataSize = sizeof(small)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadScheduleData(instrument,
+                                                        &dataset,
+                                                        "s_cont",
+                                                        &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    /* A dataset the instrument does not know is a hardware error. */
+    response = "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR;
+    download = (RBRInstrumentGen4DownloadData) {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES,
+        .count = 8,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadScheduleData(instrument,
+                                                        &dataset,
+                                                        "s_cont",
+                                                        &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    /* An invalid request is refused before the command. */
+    download = (RBRInstrumentGen4DownloadData) {
+        .unit = RBRINSTRUMENTGEN4_UNKNOWN_DOWNLOAD_DATA_UNIT,
+        .count = 8,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRInstrumentGen4Dataset_downloadScheduleData(instrument,
+                                                        &dataset,
+                                                        "s_cont",
+                                                        &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(datasetDownloadEvents)
+{
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    char data[24];
+
+    /* A whole-dataset transfer measured in events. */
+    const char *response =
+        "download d1/events eventcount=2 eventstart=0 bytecount=16"
+        RESPONSE_TERMINATOR
+        "EVENTDATA0123456\xb8\x0d";
+    RBRInstrumentGen4DownloadEvents download = {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_EVENTS,
+        .count = 2,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadEvents(instrument,
+                                                  &dataset,
+                                                  &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("download d1/events eventcount=2 eventstart=0"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_EQ(INT64_C(2), download.count, "%" PRId64);
+    TEST_ASSERT_EQ(INT64_C(16), download.byteCount, "%" PRId64);
+    TEST_ASSERT(memcmp(data, "EVENTDATA0123456", 16) == 0);
+
+    return true;
+}
+
+TEST_LOGGER4(datasetDownloadScheduleEvents)
+{
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    char data[24];
+
+    const char *response =
+        "download d1/s_cont/events eventcount=2 eventstart=0 bytecount=16"
+        RESPONSE_TERMINATOR
+        "EVENTDATA0123456\xb8\x0d";
+    RBRInstrumentGen4DownloadEvents download = {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_EVENTS,
+        .count = 2,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadScheduleEvents(instrument,
+                                                          &dataset,
+                                                          "s_cont",
+                                                          &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("download d1/s_cont/events eventcount=2 eventstart=0"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_EQ(INT64_C(2), download.count, "%" PRId64);
+    TEST_ASSERT_EQ(INT64_C(16), download.byteCount, "%" PRId64);
+
+    return true;
+}
+
+TEST_LOGGER4(datasetDownloadMeta)
+{
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    char data[16];
+
+    const char *response =
+        "download d1/meta bytecount=8 bytestart=0" RESPONSE_TERMINATOR
+        "METAMETA\xc3\x14";
+    RBRInstrumentGen4DownloadMeta download = {
+        .byteCount = 8,
+        .byteStart = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadMeta(instrument,
+                                                &dataset,
+                                                &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("download d1/meta bytecount=8 bytestart=0"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_EQ(INT64_C(8), download.byteCount, "%" PRId64);
+    TEST_ASSERT(memcmp(data, "METAMETA", 8) == 0);
+
+    return true;
+}

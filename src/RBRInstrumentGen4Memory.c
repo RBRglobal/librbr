@@ -14,6 +14,8 @@
 #include <stdio.h>
 /* Required for strtol. */
 #include <stdlib.h>
+/* Required for PRId32. */
+#include <inttypes.h>
 
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Configuration.h"
@@ -468,14 +470,357 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteDatasetAll(
     return RBRInstrumentGen4_converse(instrument, "dataset delete all");
 }
 
+const char *RBRInstrumentGen4DownloadDataUnit_name(
+    RBRInstrumentGen4DownloadDataUnit unit)
+{
+    switch (unit)
+    {
+    case RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES:
+        return "bytes";
+    case RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_SAMPLES:
+        return "samples";
+    case RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_COUNT:
+        return "download data unit count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_DOWNLOAD_DATA_UNIT:
+    default:
+        return "unknown download data unit";
+    }
+}
+
+const char *RBRInstrumentGen4DownloadEventsUnit_name(
+    RBRInstrumentGen4DownloadEventsUnit unit)
+{
+    switch (unit)
+    {
+    case RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_BYTES:
+        return "bytes";
+    case RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_EVENTS:
+        return "events";
+    case RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_COUNT:
+        return "download events unit count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_DOWNLOAD_EVENTS_UNIT:
+    default:
+        return "unknown download events unit";
+    }
+}
+
+/**
+ * \brief Keep retrying reads until we retrieve a fixed amount of data.
+ *
+ * This function first drains data out of RBRInstrumentGen4.responseBuffer,
+ * then begins to read from the instrument. As a result, \a data must not be
+ * RBRInstrumentGen4.responseBuffer!
+ *
+ * \param [in] instrument the instrument connection
+ * \param [out] data the buffer to write into
+ * \param [in] size the amount of data to write into the buffer
+ */
+static RBRInstrumentGen4Error RBRInstrumentGen4_fixedRead(
+    struct RBRInstrumentGen4 *instrument,
+    void *data,
+    int64_t size)
+{
+    int64_t bufferLength = 0;
+    int32_t readLength;
+
+    /* Can we steal from the response buffer? */
+    if (instrument->lastResponseLength < instrument->responseBufferLength)
+    {
+        readLength = instrument->responseBufferLength
+                     - instrument->lastResponseLength;
+        if (readLength > size)
+        {
+            readLength = (int32_t) size;
+        }
+
+        memcpy(data,
+               ((uint8_t *) instrument->responseBuffer)
+               + instrument->lastResponseLength,
+               readLength);
+
+        bufferLength = readLength;
+        instrument->lastResponseLength += readLength;
+    }
+
+    /* Now poll the instrument. */
+    while (bufferLength < size)
+    {
+        readLength = size - bufferLength > INT32_MAX
+                     ? INT32_MAX
+                     : (int32_t) (size - bufferLength);
+
+        RBR_TRY(instrument->callbacks.read(
+                    instrument,
+                    ((uint8_t *) data) + bufferLength,
+                    &readLength));
+
+        bufferLength += readLength;
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+/**
+ * \brief Perform a download: send the command, parse its echo, read the
+ * binary transfer, and verify its trailing CRC.
+ *
+ * The echo always reports `bytecount`; when \a countKey is not `bytecount`,
+ * the count in the requested unit is reported under \a countKey as well.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] countKey the count key sent with the command
+ * \param [in,out] count the requested amount; updated to the amount reported
+ * \param [out] byteCount the byte count reported
+ * \param [out] data the buffer receiving the transfer
+ * \param [in] dataSize the capacity of \a data in bytes
+ */
+static RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadCommon(
+    RBRInstrumentGen4 *instrument,
+    const char *countKey,
+    int64_t *count,
+    int64_t *byteCount,
+    void *data,
+    int64_t dataSize)
+{
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (strcmp(parameter.key, "bytecount") == 0)
+        {
+            *byteCount = strtol(parameter.value, NULL, 10);
+        }
+
+        if (strcmp(parameter.key, countKey) == 0)
+        {
+            *count = strtoll(parameter.value, NULL, 10);
+        }
+    }
+
+    if (*byteCount > dataSize)
+    {
+        /*
+         * We requested more data than we have room for, so we need to drain
+         * all data buffered on the link, CRC included, before we can return an 
+         * error. Otherwise, the next conversation with the instrument would
+         * read it. We'll use the command buffer as temporary storage.
+         */
+        int64_t rest = *byteCount + (int64_t) sizeof(uint16_t);
+        while (rest > 0)
+        {
+            int64_t chunk =
+                rest > (int64_t) sizeof(instrument->commandBuffer)
+                ? (int64_t) sizeof(instrument->commandBuffer)
+                : rest;
+            RBR_TRY(RBRInstrumentGen4_fixedRead(instrument,
+                                                instrument->commandBuffer,
+                                                chunk));
+            rest -= chunk;
+        }
+        return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+    }
+
+    RBR_TRY(RBRInstrumentGen4_fixedRead(instrument, data, *byteCount));
+
+    /* The instrument transmits the 16-bit CRC most significant byte first. */
+    uint8_t crc[2];
+    RBR_TRY(RBRInstrumentGen4_fixedRead(instrument, crc, 2));
+
+    uint16_t reportedCrc = (uint16_t) ((crc[0] << 8) | crc[1]);
+    if (calculateCrcGen4(data, *byteCount) != reportedCrc)
+    {
+        return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadScheduleData(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    const char *scheduleLabel,
+    RBRInstrumentGen4DownloadData *download)
+{
+    if (dataset->label[0] == '\0'
+        || scheduleLabel[0] == '\0'
+        || (download->unit != RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES
+            && download->unit != RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_SAMPLES)
+        || download->count < 0
+        || download->start < 0
+        || download->data == NULL)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    bool bytes = download->unit == RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES;
+    const char *countKey = bytes ? "bytecount" : "samplecount";
+
+    download->byteCount = 0;
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "download %s/%s/data"
+                                       " %s=%" PRId64 " %s=%" PRId64,
+                                       dataset->label,
+                                       scheduleLabel,
+                                       countKey,
+                                       download->count,
+                                       bytes ? "bytestart" : "samplestart",
+                                       download->start));
+
+    RBR_TRY(RBRInstrumentGen4Dataset_downloadCommon(
+                instrument,
+                countKey,
+                &download->count,
+                &download->byteCount,
+                download->data,
+                download->dataSize));
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+/**
+ * \brief Perform an events download from the whole dataset (\a scheduleLabel
+ * NULL) or from one schedule.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] dataset the dataset, selected by its label
+ * \param [in] scheduleLabel the schedule, or NULL for the whole dataset
+ * \param [in,out] download the download request and its result
+ */
+static RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadEventsCommon(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    const char *scheduleLabel,
+    RBRInstrumentGen4DownloadEvents *download)
+{
+    if (dataset->label[0] == '\0'
+        || (download->unit != RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_BYTES
+            && download->unit
+               != RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_EVENTS)
+        || download->count < 0
+        || download->start < 0
+        || download->data == NULL)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    bool bytes
+        = download->unit == RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_BYTES;
+    const char *countKey = bytes ? "bytecount" : "eventcount";
+
+    download->byteCount = 0;
+
+    if (scheduleLabel == NULL)
+    {
+        RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                           "download %s/events"
+                                           " %s=%" PRId64 " %s=%" PRId64,
+                                           dataset->label,
+                                           countKey,
+                                           download->count,
+                                           bytes ? "bytestart" : "eventstart",
+                                           download->start));
+    }
+    else
+    {
+        RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                           "download %s/%s/events"
+                                           " %s=%" PRId64 " %s=%" PRId64,
+                                           dataset->label,
+                                           scheduleLabel,
+                                           countKey,
+                                           download->count,
+                                           bytes ? "bytestart" : "eventstart",
+                                           download->start));
+    }
+
+    RBR_TRY(RBRInstrumentGen4Dataset_downloadCommon(
+                instrument,
+                countKey,
+                &download->count,
+                &download->byteCount,
+                download->data,
+                download->dataSize));
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadEvents(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    RBRInstrumentGen4DownloadEvents *download)
+{
+    return RBRInstrumentGen4Dataset_downloadEventsCommon(instrument,
+                                                       dataset,
+                                                       NULL,
+                                                       download);
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadScheduleEvents(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    const char *scheduleLabel,
+    RBRInstrumentGen4DownloadEvents *download)
+{
+    if (scheduleLabel[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    return RBRInstrumentGen4Dataset_downloadEventsCommon(instrument,
+                                                       dataset,
+                                                       scheduleLabel,
+                                                       download);
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadMeta(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    RBRInstrumentGen4DownloadMeta *download)
+{
+    if (dataset->label[0] == '\0'
+        || download->byteCount < 0
+        || download->byteStart < 0
+        || download->data == NULL)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "download %s/meta"
+                                       " bytecount=%" PRId64
+                                       " bytestart=%" PRId64,
+                                       dataset->label,
+                                       download->byteCount,
+                                       download->byteStart));
+
+    int64_t byteCount = 0;
+    RBR_TRY(RBRInstrumentGen4Dataset_downloadCommon(instrument,
+                                                    "bytecount",
+                                                    &download->byteCount,
+                                                    &byteCount,
+                                                    download->data,
+                                                    download->dataSize));
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
 /* CRC-CCITT */
-uint16_t calculateCrcGen4(const void *data, int32_t size)
+uint16_t calculateCrcGen4(const void *data, int64_t size)
 {
 #define CRC_POLYNOMIAL 0x1021
 
     uint16_t crc = 0xFFFF;
 
-    for (int32_t i = 0; i < size; i++)
+    for (int64_t i = 0; i < size; i++)
     {
         uint8_t b = ((uint8_t *) data)[i];
 

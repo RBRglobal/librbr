@@ -490,6 +490,299 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteDataset(
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteDatasetAll(
     RBRInstrumentGen4 *instrument);
 
+/**
+ * \brief The unit in which a sample data download's count and start offset
+ * are measured.
+ *
+ * \see RBRInstrumentGen4DownloadData
+ */
+typedef enum RBRInstrumentGen4DownloadDataUnit
+{
+    /** The transfer is measured in bytes (`bytecount`/`bytestart`). */
+    RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES,
+    /** The transfer is measured in samples (`samplecount`/`samplestart`). */
+    RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_SAMPLES,
+    /** The number of sample data download units. */
+    RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_COUNT,
+    /** An unknown or unrecognized sample data download unit. */
+    RBRINSTRUMENTGEN4_UNKNOWN_DOWNLOAD_DATA_UNIT
+} RBRInstrumentGen4DownloadDataUnit;
+
+/**
+ * \brief Get a human-readable string name for a sample data download unit.
+ *
+ * \param [in] unit the download unit
+ * \return a string name for the download unit
+ * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ */
+const char *RBRInstrumentGen4DownloadDataUnit_name(
+    RBRInstrumentGen4DownloadDataUnit unit);
+
+/**
+ * \brief The unit in which an events download's count and start offset are
+ * measured.
+ *
+ * \see RBRInstrumentGen4DownloadEvents
+ */
+typedef enum RBRInstrumentGen4DownloadEventsUnit
+{
+    /** The transfer is measured in bytes (`bytecount`/`bytestart`). */
+    RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_BYTES,
+    /** The transfer is measured in events (`eventcount`/`eventstart`). */
+    RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_EVENTS,
+    /** The number of events download units. */
+    RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_COUNT,
+    /** An unknown or unrecognized events download unit. */
+    RBRINSTRUMENTGEN4_UNKNOWN_DOWNLOAD_EVENTS_UNIT
+} RBRInstrumentGen4DownloadEventsUnit;
+
+/**
+ * \brief Get a human-readable string name for an events download unit.
+ *
+ * \param [in] unit the download unit
+ * \return a string name for the download unit
+ * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ */
+const char *RBRInstrumentGen4DownloadEventsUnit_name(
+    RBRInstrumentGen4DownloadEventsUnit unit);
+
+/**
+ * \brief `download <dataset_label>/<schedule_label>/data` command
+ * parameters.
+ *
+ * \see RBRInstrumentGen4Dataset_downloadScheduleData()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
+ */
+typedef struct RBRInstrumentGen4DownloadData
+{
+    /** \brief The unit for both #count and #start. */
+    RBRInstrumentGen4DownloadDataUnit unit;
+
+    /**
+     * \brief The amount of data to transfer, in #unit: the requested
+     * amount, updated to the amount the instrument reports.
+     */
+    int64_t count;
+
+    /** \brief The offset to begin reading from, in #unit, from 0. */
+    int64_t start;
+
+    /**
+     * \brief The number of bytes transferred, excluding the trailing CRC.
+     * \readonly
+     */
+    int64_t byteCount;
+
+    /** \brief The caller-provided buffer receiving the transferred data. */
+    void *data;
+
+    /**
+     * \brief The capacity of #data in bytes. Nothing is written to #data
+     * beyond it.
+     */
+    int64_t dataSize;
+} RBRInstrumentGen4DownloadData;
+
+/**
+ * \brief `download <dataset_label>[/<schedule_label>]/events` command
+ * parameters.
+ *
+ * \see RBRInstrumentGen4Dataset_downloadEvents()
+ * \see RBRInstrumentGen4Dataset_downloadScheduleEvents()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
+ */
+typedef struct RBRInstrumentGen4DownloadEvents
+{
+    /** \brief The unit for both #count and #start. */
+    RBRInstrumentGen4DownloadEventsUnit unit;
+
+    /**
+     * \brief The amount of data to transfer, in #unit: the requested
+     * amount, updated to the amount the instrument reports.
+     */
+    int64_t count;
+
+    /** \brief The offset to begin reading from, in #unit, from 0. */
+    int64_t start;
+
+    /**
+     * \brief The number of bytes transferred, excluding the trailing CRC.
+     * \readonly
+     */
+    int64_t byteCount;
+
+    /** \brief The caller-provided buffer receiving the transferred data. */
+    void *data;
+
+    /**
+     * \brief The capacity of #data in bytes. Nothing is written to #data
+     * beyond it.
+     */
+    int64_t dataSize;
+} RBRInstrumentGen4DownloadEvents;
+
+/**
+ * \brief `download <dataset_label>/meta` command parameters.
+ *
+ * \see RBRInstrumentGen4Dataset_downloadMeta()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
+ */
+typedef struct RBRInstrumentGen4DownloadMeta
+{
+    /**
+     * \brief The number of bytes to transfer: the requested amount,
+     * updated to the amount the instrument reports. Excludes the trailing
+     * CRC.
+     */
+    int64_t byteCount;
+
+    /** \brief The offset to begin reading from, in bytes, from 0. */
+    int64_t byteStart;
+
+    /** \brief The caller-provided buffer receiving the transferred data. */
+    void *data;
+
+    /**
+     * \brief The capacity of #data in bytes. Nothing is written to #data
+     * beyond it.
+     */
+    int64_t dataSize;
+} RBRInstrumentGen4DownloadMeta;
+
+/**
+ * \brief Download part of one schedule's sample data within a dataset.
+ *
+ * The transfer is checked against its trailing CRC before returning.
+ *
+ * \note Issues the `download <dataset_label>/<schedule_label>/data`
+ * command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] dataset the dataset, selected by its label
+ * \param [in] scheduleLabel the schedule, as listed by
+ *                           RBRInstrumentGen4Dataset.scheduleList
+ * \param [in,out] download the download request: the caller populates the
+ *                         unit, count, offset, and buffer fields to say what
+ *                         to transfer and where to put it; the counts are
+ *                         updated with what the instrument returned
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the data is successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when a label is empty,
+ *                                                    the unit is invalid, or
+ *                                                    the count or offset is
+ *                                                    negative
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the response byte count
+ *                                             exceeds the buffer capacity
+ * \return #RBRINSTRUMENTGEN4_CHECKSUM_ERROR when the transfer fails its CRC
+ *                                           check
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the dataset or schedule
+ *                                           does not exist
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadScheduleData(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    const char *scheduleLabel,
+    RBRInstrumentGen4DownloadData *download);
+
+/**
+ * \brief Download a dataset's events, including those not tied to any
+ * schedule.
+ *
+ * \note Issues the `download <dataset_label>/events` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] dataset the dataset, selected by its label
+ * \param [in,out] download the download request: the caller populates the
+ *                         unit, count, offset, and buffer fields to say what
+ *                         to transfer and where to put it; the counts are
+ *                         updated with what the instrument returned
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the data is successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is
+ *                                                    empty, the unit is
+ *                                                    invalid, or the count
+ *                                                    or offset is negative
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the response byte count
+ *                                             exceeds the buffer capacity
+ * \return #RBRINSTRUMENTGEN4_CHECKSUM_ERROR when the transfer fails its CRC
+ *                                           check
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the dataset does not exist
+ * \see RBRInstrumentGen4Dataset_downloadScheduleEvents()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadEvents(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    RBRInstrumentGen4DownloadEvents *download);
+
+/**
+ * \brief Download part of one schedule's events within a dataset.
+ *
+ * \note Issues the `download <dataset_label>/<schedule_label>/events`
+ * command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] dataset the dataset, selected by its label
+ * \param [in] scheduleLabel the schedule, as listed by
+ *                           RBRInstrumentGen4Dataset.scheduleList
+ * \param [in,out] download the download request: the caller populates the
+ *                         unit, count, offset, and buffer fields to say what
+ *                         to transfer and where to put it; the counts are
+ *                         updated with what the instrument returned
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the data is successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when a label is empty,
+ *                                                    the unit is invalid, or
+ *                                                    the count or offset is
+ *                                                    negative
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the response byte count
+ *                                             exceeds the buffer capacity
+ * \return #RBRINSTRUMENTGEN4_CHECKSUM_ERROR when the transfer fails its CRC
+ *                                           check
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the dataset or schedule
+ *                                           does not exist
+ * \see RBRInstrumentGen4Dataset_downloadEvents()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadScheduleEvents(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    const char *scheduleLabel,
+    RBRInstrumentGen4DownloadEvents *download);
+
+/**
+ * \brief Download a dataset's metadata.
+ *
+ * \note Issues the `download <dataset_label>/meta` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] dataset the dataset, selected by its label
+ * \param [in,out] download the download request: the caller populates the
+ *                         count, offset, and buffer fields to say what to
+ *                         transfer and where to put it; the count is updated
+ *                         with what the instrument returned
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the data is successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is
+ *                                                    empty or the count or
+ *                                                    offset is negative
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the response byte count
+ *                                             exceeds the buffer capacity
+ * \return #RBRINSTRUMENTGEN4_CHECKSUM_ERROR when the transfer fails its CRC
+ *                                           check
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the dataset does not exist
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadMeta(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    RBRInstrumentGen4DownloadMeta *download);
+
 /*****************************************************************************************************************/
 /**
  * \brief Functions available to aggregate channel values within bins.
@@ -851,7 +1144,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPostprocessingCommand(
  */
 uint16_t calculateCrcGen4(
     const void *data,
-    int32_t size);   
+    int64_t size);   
 
 #ifdef __cplusplus
 }
