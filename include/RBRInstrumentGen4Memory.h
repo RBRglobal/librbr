@@ -260,6 +260,179 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDataset(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4Dataset *dataset);
 
+/**
+ * \brief `dataset <dataset_label>/[<schedule_label>/]events` command
+ * parameters.
+ *
+ * \see RBRInstrumentGen4Dataset_getEventsBlock()
+ * \see RBRInstrumentGen4Dataset_getScheduleEventsBlock()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
+ */
+typedef struct RBRInstrumentGen4DatasetEventsBlock
+{
+    /** \brief The memory usage of the events block in bytes. */
+    int64_t byteCount;
+    /** \brief The memory usage of the events block in events. */
+    int64_t eventCount;
+} RBRInstrumentGen4DatasetEventsBlock;
+
+/**
+ * \brief `dataset <dataset_label>/meta` command parameters.
+ *
+ * \see RBRInstrumentGen4Dataset_getMetaBlock()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
+ */
+typedef struct RBRInstrumentGen4DatasetMetaBlock
+{
+    /** \brief The memory usage of the metadata block in bytes. */
+    int64_t byteCount;
+} RBRInstrumentGen4DatasetMetaBlock;
+
+/**
+ * \brief `dataset <dataset_label>/<schedule_label>` command parameters.
+ *
+ * \see RBRInstrumentGen4Dataset_getScheduleBlock()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
+ */
+typedef struct RBRInstrumentGen4DatasetScheduleBlock
+{
+    /** \brief The memory usage of the schedule's blocks in bytes. */
+    int64_t byteCount;
+} RBRInstrumentGen4DatasetScheduleBlock;
+
+/**
+ * \brief `dataset <dataset_label>/<schedule_label>/data` command parameters.
+ *
+ * \see RBRInstrumentGen4Dataset_getScheduleDataBlock()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
+ */
+typedef struct RBRInstrumentGen4DatasetDataBlock
+{
+    /** \brief The memory usage of the sample data block in bytes. */
+    int64_t byteCount;
+    /** \brief The memory usage of the sample data block in samples. */
+    int64_t sampleCount;
+} RBRInstrumentGen4DatasetDataBlock;
+
+/**
+ * \brief Get the memory usage of all of a dataset's events, including
+ * those not tied to any schedule.
+ *
+ * \note Issues the `dataset <dataset_label>/events` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] dataset the dataset, selected by its label
+ * \param [out] block the memory usage of the events block
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the dataset does not exist
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getEventsBlock(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    RBRInstrumentGen4DatasetEventsBlock *block);
+
+/**
+ * \brief Get the memory usage of all of a dataset's metadata.
+ *
+ * \note Issues the `dataset <dataset_label>/meta` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] dataset the dataset, selected by its label
+ * \param [out] block the memory usage of the metadata block
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the dataset does not exist
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getMetaBlock(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    RBRInstrumentGen4DatasetMetaBlock *block);
+
+/**
+ * \brief Get the memory usage of one of a dataset's schedules, summed over
+ * all of its block types.
+ *
+ * \note Issues the `dataset <dataset_label>/<schedule_label>` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] dataset the dataset, selected by its label
+ * \param [in] scheduleLabel the schedule, as listed by
+ *                           RBRInstrumentGen4Dataset.scheduleList
+ * \param [out] block the memory usage of the schedule's blocks
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when either label is
+ *                                                    empty
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the dataset or schedule does
+ *                                           not exist
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleBlock(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    const char *scheduleLabel,
+    RBRInstrumentGen4DatasetScheduleBlock *block);
+
+/**
+ * \brief Get the memory usage of one schedule's events within a dataset.
+ *
+ * \note Issues the `dataset <dataset_label>/<schedule_label>/events`
+ * command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] dataset the dataset, selected by its label
+ * \param [in] scheduleLabel the schedule, as listed by
+ *                           RBRInstrumentGen4Dataset.scheduleList
+ * \param [out] block the memory usage of the schedule's events block
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when either label is
+ *                                                    empty
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the dataset or schedule does
+ *                                           not exist
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleEventsBlock(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    const char *scheduleLabel,
+    RBRInstrumentGen4DatasetEventsBlock *block);
+
+/**
+ * \brief Get the memory usage of one schedule's sample data within a
+ * dataset.
+ *
+ * \note Issues the `dataset <dataset_label>/<schedule_label>/data` command.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] dataset the dataset, selected by its label
+ * \param [in] scheduleLabel the schedule, as listed by
+ *                           RBRInstrumentGen4Dataset.scheduleList
+ * \param [out] block the memory usage of the schedule's sample data block
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when either label is
+ *                                                    empty
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the dataset or schedule does
+ *                                           not exist
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleDataBlock(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    const char *scheduleLabel,
+    RBRInstrumentGen4DatasetDataBlock *block);
+
 /** \brief It determines the type of information retrieved for the specific schedule. 
  * There are three keywoards: data|events|meta.
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/dataset

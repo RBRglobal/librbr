@@ -297,3 +297,239 @@ TEST_LOGGER4(getDataset)
 
     return true;
 }
+
+typedef struct GetBlockTest
+{
+    const char *scheduleLabel;
+    const char *command;
+    const char *response;
+    RBRInstrumentGen4Error expectedError;
+    int64_t expectedByteCount;
+    int64_t expectedOtherCount;
+} GetBlockTest;
+
+TEST_LOGGER4(datasetGetEventsBlock)
+{
+    GetBlockTest tests[] = {
+        { NULL,
+          "dataset d1/events" COMMAND_TERMINATOR,
+          "dataset d1/events bytecount=120 eventcount=5" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS, 120, 5 },
+        /* A dataset with no events reports zero counts. */
+        { NULL,
+          "dataset d1/events" COMMAND_TERMINATOR,
+          "dataset d1/events bytecount=0 eventcount=0" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS, 0, 0 },
+        { NULL,
+          "dataset d1/events" COMMAND_TERMINATOR,
+          "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR, 0, 0 },
+        { NULL, NULL, NULL, 0, 0, 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    RBRInstrumentGen4DatasetEventsBlock block;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4Dataset_getEventsBlock(instrument,
+                                                      &dataset,
+                                                      &block);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+        TEST_ASSERT_EQ(tests[i].expectedByteCount,
+                       block.byteCount,
+                       "%" PRId64);
+        TEST_ASSERT_EQ(tests[i].expectedOtherCount,
+                       block.eventCount,
+                       "%" PRId64);
+    }
+
+    return true;
+}
+
+TEST_LOGGER4(datasetGetMetaBlock)
+{
+    GetBlockTest tests[] = {
+        { NULL,
+          "dataset d1/meta" COMMAND_TERMINATOR,
+          "dataset d1/meta bytecount=4836" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS, 4836, 0 },
+        { NULL,
+          "dataset d1/meta" COMMAND_TERMINATOR,
+          "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR, 0, 0 },
+        { NULL, NULL, NULL, 0, 0, 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    RBRInstrumentGen4DatasetMetaBlock block;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4Dataset_getMetaBlock(instrument,
+                                                    &dataset,
+                                                    &block);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+        TEST_ASSERT_EQ(tests[i].expectedByteCount,
+                       block.byteCount,
+                       "%" PRId64);
+    }
+
+    return true;
+}
+
+TEST_LOGGER4(datasetGetScheduleBlock)
+{
+    GetBlockTest tests[] = {
+        { "s_cont",
+          "dataset d1/s_cont" COMMAND_TERMINATOR,
+          "dataset d1/s_cont bytecount=768" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS, 768, 0 },
+        /*
+         * A schedule the dataset does not know reports the dataset as not
+         * found, naming the dataset rather than the schedule.
+         */
+        { "nosuch",
+          "dataset d1/nosuch" COMMAND_TERMINATOR,
+          "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR, 0, 0 },
+        { NULL, NULL, NULL, 0, 0, 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    RBRInstrumentGen4DatasetScheduleBlock block;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4Dataset_getScheduleBlock(instrument,
+                                                        &dataset,
+                                                        tests[i].scheduleLabel,
+                                                        &block);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+        TEST_ASSERT_EQ(tests[i].expectedByteCount,
+                       block.byteCount,
+                       "%" PRId64);
+    }
+
+    /* An empty schedule label is refused before the command. */
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRInstrumentGen4Dataset_getScheduleBlock(instrument,
+                                                    &dataset,
+                                                    "",
+                                                    &block);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(datasetGetScheduleEventsBlock)
+{
+    GetBlockTest tests[] = {
+        { "s_cont",
+          "dataset d1/s_cont/events" COMMAND_TERMINATOR,
+          "dataset d1/s_cont/events bytecount=120 eventcount=5"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS, 120, 5 },
+        /*
+         * A schedule the dataset does not know reports the dataset as not
+         * found, naming the dataset rather than the schedule.
+         */
+        { "nosuch",
+          "dataset d1/nosuch/events" COMMAND_TERMINATOR,
+          "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR, 0, 0 },
+        { NULL, NULL, NULL, 0, 0, 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    RBRInstrumentGen4DatasetEventsBlock block;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4Dataset_getScheduleEventsBlock(
+            instrument,
+            &dataset,
+            tests[i].scheduleLabel,
+            &block);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+        TEST_ASSERT_EQ(tests[i].expectedByteCount,
+                       block.byteCount,
+                       "%" PRId64);
+        TEST_ASSERT_EQ(tests[i].expectedOtherCount,
+                       block.eventCount,
+                       "%" PRId64);
+    }
+
+    return true;
+}
+
+TEST_LOGGER4(datasetGetScheduleDataBlock)
+{
+    GetBlockTest tests[] = {
+        { "s_cont",
+          "dataset d1/s_cont/data" COMMAND_TERMINATOR,
+          "dataset d1/s_cont/data bytecount=648 samplecount=27"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS, 648, 27 },
+        /* A schedule which never sampled reports zero counts. */
+        { "s_cont",
+          "dataset d1/s_cont/data" COMMAND_TERMINATOR,
+          "dataset d1/s_cont/data bytecount=0 samplecount=0"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS, 0, 0 },
+        { "nosuch",
+          "dataset d1/nosuch/data" COMMAND_TERMINATOR,
+          "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR, 0, 0 },
+        { NULL, NULL, NULL, 0, 0, 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    RBRInstrumentGen4DatasetDataBlock block;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4Dataset_getScheduleDataBlock(
+            instrument,
+            &dataset,
+            tests[i].scheduleLabel,
+            &block);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+        TEST_ASSERT_EQ(tests[i].expectedByteCount,
+                       block.byteCount,
+                       "%" PRId64);
+        TEST_ASSERT_EQ(tests[i].expectedOtherCount,
+                       block.sampleCount,
+                       "%" PRId64);
+    }
+
+    return true;
+}

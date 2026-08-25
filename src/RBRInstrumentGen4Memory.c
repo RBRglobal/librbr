@@ -280,6 +280,174 @@ const char *RBRInstrumentGen4Block_name(RBRInstrumentGen4Block block){
     }
 }
 
+/**
+ * \brief Parse the counts out of a `dataset` block query response.
+ *
+ * A count the caller does not expect for the block type is passed as NULL
+ * and left unparsed.
+ */
+static void RBRInstrumentGen4Dataset_parseBlockResponse(
+    RBRInstrumentGen4 *instrument,
+    int64_t *byteCount,
+    int64_t *sampleCount,
+    int64_t *eventCount)
+{
+    char *command = NULL;
+    RBRInstrumentGen4ResponseParameter parameter;
+    while (true)
+    {
+        RBRInstrumentGen4_parseResponse(instrument,
+                                        &command,
+                                        &parameter);
+
+        if (parameter.key == NULL || parameter.value == NULL)
+        {
+            break;
+        }
+        else if (byteCount != NULL
+                 && strcmp(parameter.key, "bytecount") == 0)
+        {
+            *byteCount = strtoll(parameter.value, NULL, 10);
+        }
+        else if (sampleCount != NULL
+                 && strcmp(parameter.key, "samplecount") == 0)
+        {
+            *sampleCount = strtoll(parameter.value, NULL, 10);
+        }
+        else if (eventCount != NULL
+                 && strcmp(parameter.key, "eventcount") == 0)
+        {
+            *eventCount = strtoll(parameter.value, NULL, 10);
+        }
+    }
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getEventsBlock(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    RBRInstrumentGen4DatasetEventsBlock *block)
+{
+    if (dataset->label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    memset(block, 0, sizeof(RBRInstrumentGen4DatasetEventsBlock));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "dataset %s/events",
+                                       dataset->label));
+
+    RBRInstrumentGen4Dataset_parseBlockResponse(instrument,
+                                                &block->byteCount,
+                                                NULL,
+                                                &block->eventCount);
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getMetaBlock(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    RBRInstrumentGen4DatasetMetaBlock *block)
+{
+    if (dataset->label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    memset(block, 0, sizeof(RBRInstrumentGen4DatasetMetaBlock));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "dataset %s/meta",
+                                       dataset->label));
+
+    RBRInstrumentGen4Dataset_parseBlockResponse(instrument,
+                                                &block->byteCount,
+                                                NULL,
+                                                NULL);
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleBlock(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    const char *scheduleLabel,
+    RBRInstrumentGen4DatasetScheduleBlock *block)
+{
+    if (dataset->label[0] == '\0' || scheduleLabel[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    memset(block, 0, sizeof(RBRInstrumentGen4DatasetScheduleBlock));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "dataset %s/%s",
+                                       dataset->label,
+                                       scheduleLabel));
+
+    RBRInstrumentGen4Dataset_parseBlockResponse(instrument,
+                                                &block->byteCount,
+                                                NULL,
+                                                NULL);
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleEventsBlock(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    const char *scheduleLabel,
+    RBRInstrumentGen4DatasetEventsBlock *block)
+{
+    if (dataset->label[0] == '\0' || scheduleLabel[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    memset(block, 0, sizeof(RBRInstrumentGen4DatasetEventsBlock));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "dataset %s/%s/events",
+                                       dataset->label,
+                                       scheduleLabel));
+
+    RBRInstrumentGen4Dataset_parseBlockResponse(instrument,
+                                                &block->byteCount,
+                                                NULL,
+                                                &block->eventCount);
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleDataBlock(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Dataset *dataset,
+    const char *scheduleLabel,
+    RBRInstrumentGen4DatasetDataBlock *block)
+{
+    if (dataset->label[0] == '\0' || scheduleLabel[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    memset(block, 0, sizeof(RBRInstrumentGen4DatasetDataBlock));
+
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "dataset %s/%s/data",
+                                       dataset->label,
+                                       scheduleLabel));
+
+    RBRInstrumentGen4Dataset_parseBlockResponse(instrument,
+                                                &block->byteCount,
+                                                &block->sampleCount,
+                                                NULL);
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
 RBRInstrumentGen4Error RBRInstrumentGen4_deleteDataset(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4Dataset *dataset)
