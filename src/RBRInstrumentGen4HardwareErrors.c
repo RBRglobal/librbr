@@ -43,6 +43,14 @@ const char *RBRInstrumentGen4HardwareError_name(RBRInstrumentGen4HardwareError e
         return "invalid data";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_FEATURE_NOT_SUPPORTED_BY_HARDWARE:
         return "feature not supported by hardware";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_SYNTAX_ERROR:
+        return "syntax error";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_LABEL_ALREADY_IN_USE:
+        return "label is already in use";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_PARAMETER_IS_READ_ONLY:
+        return "parameter is read only";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_ILLEGAL_CHARACTER_IN_LABEL:
+        return "illegal character in label";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_QUALIFIER_USED_BY_ANOTHER_OBJECT:
         return "qualifier used by another object";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_UNKNOWN_ERROR3:
@@ -64,6 +72,8 @@ const char *RBRInstrumentGen4HardwareError_name(RBRInstrumentGen4HardwareError e
         return "failed to enable for logging";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_NOT_LOGGING:
         return "not logging";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_CANNOT_RESUME_UNLESS_PAUSED:
+        return "cannot resume unless paused";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_LOGGING_ALREADY_ACTIVE:
         return "logging already active";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_UNCLEARED_ERROR_USE_ERRORLOG:
@@ -96,8 +106,16 @@ const char *RBRInstrumentGen4HardwareError_name(RBRInstrumentGen4HardwareError e
         return "AUX1 not available in current serial mode";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_WRONG_DDSAMPLING_SETTINGS:
         return "wrong ddsampling settings";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_UNABLE_TO_ESTIMATE_MEMORY_USAGE:
+        return "unable to estimate memory usage";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_EMPTY_SCHEDULE_LIST_IN_CONFIGURATION:
+        return "empty schedule list in configuration";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_DATASET_LIMIT_REACHED:
         return "dataset limit reached, delete dataset(s) to make space";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_INSTRUMENT_STATE_IS_ALREADY_DISABLED:
+        return "instrument state is already disabled";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_ALREADY_ENABLED_WITH_DIFFERENT_SETTINGS:
+        return "instrument was already enabled with different settings";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_ITEM_IS_NOT_CONFIGURED:
         return "item is not configured";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_CONFIGURATION_FAILED:

@@ -524,16 +524,15 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_verify(instrument,
                              &config_ascent,
                              DATASET_ASCENT_LABEL,
+                             RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
                              deploymentStatus);
 
     // enable the instrument
     RBRInstrumentGen4_enable(instrument,
                              &config_ascent,
                              DATASET_ASCENT_LABEL,
-                             false,
                              RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
-                             &datasetPool,
-                             deploymentStatus); // false, normal are default.
+                             deploymentStatus);
 
 instrumentCleanup:
     RBRInstrumentGen4_close(instrument);

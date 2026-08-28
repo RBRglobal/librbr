@@ -23,6 +23,23 @@
 #include "RBRInstrumentGen4Internal.h"
 #include "RBRInstrumentGen4Instrument.h"
 
+const char *RBRInstrumentGen4InstrumentState_name(
+    RBRInstrumentGen4InstrumentState state)
+{
+    switch (state)
+    {
+    case RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED:
+        return "disabled";
+    case RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED:
+        return "enabled";
+    case RBRINSTRUMENTGEN4_INSTRUMENT_STATE_COUNT:
+        return "instrument state count";
+    case RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE:
+    default:
+        return "unknown instrument state";
+    }
+}
+
 /* The minimum length of a version string. */
 #define VERSION_MIN 3
 

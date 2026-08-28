@@ -25,7 +25,6 @@
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Configuration.h"
 #include "RBRInstrumentGen4Memory.h"
-#include "RBRInstrumentGen4Schedule.h"
 #include "posix-shared.h"
 
 //************************************* customer defined parameters *************************************//
@@ -238,16 +237,14 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_verify(instrument,
                              &config,
                              NEW_DATASET_LABEL,
+                             RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
                              &loggingState);
 
     /* enable the instrument */
-    RBRInstrumentGen4Dataset *dataset;
     RBRInstrumentGen4_enable(instrument,
                              &config,
                              NEW_DATASET_LABEL,
                              RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
-                             &datasetPool,
-                             &dataset,
                              &loggingState);
 
 instrumentCleanup:

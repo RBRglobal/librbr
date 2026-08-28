@@ -320,17 +320,15 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_verify(instrument,
                              &config_ascent,
                              NEW_DATASET_LABEL,
+                             RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
                              &loggingState);
 
     printf("%s: Start instrument logging with default_config.\n",
            programName);
-    RBRInstrumentGen4Dataset *dataset;
     if ((err = RBRInstrumentGen4_enable(instrument,
                                         &config_ascent,
                                         NEW_DATASET_LABEL,
                                         RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
-                                        &datasetPool,
-                                        &dataset,
                                         &loggingState)) != RBRINSTRUMENTGEN4_SUCCESS)
     {
         fprintf(stderr,

@@ -31,7 +31,6 @@
 #include "RBRInstrumentGen4Deployment.h"
 #include "RBRInstrumentGen4Instrument.h"
 #include "RBRInstrumentGen4Memory.h"
-#include "RBRInstrumentGen4Schedule.h"
 #include "RBRParserGen4.h"
 #include "posix-shared.h"
 
@@ -284,13 +283,14 @@ int main(int argc, char *argv[])
 
     /************ start of ascent ************/
     /* enable the instrument */
-    RBRInstrumentGen4Dataset *dataset_ascent;
+    RBRInstrumentGen4Dataset dataset_ascent_value = {
+        .label = NEW_DATASET_LABEL
+    };
+    RBRInstrumentGen4Dataset *dataset_ascent = &dataset_ascent_value;
     RBRInstrumentGen4_enable(instrument,
                              &config_ascent,
                              NEW_DATASET_LABEL,
                              RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
-                             &datasetPool,
-                             &dataset_ascent,
                              &loggingState);
 
     /************ end of ascent ************/
