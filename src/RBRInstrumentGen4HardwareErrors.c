@@ -45,6 +45,8 @@ const char *RBRInstrumentGen4HardwareError_name(RBRInstrumentGen4HardwareError e
         return "feature not supported by hardware";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_SYNTAX_ERROR:
         return "syntax error";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_UNKNOWN_QUALIFIER:
+        return "unknown qualifier";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_INVALID_QUALIFIER:
         return "invalid qualifier";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_MISSING_QUALIFIER:
