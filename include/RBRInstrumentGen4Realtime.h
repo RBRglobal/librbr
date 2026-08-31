@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen4Polling.h
+ * \file RBRInstrumentGen4Realtime.h
  *
  * \brief Instrument commands and structures pertaining to on-demand data
  * acquisition.
@@ -11,8 +11,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTGEN4POLLING_H
-#define LIBRBR_RBRINSTRUMENTGEN4POLLING_H
+#ifndef LIBRBR_RBRINSTRUMENTGEN4REALTIME_H
+#define LIBRBR_RBRINSTRUMENTGEN4REALTIME_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -123,4 +123,4 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollGroups(
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTGEN4POLLING_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN4REALTIME_H */

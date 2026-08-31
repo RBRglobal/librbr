@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen4Polling.c
+ * \file RBRInstrumentGen4Realtime.c
  *
  * \brief Library implementation.
  *
@@ -13,7 +13,7 @@
 
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Internal.h"
-#include "RBRInstrumentGen4Polling.h"
+#include "RBRInstrumentGen4Realtime.h"
 
 /**
  * \brief Send a poll command and read the resulting sample.

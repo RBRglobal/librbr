@@ -137,7 +137,7 @@ GEN4_OBJECTS := src/RBRInstrumentGen4.o \
                 src/RBRInstrumentGen4Instrument.o \
                 src/RBRInstrumentGen4Internal.o \
                 src/RBRInstrumentGen4Memory.o \
-                src/RBRInstrumentGen4Polling.o \
+                src/RBRInstrumentGen4Realtime.o \
                 src/RBRInstrumentGen4Security.o \
                 src/RBRInstrumentGen4Streaming.o \
                 src/RBRParserGen4.o
@@ -232,7 +232,7 @@ GEN4_TEST_MODULES := communication \
                      deployment \
                      instrument \
                      memory \
-                     polling \
+                     realtime \
                      security
 
 bin/tests: bin/libRBR.a \

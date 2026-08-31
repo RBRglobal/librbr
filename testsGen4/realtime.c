@@ -1,7 +1,7 @@
 /**
- * \file polling.c
+ * \file realtime.c
  *
- * \brief Tests for instrument polling commands.
+ * \brief Tests for instrument realtime data commands.
  *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
@@ -11,7 +11,7 @@
 /* Required for memset. */
 #include <string.h>
 
-#include "RBRInstrumentGen4Polling.h"
+#include "RBRInstrumentGen4Realtime.h"
 #include "tests.h"
 
 typedef struct PollTest
