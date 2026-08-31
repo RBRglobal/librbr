@@ -218,13 +218,6 @@ GEN3_TEST_MODULES := communication \
 ##
 ## As for the Gen3 suite, each one of these names corresponds to a C source
 ## file in the `testsGen4/` directory (using the `TEST_LOGGER4` macro).
-##
-## Modules not listed below exist in `testsGen4/` but predate the late-2024
-## L4 grammar/API alignment and do not currently build or pass against the
-## Gen4 sources; re-enabling them is part of the test alignment planned for
-## libRBR 2.0 (SYS-1194):
-##
-## - `streaming`: predates the `channels` to `channelCount` rename
 GEN4_TEST_MODULES := communication \
                      configuration \
                      deployment \
