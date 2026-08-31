@@ -20,7 +20,6 @@ extern "C" {
  * And "Memory", "Deployment. "*/
 #include "RBRInstrumentGen4Communication.h"
 #include "RBRInstrumentGen4Configuration.h"
-#include "RBRInstrumentGen4Gating.h"
 #include "RBRInstrumentGen4Streaming.h"
 #include "RBRInstrumentGen4Memory.h"
 #include "RBRInstrumentGen4Deployment.h"
