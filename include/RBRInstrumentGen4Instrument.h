@@ -67,41 +67,6 @@ const char *RBRInstrumentGen4InstrumentState_name(
 #define RBRINSTRUMENTGEN4_PCBA_COUNT_MAX 12
 
 /**
- * \brief Possible results when comparing two firmware version strings.
- *
- * \see RBRInstrumentGen4Version_compare()
- */
-typedef enum RBRInstrumentGen4FWVersionCompareResult
-{
-    /** Invalid string for FW version found in at least one of the inputs 
-     * for RBRInstrumentGen4Version_compare().
-     */
-    RBRINSTRUMENTGEN4_FW_INVALID = -2,
-    /** First FW version input is less than the second input. */
-    RBRINSTRUMENTGEN4_FW_LESS_THAN = -1,
-    /** First FW version input is greater than the second input. */
-    RBRINSTRUMENTGEN4_FW_GREATER_THAN = 1,
-    /** Two FW version inputs equal. */
-    RBRINSTRUMENTGEN4_FW_EQUAL = 0
-} RBRInstrumentGen4FWVersionCompareResult;
-
-/**
- * 
- * \brief Compare two firmware version strings.
- *
- * If either string is not a version string (format XXSYYY) then the result
- * will indicate that it is the lesser version. If neither is valid, then the
- * result will indicate equality.
- *
- * \param a the first firmware version as a null-terminated C string
- * \param b the second firmware version as a null-terminated C string
- * \return <0 if \a a is a lower version than \a b
- * \return 0 \a a and \a b are the same version
- * \return >0 if \a b is a lower version than \a b
- */
-int RBRInstrumentGen4Version_compare(const char *a, const char *b);
-
-/**
  * \brief Get identification information using the legacy `id` command.
  * \note Issues the `id` instrument command.
  *

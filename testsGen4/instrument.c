@@ -14,32 +14,6 @@
 #include "tests.h"
 #include "RBRInstrumentGen4Instrument.h"
 
-// only used in RBRInstrumentGen4_setPostprocessing() in RBRInstrumentGen4Memory.c
-TEST_LOGGER4(version_comparison)
-{
-    /* Valid versions. */
-    TEST_ASSERT(RBRInstrumentGen4Version_compare("1.14.5+202310150927", "1.14.5+202310150927") == RBRINSTRUMENTGEN4_FW_EQUAL);
-    TEST_ASSERT(RBRInstrumentGen4Version_compare("1.14.6+202310150927", "1.14.5+202310150927") == RBRINSTRUMENTGEN4_FW_GREATER_THAN);
-    TEST_ASSERT(RBRInstrumentGen4Version_compare("1.14.4+202310150927", "1.14.5+202310150927") == RBRINSTRUMENTGEN4_FW_LESS_THAN);
-
-    TEST_ASSERT(RBRInstrumentGen4Version_compare("0.7.0-dev.dbg+202312051738", "0.7.0-dev.dbg+202312051738") == RBRINSTRUMENTGEN4_FW_EQUAL);
-    TEST_ASSERT(RBRInstrumentGen4Version_compare("0.8.0-dev.dbg+202312051738", "0.7.0-dev.dbg+202312051738") == RBRINSTRUMENTGEN4_FW_GREATER_THAN);
-    TEST_ASSERT(RBRInstrumentGen4Version_compare("0.6.0-dev.dbg+202312051738", "0.7.0-dev.dbg+202312051738") == RBRINSTRUMENTGEN4_FW_LESS_THAN);
-
-    TEST_ASSERT(RBRInstrumentGen4Version_compare("1.0.0-dev.dbg+202312051738", "1.0.0+202312051738") == RBRINSTRUMENTGEN4_FW_EQUAL);
-    TEST_ASSERT(RBRInstrumentGen4Version_compare("1.0.0+202312051738", "0.7.0-dev.dbg+202312051738") == RBRINSTRUMENTGEN4_FW_GREATER_THAN);
-    TEST_ASSERT(RBRInstrumentGen4Version_compare("0.7.0-dev.dbg+202312051738", "1.0.0+202312051738") == RBRINSTRUMENTGEN4_FW_LESS_THAN);
-
-    TEST_ASSERT(RBRInstrumentGen4Version_compare("0.0.000+202310150927", "000.0.0+202310150927") == RBRINSTRUMENTGEN4_FW_EQUAL);
-    /* Invalid versions. */
-    TEST_ASSERT(RBRInstrumentGen4Version_compare(".", ".") == RBRINSTRUMENTGEN4_FW_INVALID);
-    TEST_ASSERT(RBRInstrumentGen4Version_compare(".000.0+202310150927", "0.000.0+202310150927") == RBRINSTRUMENTGEN4_FW_INVALID);
-    TEST_ASSERT(RBRInstrumentGen4Version_compare("..0+202310150927", "0.000.0+202310150927") == RBRINSTRUMENTGEN4_FW_INVALID);
-    TEST_ASSERT(RBRInstrumentGen4Version_compare("0.0.+202310150927", "0.0.000+202310150927") == RBRINSTRUMENTGEN4_FW_INVALID);
-    TEST_ASSERT(RBRInstrumentGen4Version_compare("0.000.+202310150927", "0.0.000+202310150927") == RBRINSTRUMENTGEN4_FW_INVALID);
-    return true;
-}
-
 typedef struct LegacyIdTest
 {
     const char *response;
