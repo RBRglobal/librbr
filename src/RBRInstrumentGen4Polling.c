@@ -10,105 +10,50 @@
 
 /* Required for snprintf. */
 #include <stdio.h>
-/* Required for memset. */
-#include <string.h>
 
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Internal.h"
 #include "RBRInstrumentGen4Polling.h"
 
-RBRInstrumentGen4Error RBRInstrumentGen4_pollOneChannel(RBRInstrumentGen4 *instrument,
-                                       const char *channelLabel,
-                                       RBRInstrumentGen4Sample *sample)
+/**
+ * \brief Send a poll command and read the resulting sample.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] parameter the list parameter to send, or `NULL` for a bare
+ *                       `poll`
+ * \param [in] list the value of \a parameter
+ * \param [out] sample the polled sample
+ */
+static RBRInstrumentGen4Error RBRInstrumentGen4_sendPoll(
+    RBRInstrumentGen4 *instrument,
+    const char *parameter,
+    const char *list,
+    RBRInstrumentGen4Sample *sample)
 {
     char *commandBuffer = (char *) instrument->commandBuffer;
     int32_t *commandBufferLength = &instrument->commandBufferLength;
 
-    //Max channel name is 31 characters. (RBRINSTRMENTGEN4_CHANNEL_LABEL_MAX)
-    //Then maximum length for this command is 63 chars + terminator. It won't exceed the instrument->commandBuffer[120]
     *commandBufferLength = snprintf(
         commandBuffer,
         sizeof(instrument->commandBuffer),
-        "poll channellist=%s%s",
-        channelLabel, RBRINSTRUMENTGEN4_SEND_COMMAND_TERMINATOR);
-
-    RBR_TRY(RBRInstrumentGen4_sendBuffer(instrument));
-
-    RBRInstrumentGen4Error err;
-    /* RBRInstrumentGen4_readResponse() returns #RBRINSTRUMENT_SAMPLE when a sample
-     * is read to the given sample pointer; a return of #RBRINSTRUMENT_SUCCESS
-     * means that it found some other command response instead, so we'll loop
-     * until we get a “failure” value (which we hope is SAMPLE). */
-    do
-    {
-        err = RBRInstrumentGen4_readResponse(instrument, true, sample);
-    } while (err == RBRINSTRUMENTGEN4_SUCCESS);
-    /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any
-     * other errors can really be errors. */
-    if (err == RBRINSTRUMENTGEN4_SAMPLE)
-    {
-        err = RBRINSTRUMENTGEN4_SUCCESS;
-    }
-
-    return err;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_pollOneGroup(RBRInstrumentGen4 *instrument,
-                                       const char *groupLabel,
-                                       RBRInstrumentGen4Sample *sample)
-{
-    char *commandBuffer = (char *) instrument->commandBuffer;
-    int32_t *commandBufferLength = &instrument->commandBufferLength;
-
-    //Max channel name is 31 characters. (RBRINSTRMENTGEN4_CHANNEL_LABEL_MAX)
-    //Then maximum length for this command is 63 chars + terminator. It won't exceed the instrument->commandBuffer[120]
-    *commandBufferLength = snprintf(
-        commandBuffer,
-        sizeof(instrument->commandBuffer),
-        "poll grouplist=%s%s",
-        groupLabel, RBRINSTRUMENTGEN4_SEND_COMMAND_TERMINATOR);
-
-    RBR_TRY(RBRInstrumentGen4_sendBuffer(instrument));
-
-    RBRInstrumentGen4Error err;
-    /* RBRInstrumentGen4_readResponse() returns #RBRINSTRUMENT_SAMPLE when a sample
-     * is read to the given sample pointer; a return of #RBRINSTRUMENT_SUCCESS
-     * means that it found some other command response instead, so we'll loop
-     * until we get a “failure” value (which we hope is SAMPLE). */
-    do
-    {
-        err = RBRInstrumentGen4_readResponse(instrument, true, sample);
-    } while (err == RBRINSTRUMENTGEN4_SUCCESS);
-    /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any
-     * other errors can really be errors. */
-    if (err == RBRINSTRUMENTGEN4_SAMPLE)
-    {
-        err = RBRINSTRUMENTGEN4_SUCCESS;
-    }
-
-    return err;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_pollAllChannels(RBRInstrumentGen4 *instrument,
-                                       RBRInstrumentGen4Sample *sample)
-{
-    char *commandBuffer = (char *) instrument->commandBuffer;
-    int32_t *commandBufferLength = &instrument->commandBufferLength;
-
-    //maximum length for this command is 35 chars + terminator. It won't exceed the instrument->commandBuffer[120]
-    *commandBufferLength = snprintf(
-        commandBuffer,
-        sizeof(instrument->commandBuffer),
-        "poll channellist=all%s",
+        "poll%s%s%s%s",
+        parameter != NULL ? " " : "",
+        parameter != NULL ? parameter : "",
+        parameter != NULL ? list : "",
         RBRINSTRUMENTGEN4_SEND_COMMAND_TERMINATOR);
+    if ((size_t) *commandBufferLength >= sizeof(instrument->commandBuffer))
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
 
     RBR_TRY(RBRInstrumentGen4_sendBuffer(instrument));
 
     RBRInstrumentGen4Error err;
-    /* RBRInstrumentGen4_readResponse() returns #RBRINSTRUMENT_SAMPLE when a sample
-     * is read to the given sample pointer; a return of #RBRINSTRUMENT_SUCCESS
-     * means that it found some other command response instead, so we'll loop
-     * until we get a “failure” value (which we hope is SAMPLE). */
+    /* RBRInstrumentGen4_readResponse() returns #RBRINSTRUMENTGEN4_SAMPLE when
+     * a sample is read to the given sample pointer; a return of
+     * #RBRINSTRUMENTGEN4_SUCCESS means that it found some other command
+     * response instead, so we'll loop until we get a “failure” value (which
+     * we hope is SAMPLE). */
     do
     {
         err = RBRInstrumentGen4_readResponse(instrument, true, sample);
@@ -119,5 +64,35 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollAllChannels(RBRInstrumentGen4 *inst
     {
         err = RBRINSTRUMENTGEN4_SUCCESS;
     }
+
     return err;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_poll(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Sample *sample)
+{
+    return RBRInstrumentGen4_sendPoll(instrument, NULL, NULL, sample);
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_pollChannels(
+    RBRInstrumentGen4 *instrument,
+    const char *channelList,
+    RBRInstrumentGen4Sample *sample)
+{
+    return RBRInstrumentGen4_sendPoll(instrument,
+                                      "channellist=",
+                                      channelList,
+                                      sample);
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_pollGroups(
+    RBRInstrumentGen4 *instrument,
+    const char *groupList,
+    RBRInstrumentGen4Sample *sample)
+{
+    return RBRInstrumentGen4_sendPoll(instrument,
+                                      "grouplist=",
+                                      groupList,
+                                      sample);
 }

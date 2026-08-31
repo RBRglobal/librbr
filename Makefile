@@ -226,12 +226,13 @@ GEN3_TEST_MODULES := communication \
 ## Gen4 sources; re-enabling them is part of the test alignment planned for
 ## libRBR 2.0 (SYS-1194):
 ##
-## - `polling`, `streaming`: predate the `channels` to `channelCount` rename
+## - `streaming`: predates the `channels` to `channelCount` rename
 GEN4_TEST_MODULES := communication \
                      configuration \
                      deployment \
                      instrument \
                      memory \
+                     polling \
                      security
 
 bin/tests: bin/libRBR.a \

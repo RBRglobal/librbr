@@ -22,11 +22,15 @@ extern "C" {
 #include "RBRInstrumentGen4Streaming.h"
 
 /**
- * \brief Requests an “on-demand” sample of one channel from the logger.
+ * \brief Requests an “on-demand” sample of every channel from the
+ * instrument.
  *
- * Unlike streaming data/RBRInstrumentGen4_readSample(), polled data is returned
- * directly to the caller (independent of any RBRInstrumentGen4SampleCallback
- * defined in RBRInstrumentGen4Callbacks.sample).
+ * Sends a bare `poll` command.
+ *
+ * Unlike streaming data/RBRInstrumentGen4_readSample(), polled data is
+ * returned directly to the caller (independent of any
+ * RBRInstrumentGen4SampleCallback defined in
+ * RBRInstrumentGen4Callbacks.sample).
  *
  * Because polled samples are indistinguishable from streamed samples, this
  * function may return a streamed sample, _not_ a polled sample, if the
@@ -35,24 +39,27 @@ extern "C" {
  * produced by the instrument before the response to the `poll` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] channelLabel specifies one channel to sample
  * \param [out] sample the polled sample
  * \return #RBRINSTRUMENTGEN4_SUCCESS when a sample is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when an invalid channel is requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_pollOneChannel(RBRInstrumentGen4 *instrument,
-                                       const char *channelLabel,
-                                       RBRInstrumentGen4Sample *sample);
+RBRInstrumentGen4Error RBRInstrumentGen4_poll(
+    RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4Sample *sample);
 
 /**
- * \brief Requests an “on-demand” sample set of a group from the logger.
+ * \brief Requests an “on-demand” sample of the given channels from the
+ * instrument.
  *
- * Unlike streaming data/RBRInstrumentGen4_readSample(), polled data is returned
- * directly to the caller (independent of any RBRInstrumentGen4SampleCallback
- * defined in RBRInstrumentGen4Callbacks.sample).
+ * Sends the `poll channellist=` command. \a channelList is sent verbatim as
+ * the parameter value; see the command documentation for the list format.
+ *
+ * Unlike streaming data/RBRInstrumentGen4_readSample(), polled data is
+ * returned directly to the caller (independent of any
+ * RBRInstrumentGen4SampleCallback defined in
+ * RBRInstrumentGen4Callbacks.sample).
  *
  * Because polled samples are indistinguishable from streamed samples, this
  * function may return a streamed sample, _not_ a polled sample, if the
@@ -61,24 +68,33 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollOneChannel(RBRInstrumentGen4 *instr
  * produced by the instrument before the response to the `poll` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] groupLabel specifies one group to sample
+ * \param [in] channelList the channels to sample
  * \param [out] sample the polled sample
  * \return #RBRINSTRUMENTGEN4_SUCCESS when a sample is successfully read
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the channel list
+ *         is too long to send
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when an invalid channel is requested
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when an invalid channel is
+ *         requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_pollOneGroup(RBRInstrumentGen4 *instrument,
-                                       const char *groupLabel,
-                                       RBRInstrumentGen4Sample *sample);
+RBRInstrumentGen4Error RBRInstrumentGen4_pollChannels(
+    RBRInstrumentGen4 *instrument,
+    const char *channelList,
+    RBRInstrumentGen4Sample *sample);
 
 /**
- * \brief Requests an “on-demand” sample set of all channels from the logger.
+ * \brief Requests an “on-demand” sample of the given groups of channels from
+ * the instrument.
  *
- * Unlike streaming data/RBRInstrumentGen4_readSample(), polled data is returned
- * directly to the caller (independent of any RBRInstrumentGen4SampleCallback
- * defined in RBRInstrumentGen4Callbacks.sample).
+ * Sends the `poll grouplist=` command. \a groupList is sent verbatim as the
+ * parameter value; see the command documentation for the list format.
+ *
+ * Unlike streaming data/RBRInstrumentGen4_readSample(), polled data is
+ * returned directly to the caller (independent of any
+ * RBRInstrumentGen4SampleCallback defined in
+ * RBRInstrumentGen4Callbacks.sample).
  *
  * Because polled samples are indistinguishable from streamed samples, this
  * function may return a streamed sample, _not_ a polled sample, if the
@@ -87,19 +103,24 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollOneGroup(RBRInstrumentGen4 *instrum
  * produced by the instrument before the response to the `poll` command.
  *
  * \param [in] instrument the instrument connection
+ * \param [in] groupList the groups of channels to sample
  * \param [out] sample the polled sample
  * \return #RBRINSTRUMENTGEN4_SUCCESS when a sample is successfully read
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the group list is
+ *         too long to send
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when an invalid channel is requested
+ * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when an invalid group is
+ *         requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_pollAllChannels(RBRInstrumentGen4 *instrument,
-                                       RBRInstrumentGen4Sample *sample);
-                            
+RBRInstrumentGen4Error RBRInstrumentGen4_pollGroups(
+    RBRInstrumentGen4 *instrument,
+    const char *groupList,
+    RBRInstrumentGen4Sample *sample);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTPOLLING_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN4POLLING_H */
