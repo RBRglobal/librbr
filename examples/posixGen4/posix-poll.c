@@ -133,7 +133,9 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_getOutputFormat(instrument, &outputformat);
     outputformat.sn = true;
     outputformat.scheduleLabel = true;
-    outputformat.dateTime = false;
+    /* The library cannot currently parse samples without a timestamp; see
+     * SYS-1244. */
+    outputformat.dateTime = true;
     outputformat.crc = true;
     RBRInstrumentGen4_setOutputFormat(instrument, &outputformat);
 
@@ -142,7 +144,9 @@ int main(int argc, char *argv[])
     while (true)
     {
         // poll one group
-        err = RBRInstrumentGen4_pollOneGroup(instrument, groupPool.pool[0].label, &sample);
+        err = RBRInstrumentGen4_pollGroups(instrument,
+                                           groupPool.pool[0].label,
+                                           &sample);
         if (err != RBRINSTRUMENTGEN4_SUCCESS)
         {
             fprintf(stderr, "Error: %s\n", RBRInstrumentGen4Error_name(err));
