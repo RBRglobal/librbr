@@ -415,7 +415,7 @@ static void RBRInstrumentGen4_terminateResponse(
  * \return the first byte after the next delimiter or consecutive delimiters
  * \return NULL if no such byte exists
  */
-char *seek(const char *str, char delimiter)
+static char *seek(const char *str, char delimiter)
 {
     char *token = (char *)str;
     if (token == NULL
