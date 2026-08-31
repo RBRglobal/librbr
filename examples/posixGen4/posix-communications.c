@@ -146,9 +146,6 @@ int main(int argc, char *argv[])
     switch (link.type)
     {
     case RBRINSTRUMENTGEN4_LINK_TYPE_USB:
-    #if 0
-        RBRInstrumentGen4_setUSBStreamingState(instrument, true);
-    #endif
         break;
     case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
         {
@@ -157,9 +154,6 @@ int main(int argc, char *argv[])
             printf("Connected in %s mode at %s baud.\n",
                    RBRInstrumentGen4LinkSerialMode_name(serial.mode),
                    RBRInstrumentGen4LinkSerialBaudRate_name(serial.baudRate));
-#if 0
-            RBRInstrumentGen4_setSerialStreamingState(instrument, true);
-#endif
             break;
         }
     default:
@@ -284,29 +278,6 @@ int main(int argc, char *argv[])
            RBRInstrumentGen4ExternalBatteryType_name(powerExternal.batteryType),
            RBRInstrumentGen4ExternalBatteryType_displayName(powerExternal.batteryType),
            powerExternal.used);
-
-
-#if 0
-    RBRInstrumentGen4Deployment deployment;
-    RBRInstrumentGen4_getDeployment(instrument, &deployment);
-    if (deployment.status != RBRINSTRUMENTGEN4_STATUS_LOGGING)
-    {
-        printf("%s: Instrument is %s, not logging. I'm going to start it.\n",
-               programName,
-               RBRInstrumentGen4DeploymentStatus_name(deployment.status));
-
-        if ((err = instrumentStart(instrument)) != RBRINSTRUMENTGEN4_SUCCESS)
-        {
-            fprintf(stderr,
-                    "%s: Failed to start instrument: %s!\n",
-                    programName,
-                    RBRInstrumentGen4Error_name(err));
-            status = EXIT_FAILURE;
-            goto instrumentCleanup;
-        }
-    }
-    goto fileCleanup;
-#endif
 
 instrumentCleanup:
     RBRInstrumentGen4_close(instrument);
