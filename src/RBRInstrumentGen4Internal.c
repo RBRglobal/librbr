@@ -572,7 +572,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
                         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
                     }
                     uint16_t calCrc;
-                    calCrc = calculateCrcGen4(response, token - response);
+                    calCrc = RBRInstrumentGen4_calculateCrc(response, token - response);
                     if (calCrc != realCrc)
                     {
                         return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;

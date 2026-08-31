@@ -787,7 +787,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadMeta(
  * \return calculated CRC
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
-uint16_t calculateCrcGen4(
+uint16_t RBRInstrumentGen4_calculateCrc(
     const void *data,
     int64_t size);   
 

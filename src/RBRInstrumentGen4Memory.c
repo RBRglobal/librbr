@@ -634,7 +634,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadCommon(
     RBR_TRY(RBRInstrumentGen4_fixedRead(instrument, crc, 2));
 
     uint16_t reportedCrc = (uint16_t) ((crc[0] << 8) | crc[1]);
-    if (calculateCrcGen4(data, *byteCount) != reportedCrc)
+    if (RBRInstrumentGen4_calculateCrc(data, *byteCount) != reportedCrc)
     {
         return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;
     }
@@ -813,7 +813,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadMeta(
 }
 
 /* CRC-CCITT */
-uint16_t calculateCrcGen4(const void *data, int64_t size)
+uint16_t RBRInstrumentGen4_calculateCrc(const void *data, int64_t size)
 {
 #define CRC_POLYNOMIAL 0x1021
 
