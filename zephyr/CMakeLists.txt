@@ -75,7 +75,6 @@ if(CONFIG_LIBRBR)
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Internal.h
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Memory.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Realtime.c
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Security.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Streaming.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRParserGen4.c
         )

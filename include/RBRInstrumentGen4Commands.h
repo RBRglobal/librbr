@@ -26,7 +26,6 @@ extern "C" {
 #include "RBRInstrumentGen4Deployment.h"
 #include "RBRInstrumentGen4Instrument.h"
 #include "RBRInstrumentGen4Realtime.h"
-#include "RBRInstrumentGen4Security.h"
 
 #ifdef __cplusplus
 }
