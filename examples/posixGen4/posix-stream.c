@@ -221,9 +221,7 @@ int main(int argc, char *argv[])
         = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
     RBRInstrumentGen4_disable(instrument, &loggingState);
 
-    RBRInstrumentGen4DatasetPool datasetPool;
-    RBRInstrumentGen4_getDatasetPool(instrument, &datasetPool);
-    RBRInstrumentGen4_deleteDatasetAll(instrument, &datasetPool);
+    RBRInstrumentGen4_deleteDatasetAll(instrument);
 
     RBRInstrumentGen4ConfigPool configPool;
     RBRInstrumentGen4_getConfigPool(instrument, &configPool);

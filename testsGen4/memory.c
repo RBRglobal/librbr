@@ -9,510 +9,829 @@
  */
 
 #include "tests.h"
+#include "RBRInstrumentGen4Memory.h"
 
-TEST_LOGGER3(meminfo)
+/* Required for PRId64. */
+#include <inttypes.h>
+
+typedef struct GetStorageTest
 {
-    RBRInstrumentGen4Storage expected = {
-        .dataset = RBRINSTRUMENTGEN4_DATASET_STANDARD,
-        .used = 1528,
-        .remaining = 134216192,
-        .size = 134217728
-    };
-    RBRInstrumentGen4Storage actual = {
-        .dataset = RBRINSTRUMENTGEN4_DATASET_STANDARD
-    };
+    const char *response;
+    RBRInstrumentGen4Error expectedError;
+    RBRInstrumentGen4Storage expected;
+} GetStorageTest;
 
-    TestIOBuffers_init(buffers,
-                       "meminfo dataset = 1, used = 1528, "
-                       "remaining = 134216192, size = 134217728"
-                       RESPONSE_TERMINATOR,
-                       0);
-    RBRInstrumentGen4Error err = RBRInstrumentGen4_getStorage(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(expected.dataset, actual.dataset, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.used, actual.used, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.remaining, actual.remaining, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.size, actual.size, "%" PRIi32);
-    TEST_ASSERT_STR_EQ("meminfo dataset = 1" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
-
-    return true;
-}
-
-TEST_LOGGER3(meminfo_invalid_dataset)
+TEST_LOGGER4(getStorage)
 {
-    RBRInstrumentGen4Storage test = {
-        .dataset = RBRINSTRUMENTGEN4_UNKNOWN_DATASET
-    };
-
-    TestIOBuffers_init(buffers, "", 0);
-    RBRInstrumentGen4Error err = RBRInstrumentGen4_getStorage(instrument, &test);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
-                        err,
-                        RBRInstrumentGen4Error);
-
-    return true;
-}
-
-TEST_LOGGER2(read)
-{
-    uint8_t buf[1400];
-    RBRInstrumentGen4Data expected = {
-        .dataset = RBRINSTRUMENTGEN4_DATASET_STANDARD,
-        .size    = 8,
-        .offset  = 2800,
-        .data    = buf
-    };
-    RBRInstrumentGen4Data actual = {
-        .dataset = RBRINSTRUMENTGEN4_DATASET_STANDARD,
-        .size    = 1400,
-        .offset  = 2800,
-        .data    = buf
+    GetStorageTest tests[] = {
+        /* A bare query reports all four parameters. */
+        { "storage used=15372 remaining=61016097780 size=61016113152"
+          " access=instrument" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 15372LL,
+            61016097780LL,
+            61016113152LL,
+            RBRINSTRUMENTGEN4_STORAGE_ACCESS_INSTRUMENT } },
+        { "storage used=1528 remaining=134216192 size=134217728"
+          " access=usbhost" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 1528LL,
+            134216192LL,
+            134217728LL,
+            RBRINSTRUMENTGEN4_STORAGE_ACCESS_USBHOST } },
+        /* An unreported parameter keeps its unset value. */
+        { "storage used=15372" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 15372LL, 0LL, 0LL, RBRINSTRUMENTGEN4_UNKNOWN_STORAGE_ACCESS } },
+        /* An unrecognized access location parses to the unknown member. */
+        { "storage used=15372 remaining=61016097780 size=61016113152"
+          " access=cloud" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 15372LL,
+            61016097780LL,
+            61016113152LL,
+            RBRINSTRUMENTGEN4_UNKNOWN_STORAGE_ACCESS } },
+        /* Keys the library does not model are ignored. */
+        { "storage used=15372 remaining=61016097780 size=61016113152"
+          " access=instrument bogus=1" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 15372LL,
+            61016097780LL,
+            61016113152LL,
+            RBRINSTRUMENTGEN4_STORAGE_ACCESS_INSTRUMENT } },
+        { NULL, 0, { 0, 0, 0, 0 } }
     };
 
-    TestIOBuffers_init(buffers,
-                       "data 1 8 2800"
-                       RESPONSE_TERMINATOR
-                       "AAAAAAAA\045\224"
-                       RESPONSE_TERMINATOR,
-                       0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_readData(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(expected.dataset, actual.dataset, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.size, actual.size, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.offset, actual.offset, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.data, actual.data, "%p");
-    TEST_ASSERT_STR_EQ("read data 1 1400 2800"
-                       COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Storage actual;
 
-    return true;
-}
-
-TEST_LOGGER2(read_offset_mismatch)
-{
-    uint8_t buf[1400];
-    RBRInstrumentGen4Data actual = {
-        .dataset = RBRINSTRUMENTGEN4_DATASET_STANDARD,
-        .size    = 1400,
-        .offset  = 2800,
-        .data    = buf
-    };
-
-
-    TestIOBuffers_init(buffers,
-                       "data 1 8 1000"
-                       RESPONSE_TERMINATOR
-                       "AAAAAAAA\045\224"
-                       RESPONSE_TERMINATOR,
-                       0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_readData(instrument, &actual);
-    TEST_ASSERT_STR_EQ("read data 1 1400 2800"
-                       COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_COMMUNICATION_ERROR, err, RBRInstrumentGen4Error);
-    return true;
-}
-
-TEST_LOGGER3(readdata)
-{
-    uint8_t buf[1400];
-    RBRInstrumentGen4Data expected = {
-        .dataset = RBRINSTRUMENTGEN4_DATASET_STANDARD,
-        .size    = 8,
-        .offset  = 2800,
-        .data    = buf
-    };
-    RBRInstrumentGen4Data actual = {
-        .dataset = RBRINSTRUMENTGEN4_DATASET_STANDARD,
-        .size    = 1400,
-        .offset  = 2800,
-        .data    = buf
-    };
-
-    TestIOBuffers_init(buffers,
-                       "readdata dataset = 1, size = 8, offset = 2800"
-                       RESPONSE_TERMINATOR
-                       "AAAAAAAA\045\224"
-                       RESPONSE_TERMINATOR,
-                       0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_readData(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(expected.dataset, actual.dataset, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.size, actual.size, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.offset, actual.offset, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.data, actual.data, "%p");
-    TEST_ASSERT_STR_EQ("readdata dataset = 1, size = 1400, offset = 2800"
-                       COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
-
-    return true;
-}
-
-TEST_LOGGER3(readdata_offset_mismatch)
-{
-    uint8_t buf[1400];
-    RBRInstrumentGen4Data actual = {
-        .dataset = RBRINSTRUMENTGEN4_DATASET_STANDARD,
-        .size    = 1400,
-        .offset  = 2800,
-        .data    = buf
-    };
-
-    TestIOBuffers_init(buffers,
-                       "readdata dataset = 1, size = 8, offset = 1000"
-                       RESPONSE_TERMINATOR
-                       "AAAAAAAA\045\024"
-                       RESPONSE_TERMINATOR,
-                       0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_readData(instrument, &actual);
-    TEST_ASSERT_STR_EQ("readdata dataset = 1, size = 1400, offset = 2800"
-                       COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_COMMUNICATION_ERROR, err, RBRInstrumentGen4Error);
-    return true;
-}
-
-TEST_LOGGER3(readdata_invalid_dataset)
-{
-    RBRInstrumentGen4Data test = {
-        .dataset = RBRINSTRUMENTGEN4_UNKNOWN_DATASET,
-        .size    = 0,
-        .offset  = 0,
-        .data    = NULL
-    };
-
-    TestIOBuffers_init(buffers, "", 0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_readData(instrument, &test);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
-                        err,
-                        RBRInstrumentGen4Error);
-
-    return true;
-}
-
-TEST_LOGGER3(readdata_crc_failure)
-{
-    uint8_t buf[1400];
-    RBRInstrumentGen4Data expected = {
-        .dataset = RBRINSTRUMENTGEN4_DATASET_STANDARD,
-        .size    = 0,
-        .offset  = 2800,
-        .data    = buf
-    };
-    RBRInstrumentGen4Data actual = {
-        .dataset = RBRINSTRUMENTGEN4_DATASET_STANDARD,
-        .size    = 1400,
-        .offset  = 2800,
-        .data    = buf
-    };
-
-    TestIOBuffers_init(buffers,
-                       "readdata dataset = 1, size = 8, offset = 2800"
-                       RESPONSE_TERMINATOR
-                       "AAAAAAAA00"
-                       RESPONSE_TERMINATOR,
-                       0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_readData(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_CHECKSUM_ERROR, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(expected.dataset, actual.dataset, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.size, actual.size, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.offset, actual.offset, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.data, actual.data, "%p");
-    TEST_ASSERT_STR_EQ("readdata dataset = 1, size = 1400, offset = 2800"
-                       COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
-
-    return true;
-}
-
-TEST_LOGGER2(memformat_support)
-{
-    RBRInstrumentGen4MemoryFormat expected = RBRINSTRUMENTGEN4_MEMFORMAT_RAWBIN00
-                                         | RBRINSTRUMENTGEN4_MEMFORMAT_CALBIN00;
-    RBRInstrumentGen4MemoryFormat actual = RBRINSTRUMENTGEN4_MEMFORMAT_NONE;
-
-    TestIOBuffers_init(buffers,
-                       "memformat support = rawbin00, calbin00"
-                       RESPONSE_TERMINATOR,
-                       0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_getAvailableMemoryFormats(
-        instrument,
-        &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(expected, actual, "0x%04X");
-    TEST_ASSERT_STR_EQ("memformat support" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
-
-    return true;
-}
-
-TEST_LOGGER3(memformat_availabletypes)
-{
-    RBRInstrumentGen4MemoryFormat expected = RBRINSTRUMENTGEN4_MEMFORMAT_RAWBIN00
-                                         | RBRINSTRUMENTGEN4_MEMFORMAT_CALBIN00;
-    RBRInstrumentGen4MemoryFormat actual = RBRINSTRUMENTGEN4_MEMFORMAT_NONE;
-
-    TestIOBuffers_init(buffers,
-                       "memformat availabletypes = rawbin00|calbin00"
-                       RESPONSE_TERMINATOR,
-                       0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_getAvailableMemoryFormats(
-        instrument,
-        &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(expected, actual, "0x%04X");
-    TEST_ASSERT_STR_EQ("memformat availabletypes" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
-
-    return true;
-}
-
-TEST_LOGGER3(memformat_type)
-{
-    RBRInstrumentGen4MemoryFormat expected = RBRINSTRUMENTGEN4_MEMFORMAT_RAWBIN00;
-    RBRInstrumentGen4MemoryFormat actual = RBRINSTRUMENTGEN4_MEMFORMAT_NONE;
-
-    TestIOBuffers_init(buffers,
-                       "memformat type = rawbin00" RESPONSE_TERMINATOR,
-                       0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_getCurrentMemoryFormat(
-        instrument,
-        &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_ENUM_EQ(expected, actual, RBRInstrumentGen4MemoryFormat);
-    TEST_ASSERT_STR_EQ("memformat type" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
-
-    return true;
-}
-
-TEST_LOGGER3(memformat_newtype)
-{
-    RBRInstrumentGen4MemoryFormat expected = RBRINSTRUMENTGEN4_MEMFORMAT_CALBIN00;
-    RBRInstrumentGen4MemoryFormat actual = RBRINSTRUMENTGEN4_MEMFORMAT_NONE;
-
-    TestIOBuffers_init(buffers,
-                       "memformat newtype = calbin00" RESPONSE_TERMINATOR,
-                       0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_getNewMemoryFormat(
-        instrument,
-        &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_ENUM_EQ(expected, actual, RBRInstrumentGen4MemoryFormat);
-    TEST_ASSERT_STR_EQ("memformat newtype" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
-
-    return true;
-}
-
-TEST_LOGGER3(memformat_newtype_set)
-{
-    const char *text = "memformat newtype = calbin00";
-    char expectedCommand[COMMAND_RESPONSE_SIZE];
-    char response[COMMAND_RESPONSE_SIZE];
-    rbr_prepareCommandResponse(text, expectedCommand, response);
-
-    TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_setNewMemoryFormat(
-        instrument,
-        RBRINSTRUMENTGEN4_MEMFORMAT_CALBIN00);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
-
-    return true;
-}
-
-TEST_LOGGER3(postprocessing)
-{
-    RBRInstrumentGen4Postprocessing expected = {
-        .status = RBRINSTRUMENTGEN4_POSTPROCESSING_STATUS_IDLE,
-        .channels = {
-            .count = 5,
-            .channels = {
-                {
-                    .function = RBRINSTRUMENTGEN4_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "pressure_01"
-                },
-                {
-                    .function =
-                        RBRINSTRUMENTGEN4_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
-                    .label = "pressure_01"
-                },
-                {
-                    .function = RBRINSTRUMENTGEN4_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "temperature_01"
-                },
-                {
-                    .function = RBRINSTRUMENTGEN4_POSTPROCESSING_AGGREGATE_STD,
-                    .label = "temperature_01"
-                },
-                {
-                    .function = RBRINSTRUMENTGEN4_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "conductivity_01"
-                }
-            }
-        },
-        .binReference = "pressure_01",
-        .binFilter = RBRINSTRUMENTGEN4_POSTPROCESSING_BINFILTER_NONE,
-        .binSize = 50.0,
-        .tstampMin = RBRINSTRUMENTGEN4_DATETIME_MIN,
-        .tstampMax = RBRINSTRUMENTGEN4_DATETIME_MAX,
-        .depthMin = 10.0,
-        .depthMax = 1000.0,
-        .dcAlpha = 0.08,
-        .dcTau = 8.0,
-        .dcTdelay = 0.35,
-        .dcCtCoeff = 2.4e-4
-    };
-    RBRInstrumentGen4Postprocessing actual;
-
-    const char *response = "postprocessing status = idle, channels = "
-                          "mean(pressure_01)|count(pressure_01)"
-                          "|mean(temperature_01)|std(temperature_01)"
-                          "|mean(conductivity_01), "
-                          "tstamp_min = 20000101000000, "
-                          "tstamp_max = 20991231235959, "
-                          "binsize = 50.0, binreference = pressure_01, "
-                          "depth_min = 10.0, depth_max = 1000.0, "
-                          "binfilter = none, "
-                          "dc_alpha = 0.08, dc_tau = 8.000, dc_tdelay = 0.35, dc_ctcoeff = 2.4e-4" RESPONSE_TERMINATOR;
-    TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_getPostprocessing(instrument,
-                                                             &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_ENUM_EQ(expected.status,
-                        actual.status,
-                        RBRInstrumentGen4PostprocessingStatus);
-    TEST_ASSERT_EQ(expected.channels.count, actual.channels.count, "%" PRIi32);
-    for (int i = 0; i < expected.channels.count; i++)
+    for (int i = 0; tests[i].response != NULL; i++)
     {
-        TEST_ASSERT_ENUM_EQ(expected.channels.channels[i].function,
-                            actual.channels.channels[i].function,
-                            RBRInstrumentGen4PostprocessingAggregate);
-        TEST_ASSERT_STR_EQ(expected.channels.channels[i].label,
-                           actual.channels.channels[i].label);
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4_getStorage(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ("storage" COMMAND_TERMINATOR,
+                           buffers->writeBuffer);
+        TEST_ASSERT_EQ(tests[i].expected.used, actual.used, "%" PRId64);
+        TEST_ASSERT_EQ(tests[i].expected.remaining,
+                       actual.remaining,
+                       "%" PRId64);
+        TEST_ASSERT_EQ(tests[i].expected.size, actual.size, "%" PRId64);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.access,
+                            actual.access,
+                            RBRInstrumentGen4StorageAccess);
     }
-    TEST_ASSERT_STR_EQ(expected.binReference, actual.binReference);
-    TEST_ASSERT_ENUM_EQ(expected.binFilter,
-                        actual.binFilter,
-                        RBRInstrumentGen4PostprocessingBinFilter);
-    TEST_ASSERT_EQ(expected.binSize, actual.binSize, "%f");
-    TEST_ASSERT_EQ(expected.tstampMin, actual.tstampMin, "%" PRIi64);
-    TEST_ASSERT_EQ(expected.tstampMax, actual.tstampMax, "%" PRIi64);
-    TEST_ASSERT_EQ(expected.depthMin, actual.depthMin, "%f");
-    TEST_ASSERT_EQ(expected.depthMax, actual.depthMax, "%f");
-    TEST_ASSERT_EQ(expected.dcAlpha, actual.dcAlpha, "%f");
-    TEST_ASSERT_EQ(expected.dcTau, actual.dcTau, "%f");
-    TEST_ASSERT_EQ(expected.dcTdelay, actual.dcTdelay, "%f");
-    TEST_ASSERT_EQ(expected.dcCtCoeff, actual.dcCtCoeff, "%f");
-    TEST_ASSERT_STR_EQ("postprocessing all" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
 
     return true;
 }
 
-TEST_LOGGER3(postprocessing_set)
+typedef struct SetStorageTest
 {
-    RBRInstrumentGen4Postprocessing postprocessing = {
-        .status = RBRINSTRUMENTGEN4_UNKNOWN_POSTPROCESSING_STATUS,
-        .channels = {
-            .count = 5,
-            .channels = {
-                {
-                    .function = RBRINSTRUMENTGEN4_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "pressure_01"
-                },
-                {
-                    .function =
-                        RBRINSTRUMENTGEN4_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
-                    .label = "pressure_01"
-                },
-                {
-                    .function = RBRINSTRUMENTGEN4_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "temperature_01"
-                },
-                {
-                    .function = RBRINSTRUMENTGEN4_POSTPROCESSING_AGGREGATE_STD,
-                    .label = "temperature_01"
-                },
-                {
-                    .function = RBRINSTRUMENTGEN4_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "conductivity_01"
-                }
-            }
-        },
-        .binReference = "pressure_01",
-        .binFilter = RBRINSTRUMENTGEN4_POSTPROCESSING_BINFILTER_NONE,
-        .binSize = 50.0,
-        .tstampMin = RBRINSTRUMENTGEN4_DATETIME_MIN,
-        .tstampMax = RBRINSTRUMENTGEN4_DATETIME_MAX,
-        .depthMin = 10.0,
-        .depthMax = 1000.0,
-        .dcAlpha = 0.08,
-        .dcTau = 8.0,
-        .dcTdelay = 0.35,
-        .dcCtCoeff = 2.4e-4
+    RBRInstrumentGen4StorageAccess access;
+    const char *command;
+    const char *response;
+    RBRInstrumentGen4Error expectedError;
+} SetStorageTest;
+
+TEST_LOGGER4(setStorage)
+{
+    SetStorageTest tests[] = {
+        { RBRINSTRUMENTGEN4_STORAGE_ACCESS_INSTRUMENT,
+          "storage access=instrument" COMMAND_TERMINATOR,
+          "storage access=instrument" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS },
+        { RBRINSTRUMENTGEN4_STORAGE_ACCESS_USBHOST,
+          "storage access=usbhost" COMMAND_TERMINATOR,
+          "storage access=usbhost" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS },
+        /*
+         * Selecting the location already in use is a warning, which the
+         * library surfaces as a hardware error with the response type
+         * distinguishing it.
+         */
+        { RBRINSTRUMENTGEN4_STORAGE_ACCESS_INSTRUMENT,
+          "storage access=instrument" COMMAND_TERMINATOR,
+          "WRN-305 storage access already at selected location"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR },
+        /* Sentinel members are refused before the command. */
+        { RBRINSTRUMENTGEN4_STORAGE_ACCESS_COUNT,
+          "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE },
+        { RBRINSTRUMENTGEN4_UNKNOWN_STORAGE_ACCESS,
+          "",
+          "",
+          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE },
+        { 0, NULL, NULL, 0 }
     };
 
-    const char *expectedCommand = "postprocessing binreference = pressure_01, "
-                          "binfilter = none, binsize = 50.0"
-                          COMMAND_TERMINATOR
-                          "postprocessing tstamp_min = 20000101000000"
-                          COMMAND_TERMINATOR
-                          "postprocessing tstamp_max = 20991231235959"
-                          COMMAND_TERMINATOR
-                          "postprocessing depth_min = 10.0, depth_max = 1000.0"
-                          COMMAND_TERMINATOR
-                          "postprocessing dc_alpha = 0.080, dc_tau = 8.000, dc_tdelay = 0.350, dc_ctcoeff = 2.4000e-04"
-                          COMMAND_TERMINATOR
-                          "postprocessing channels = mean(pressure_01)"
-                          "|count(pressure_01)|mean(temperature_01)"
-                          "|std(temperature_01)|mean(conductivity_01)"
-                          COMMAND_TERMINATOR;
+    RBRInstrumentGen4Error err;
 
-    const char *response = "postprocessing binreference = pressure_01, "
-                          "binfilter = none, binsize = 50.0"
-                          RESPONSE_TERMINATOR
-                          "postprocessing tstamp_min = 20000101000000"
-                          RESPONSE_TERMINATOR
-                          "postprocessing tstamp_max = 20991231235959"
-                          RESPONSE_TERMINATOR
-                          "postprocessing depth_min = 10.0, depth_max = 1000.0"
-                          RESPONSE_TERMINATOR
-                          "postprocessing dc_alpha = 0.080, dc_tau = 8.000, dc_tdelay = 0.350, dc_ctcoeff = 2.4000e-04"
-                          RESPONSE_TERMINATOR
-                          "postprocessing channels = mean(pressure_01)"
-                          "|count(pressure_01)|mean(temperature_01)"
-                          "|std(temperature_01)|mean(conductivity_01)"
-                          RESPONSE_TERMINATOR;
-
-    TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_setPostprocessing(instrument,
-                                                             &postprocessing);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        RBRInstrumentGen4Storage storage = {
+            .access = tests[i].access
+        };
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4_setStorage(instrument, &storage);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+    }
 
     return true;
 }
 
-TEST_LOGGER3(postprocessing_command)
+typedef struct GetDatasetPoolTest
 {
-    const char *response = "postprocessing status = processing"
-                          RESPONSE_TERMINATOR;
-    TestIOBuffers_init(buffers, response, 0);
+    const char *response;
+    RBRInstrumentGen4Error expectedError;
+    RBRInstrumentGen4DatasetPool expected;
+} GetDatasetPoolTest;
 
-    RBRInstrumentGen4PostprocessingStatus result;
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_setPostprocessingCommand(
-        instrument,
-        RBRINSTRUMENTGEN4_POSTPROCESSING_COMMAND_START,
-        &result);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_POSTPROCESSING_STATUS_PROCESSING,
-                        result,
-                        RBRInstrumentGen4PostprocessingStatus);
-    TEST_ASSERT_STR_EQ("postprocessing command = start" COMMAND_TERMINATOR,
+TEST_LOGGER4(getDatasetPool)
+{
+    GetDatasetPoolTest tests[] = {
+        { "dataset count=3 maxcount=4 list=d1|d2|d5" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 3, 4, { { .label = "d1" }, { .label = "d2" },
+                    { .label = "d5" } } } },
+        { "dataset count=1 maxcount=20 list=DeepCove" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 1, 20, { { .label = "DeepCove" } } } },
+        /* An empty pool reports `none`. */
+        { "dataset count=0 maxcount=4 list=none" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 0, 4, { { .label = "" } } } },
+        /* Keys the library does not model are ignored. */
+        { "dataset count=1 maxcount=4 list=d1 bogus=1" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { 1, 4, { { .label = "d1" } } } },
+        { NULL, 0, { 0, 0, { { .label = "" } } } }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4DatasetPool actual;
+
+    for (int i = 0; tests[i].response != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4_getDatasetPool(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ("dataset" COMMAND_TERMINATOR,
+                           buffers->writeBuffer);
+        TEST_ASSERT_EQ(tests[i].expected.count, actual.count, "%" PRId32);
+        TEST_ASSERT_EQ(tests[i].expected.maxCount,
+                       actual.maxCount,
+                       "%" PRId32);
+        for (int32_t dataset = 0;
+             dataset < RBRINSTRUMENTGEN4_DATASET_COUNT_MAX
+             && dataset < tests[i].expected.count;
+             dataset++)
+        {
+            TEST_ASSERT_STR_EQ(tests[i].expected.pool[dataset].label,
+                               actual.pool[dataset].label);
+        }
+    }
+
+    return true;
+}
+
+typedef struct GetDatasetTest
+{
+    const char *response;
+    RBRInstrumentGen4Error expectedError;
+    RBRInstrumentGen4Dataset expected;
+} GetDatasetTest;
+
+TEST_LOGGER4(getDataset)
+{
+    GetDatasetTest tests[] = {
+        { "dataset d1 status=closed schedulelist=s_cont bytecount=5604"
+          " datatype=float64" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { .label = "d1",
+            .status = RBRINSTRUMENTGEN4_DATASET_STATUS_CLOSED,
+            .scheduleCount = 1,
+            .scheduleList = { "s_cont" },
+            .byteCount = 5604LL,
+            .dataType = RBRINSTRUMENTGEN4_DATATYPE_FLOAT64 } },
+        { "dataset d1 status=open schedulelist=tides_schedule|DO_schedule"
+          " bytecount=3749498 datatype=float32" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { .label = "d1",
+            .status = RBRINSTRUMENTGEN4_DATASET_STATUS_OPEN,
+            .scheduleCount = 2,
+            .scheduleList = { "tides_schedule", "DO_schedule" },
+            .byteCount = 3749498LL,
+            .dataType = RBRINSTRUMENTGEN4_DATATYPE_FLOAT32 } },
+        /* Values the library does not model parse to the unknown members. */
+        { "dataset d1 status=bogus schedulelist=s_cont bytecount=0"
+          " datatype=bogus" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { .label = "d1",
+            .status = RBRINSTRUMENTGEN4_UNKNOWN_DATASET_STATUS,
+            .scheduleCount = 1,
+            .scheduleList = { "s_cont" },
+            .byteCount = 0LL,
+            .dataType = RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE } },
+        /* A dataset which does not exist is a hardware error. */
+        { "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+          { .label = "d1",
+            .status = RBRINSTRUMENTGEN4_UNKNOWN_DATASET_STATUS,
+            .scheduleCount = 0,
+            .scheduleList = { "" },
+            .byteCount = 0LL,
+            .dataType = RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE } },
+        { NULL, 0, { .label = "" } }
+    };
+
+    RBRInstrumentGen4Error err;
+
+    for (int i = 0; tests[i].response != NULL; i++)
+    {
+        RBRInstrumentGen4Dataset actual = { .label = "d1" };
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4_getDataset(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ("dataset d1" COMMAND_TERMINATOR,
+                           buffers->writeBuffer);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.status,
+                            actual.status,
+                            RBRInstrumentGen4DatasetStatus);
+        TEST_ASSERT_EQ(tests[i].expected.scheduleCount,
+                       actual.scheduleCount,
+                       "%" PRId32);
+        for (int32_t schedule = 0;
+             schedule < tests[i].expected.scheduleCount;
+             schedule++)
+        {
+            TEST_ASSERT_STR_EQ(tests[i].expected.scheduleList[schedule],
+                               actual.scheduleList[schedule]);
+        }
+        TEST_ASSERT_EQ(tests[i].expected.byteCount,
+                       actual.byteCount,
+                       "%" PRId64);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.dataType,
+                            actual.dataType,
+                            RBRInstrumentGen4DataType);
+    }
+
+    /* An empty label is refused before the command. */
+    RBRInstrumentGen4Dataset unlabelled = { .label = "" };
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRInstrumentGen4_getDataset(instrument, &unlabelled);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+typedef struct GetBlockTest
+{
+    const char *scheduleLabel;
+    const char *command;
+    const char *response;
+    RBRInstrumentGen4Error expectedError;
+    int64_t expectedByteCount;
+    int64_t expectedOtherCount;
+} GetBlockTest;
+
+TEST_LOGGER4(datasetGetEventsBlock)
+{
+    GetBlockTest tests[] = {
+        { NULL,
+          "dataset d1/events" COMMAND_TERMINATOR,
+          "dataset d1/events bytecount=120 eventcount=5" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS, 120, 5 },
+        /* A dataset with no events reports zero counts. */
+        { NULL,
+          "dataset d1/events" COMMAND_TERMINATOR,
+          "dataset d1/events bytecount=0 eventcount=0" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS, 0, 0 },
+        { NULL,
+          "dataset d1/events" COMMAND_TERMINATOR,
+          "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR, 0, 0 },
+        { NULL, NULL, NULL, 0, 0, 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    RBRInstrumentGen4DatasetEventsBlock block;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4Dataset_getEventsBlock(instrument,
+                                                      &dataset,
+                                                      &block);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+        TEST_ASSERT_EQ(tests[i].expectedByteCount,
+                       block.byteCount,
+                       "%" PRId64);
+        TEST_ASSERT_EQ(tests[i].expectedOtherCount,
+                       block.eventCount,
+                       "%" PRId64);
+    }
+
+    return true;
+}
+
+TEST_LOGGER4(datasetGetMetaBlock)
+{
+    GetBlockTest tests[] = {
+        { NULL,
+          "dataset d1/meta" COMMAND_TERMINATOR,
+          "dataset d1/meta bytecount=4836" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS, 4836, 0 },
+        { NULL,
+          "dataset d1/meta" COMMAND_TERMINATOR,
+          "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR, 0, 0 },
+        { NULL, NULL, NULL, 0, 0, 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    RBRInstrumentGen4DatasetMetaBlock block;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4Dataset_getMetaBlock(instrument,
+                                                    &dataset,
+                                                    &block);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+        TEST_ASSERT_EQ(tests[i].expectedByteCount,
+                       block.byteCount,
+                       "%" PRId64);
+    }
+
+    return true;
+}
+
+TEST_LOGGER4(datasetGetScheduleBlock)
+{
+    GetBlockTest tests[] = {
+        { "s_cont",
+          "dataset d1/s_cont" COMMAND_TERMINATOR,
+          "dataset d1/s_cont bytecount=768" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS, 768, 0 },
+        /*
+         * A schedule the dataset does not know reports the dataset as not
+         * found, naming the dataset rather than the schedule.
+         */
+        { "nosuch",
+          "dataset d1/nosuch" COMMAND_TERMINATOR,
+          "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR, 0, 0 },
+        { NULL, NULL, NULL, 0, 0, 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    RBRInstrumentGen4DatasetScheduleBlock block;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4Dataset_getScheduleBlock(instrument,
+                                                        &dataset,
+                                                        tests[i].scheduleLabel,
+                                                        &block);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+        TEST_ASSERT_EQ(tests[i].expectedByteCount,
+                       block.byteCount,
+                       "%" PRId64);
+    }
+
+    /* An empty schedule label is refused before the command. */
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRInstrumentGen4Dataset_getScheduleBlock(instrument,
+                                                    &dataset,
+                                                    "",
+                                                    &block);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(datasetGetScheduleEventsBlock)
+{
+    GetBlockTest tests[] = {
+        { "s_cont",
+          "dataset d1/s_cont/events" COMMAND_TERMINATOR,
+          "dataset d1/s_cont/events bytecount=120 eventcount=5"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS, 120, 5 },
+        /*
+         * A schedule the dataset does not know reports the dataset as not
+         * found, naming the dataset rather than the schedule.
+         */
+        { "nosuch",
+          "dataset d1/nosuch/events" COMMAND_TERMINATOR,
+          "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR, 0, 0 },
+        { NULL, NULL, NULL, 0, 0, 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    RBRInstrumentGen4DatasetEventsBlock block;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4Dataset_getScheduleEventsBlock(
+            instrument,
+            &dataset,
+            tests[i].scheduleLabel,
+            &block);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+        TEST_ASSERT_EQ(tests[i].expectedByteCount,
+                       block.byteCount,
+                       "%" PRId64);
+        TEST_ASSERT_EQ(tests[i].expectedOtherCount,
+                       block.eventCount,
+                       "%" PRId64);
+    }
+
+    return true;
+}
+
+TEST_LOGGER4(datasetGetScheduleDataBlock)
+{
+    GetBlockTest tests[] = {
+        { "s_cont",
+          "dataset d1/s_cont/data" COMMAND_TERMINATOR,
+          "dataset d1/s_cont/data bytecount=648 samplecount=27"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS, 648, 27 },
+        /* A schedule which never sampled reports zero counts. */
+        { "s_cont",
+          "dataset d1/s_cont/data" COMMAND_TERMINATOR,
+          "dataset d1/s_cont/data bytecount=0 samplecount=0"
+          RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS, 0, 0 },
+        { "nosuch",
+          "dataset d1/nosuch/data" COMMAND_TERMINATOR,
+          "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR, 0, 0 },
+        { NULL, NULL, NULL, 0, 0, 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    RBRInstrumentGen4DatasetDataBlock block;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4Dataset_getScheduleDataBlock(
+            instrument,
+            &dataset,
+            tests[i].scheduleLabel,
+            &block);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+        TEST_ASSERT_EQ(tests[i].expectedByteCount,
+                       block.byteCount,
+                       "%" PRId64);
+        TEST_ASSERT_EQ(tests[i].expectedOtherCount,
+                       block.sampleCount,
+                       "%" PRId64);
+    }
+
+    return true;
+}
+
+typedef struct DeleteDatasetTest
+{
+    const char *label;
+    const char *command;
+    const char *response;
+    RBRInstrumentGen4Error expectedError;
+} DeleteDatasetTest;
+
+TEST_LOGGER4(deleteDataset)
+{
+    DeleteDatasetTest tests[] = {
+        { "d5",
+          "dataset delete d5" COMMAND_TERMINATOR,
+          "dataset delete d5" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_SUCCESS },
+        { "nosuch",
+          "dataset delete nosuch" COMMAND_TERMINATOR,
+          "ERR-304 dataset not found: 'nosuch'" RESPONSE_TERMINATOR,
+          RBRINSTRUMENTGEN4_HARDWARE_ERROR },
+        { NULL, NULL, NULL, 0 }
+    };
+
+    RBRInstrumentGen4Error err;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen4_deleteDataset(instrument, tests[i].label);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
+                            err,
+                            RBRInstrumentGen4Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+    }
+
+    /* An empty label is refused before the command. */
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRInstrumentGen4_deleteDataset(instrument, "");
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(deleteDatasetAll)
+{
+    TestIOBuffers_init(buffers,
+                       "dataset delete all" RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_deleteDatasetAll(
+        instrument);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("dataset delete all" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(datasetDownloadScheduleData)
+{
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    char data[16];
+
+    /* A transfer in bytes: the payload follows the echo, then the CRC. */
+    const char *response =
+        "download d1/s_cont/data bytecount=8 bytestart=0" RESPONSE_TERMINATOR
+        "AAAAAAAA\x25\x94";
+    RBRInstrumentGen4DownloadData download = {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES,
+        .count = 8,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadScheduleData(instrument,
+                                                        &dataset,
+                                                        "s_cont",
+                                                        &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("download d1/s_cont/data bytecount=8 bytestart=0"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_EQ(INT64_C(8), download.count, "%" PRId64);
+    TEST_ASSERT_EQ(INT64_C(8), download.byteCount, "%" PRId64);
+    TEST_ASSERT(memcmp(data, "AAAAAAAA", 8) == 0);
+
+    /*
+     * A transfer in samples: the echo appends the byte count, and an
+     * overrunning request is clamped to what the schedule holds.
+     */
+    response =
+        "download d1/s_cont/data samplecount=2 samplestart=0 bytecount=8"
+        RESPONSE_TERMINATOR
+        "AAAAAAAA\x25\x94";
+    download = (RBRInstrumentGen4DownloadData) {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_SAMPLES,
+        .count = 100,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadScheduleData(instrument,
+                                                        &dataset,
+                                                        "s_cont",
+                                                        &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("download d1/s_cont/data samplecount=100 samplestart=0"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_EQ(INT64_C(2), download.count, "%" PRId64);
+    TEST_ASSERT_EQ(INT64_C(8), download.byteCount, "%" PRId64);
+
+    /* A corrupted transfer fails its CRC check. */
+    response =
+        "download d1/s_cont/data bytecount=8 bytestart=0" RESPONSE_TERMINATOR
+        "AAAAAAAB\x25\x94";
+    download = (RBRInstrumentGen4DownloadData) {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES,
+        .count = 8,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadScheduleData(instrument,
+                                                        &dataset,
+                                                        "s_cont",
+                                                        &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_CHECKSUM_ERROR,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    /* A response larger than the buffer is refused before writing it. */
+    char small[4];
+    response =
+        "download d1/s_cont/data bytecount=8 bytestart=0" RESPONSE_TERMINATOR
+        "AAAAAAAA\x25\x94";
+    download = (RBRInstrumentGen4DownloadData) {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES,
+        .count = 8,
+        .start = 0,
+        .data = small,
+        .dataSize = sizeof(small)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadScheduleData(instrument,
+                                                        &dataset,
+                                                        "s_cont",
+                                                        &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    /* A dataset the instrument does not know is a hardware error. */
+    response = "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR;
+    download = (RBRInstrumentGen4DownloadData) {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES,
+        .count = 8,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadScheduleData(instrument,
+                                                        &dataset,
+                                                        "s_cont",
+                                                        &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+                        err,
+                        RBRInstrumentGen4Error);
+
+    /* An invalid request is refused before the command. */
+    download = (RBRInstrumentGen4DownloadData) {
+        .unit = RBRINSTRUMENTGEN4_UNKNOWN_DOWNLOAD_DATA_UNIT,
+        .count = 8,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRInstrumentGen4Dataset_downloadScheduleData(instrument,
+                                                        &dataset,
+                                                        "s_cont",
+                                                        &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(datasetDownloadEvents)
+{
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    char data[24];
+
+    /* A whole-dataset transfer measured in events. */
+    const char *response =
+        "download d1/events eventcount=2 eventstart=0 bytecount=16"
+        RESPONSE_TERMINATOR
+        "EVENTDATA0123456\xb8\x0d";
+    RBRInstrumentGen4DownloadEvents download = {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_EVENTS,
+        .count = 2,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadEvents(instrument,
+                                                  &dataset,
+                                                  &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("download d1/events eventcount=2 eventstart=0"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_EQ(INT64_C(2), download.count, "%" PRId64);
+    TEST_ASSERT_EQ(INT64_C(16), download.byteCount, "%" PRId64);
+    TEST_ASSERT(memcmp(data, "EVENTDATA0123456", 16) == 0);
+
+    return true;
+}
+
+TEST_LOGGER4(datasetDownloadScheduleEvents)
+{
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    char data[24];
+
+    const char *response =
+        "download d1/s_cont/events eventcount=2 eventstart=0 bytecount=16"
+        RESPONSE_TERMINATOR
+        "EVENTDATA0123456\xb8\x0d";
+    RBRInstrumentGen4DownloadEvents download = {
+        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_EVENTS,
+        .count = 2,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadScheduleEvents(instrument,
+                                                          &dataset,
+                                                          "s_cont",
+                                                          &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("download d1/s_cont/events eventcount=2 eventstart=0"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_EQ(INT64_C(2), download.count, "%" PRId64);
+    TEST_ASSERT_EQ(INT64_C(16), download.byteCount, "%" PRId64);
+
+    return true;
+}
+
+TEST_LOGGER4(datasetDownloadMeta)
+{
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Dataset dataset = { .label = "d1" };
+    char data[16];
+
+    const char *response =
+        "download d1/meta bytecount=8 bytestart=0" RESPONSE_TERMINATOR
+        "METAMETA\xc3\x14";
+    RBRInstrumentGen4DownloadMeta download = {
+        .byteCount = 8,
+        .byteStart = 0,
+        .data = data,
+        .dataSize = sizeof(data)
+    };
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRInstrumentGen4Dataset_downloadMeta(instrument,
+                                                &dataset,
+                                                &download);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("download d1/meta bytecount=8 bytestart=0"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT_EQ(INT64_C(8), download.byteCount, "%" PRId64);
+    TEST_ASSERT(memcmp(data, "METAMETA", 8) == 0);
 
     return true;
 }

@@ -45,10 +45,16 @@ const char *RBRInstrumentGen4HardwareError_name(RBRInstrumentGen4HardwareError e
         return "feature not supported by hardware";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_SYNTAX_ERROR:
         return "syntax error";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_INVALID_QUALIFIER:
+        return "invalid qualifier";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_MISSING_QUALIFIER:
+        return "missing qualifier";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_LABEL_ALREADY_IN_USE:
         return "label is already in use";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_PARAMETER_IS_READ_ONLY:
         return "parameter is read only";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_MISPLACED_ARGUMENT:
+        return "misplaced argument";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_ILLEGAL_CHARACTER_IN_LABEL:
         return "illegal character in label";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_QUALIFIER_USED_BY_ANOTHER_OBJECT:
@@ -60,6 +66,15 @@ const char *RBRInstrumentGen4HardwareError_name(RBRInstrumentGen4HardwareError e
         return "unknown error";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_MEMORY_ERASE_NOT_COMPLETED:
         return "memory erase not completed";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_DOWNLOAD_TRACKING_FAILED:
+        return "download tracking failed, specify all parameters";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_STORAGE_ACCESS_MUST_BE_SET_TO_INSTRUMENT:
+        return "storage access must be set to 'instrument' prior to being"
+               " used";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_DATASET_NOT_FOUND:
+        return "dataset not found";
+    case RBRINSTRUMENTGEN4_HARDWARE_ERROR_STORAGE_ACCESS_ALREADY_AT_SELECTED_LOCATION:
+        return "storage access already at selected location";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY:
         return "estimated memory usage exceeds capacity";
     case RBRINSTRUMENTGEN4_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST:
