@@ -132,9 +132,8 @@ extern "C"
         int32_t specifiedGroupLabelCnt);
 
     /**
-     * \brief Set \a config pointers to \a schedulePool schedules with labels
-     *        that match \a specifiedScheduleLabels.
-     * \param config destination config
+     * \brief Fill \a scheduleList with \a specifiedScheduleLabels.
+     * \param scheduleList destination list
      * \param schedulePool pool of schedules to match to \a specifiedScheduleLabels
      * \param specifiedScheduleLabels array of labels to match to \a schedulePool
      * \param specifiedScheduleLabelCnt number of labels in \a specifiedScheduleLabels
@@ -143,7 +142,7 @@ extern "C"
      * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the target is too small for the requested number of children
      */
     RBRInstrumentGen4Error RBRInstrumentGen4_populateConfigSchedules(
-        RBRInstrumentGen4Config *config,
+        RBRInstrumentGen4LabelList *scheduleList,
         RBRInstrumentGen4SchedulePool *schedulePool,
         const RBRInstrumentGen4Label specifiedScheduleLabels[],
         int32_t specifiedScheduleLabelCnt);

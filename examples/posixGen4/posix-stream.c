@@ -223,7 +223,11 @@ int main(int argc, char *argv[])
 
     RBRInstrumentGen4_deleteDatasetAll(instrument);
 
-    RBRInstrumentGen4ConfigPool configPool;
+    RBRInstrumentGen4Config configBuf[RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX];
+    RBRInstrumentGen4ConfigPool configPool = {
+        .size = RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX,
+        .pool = configBuf
+    };
     RBRInstrumentGen4_getConfigPool(instrument, &configPool);
     RBRInstrumentGen4_deleteConfigAll(instrument);
 

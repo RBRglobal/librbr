@@ -364,15 +364,29 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleGroups(
 
 // can be static.
 RBRInstrumentGen4Error RBRInstrumentGen4_populateConfigSchedules(
-    RBRInstrumentGen4Config *config,
+    RBRInstrumentGen4LabelList *scheduleList,
     RBRInstrumentGen4SchedulePool *schedulePool,
     const RBRInstrumentGen4Label specifiedScheduleLabels[],
     int32_t specifiedScheduleLabelCnt)
 {
-    (void)config;
+    /* The schedules were created moments ago, so the pool read at startup
+     * cannot be used to check them. */
     (void)schedulePool;
-    (void)specifiedScheduleLabels;
-    (void)specifiedScheduleLabelCnt;
+
+    if (specifiedScheduleLabelCnt > scheduleList->size)
+    {
+        fprintf(stderr, "Error: schedule list buffer too small!\n");
+        return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+    }
+
+    for (int32_t i = 0; i < specifiedScheduleLabelCnt; i++)
+    {
+        snprintf(scheduleList->labels[i],
+                 sizeof(scheduleList->labels[i]),
+                 "%s",
+                 specifiedScheduleLabels[i]);
+    }
+    scheduleList->count = specifiedScheduleLabelCnt;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
@@ -550,9 +564,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewConfig(
     memset(newConfig, 0, sizeof(RBRInstrumentGen4Config));
     snprintf(newConfig->label, sizeof(newConfig->label), "%s", newConfigLabel);
 
+    RBRInstrumentGen4Label labelBuf[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
+    RBRInstrumentGen4LabelList scheduleList = {
+        .size = RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX,
+        .labels = labelBuf
+    };
+
     RBRInstrumentGen4_createConfig(instrument, newConfigLabel); // warning: read err!!!
-    RBRInstrumentGen4_populateConfigSchedules(newConfig, schedulePool, specifiedScheduleLabels, specifiedScheduleLabelCnt); // warning: read err!!!
-    RBRInstrumentGen4_setConfig(instrument, newConfig); // warning: read err!!!
+    RBRInstrumentGen4_populateConfigSchedules(&scheduleList, schedulePool, specifiedScheduleLabels, specifiedScheduleLabelCnt); // warning: read err!!!
+    // warning: read err!!!
+    RBRInstrumentGen4_setConfig(instrument, newConfig, &scheduleList);
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 //-------------------------------------------------------------------------------

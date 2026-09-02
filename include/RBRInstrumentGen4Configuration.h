@@ -1196,9 +1196,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getGroup(
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the group cannot be written
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty,
- *                                                    the list's count does
- *                                                    not fit its array, or a
- *                                                    channel label is empty
+ *                                                    \a channelList is `NULL`,
+ *                                                    its count does not fit
+ *                                                    its array, or a channel
+ *                                                    label is empty
  * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit the
  *                                            command
  * \see RBRInstrumentGen4_getGroup()
@@ -1744,27 +1745,30 @@ typedef struct RBRInstrumentGen4Config
      * Set by the caller to select the configuration to read.
      */
     char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
-
-    /** \brief The number of schedules in the configuration. */
-    int32_t scheduleCount;
-
-    /** \brief The labels of the schedules in the configuration. */
-    char scheduleList[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX]
-                     [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 } RBRInstrumentGen4Config;
 
 /**
- * \brief Populate the parameters of a configuration.
+ * \brief Read the schedules in a configuration.
  *
  * The caller sets RBRInstrumentGen4Config.label to select the configuration.
+ * The labels of the configuration's schedules are written to
+ * \a scheduleList when it is given.
  *
  * \note Issues the `config <config_label>` command.
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] config the configuration to read, selected by its label
+ * \param [out] scheduleList the schedules in the configuration, or `NULL` to
+ *                           skip them
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the configuration is read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a scheduleList cannot hold every
+ *                                      reported schedule; the first `size` are
+ *                                      stored, and `count` is set to the value
+ *                                      reported by the instrument which WILL
+ *                                      exceed `size`
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the configuration does not
  *                                           exist
  * \see RBRInstrumentGen4_getConfigPool()
@@ -1773,49 +1777,58 @@ typedef struct RBRInstrumentGen4Config
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getConfig(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Config *config);
+    RBRInstrumentGen4Config *config,
+    RBRInstrumentGen4LabelList *scheduleList);
 
 /**
  * \brief Set the schedules in a configuration.
  *
- * Sends `schedulelist`, the command's only parameter. A zero
- * RBRInstrumentGen4Config.scheduleCount sends `none`.
+ * Sends `schedulelist`, the command's only parameter. An empty
+ * \a scheduleList sends `none`.
  *
  * \note Issues the `config <config_label>` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] config the configuration to write
+ * \param [in] config the configuration to write, selected by its label
+ * \param [in] scheduleList the schedules to put in the configuration
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the configuration is written
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the configuration cannot be
  *                                           written
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty,
- *                                                    the schedule count is out
- *                                                    of range, or a schedule
- *                                                    label is empty
- * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit
+ *                                                    \a scheduleList is
+ *                                                    `NULL`, its count does
+ *                                                    not fit its array, or a
+ *                                                    schedule label is empty
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit the
+ *                                            command
  * \see RBRInstrumentGen4_getConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_setConfig(
     RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Config *config);
+    const RBRInstrumentGen4Config *config,
+    const RBRInstrumentGen4LabelList *scheduleList);
 
 /**
- * \brief `config` command parameters.
+ * \brief `config` command parameters. The `list` is stored in a user provided
+ * buffer (#pool).
  *
  * \see RBRInstrumentGen4_getConfigPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
 typedef struct RBRInstrumentGen4ConfigPool
 {
+    /** \brief The number of configurations #pool can hold. */
+    int32_t size;
+
     /**
      * \brief The number of configurations defined on the instrument.
      *
-     * \warning Use `min(count, RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX)` to avoid
-     * an out-of-bounds error when accessing #pool if 
-     * #maxCount > #RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX.
+     * \warning This field will be larger than #size when
+     * #RBRINSTRUMENTGEN4_TRUNCATED is returned by the getter. Care should be
+     * taken to avoid out-of-bounds access when iterating over #pool.
      */
     int32_t count;
 
@@ -1825,8 +1838,8 @@ typedef struct RBRInstrumentGen4ConfigPool
      */
     int32_t maxCount;
 
-    /** \brief The pool of configurations. */
-    RBRInstrumentGen4Config pool[RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX];
+    /** \brief User provided buffer of the configurations defined. */
+    RBRInstrumentGen4Config *pool;
 } RBRInstrumentGen4ConfigPool;
 
 /**
@@ -1838,10 +1851,15 @@ typedef struct RBRInstrumentGen4ConfigPool
  * \note Issues the `config` command.
  *
  * \param [in] instrument the instrument connection
- * \param [out] configPool the populated pool of configurations
+ * \param [in,out] configPool the configurations defined, labels only
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the configurations are read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a configPool cannot hold every
+ *                                      reported configuration; the first
+ *                                      `size` are stored, and `count` is set
+ *                                      to the value reported by the instrument
+ *                                      which WILL exceed `size`
  * \see RBRInstrumentGen4_getConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
