@@ -115,9 +115,9 @@ extern "C"
         int32_t specifiedChannelLabelCnt);
 
     /**
-     * \brief Set \a schedule pointers to \a groupPool groups with labels
-     *        that match \a specifiedGroupLabels.
-     * \param schedule destination schedule
+     * \brief Fill \a groupList with the \a groupPool groups whose labels
+     *        match \a specifiedGroupLabels.
+     * \param groupList destination list
      * \param groupPool pool of groups to match to \a specifiedGroupLabels
      * \param specifiedGroupLabels array of labels to match to \a groupPool
      * \param specifiedGroupLabelCnt number of labels in \a specifiedGroupLabels
@@ -126,7 +126,7 @@ extern "C"
      * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the target is too small for the requested number of children
      */
     RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleGroups(
-        RBRInstrumentGen4Schedule *schedule,
+        RBRInstrumentGen4LabelList *groupList,
         RBRInstrumentGen4GroupPool *groupPool,
         const RBRInstrumentGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt);
@@ -253,6 +253,7 @@ extern "C"
         int32_t specifiedGroupLabelCnt,
         RBRInstrumentGen4ScheduleMode mode,
         RBRInstrumentGen4GroupPool *groupPool,
+        RBRInstrumentGen4LabelList *groupList,
         RBRInstrumentGen4Schedule *newSchedule);
 
     /**
@@ -281,7 +282,7 @@ extern "C"
      * \param [in] groupPool the pool to search for children in
      * \param [in] period the sample period in milliseconds
      * \param [in] castDetection enable cast detection when true
-     * \param [inout] groupPool the pool to add the parent to
+     * \param [out] groupList the groups given to the parent
      * \param [out] newSchedule the new parent
      * \return #RBRINSTRUMENTGEN4_SUCCESS when the parent is successfully created and populated
      * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
@@ -299,6 +300,7 @@ extern "C"
         RBRInstrumentGen4Period period,
         bool castDetection,
         RBRInstrumentGen4GroupPool *groupPool,
+        RBRInstrumentGen4LabelList *groupList,
         RBRInstrumentGen4Schedule *newSchedule);
 
     /**

@@ -156,7 +156,12 @@ int main(int argc, char *argv[])
 
     RBRInstrumentGen4_deleteConfigAll(instrument);
 
-    RBRInstrumentGen4SchedulePool schedulePool;
+    RBRInstrumentGen4Schedule
+        scheduleBuf[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
+    RBRInstrumentGen4SchedulePool schedulePool = {
+        .size = RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX,
+        .pool = scheduleBuf
+    };
     RBRInstrumentGen4_deleteScheduleAll(instrument);
 
     RBRInstrumentGen4GroupPool groupPool;
@@ -208,6 +213,11 @@ int main(int argc, char *argv[])
 
     /************ schedule definition ************/
     RBRInstrumentGen4Schedule schedule;
+    RBRInstrumentGen4Label groupLabelBuf[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX];
+    RBRInstrumentGen4LabelList groupList = {
+        .size = RBRINSTRUMENTGEN4_GROUP_COUNT_MAX,
+        .labels = groupLabelBuf
+    };
     RBRInstrumentGen4_initNewScheduleContinuous(instrument,
                          SCHEDULE_PTS_LABEL,
                          SCHEDULE_PTS_GROUPS,
@@ -216,6 +226,7 @@ int main(int argc, char *argv[])
                          SCHEDULE_PTS_PERIOD,
                          SCHEDULE_PTS_CASTDETECTION,
                          &groupPool,
+                         &groupList,
                          &schedule);
 
     /************ configuration definition ************/

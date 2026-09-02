@@ -227,7 +227,12 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_getConfigPool(instrument, &configPool);
     RBRInstrumentGen4_deleteConfigAll(instrument);
 
-    RBRInstrumentGen4SchedulePool schedulePool;
+    RBRInstrumentGen4Schedule
+        scheduleBuf[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
+    RBRInstrumentGen4SchedulePool schedulePool = {
+        .size = RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX,
+        .pool = scheduleBuf
+    };
     RBRInstrumentGen4_getSchedulePool(instrument, &schedulePool);
     RBRInstrumentGen4_deleteScheduleAll(instrument);
 
@@ -259,6 +264,11 @@ int main(int argc, char *argv[])
 
     /************ schedule definition ************/
     RBRInstrumentGen4Schedule schedule_pts;
+    RBRInstrumentGen4Label groupLabelBuf[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX];
+    RBRInstrumentGen4LabelList groupList = {
+        .size = RBRINSTRUMENTGEN4_GROUP_COUNT_MAX,
+        .labels = groupLabelBuf
+    };
     RBRInstrumentGen4_initNewScheduleContinuous(instrument,
                           SCHEDULE_PTS_LABEL,
                           SCHEDULE_PTS_GROUPS,
@@ -267,6 +277,7 @@ int main(int argc, char *argv[])
                           SCHEDULE_PTS_PERIOD,
                           SCHEDULE_PTS_CASTDETECTION,
                           &groupPool,
+                          &groupList,
                           &schedule_pts);
 
     /* The link we are connected over is where this schedule should stream. */
@@ -293,7 +304,7 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
     // warning: read error for RBRInstrumentGen4_initNewSchedule!!!
-    RBRInstrumentGen4_setSchedule(instrument, &schedule_pts);
+    RBRInstrumentGen4_setSchedule(instrument, &schedule_pts, &groupList);
 
     /************ configuration definition ************/
     RBRInstrumentGen4Config config_ascent;
