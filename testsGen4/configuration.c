@@ -996,12 +996,6 @@ static bool test_channel(RBRInstrumentGen4Channel *expected,
     TEST_ASSERT_EQ(expected->measuringTime, actual->measuringTime, "%" PRIi32);
     TEST_ASSERT_EQ(expected->readOutTime, actual->readOutTime, "%" PRIi32);
     TEST_ASSERT_STR_EQ(expected->userUnits, actual->userUnits);
-    TEST_ASSERT_EQ(expected->groupCount, actual->groupCount, "%" PRIi32);
-    for (int32_t group = 0; group < expected->groupCount; ++group)
-    {
-        TEST_ASSERT_STR_EQ(expected->groupList[group],
-                           actual->groupList[group]);
-    }
     TEST_ASSERT_ENUM_EQ(expected->nature,
                         actual->nature,
                         RBRInstrumentGen4ChannelNature);
@@ -1018,7 +1012,11 @@ TEST_LOGGER4(channellist)
     const char *expected[] = {
         "temperature_00", "pressure_00", "seapressure_00", "depth_00"
     };
-    RBRInstrumentGen4ChannelPool actual;
+    RBRInstrumentGen4Channel channelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4ChannelPool actual = {
+        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+        .pool = channelBuf
+    };
 
     TestIOBuffers_init(
         buffers,
@@ -1040,9 +1038,40 @@ TEST_LOGGER4(channellist)
     return true;
 }
 
+TEST_LOGGER4(channellistTooSmall)
+{
+    RBRInstrumentGen4Channel channelBuf[2];
+    RBRInstrumentGen4ChannelPool actual = {
+        .size = 2,
+        .pool = channelBuf
+    };
+
+    TestIOBuffers_init(
+        buffers,
+        "channel count=4 "
+        "list=temperature_00|pressure_00|seapressure_00|depth_00"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getChannelPool(instrument,
+                                                                  &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_TRUNCATED,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(4, actual.count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("temperature_00", actual.pool[0].label);
+    TEST_ASSERT_STR_EQ("pressure_00", actual.pool[1].label);
+
+    return true;
+}
+
 TEST_LOGGER4(channellistScientific)
 {
-    RBRInstrumentGen4ChannelPool actual;
+    RBRInstrumentGen4Channel channelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4ChannelPool actual = {
+        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+        .pool = channelBuf
+    };
 
     TestIOBuffers_init(
         buffers,
@@ -1066,7 +1095,11 @@ TEST_LOGGER4(channellistScientific)
 
 TEST_LOGGER4(channellistWithoutChannels)
 {
-    RBRInstrumentGen4ChannelPool actual;
+    RBRInstrumentGen4Channel channelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4ChannelPool actual = {
+        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+        .pool = channelBuf
+    };
 
     TestIOBuffers_init(buffers,
                        "channel system count=0 list=none" RESPONSE_TERMINATOR,
@@ -1086,7 +1119,11 @@ TEST_LOGGER4(channellistWithoutChannels)
 
 TEST_LOGGER4(channellistUnknownNature)
 {
-    RBRInstrumentGen4ChannelPool actual;
+    RBRInstrumentGen4Channel channelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4ChannelPool actual = {
+        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+        .pool = channelBuf
+    };
 
     TestIOBuffers_init(buffers, "", 0);
 
@@ -1110,7 +1147,6 @@ TEST_LOGGER4(channel)
         .measuringTime = 13,
         .readOutTime = 1,
         .userUnits = "C",
-        .groupCount = 0,
         .nature = RBRINSTRUMENTGEN4_CHANNEL_NATURE_SCIENTIFIC,
         .derived = false,
         .node = "self",
@@ -1148,7 +1184,6 @@ TEST_LOGGER4(channelDerived)
         .measuringTime = 0,
         .readOutTime = 0,
         .userUnits = "m",
-        .groupCount = 0,
         .nature = RBRINSTRUMENTGEN4_CHANNEL_NATURE_SCIENTIFIC,
         .derived = true,
         .node = "",
@@ -1175,6 +1210,8 @@ TEST_LOGGER4(channelDerived)
     return test_channel(&expected, &actual);
 }
 
+/* Group membership is reported by the instrument but not modelled here: the
+ * parameter is skipped. */
 TEST_LOGGER4(channelWithGroups)
 {
     RBRInstrumentGen4Channel actual = {
@@ -1193,9 +1230,8 @@ TEST_LOGGER4(channelWithGroups)
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getChannel(instrument,
                                                               &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(2, actual.groupCount, "%" PRIi32);
-    TEST_ASSERT_STR_EQ("surface", actual.groupList[0]);
-    TEST_ASSERT_STR_EQ("profile", actual.groupList[1]);
+    TEST_ASSERT_STR_EQ("temp006", actual.type);
+    TEST_ASSERT_STR_EQ("thermistor_00", actual.device);
 
     return true;
 }

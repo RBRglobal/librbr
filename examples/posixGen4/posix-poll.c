@@ -119,8 +119,12 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    // populate all channels and calibrations.
-    RBRInstrumentGen4ChannelPool channelPool;
+    // read the channel pool
+    RBRInstrumentGen4Channel channelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4ChannelPool channelPool = {
+        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+        .pool = channelBuf
+    };
     RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
 
     // create group

@@ -733,7 +733,6 @@ const char *RBRInstrumentGen4ChannelNature_name(
 /**
  * \brief Instrument `channel <channel_label>` command parameters.
  *
- * \see RBRInstrumentGen4ChannelPool
  * \see RBRInstrumentGen4_getChannel()
  * \see RBRInstrumentGen4_setChannel()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
@@ -771,18 +770,6 @@ typedef struct RBRInstrumentGen4Channel
      */
     char userUnits[RBRINSTRUMENTGEN4_CHANNEL_UNIT_MAX + 1];
 
-    /** \brief The number of groups this channel belongs to. */
-    const int32_t groupCount;
-
-    /**
-     * \brief The labels of the groups this channel belongs to.
-     *
-     * Membership is changed through the `group` command, not here.
-     * \see RBRInstrumentGen4_setGroup()
-     */
-    const char groupList[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX]
-                        [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
-
     /** \brief Whether the channel measures or reports housekeeping. */
     const RBRInstrumentGen4ChannelNature nature;
 
@@ -816,7 +803,8 @@ typedef struct RBRInstrumentGen4Channel
 } RBRInstrumentGen4Channel;
 
 /**
- * \brief Instrument `channel` command parameters.
+ * \brief `channel` command parameters. The `list` is stored in a user provided
+ * buffer (#pool).
  *
  * \see RBRInstrumentGen4_getChannelPool()
  * \see RBRInstrumentGen4_getChannelPoolByNature()
@@ -824,22 +812,25 @@ typedef struct RBRInstrumentGen4Channel
  */
 typedef struct RBRInstrumentGen4ChannelPool
 {
+    /** \brief The number of channels #pool can hold. */
+    int32_t size;
+
     /**
      * \brief The number of channels reported.
      *
-     * \warning Use `min(count, RBRINSTRUMENTGEN4_CHANNEL_MAX)` to avoid an
-     * out-of-bounds error when accessing #pool if 
-     * #count > #RBRINSTRUMENTGEN4_CHANNEL_MAX.
+     * \warning This field will be larger than #size when
+     * #RBRINSTRUMENTGEN4_TRUNCATED is returned by the getter. Care should be
+     * taken to avoid out-of-bounds access when iterating over #pool.
      */
     int32_t count;
 
     /**
-     * \brief The channels reported.
+     * \brief User provided buffer of the channels reported.
      *
      * Discovery reports nothing but the labels; read a channel's parameters
      * with RBRInstrumentGen4_getChannel().
      */
-    RBRInstrumentGen4Channel pool[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4Channel *pool;
 } RBRInstrumentGen4ChannelPool;
 
 /**
@@ -889,7 +880,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setChannel(
     const RBRInstrumentGen4Channel *channel);
 
 /**
- * \brief Populate the pool of channels configured on the instrument.
+ * \brief Read the labels of the channels configured on the instrument.
  *
  * Reports nothing but the labels; read a channel's parameters with
  * RBRInstrumentGen4_getChannel().
@@ -897,10 +888,15 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setChannel(
  * \note Issues the `channel` command.
  *
  * \param [in] instrument the instrument connection
- * \param [out] channelPool the labels of the channels present
+ * \param [in,out] channelPool the channels present, labels only
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the pool is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a channelPool cannot hold every
+ *                                      reported channel; the first `size` are
+ *                                      stored, and `count` is set to the value
+ *                                      reported by the instrument which WILL
+ *                                      exceed `size`
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the channel pool cannot be read
  * \see RBRInstrumentGen4_getChannelPoolByNature()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
@@ -910,7 +906,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(
     RBRInstrumentGen4ChannelPool *channelPool);
 
 /**
- * \brief Populate the pool of channels of one nature.
+ * \brief Read the labels of the channels of one nature.
  *
  * Reports nothing but the labels; read a channel's parameters with
  * RBRInstrumentGen4_getChannel().
@@ -919,10 +915,15 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(
  *
  * \param [in] instrument the instrument connection
  * \param [in] nature the nature of the channels to report
- * \param [out] channelPool the labels of the channels present
+ * \param [in,out] channelPool the channels present, labels only
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the pool is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a channelPool cannot hold every
+ *                                      reported channel; the first `size` are
+ *                                      stored, and `count` is set to the value
+ *                                      reported by the instrument which WILL
+ *                                      exceed `size`
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the channel pool cannot be read
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the nature is not
  *                                                    one the command accepts

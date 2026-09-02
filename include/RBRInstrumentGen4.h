@@ -84,8 +84,7 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
  * The default maximum of 32 channels is reflective of the maximum number of
  * channels supported by RBR instruments, but most instruments have far fewer.
  * Adjusting this value will dramatically affect the size of some structures;
- * notably RBRInstrumentGen4Sample, but also RBRInstrumentGen4ChannelPool (used by
- * RBRInstrumentGen4_getChannelPool()) and RBRInstrumentGen4Calibration.n
+ * notably RBRInstrumentGen4Sample, but also RBRInstrumentGen4Calibration.n
  */
 #ifndef RBRINSTRUMENTGEN4_CHANNEL_MAX
 #define RBRINSTRUMENTGEN4_CHANNEL_MAX 32
@@ -236,6 +235,11 @@ typedef enum RBRInstrumentGen4Error
     RBRINSTRUMENTGEN4_CHECKSUM_ERROR,
     /** The given value is out of bounds or otherwise unsuitable. */
     RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+    /**
+     * The command succeeded but the user provided buffer could not hold
+     * everything the instrument reported; only what fits was stored.
+     */
+    RBRINSTRUMENTGEN4_TRUNCATED,
     /**
      * Used internally when the parser encounters a sample.
      *

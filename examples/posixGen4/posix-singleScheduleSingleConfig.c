@@ -163,33 +163,36 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_deleteGroupAll(instrument);
 
     /************ group definition ************/
-    /* populate all channelPool and calibrations */
-    RBRInstrumentGen4ChannelPool channelPool;
+    /* read the channel pool, then each channel and its calibration */
+    RBRInstrumentGen4Channel channelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4ChannelPool channelPool = {
+        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+        .pool = channelBuf
+    };
     RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
 
     for (int32_t i = 0; i < channelPool.count; i++)
     {
-        RBRInstrumentGen4_getChannel(instrument, &channelPool.pool[i]);
+        RBRInstrumentGen4Channel *channel = &channelPool.pool[i];
+        RBRInstrumentGen4_getChannel(instrument, channel);
         printf(
             "%s,%s,%d,%d,%d,%s,%s,%s,%u",
-            channelPool.pool[i].label,
-            channelPool.pool[i].type,
-            channelPool.pool[i].settlingTime,
-            channelPool.pool[i].measuringTime,
-            channelPool.pool[i].readOutTime,
-            channelPool.pool[i].userUnits,
-            RBRInstrumentGen4ChannelNature_name(channelPool.pool[i].nature),
-            channelPool.pool[i].device,
-            channelPool.pool[i].derived
+            channel->label,
+            channel->type,
+            channel->settlingTime,
+            channel->measuringTime,
+            channel->readOutTime,
+            channel->userUnits,
+            RBRInstrumentGen4ChannelNature_name(channel->nature),
+            channel->device,
+            channel->derived
         );
-    }
-    for (int32_t i = 0; i < channelPool.count; i++)
-    {
+
         RBRInstrumentGen4Calibration calibration;
         snprintf(calibration.label,
                  sizeof(calibration.label),
                  "%s",
-                 channelPool.pool[i].label);
+                 channel->label);
         RBRInstrumentGen4_getCalibration(instrument, &calibration);
     }
 

@@ -290,11 +290,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    // init pointer array pointing to sourceObjects
-    RBRInstrumentGen4Channel *_newPtrList[RBRINSTRUMENTGEN4_CHANNEL_MAX] = { NULL };
-
     // find out each label specified, and compare with all sourceObjList.
-    // and fill the pointer array.
     int32_t _currentIndex = 0;
     int32_t _totalSourceObjCnt = channelPool->count;
 
@@ -304,9 +300,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
         flag = false;
         for (int32_t i = 0; i < _totalSourceObjCnt; i++)
         {
-            if (strcmp(channelPool->pool[i].label, specifiedChannelLabels[j]) == 0)
+            const char *label = channelPool->pool[i].label;
+            if (strcmp(label, specifiedChannelLabels[j]) == 0)
             {
-                _newPtrList[_currentIndex] = &(channelPool->pool[i]);
+                snprintf(group->channelList[_currentIndex],
+                         sizeof(group->channelList[_currentIndex]),
+                         "%s",
+                         label);
                 _currentIndex++;
                 flag = true;
                 break;
@@ -324,14 +324,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    // Only the channels which were actually found are copied to the group.
-    for (int32_t i = 0; i < _currentIndex; i++)
-    {
-        snprintf(group->channelList[i],
-                 sizeof(group->channelList[i]),
-                 "%s",
-                 _newPtrList[i]->label);
-    }
+    // Only the channels which were actually found are in the group.
     group->channelCount = _currentIndex;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }

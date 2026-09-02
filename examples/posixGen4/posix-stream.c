@@ -236,8 +236,12 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_deleteGroupAll(instrument);
 
     /************ group definition ************/
-    // populate all channelPool and calibrations
-    RBRInstrumentGen4ChannelPool channelPool;
+    // read the channel pool
+    RBRInstrumentGen4Channel channelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4ChannelPool channelPool = {
+        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+        .pool = channelBuf
+    };
     RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
 
     // specify groupLabel, channel labels, and create group instance

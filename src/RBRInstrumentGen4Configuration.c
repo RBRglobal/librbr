@@ -956,6 +956,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_parseChannelPool(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4ChannelPool *channelPool)
 {
+    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
@@ -981,15 +982,20 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_parseChannelPool(
                 continue;
             }
 
+            /* Channels past the pool's capacity are discarded. */
             char *value = parameter.value;
-            for (int32_t channel = 0;
-                 value != NULL && channel < RBRINSTRUMENTGEN4_CHANNEL_MAX;
-                 channel++)
+            for (int32_t i = 0; value != NULL; i++)
             {
+                if (i >= channelPool->size)
+                {
+                    err = RBRINSTRUMENTGEN4_TRUNCATED;
+                    break;
+                }
+
                 char *nextValue = RBRInstrumentGen4_splitListValue(value);
 
-                snprintf(channelPool->pool[channel].label,
-                         sizeof(channelPool->pool[channel].label),
+                snprintf(channelPool->pool[i].label,
+                         sizeof(channelPool->pool[i].label),
                          "%s",
                          value);
 
@@ -998,7 +1004,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_parseChannelPool(
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return err;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
@@ -1059,29 +1065,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
                      "%s",
                      parameter.value);
         }
-        else if (strcmp(parameter.key, "grouplist") == 0)
-        {
-            /* A channel in no groups reports `none`, not an empty list. */
-            if (strcmp(parameter.value, "none") == 0)
-            {
-                continue;
-            }
-
-            char *value = parameter.value;
-            while (value != NULL
-                   && channel->groupCount < RBRINSTRUMENTGEN4_GROUP_COUNT_MAX)
-            {
-                char *nextValue = RBRInstrumentGen4_splitListValue(value);
-
-                snprintf((char *) channel->groupList[channel->groupCount],
-                         sizeof(channel->groupList[channel->groupCount]),
-                         "%s",
-                         value);
-                (*(int32_t *) &channel->groupCount)++;
-
-                value = nextValue;
-            }
-        }
         else if (strcmp(parameter.key, "nature") == 0)
         {
             *(RBRInstrumentGen4ChannelNature *) &channel->nature =
@@ -1134,7 +1117,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4ChannelPool *channelPool)
 {
-    memset(channelPool, 0, sizeof(RBRInstrumentGen4ChannelPool));
+    channelPool->count = 0;
+    memset(channelPool->pool,
+           0,
+           channelPool->size * sizeof(RBRInstrumentGen4Channel));
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "channel"));
 
@@ -1151,7 +1137,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPoolByNature(
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    memset(channelPool, 0, sizeof(RBRInstrumentGen4ChannelPool));
+    channelPool->count = 0;
+    memset(channelPool->pool,
+           0,
+           channelPool->size * sizeof(RBRInstrumentGen4Channel));
 
     RBR_TRY(RBRInstrumentGen4_converse(
                 instrument,
