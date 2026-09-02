@@ -231,7 +231,11 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_getSchedulePool(instrument, &schedulePool);
     RBRInstrumentGen4_deleteScheduleAll(instrument);
 
-    RBRInstrumentGen4GroupPool groupPool;
+    RBRInstrumentGen4Group groupBuf[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX];
+    RBRInstrumentGen4GroupPool groupPool = {
+        .size = RBRINSTRUMENTGEN4_GROUP_COUNT_MAX,
+        .pool = groupBuf
+    };
     RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
     RBRInstrumentGen4_deleteGroupAll(instrument);
 

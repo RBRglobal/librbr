@@ -1293,18 +1293,24 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setParameters(
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getGroup(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Group *group)
+    RBRInstrumentGen4Group *group,
+    RBRInstrumentGen4LabelList *channelList)
 {
     /* The label selects the group, so it outlives the reset. */
     char label[sizeof(group->label)];
     snprintf(label, sizeof(label), "%s", group->label);
 
     memset(group, 0, sizeof(RBRInstrumentGen4Group));
+    if (channelList != NULL)
+    {
+        channelList->count = 0;
+    }
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "group %s", label));
 
     snprintf(group->label, sizeof(group->label), "%s", label);
 
+    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
@@ -1317,57 +1323,54 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getGroup(
         {
             break;
         }
-        else if (strcmp(parameter.key, "channellist") == 0)
+        else if (strcmp(parameter.key, "channellist") == 0
+                 && channelList != NULL)
         {
-            RBRInstrumentGen4_parseLabelList(group->channelList,
-                                             RBRINSTRUMENTGEN4_CHANNEL_MAX,
-                                             &group->channelCount,
-                                             parameter.value);
-        }
-        else if (strcmp(parameter.key, "schedulelist") == 0)
-        {
-            RBRInstrumentGen4_parseLabelList(
-                (RBRInstrumentGen4Label *) group->scheduleList,
-                RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX,
-                (int32_t *) &group->scheduleCount,
-                parameter.value);
+            err = RBRInstrumentGen4_copyLabelList(channelList,
+                                                  parameter.value);
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return err;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_setGroup(
     RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Group *group)
+    const RBRInstrumentGen4Group *group,
+    const RBRInstrumentGen4LabelList *channelList)
 {
-    if (group->label[0] == '\0'
-        || group->channelCount < 0
-        || group->channelCount > RBRINSTRUMENTGEN4_CHANNEL_MAX)
+    if (group->label[0] == '\0')
     {
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
+    RBR_TRY(RBRInstrumentGen4_checkLabelList(channelList));
 
-    char channelList[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX];
-    RBR_TRY(RBRInstrumentGen4_formatLabelList(channelList,
-                                              (int32_t) sizeof(channelList),
-                                              group->channelList,
-                                              group->channelCount));
+    char value[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX];
+    RBR_TRY(RBRInstrumentGen4_formatLabelList(
+                value,
+                (int32_t) sizeof(value),
+                (const RBRInstrumentGen4Label *) channelList->labels,
+                channelList->count));
 
     return RBRInstrumentGen4_converse(instrument,
                                       "group %s channellist=%s",
                                       group->label,
-                                      channelList);
+                                      value);
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getGroupPool(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4GroupPool *groupPool)
 {
-    memset(groupPool, 0, sizeof(RBRInstrumentGen4GroupPool));
+    groupPool->count = 0;
+    groupPool->maxCount = 0;
+    memset(groupPool->pool,
+           0,
+           groupPool->size * sizeof(RBRInstrumentGen4Group));
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "group"));
 
+    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
@@ -1396,15 +1399,20 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getGroupPool(
                 continue;
             }
 
+            /* Groups past the pool's capacity are discarded. */
             char *value = parameter.value;
-            for (int32_t group = 0;
-                 value != NULL && group < RBRINSTRUMENTGEN4_GROUP_COUNT_MAX;
-                 group++)
+            for (int32_t i = 0; value != NULL; i++)
             {
+                if (i >= groupPool->size)
+                {
+                    err = RBRINSTRUMENTGEN4_TRUNCATED;
+                    break;
+                }
+
                 char *nextValue = RBRInstrumentGen4_splitListValue(value);
 
-                snprintf(groupPool->pool[group].label,
-                         sizeof(groupPool->pool[group].label),
+                snprintf(groupPool->pool[i].label,
+                         sizeof(groupPool->pool[i].label),
                          "%s",
                          value);
 
@@ -1413,7 +1421,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getGroupPool(
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return err;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_createGroup(

@@ -66,6 +66,8 @@
 #define COMMAND_PROMPT_LEN 7
 
 #define ARRAY_SEPARATOR_L4 '|'
+/** \brief The value an empty list is reported and sent as. */
+#define EMPTY_LIST_L4 "none"
 #define PARAMETER_SEPARATOR_L4 ' '
 #define PARAMETER_VALUE_SEPARATOR_L4 '='
 
@@ -1327,6 +1329,66 @@ RBRInstrumentGen4Error RBRInstrumentGen4_formatLabelList(
         }
 
         length += written;
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_copyLabelList(
+    RBRInstrumentGen4LabelList *labelList,
+    char *value)
+{
+    labelList->count = 0;
+
+    if (strcmp(value, EMPTY_LIST_L4) == 0)
+    {
+        return RBRINSTRUMENTGEN4_SUCCESS;
+    }
+
+    while (value != NULL)
+    {
+        if (labelList->count >= labelList->size)
+        {
+            /* Count the rest of the labels without storing them. */
+            labelList->count++;
+            for (; *value != '\0'; value++)
+            {
+                if (*value == ARRAY_SEPARATOR_L4)
+                {
+                    labelList->count++;
+                }
+            }
+            return RBRINSTRUMENTGEN4_TRUNCATED;
+        }
+
+        char *nextValue = RBRInstrumentGen4_splitListValue(value);
+
+        snprintf(labelList->labels[labelList->count],
+                 sizeof(labelList->labels[labelList->count]),
+                 "%s",
+                 value);
+        labelList->count++;
+
+        value = nextValue;
+    }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+RBRInstrumentGen4Error RBRInstrumentGen4_checkLabelList(
+    const RBRInstrumentGen4LabelList *labelList)
+{
+    if (labelList->count < 0 || labelList->count > labelList->size)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    for (int32_t label = 0; label < labelList->count; label++)
+    {
+        if (labelList->labels[label][0] == '\0')
+        {
+            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        }
     }
 
     return RBRINSTRUMENTGEN4_SUCCESS;

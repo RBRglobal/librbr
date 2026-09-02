@@ -406,6 +406,33 @@ RBRInstrumentGen4Error RBRInstrumentGen4_formatLabelList(
     int32_t count);
 
 /**
+ * \brief Copy a pipe-separated parameter value into a label list.
+ *
+ * `none` yields a zero count. The count is the number of labels reported;
+ * labels past the list's capacity are discarded.
+ *
+ * \param [out] labelList the caller-provided label list
+ * \param [in,out] value the response value, consumed in place
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when every label is stored
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when labels were discarded
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_copyLabelList(
+    RBRInstrumentGen4LabelList *labelList,
+    char *value);
+
+/**
+ * \brief Check that a label list can be sent as a parameter value.
+ *
+ * The count must fit the array and no label may be empty.
+ *
+ * \param [in] labelList the list to check
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when the list is well-formed
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE otherwise
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_checkLabelList(
+    const RBRInstrumentGen4LabelList *labelList);
+
+/**
  * \brief Parse a pipe-separated parameter value into an array of labels.
  *
  * `none` yields a zero count. Labels past \a max are discarded.

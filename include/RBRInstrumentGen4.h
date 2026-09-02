@@ -176,6 +176,32 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
  */
 typedef char RBRInstrumentGen4Label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
+/**
+ * \brief A list of labels stored in a user provided buffer (#labels).
+ *
+ * Library functions which read or send a list of labels (a group's channels,
+ * a schedule's groups, ...) take one of these instead of storing the list in
+ * the object structure. The user sizes #labels for the lists it needs, and
+ * may reuse one array across objects and commands.
+ */
+typedef struct RBRInstrumentGen4LabelList
+{
+    /** \brief The number of labels #labels can hold. */
+    int32_t size;
+
+    /**
+     * \brief The number of labels in the list.
+     *
+     * \warning This field will be larger than #size when
+     * #RBRINSTRUMENTGEN4_TRUNCATED is returned by the getter. Care should be
+     * taken to avoid out-of-bounds access when iterating over #labels.
+     */
+    int32_t count;
+
+    /** \brief User provided array of labels. */
+    RBRInstrumentGen4Label *labels;
+} RBRInstrumentGen4LabelList;
+
 /** \brief The maximum length of characters within a dataset block name.*/
 #define RBRINSTRUMENTGEN4_DATABLOCK_NAME_MAX 6
 

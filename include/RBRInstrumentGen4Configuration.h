@@ -1147,43 +1147,29 @@ typedef struct RBRInstrumentGen4Group
      * Set by the caller to select the group to read.
      */
     char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
-
-    /** \brief The number of channels in the group. */
-    int32_t channelCount;
-
-    /** \brief The labels of the channels in the group. */
-    char channelList[RBRINSTRUMENTGEN4_CHANNEL_MAX]
-                    [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
-
-    /**
-     * \brief The number of schedules using the group.
-     *
-     * \readonly
-     */
-    const int32_t scheduleCount;
-
-    /**
-     * \brief The labels of the schedules using the group.
-     *
-     * \readonly
-     * \see RBRInstrumentGen4_setSchedule()
-     */
-    const char scheduleList[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX]
-                           [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 } RBRInstrumentGen4Group;
 
 /**
- * \brief Populate the parameters of a group.
+ * \brief Read the channels in a group.
  *
  * The caller sets RBRInstrumentGen4Group.label to select the group to read.
+ * The labels of the group's channels are written to \a channelList when it
+ * is given.
  *
  * \note Issues the `group <group_label>` command.
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] group the group to read, selected by its label
+ * \param [out] channelList the channels in the group, or `NULL` to skip them
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a channelList cannot hold every
+ *                                      reported channel; the first `size` are
+ *                                      stored, and `count` is set to the value
+ *                                      reported by the instrument which WILL
+ *                                      exceed `size`
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the group does not exist
  * \see RBRInstrumentGen4_getGroupPool()
  * \see RBRInstrumentGen4_setGroup()
@@ -1191,56 +1177,64 @@ typedef struct RBRInstrumentGen4Group
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getGroup(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Group *group);
+    RBRInstrumentGen4Group *group,
+    RBRInstrumentGen4LabelList *channelList);
 
 /**
  * \brief Set the channels in a group.
  *
- * Sends `channellist`, the only writable parameter. A zero
- * RBRInstrumentGen4Group.channelCount sends `none`.
+ * Sends `channellist`, the only writable parameter. An empty \a channelList
+ * sends `none`.
  *
  * \note Issues the `group <group_label>` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] group the group to write
+ * \param [in] group the group to write, selected by its label
+ * \param [in] channelList the channels to put in the group
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully written
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the group cannot be written
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty,
- *                                                    the channel count is out
- *                                                    of range, or a channel
- *                                                    label is empty
- * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit
+ *                                                    the list's count does
+ *                                                    not fit its array, or a
+ *                                                    channel label is empty
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit the
+ *                                            command
  * \see RBRInstrumentGen4_getGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_setGroup(
     RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Group *group);
+    const RBRInstrumentGen4Group *group,
+    const RBRInstrumentGen4LabelList *channelList);
 
 /**
- * \brief `group` command parameters.
+ * \brief `group` command parameters. The `list` is stored in a user provided
+ * buffer (#pool).
  *
  * \see RBRInstrumentGen4_getGroupPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
 typedef struct RBRInstrumentGen4GroupPool
 {
+    /** \brief The number of groups #pool can hold. */
+    int32_t size;
+
     /**
      * \brief The number of groups defined on the instrument.
      *
-     * \warning Use `min(count, RBRINSTRUMENTGEN4_GROUP_COUNT_MAX)` to avoid an 
-     * out-of-bounds error when accessing #pool if 
-     * #maxCount > RBRINSTRUMENTGEN4_GROUP_COUNT_MAX.
+     * \warning This field will be larger than #size when
+     * #RBRINSTRUMENTGEN4_TRUNCATED is returned by the getter. Care should be
+     * taken to avoid out-of-bounds access when iterating over #pool.
      */
     int32_t count;
 
     /** \brief The maximum number of groups that can exist on the instrument. */
     int32_t maxCount;
 
-    /** \brief The pool of groups. */
-    RBRInstrumentGen4Group pool[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX];
+    /** \brief User provided buffer of the groups defined. */
+    RBRInstrumentGen4Group *pool;
 } RBRInstrumentGen4GroupPool;
 
 /**
@@ -1252,10 +1246,15 @@ typedef struct RBRInstrumentGen4GroupPool
  * \note Issues the `group` command.
  *
  * \param [in] instrument the instrument connection
- * \param [out] groupPool the populated pool of groups
+ * \param [in,out] groupPool the groups defined, labels only
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the groups are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a groupPool cannot hold every
+ *                                      reported group; the first `size` are
+ *                                      stored, and `count` is set to the value
+ *                                      reported by the instrument which WILL
+ *                                      exceed `size`
  * \see RBRInstrumentGen4_getGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */

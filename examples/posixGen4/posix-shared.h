@@ -98,9 +98,9 @@ extern "C"
                                   int count);
 
     /**
-     * \brief Set \a group pointers to \a channelPool channels with labels
-     *        that match \a specifiedChannelLabels.
-     * \param group destination group
+     * \brief Fill \a channelList with the \a channelPool channels whose labels
+     *        match \a specifiedChannelLabels.
+     * \param channelList destination list
      * \param channelPool pool of channels to match to \a specifiedChannelLabels
      * \param specifiedChannelLabels array of labels to match to \a channelPool
      * \param specifiedChannelLabelCnt number of labels in \a specifiedChannelLabels
@@ -109,7 +109,7 @@ extern "C"
      * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the target is too small for the requested number of children
      */
     RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
-        RBRInstrumentGen4Group *group,
+        RBRInstrumentGen4LabelList *channelList,
         RBRInstrumentGen4ChannelPool *channelPool,
         const RBRInstrumentGen4Label specifiedChannelLabels[],
         int32_t specifiedChannelLabelCnt);

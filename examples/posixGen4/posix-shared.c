@@ -278,7 +278,7 @@ void cpy_ptrArray_forSchedule(RBRInstrumentGen4Schedule *target[],
 /* Channel, group, and schedule configurations are TBD. */
 // can be static.
 RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
-    RBRInstrumentGen4Group *group,
+    RBRInstrumentGen4LabelList *channelList,
     RBRInstrumentGen4ChannelPool *channelPool,
     const RBRInstrumentGen4Label specifiedChannelLabels[],
     int32_t specifiedChannelLabelCnt)
@@ -303,8 +303,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
             const char *label = channelPool->pool[i].label;
             if (strcmp(label, specifiedChannelLabels[j]) == 0)
             {
-                snprintf(group->channelList[_currentIndex],
-                         sizeof(group->channelList[_currentIndex]),
+                if (_currentIndex >= channelList->size)
+                {
+                    fprintf(stderr, "Error: channel list buffer too small!\n");
+                    return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+                }
+                snprintf(channelList->labels[_currentIndex],
+                         sizeof(channelList->labels[_currentIndex]),
                          "%s",
                          label);
                 _currentIndex++;
@@ -324,8 +329,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    // Only the channels which were actually found are in the group.
-    group->channelCount = _currentIndex;
+    // Only the channels which were actually found are in the list.
+    channelList->count = _currentIndex;
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
@@ -445,12 +450,18 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewGroup(
     memset(newGroup, 0, sizeof(RBRInstrumentGen4Group));
     snprintf(newGroup->label, sizeof(newGroup->label), "%s", newGroupLabel);
 
+    RBRInstrumentGen4Label labelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4LabelList channelList = {
+        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+        .labels = labelBuf
+    };
+
     RBRInstrumentGen4_createGroup(instrument, newGroupLabel);
-    RBRInstrumentGen4_populateGroupChannels(newGroup,
+    RBRInstrumentGen4_populateGroupChannels(&channelList,
                                     channelPool,
                                     specifiedChannelLabels,
                                     specifiedChannelLabelCnt);
-    RBRInstrumentGen4_setGroup(instrument, newGroup);
+    RBRInstrumentGen4_setGroup(instrument, newGroup, &channelList);
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 // can be static
