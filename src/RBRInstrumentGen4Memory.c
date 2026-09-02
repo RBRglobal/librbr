@@ -160,7 +160,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetPool(
         else if (strcmp(parameter.key, "list") == 0)
         {
             /* An empty pool reports `none`. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }

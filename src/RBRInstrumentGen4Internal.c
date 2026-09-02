@@ -66,8 +66,6 @@
 #define COMMAND_PROMPT_LEN 7
 
 #define ARRAY_SEPARATOR_L4 '|'
-/** \brief The value an empty list is reported and sent as. */
-#define EMPTY_LIST_L4 "none"
 #define PARAMETER_SEPARATOR_L4 ' '
 #define PARAMETER_VALUE_SEPARATOR_L4 '='
 
@@ -1310,7 +1308,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_formatLabelList(
 
     if (labelList->count == 0)
     {
-        length = snprintf(value, size, EMPTY_LIST_L4);
+        length = snprintf(value, size, RBRINSTRUMENTGEN4_EMPTY_LIST);
         return length > 0 && length < size
                ? RBRINSTRUMENTGEN4_SUCCESS
                : RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
@@ -1346,7 +1344,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_copyLabelList(
 {
     labelList->count = 0;
 
-    if (strcmp(value, EMPTY_LIST_L4) == 0)
+    if (strcmp(value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
     {
         return RBRINSTRUMENTGEN4_SUCCESS;
     }

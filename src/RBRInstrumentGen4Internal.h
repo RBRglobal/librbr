@@ -34,6 +34,8 @@ extern "C" {
 #define RBRINSTRUMENTGEN4_RESPONSE_TERMINATOR "\r\n"
 /** \brief The length of the command terminator. */
 #define RBRINSTRUMENTGEN4_RESPONSE_TERMINATOR_LEN 2
+/** \brief The value an empty list is reported and sent as. */
+#define RBRINSTRUMENTGEN4_EMPTY_LIST "none"
 
 /**
  * \brief The length of the timestamp of a streamed sample.

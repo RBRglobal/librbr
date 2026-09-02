@@ -59,7 +59,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getNode(
         else if (strcmp(parameter.key, "portlist") == 0)
         {
             /* A node with no ports reports `none`, not an empty list. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -139,7 +139,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getNodePool(
         else if (strcmp(parameter.key, "list") == 0)
         {
             /* An instrument with no nodes reports `none` to indicate an empty list */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -293,7 +293,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPort(
         else if (strcmp(parameter.key, "devicelist") == 0)
         {
             /* A port with no devices reports `none`, not an empty list. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -356,7 +356,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPortPool(
         else if (strcmp(parameter.key, "list") == 0)
         {
             /* An instrument with no ports reports `none`, not an empty list. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -487,7 +487,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDevice(
         else if (strcmp(parameter.key, "channellist") == 0)
         {
             /* A device with no channels reports `none`, not an empty list. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -570,7 +570,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDevicePool(
         {
             /* An instrument with no devices reports `none`, not an empty
              * list. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -629,7 +629,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_discoverDevices(
         {
             /* Discovery finding nothing reports `none`, not an empty list.
              * There is no count to read: the list is the whole answer. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -977,7 +977,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_parseChannelPool(
         {
             /* An instrument with no channels reports `none`, not an empty
              * list. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -1391,7 +1391,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getGroupPool(
         else if (strcmp(parameter.key, "list") == 0)
         {
             /* An empty pool reports `none`. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -1552,7 +1552,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getConfigPool(
         else if (strcmp(parameter.key, "list") == 0)
         {
             /* An empty pool reports `none`. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -1944,7 +1944,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
         else if (strcmp(parameter.key, "list") == 0)
         {
             /* An empty pool reports `none`. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -1986,7 +1986,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
         else if (strcmp(parameter.key, "availablefastperiods") == 0)
         {
             /* No fast periods reports `none`. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
