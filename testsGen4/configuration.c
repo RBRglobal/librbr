@@ -1216,6 +1216,24 @@ TEST_LOGGER4(channelWithGroups)
     return true;
 }
 
+
+TEST_LOGGER4(channelEmptyLabel)
+{
+    /* An empty label is refused before the command. */
+    RBRInstrumentGen4Channel channel = { .label = "" };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getChannel(instrument,
+                                                            &channel);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
 TEST_LOGGER4(channelSet)
 {
     RBRInstrumentGen4Channel channel = {
@@ -1402,6 +1420,25 @@ TEST_LOGGER4(groupChannelListTooSmall)
                         RBRInstrumentGen4Error);
     TEST_ASSERT_EQ(2, channelList.count, "%" PRIi32);
     TEST_ASSERT_STR_EQ("temperature_00", channelList.labels[0]);
+
+    return true;
+}
+
+
+TEST_LOGGER4(groupEmptyLabel)
+{
+    /* An empty label is refused before the command. */
+    RBRInstrumentGen4Group group = { .label = "" };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getGroup(instrument,
+                                                            &group,
+                                                            NULL);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
 }
@@ -1736,6 +1773,25 @@ TEST_LOGGER4(configScheduleListTooSmall)
                         RBRInstrumentGen4Error);
     TEST_ASSERT_EQ(2, scheduleList.count, "%" PRIi32);
     TEST_ASSERT_STR_EQ("s_a", scheduleList.labels[0]);
+
+    return true;
+}
+
+
+TEST_LOGGER4(configEmptyLabel)
+{
+    /* An empty label is refused before the command. */
+    RBRInstrumentGen4Config config = { .label = "" };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getConfig(instrument,
+                                                            &config,
+                                                            NULL);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
 }
@@ -2171,6 +2227,25 @@ TEST_LOGGER4(scheduleDeferredMode)
                         actual.mode,
                         RBRInstrumentGen4ScheduleMode);
     TEST_ASSERT_EQ(0, actual.parameters.continuous.period, "%" PRIi32);
+
+    return true;
+}
+
+
+TEST_LOGGER4(scheduleEmptyLabel)
+{
+    /* An empty label is refused before the command. */
+    RBRInstrumentGen4Schedule schedule = { .label = "" };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getSchedule(instrument,
+                                                            &schedule,
+                                                            NULL);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
 }

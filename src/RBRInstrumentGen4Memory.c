@@ -200,11 +200,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDataset(
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    /* The label selects the dataset, so it outlives the reset. */
-    char label[sizeof(dataset->label)];
-    snprintf(label, sizeof(label), "%s", dataset->label);
-
-    memset(dataset, 0, sizeof(RBRInstrumentGen4Dataset));
+    RBR_RESET_EXCEPT(dataset, label);
     dataset->status = RBRINSTRUMENTGEN4_UNKNOWN_DATASET_STATUS;
     dataset->dataType = RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE;
     if (scheduleList != NULL)
@@ -212,9 +208,9 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDataset(
         scheduleList->count = 0;
     }
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "dataset %s", label));
-
-    snprintf(dataset->label, sizeof(dataset->label), "%s", label);
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "dataset %s",
+                                       dataset->label));
 
     RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;

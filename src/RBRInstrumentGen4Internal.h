@@ -65,6 +65,22 @@ extern "C" {
 } while (0)
 
 /**
+ * \brief Zero every member of a structure except one.
+ *
+ * \param [in,out] object a pointer to the structure
+ * \param [in] member the name of the member to keep
+ */
+#define RBR_RESET_EXCEPT(object, member) do { \
+        char *_begin = (char *) (object); \
+        char *_keepBegin = (char *) &(object)->member; \
+        char *_keepEnd = _keepBegin + sizeof((object)->member); \
+        memset(_begin, 0, (size_t) (_keepBegin - _begin)); \
+        memset(_keepEnd, \
+               0, \
+               sizeof(*(object)) - (size_t) (_keepEnd - _begin)); \
+} while (0)
+
+/**
  * Send the first RBRInstrumentGen4.commandBufferLength bytes of
  * RBRInstrumentGen4.commandBuffer to the instrument. No formatting or validation
  * of the contents of the buffer will be performed.

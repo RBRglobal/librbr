@@ -846,6 +846,7 @@ typedef struct RBRInstrumentGen4ChannelPool
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the channel is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the channel does not exist
  * \see RBRInstrumentGen4_getChannelPool()
  * \see RBRInstrumentGen4_setChannel()

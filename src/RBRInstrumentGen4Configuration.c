@@ -1011,16 +1011,17 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4Channel *channel)
 {
-    /* The label selects the channel to read, so it has to outlive the reset of
-     * the rest of the structure. */
-    char label[sizeof(channel->label)];
-    snprintf(label, sizeof(label), "%s", channel->label);
+    if (channel->label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
 
-    memset(channel, 0, sizeof(RBRInstrumentGen4Channel));
+    RBR_RESET_EXCEPT(channel, label);
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "channel %s", label));
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "channel %s",
+                                       channel->label));
 
-    snprintf(channel->label, sizeof(channel->label), "%s", label);
     *(RBRInstrumentGen4ChannelNature *) &channel->nature =
         RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE;
 
@@ -1296,19 +1297,18 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getGroup(
     RBRInstrumentGen4Group *group,
     RBRInstrumentGen4LabelList *channelList)
 {
-    /* The label selects the group, so it outlives the reset. */
-    char label[sizeof(group->label)];
-    snprintf(label, sizeof(label), "%s", group->label);
+    if (group->label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
 
-    memset(group, 0, sizeof(RBRInstrumentGen4Group));
+    RBR_RESET_EXCEPT(group, label);
     if (channelList != NULL)
     {
         channelList->count = 0;
     }
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "group %s", label));
-
-    snprintf(group->label, sizeof(group->label), "%s", label);
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "group %s", group->label));
 
     RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;
@@ -1456,19 +1456,20 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getConfig(
     RBRInstrumentGen4Config *config,
     RBRInstrumentGen4LabelList *scheduleList)
 {
-    /* The label selects the configuration, so it outlives the reset. */
-    char label[sizeof(config->label)];
-    snprintf(label, sizeof(label), "%s", config->label);
+    if (config->label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
 
-    memset(config, 0, sizeof(RBRInstrumentGen4Config));
+    RBR_RESET_EXCEPT(config, label);
     if (scheduleList != NULL)
     {
         scheduleList->count = 0;
     }
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "config %s", label));
-
-    snprintf(config->label, sizeof(config->label), "%s", label);
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "config %s",
+                                       config->label));
 
     RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;
@@ -1700,19 +1701,21 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
     RBRInstrumentGen4Schedule *schedule,
     RBRInstrumentGen4LabelList *groupList)
 {
-    /* The label selects the schedule, so it outlives the reset. */
-    char label[sizeof(schedule->label)];
-    snprintf(label, sizeof(label), "%s", schedule->label);
+    if (schedule->label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
 
-    memset(schedule, 0, sizeof(RBRInstrumentGen4Schedule));
+    RBR_RESET_EXCEPT(schedule, label);
     if (groupList != NULL)
     {
         groupList->count = 0;
     }
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "schedule %s", label));
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "schedule %s",
+                                       schedule->label));
 
-    snprintf(schedule->label, sizeof(schedule->label), "%s", label);
     schedule->stream = RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STREAM;
     schedule->storage = RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE;
     schedule->mode = RBRINSTRUMENTGEN4_SCHEDULE_MODE_NONE;
