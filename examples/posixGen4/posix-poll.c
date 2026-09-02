@@ -31,7 +31,7 @@
 
 #define GROUP_PTS_LABEL "gr_pts"
 #define GROUP_PTS_CHANNELS \
-(const char[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX]) \
+(const RBRInstrumentGen4Label[]) \
 {   \
     PRESSURE, \
         TEMPERATURE, \

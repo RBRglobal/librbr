@@ -631,7 +631,7 @@ typedef struct RBRInstrumentGen4Calibration
      * RBRInstrumentGen4_getCalibration(). Calibrations are one to one with
      * channels and cannot be created or deleted.
      */
-    char label[RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX + 1];
+    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
     /**
      * \brief The formula used to convert raw readings to physical units.
@@ -746,7 +746,7 @@ typedef struct RBRInstrumentGen4Channel
      * Set by the caller to select the channel to read; see
      * RBRInstrumentGen4_getChannel().
      */
-    char label[RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX + 1];
+    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
     /**
      * \brief A short, pre-defined generic name for the installed channel.
@@ -1152,7 +1152,7 @@ typedef struct RBRInstrumentGen4Group
 
     /** \brief The labels of the channels in the group. */
     char channelList[RBRINSTRUMENTGEN4_CHANNEL_MAX]
-                    [RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX + 1];
+                    [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
     /**
      * \brief The number of schedules using the group.

@@ -111,7 +111,7 @@ extern "C"
     RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
         RBRInstrumentGen4Group *group,
         RBRInstrumentGen4ChannelPool *channelPool,
-        const char specifiedChannelLabels[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX],
+        const RBRInstrumentGen4Label specifiedChannelLabels[],
         int32_t specifiedChannelLabelCnt);
 
     /**
@@ -128,7 +128,7 @@ extern "C"
     RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleGroups(
         RBRInstrumentGen4Schedule *schedule,
         RBRInstrumentGen4GroupPool *groupPool,
-        const char specifiedGroupLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
+        const RBRInstrumentGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt);
 
     /**
@@ -145,7 +145,7 @@ extern "C"
     RBRInstrumentGen4Error RBRInstrumentGen4_populateConfigSchedules(
         RBRInstrumentGen4Config *config,
         RBRInstrumentGen4SchedulePool *schedulePool,
-        const char specifiedScheduleLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
+        const RBRInstrumentGen4Label specifiedScheduleLabels[],
         int32_t specifiedScheduleLabelCnt);
 
     /**
@@ -224,7 +224,7 @@ extern "C"
     RBRInstrumentGen4Error RBRInstrumentGen4_initNewGroup(
         RBRInstrumentGen4 *instrument,
         const char newGroupLabel[],
-        const char specifiedChannelLabels[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX],
+        const RBRInstrumentGen4Label specifiedChannelLabels[],
         int32_t specifiedChannelLabelCnt,
         RBRInstrumentGen4ChannelPool *channelPool,
         RBRInstrumentGen4Group *newGroup);
@@ -249,7 +249,7 @@ extern "C"
     RBRInstrumentGen4Error RBRInstrumentGen4_initNewSchedule(
         RBRInstrumentGen4 *instrument,
         const char newScheduleLabel[],
-        const char specifiedGroupLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
+        const RBRInstrumentGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt,
         RBRInstrumentGen4ScheduleMode mode,
         RBRInstrumentGen4GroupPool *groupPool,
@@ -293,7 +293,7 @@ extern "C"
     RBRInstrumentGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
         RBRInstrumentGen4 *instrument,
         const char newScheduleLabel[],
-        const char specifiedGroupLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
+        const RBRInstrumentGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt,
         RBRInstrumentGen4ScheduleMode mode,
         RBRInstrumentGen4Period period,
@@ -321,7 +321,7 @@ extern "C"
     RBRInstrumentGen4Error RBRInstrumentGen4_initNewConfig(
         RBRInstrumentGen4 *instrument,
         const char newConfigLabel[],
-        const char specifiedScheduleLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
+        const RBRInstrumentGen4Label specifiedScheduleLabels[],
         int32_t specifiedScheduleLabelCnt,
         RBRInstrumentGen4SchedulePool *schedulePool,
         RBRInstrumentGen4Config *newConfig);

@@ -99,14 +99,6 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
 #define RBRINSTRUMENTGEN4_CHANNEL_MAX_LEN sizeof(xstr(RBRINSTRUMENTGEN4_CHANNEL_MAX))
 
 /**
- * \brief The maximum number of characters in a channel label (e.g.,
- * “temperature_00”).
- *
- * Does not include any null terminator.
- */
-#define RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX 31
-
-/**
  * \brief The maximum number of characters in a channel type (e.g., “temp09”).
  *
  * Does not include any null terminator.

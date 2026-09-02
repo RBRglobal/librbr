@@ -41,7 +41,7 @@
 
 #define GROUP_PTS_LABEL "gr_pts"
 #define GROUP_PTS_CHANNELS                              \
-    (const char[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
         SALINITY_DYNCORR,                               \
@@ -56,7 +56,7 @@
 #define SCHEDULE_PTS_COUNT 3
 
 #define SCHEDULE_PTS_GROUPS                          \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         GROUP_PTS_LABEL                              \
     }
@@ -80,7 +80,7 @@
 
 #define CONFIG_ASCENT_LABEL "cf_ascent"
 #define CONFIG_ASCENT_SCHEDULES                      \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         SCHEDULE_PTS_LABEL                           \
     }

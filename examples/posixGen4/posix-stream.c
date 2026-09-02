@@ -36,7 +36,7 @@
 
 #define GROUP_PTS_LABEL "gr_pts"
 #define GROUP_PTS_CHANNELS                              \
-    (const char[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             TEMPERATURE,                                \
@@ -50,7 +50,7 @@
 #define SCHEDULE_PTS_CASTDETECTION false
 
 #define SCHEDULE_PTS_GROUPS                          \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         GROUP_PTS_LABEL                              \
     }
@@ -58,7 +58,7 @@
 
 #define CONFIG_ASCENT_LABEL "cf_ascent"
 #define CONFIG_ASCENT_SCHEDULES                      \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         SCHEDULE_PTS_LABEL                           \
     }
