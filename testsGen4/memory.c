@@ -176,11 +176,7 @@ TEST_LOGGER4(getDatasetPool)
     };
 
     RBRInstrumentGen4Error err;
-    RBRInstrumentGen4Dataset datasetBuf[3];
-    RBRInstrumentGen4DatasetPool actual = {
-        .size = 3,
-        .pool = datasetBuf
-    };
+    RBRINSTRUMENTGEN4_DATASET_POOL_DECL(actual, 3);
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
@@ -207,7 +203,7 @@ TEST_LOGGER4(getDatasetPool)
     /* A pool which cannot hold every dataset is truncated and reported. */
     RBRInstrumentGen4DatasetPool shortPool = {
         .size = 2,
-        .pool = datasetBuf
+        .pool = actualBuffer
     };
     TestIOBuffers_init(buffers,
                        "dataset count=3 maxcount=4 list=d1|d2|d5"
@@ -281,11 +277,7 @@ TEST_LOGGER4(getDataset)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         RBRInstrumentGen4Dataset actual = { .label = "d1" };
-        RBRInstrumentGen4Label labelBuf[2];
-        RBRInstrumentGen4LabelList scheduleList = {
-            .size = 2,
-            .labels = labelBuf
-        };
+        RBRINSTRUMENTGEN4_LABEL_LIST_DECL(scheduleList, 2);
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrumentGen4_getDataset(instrument,
                                            &actual,
@@ -339,11 +331,7 @@ TEST_LOGGER4(getDataset)
 
     /* A schedule list which does not fit is truncated and reported. */
     RBRInstrumentGen4Dataset overfull = { .label = "d1" };
-    RBRInstrumentGen4Label shortLabelBuf[1];
-    RBRInstrumentGen4LabelList shortList = {
-        .size = 1,
-        .labels = shortLabelBuf
-    };
+    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(shortList, 1);
     TestIOBuffers_init(buffers,
                        "dataset d1 status=closed"
                        " schedulelist=tides_schedule|DO_schedule"
