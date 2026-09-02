@@ -127,13 +127,24 @@ int main(int argc, char *argv[])
     };
     RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
 
-    // create group
-    RBRInstrumentGen4Group groupBuf[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX];
+    // Only the first group is polled, so only one label is kept; the pool
+    // reports that the rest were discarded, which is expected here.
+    RBRInstrumentGen4Group groupBuf[1];
     RBRInstrumentGen4GroupPool groupPool = {
-        .size = RBRINSTRUMENTGEN4_GROUP_COUNT_MAX,
+        .size = 1,
         .pool = groupBuf
     };
-    RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
+    err = RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
+    if (err != RBRINSTRUMENTGEN4_SUCCESS
+        && err != RBRINSTRUMENTGEN4_TRUNCATED)
+    {
+        fprintf(stderr,
+                "%s: Failed to read the group pool: %s!\n",
+                programName,
+                RBRInstrumentGen4Error_name(err));
+        status = EXIT_FAILURE;
+        goto instrumentCleanup;
+    }
 
     // specify outputformat. The setter sends every parameter of the command,
     // so read the current format and change only the sample fields.

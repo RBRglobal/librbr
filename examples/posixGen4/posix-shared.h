@@ -107,6 +107,8 @@ extern "C"
      * \return RBRINSTRUMENTGEN4_SUCCESS when all labels are found and the target is set
      * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if any label is not found
      * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the target is too small for the requested number of children
+     * \return RBRINSTRUMENTGEN4_TRUNCATED if \a channelPool was too small to
+     *         hold every channel
      */
     RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
         RBRInstrumentGen4LabelList *channelList,
@@ -115,35 +117,30 @@ extern "C"
         int32_t specifiedChannelLabelCnt);
 
     /**
-     * \brief Fill \a groupList with the \a groupPool groups whose labels
-     *        match \a specifiedGroupLabels.
+     * \brief Fill \a groupList with \a specifiedGroupLabels.
      * \param groupList destination list
-     * \param groupPool pool of groups to match to \a specifiedGroupLabels
-     * \param specifiedGroupLabels array of labels to match to \a groupPool
+     * \param specifiedGroupLabels array of labels to copy
      * \param specifiedGroupLabelCnt number of labels in \a specifiedGroupLabels
-     * \return RBRINSTRUMENTGEN4_SUCCESS when all labels are found and the target is set
-     * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if any label is not found
-     * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the target is too small for the requested number of children
+     * \return RBRINSTRUMENTGEN4_SUCCESS when the labels are copied
+     * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the list cannot hold the
+     *         labels
      */
     RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleGroups(
         RBRInstrumentGen4LabelList *groupList,
-        RBRInstrumentGen4GroupPool *groupPool,
         const RBRInstrumentGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt);
 
     /**
      * \brief Fill \a scheduleList with \a specifiedScheduleLabels.
      * \param scheduleList destination list
-     * \param schedulePool pool of schedules to match to \a specifiedScheduleLabels
-     * \param specifiedScheduleLabels array of labels to match to \a schedulePool
+     * \param specifiedScheduleLabels array of labels to copy
      * \param specifiedScheduleLabelCnt number of labels in \a specifiedScheduleLabels
-     * \return RBRINSTRUMENTGEN4_SUCCESS when all labels are found and the target is set
-     * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if any label is not found
-     * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the target is too small for the requested number of children
+     * \return RBRINSTRUMENTGEN4_SUCCESS when the labels are copied
+     * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the list cannot hold the
+     *         labels
      */
     RBRInstrumentGen4Error RBRInstrumentGen4_populateConfigSchedules(
         RBRInstrumentGen4LabelList *scheduleList,
-        RBRInstrumentGen4SchedulePool *schedulePool,
         const RBRInstrumentGen4Label specifiedScheduleLabels[],
         int32_t specifiedScheduleLabelCnt);
 
@@ -154,6 +151,8 @@ extern "C"
      * \param datasetLabel label to search for
      * \return RBRINSTRUMENTGEN4_SUCCESS when the label is found and the target is set
      * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if the label is not found
+     * \return RBRINSTRUMENTGEN4_TRUNCATED if \a datasetPool was too small
+     *         to hold every dataset
      */
     RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetFromPool(
         RBRInstrumentGen4Dataset **targetDataset,
@@ -251,7 +250,6 @@ extern "C"
         const RBRInstrumentGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt,
         RBRInstrumentGen4ScheduleMode mode,
-        RBRInstrumentGen4GroupPool *groupPool,
         RBRInstrumentGen4LabelList *groupList,
         RBRInstrumentGen4Schedule *newSchedule);
 
@@ -278,7 +276,6 @@ extern "C"
      * \param [in] newScheduleLabel the label to give the parent
      * \param [in] specifiedGroupLabels the labels of the children to give the parent
      * \param [in] specifiedGroupLabelCnt the number of children to give the parent
-     * \param [in] groupPool the pool to search for children in
      * \param [in] period the sample period in milliseconds
      * \param [in] castDetection enable cast detection when true
      * \param [out] groupList the groups given to the parent
@@ -298,7 +295,6 @@ extern "C"
         RBRInstrumentGen4ScheduleMode mode,
         RBRInstrumentGen4Period period,
         bool castDetection,
-        RBRInstrumentGen4GroupPool *groupPool,
         RBRInstrumentGen4LabelList *groupList,
         RBRInstrumentGen4Schedule *newSchedule);
 
@@ -309,8 +305,7 @@ extern "C"
      * \param [in] newConfigLabel the label to give the config
      * \param [in] specifiedScheduleLabels the labels of the schedules to give the parent
      * \param [in] specifiedScheduleLabelCnt the number of children to give the parent
-     * \param [in] schedulePool the pool to search for children in
-     * \param [inout] configPool the pool to add the parent to
+     * \param [out] scheduleList the schedules given to the parent
      * \param [out] newConfig the new parent
      * \return #RBRINSTRUMENTGEN4_SUCCESS when the parent is successfully created and populated
      * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
@@ -324,7 +319,7 @@ extern "C"
         const char newConfigLabel[],
         const RBRInstrumentGen4Label specifiedScheduleLabels[],
         int32_t specifiedScheduleLabelCnt,
-        RBRInstrumentGen4SchedulePool *schedulePool,
+        RBRInstrumentGen4LabelList *scheduleList,
         RBRInstrumentGen4Config *newConfig);
 
 #ifdef __cplusplus

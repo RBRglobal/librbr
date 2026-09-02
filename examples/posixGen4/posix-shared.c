@@ -290,6 +290,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
+    if (channelPool->count > channelPool->size)
+    {
+        fprintf(stderr, "Error: channel pool holds only %" PRIi32 " of %" PRIi32 " channels!\n",
+                channelPool->size, channelPool->count);
+        return RBRINSTRUMENTGEN4_TRUNCATED;
+    }
+
     // find out each label specified, and compare with all sourceObjList.
     int32_t _currentIndex = 0;
     int32_t _totalSourceObjCnt = channelPool->count;
@@ -337,14 +344,9 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
 // can be static.
 RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleGroups(
     RBRInstrumentGen4LabelList *groupList,
-    RBRInstrumentGen4GroupPool *groupPool,
     const RBRInstrumentGen4Label specifiedGroupLabels[],
     int32_t specifiedGroupLabelCnt)
 {
-    /* The groups were created moments ago, so the pool read at startup
-     * cannot be used to check them. */
-    (void)groupPool;
-
     if (specifiedGroupLabelCnt > groupList->size)
     {
         fprintf(stderr, "Error: group list buffer too small!\n");
@@ -365,14 +367,9 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleGroups(
 // can be static.
 RBRInstrumentGen4Error RBRInstrumentGen4_populateConfigSchedules(
     RBRInstrumentGen4LabelList *scheduleList,
-    RBRInstrumentGen4SchedulePool *schedulePool,
     const RBRInstrumentGen4Label specifiedScheduleLabels[],
     int32_t specifiedScheduleLabelCnt)
 {
-    /* The schedules were created moments ago, so the pool read at startup
-     * cannot be used to check them. */
-    (void)schedulePool;
-
     if (specifiedScheduleLabelCnt > scheduleList->size)
     {
         fprintf(stderr, "Error: schedule list buffer too small!\n");
@@ -400,6 +397,12 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetFromPool(
     if (_totalSourceObjCnt <= 0)
     {
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+    else if (_totalSourceObjCnt > datasetPool->size)
+    {
+        fprintf(stderr, "Error: dataset pool holds only %" PRIi32 " of %" PRIi32 " datasets!\n",
+                datasetPool->size, datasetPool->count);
+        return RBRINSTRUMENTGEN4_TRUNCATED;
     }
     else
     {
@@ -499,7 +502,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewSchedule(
     const RBRInstrumentGen4Label specifiedGroupLabels[],
     int32_t specifiedGroupLabelCnt,
     RBRInstrumentGen4ScheduleMode mode,
-    RBRInstrumentGen4GroupPool *groupPool,
     RBRInstrumentGen4LabelList *groupList,
     RBRInstrumentGen4Schedule *newSchedule)
 {
@@ -510,7 +512,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewSchedule(
              newScheduleLabel);
 
     RBRInstrumentGen4_createSchedule(instrument, newScheduleLabel);
-    RBRInstrumentGen4_populateScheduleGroups(groupList, groupPool, specifiedGroupLabels, specifiedGroupLabelCnt); // warning: read err!!!
+    // warning: read err!!!
+    RBRInstrumentGen4_populateScheduleGroups(groupList,
+                                             specifiedGroupLabels,
+                                             specifiedGroupLabelCnt);
     newSchedule->mode = mode;
     newSchedule->stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_OFF; // default value.
     newSchedule->storage = RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE;
@@ -535,7 +540,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
     RBRInstrumentGen4ScheduleMode mode,
     RBRInstrumentGen4Period period,
     bool castDetection,
-    RBRInstrumentGen4GroupPool *groupPool,
     RBRInstrumentGen4LabelList *groupList,
     RBRInstrumentGen4Schedule *newSchedule)
 {
@@ -544,7 +548,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
                            specifiedGroupLabels,
                            specifiedGroupLabelCnt,
                            mode,
-                           groupPool,
                            groupList,
                            newSchedule);
     RBRInstrumentGen4_populateScheduleContinuous(newSchedule, period, castDetection);
@@ -558,22 +561,19 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewConfig(
     const char newConfigLabel[],
     const RBRInstrumentGen4Label specifiedScheduleLabels[],
     int32_t specifiedScheduleLabelCnt,
-    RBRInstrumentGen4SchedulePool *schedulePool,
+    RBRInstrumentGen4LabelList *scheduleList,
     RBRInstrumentGen4Config *newConfig)
 {
     memset(newConfig, 0, sizeof(RBRInstrumentGen4Config));
     snprintf(newConfig->label, sizeof(newConfig->label), "%s", newConfigLabel);
 
-    RBRInstrumentGen4Label labelBuf[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
-    RBRInstrumentGen4LabelList scheduleList = {
-        .size = RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX,
-        .labels = labelBuf
-    };
-
     RBRInstrumentGen4_createConfig(instrument, newConfigLabel); // warning: read err!!!
-    RBRInstrumentGen4_populateConfigSchedules(&scheduleList, schedulePool, specifiedScheduleLabels, specifiedScheduleLabelCnt); // warning: read err!!!
     // warning: read err!!!
-    RBRInstrumentGen4_setConfig(instrument, newConfig, &scheduleList);
+    RBRInstrumentGen4_populateConfigSchedules(scheduleList,
+                                              specifiedScheduleLabels,
+                                              specifiedScheduleLabelCnt);
+    // warning: read err!!!
+    RBRInstrumentGen4_setConfig(instrument, newConfig, scheduleList);
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 //-------------------------------------------------------------------------------

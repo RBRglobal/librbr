@@ -156,15 +156,7 @@ int main(int argc, char *argv[])
 
     RBRInstrumentGen4_deleteConfigAll(instrument);
 
-    RBRInstrumentGen4Schedule
-        scheduleBuf[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
-    RBRInstrumentGen4SchedulePool schedulePool = {
-        .size = RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX,
-        .pool = scheduleBuf
-    };
     RBRInstrumentGen4_deleteScheduleAll(instrument);
-
-    RBRInstrumentGen4GroupPool groupPool;
     RBRInstrumentGen4_deleteGroupAll(instrument);
 
     /************ group definition ************/
@@ -176,7 +168,11 @@ int main(int argc, char *argv[])
     };
     RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
 
-    for (int32_t i = 0; i < channelPool.count; i++)
+    /* Only min(count, size) channels are stored when the instrument reports
+     * more than the buffer holds. */
+    int32_t channelCount = channelPool.count < channelPool.size
+        ? channelPool.count : channelPool.size;
+    for (int32_t i = 0; i < channelCount; i++)
     {
         RBRInstrumentGen4Channel *channel = &channelPool.pool[i];
         RBRInstrumentGen4_getChannel(instrument, channel);
@@ -213,9 +209,9 @@ int main(int argc, char *argv[])
 
     /************ schedule definition ************/
     RBRInstrumentGen4Schedule schedule;
-    RBRInstrumentGen4Label groupLabelBuf[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX];
+    RBRInstrumentGen4Label groupLabelBuf[SCHEDULE_PTS_GROUP_COUNT];
     RBRInstrumentGen4LabelList groupList = {
-        .size = RBRINSTRUMENTGEN4_GROUP_COUNT_MAX,
+        .size = SCHEDULE_PTS_GROUP_COUNT,
         .labels = groupLabelBuf
     };
     RBRInstrumentGen4_initNewScheduleContinuous(instrument,
@@ -225,17 +221,21 @@ int main(int argc, char *argv[])
                          SCHEDULE_PTS_MODE,
                          SCHEDULE_PTS_PERIOD,
                          SCHEDULE_PTS_CASTDETECTION,
-                         &groupPool,
                          &groupList,
                          &schedule);
 
     /************ configuration definition ************/
     RBRInstrumentGen4Config config;
+    RBRInstrumentGen4Label scheduleLabelBuf[CONFIG_ASCENT_SCHEDULE_COUNT];
+    RBRInstrumentGen4LabelList scheduleList = {
+        .size = CONFIG_ASCENT_SCHEDULE_COUNT,
+        .labels = scheduleLabelBuf
+    };
     RBRInstrumentGen4_initNewConfig(instrument,
                         CONFIG_ASCENT_LABEL,
                         CONFIG_ASCENT_SCHEDULES,
                         CONFIG_ASCENT_SCHEDULE_COUNT,
-                        &schedulePool,
+                        &scheduleList,
                         &config);
 
     /************ deployment parameters ************/

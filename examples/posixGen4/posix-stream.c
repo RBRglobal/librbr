@@ -223,29 +223,8 @@ int main(int argc, char *argv[])
 
     RBRInstrumentGen4_deleteDatasetAll(instrument);
 
-    RBRInstrumentGen4Config configBuf[RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX];
-    RBRInstrumentGen4ConfigPool configPool = {
-        .size = RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX,
-        .pool = configBuf
-    };
-    RBRInstrumentGen4_getConfigPool(instrument, &configPool);
     RBRInstrumentGen4_deleteConfigAll(instrument);
-
-    RBRInstrumentGen4Schedule
-        scheduleBuf[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
-    RBRInstrumentGen4SchedulePool schedulePool = {
-        .size = RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX,
-        .pool = scheduleBuf
-    };
-    RBRInstrumentGen4_getSchedulePool(instrument, &schedulePool);
     RBRInstrumentGen4_deleteScheduleAll(instrument);
-
-    RBRInstrumentGen4Group groupBuf[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX];
-    RBRInstrumentGen4GroupPool groupPool = {
-        .size = RBRINSTRUMENTGEN4_GROUP_COUNT_MAX,
-        .pool = groupBuf
-    };
-    RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
     RBRInstrumentGen4_deleteGroupAll(instrument);
 
     /************ group definition ************/
@@ -268,9 +247,9 @@ int main(int argc, char *argv[])
 
     /************ schedule definition ************/
     RBRInstrumentGen4Schedule schedule_pts;
-    RBRInstrumentGen4Label groupLabelBuf[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX];
+    RBRInstrumentGen4Label groupLabelBuf[SCHEDULE_PTS_GROUP_COUNT];
     RBRInstrumentGen4LabelList groupList = {
-        .size = RBRINSTRUMENTGEN4_GROUP_COUNT_MAX,
+        .size = SCHEDULE_PTS_GROUP_COUNT,
         .labels = groupLabelBuf
     };
     RBRInstrumentGen4_initNewScheduleContinuous(instrument,
@@ -280,7 +259,6 @@ int main(int argc, char *argv[])
                           SCHEDULE_PTS_MODE,
                           SCHEDULE_PTS_PERIOD,
                           SCHEDULE_PTS_CASTDETECTION,
-                          &groupPool,
                           &groupList,
                           &schedule_pts);
 
@@ -312,11 +290,16 @@ int main(int argc, char *argv[])
 
     /************ configuration definition ************/
     RBRInstrumentGen4Config config_ascent;
+    RBRInstrumentGen4Label scheduleLabelBuf[CONFIG_ASCENT_SCHEDULE_COUNT];
+    RBRInstrumentGen4LabelList scheduleList = {
+        .size = CONFIG_ASCENT_SCHEDULE_COUNT,
+        .labels = scheduleLabelBuf
+    };
     RBRInstrumentGen4_initNewConfig(instrument,
                          CONFIG_ASCENT_LABEL,
                          CONFIG_ASCENT_SCHEDULES,
-                        CONFIG_ASCENT_SCHEDULE_COUNT,
-                         &schedulePool,
+                         CONFIG_ASCENT_SCHEDULE_COUNT,
+                         &scheduleList,
                          &config_ascent);
 
     // specify outputformat. The setter sends every parameter of the command,
