@@ -167,7 +167,7 @@ typedef struct RBRInstrumentGen4Deployment
      *
      * \readonly
      */
-    const RBRInstrumentGen4DeploymentStatus status;
+    RBRInstrumentGen4DeploymentStatus status;
 
     /** \brief The gating condition of the next deployment. */
     RBRInstrumentGen4Gate gate;
@@ -177,7 +177,7 @@ typedef struct RBRInstrumentGen4Deployment
      *
      * \readonly
      */
-    const bool simulation;
+    bool simulation;
 } RBRInstrumentGen4Deployment;
 
 /**
