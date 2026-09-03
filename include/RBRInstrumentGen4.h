@@ -195,9 +195,6 @@ typedef struct RBRInstrumentGen4LabelList
     RBRInstrumentGen4Label *labels;
 } RBRInstrumentGen4LabelList;
 
-/** \brief The maximum length of characters within a dataset block name.*/
-#define RBRINSTRUMENTGEN4_DATABLOCK_NAME_MAX 6
-
 /**
  * A date and time in milliseconds since the Unix epoch
  * (1970-01-01T00:00:00.000Z). Instrument functions operating on time (e.g.,
