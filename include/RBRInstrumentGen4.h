@@ -83,19 +83,12 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
  *
  * The default maximum of 32 channels is reflective of the maximum number of
  * channels supported by RBR instruments, but most instruments have far fewer.
- * Adjusting this value will dramatically affect the size of some structures;
- * notably RBRInstrumentGen4Sample, but also RBRInstrumentGen4Calibration.n
+ * Adjusting this value will dramatically affect the size of some structures,
+ * notably RBRInstrumentGen4Sample.
  */
 #ifndef RBRINSTRUMENTGEN4_CHANNEL_MAX
 #define RBRINSTRUMENTGEN4_CHANNEL_MAX 32
 #endif
-
-/** \brief Stringize the result of macro expansion. */
-#define xstr(s) str(s)
-/** \brief Stringize the macro argument. */
-#define str(s) #s
-/** \brief The string length of the maximum number of instrument channels. */
-#define RBRINSTRUMENTGEN4_CHANNEL_MAX_LEN sizeof(xstr(RBRINSTRUMENTGEN4_CHANNEL_MAX))
 
 /**
  * \brief The maximum number of characters in a channel type (e.g., “temp09”).
