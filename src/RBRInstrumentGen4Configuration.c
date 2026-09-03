@@ -694,7 +694,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
 
         if (strcmp(parameter.key, "equation") == 0)
         {
-            snprintf((char *) calibration->equation,
+            snprintf(calibration->equation,
                      sizeof(calibration->equation),
                      "%s",
                      parameter.value);
@@ -1022,8 +1022,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
                                        "channel %s",
                                        channel->label));
 
-    *(RBRInstrumentGen4ChannelNature *) &channel->nature =
-        RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE;
+    channel->nature = RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE;
 
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
@@ -1039,25 +1038,22 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
         }
         else if (strcmp(parameter.key, "type") == 0)
         {
-            snprintf((char *) channel->type,
+            snprintf(channel->type,
                      sizeof(channel->type),
                      "%s",
                      parameter.value);
         }
         else if (strcmp(parameter.key, "settlingtime") == 0)
         {
-            *(RBRInstrumentGen4Period *) &channel->settlingTime =
-                strtol(parameter.value, NULL, 10);
+            channel->settlingTime = strtol(parameter.value, NULL, 10);
         }
         else if (strcmp(parameter.key, "measuringtime") == 0)
         {
-            *(RBRInstrumentGen4Period *) &channel->measuringTime =
-                strtol(parameter.value, NULL, 10);
+            channel->measuringTime = strtol(parameter.value, NULL, 10);
         }
         else if (strcmp(parameter.key, "readouttime") == 0)
         {
-            *(RBRInstrumentGen4Period *) &channel->readOutTime =
-                strtol(parameter.value, NULL, 10);
+            channel->readOutTime = strtol(parameter.value, NULL, 10);
         }
         else if (strcmp(parameter.key, "userunits") == 0)
         {
@@ -1068,29 +1064,28 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
         }
         else if (strcmp(parameter.key, "nature") == 0)
         {
-            *(RBRInstrumentGen4ChannelNature *) &channel->nature =
+            channel->nature =
                 RBRInstrumentGen4ChannelNature_parse(parameter.value);
         }
         else if (strcmp(parameter.key, "derived") == 0)
         {
-            *(bool *) &channel->derived = (strcmp(parameter.value,
-                                                  "true") == 0);
+            channel->derived = (strcmp(parameter.value, "true") == 0);
         }
         else if (strcmp(parameter.key, "node") == 0)
         {
-            RBRInstrumentGen4_copyOptionalLabel((char *) channel->node,
+            RBRInstrumentGen4_copyOptionalLabel(channel->node,
                                                 sizeof(channel->node),
                                                 parameter.value);
         }
         else if (strcmp(parameter.key, "port") == 0)
         {
-            RBRInstrumentGen4_copyOptionalLabel((char *) channel->port,
+            RBRInstrumentGen4_copyOptionalLabel(channel->port,
                                                 sizeof(channel->port),
                                                 parameter.value);
         }
         else if (strcmp(parameter.key, "device") == 0)
         {
-            RBRInstrumentGen4_copyOptionalLabel((char *) channel->device,
+            RBRInstrumentGen4_copyOptionalLabel(channel->device,
                                                 sizeof(channel->device),
                                                 parameter.value);
         }

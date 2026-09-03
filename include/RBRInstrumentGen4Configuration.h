@@ -637,8 +637,10 @@ typedef struct RBRInstrumentGen4Calibration
      * \brief The formula used to convert raw readings to physical units.
      *
      * E.g. `temperature`, `linear`, `deri_depth`.
+     *
+     * \readonly
      */
-    const char equation[RBRINSTRUMENTGEN4_CALIBRATION_EQUATION_MAX + 1];
+    char equation[RBRINSTRUMENTGEN4_CALIBRATION_EQUATION_MAX + 1];
 
     /**
      * \brief The date and time of the calibration.
@@ -751,17 +753,31 @@ typedef struct RBRInstrumentGen4Channel
      * \brief A short, pre-defined generic name for the installed channel.
      *
      * E.g. `temp006`, `pres003`, `dpth001`.
+     *
+     * \readonly
      */
-    const char type[RBRINSTRUMENTGEN4_CHANNEL_TYPE_MAX + 1];
+    char type[RBRINSTRUMENTGEN4_CHANNEL_TYPE_MAX + 1];
 
-    /** \brief Settling time in milliseconds; zero on a derived channel. */
-    const RBRInstrumentGen4Period settlingTime;
+    /**
+     * \brief Settling time in milliseconds; zero on a derived channel.
+     *
+     * \readonly
+     */
+    RBRInstrumentGen4Period settlingTime;
 
-    /** \brief Measuring time in milliseconds; zero on a derived channel. */
-    const RBRInstrumentGen4Period measuringTime;
+    /**
+     * \brief Measuring time in milliseconds; zero on a derived channel.
+     *
+     * \readonly
+     */
+    RBRInstrumentGen4Period measuringTime;
 
-    /** \brief Read-out time in milliseconds; zero on a derived channel. */
-    const RBRInstrumentGen4Period readOutTime;
+    /**
+     * \brief Read-out time in milliseconds; zero on a derived channel.
+     *
+     * \readonly
+     */
+    RBRInstrumentGen4Period readOutTime;
 
     /**
      * \brief The unit in which processed data is reported.
@@ -770,36 +786,48 @@ typedef struct RBRInstrumentGen4Channel
      */
     char userUnits[RBRINSTRUMENTGEN4_CHANNEL_UNIT_MAX + 1];
 
-    /** \brief Whether the channel measures or reports housekeeping. */
-    const RBRInstrumentGen4ChannelNature nature;
+    /**
+     * \brief Whether the channel measures or reports housekeeping.
+     *
+     * \readonly
+     */
+    RBRInstrumentGen4ChannelNature nature;
 
     /**
      * \brief Whether the channel is computed from other channels rather than
      * measured.
+     *
+     * \readonly
      */
-    const bool derived;
+    bool derived;
 
     /**
      * \brief The label of the node the channel is reached through.
      *
      * `self` for a channel of the instrument itself, and empty for a derived
      * channel, which the instrument reports as `na`.
+     *
+     * \readonly
      */
-    const char node[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char node[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
     /**
      * \brief The label of the port the channel is reached through.
      *
      * Empty for a derived channel, which the instrument reports as `na`.
+     *
+     * \readonly
      */
-    const char port[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char port[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
     /**
      * \brief The label of the device the channel belongs to.
      *
      * Empty for a derived channel, which the instrument reports as `na`.
+     *
+     * \readonly
      */
-    const char device[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char device[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 } RBRInstrumentGen4Channel;
 
 /**
@@ -860,9 +888,9 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
  * \brief Update a channel's user units.
  *
  * RBRInstrumentGen4Channel.userUnits is the only parameter of the command a
- * caller may change; every other field of the structure is `const`. Read the
- * channel with RBRInstrumentGen4_getChannel(), change the units, and write the
- * structure back.
+ * caller may change; every other field of the structure is read-only. Read
+ * the channel with RBRInstrumentGen4_getChannel(), change the units, and write
+ * the structure back.
  *
  * \note Issues the `channel <channel_label>` command.
  *
@@ -964,7 +992,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
  * change what you need, and write the structure back: the counts read there
  * are what bounds the coefficients sent.
  *
- * The equation is `const` and never sent; the instrument rejects a write to it.
+ * The equation is read-only and never sent; the instrument rejects a write to
+ * it.
  *
  * \warning Hardware errors may occur if the instrument is logging, a
  *          coefficient is out of range for the equation, or an m reference
