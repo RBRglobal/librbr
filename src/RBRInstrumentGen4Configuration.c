@@ -1301,35 +1301,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setParameters(
         (double) parameters->temperature);
 }
 
-const char *RBRInstrumentGen4UvledCommand_name(RBRInstrumentGen4UvledCommand uvledCommand)
-{
-            switch(uvledCommand){
-            case RBRINSTRUMENTGEN4_UVLED_ACTIVATE:
-                return "activate";
-            case RBRINSTRUMENTGEN4_UVLED_DEACTIVATE:
-                return "deactivate";
-            case RBRINSTRUMENTGEN4_UVLED_STATUS:
-                return "status";
-            case RBRINSTRUMENTGEN4_UVLED_COUNT:
-                return "uvled command count";
-            case RBRINSTRUMENTGEN4_UNKNOWN_UVLED:
-            default:
-                return "unknown uvled command";
-            }
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4_getUvled(RBRInstrumentGen4 *instrument, RBRInstrumentGen4Uvled *uvled){
-        (void)instrument;
-        (void)uvled;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
-RBRInstrumentGen4Error RBRInstrumentGen4Uvled_setUvled(RBRInstrumentGen4 *instrument, const RBRInstrumentGen4Uvled *uvled){
-        (void)instrument;
-        (void)uvled;
-        return RBRINSTRUMENTGEN4_SUCCESS;
-}
-
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getGroup(
     RBRInstrumentGen4 *instrument,

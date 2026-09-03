@@ -25,8 +25,9 @@ LDLIBS := -lRBR -lm
 ## - posix-parse-file calls RBRParserGen4_destroy(), which is declared but
 ##   not implemented (the Gen4 sample parser is incomplete);
 ## - posix-profilingFloat configures a `regimes` schedule; the `regimes` and
-##   `ddsampling` modes are not modelled (SYS-1234). Its source is otherwise
-##   untouched, so re-enabling it is the only change needed.
+##   `ddsampling` modes are not modelled (SYS-1234). It also uses download
+##   and dataset interfaces which have since been reworked, so it needs
+##   realignment beyond the regimes modelling.
 EXAMPLES := \
     posix-communications \
     posix-download-datablock-bySchedule \

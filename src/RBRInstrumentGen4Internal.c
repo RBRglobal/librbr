@@ -415,7 +415,7 @@ static void RBRInstrumentGen4_terminateResponse(
  * \return the first byte after the next delimiter or consecutive delimiters
  * \return NULL if no such byte exists
  */
-char *seek(const char *str, char delimiter)
+static char *seek(const char *str, char delimiter)
 {
     char *token = (char *)str;
     if (token == NULL
@@ -572,7 +572,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
                         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
                     }
                     uint16_t calCrc;
-                    calCrc = calculateCrcGen4(response, token - response);
+                    calCrc = RBRInstrumentGen4_calculateCrc(response, token - response);
                     if (calCrc != realCrc)
                     {
                         return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;

@@ -68,14 +68,12 @@ if(CONFIG_LIBRBR)
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Communication.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Configuration.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Deployment.c
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Gating.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4HardwareErrors.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Instrument.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Internal.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Internal.h
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Memory.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Realtime.c
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Security.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Streaming.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRParserGen4.c
         )
