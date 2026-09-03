@@ -137,7 +137,7 @@ GEN4_OBJECTS := src/RBRInstrumentGen4.o \
                 src/RBRInstrumentGen4Instrument.o \
                 src/RBRInstrumentGen4Internal.o \
                 src/RBRInstrumentGen4Memory.o \
-                src/RBRInstrumentGen4Polling.o \
+                src/RBRInstrumentGen4Realtime.o \
                 src/RBRInstrumentGen4Security.o \
                 src/RBRInstrumentGen4Streaming.o \
                 src/RBRParserGen4.o
@@ -226,12 +226,13 @@ GEN3_TEST_MODULES := communication \
 ## Gen4 sources; re-enabling them is part of the test alignment planned for
 ## libRBR 2.0 (SYS-1194):
 ##
-## - `polling`, `streaming`: predate the `channels` to `channelCount` rename
+## - `streaming`: predates the `channels` to `channelCount` rename
 GEN4_TEST_MODULES := communication \
                      configuration \
                      deployment \
                      instrument \
                      memory \
+                     realtime \
                      security
 
 bin/tests: bin/libRBR.a \
