@@ -165,11 +165,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getLinkSerial(
 {
     memset(serial, 0, sizeof(RBRInstrumentGen4LinkSerial));
 
-    RBRInstrumentGen4LinkSerialBaudRate *availableBaudRates
-        = (RBRInstrumentGen4LinkSerialBaudRate *) &serial->availableBaudRates;
-    RBRInstrumentGen4LinkSerialMode *availableModes
-        = (RBRInstrumentGen4LinkSerialMode *) &serial->availableModes;
-
     RBR_TRY(RBRInstrumentGen4_converse(
         instrument,
         "link serial baudrate mode availablebaudrates availablemodes"
@@ -203,7 +198,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getLinkSerial(
             while (value != NULL)
             {
                 char *nextValue = RBRInstrumentGen4_splitListValue(value);
-                *availableBaudRates
+                serial->availableBaudRates
                     |= RBRInstrumentGen4LinkSerialBaudRate_parse(value);
 
                 value = nextValue;
@@ -215,7 +210,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getLinkSerial(
             while (value != NULL)
             {
                 char *nextValue = RBRInstrumentGen4_splitListValue(value);
-                *availableModes
+                serial->availableModes
                     |= RBRInstrumentGen4LinkSerialMode_parse(value);
 
                 value = nextValue;
@@ -284,8 +279,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getWiFi(RBRInstrumentGen4 *instrument,
 {
      memset(wifi, 0, sizeof(RBRInstrumentGen4WiFi));
 
-    RBRInstrumentGen4WiFiState *state = (RBRInstrumentGen4WiFiState *)&wifi->state;
-    *state = RBRINSTRUMENTGEN4_UNKNOWN_WIFI;
+    wifi->state = RBRINSTRUMENTGEN4_UNKNOWN_WIFI;
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "wifi"));
 
@@ -314,7 +308,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getWiFi(RBRInstrumentGen4 *instrument,
                 if (strcmp(RBRInstrumentGen4WiFiState_name(i),
                            parameter.value) == 0)
                 {
-                    *state = i;
+                    wifi->state = i;
                     break;
                 }
             }
@@ -336,8 +330,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getWiFi(RBRInstrumentGen4 *instrument,
                 if (strcmp(RBRInstrumentGen4LinkSerialBaudRate_name(i),
                            parameter.value) == 0)
                 {
-                    *(RBRInstrumentGen4LinkSerialBaudRate *)
-                        &wifi->baudRate = i;
+                    wifi->baudRate = i;
                     break;
                 }
             }
