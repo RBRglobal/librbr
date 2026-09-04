@@ -152,8 +152,6 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_getOutputFormat(instrument, &outputformat);
     outputformat.sn = true;
     outputformat.scheduleLabel = true;
-    /* The library cannot currently parse samples without a timestamp; see
-     * SYS-1244. */
     outputformat.dateTime = true;
     outputformat.crc = true;
     RBRInstrumentGen4_setOutputFormat(instrument, &outputformat);

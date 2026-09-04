@@ -510,10 +510,13 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
             RBR_TRY(RBRInstrumentGen4DateTime_parseSampleTime(token,
                                                         &sample->timestamp,
                                                         &timestamp_end));
-            token = timestamp_end;
+            if ((token = seek(timestamp_end, PARAMETER_SEPARATOR_L4)) == NULL)
+            {
+                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+            }
         }
 
-        while ((token = seek(token, PARAMETER_SEPARATOR_L4)) != NULL
+        while (token != NULL
                && sample->channelCount < RBRINSTRUMENTGEN4_CHANNEL_MAX)
         {
             char *reading_end = token;
@@ -595,6 +598,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
             }
 
             sample->readings[sample->channelCount++] = reading;
+            token = seek(token, PARAMETER_SEPARATOR_L4);
         }
         return RBRINSTRUMENTGEN4_SUCCESS;
     }
