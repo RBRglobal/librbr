@@ -496,8 +496,23 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
         }
     }
 
+    /* Labels' naming constraints are enforced by the instrument, not here. */
     if (outputFormat->scheduleLabel)
     {
+        char *label_end = token;
+        while (*label_end != PARAMETER_SEPARATOR_L4
+               && *label_end != '\0')
+        {
+            ++label_end;
+        }
+        size_t label_len = (size_t) (label_end - token);
+        if (label_len > RBRINSTRUMENTGEN4_LABEL_NAME_MAX)
+        {
+            label_len = RBRINSTRUMENTGEN4_LABEL_NAME_MAX;
+        }
+        memcpy(sample->scheduleLabel, token, label_len);
+        sample->scheduleLabel[label_len] = '\0';
+
         if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
         {
             return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;

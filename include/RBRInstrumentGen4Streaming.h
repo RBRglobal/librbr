@@ -148,6 +148,12 @@ typedef struct RBRInstrumentGen4Sample
 {
     /** \brief The timestamp of the sample. */
     RBRInstrumentGen4DateTime timestamp;
+    /**
+     * \brief The schedule label reported with the sample.
+     *
+     * An empty string when the output format omits the schedule label.
+     */
+    char scheduleLabel[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
     /** \brief The number of populated sample readings. */
     int32_t channelCount;
     /**

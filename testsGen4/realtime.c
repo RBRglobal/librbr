@@ -130,6 +130,7 @@ TEST_LOGGER4(poll)
             .crc = false },
           RBRINSTRUMENTGEN4_SUCCESS,
           { .timestamp = 1710054091000LL,
+            .scheduleLabel = "polling",
             .channelCount = 1,
             .readings = { RBRInstrumentGen4Reading_setError(
                 RBRINSTRUMENTGEN4_READING_FLAG_ERROR, 1) } } },
@@ -225,6 +226,7 @@ TEST_LOGGER4(poll)
             .crc = false },
           RBRINSTRUMENTGEN4_SUCCESS,
           { .timestamp = 0,
+            .scheduleLabel = "polling",
             .channelCount = 4,
             .readings = { 12.5356691, 9.81261000,
                           -0.319890648, -0.317924945 } } },
@@ -239,6 +241,7 @@ TEST_LOGGER4(poll)
             .crc = true },
           RBRINSTRUMENTGEN4_SUCCESS,
           { .timestamp = 0,
+            .scheduleLabel = "polling",
             .channelCount = 4,
             .readings = { 12.5356399, 9.79543000,
                           -0.337070648, -0.334999375 } } },
@@ -281,6 +284,7 @@ TEST_LOGGER4(poll)
             .crc = false },
           RBRINSTRUMENTGEN4_SUCCESS,
           { .timestamp = 0,
+            .scheduleLabel = "polling",
             .channelCount = 4,
             .readings = { 12.5369048, 9.81109000,
                           -0.321410648, -0.319435605 } } },
@@ -295,6 +299,7 @@ TEST_LOGGER4(poll)
             .crc = true },
           RBRINSTRUMENTGEN4_SUCCESS,
           { .timestamp = 0,
+            .scheduleLabel = "polling",
             .channelCount = 4,
             .readings = { 12.5369632, 9.80959000,
                           -0.322910648, -0.320926387 } } },
@@ -314,6 +319,7 @@ TEST_LOGGER4(poll)
             .dataType = RBRINSTRUMENTGEN4_DATATYPE_FLOAT64 },
           RBRINSTRUMENTGEN4_SUCCESS,
           { .timestamp = 1710333456000LL,
+            .scheduleLabel = "polling",
             .channelCount = 4,
             .readings = { 12.5369242316864, 9.80062000000000,
                           -0.331880648498535, -0.329841267502290 } } },
@@ -384,6 +390,8 @@ TEST_LOGGER4(poll)
         TEST_ASSERT_EQ(tests[i].expected.channelCount,
                        actual.channelCount,
                        "%" PRIi32);
+        TEST_ASSERT_STR_EQ(tests[i].expected.scheduleLabel,
+                           actual.scheduleLabel);
         for (int32_t channel = 0; channel < actual.channelCount; ++channel)
         {
             TEST_ASSERT_ENUM_EQ(
