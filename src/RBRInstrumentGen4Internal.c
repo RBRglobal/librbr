@@ -473,140 +473,133 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
 
     double reading;
     sample->channelCount = 0;
-    if (strchr(response, PARAMETER_SEPARATOR_L4) != NULL)
+    char *token = response;
+    if (outputFormat->sn)
     {
-        char *token = response;
-        if (outputFormat->sn)
+        if (memcmp(token, "RBR", 3) != 0)
         {
-            if (memcmp(token, "RBR", 3) != 0)
-            {
-                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-            }
-            if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
-            {
-                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-            }
-            if (!isdigit(*token))
-            {
-                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-            }
-            if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
-            {
-                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-            }
+            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
         }
-
-        if (outputFormat->scheduleLabel)
+        if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
         {
-            if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
-            {
-                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-            }
+            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
         }
-
-        if (outputFormat->dateTime)
+        if (!isdigit(*token))
         {
-            char* timestamp_end;
-            RBR_TRY(RBRInstrumentGen4DateTime_parseSampleTime(token,
-                                                        &sample->timestamp,
-                                                        &timestamp_end));
-            if ((token = seek(timestamp_end, PARAMETER_SEPARATOR_L4)) == NULL)
-            {
-                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-            }
+            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
         }
-
-        while (token != NULL
-               && sample->channelCount < RBRINSTRUMENTGEN4_CHANNEL_MAX)
+        if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
         {
-            char *reading_end = token;
-            /*
-            if (memcmp(token,
-                       RBRINSTRUMENTGEN4_RESPONSE_TERMINATOR,
-                       RBRINSTRUMENTGEN4_RESPONSE_TERMINATOR_LEN))
+            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        }
+    }
+
+    if (outputFormat->scheduleLabel)
+    {
+        if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
+        {
+            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        }
+    }
+
+    /* Datetime format is 'YYYY-MM-DD hh:mm:ss.zzz' */
+    if (outputFormat->dateTime)
+    {
+        char* timestamp_end;
+        RBR_TRY(RBRInstrumentGen4DateTime_parseSampleTime(token,
+                                                          &sample->timestamp,
+                                                          &timestamp_end));
+        if ((token = seek(timestamp_end, PARAMETER_SEPARATOR_L4)) == NULL)
+        {
+            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        }
+    }
+
+    while (token != NULL
+           && sample->channelCount < RBRINSTRUMENTGEN4_CHANNEL_MAX)
+    {
+        char *reading_end = token;
+        /*
+        if (memcmp(token,
+                   RBRINSTRUMENTGEN4_RESPONSE_TERMINATOR,
+                   RBRINSTRUMENTGEN4_RESPONSE_TERMINATOR_LEN))
+        {
+            return RBRINSTRUMENTGEN4_SUCCESS;
+        }
+        else */
+        if (memcmp(token, SAMPLE_NAN, 3) == 0)
+        {
+            reading = (double) NAN;
+        }
+        else if (memcmp(token, SAMPLE_INF, 3) == 0)
+        {
+            reading = (double) INFINITY;
+        }
+        else if (memcmp(token, SAMPLE_NINF, 4) == 0)
+        {
+            reading = -(double) INFINITY;
+        }
+        else if (memcmp(token, SAMPLE_UNCAL, 3) == 0)
+        {
+            reading = RBRInstrumentGen4Reading_setError(
+                RBRINSTRUMENTGEN4_READING_FLAG_UNCALIBRATED,
+                0);
+        }
+        else if (memcmp(token,
+                        SAMPLE_ERROR_PREFIX,
+                        SAMPLE_ERROR_PREFIX_LEN) == 0)
+        {
+            /* Uh-oh. We'll encode the error in a NaN. Filtering, etc. will
+             * ignore the value and the sample formatter will output it just as
+             * we received it. */
+            reading = RBRInstrumentGen4Reading_setError(
+                RBRINSTRUMENTGEN4_READING_FLAG_ERROR,
+                strtol(token + SAMPLE_ERROR_PREFIX_LEN,
+                       NULL,
+                       10));
+        }
+        else if (memcmp(token, "0x", 2) == 0)
+        {
+            if (outputFormat->crc)
             {
-                return RBRINSTRUMENTGEN4_SUCCESS;
-            }
-            else */
-            if (memcmp(token, SAMPLE_NAN, 3) == 0)
-            {
-                reading = (double) NAN;
-            }
-            else if (memcmp(token, SAMPLE_INF, 3) == 0)
-            {
-                reading = (double) INFINITY;
-            }
-            else if (memcmp(token, SAMPLE_NINF, 4) == 0)
-            {
-                reading = -(double) INFINITY;
-            }
-            else if (memcmp(token, SAMPLE_UNCAL, 3) == 0)
-            {
-                reading = RBRInstrumentGen4Reading_setError(
-                    RBRINSTRUMENTGEN4_READING_FLAG_UNCALIBRATED,
-                    0);
-            }
-            else if (memcmp(token,
-                            SAMPLE_ERROR_PREFIX,
-                            SAMPLE_ERROR_PREFIX_LEN) == 0)
-            {
-                /* Uh-oh. We'll encode the error in a NaN. Filtering, etc. will
-                    * ignore the value and the sample formatter will output it just as
-                    * we received it. */
-                reading = RBRInstrumentGen4Reading_setError(
-                    RBRINSTRUMENTGEN4_READING_FLAG_ERROR,
-                    strtol(token + SAMPLE_ERROR_PREFIX_LEN,
-                           NULL,
-                           10));
-            }
-            else if (memcmp(token, "0x", 2) == 0)
-            {
-                if (outputFormat->crc)
-                {
-                    /*
-                    * calculate CRC.
-                    * The CRC includes all characters already sent on this line, starting with the first, up to
-                    * and including the last space character before the <CRC>.
-                    */
-                    uint16_t realCrc = strtol(token, &reading_end, 16);
-                    if (reading == 0 && token == reading_end)
-                    {
-                        /* No value was parsed. */
-                        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-                    }
-                    uint16_t calCrc;
-                    calCrc = RBRInstrumentGen4_calculateCrc(response, token - response);
-                    if (calCrc != realCrc)
-                    {
-                        return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;
-                    }
-                    return RBRINSTRUMENTGEN4_SUCCESS;
-                }
-                else
-                {
-                    return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-                }
-            }
-            else
-            {
-                reading = strtod(token, &reading_end);
+                /*
+                * calculate CRC.
+                * The CRC includes all characters already sent on this line, starting with the first, up to
+                * and including the last space character before the <CRC>.
+                */
+                uint16_t realCrc = strtol(token, &reading_end, 16);
                 if (reading == 0 && token == reading_end)
                 {
                     /* No value was parsed. */
                     return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
                 }
+                uint16_t calCrc;
+                calCrc = RBRInstrumentGen4_calculateCrc(response, token - response);
+                if (calCrc != realCrc)
+                {
+                    return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;
+                }
+                return RBRINSTRUMENTGEN4_SUCCESS;
             }
-
-            sample->readings[sample->channelCount++] = reading;
-            token = seek(token, PARAMETER_SEPARATOR_L4);
+            else
+            {
+                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+            }
         }
-        return RBRINSTRUMENTGEN4_SUCCESS;
+        else
+        {
+            reading = strtod(token, &reading_end);
+            if (reading == 0 && token == reading_end)
+            {
+                /* No value was parsed. */
+                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+            }
+        }
+
+        sample->readings[sample->channelCount++] = reading;
+        token = seek(token, PARAMETER_SEPARATOR_L4);
     }
-    else 
-    {
-        /* No spaces in the response. Not likely but just in case. */
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-    }
+    return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 /**
