@@ -162,6 +162,7 @@ int main(int argc, char *argv[])
     {
         // poll one group
         err = RBRInstrumentGen4_pollGroups(instrument,
+                                           true,
                                            groupPool.pool[0].label,
                                            &sample);
         if (err != RBRINSTRUMENTGEN4_SUCCESS)
