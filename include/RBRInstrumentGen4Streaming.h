@@ -149,13 +149,18 @@ typedef struct RBRInstrumentGen4Sample
  *
  * This function waits for a streamed sample to arrive, parses it, then calls
  * the RBRInstrumentGen4SampleCallback provided to the instrument via
- * RBRInstrumentGen4Callbacks.sample.
+ * RBRInstrumentGen4Callbacks.sample, delivering the sample into
+ * RBRInstrumentGen4Callbacks.sampleBuffer.
+ *
+ * This requires RBRInstrumentGen4Callbacks.sample and
+ * RBRInstrumentGen4Callbacks.sampleBuffer to be populated.
  *
  * \param [in] instrument the instrument connection
  * \return #RBRINSTRUMENTGEN4_SUCCESS when a streaming sample has been read
+ * \return #RBRINSTRUMENTGEN4_MISSING_CALLBACK when the connection was opened
+ *         without a sample callback
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_fetchSample() for on-demand sample fetching
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_readSample(RBRInstrumentGen4 *instrument);
 

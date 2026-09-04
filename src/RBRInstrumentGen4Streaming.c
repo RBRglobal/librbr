@@ -80,6 +80,11 @@ inline double RBRInstrumentGen4Reading_setError(RBRInstrumentGen4ReadingError er
 
 RBRInstrumentGen4Error RBRInstrumentGen4_readSample(RBRInstrumentGen4 *instrument)
 {
+    if (instrument->callbacks.sample == NULL)
+    {
+        return RBRINSTRUMENTGEN4_MISSING_CALLBACK;
+    }
+
     RBRInstrumentGen4Error err;
     RBRInstrumentGen4DateTime now;
     /* RBRInstrumentGen4_readResponse() returns #RBRINSTRUMENTGEN4_SAMPLE when a sample

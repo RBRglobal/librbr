@@ -554,6 +554,9 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getInstrument(
  * \brief Get the current output format.
  * \note Issues the `instrument outputformat` command.
  *
+ * On success, the library caches the output format and uses it to parse
+ * subsequently received samples.
+ *
  * \param [in] instrument the instrument connection
  * \param [out] outputformat the current output format
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
@@ -577,6 +580,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getOutputFormat(
  * \warning RBRParserGen4 reads only #RBRINSTRUMENTGEN4_ENCODING_ASCII.
  *          Selecting #RBRINSTRUMENTGEN4_ENCODING_BINARY will stop this library
  *          from being able to interpret samples or command responses.
+ *
+ * On success, the library caches the output format and uses it to parse
+ * subsequently received samples. On failure the cache is left unchanged and
+ * may no longer match the instrument. Samples received while the cache is
+ * stale are usually refused, but some mismatches go undetected and yield a
+ * wrongly accepted sample, so call RBRInstrumentGen4_getOutputFormat()
+ * before relying on parsed samples again.
  *
  * \param [in] instrument the instrument connection
  * \param [in] outputformat the desired output format

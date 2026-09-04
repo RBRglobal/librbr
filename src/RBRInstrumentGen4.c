@@ -215,19 +215,9 @@ RBRInstrumentGen4Error RBRInstrumentGen4_open(RBRInstrumentGen4 **instrument,
     (*instrument)->response.type     = RBRINSTRUMENTGEN4_RESPONSE_UNKNOWN_TYPE;
     (*instrument)->outputFormat      = RBRINSTRUMENTGEN4_DEFAULT_OUTPUTFORMAT;
 
-    /**
-     * Note that because we assume a default output format, there is a critical 
-     * window where conversing with the instrument can fail if it was previously
-     * configured to stream samples in a non-default output format. This is only
-     * an issue until we read the output format off of the instrument, at which
-     * point we will be able to parse the samples correctly.
-     * Consequently, the below function calls (RBRInstrumentGen4Sample_parse in 
-     * RBRInstrumentGen4_readResponse in RBRInstrumentGen4_converse in both 
-     * RBRInstrumentGen4_populateGeneration and 
-     * RBRInstrumentGen4_getOutputFormat) will return an error if 
-     * RBRInstrumentGen4_open is called on an instrument that
-     * is streaming samples that are *not* in the default output format.
-     */
+    /* We assume a default output format until it's read below, so samples
+     * streamed in any other format in the meantime are dropped as
+     * unrecognised responses. See the RBRInstrumentGen4_open() doc comment. */
     RBRInstrumentGen4Error err;
     err = RBRInstrumentGen4_populateGeneration(*instrument);
 

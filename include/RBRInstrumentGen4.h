@@ -930,9 +930,16 @@ typedef struct RBRInstrumentGen4
  * RBRInstrumentGen4 instance, and may be overwritten as soon as the callback
  * returns.
  *
- * This library supports only 4th-generation RBR instruments. If the library 
- * detects an unsupported instrument during connection, 
+ * This constructor supports only 4th-generation RBR instruments. If the 
+ * constructor detects an unsupported instrument during connection,
  * #RBRINSTRUMENTGEN4_UNSUPPORTED is returned.
+ *
+ * Until this function has read the instrument's output format, the library
+ * assumes it to be #RBRINSTRUMENTGEN4_DEFAULT_OUTPUTFORMAT. Samples streamed
+ * in any other format while the connection is being opened are not
+ * recognised as samples: they are discarded rather than passed to
+ * RBRInstrumentGen4Callbacks.sample.
+ * \see RBRInstrumentGen4_setOutputFormat()
  *
  * In the event of any return value other than #RBRINSTRUMENTGEN4_SUCCESS, any
  * memory allocated by this constructor is freed. That is, in the event of
