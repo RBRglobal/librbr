@@ -457,7 +457,6 @@ static char *seek(const char *str, char delimiter)
  * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if the response does not
  *         follow the specified output format
  */
-
 static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
     RBRInstrumentGen4Sample *sample,
     RBRInstrumentGen4OutputFormat *outputFormat,
@@ -465,26 +464,22 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
 {
     memset(sample, 0, sizeof(RBRInstrumentGen4Sample));
 
-    /*
-    All samples scenario:
-    2023-09-10 11:24:14.125 38.6671142e+000 22.0217124e+000
-    <RBR 999999 >polling 2023-09-10 11:24:14.125 38.6671142e+000 22.0217124e+000< 0xABCD>
-    <RBR 999999 ><scheduleLabel >2023-09-10 11:24:14.125 38.6671142e+000 22.0217124e+000< 0xABCD>
-    */
-
     double reading;
     sample->channelCount = 0;
     char *token = response;
+    /* Serial numbers are expected to be of the form 'RBR [0-9]+' */
     if (outputFormat->sn)
     {
         if (memcmp(token, "RBR", 3) != 0)
         {
             return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
         }
-        if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
+        /* Explicitly check for a ' ', not PARAMETER_SEPARATOR_L4 */
+        if ((token = seek(token, ' ')) == NULL)
         {
             return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
         }
+        /* Assume the serial number is valid if it starts with a digit */
         if (!isdigit(*token))
         {
             return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
@@ -535,14 +530,6 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
            && sample->channelCount < RBRINSTRUMENTGEN4_CHANNEL_MAX)
     {
         char *reading_end = token;
-        /*
-        if (memcmp(token,
-                   RBRINSTRUMENTGEN4_RESPONSE_TERMINATOR,
-                   RBRINSTRUMENTGEN4_RESPONSE_TERMINATOR_LEN))
-        {
-            return RBRINSTRUMENTGEN4_SUCCESS;
-        }
-        else */
         if (memcmp(token, SAMPLE_NAN, 3) == 0)
         {
             reading = (double) NAN;
@@ -569,19 +556,18 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
         {
             if (outputFormat->crc)
             {
-                /*
-                * calculate CRC.
-                * The CRC includes all characters already sent on this line, starting with the first, up to
-                * and including the last space character before the <CRC>.
-                */
+                /* Calculate the CRC. The CRC includes all characters already
+                 * sent on this line, starting with the first, up to
+                 * and including the last space character before the <CRC>. */
                 uint16_t realCrc = strtol(token, &reading_end, 16);
-                if (reading == 0 && token == reading_end)
+                if (reading_end <= token + 2)
                 {
                     /* No value was parsed. */
                     return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
                 }
                 uint16_t calCrc;
-                calCrc = RBRInstrumentGen4_calculateCrc(response, token - response);
+                calCrc = RBRInstrumentGen4_calculateCrc(response,
+                                                        token - response);
                 if (calCrc != realCrc)
                 {
                     return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;
