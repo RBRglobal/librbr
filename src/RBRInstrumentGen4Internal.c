@@ -662,6 +662,24 @@ RBRInstrumentGen4Error RBRInstrumentGen4_errorCheckResponse(
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
+RBRInstrumentGen4Error RBRInstrumentGen4_deliverSample(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Sample *sample)
+{
+    if (instrument->callbacks.sample == NULL)
+    {
+        return RBRINSTRUMENTGEN4_SUCCESS;
+    }
+
+    if (sample != instrument->callbacks.sampleBuffer)
+    {
+        *instrument->callbacks.sampleBuffer = *sample;
+    }
+
+    return instrument->callbacks.sample(instrument,
+                                        instrument->callbacks.sampleBuffer);
+}
+
 RBRInstrumentGen4Error RBRInstrumentGen4_readResponse(RBRInstrumentGen4 *instrument,
                                                       bool breakOnSample,
                                                       RBRInstrumentGen4Sample *sample)
@@ -696,10 +714,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_readResponse(RBRInstrumentGen4 *instrum
 
         if (sampleTarget != NULL && RBRInstrumentGen4Sample_parse(sampleTarget, &instrument->outputFormat, beginning) == RBRINSTRUMENTGEN4_SUCCESS)
         {
-            if (instrument->callbacks.sample != NULL && sample == NULL)
+            if (sample == NULL)
             {
-                RBR_TRY(instrument->callbacks.sample(instrument,
-                                                     sampleTarget));
+                RBR_TRY(RBRInstrumentGen4_deliverSample(instrument,
+                                                        sampleTarget));
             }
             if (breakOnSample)
             {

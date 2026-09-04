@@ -168,6 +168,23 @@ RBRInstrumentGen4Error RBRInstrumentGen4_readResponse(RBRInstrumentGen4 *instrum
                                               RBRInstrumentGen4Sample *sample);
 
 /**
+ * Deliver a sample to the RBRInstrumentGen4SampleCallback set via
+ * RBRInstrumentGen4Callbacks.sample, if any. If \a sample is not already
+ * RBRInstrumentGen4Callbacks.sampleBuffer, it will be copied there first;
+ * RBRInstrumentGen4_open() guarantees that sampleBuffer is non-`NULL`
+ * whenever the callback is set.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] sample the sample to deliver
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when no callback is set, or the value
+ *         returned by the callback otherwise
+ * \see RBRInstrumentGen4_open() for the sampleBuffer guarantee
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_deliverSample(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Sample *sample);
+
+/**
  * \brief Send a command to the instrument and await an appropriate response.
  *
  * This function is more than just a combination of RBRInstrumentGen4_sendCommand()
