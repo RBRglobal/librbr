@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Memory.c
+ * \file RBRGen3Memory.c
  *
  * \brief Library implementation.
  *
@@ -18,38 +18,38 @@
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
 
-const char *RBRInstrumentGen3Dataset_name(RBRInstrumentGen3Dataset dataset)
+const char *RBRGen3Dataset_name(RBRGen3Dataset dataset)
 {
     switch (dataset)
     {
-    case RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS:
+    case RBRGEN3_DATASET_EASYPARSE_EVENTS:
         return "EasyParse events";
-    case RBRINSTRUMENTGEN3_DATASET_STANDARD:
+    case RBRGEN3_DATASET_STANDARD:
         return "standard or EasyParse data";
-    case RBRINSTRUMENTGEN3_DATASET_EASYPARSE_DEPLOYMENT_HEADER:
+    case RBRGEN3_DATASET_EASYPARSE_DEPLOYMENT_HEADER:
         return "EasyParse deployment header";
-    case RBRINSTRUMENTGEN3_DATASET_POSTPROCESSING_SAMPLE_DATA:
+    case RBRGEN3_DATASET_POSTPROCESSING_SAMPLE_DATA:
         return "post-processing sample data";
-    case RBRINSTRUMENTGEN3_DATASET_UNKNOWN_DATASET1:
-    case RBRINSTRUMENTGEN3_UNKNOWN_DATASET:
+    case RBRGEN3_DATASET_UNKNOWN_DATASET1:
+    case RBRGEN3_UNKNOWN_DATASET:
     default:
         return "unknown dataset";
     }
 }
 
-RBRGen3Error RBRInstrumentGen3_getMemoryInfo(
+RBRGen3Error RBRGen3_getMemoryInfo(
     RBRGen3 *instrument,
-    RBRInstrumentGen3MemoryInfo *memoryInfo)
+    RBRGen3MemoryInfo *memoryInfo)
 {
-    if (memoryInfo->dataset < RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS
-        || memoryInfo->dataset == RBRINSTRUMENTGEN3_DATASET_UNKNOWN_DATASET1
-        || memoryInfo->dataset >= RBRINSTRUMENTGEN3_DATASET_COUNT)
+    if (memoryInfo->dataset < RBRGEN3_DATASET_EASYPARSE_EVENTS
+        || memoryInfo->dataset == RBRGEN3_DATASET_UNKNOWN_DATASET1
+        || memoryInfo->dataset >= RBRGEN3_DATASET_COUNT)
     {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    RBRInstrumentGen3Dataset dataset = memoryInfo->dataset;
-    memset(memoryInfo, 0, sizeof(RBRInstrumentGen3MemoryInfo));
+    RBRGen3Dataset dataset = memoryInfo->dataset;
+    memset(memoryInfo, 0, sizeof(RBRGen3MemoryInfo));
 
     RBR_TRY(RBRGen3_converse(instrument,
                                    "meminfo dataset = %d",
@@ -88,9 +88,9 @@ RBRGen3Error RBRInstrumentGen3_getMemoryInfo(
     return RBRGEN3_SUCCESS;
 }
 
-static RBRGen3Error RBRInstrumentGen3L2_parseDataResponse(
+static RBRGen3Error RBRGen3L2_parseDataResponse(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Data *data)
+    RBRGen3Data *data)
 {
     sscanf(instrument->response.response,
            "data %d %d %d",
@@ -100,9 +100,9 @@ static RBRGen3Error RBRInstrumentGen3L2_parseDataResponse(
     return RBRGEN3_SUCCESS;
 }
 
-static RBRGen3Error RBRInstrumentGen3L3_parseDataResponse(
+static RBRGen3Error RBRGen3L3_parseDataResponse(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Data *data)
+    RBRGen3Data *data)
 {
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
@@ -144,7 +144,7 @@ static RBRGen3Error RBRInstrumentGen3L3_parseDataResponse(
  * \param [out] data the buffer to write into
  * \param [in] size the amount of data to write into the buffer
  */
-static RBRGen3Error RBRInstrumentGen3_fixedRead(
+static RBRGen3Error RBRGen3_fixedRead(
     struct RBRGen3 *instrument,
     void *data,
     int32_t size)
@@ -215,18 +215,18 @@ uint16_t calculateCrc(const void *data, int32_t size)
     return crc;
 }
 
-RBRGen3Error RBRInstrumentGen3_readData(RBRGen3 *instrument,
-                                          RBRInstrumentGen3Data *data)
+RBRGen3Error RBRGen3_readData(RBRGen3 *instrument,
+                                          RBRGen3Data *data)
 {
-    if (data->dataset < RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS
-        || data->dataset == RBRINSTRUMENTGEN3_DATASET_UNKNOWN_DATASET1
-        || data->dataset >= RBRINSTRUMENTGEN3_DATASET_COUNT)
+    if (data->dataset < RBRGEN3_DATASET_EASYPARSE_EVENTS
+        || data->dataset == RBRGEN3_DATASET_UNKNOWN_DATASET1
+        || data->dataset >= RBRGEN3_DATASET_COUNT)
     {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    RBRInstrumentGen3Data workingData;
-    memcpy(&workingData, data, sizeof(RBRInstrumentGen3Data));
+    RBRGen3Data workingData;
+    memcpy(&workingData, data, sizeof(RBRGen3Data));
     data->size = 0;
 
     /*
@@ -265,11 +265,11 @@ RBRGen3Error RBRInstrumentGen3_readData(RBRGen3 *instrument,
      * parse it with sscanf. We can just do things the normal way for L3. */
     if (instrument->generation == RBRGEN3_LOGGER2)
     {
-        RBR_TRY(RBRInstrumentGen3L2_parseDataResponse(instrument, &workingData));
+        RBR_TRY(RBRGen3L2_parseDataResponse(instrument, &workingData));
     }
     else
     {
-        RBR_TRY(RBRInstrumentGen3L3_parseDataResponse(instrument, &workingData));
+        RBR_TRY(RBRGen3L3_parseDataResponse(instrument, &workingData));
     }
 
     /* check if offset in response matches requested offset. If not, return error. */
@@ -277,10 +277,10 @@ RBRGen3Error RBRInstrumentGen3_readData(RBRGen3 *instrument,
         return RBRGEN3_COMMUNICATION_ERROR;
     }
 
-    /* Fill the user-provided buffer. RBRInstrumentGen3_fixedRead() will first pull
+    /* Fill the user-provided buffer. RBRGen3_fixedRead() will first pull
      * leftover data from RBRGen3.responseBuffer, then read from the
      * instrument. */
-    RBR_TRY(RBRInstrumentGen3_fixedRead(instrument, data->data, workingData.size));
+    RBR_TRY(RBRGen3_fixedRead(instrument, data->data, workingData.size));
 
     /* CRC check the last two bytes. */
     union
@@ -290,7 +290,7 @@ RBRGen3Error RBRInstrumentGen3_readData(RBRGen3 *instrument,
     }
     crc;
 
-    RBR_TRY(RBRInstrumentGen3_fixedRead(instrument, crc.buf, 2));
+    RBR_TRY(RBRGen3_fixedRead(instrument, crc.buf, 2));
     /* The logger reports the CRC as big-endian. Under the assumption that the
      * host is little-endian, we'll byte swap it before using it for
      * comparison. ntohs() is POSIX but not part of the C standard, and we want
@@ -304,38 +304,38 @@ RBRGen3Error RBRInstrumentGen3_readData(RBRGen3 *instrument,
         return RBRGEN3_CHECKSUM_ERROR;
     }
 
-    memcpy(data, &workingData, sizeof(RBRInstrumentGen3Data));
+    memcpy(data, &workingData, sizeof(RBRGen3Data));
 
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_memoryClear(RBRGen3 *instrument)
+RBRGen3Error RBRGen3_memoryClear(RBRGen3 *instrument)
 {
     RBR_TRY(RBRInstrumentGen3_permit(instrument, "memclear"));
     RBR_TRY(RBRGen3_converse(instrument, "memclear"));
     return RBRGEN3_SUCCESS;
 }
 
-const char *RBRInstrumentGen3MemoryFormat_name(RBRInstrumentGen3MemoryFormat format)
+const char *RBRGen3MemoryFormat_name(RBRGen3MemoryFormat format)
 {
     switch (format)
     {
-    case RBRINSTRUMENTGEN3_MEMFORMAT_NONE:
+    case RBRGEN3_MEMFORMAT_NONE:
         return "none";
-    case RBRINSTRUMENTGEN3_MEMFORMAT_RAWBIN00:
+    case RBRGEN3_MEMFORMAT_RAWBIN00:
         return "rawbin00";
-    case RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00:
+    case RBRGEN3_MEMFORMAT_CALBIN00:
         return "calbin00";
     default:
         return "unknown memory format";
     }
 }
 
-RBRGen3Error RBRInstrumentGen3_getAvailableMemoryFormats(
+RBRGen3Error RBRGen3_getAvailableMemoryFormats(
     RBRGen3 *instrument,
-    RBRInstrumentGen3MemoryFormat *memoryFormats)
+    RBRGen3MemoryFormat *memoryFormats)
 {
-    *memoryFormats = RBRINSTRUMENTGEN3_MEMFORMAT_NONE;
+    *memoryFormats = RBRGEN3_MEMFORMAT_NONE;
 
     /*
      * The subcommand of `memformat` to retrieve available types changed
@@ -395,11 +395,11 @@ RBRGen3Error RBRInstrumentGen3_getAvailableMemoryFormats(
                 nextValue += separatorLen;
             }
 
-            for (int i = RBRINSTRUMENTGEN3_MEMFORMAT_NONE + 1;
-                 i <= RBRINSTRUMENTGEN3_MEMFORMAT_MAX;
+            for (int i = RBRGEN3_MEMFORMAT_NONE + 1;
+                 i <= RBRGEN3_MEMFORMAT_MAX;
                  i <<= 1)
             {
-                if (strcmp(RBRInstrumentGen3MemoryFormat_name(i),
+                if (strcmp(RBRGen3MemoryFormat_name(i),
                            parameter.value) == 0)
                 {
                     *memoryFormats |= i;
@@ -415,11 +415,11 @@ RBRGen3Error RBRInstrumentGen3_getAvailableMemoryFormats(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_getCurrentMemoryFormat(
+RBRGen3Error RBRGen3_getCurrentMemoryFormat(
     RBRGen3 *instrument,
-    RBRInstrumentGen3MemoryFormat *memoryFormat)
+    RBRGen3MemoryFormat *memoryFormat)
 {
-    *memoryFormat = RBRINSTRUMENTGEN3_MEMFORMAT_NONE;
+    *memoryFormat = RBRGEN3_MEMFORMAT_NONE;
 
     RBR_TRY(RBRGen3_converse(instrument, "memformat type"));
 
@@ -440,11 +440,11 @@ RBRGen3Error RBRInstrumentGen3_getCurrentMemoryFormat(
             continue;
         }
 
-        for (int i = RBRINSTRUMENTGEN3_MEMFORMAT_NONE + 1;
-             i <= RBRINSTRUMENTGEN3_MEMFORMAT_MAX;
+        for (int i = RBRGEN3_MEMFORMAT_NONE + 1;
+             i <= RBRGEN3_MEMFORMAT_MAX;
              i <<= 1)
         {
-            if (strcmp(RBRInstrumentGen3MemoryFormat_name(i),
+            if (strcmp(RBRGen3MemoryFormat_name(i),
                        parameter.value) == 0)
             {
                 *memoryFormat = i;
@@ -458,11 +458,11 @@ RBRGen3Error RBRInstrumentGen3_getCurrentMemoryFormat(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_getNewMemoryFormat(
+RBRGen3Error RBRGen3_getNewMemoryFormat(
     RBRGen3 *instrument,
-    RBRInstrumentGen3MemoryFormat *memoryFormat)
+    RBRGen3MemoryFormat *memoryFormat)
 {
-    *memoryFormat = RBRINSTRUMENTGEN3_MEMFORMAT_NONE;
+    *memoryFormat = RBRGEN3_MEMFORMAT_NONE;
 
     RBR_TRY(RBRGen3_converse(instrument, "memformat newtype"));
 
@@ -483,11 +483,11 @@ RBRGen3Error RBRInstrumentGen3_getNewMemoryFormat(
             continue;
         }
 
-        for (int i = RBRINSTRUMENTGEN3_MEMFORMAT_RAWBIN00 + 1;
-             i <= RBRINSTRUMENTGEN3_MEMFORMAT_MAX;
+        for (int i = RBRGEN3_MEMFORMAT_RAWBIN00 + 1;
+             i <= RBRGEN3_MEMFORMAT_MAX;
              i <<= 1)
         {
-            if (strcmp(RBRInstrumentGen3MemoryFormat_name(i),
+            if (strcmp(RBRGen3MemoryFormat_name(i),
                        parameter.value) == 0)
             {
                 *memoryFormat = i;
@@ -501,107 +501,107 @@ RBRGen3Error RBRInstrumentGen3_getNewMemoryFormat(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_setNewMemoryFormat(
+RBRGen3Error RBRGen3_setNewMemoryFormat(
     RBRGen3 *instrument,
-    RBRInstrumentGen3MemoryFormat memoryFormat)
+    RBRGen3MemoryFormat memoryFormat)
 {
-    if (memoryFormat < RBRINSTRUMENTGEN3_MEMFORMAT_NONE
-        || memoryFormat > RBRINSTRUMENTGEN3_MEMFORMAT_MAX)
+    if (memoryFormat < RBRGEN3_MEMFORMAT_NONE
+        || memoryFormat > RBRGEN3_MEMFORMAT_MAX)
     {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    const char *formatName = RBRInstrumentGen3MemoryFormat_name(memoryFormat);
+    const char *formatName = RBRGen3MemoryFormat_name(memoryFormat);
     return RBRGen3_converse(instrument,
                                   "memformat newtype = %s",
                                   formatName);
 }
 
-const char *RBRInstrumentGen3PostprocessingAggregate_name(
-    RBRInstrumentGen3PostprocessingAggregate function)
+const char *RBRGen3PostprocessingAggregate_name(
+    RBRGen3PostprocessingAggregate function)
 {
     switch (function)
     {
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_MEAN:
+    case RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN:
         return "mean";
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_STD:
+    case RBRGEN3_POSTPROCESSING_AGGREGATE_STD:
         return "std";
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT:
+    case RBRGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT:
         return "count";
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_COUNT:
+    case RBRGEN3_POSTPROCESSING_AGGREGATE_COUNT:
         return "post-processing aggregate function count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_POSTPROCESSING_AGGREGATE:
+    case RBRGEN3_UNKNOWN_POSTPROCESSING_AGGREGATE:
     default:
         return "unknown post-processing aggregate function";
     }
 }
 
-const char *RBRInstrumentGen3PostprocessingStatus_name(
-    RBRInstrumentGen3PostprocessingStatus status)
+const char *RBRGen3PostprocessingStatus_name(
+    RBRGen3PostprocessingStatus status)
 {
     switch (status)
     {
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_STATUS_IDLE:
+    case RBRGEN3_POSTPROCESSING_STATUS_IDLE:
         return "idle";
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_STATUS_PROCESSING:
+    case RBRGEN3_POSTPROCESSING_STATUS_PROCESSING:
         return "processing";
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_STATUS_COMPLETED:
+    case RBRGEN3_POSTPROCESSING_STATUS_COMPLETED:
         return "completed";
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_STATUS_ABORTED:
+    case RBRGEN3_POSTPROCESSING_STATUS_ABORTED:
         return "aborted";
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_STATUS_COUNT:
+    case RBRGEN3_POSTPROCESSING_STATUS_COUNT:
         return "post-processing status count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_POSTPROCESSING_STATUS:
+    case RBRGEN3_UNKNOWN_POSTPROCESSING_STATUS:
     default:
         return "unknown post-processing status";
     }
 }
 
-const char *RBRInstrumentGen3PostprocessingCommand_name(
-    RBRInstrumentGen3PostprocessingCommand command)
+const char *RBRGen3PostprocessingCommand_name(
+    RBRGen3PostprocessingCommand command)
 {
     switch (command)
     {
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_COMMAND_START:
+    case RBRGEN3_POSTPROCESSING_COMMAND_START:
         return "start";
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_COMMAND_RESET:
+    case RBRGEN3_POSTPROCESSING_COMMAND_RESET:
         return "reset";
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_COMMAND_ABORT:
+    case RBRGEN3_POSTPROCESSING_COMMAND_ABORT:
         return "abort";
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_COMMAND_COUNT:
+    case RBRGEN3_POSTPROCESSING_COMMAND_COUNT:
         return "post-processing command count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_POSTPROCESSING_COMMAND:
+    case RBRGEN3_UNKNOWN_POSTPROCESSING_COMMAND:
     default:
         return "unknown post-processing command";
     }
 }
 
-const char *RBRInstrumentGen3PostprocessingBinFilter_name(
-    RBRInstrumentGen3PostprocessingBinFilter filter)
+const char *RBRGen3PostprocessingBinFilter_name(
+    RBRGen3PostprocessingBinFilter filter)
 {
     switch (filter)
     {
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_BINFILTER_NONE:
+    case RBRGEN3_POSTPROCESSING_BINFILTER_NONE:
         return "none";
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_BINFILTER_ASCENTONLY:
+    case RBRGEN3_POSTPROCESSING_BINFILTER_ASCENTONLY:
         return "ascentonly";
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_BINFILTER_DESCENTONLY:
+    case RBRGEN3_POSTPROCESSING_BINFILTER_DESCENTONLY:
         return "descentonly";
-    case RBRINSTRUMENTGEN3_POSTPROCESSING_BINFILTER_COUNT:
+    case RBRGEN3_POSTPROCESSING_BINFILTER_COUNT:
         return "post-processing bin filter count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_POSTPROCESSING_BINFILTER:
+    case RBRGEN3_UNKNOWN_POSTPROCESSING_BINFILTER:
     default:
         return "unknown post-processing bin filter";
     }
 }
 
-RBRGen3Error RBRInstrumentGen3_getPostprocessing(
+RBRGen3Error RBRGen3_getPostprocessing(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Postprocessing *postprocessing)
+    RBRGen3Postprocessing *postprocessing)
 {
-    memset(postprocessing, 0, sizeof(RBRInstrumentGen3Postprocessing));
-    postprocessing->status = RBRINSTRUMENTGEN3_UNKNOWN_POSTPROCESSING_STATUS;
-    postprocessing->binFilter = RBRINSTRUMENTGEN3_UNKNOWN_POSTPROCESSING_BINFILTER;
+    memset(postprocessing, 0, sizeof(RBRGen3Postprocessing));
+    postprocessing->status = RBRGEN3_UNKNOWN_POSTPROCESSING_STATUS;
+    postprocessing->binFilter = RBRGEN3_UNKNOWN_POSTPROCESSING_BINFILTER;
 
     RBR_TRY(RBRGen3_converse(instrument, "postprocessing all"));
 
@@ -617,9 +617,9 @@ RBRGen3Error RBRInstrumentGen3_getPostprocessing(
         }
         else if (strcmp(parameter.key, "status") == 0)
         {
-            for (int i = 0; i < RBRINSTRUMENTGEN3_POSTPROCESSING_STATUS_COUNT; ++i)
+            for (int i = 0; i < RBRGEN3_POSTPROCESSING_STATUS_COUNT; ++i)
             {
-                if (strcmp(RBRInstrumentGen3PostprocessingStatus_name(i),
+                if (strcmp(RBRGen3PostprocessingStatus_name(i),
                            parameter.value) == 0)
                 {
                     postprocessing->status = i;
@@ -629,7 +629,7 @@ RBRGen3Error RBRInstrumentGen3_getPostprocessing(
         }
         else if (strcmp(parameter.key, "channels") == 0)
         {
-            RBRInstrumentGen3PostprocessingChannelsList *channelsList =
+            RBRGen3PostprocessingChannelsList *channelsList =
                 &postprocessing->channels;
 
             char *functionStart;
@@ -651,10 +651,10 @@ RBRGen3Error RBRInstrumentGen3_getPostprocessing(
                 }
 
                 for (int i = 0;
-                     i < RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_COUNT;
+                     i < RBRGEN3_POSTPROCESSING_AGGREGATE_COUNT;
                      ++i)
                 {
-                    if (strcmp(RBRInstrumentGen3PostprocessingAggregate_name(i),
+                    if (strcmp(RBRGen3PostprocessingAggregate_name(i),
                                functionStart) == 0)
                     {
                         channelsList->channels[channel].function = i;
@@ -681,10 +681,10 @@ RBRGen3Error RBRInstrumentGen3_getPostprocessing(
         else if (strcmp(parameter.key, "binfilter") == 0)
         {
             for (int i = 0;
-                 i < RBRINSTRUMENTGEN3_POSTPROCESSING_BINFILTER_COUNT;
+                 i < RBRGEN3_POSTPROCESSING_BINFILTER_COUNT;
                  ++i)
             {
-                if (strcmp(RBRInstrumentGen3PostprocessingBinFilter_name(i),
+                if (strcmp(RBRGen3PostprocessingBinFilter_name(i),
                            parameter.value) == 0)
                 {
                     postprocessing->binFilter = i;
@@ -737,19 +737,19 @@ RBRGen3Error RBRInstrumentGen3_getPostprocessing(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_setPostprocessing(
+RBRGen3Error RBRGen3_setPostprocessing(
     RBRGen3 *instrument,
-    const RBRInstrumentGen3Postprocessing *postprocessing)
+    const RBRGen3Postprocessing *postprocessing)
 {
     bool timeBinning = strcmp(postprocessing->binReference, "tstamp") == 0;
 
     if (postprocessing->channels.count < 0
         || postprocessing->channels.count >=
-        RBRINSTRUMENTGEN3_POSTPROCESSING_CHANNEL_MAX
+        RBRGEN3_POSTPROCESSING_CHANNEL_MAX
         || postprocessing->binFilter <
-        RBRINSTRUMENTGEN3_POSTPROCESSING_BINFILTER_NONE
+        RBRGEN3_POSTPROCESSING_BINFILTER_NONE
         || postprocessing->binFilter >=
-        RBRINSTRUMENTGEN3_POSTPROCESSING_BINFILTER_COUNT
+        RBRGEN3_POSTPROCESSING_BINFILTER_COUNT
         || postprocessing->binSize < 0
         || postprocessing->tstampMin < RBRGEN3_DATETIME_MIN
         || postprocessing->tstampMin > RBRGEN3_DATETIME_MAX
@@ -762,15 +762,15 @@ RBRGen3Error RBRInstrumentGen3_setPostprocessing(
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    const RBRInstrumentGen3PostprocessingChannelsList *channelsList =
+    const RBRGen3PostprocessingChannelsList *channelsList =
         &postprocessing->channels;
 
     for (int channel = 0; channel < channelsList->count; ++channel)
     {
         if (channelsList->channels[channel].function <
-            RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_MEAN
+            RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN
             || channelsList->channels[channel].function >=
-            RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_COUNT)
+            RBRGEN3_POSTPROCESSING_AGGREGATE_COUNT)
         {
             return RBRGEN3_INVALID_PARAMETER_VALUE;
         }
@@ -783,7 +783,7 @@ RBRGen3Error RBRInstrumentGen3_setPostprocessing(
         instrument,
         "postprocessing binreference = %s, binfilter = %s, binsize = %.1f",
         postprocessing->binReference,
-        RBRInstrumentGen3PostprocessingBinFilter_name(postprocessing->binFilter),
+        RBRGen3PostprocessingBinFilter_name(postprocessing->binFilter),
         (double) postprocessing->binSize));
 
     char tstamp[RBRGEN3_SCHEDULE_TIME_LEN + 1];
@@ -833,7 +833,7 @@ RBRGen3Error RBRInstrumentGen3_setPostprocessing(
     const char *functionName;
     for (int channel = 0; channel < channelsList->count; ++channel)
     {
-        functionName = RBRInstrumentGen3PostprocessingAggregate_name(
+        functionName = RBRGen3PostprocessingAggregate_name(
             channelsList->channels[channel].function);
 
         if (*commandBufferLength
@@ -889,23 +889,23 @@ RBRGen3Error RBRInstrumentGen3_setPostprocessing(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_setPostprocessingCommand(
+RBRGen3Error RBRGen3_setPostprocessingCommand(
     RBRGen3 *instrument,
-    RBRInstrumentGen3PostprocessingCommand command,
-    RBRInstrumentGen3PostprocessingStatus *status)
+    RBRGen3PostprocessingCommand command,
+    RBRGen3PostprocessingStatus *status)
 {
-    if (command < RBRINSTRUMENTGEN3_POSTPROCESSING_COMMAND_START
-        || command >= RBRINSTRUMENTGEN3_POSTPROCESSING_COMMAND_COUNT)
+    if (command < RBRGEN3_POSTPROCESSING_COMMAND_START
+        || command >= RBRGEN3_POSTPROCESSING_COMMAND_COUNT)
     {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    *status = RBRINSTRUMENTGEN3_UNKNOWN_POSTPROCESSING_STATUS;
+    *status = RBRGEN3_UNKNOWN_POSTPROCESSING_STATUS;
 
     RBR_TRY(RBRGen3_converse(
                 instrument,
                 "postprocessing command = %s",
-                RBRInstrumentGen3PostprocessingCommand_name(command)));
+                RBRGen3PostprocessingCommand_name(command)));
 
     char *instrumentCommand = NULL;
     RBRGen3ResponseParameter parameter;
@@ -919,9 +919,9 @@ RBRGen3Error RBRInstrumentGen3_setPostprocessingCommand(
             continue;
         }
 
-        for (int i = 0; i < RBRINSTRUMENTGEN3_POSTPROCESSING_STATUS_COUNT; ++i)
+        for (int i = 0; i < RBRGEN3_POSTPROCESSING_STATUS_COUNT; ++i)
         {
-            if (strcmp(RBRInstrumentGen3PostprocessingStatus_name(i),
+            if (strcmp(RBRGen3PostprocessingStatus_name(i),
                        parameter.value) == 0)
             {
                 *status = i;

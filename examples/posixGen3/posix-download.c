@@ -109,30 +109,30 @@ int main(int argc, char *argv[])
            hwrev.cpu,
            hwrev.bsl);
 
-    RBRInstrumentGen3MemoryInfo meminfo;
-    meminfo.dataset = RBRINSTRUMENTGEN3_DATASET_STANDARD;
-    RBRInstrumentGen3_getMemoryInfo(instrument, &meminfo);
+    RBRGen3MemoryInfo meminfo;
+    meminfo.dataset = RBRGEN3_DATASET_STANDARD;
+    RBRGen3_getMemoryInfo(instrument, &meminfo);
     printf("Dataset %s is %0.2f%% full (%" PRIi32 "B used).\n",
-           RBRInstrumentGen3Dataset_name(meminfo.dataset),
+           RBRGen3Dataset_name(meminfo.dataset),
            ((double) meminfo.used) / meminfo.size * 100,
            meminfo.used);
 
-    RBRInstrumentGen3MemoryFormat memformat;
-    RBRInstrumentGen3_getAvailableMemoryFormats(instrument, &memformat);
+    RBRGen3MemoryFormat memformat;
+    RBRGen3_getAvailableMemoryFormats(instrument, &memformat);
     printf("It supports these memory formats:\n");
-    for (int i = RBRINSTRUMENTGEN3_MEMFORMAT_NONE + 1;
-         i <= RBRINSTRUMENTGEN3_MEMFORMAT_MAX;
+    for (int i = RBRGEN3_MEMFORMAT_NONE + 1;
+         i <= RBRGEN3_MEMFORMAT_MAX;
          i <<= 1)
     {
         if (memformat & i)
         {
-            printf("\t%s\n", RBRInstrumentGen3MemoryFormat_name(i));
+            printf("\t%s\n", RBRGen3MemoryFormat_name(i));
         }
     }
 
-    RBRInstrumentGen3_getCurrentMemoryFormat(instrument, &memformat);
+    RBRGen3_getCurrentMemoryFormat(instrument, &memformat);
     printf("It's currently storing data of format %s.\n",
-           RBRInstrumentGen3MemoryFormat_name(memformat));
+           RBRGen3MemoryFormat_name(memformat));
 
     char filename[PATH_MAX + 1];
     snprintf(filename, sizeof(filename), "%06d.bin", id.serial);
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
     }
 
     uint8_t buf[CHUNK_SIZE];
-    RBRInstrumentGen3Data data = {
+    RBRGen3Data data = {
         .dataset = meminfo.dataset,
         .offset  = initialOffset,
         .data    = buf
@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
     while (data.offset < meminfo.used)
     {
         data.size = sizeof(buf);
-        err = RBRInstrumentGen3_readData(instrument, &data);
+        err = RBRGen3_readData(instrument, &data);
         if (err == RBRGEN3_SUCCESS)
         {
             write(downloadFd, data.data, data.size);

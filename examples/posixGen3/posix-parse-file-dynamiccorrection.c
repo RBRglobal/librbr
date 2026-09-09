@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
     };
 
     RBRParserGen3Config parserConfig = {
-        .format = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00,
+        .format = RBRGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
                 .channels = channels
@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
         bufSize += readSize;
         parsedSize = bufSize;
         RBRParserGen3_parse(parser,
-                        RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
+                        RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize); //parserSample() gets called and prints the sample.
         bufSize -= parsedSize;

@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
     };
 
     RBRParserGen3Config parserConfig = {
-        .format = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00,
+        .format = RBRGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
                 .channels = channels.on
@@ -155,8 +155,8 @@ int main(int argc, char *argv[])
 
     uint8_t buf[CHUNK_SIZE];
     int32_t bufSize = 0;
-    RBRInstrumentGen3Data data = {
-        .dataset = RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
+    RBRGen3Data data = {
+        .dataset = RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
         .offset  = 0
     };
     int32_t parsedSize;
@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
     {
         data.data = buf + bufSize;
         data.size = sizeof(buf) - bufSize;
-        err = RBRInstrumentGen3_readData(instrument, &data);
+        err = RBRGen3_readData(instrument, &data);
         if (err == RBRGEN3_TIMEOUT)
         {
             printf("\nWarning: timeout. Retrying...\n");
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
         bufSize += data.size;
         parsedSize = bufSize;
         RBRParserGen3_parse(parser,
-                        RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
+                        RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize);
         bufSize -= parsedSize;

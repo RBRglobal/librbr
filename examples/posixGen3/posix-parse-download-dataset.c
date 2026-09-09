@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
     };
 
     RBRParserGen3Config parserConfig = {
-        .format = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00,
+        .format = RBRGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
                 .channels = channels.on
@@ -164,8 +164,8 @@ int main(int argc, char *argv[])
 
     uint8_t buf[1024];
     int32_t bufSize = 0;
-    RBRInstrumentGen3Dataset _numOfDataset = _downloadFrom;
-    RBRInstrumentGen3Data data = {
+    RBRGen3Dataset _numOfDataset = _downloadFrom;
+    RBRGen3Data data = {
         .dataset = _numOfDataset,
         .offset  = 0
     };
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
     {
         data.data = buf + bufSize;
         data.size = sizeof(buf) - bufSize;
-        err = RBRInstrumentGen3_readData(instrument, &data);
+        err = RBRGen3_readData(instrument, &data);
 
         if (err == RBRGEN3_TIMEOUT)
         {
@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
         bufSize += data.size;
         parsedSize = bufSize;
         RBRParserGen3_parse(parser,
-                        RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
+                        RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize);
 

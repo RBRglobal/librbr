@@ -45,9 +45,9 @@ RBRGen3Error instrumentStart(RBRGen3 *instrument)
         return err;
     }
 
-    if ((err = RBRInstrumentGen3_setNewMemoryFormat(
+    if ((err = RBRGen3_setNewMemoryFormat(
              instrument,
-             RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00))
+             RBRGEN3_MEMFORMAT_CALBIN00))
         != RBRGEN3_SUCCESS)
     {
         return err;

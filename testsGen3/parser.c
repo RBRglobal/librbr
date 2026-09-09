@@ -14,7 +14,7 @@
 #include "tests.h"
 
 TEST_PARSER_CONFIG(two_channels) = {
-    .format = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00,
+    .format = RBRGEN3_MEMFORMAT_CALBIN00,
     .formatConfig = {
         .easyParse = {
             .channels = 2
@@ -30,7 +30,7 @@ TEST_PARSER(event, two_channels)
 
     RBRGen3Error err = RBRParserGen3_parse(
         parser,
-        RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS,
+        RBRGEN3_DATASET_EASYPARSE_EVENTS,
         data,
         &size);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -57,7 +57,7 @@ TEST_PARSER(event_with_auxiliary_data, two_channels)
 
     RBRGen3Error err = RBRParserGen3_parse(
         parser,
-        RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS,
+        RBRGEN3_DATASET_EASYPARSE_EVENTS,
         data,
         &size);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -88,7 +88,7 @@ TEST_PARSER(events, two_channels)
 
     RBRGen3Error err = RBRParserGen3_parse(
         parser,
-        RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS,
+        RBRGEN3_DATASET_EASYPARSE_EVENTS,
         data,
         &size);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -160,7 +160,7 @@ TEST_PARSER(samples, two_channels)
 
     RBRGen3Error err = RBRParserGen3_parse(
         parser,
-        RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
+        RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
         data,
         &size);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);

@@ -81,11 +81,11 @@ int main(int argc, char *argv[])
         goto serialCleanup;
     }
 
-    RBRInstrumentGen3MemoryInfo meminfo;
-    meminfo.dataset = RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA;
-    RBRInstrumentGen3_getMemoryInfo(instrument, &meminfo);
+    RBRGen3MemoryInfo meminfo;
+    meminfo.dataset = RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA;
+    RBRGen3_getMemoryInfo(instrument, &meminfo);
     printf("Dataset %s is %0.2f%% full (%" PRIi32 "B used).\n",
-           RBRInstrumentGen3Dataset_name(meminfo.dataset),
+           RBRGen3Dataset_name(meminfo.dataset),
            ((double) meminfo.used) / meminfo.size * 100,
            meminfo.used);
 
@@ -98,12 +98,12 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    RBRInstrumentGen3MemoryFormat memformat;
-    RBRInstrumentGen3_getCurrentMemoryFormat(instrument, &memformat);
+    RBRGen3MemoryFormat memformat;
+    RBRGen3_getCurrentMemoryFormat(instrument, &memformat);
     printf("It's currently storing data of format %s.\n",
-           RBRInstrumentGen3MemoryFormat_name(memformat));
+           RBRGen3MemoryFormat_name(memformat));
 
-    if (memformat != RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00)
+    if (memformat != RBRGEN3_MEMFORMAT_CALBIN00)
     {
         fprintf(stderr,
                 "%s: Post-processing can only operate on EasyParse datasets! "
@@ -113,8 +113,8 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    RBRInstrumentGen3Postprocessing postprocessing;
-    if ((err = RBRInstrumentGen3_getPostprocessing(
+    RBRGen3Postprocessing postprocessing;
+    if ((err = RBRGen3_getPostprocessing(
              instrument,
              &postprocessing))
         != RBRGEN3_SUCCESS)
@@ -127,11 +127,11 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    if (postprocessing.status != RBRINSTRUMENTGEN3_POSTPROCESSING_STATUS_IDLE)
+    if (postprocessing.status != RBRGEN3_POSTPROCESSING_STATUS_IDLE)
     {
-        if ((err = RBRInstrumentGen3_setPostprocessingCommand(
+        if ((err = RBRGen3_setPostprocessingCommand(
                  instrument,
-                 RBRINSTRUMENTGEN3_POSTPROCESSING_COMMAND_RESET,
+                 RBRGEN3_POSTPROCESSING_COMMAND_RESET,
                  &postprocessing.status))
             != RBRGEN3_SUCCESS)
         {
@@ -147,26 +147,26 @@ int main(int argc, char *argv[])
     RBRGen3DateTime now = time(NULL);
     now *= 1000;
 
-    postprocessing = (RBRInstrumentGen3Postprocessing) {
+    postprocessing = (RBRGen3Postprocessing) {
         .channels = {
             .count = 3,
             .channels = {
                 {
-                    .function = RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
+                    .function = RBRGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
                     .label = "pressure_00"
                 },
                 {
-                    .function = RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_MEAN,
+                    .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
                     .label = "temperature_00"
                 },
                 {
-                    .function = RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_STD,
+                    .function = RBRGEN3_POSTPROCESSING_AGGREGATE_STD,
                     .label = "temperature_00"
                 }
             }
         },
         .binReference = "tstamp",
-        .binFilter = RBRINSTRUMENTGEN3_POSTPROCESSING_BINFILTER_NONE,
+        .binFilter = RBRGEN3_POSTPROCESSING_BINFILTER_NONE,
         .binSize = 0,
         .tstampMin = now - 1800000LL /* data from the last half-hour */,
         .tstampMax = now,
@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
         .dcCtCoeff = 2.4e-4
     };
 
-    if ((err = RBRInstrumentGen3_setPostprocessing(
+    if ((err = RBRGen3_setPostprocessing(
              instrument,
              &postprocessing) != RBRGEN3_SUCCESS)
         != RBRGEN3_SUCCESS)
@@ -191,9 +191,9 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    if ((err = RBRInstrumentGen3_setPostprocessingCommand(
+    if ((err = RBRGen3_setPostprocessingCommand(
              instrument,
-             RBRINSTRUMENTGEN3_POSTPROCESSING_COMMAND_START,
+             RBRGEN3_POSTPROCESSING_COMMAND_START,
              &postprocessing.status))
         != RBRGEN3_SUCCESS)
     {
@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
 
         printf("Checking post-processing status...\n");
 
-        if ((err = RBRInstrumentGen3_getPostprocessing(
+        if ((err = RBRGen3_getPostprocessing(
                  instrument,
                  &postprocessing))
             != RBRGEN3_SUCCESS)
@@ -223,15 +223,15 @@ int main(int argc, char *argv[])
         status = EXIT_FAILURE;
         goto instrumentCleanup;
         }
-    } while (postprocessing.status == RBRINSTRUMENTGEN3_POSTPROCESSING_STATUS_PROCESSING);
+    } while (postprocessing.status == RBRGEN3_POSTPROCESSING_STATUS_PROCESSING);
 
-    if (postprocessing.status != RBRINSTRUMENTGEN3_POSTPROCESSING_STATUS_COMPLETED)
+    if (postprocessing.status != RBRGEN3_POSTPROCESSING_STATUS_COMPLETED)
     {
         fprintf(stderr,
                 "%s: Expected to find that the post-processing had completed, "
                 "but instead found that it was %s!\n",
                 programName,
-                RBRInstrumentGen3PostprocessingStatus_name(postprocessing.status));
+                RBRGen3PostprocessingStatus_name(postprocessing.status));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }

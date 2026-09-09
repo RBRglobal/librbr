@@ -96,7 +96,7 @@ For example,
 
 ~~~{.c}
 TEST_PARSER_CONFIG(two_channels) = {
-    .format = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00,
+    .format = RBRGEN3_MEMFORMAT_CALBIN00,
     .formatConfig = {
         .easyParse = {
             .channels = 2

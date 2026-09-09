@@ -122,7 +122,7 @@ RBRGen3Error RBRParserGen3_init(RBRParserGen3 **parser,
         return RBRGEN3_MISSING_CALLBACK;
     }
 
-    if (config->format != RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00)
+    if (config->format != RBRGEN3_MEMFORMAT_CALBIN00)
     {
         return RBRGEN3_UNSUPPORTED;
     }
@@ -283,7 +283,7 @@ static RBRGen3Error RBRParserGen3_parseEPSamples(
 }
 
 RBRGen3Error RBRParserGen3_parse(RBRParserGen3 *parser,
-                                   RBRInstrumentGen3Dataset dataset,
+                                   RBRGen3Dataset dataset,
                                    const void *const data,
                                    int32_t *size)
 {
@@ -291,11 +291,11 @@ RBRGen3Error RBRParserGen3_parse(RBRParserGen3 *parser,
 
     switch (dataset)
     {
-    case RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS:
+    case RBRGEN3_DATASET_EASYPARSE_EVENTS:
         return RBRParserGen3_parseEPEvents(parser, d, size);
-    case RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA:
+    case RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA:
         return RBRParserGen3_parseEPSamples(parser, d, size);
-    case RBRINSTRUMENTGEN3_DATASET_EASYPARSE_DEPLOYMENT_HEADER:
+    case RBRGEN3_DATASET_EASYPARSE_DEPLOYMENT_HEADER:
     default:
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }

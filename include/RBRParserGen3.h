@@ -130,7 +130,7 @@ typedef struct RBRInstrumentGen3Event
  * The \a event pointer will be the same as given via
  * RBRParserGen3Callbacks.eventBuffer. The event value will be overwritten every
  * time event parsing is attempted, which will be at least once per invocation
- * of RBRParserGen3_parse() for dataset #RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS
+ * of RBRParserGen3_parse() for dataset #RBRGEN3_DATASET_EASYPARSE_EVENTS
  * where the buffer is large enough. If you want to use the event after your
  * callback has returned, make a copy of it.
  *
@@ -204,7 +204,7 @@ typedef struct RBRParserGen3EasyParseConfig
 typedef struct RBRParserGen3Config
 {
     /** \brief The format of memory being parsed. */
-    RBRInstrumentGen3MemoryFormat format;
+    RBRGen3MemoryFormat format;
 
     /** \brief Format-specific configuration. */
     union
@@ -257,7 +257,7 @@ typedef struct RBRParserGen3
  * structure and no references to them are retained.
  *
  * Currently, the only supported memory format is
- * #RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00 (“EasyParse”). Requesting any other format
+ * #RBRGEN3_MEMFORMAT_CALBIN00 (“EasyParse”). Requesting any other format
  * via RBRParserGen3Config will cause #RBRGEN3_UNSUPPORTED to be returned.
  *
  * Both callback functions are optional, but that probably isn't very useful:
@@ -339,10 +339,10 @@ void RBRParserGen3_setUserData(RBRParserGen3 *parser, void *userData);
 /**
  * \brief Parse a chunk of data.
  *
- * For a parser configured to parse #RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00-format
- * data, \a dataset may be given as #RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS or
- * #RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA. Any other value (including
- * #RBRINSTRUMENTGEN3_DATASET_EASYPARSE_DEPLOYMENT_HEADER, which is currently
+ * For a parser configured to parse #RBRGEN3_MEMFORMAT_CALBIN00-format
+ * data, \a dataset may be given as #RBRGEN3_DATASET_EASYPARSE_EVENTS or
+ * #RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA. Any other value (including
+ * #RBRGEN3_DATASET_EASYPARSE_DEPLOYMENT_HEADER, which is currently
  * unsupported) will cause the function to return
  * #RBRGEN3_INVALID_PARAMETER_VALUE and no data will be parsed.
  *
@@ -363,7 +363,7 @@ void RBRParserGen3_setUserData(RBRParserGen3 *parser, void *userData);
  *                                                or invalid
  */
 RBRGen3Error RBRParserGen3_parse(RBRParserGen3 *parser,
-                                   RBRInstrumentGen3Dataset dataset,
+                                   RBRGen3Dataset dataset,
                                    const void *const data,
                                    int32_t *size);
 

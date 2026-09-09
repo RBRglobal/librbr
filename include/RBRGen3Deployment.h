@@ -47,7 +47,7 @@ RBRGen3Error RBRGen3_verify(
 /**
  * \brief Enable the instrument to sample according to the programmed schedule.
  *
- * If \a eraseMemory is not `true`, RBRInstrumentGen3_memoryClear() must be used to
+ * If \a eraseMemory is not `true`, RBRGen3_memoryClear() must be used to
  * erase the memory beforehand as necessary.
  *
  * A hardware error can be generated for a variety of reasons. See the `enable`

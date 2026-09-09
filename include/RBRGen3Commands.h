@@ -21,7 +21,7 @@ extern "C" {
 #include "RBRInstrumentGen3Vehicle.h"
 #include "RBRInstrumentGen3Streaming.h"
 #include "RBRGen3Deployment.h"
-#include "RBRInstrumentGen3Memory.h"
+#include "RBRGen3Memory.h"
 #include "RBRGen3Communication.h"
 #include "RBRInstrumentGen3Other.h"
 #include "RBRGen3Fetching.h"

@@ -44,7 +44,7 @@ if(CONFIG_LIBRBR)
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3HardwareErrors.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Internal.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Internal.h
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen3Memory.c
+            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Memory.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen3Other.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen3Pauseresume.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen3Schedule.c

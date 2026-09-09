@@ -257,7 +257,7 @@ RBRGen3Error RBRInstrumentGen3_getOutputFormat(
         }
 
         for (int i = RBRINSTRUMENTGEN3_OUTFORMAT_NONE + 1;
-             i <= RBRINSTRUMENTGEN3_MEMFORMAT_MAX;
+             i <= RBRGEN3_MEMFORMAT_MAX;
              i <<= 1)
         {
             if (strcmp(RBRInstrumentGen3OutputFormat_name(i),
