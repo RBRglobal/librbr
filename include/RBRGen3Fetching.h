@@ -21,7 +21,7 @@ extern "C" {
 /**
  * \brief Requests an “on-demand” sample set from the logger.
  *
- * Unlike streaming data/RBRInstrumentGen3_readSample(), fetched data is returned
+ * Unlike streaming data/RBRGen3_readSample(), fetched data is returned
  * directly to the caller (independent of any RBRGen3SampleCallback
  * defined in RBRGen3Callbacks.sample).
  *
@@ -35,7 +35,7 @@ extern "C" {
  * which channels are fetched. This can be useful to limit the use of
  * power-hungry sensors. If \a channels is not given as `NULL`, then readings
  * will be requested from channels corresponding to the first
- * RBRInstrumentGen3LabelsList.count labels from the list. Otherwise, and for
+ * RBRGen3LabelsList.count labels from the list. Otherwise, and for
  * Logger2 instruments, readings will be fetched from all enabled channels.
  *
  * \param [in] instrument the instrument connection
@@ -49,7 +49,7 @@ extern "C" {
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/fetch
  */
 RBRGen3Error RBRGen3_fetch(RBRGen3 *instrument,
-                                       RBRInstrumentGen3LabelsList *channels,
+                                       RBRGen3LabelsList *channels,
                                        bool sleepAfter,
                                        RBRGen3Sample *sample);
 

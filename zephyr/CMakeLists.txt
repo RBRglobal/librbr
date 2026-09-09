@@ -49,7 +49,7 @@ if(CONFIG_LIBRBR)
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Pauseresume.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Schedule.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Security.c
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen3Streaming.c
+            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Streaming.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen3Vehicle.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRParserGen3.c
         )

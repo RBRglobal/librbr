@@ -69,7 +69,7 @@ RBRGen3Error streamCTD(RBRGen3 *instrument, int dynamicCorrection_channel[], boo
         isAbsolute = 1;
     }
     
-    err = RBRInstrumentGen3_readSample(instrument);
+    err = RBRGen3_readSample(instrument);
     if (err != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "Error: %s\n", RBRGen3Error_name(err));
@@ -209,8 +209,8 @@ int main(int argc, char *argv[])
     }
 
     /* query labels to check for CTD */
-    RBRInstrumentGen3LabelsList labelList;
-    err = RBRInstrumentGen3_getLabelsList(instrument, &labelList);
+    RBRGen3LabelsList labelList;
+    err = RBRGen3_getLabelsList(instrument, &labelList);
     if ( err != RBRGEN3_SUCCESS )
     {
             fprintf(stderr, "%s: Failed to query label list: %s!\n",
@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
     switch (link)
     {
     case RBRGEN3_LINK_USB:
-        RBRInstrumentGen3_setUSBStreamingState(instrument, true);
+        RBRGen3_setUSBStreamingState(instrument, true);
         break;
     case RBRGEN3_LINK_SERIAL:
     case RBRGEN3_LINK_WIFI:
@@ -315,7 +315,7 @@ int main(int argc, char *argv[])
                    RBRGen3SerialMode_name(serial.mode),
                    RBRGen3SerialBaudRate_name(serial.baudRate));
 
-            RBRInstrumentGen3_setSerialStreamingState(instrument, true);
+            RBRGen3_setSerialStreamingState(instrument, true);
             break;
         }
     default:

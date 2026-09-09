@@ -23,8 +23,8 @@ if all five streaming output formats
 are available:
 
 ~~~{.c}
-RBRInstrumentGen3OutputFormat outputFormats;
-RBRInstrumentGen3_getAvailableOutputFormats(instrument, &outputFormats);
+RBRGen3OutputFormat outputFormats;
+RBRGen3_getAvailableOutputFormats(instrument, &outputFormats);
 assert(outputFormats == RBRINSTRUMENTGEN3_CALTEXT01
                       | RBRINSTRUMENTGEN3_CALTEXT02
                       | RBRINSTRUMENTGEN3_CALTEXT03
@@ -35,8 +35,8 @@ assert(outputFormats == RBRINSTRUMENTGEN3_CALTEXT01
 And to check if a specific format is supported, e.g., `caltext03`:
 
 ~~~{.c}
-RBRInstrumentGen3OutputFormat outputFormats;
-RBRInstrumentGen3_getAvailableOutputFormats(instrument, &outputFormats);
+RBRGen3OutputFormat outputFormats;
+RBRGen3_getAvailableOutputFormats(instrument, &outputFormats);
 if (outputFormats | RBRINSTRUMENTGEN3_CALTEXT03)
 {
     ...

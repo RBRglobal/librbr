@@ -498,7 +498,7 @@ static RBRGen3Error RBRGen3Sample_parse(
         }
         else if (strcmp(token, SAMPLE_UNCAL) == 0)
         {
-            reading = RBRInstrumentGen3Reading_setError(
+            reading = RBRGen3Reading_setError(
                 RBRGEN3_READING_FLAG_UNCALIBRATED,
                 0);
         }
@@ -509,7 +509,7 @@ static RBRGen3Error RBRGen3Sample_parse(
             /* Uh-oh. We'll encode the error in a NaN. Filtering, etc. will
              * ignore the value and the sample formatter will output it just as
              * we received it. */
-            reading = RBRInstrumentGen3Reading_setError(
+            reading = RBRGen3Reading_setError(
                 RBRGEN3_READING_FLAG_ERROR,
                 strtol(token + SAMPLE_ERROR_PREFIX_LEN,
                        NULL,

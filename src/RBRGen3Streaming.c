@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Streaming.c
+ * \file RBRGen3Streaming.c
  *
  * \brief Library implementation.
  *
@@ -23,16 +23,16 @@
 #define READING_ERROR_MASK    0x0000FFFF
 #define READING_ERROR_OFFSET (0 * 8)
 
-RBRGen3Error RBRInstrumentGen3_getChannelsList(
+RBRGen3Error RBRGen3_getChannelsList(
     RBRGen3 *instrument,
-    RBRInstrumentGen3ChannelsList *channelsList)
+    RBRGen3ChannelsList *channelsList)
 {
     if (instrument->generation == RBRGEN3_LOGGER2)
     {
         return RBRGEN3_UNSUPPORTED;
     }
 
-    memset(channelsList, 0, sizeof(RBRInstrumentGen3ChannelsList));
+    memset(channelsList, 0, sizeof(RBRGen3ChannelsList));
 
     RBR_TRY(RBRGen3_converse(instrument, "outputformat channelslist"));
 
@@ -87,16 +87,16 @@ RBRGen3Error RBRInstrumentGen3_getChannelsList(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_getLabelsList(
+RBRGen3Error RBRGen3_getLabelsList(
     RBRGen3 *instrument,
-    RBRInstrumentGen3LabelsList *labelsList)
+    RBRGen3LabelsList *labelsList)
 {
     if (instrument->generation == RBRGEN3_LOGGER2)
     {
         return RBRGEN3_UNSUPPORTED;
     }
 
-    memset(labelsList, 0, sizeof(RBRInstrumentGen3LabelsList));
+    memset(labelsList, 0, sizeof(RBRGen3LabelsList));
 
     RBR_TRY(RBRGen3_converse(instrument, "outputformat labelslist"));
 
@@ -136,32 +136,32 @@ RBRGen3Error RBRInstrumentGen3_getLabelsList(
     return RBRGEN3_SUCCESS;
 }
 
-const char *RBRInstrumentGen3OutputFormat_name(RBRInstrumentGen3OutputFormat format)
+const char *RBRGen3OutputFormat_name(RBRGen3OutputFormat format)
 {
     switch (format)
     {
-    case RBRINSTRUMENTGEN3_OUTFORMAT_NONE:
+    case RBRGEN3_OUTFORMAT_NONE:
         return "none";
-    case RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT01:
+    case RBRGEN3_OUTFORMAT_CALTEXT01:
         return "caltext01";
-    case RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT02:
+    case RBRGEN3_OUTFORMAT_CALTEXT02:
         return "caltext02";
-    case RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT03:
+    case RBRGEN3_OUTFORMAT_CALTEXT03:
         return "caltext03";
-    case RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT04:
+    case RBRGEN3_OUTFORMAT_CALTEXT04:
         return "caltext04";
-    case RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT07:
+    case RBRGEN3_OUTFORMAT_CALTEXT07:
         return "caltext07";
     default:
         return "unknown output format";
     }
 }
 
-RBRGen3Error RBRInstrumentGen3_getAvailableOutputFormats(
+RBRGen3Error RBRGen3_getAvailableOutputFormats(
     RBRGen3 *instrument,
-    RBRInstrumentGen3OutputFormat *outputFormats)
+    RBRGen3OutputFormat *outputFormats)
 {
-    *outputFormats = RBRINSTRUMENTGEN3_OUTFORMAT_NONE;
+    *outputFormats = RBRGEN3_OUTFORMAT_NONE;
 
     const char *command;
     const char *searchKey;
@@ -211,11 +211,11 @@ RBRGen3Error RBRInstrumentGen3_getAvailableOutputFormats(
                 nextValue += separatorLength;
             }
 
-            for (int i = RBRINSTRUMENTGEN3_OUTFORMAT_NONE + 1;
-                 i <= RBRINSTRUMENTGEN3_OUTFORMAT_MAX;
+            for (int i = RBRGEN3_OUTFORMAT_NONE + 1;
+                 i <= RBRGEN3_OUTFORMAT_MAX;
                  i <<= 1)
             {
-                if (strcmp(RBRInstrumentGen3OutputFormat_name(i),
+                if (strcmp(RBRGen3OutputFormat_name(i),
                            parameter.value) == 0)
                 {
                     *outputFormats |= i;
@@ -231,11 +231,11 @@ RBRGen3Error RBRInstrumentGen3_getAvailableOutputFormats(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_getOutputFormat(
+RBRGen3Error RBRGen3_getOutputFormat(
     RBRGen3 *instrument,
-    RBRInstrumentGen3OutputFormat *outputFormat)
+    RBRGen3OutputFormat *outputFormat)
 {
-    *outputFormat = RBRINSTRUMENTGEN3_OUTFORMAT_NONE;
+    *outputFormat = RBRGEN3_OUTFORMAT_NONE;
 
     RBR_TRY(RBRGen3_converse(instrument, "outputformat type"));
 
@@ -256,11 +256,11 @@ RBRGen3Error RBRInstrumentGen3_getOutputFormat(
             continue;
         }
 
-        for (int i = RBRINSTRUMENTGEN3_OUTFORMAT_NONE + 1;
+        for (int i = RBRGEN3_OUTFORMAT_NONE + 1;
              i <= RBRGEN3_MEMFORMAT_MAX;
              i <<= 1)
         {
-            if (strcmp(RBRInstrumentGen3OutputFormat_name(i),
+            if (strcmp(RBRGen3OutputFormat_name(i),
                        parameter.value) == 0)
             {
                 *outputFormat = i;
@@ -275,11 +275,11 @@ RBRGen3Error RBRInstrumentGen3_getOutputFormat(
 }
 
 
-RBRGen3Error RBRInstrumentGen3_setOutputFormat(
+RBRGen3Error RBRGen3_setOutputFormat(
     RBRGen3 *instrument,
-    RBRInstrumentGen3OutputFormat outputFormat)
+    RBRGen3OutputFormat outputFormat)
 {
-    const char *formatName = RBRInstrumentGen3OutputFormat_name(outputFormat);
+    const char *formatName = RBRGen3OutputFormat_name(outputFormat);
     
     /* if it's caltext07, it is only available for LOGGER3 with fw 1.109 or later. */
     if (strcmp(formatName, "caltext07") == 0){
@@ -307,7 +307,7 @@ RBRGen3Error RBRInstrumentGen3_setOutputFormat(
                                   formatName);
 }
 
-RBRGen3Error RBRInstrumentGen3_getUSBStreamingState(
+RBRGen3Error RBRGen3_getUSBStreamingState(
     RBRGen3 *instrument,
     bool *enabled)
 {
@@ -318,7 +318,7 @@ RBRGen3Error RBRInstrumentGen3_getUSBStreamingState(
                                  enabled);
 }
 
-RBRGen3Error RBRInstrumentGen3_setUSBStreamingState(
+RBRGen3Error RBRGen3_setUSBStreamingState(
     RBRGen3 *instrument,
     bool enabled)
 {
@@ -327,7 +327,7 @@ RBRGen3Error RBRInstrumentGen3_setUSBStreamingState(
                                   enabled ? "on" : "off");
 }
 
-RBRGen3Error RBRInstrumentGen3_getSerialStreamingState(
+RBRGen3Error RBRGen3_getSerialStreamingState(
     RBRGen3 *instrument,
     bool *enabled)
 {
@@ -338,7 +338,7 @@ RBRGen3Error RBRInstrumentGen3_getSerialStreamingState(
                                  enabled);
 }
 
-RBRGen3Error RBRInstrumentGen3_setSerialStreamingState(
+RBRGen3Error RBRGen3_setSerialStreamingState(
     RBRGen3 *instrument,
     bool enabled)
 {
@@ -347,45 +347,45 @@ RBRGen3Error RBRInstrumentGen3_setSerialStreamingState(
                                   enabled ? "on" : "off");
 }
 
-const char *RBRInstrumentGen3AuxOutputActiveLevel_name(
-    RBRInstrumentGen3AuxOutputActiveLevel level)
+const char *RBRGen3AuxOutputActiveLevel_name(
+    RBRGen3AuxOutputActiveLevel level)
 {
     switch (level)
     {
-    case RBRINSTRUMENTGEN3_ACTIVE_HIGH:
+    case RBRGEN3_ACTIVE_HIGH:
         return "high";
-    case RBRINSTRUMENTGEN3_ACTIVE_LOW:
+    case RBRGEN3_ACTIVE_LOW:
         return "low";
-    case RBRINSTRUMENTGEN3_ACTIVE_COUNT:
+    case RBRGEN3_ACTIVE_COUNT:
         return "active output level count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_ACTIVE:
+    case RBRGEN3_UNKNOWN_ACTIVE:
     default:
         return "unknown active output level";
     }
 }
 
-const char *RBRInstrumentGen3AuxOutputSleepLevel_name(
-    RBRInstrumentGen3AuxOutputSleepLevel level)
+const char *RBRGen3AuxOutputSleepLevel_name(
+    RBRGen3AuxOutputSleepLevel level)
 {
     switch (level)
     {
-    case RBRINSTRUMENTGEN3_SLEEP_TRISTATE:
+    case RBRGEN3_SLEEP_TRISTATE:
         return "tristate";
-    case RBRINSTRUMENTGEN3_SLEEP_HIGH:
+    case RBRGEN3_SLEEP_HIGH:
         return "high";
-    case RBRINSTRUMENTGEN3_SLEEP_LOW:
+    case RBRGEN3_SLEEP_LOW:
         return "low";
-    case RBRINSTRUMENTGEN3_SLEEP_COUNT:
+    case RBRGEN3_SLEEP_COUNT:
         return "sleep output level count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_SLEEP:
+    case RBRGEN3_UNKNOWN_SLEEP:
     default:
         return "unknown sleep level";
     }
 }
 
-RBRGen3Error RBRInstrumentGen3_getAuxOutput(
+RBRGen3Error RBRGen3_getAuxOutput(
     RBRGen3 *instrument,
-    RBRInstrumentGen3AuxOutput *auxOutput)
+    RBRGen3AuxOutput *auxOutput)
 {
     if (auxOutput->aux != 1)
     {
@@ -393,9 +393,9 @@ RBRGen3Error RBRInstrumentGen3_getAuxOutput(
     }
 
     uint8_t aux = auxOutput->aux;
-    memset(auxOutput, 0, sizeof(RBRInstrumentGen3AuxOutput));
-    auxOutput->active = RBRINSTRUMENTGEN3_UNKNOWN_ACTIVE;
-    auxOutput->sleep = RBRINSTRUMENTGEN3_UNKNOWN_SLEEP;
+    memset(auxOutput, 0, sizeof(RBRGen3AuxOutput));
+    auxOutput->active = RBRGEN3_UNKNOWN_ACTIVE;
+    auxOutput->sleep = RBRGEN3_UNKNOWN_SLEEP;
 
     RBR_TRY(RBRGen3_converse(instrument,
                                    "streamserial aux%" PRIi8 "_all",
@@ -431,9 +431,9 @@ RBRGen3Error RBRInstrumentGen3_getAuxOutput(
         }
         else if (strcmp(parameter.key, "aux1_active") == 0)
         {
-            for (int i = 0; i < RBRINSTRUMENTGEN3_ACTIVE_COUNT; i++)
+            for (int i = 0; i < RBRGEN3_ACTIVE_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentGen3AuxOutputActiveLevel_name(i),
+                if (strcmp(RBRGen3AuxOutputActiveLevel_name(i),
                            parameter.value) == 0)
                 {
                     auxOutput->active = i;
@@ -443,9 +443,9 @@ RBRGen3Error RBRInstrumentGen3_getAuxOutput(
         }
         else if (strcmp(parameter.key, "aux1_sleep") == 0)
         {
-            for (int i = 0; i < RBRINSTRUMENTGEN3_SLEEP_COUNT; i++)
+            for (int i = 0; i < RBRGEN3_SLEEP_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentGen3AuxOutputSleepLevel_name(i),
+                if (strcmp(RBRGen3AuxOutputSleepLevel_name(i),
                            parameter.value) == 0)
                 {
                     auxOutput->sleep = i;
@@ -459,9 +459,9 @@ RBRGen3Error RBRInstrumentGen3_getAuxOutput(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_setAuxOutput(
+RBRGen3Error RBRGen3_setAuxOutput(
     RBRGen3 *instrument,
-    const RBRInstrumentGen3AuxOutput *auxOutput)
+    const RBRGen3AuxOutput *auxOutput)
 {
     const char *enabledParameter;
     const char *enabledValue;
@@ -489,34 +489,34 @@ RBRGen3Error RBRInstrumentGen3_setAuxOutput(
         auxOutput->aux,
         auxOutput->hold,
         auxOutput->aux,
-        RBRInstrumentGen3AuxOutputActiveLevel_name(auxOutput->active),
+        RBRGen3AuxOutputActiveLevel_name(auxOutput->active),
         auxOutput->aux,
-        RBRInstrumentGen3AuxOutputSleepLevel_name(auxOutput->sleep));
+        RBRGen3AuxOutputSleepLevel_name(auxOutput->sleep));
 }
 
-const char *RBRInstrumentGen3ReadingFlag_name(RBRInstrumentGen3ReadingFlag flag)
+const char *RBRGen3ReadingFlag_name(RBRGen3ReadingFlag flag)
 {
     switch (flag)
     {
-    case RBRINSTRUMENTGEN3_READING_FLAG_NONE:
+    case RBRGEN3_READING_FLAG_NONE:
         return "none";
     case RBRGEN3_READING_FLAG_UNCALIBRATED:
         return "uncalibrated";
     case RBRGEN3_READING_FLAG_ERROR:
         return "error";
-    case RBRINSTRUMENTGEN3_READING_FLAG_COUNT:
+    case RBRGEN3_READING_FLAG_COUNT:
         return "reading flag count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_READING_FLAG:
+    case RBRGEN3_UNKNOWN_READING_FLAG:
     default:
         return "unknown reading flag";
     }
 }
 
-inline RBRInstrumentGen3ReadingFlag RBRInstrumentGen3Reading_getFlag(double reading)
+inline RBRGen3ReadingFlag RBRGen3Reading_getFlag(double reading)
 {
     if (!isnan(reading))
     {
-        return RBRINSTRUMENTGEN3_READING_FLAG_NONE;
+        return RBRGEN3_READING_FLAG_NONE;
     }
 
     union
@@ -530,7 +530,7 @@ inline RBRInstrumentGen3ReadingFlag RBRInstrumentGen3Reading_getFlag(double read
     return (alias.raw & READING_FLAG_MASK) >> READING_FLAG_OFFSET;
 }
 
-inline uint8_t RBRInstrumentGen3Reading_getError(double reading)
+inline uint8_t RBRGen3Reading_getError(double reading)
 {
     if (!isnan(reading))
     {
@@ -548,7 +548,7 @@ inline uint8_t RBRInstrumentGen3Reading_getError(double reading)
     return (alias.raw & READING_ERROR_MASK) >> READING_ERROR_OFFSET;
 }
 
-inline double RBRInstrumentGen3Reading_setError(RBRInstrumentGen3ReadingFlag flag,
+inline double RBRGen3Reading_setError(RBRGen3ReadingFlag flag,
                                             uint8_t error)
 {
     union
@@ -565,7 +565,7 @@ inline double RBRInstrumentGen3Reading_setError(RBRInstrumentGen3ReadingFlag fla
     return alias.reading;
 }
 
-RBRGen3Error RBRInstrumentGen3_readSample(RBRGen3 *instrument)
+RBRGen3Error RBRGen3_readSample(RBRGen3 *instrument)
 {
     RBRGen3Error err;
     /* RBRGen3_readResponse() returns #RBRGEN3_SAMPLE when a sample

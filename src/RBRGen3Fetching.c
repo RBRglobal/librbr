@@ -17,7 +17,7 @@
 #include "RBRGen3Internal.h"
 
 RBRGen3Error RBRGen3_fetch(RBRGen3 *instrument,
-                                       RBRInstrumentGen3LabelsList *channels,
+                                       RBRGen3LabelsList *channels,
                                        bool sleepAfter,
                                        RBRGen3Sample *sample)
 {

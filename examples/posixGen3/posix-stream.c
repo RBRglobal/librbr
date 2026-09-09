@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
     switch (link)
     {
     case RBRGEN3_LINK_USB:
-        RBRInstrumentGen3_setUSBStreamingState(instrument, true);
+        RBRGen3_setUSBStreamingState(instrument, true);
         break;
     case RBRGEN3_LINK_SERIAL:
     case RBRGEN3_LINK_WIFI:
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
                    RBRGen3SerialMode_name(serial.mode),
                    RBRGen3SerialBaudRate_name(serial.baudRate));
 
-            RBRInstrumentGen3_setSerialStreamingState(instrument, true);
+            RBRGen3_setSerialStreamingState(instrument, true);
             break;
         }
     default:
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
 
     while (true)
     {
-        if ((err = RBRInstrumentGen3_readSample(instrument)) != RBRGEN3_SUCCESS)
+        if ((err = RBRGen3_readSample(instrument)) != RBRGEN3_SUCCESS)
         {
             fprintf(stderr, "Error: %s\n", RBRGen3Error_name(err));
         }

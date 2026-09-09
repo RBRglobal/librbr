@@ -96,8 +96,8 @@ extern const char *RBRGEN3_LIB_BUILD_DATE;
  * channels supported by RBR instruments, but most instruments have far fewer.
  * Adjusting this value will dramatically affect the size of some structures;
  * notably RBRGen3Sample, but also RBRGen3Channels (used by
- * RBRGen3_getChannels()) and RBRInstrumentGen3ChannelsList (used by
- * RBRInstrumentGen3_getChannelsList()).
+ * RBRGen3_getChannels()) and RBRGen3ChannelsList (used by
+ * RBRGen3_getChannelsList()).
  */
 #ifndef RBRGEN3_CHANNEL_MAX
 #define RBRGEN3_CHANNEL_MAX 32
@@ -237,7 +237,7 @@ typedef enum RBRGen3Error
      * Used internally when the parser encounters a sample.
      *
      * \see RBRGen3_fetch()
-     * \see RBRInstrumentGen3_readSample()
+     * \see RBRGen3_readSample()
      */
     RBRGEN3_SAMPLE,
     /** Communication error. */

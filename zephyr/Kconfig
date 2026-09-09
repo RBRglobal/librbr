@@ -65,8 +65,8 @@ config RBRGEN3_CHANNEL_MAX
         of channels supported by RBR instruments, but most instruments have far
         fewer. Adjusting this value will dramatically affect the size of some
         structures; notably RBRGen3Sample, but also RBRGen3Channels
-        (used by RBRGen3_getChannels()) and RBRInstrumentGen3ChannelsList
-        (used by RBRInstrumentGen3_getChannelsList()).
+        (used by RBRGen3_getChannels()) and RBRGen3ChannelsList
+        (used by RBRGen3_getChannelsList()).
 
 config RBRGEN3_CALIBRATION_C_COEFFICIENT_MAX
     int "The maximum number of C calibration coefficients per channel."

@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Streaming.h
+ * \file RBRGen3Streaming.h
  *
  * \brief Instrument commands and structures pertaining to real-time data
  * acquisition.
@@ -11,8 +11,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTGEN3STREAMING_H
-#define LIBRBR_RBRINSTRUMENTGEN3STREAMING_H
+#ifndef LIBRBR_RBRGEN3STREAMING_H
+#define LIBRBR_RBRGEN3STREAMING_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,15 +22,15 @@ extern "C" {
  * \brief The maximum number of characters in an output format name (e.g.,
  * “caltext01”).
  */
-#define RBRINSTRUMENTGEN3_OUTPUT_FORMAT_NAME_MAX 15
+#define RBRGEN3_OUTPUT_FORMAT_NAME_MAX 15
 
 /**
  * \brief Response to the `outputformat channelslist` command.
  *
- * \see RBRInstrumentGen3_getChannelsList()
+ * \see RBRGen3_getChannelsList()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-typedef struct RBRInstrumentGen3ChannelsList
+typedef struct RBRGen3ChannelsList
 {
     /** \brief The number of active channels. */
     int32_t count;
@@ -42,7 +42,7 @@ typedef struct RBRInstrumentGen3ChannelsList
         /** \brief The unit of the channel as a null-terminated C string. */
         char unit[RBRGEN3_CHANNEL_UNIT_MAX + 1];
     } channels[RBRGEN3_CHANNEL_MAX];
-} RBRInstrumentGen3ChannelsList;
+} RBRGen3ChannelsList;
 
 /**
  * \brief Report a list of names and units for active channels, in order.
@@ -50,7 +50,7 @@ typedef struct RBRInstrumentGen3ChannelsList
  * Helpful for identifying the channel corresponding to each value in the
  * transmitted data.
  *
- * RBRInstrumentGen3ChannelsList.channels will be populated in the order reported
+ * RBRGen3ChannelsList.channels will be populated in the order reported
  * by the instrument. Unpopulated entries will have zero-length name and unit
  * members.
  *
@@ -63,20 +63,20 @@ typedef struct RBRInstrumentGen3ChannelsList
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the command is unavailable
- * \see RBRInstrumentGen3_getLabelsList()
+ * \see RBRGen3_getLabelsList()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRGen3Error RBRInstrumentGen3_getChannelsList(
+RBRGen3Error RBRGen3_getChannelsList(
     RBRGen3 *instrument,
-    RBRInstrumentGen3ChannelsList *channelsList);
+    RBRGen3ChannelsList *channelsList);
 
 /**
  * \brief Response to the `outputformat labelslist` command.
  *
- * \see RBRInstrumentGen3_getLabelsList()
+ * \see RBRGen3_getLabelsList()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-typedef struct RBRInstrumentGen3LabelsList
+typedef struct RBRGen3LabelsList
 {
     /** \brief The number of active channels. */
     int32_t count;
@@ -84,7 +84,7 @@ typedef struct RBRInstrumentGen3LabelsList
      * \brief The label for each active channel as null-terminated C strings.
      */
     char labels[RBRGEN3_CHANNEL_MAX][RBRGEN3_CHANNEL_LABEL_MAX + 1];
-} RBRInstrumentGen3LabelsList;
+} RBRGen3LabelsList;
 
 /**
  * \brief Report a list of labels for active channels, in order.
@@ -92,7 +92,7 @@ typedef struct RBRInstrumentGen3LabelsList
  * Helpful for identifying the channel corresponding to each value in the
  * transmitted data.
  *
- * RBRInstrumentGen3LabelsList.channels will be populated in the order reported
+ * RBRGen3LabelsList.channels will be populated in the order reported
  * by the instrument. Unpopulated entries will be zero-length.
  *
  * \nol2 Use RBRGen3_getChannels() and RBRGen3_getChannel().
@@ -104,43 +104,43 @@ typedef struct RBRInstrumentGen3LabelsList
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the command is unavailable
- * \see RBRInstrumentGen3_getChannelsList()
+ * \see RBRGen3_getChannelsList()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRGen3Error RBRInstrumentGen3_getLabelsList(
+RBRGen3Error RBRGen3_getLabelsList(
     RBRGen3 *instrument,
-    RBRInstrumentGen3LabelsList *labelsList);
+    RBRGen3LabelsList *labelsList);
 
 /**
  * \brief Instrument output formats.
  *
- * \see RBRInstrumentGen3_getAvailableOutputFormats()
- * \see RBRInstrumentGen3_getOutputFormat()
- * \see RBRInstrumentGen3_setOutputFormat()
+ * \see RBRGen3_getAvailableOutputFormats()
+ * \see RBRGen3_getOutputFormat()
+ * \see RBRGen3_setOutputFormat()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-typedef enum RBRInstrumentGen3OutputFormat
+typedef enum RBRGen3OutputFormat
 {
     /** No format. */
-    RBRINSTRUMENTGEN3_OUTFORMAT_NONE      = 0,
+    RBRGEN3_OUTFORMAT_NONE      = 0,
     /** Physical units to 4 decimal places. */
-    RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT01 = 1 << 0,
+    RBRGEN3_OUTFORMAT_CALTEXT01 = 1 << 0,
     /** Physical units to 4 decimal places with units. */
-    RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT02 = 1 << 1,
+    RBRGEN3_OUTFORMAT_CALTEXT02 = 1 << 1,
     /**
      * Physical units with sufficient significant digits to ensure no
      * resolution loss.
      */
-    RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT03 = 1 << 2,
+    RBRGEN3_OUTFORMAT_CALTEXT03 = 1 << 2,
     /** Physical units expressed as “engineering-notation” floating point. */
-    RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT04 = 1 << 3,
+    RBRGEN3_OUTFORMAT_CALTEXT04 = 1 << 3,
     /** Physical units to 4 decimal places. 
      *  The output starts with the keyword "RBR" followed by the serial number. 
      *  This format is available for LOGGER3 with fw 1.109 or later*/
-    RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT07 = 1 << 4,
+    RBRGEN3_OUTFORMAT_CALTEXT07 = 1 << 4,
     /** Corresponds to the largest output format enum value. */
-    RBRINSTRUMENTGEN3_OUTFORMAT_MAX       = RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT07
-} RBRInstrumentGen3OutputFormat;
+    RBRGEN3_OUTFORMAT_MAX       = RBRGEN3_OUTFORMAT_CALTEXT07
+} RBRGen3OutputFormat;
 
 /**
  * \brief Get a human-readable string name for an output format.
@@ -149,13 +149,13 @@ typedef enum RBRInstrumentGen3OutputFormat
  * \return a string name for the output format
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen3OutputFormat_name(RBRInstrumentGen3OutputFormat format);
+const char *RBRGen3OutputFormat_name(RBRGen3OutputFormat format);
 
 /**
  * \brief Report a list of available output formats.
  *
  * \a outputFormats will be treated as a bit field representation of available
- * output formats as defined by RBRInstrumentGen3OutputFormat. For details, consult
+ * output formats as defined by RBRGen3OutputFormat. For details, consult
  * [Working with Bit Fields](bitfields.md).
  *
  * \param [in] instrument the instrument connection
@@ -165,9 +165,9 @@ const char *RBRInstrumentGen3OutputFormat_name(RBRInstrumentGen3OutputFormat for
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRGen3Error RBRInstrumentGen3_getAvailableOutputFormats(
+RBRGen3Error RBRGen3_getAvailableOutputFormats(
     RBRGen3 *instrument,
-    RBRInstrumentGen3OutputFormat *outputFormats);
+    RBRGen3OutputFormat *outputFormats);
 
 /**
  * \brief Get the current output format.
@@ -179,9 +179,9 @@ RBRGen3Error RBRInstrumentGen3_getAvailableOutputFormats(
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRGen3Error RBRInstrumentGen3_getOutputFormat(
+RBRGen3Error RBRGen3_getOutputFormat(
     RBRGen3 *instrument,
-    RBRInstrumentGen3OutputFormat *outputFormat);
+    RBRGen3OutputFormat *outputFormat);
 
 /**
  * \brief Set the current output format.
@@ -195,9 +195,9 @@ RBRGen3Error RBRInstrumentGen3_getOutputFormat(
  *                                       selected
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRGen3Error RBRInstrumentGen3_setOutputFormat(
+RBRGen3Error RBRGen3_setOutputFormat(
     RBRGen3 *instrument,
-    RBRInstrumentGen3OutputFormat outputFormat);
+    RBRGen3OutputFormat outputFormat);
 
 /**
  * \brief Get the USB streaming state.
@@ -210,7 +210,7 @@ RBRGen3Error RBRInstrumentGen3_setOutputFormat(
  * \return #RBRGEN3_HARDWARE_ERROR when USB streaming is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamusb
  */
-RBRGen3Error RBRInstrumentGen3_getUSBStreamingState(
+RBRGen3Error RBRGen3_getUSBStreamingState(
     RBRGen3 *instrument,
     bool *enabled);
 
@@ -225,7 +225,7 @@ RBRGen3Error RBRInstrumentGen3_getUSBStreamingState(
  * \return #RBRGEN3_HARDWARE_ERROR when USB streaming is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamusb
  */
-RBRGen3Error RBRInstrumentGen3_setUSBStreamingState(
+RBRGen3Error RBRGen3_setUSBStreamingState(
     RBRGen3 *instrument,
     bool enabled);
 
@@ -240,7 +240,7 @@ RBRGen3Error RBRInstrumentGen3_setUSBStreamingState(
  * \return #RBRGEN3_HARDWARE_ERROR when serial streaming is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
-RBRGen3Error RBRInstrumentGen3_getSerialStreamingState(
+RBRGen3Error RBRGen3_getSerialStreamingState(
     RBRGen3 *instrument,
     bool *enabled);
 
@@ -255,7 +255,7 @@ RBRGen3Error RBRInstrumentGen3_getSerialStreamingState(
  * \return #RBRGEN3_HARDWARE_ERROR when serial streaming is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
-RBRGen3Error RBRInstrumentGen3_setSerialStreamingState(
+RBRGen3Error RBRGen3_setSerialStreamingState(
     RBRGen3 *instrument,
     bool enabled);
 
@@ -263,20 +263,20 @@ RBRGen3Error RBRInstrumentGen3_setSerialStreamingState(
  * \brief Possible levels of the auxiliary output signal during the setup time,
  * data transmission, and hold time.
  *
- * \see RBRInstrumentGen3AuxOutput
+ * \see RBRGen3AuxOutput
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
-typedef enum RBRInstrumentGen3AuxOutputActiveLevel
+typedef enum RBRGen3AuxOutputActiveLevel
 {
     /* Signal actively driven high. */
-    RBRINSTRUMENTGEN3_ACTIVE_HIGH,
+    RBRGEN3_ACTIVE_HIGH,
     /* Signal actively driven low. */
-    RBRINSTRUMENTGEN3_ACTIVE_LOW,
+    RBRGEN3_ACTIVE_LOW,
     /** The number of active output levels. */
-    RBRINSTRUMENTGEN3_ACTIVE_COUNT,
+    RBRGEN3_ACTIVE_COUNT,
     /** An unknown or unrecognized active output level. */
-    RBRINSTRUMENTGEN3_UNKNOWN_ACTIVE
-} RBRInstrumentGen3AuxOutputActiveLevel;
+    RBRGEN3_UNKNOWN_ACTIVE
+} RBRGen3AuxOutputActiveLevel;
 
 /**
  * \brief Get a human-readable string name for a signal level of an active
@@ -286,29 +286,29 @@ typedef enum RBRInstrumentGen3AuxOutputActiveLevel
  * \return a string name for the signal level
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen3AuxOutputActiveLevel_name(
-    RBRInstrumentGen3AuxOutputActiveLevel level);
+const char *RBRGen3AuxOutputActiveLevel_name(
+    RBRGen3AuxOutputActiveLevel level);
 
 /**
  * \brief Possible levels of the auxiliary output signal while the instrument
  * is asleep.
  *
- * \see RBRInstrumentGen3AuxOutput
+ * \see RBRGen3AuxOutput
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
-typedef enum RBRInstrumentGen3AuxOutputSleepLevel
+typedef enum RBRGen3AuxOutputSleepLevel
 {
     /* Passive, high-impedance signal. */
-    RBRINSTRUMENTGEN3_SLEEP_TRISTATE,
+    RBRGEN3_SLEEP_TRISTATE,
     /* Signal actively driven high. */
-    RBRINSTRUMENTGEN3_SLEEP_HIGH,
+    RBRGEN3_SLEEP_HIGH,
     /* Signal actively driven low. */
-    RBRINSTRUMENTGEN3_SLEEP_LOW,
+    RBRGEN3_SLEEP_LOW,
     /** The number of sleep output levels. */
-    RBRINSTRUMENTGEN3_SLEEP_COUNT,
+    RBRGEN3_SLEEP_COUNT,
     /** An unknown or unrecognized sleep output level. */
-    RBRINSTRUMENTGEN3_UNKNOWN_SLEEP
-} RBRInstrumentGen3AuxOutputSleepLevel;
+    RBRGEN3_UNKNOWN_SLEEP
+} RBRGen3AuxOutputSleepLevel;
 
 /**
  * \brief Get a human-readable string name for a signal level of a sleeping
@@ -318,18 +318,18 @@ typedef enum RBRInstrumentGen3AuxOutputSleepLevel
  * \return a string name for the signal level
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen3AuxOutputSleepLevel_name(
-    RBRInstrumentGen3AuxOutputSleepLevel level);
+const char *RBRGen3AuxOutputSleepLevel_name(
+    RBRGen3AuxOutputSleepLevel level);
 
 /**
  * \brief Instrument `streamserial` command parameters relating to the
  * auxiliary output signal functionality.
  *
- * \see RBRInstrumentGen3_getAuxOutput()
- * \see RBRInstrumentGen3_setAuxOutput()
+ * \see RBRGen3_getAuxOutput()
+ * \see RBRGen3_setAuxOutput()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
-typedef struct RBRInstrumentGen3AuxOutput
+typedef struct RBRGen3AuxOutput
 {
     /**
      * \brief Which auxiliary output signal settings to retrieve or configure.
@@ -364,25 +364,25 @@ typedef struct RBRInstrumentGen3AuxOutput
      * \brief The active level of the auxiliary output signal seen by the
      * external device during the setup time, data transmission, and hold time.
      */
-    RBRInstrumentGen3AuxOutputActiveLevel active;
+    RBRGen3AuxOutputActiveLevel active;
     /**
      * \brief The level of the auxiliary output signal seen by the external
      * device while the instrument is asleep.
      */
-    RBRInstrumentGen3AuxOutputSleepLevel sleep;
-} RBRInstrumentGen3AuxOutput;
+    RBRGen3AuxOutputSleepLevel sleep;
+} RBRGen3AuxOutput;
 
 /**
  * \brief Get the instrument auxiliary output signal parameters.
  *
- * RBRInstrumentGen3AuxOutput.aux must be set to the index of the auxiliary output
+ * RBRGen3AuxOutput.aux must be set to the index of the auxiliary output
  * for which signal parameters are to be retrieved. Currently, it can only ever
  * be set to `1` (AUX1). For example:
  *
  * ~~~{.c}
- * RBRInstrumentGen3AuxOutput auxOutput;
+ * RBRGen3AuxOutput auxOutput;
  * auxOutput.aux = 1;
- * RBRInstrumentGen3_getAuxOutput(instrument, &auxOutput);
+ * RBRGen3_getAuxOutput(instrument, &auxOutput);
  * ~~~
  *
  * \param [in] instrument the instrument connection
@@ -396,9 +396,9 @@ typedef struct RBRInstrumentGen3AuxOutput
  *                                                signal index is not `1`
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
-RBRGen3Error RBRInstrumentGen3_getAuxOutput(
+RBRGen3Error RBRGen3_getAuxOutput(
     RBRGen3 *instrument,
-    RBRInstrumentGen3AuxOutput *auxOutput);
+    RBRGen3AuxOutput *auxOutput);
 
 /**
  * \brief Set the instrument auxiliary output signal parameters.
@@ -418,26 +418,26 @@ RBRGen3Error RBRInstrumentGen3_getAuxOutput(
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
-RBRGen3Error RBRInstrumentGen3_setAuxOutput(
+RBRGen3Error RBRGen3_setAuxOutput(
     RBRGen3 *instrument,
-    const RBRInstrumentGen3AuxOutput *auxOutput);
+    const RBRGen3AuxOutput *auxOutput);
 
 /**
  * \brief A flag set on a sample reading.
  */
-typedef enum RBRInstrumentGen3ReadingFlag
+typedef enum RBRGen3ReadingFlag
 {
     /** No flag. */
-    RBRINSTRUMENTGEN3_READING_FLAG_NONE,
+    RBRGEN3_READING_FLAG_NONE,
     /** The channel is uncalibrated. */
     RBRGEN3_READING_FLAG_UNCALIBRATED,
     /** The reading is an error. */
     RBRGEN3_READING_FLAG_ERROR,
     /** The number of reading flags. */
-    RBRINSTRUMENTGEN3_READING_FLAG_COUNT,
+    RBRGEN3_READING_FLAG_COUNT,
     /** An unknown or unrecognized reading flag. */
-    RBRINSTRUMENTGEN3_UNKNOWN_READING_FLAG
-} RBRInstrumentGen3ReadingFlag;
+    RBRGEN3_UNKNOWN_READING_FLAG
+} RBRGen3ReadingFlag;
 
 /**
  * \brief Get a human-readable string name for a reading flag.
@@ -446,20 +446,20 @@ typedef enum RBRInstrumentGen3ReadingFlag
  * \return a string name for the reading flag
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen3ReadingFlag_name(RBRInstrumentGen3ReadingFlag flag);
+const char *RBRGen3ReadingFlag_name(RBRGen3ReadingFlag flag);
 
 /**
  * \brief Get the error flag from a reading.
  *
  * If the reading is not a NaN, returns the error flag encoded within the NaN.
- * Otherwise, returns #RBRINSTRUMENTGEN3_READING_FLAG_NONE.
+ * Otherwise, returns #RBRGEN3_READING_FLAG_NONE.
  *
  * \param reading the reading
  * \return the error flag of the reading, if present
- * \see RBRInstrumentGen3Reading_getError() to get the error value, if present
- * \see RBRInstrumentGen3Reading_setError() to create a reading with an error set
+ * \see RBRGen3Reading_getError() to get the error value, if present
+ * \see RBRGen3Reading_setError() to create a reading with an error set
  */
-RBRInstrumentGen3ReadingFlag RBRInstrumentGen3Reading_getFlag(double reading);
+RBRGen3ReadingFlag RBRGen3Reading_getFlag(double reading);
 
 /**
  * \brief Get the error value from a reading.
@@ -469,10 +469,10 @@ RBRInstrumentGen3ReadingFlag RBRInstrumentGen3Reading_getFlag(double reading);
  *
  * \param reading the reading
  * \return the error value of the reading, if present
- * \see RBRInstrumentGen3Reading_getFlag() to get the error flag, if present
- * \see RBRInstrumentGen3Reading_setError() to create a reading with an error set
+ * \see RBRGen3Reading_getFlag() to get the error flag, if present
+ * \see RBRGen3Reading_setError() to create a reading with an error set
  */
-uint8_t RBRInstrumentGen3Reading_getError(double reading);
+uint8_t RBRGen3Reading_getError(double reading);
 
 /**
  * \brief Synthesize a reading with an error set.
@@ -480,10 +480,10 @@ uint8_t RBRInstrumentGen3Reading_getError(double reading);
  * \param flag the error flag
  * \param value the error value
  * \return the error reading
- * \see RBRInstrumentGen3Reading_getFlag() to get the error flag, if present
- * \see RBRInstrumentGen3Reading_getError() to get the error value, if present
+ * \see RBRGen3Reading_getFlag() to get the error flag, if present
+ * \see RBRGen3Reading_getError() to get the error value, if present
  */
-double RBRInstrumentGen3Reading_setError(RBRInstrumentGen3ReadingFlag flag,
+double RBRGen3Reading_setError(RBRGen3ReadingFlag flag,
                                      uint8_t value);
 
 /**
@@ -505,9 +505,9 @@ typedef struct RBRGen3Sample
      * need to encode an error, it's stored in the trailing bits of a NaN, and
      * a flag is set to indicate which sort of error.
      *
-     * \see RBRInstrumentGen3Reading_getFlag() to get the error flag, if present
-     * \see RBRInstrumentGen3Reading_getError() to get the error value, if present
-     * \see RBRInstrumentGen3Reading_setError() to synthesize a error reading
+     * \see RBRGen3Reading_getFlag() to get the error flag, if present
+     * \see RBRGen3Reading_getError() to get the error value, if present
+     * \see RBRGen3Reading_setError() to synthesize a error reading
      */
     double readings[RBRGEN3_CHANNEL_MAX];
 } RBRGen3Sample;
@@ -525,10 +525,10 @@ typedef struct RBRGen3Sample
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen3_fetchSample() for on-demand sample fetching
  */
-RBRGen3Error RBRInstrumentGen3_readSample(RBRGen3 *instrument);
+RBRGen3Error RBRGen3_readSample(RBRGen3 *instrument);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTGEN3STREAMING_H */
+#endif /* LIBRBR_RBRGEN3STREAMING_H */

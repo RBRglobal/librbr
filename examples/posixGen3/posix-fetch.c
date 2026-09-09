@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     switch (link)
     {
     case RBRGEN3_LINK_USB:
-        RBRInstrumentGen3_setUSBStreamingState(instrument, false);
+        RBRGen3_setUSBStreamingState(instrument, false);
         break;
     case RBRGEN3_LINK_SERIAL:
     case RBRGEN3_LINK_WIFI:
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
                    RBRGen3SerialMode_name(serial.mode),
                    RBRGen3SerialBaudRate_name(serial.baudRate));
 
-            RBRInstrumentGen3_setSerialStreamingState(instrument, false);
+            RBRGen3_setSerialStreamingState(instrument, false);
             break;
         }
     default:
@@ -121,15 +121,15 @@ int main(int argc, char *argv[])
             printf("%" PRIi64, sample.timestamp);
             for (int32_t i = 0; i < sample.channels; i++)
             {
-                switch (RBRInstrumentGen3Reading_getFlag(sample.readings[i]))
+                switch (RBRGen3Reading_getFlag(sample.readings[i]))
                 {
                 case RBRGEN3_READING_FLAG_UNCALIBRATED:
                     printf(", ###");
                     break;
                 case RBRGEN3_READING_FLAG_ERROR:
-                    printf(", Error-%2d", RBRInstrumentGen3Reading_getError(sample.readings[i]));
+                    printf(", Error-%2d", RBRGen3Reading_getError(sample.readings[i]));
                     break;
-                case RBRINSTRUMENTGEN3_READING_FLAG_NONE:
+                case RBRGEN3_READING_FLAG_NONE:
                 default:
                     printf(", %lf", sample.readings[i]);
                     break;

@@ -107,8 +107,8 @@ int main(int argc, char *argv[])
         goto fileCleanup;
     }
 
-    RBRInstrumentGen3_setUSBStreamingState(instrument, false);
-    RBRInstrumentGen3_setSerialStreamingState(instrument, false);
+    RBRGen3_setUSBStreamingState(instrument, false);
+    RBRGen3_setSerialStreamingState(instrument, false);
 
     if ((err = instrumentStart(instrument)) != RBRGEN3_SUCCESS)
     {
