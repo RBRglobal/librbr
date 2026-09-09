@@ -28,7 +28,7 @@ static bool test_verify(RBRGen3 *instrument,
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_verify(instrument, false, &actual);
+        err = RBRGen3_verify(instrument, false, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
                             instrument->response.type,
@@ -146,7 +146,7 @@ static bool test_enable(RBRGen3 *instrument,
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_enable(instrument, false, &actual);
+        err = RBRGen3_enable(instrument, false, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
                             instrument->response.type,
@@ -264,7 +264,7 @@ static bool test_disable(RBRGen3 *instrument,
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_disable(instrument, &actual);
+        err = RBRGen3_disable(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
                             instrument->response.type,
@@ -364,7 +364,7 @@ TEST_LOGGER3(disable)
 typedef struct SimulationTest
 {
     const char *response;
-    RBRInstrumentGen3Simulation expected;
+    RBRGen3Simulation expected;
 } SimulationTest;
 
 TEST_LOGGER3(simulation)
@@ -388,12 +388,12 @@ TEST_LOGGER3(simulation)
     };
 
     RBRGen3Error err;
-    RBRInstrumentGen3Simulation actual;
+    RBRGen3Simulation actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_getSimulation(instrument, &actual);
+        err = RBRGen3_getSimulation(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.state, actual.state, bool);
         TEST_ASSERT_EQ(tests[i].expected.period, actual.period, "%" PRIi32);
@@ -404,7 +404,7 @@ TEST_LOGGER3(simulation)
 
 typedef struct SimulationSetTest
 {
-    RBRInstrumentGen3Simulation simulation;
+    RBRGen3Simulation simulation;
     const char *command;
     const char *response;
     RBRGen3Error expectedError;
@@ -464,7 +464,7 @@ TEST_LOGGER3(simulation_set)
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_setSimulation(instrument, &tests[i].simulation);
+        err = RBRGen3_setSimulation(instrument, &tests[i].simulation);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
     }

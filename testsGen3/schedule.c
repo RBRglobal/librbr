@@ -447,14 +447,14 @@ typedef struct DeploymentTest
 {
     const char *command;
     const char *response;
-    RBRInstrumentGen3Deployment expected;
+    RBRGen3Deployment expected;
 } DeploymentTest;
 
 static bool test_deployment(RBRGen3 *instrument,
                             TestIOBuffers *buffers,
                             DeploymentTest *tests)
 {
-    RBRInstrumentGen3Deployment actual;
+    RBRGen3Deployment actual;
 
     for (int i = 0; tests[i].command != NULL; ++i)
     {
@@ -520,7 +520,7 @@ TEST_LOGGER3(deployment)
 
 typedef struct DeploymentSetTest
 {
-    RBRInstrumentGen3Deployment deployment;
+    RBRGen3Deployment deployment;
     const char *response;
     RBRGen3Error expectedError;
 } DeploymentSetTest;

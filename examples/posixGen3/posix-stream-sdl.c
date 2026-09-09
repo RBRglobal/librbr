@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    RBRInstrumentGen3Deployment deployment;
+    RBRGen3Deployment deployment;
     RBRInstrumentGen3_getDeployment(instrument, &deployment);
     if (deployment.status != RBRINSTRUMENTGEN3_STATUS_LOGGING)
     {

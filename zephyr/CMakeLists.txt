@@ -38,7 +38,7 @@ if(CONFIG_LIBRBR)
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Communication.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Configuration.c
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen3Deployment.c
+            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Deployment.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen3Fetching.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen3Gating.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3HardwareErrors.c

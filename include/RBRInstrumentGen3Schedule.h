@@ -358,9 +358,9 @@ RBRGen3Error RBRInstrumentGen3_setBurstSampling(
 /**
  * \brief Possible instrument logging statuses.
  *
- * \see RBRInstrumentGen3Deployment
+ * \see RBRGen3Deployment
  * \see RBRInstrumentGen3_getDeployment()
- * \see RBRInstrumentGen3_enable()
+ * \see RBRGen3_enable()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/enable
  */
@@ -379,7 +379,7 @@ typedef enum RBRInstrumentGen3DeploymentStatus
     /**
      * A `disable` command was received.
      *
-     * \see RBRInstrumentGen3_disable()
+     * \see RBRGen3_disable()
      */
     RBRINSTRUMENTGEN3_STATUS_STOPPED,
     /** Memory full; logging has stopped. */
@@ -415,7 +415,7 @@ const char *RBRInstrumentGen3DeploymentStatus_name(
  * \see RBRInstrumentGen3_setDeployment()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
-typedef struct RBRInstrumentGen3Deployment
+typedef struct RBRGen3Deployment
 {
     /**
      * \brief The deployment start date and time.
@@ -435,7 +435,7 @@ typedef struct RBRInstrumentGen3Deployment
      * \readonly
      */
     const RBRInstrumentGen3DeploymentStatus status;
-} RBRInstrumentGen3Deployment;
+} RBRGen3Deployment;
 
 /**
  * \brief Get the instrument deployment parameters.
@@ -449,12 +449,12 @@ typedef struct RBRInstrumentGen3Deployment
  */
 RBRGen3Error RBRInstrumentGen3_getDeployment(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Deployment *deployment);
+    RBRGen3Deployment *deployment);
 
 /**
  * \brief Set the instrument deployment parameters.
  *
- * As noted in the description of RBRInstrumentGen3Deployment.status, that field is
+ * As noted in the description of RBRGen3Deployment.status, that field is
  * ignored when setting the deployment.
  *
  * Hardware errors may occur if:
@@ -474,7 +474,7 @@ RBRGen3Error RBRInstrumentGen3_getDeployment(
  */
 RBRGen3Error RBRInstrumentGen3_setDeployment(
     RBRGen3 *instrument,
-    const RBRInstrumentGen3Deployment *deployment);
+    const RBRGen3Deployment *deployment);
 
 #ifdef __cplusplus
 }

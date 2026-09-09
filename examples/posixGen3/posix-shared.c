@@ -197,7 +197,7 @@ RBRGen3Error instrumentStart(RBRGen3 *instrument)
     RBRGen3Error err;
 
     RBRInstrumentGen3DeploymentStatus status;
-    if ((err = RBRInstrumentGen3_disable(instrument, &status))
+    if ((err = RBRGen3_disable(instrument, &status))
         != RBRGEN3_SUCCESS)
     {
         return err;
@@ -217,7 +217,7 @@ RBRGen3Error instrumentStart(RBRGen3 *instrument)
         return err;
     }
 
-    RBRInstrumentGen3Deployment deployment = {
+    RBRGen3Deployment deployment = {
         .startTime = RBRGEN3_DATETIME_MIN,
         .endTime = RBRGEN3_DATETIME_MAX
     };
@@ -251,7 +251,7 @@ RBRGen3Error instrumentStart(RBRGen3 *instrument)
         RBRInstrumentGen3_setTwistActivation(instrument, &twistActivation);
     }
 
-    if ((err = RBRInstrumentGen3_enable(instrument, true, &status))
+    if ((err = RBRGen3_enable(instrument, true, &status))
         != RBRGEN3_SUCCESS)
     {
         return err;

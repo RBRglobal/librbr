@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Deployment.h
+ * \file RBRGen3Deployment.h
  *
  * \brief Instrument commands and structures pertaining to deployments.
  *
@@ -10,8 +10,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTGEN3DEPLOYMENT_H
-#define LIBRBR_RBRINSTRUMENTGEN3DEPLOYMENT_H
+#ifndef LIBRBR_RBRGEN3DEPLOYMENT_H
+#define LIBRBR_RBRGEN3DEPLOYMENT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,10 +36,10 @@ extern "C" {
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if an error would occur when enabling
  *                                       logging
- * \see RBRInstrumentGen3_enable()
+ * \see RBRGen3_enable()
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/verify
  */
-RBRGen3Error RBRInstrumentGen3_verify(
+RBRGen3Error RBRGen3_verify(
     RBRGen3 *instrument,
     bool eraseMemory,
     RBRInstrumentGen3DeploymentStatus *status);
@@ -63,7 +63,7 @@ RBRGen3Error RBRInstrumentGen3_verify(
  * \return #RBRGEN3_HARDWARE_ERROR when an error occurs enabling logging
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/enable
  */
-RBRGen3Error RBRInstrumentGen3_enable(
+RBRGen3Error RBRGen3_enable(
     RBRGen3 *instrument,
     bool eraseMemory,
     RBRInstrumentGen3DeploymentStatus *status);
@@ -78,18 +78,18 @@ RBRGen3Error RBRInstrumentGen3_enable(
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/disable
  */
-RBRGen3Error RBRInstrumentGen3_disable(
+RBRGen3Error RBRGen3_disable(
     RBRGen3 *instrument,
     RBRInstrumentGen3DeploymentStatus *status);
 
 /**
  * \brief Instrument `simulation` command parameters.
  *
- * \see RBRInstrumentGen3_getSimulation()
- * \see RBRInstrumentGen3_setSimulation()
+ * \see RBRGen3_getSimulation()
+ * \see RBRGen3_setSimulation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
-typedef struct RBRInstrumentGen3Simulation
+typedef struct RBRGen3Simulation
 {
     /** Whether simulation is enabled. */
     bool state;
@@ -99,7 +99,7 @@ typedef struct RBRInstrumentGen3Simulation
      * Specified in milliseconds. Must be greater than 0.
      */
     RBRGen3Period period;
-} RBRInstrumentGen3Simulation;
+} RBRGen3Simulation;
 
 /**
  * \brief Get the instrument simulation settings.
@@ -112,9 +112,9 @@ typedef struct RBRInstrumentGen3Simulation
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
-RBRGen3Error RBRInstrumentGen3_getSimulation(
+RBRGen3Error RBRGen3_getSimulation(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Simulation *simulation);
+    RBRGen3Simulation *simulation);
 
 /**
  * \brief Set the instrument simulation settings.
@@ -137,12 +137,12 @@ RBRGen3Error RBRInstrumentGen3_getSimulation(
  *                                                requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
-RBRGen3Error RBRInstrumentGen3_setSimulation(
+RBRGen3Error RBRGen3_setSimulation(
     RBRGen3 *instrument,
-    const RBRInstrumentGen3Simulation *simulation);
+    const RBRGen3Simulation *simulation);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTGEN3DEPLOYMENT_H */
+#endif /* LIBRBR_RBRGEN3DEPLOYMENT_H */

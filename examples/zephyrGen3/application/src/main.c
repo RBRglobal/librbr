@@ -117,7 +117,7 @@ int main(void)
         return 0;
     }
 
-    RBRInstrumentGen3Deployment deployment;
+    RBRGen3Deployment deployment;
     RBRInstrumentGen3_getDeployment(instrument, &deployment);
     if (deployment.status != RBRINSTRUMENTGEN3_STATUS_LOGGING)
     {

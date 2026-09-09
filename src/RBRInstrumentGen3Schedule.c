@@ -548,7 +548,7 @@ const char *RBRInstrumentGen3DeploymentStatus_name(
 
 static RBRGen3Error RBRInstrumentGen3_getDeploymentL2(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Deployment *deployment)
+    RBRGen3Deployment *deployment)
 {
     char *command;
     RBRGen3ResponseParameter parameter;
@@ -635,7 +635,7 @@ static RBRGen3Error RBRInstrumentGen3_getDeploymentL2(
 
 static RBRGen3Error RBRInstrumentGen3_getDeploymentL3(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Deployment *deployment)
+    RBRGen3Deployment *deployment)
 {
     RBR_TRY(RBRGen3_converse(instrument, "deployment"));
 
@@ -684,9 +684,9 @@ static RBRGen3Error RBRInstrumentGen3_getDeploymentL3(
 
 RBRGen3Error RBRInstrumentGen3_getDeployment(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Deployment *deployment)
+    RBRGen3Deployment *deployment)
 {
-    memset(deployment, 0, sizeof(RBRInstrumentGen3Deployment));
+    memset(deployment, 0, sizeof(RBRGen3Deployment));
 
     *(RBRInstrumentGen3DeploymentStatus *) &deployment->status =
         RBRINSTRUMENTGEN3_UNKNOWN_STATUS;
@@ -703,7 +703,7 @@ RBRGen3Error RBRInstrumentGen3_getDeployment(
 
 RBRGen3Error RBRInstrumentGen3_setDeployment(
     RBRGen3 *instrument,
-    const RBRInstrumentGen3Deployment *deployment)
+    const RBRGen3Deployment *deployment)
 {
     if (deployment->endTime <= deployment->startTime
         || deployment->startTime < RBRGEN3_DATETIME_MIN
