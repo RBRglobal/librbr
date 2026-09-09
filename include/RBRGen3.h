@@ -898,7 +898,7 @@ const char *RBRGen3_getLastHardwareErrorMessage(
 /* To help keep declarations and documentation organized and discoverable,
  * instrument commands and structures are broken out into individual
  * categorical headers. */
-#include "RBRInstrumentGen3Commands.h"
+#include "RBRGen3Commands.h"
 
 #ifdef __cplusplus
 }
