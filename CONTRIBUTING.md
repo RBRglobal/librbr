@@ -70,7 +70,7 @@ Technical pedantry:
       not C++-style comments (`// ...`).
 * Use types to help error checking.
   Even if your compiler doesn't mind you
-  using a `uint8_t` interchangeably with `RBRInstrumentGen3ChannelIndex`,
+  using a `uint8_t` interchangeably with `RBRGen3ChannelIndex`,
   using a specific type can assist static analysis tools
   and makes type interchange mistakes easier
   for human readers to spot.

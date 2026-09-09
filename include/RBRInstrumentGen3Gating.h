@@ -134,7 +134,7 @@ typedef struct RBRInstrumentGen3Thresholding
      * field is only used when RBRInstrumentGen3Thresholding.channelSelection is
      * set to #RBRINSTRUMENTGEN3_THRESHOLD_CHANNEL_BY_INDEX.
      */
-    RBRInstrumentGen3ChannelIndex channelIndex;
+    RBRGen3ChannelIndex channelIndex;
     /**
      * \brief The label of the channel to use for the threshold check.
      *

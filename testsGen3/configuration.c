@@ -14,7 +14,7 @@
 typedef struct ChannelsTest
 {
     const char *response;
-    RBRInstrumentGen3Channels expected;
+    RBRGen3Channels expected;
 } ChannelsTest;
 
 static bool test_channels(RBRGen3 *instrument,
@@ -22,12 +22,12 @@ static bool test_channels(RBRGen3 *instrument,
                           ChannelsTest *tests)
 {
     RBRGen3Error err;
-    RBRInstrumentGen3Channels actual;
+    RBRGen3Channels actual;
 
     for (int i = 0; tests[i].response != NULL; ++i)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_getChannels(instrument, &actual);
+        err = RBRGen3_getChannels(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_EQ(tests[i].expected.count, actual.count, "%" PRIi32);
         TEST_ASSERT_EQ(tests[i].expected.on, actual.on, "%" PRIi32);
@@ -43,9 +43,9 @@ static bool test_channels(RBRGen3 *instrument,
 
         for (int channel = 0; channel < actual.count; ++channel)
         {
-            RBRInstrumentGen3Channel *expectedChannel =
+            RBRGen3Channel *expectedChannel =
                 &tests[i].expected.channels[channel];
-            RBRInstrumentGen3Channel *actualChannel =
+            RBRGen3Channel *actualChannel =
                 &actual.channels[channel];
 
             TEST_ASSERT_STR_EQ(expectedChannel->type, actualChannel->type);
@@ -71,7 +71,7 @@ static bool test_channels(RBRGen3 *instrument,
 
             TEST_ASSERT_ENUM_EQ(expectedChannel->gain.rangingMode,
                                 actualChannel->gain.rangingMode,
-                                RBRInstrumentGen3ChannelRangingMode);
+                                RBRGen3ChannelRangingMode);
             if (isnan(expectedChannel->gain.currentGain))
             {
                 TEST_ASSERT(isnan(actualChannel->gain.currentGain));
@@ -206,7 +206,7 @@ TEST_LOGGER2(channels)
                         .equation = "tmp",
                         .userUnits = "C",
                         .gain = {
-                            .rangingMode = RBRINSTRUMENTGEN3_RANGING_NONE,
+                            .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
                             .availableGains = {NAN}
                         },
@@ -234,7 +234,7 @@ TEST_LOGGER2(channels)
                         .equation = "corr_pres2",
                         .userUnits = "dbar",
                         .gain = {
-                            .rangingMode = RBRINSTRUMENTGEN3_RANGING_NONE,
+                            .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
                             .availableGains = {NAN}
                         },
@@ -259,7 +259,7 @@ TEST_LOGGER2(channels)
                                 NAN
                             },
                             .n = {
-                                RBRINSTRUMENTGEN3_VALUE_COEFFICIENT,
+                                RBRGEN3_VALUE_COEFFICIENT,
                                 0
                             }
                         }
@@ -273,7 +273,7 @@ TEST_LOGGER2(channels)
                         .equation = "lin",
                         .userUnits = "V",
                         .gain = {
-                            .rangingMode = RBRINSTRUMENTGEN3_RANGING_NONE,
+                            .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
                             .availableGains = {NAN}
                         },
@@ -319,7 +319,7 @@ TEST_LOGGER2(channels)
                         .equation = "lin",
                         .userUnits = "ug/L",
                         .gain = {
-                            .rangingMode = RBRINSTRUMENTGEN3_RANGING_AUTO,
+                            .rangingMode = RBRGEN3_RANGING_AUTO,
                             .currentGain = NAN,
                             .availableGains = {1.0, 3.0, 10.0, 30.0, NAN}
                         },
@@ -413,7 +413,7 @@ TEST_LOGGER3(channels)
                         .equation = "tmp",
                         .userUnits = "C",
                         .gain = {
-                            .rangingMode = RBRINSTRUMENTGEN3_RANGING_NONE,
+                            .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
                             .availableGains = {NAN}
                         },
@@ -441,7 +441,7 @@ TEST_LOGGER3(channels)
                         .equation = "corr_pres2",
                         .userUnits = "dbar",
                         .gain = {
-                            .rangingMode = RBRINSTRUMENTGEN3_RANGING_NONE,
+                            .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
                             .availableGains = {NAN}
                         },
@@ -480,7 +480,7 @@ TEST_LOGGER3(channels)
                         .equation = "deri_seapres",
                         .userUnits = "dbar",
                         .gain = {
-                            .rangingMode = RBRINSTRUMENTGEN3_RANGING_NONE,
+                            .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
                             .availableGains = {NAN}
                         },
@@ -492,7 +492,7 @@ TEST_LOGGER3(channels)
                             .x = {NAN},
                             .n = {
                                 2,
-                                RBRINSTRUMENTGEN3_VALUE_COEFFICIENT,
+                                RBRGEN3_VALUE_COEFFICIENT,
                                 0
                             }
                         }
@@ -506,7 +506,7 @@ TEST_LOGGER3(channels)
                         .equation = "deri_depth",
                         .userUnits = "m",
                         .gain = {
-                            .rangingMode = RBRINSTRUMENTGEN3_RANGING_NONE,
+                            .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
                             .availableGains = {NAN}
                         },
@@ -518,7 +518,7 @@ TEST_LOGGER3(channels)
                             .x = {NAN},
                             .n = {
                                 2,
-                                RBRINSTRUMENTGEN3_VALUE_COEFFICIENT,
+                                RBRGEN3_VALUE_COEFFICIENT,
                                 0
                             }
                         }
@@ -532,7 +532,7 @@ TEST_LOGGER3(channels)
                         .equation = "none",
                         .userUnits = "counts",
                         .gain = {
-                            .rangingMode = RBRINSTRUMENTGEN3_RANGING_NONE,
+                            .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
                             .availableGains = {NAN}
                         },
@@ -543,7 +543,7 @@ TEST_LOGGER3(channels)
                             .c = {NAN},
                             .x = {NAN},
                             .n = {
-                                RBRINSTRUMENTGEN3_VALUE_COEFFICIENT,
+                                RBRGEN3_VALUE_COEFFICIENT,
                                 0
                             }
                         }
@@ -576,7 +576,7 @@ TEST_LOGGER3(channels)
                         .equation = "lin",
                         .userUnits = "ug/L",
                         .gain = {
-                            .rangingMode = RBRINSTRUMENTGEN3_RANGING_AUTO,
+                            .rangingMode = RBRGEN3_RANGING_AUTO,
                             .currentGain = NAN,
                             .availableGains = {1.0, 10.0, 100.0, NAN}
                         },
@@ -622,7 +622,7 @@ TEST_LOGGER3(channels)
                         .equation = "lin",
                         .userUnits = "NTU",
                         .gain = {
-                            .rangingMode = RBRINSTRUMENTGEN3_RANGING_MANUAL,
+                            .rangingMode = RBRGEN3_RANGING_MANUAL,
                             .currentGain = 20.0,
                             .availableGains = {1.0, 5.0, 20.0, 100.0, NAN}
                         },
@@ -650,8 +650,8 @@ TEST_LOGGER3(channels)
 
 TEST_LOGGER3(channel_gain_set_auto)
 {
-    RBRInstrumentGen3ChannelGain gain = {
-        .rangingMode = RBRINSTRUMENTGEN3_RANGING_AUTO
+    RBRGen3ChannelGain gain = {
+        .rangingMode = RBRGEN3_RANGING_AUTO
     };
 
     const char *text = "channel 1 gain = auto";
@@ -660,7 +660,7 @@ TEST_LOGGER3(channel_gain_set_auto)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRInstrumentGen3_setChannelGain(instrument,
+    RBRGen3Error err = RBRGen3_setChannelGain(instrument,
                                                           1,
                                                           &gain);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -671,8 +671,8 @@ TEST_LOGGER3(channel_gain_set_auto)
 
 TEST_LOGGER3(channel_gain_set_manual)
 {
-    RBRInstrumentGen3ChannelGain gain = {
-        .rangingMode = RBRINSTRUMENTGEN3_RANGING_MANUAL,
+    RBRGen3ChannelGain gain = {
+        .rangingMode = RBRGEN3_RANGING_MANUAL,
         .currentGain = 5.0,
         .availableGains = {1.0, 5.0, 10.0, NAN}
     };
@@ -683,7 +683,7 @@ TEST_LOGGER3(channel_gain_set_manual)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRInstrumentGen3_setChannelGain(instrument,
+    RBRGen3Error err = RBRGen3_setChannelGain(instrument,
                                                           1,
                                                           &gain);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -694,7 +694,7 @@ TEST_LOGGER3(channel_gain_set_manual)
 
 TEST_LOGGER3(calibration_set)
 {
-    RBRInstrumentGen3Calibration calibration = {
+    RBRGen3Calibration calibration = {
         .dateTime = 1537380975000LL,
         .c = {
             3.5000000e-003,
@@ -726,7 +726,7 @@ TEST_LOGGER3(calibration_set)
 
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRInstrumentGen3_setCalibration(instrument,
+    RBRGen3Error err = RBRGen3_setCalibration(instrument,
                                                           1,
                                                           &calibration);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -742,7 +742,7 @@ TEST_LOGGER3(settings_fetchpoweroffdelay)
     TestIOBuffers_init(buffers,
                        "settings fetchpoweroffdelay = 8000" RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRInstrumentGen3_getFetchPowerOffDelay(
+    RBRGen3Error err = RBRGen3_getFetchPowerOffDelay(
         instrument,
         &fetchPowerOffDelay);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -763,7 +763,7 @@ TEST_LOGGER3(settings_fetchpoweroffdelay_set)
                           RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRInstrumentGen3_setFetchPowerOffDelay(
+    RBRGen3Error err = RBRGen3_setFetchPowerOffDelay(
         instrument,
         fetchPowerOffDelay);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -779,7 +779,7 @@ TEST_LOGGER3(settings_sensorpoweralwayson)
     TestIOBuffers_init(buffers,
                        "settings sensorpoweralwayson = on" RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRInstrumentGen3_isSensorPowerAlwaysOn(
+    RBRGen3Error err = RBRGen3_isSensorPowerAlwaysOn(
         instrument,
         &sensorPowerAlwaysOn);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -799,7 +799,7 @@ TEST_LOGGER3(settings_sensorpoweralwayson_set)
                           RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRInstrumentGen3_setSensorPowerAlwaysOn(
+    RBRGen3Error err = RBRGen3_setSensorPowerAlwaysOn(
         instrument,
         sensorPowerAlwaysOn);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -815,7 +815,7 @@ TEST_LOGGER3(settings_castdetection)
     TestIOBuffers_init(buffers,
                        "settings castdetection = on" RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRInstrumentGen3_getCastDetection(
+    RBRGen3Error err = RBRGen3_getCastDetection(
         instrument,
         &castDetection);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -834,7 +834,7 @@ TEST_LOGGER3(settings_castdetection_set)
                           "settings castdetection = on" RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRInstrumentGen3_setCastDetection(
+    RBRGen3Error err = RBRGen3_setCastDetection(
         instrument,
         castDetection);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -850,7 +850,7 @@ TEST_LOGGER3(settings_inputtimeout)
     TestIOBuffers_init(buffers,
                        "settings inputtimeout = 10000" RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRInstrumentGen3_getInputTimeout(
+    RBRGen3Error err = RBRGen3_getInputTimeout(
         instrument,
         &inputTimeout);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -869,7 +869,7 @@ TEST_LOGGER3(settings_inputtimeout_set)
                           "settings inputtimeout = 15000" RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRInstrumentGen3_setInputTimeout(
+    RBRGen3Error err = RBRGen3_setInputTimeout(
         instrument,
         inputTimeout);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -885,9 +885,9 @@ TEST_LOGGER3(settings_atmosphere)
     TestIOBuffers_init(buffers,
                        "settings atmosphere = 10.1325010" RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRInstrumentGen3_getValueSetting(
+    RBRGen3Error err = RBRGen3_getValueSetting(
         instrument,
-        RBRINSTRUMENTGEN3_SETTING_ATMOSPHERE,
+        RBRGEN3_SETTING_ATMOSPHERE,
         &atmosphere);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_FLOAT_EQ(10.132501f, atmosphere, 0.000001f);
@@ -906,9 +906,9 @@ TEST_LOGGER3(settings_atmosphere_set)
 
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRInstrumentGen3_setValueSetting(
+    RBRGen3Error err = RBRGen3_setValueSetting(
         instrument,
-        RBRINSTRUMENTGEN3_SETTING_ATMOSPHERE,
+        RBRGEN3_SETTING_ATMOSPHERE,
         atmosphere);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
@@ -921,7 +921,7 @@ TEST_LOGGER3(settings_atmosphere_set)
 typedef struct SensorTest
 {
     const char *response;
-    RBRInstrumentGen3SensorParameter expected[TEST_SENSOR_PARAMETER_MAX];
+    RBRGen3SensorParameter expected[TEST_SENSOR_PARAMETER_MAX];
     int32_t size;
 } SensorTest;
 
@@ -930,7 +930,7 @@ static bool test_sensor(RBRGen3 *instrument,
                         SensorTest *tests)
 {
     RBRGen3Error err;
-    RBRInstrumentGen3SensorParameter actual;
+    RBRGen3SensorParameter actual;
 
     for (int i = 0; tests[i].response != NULL; ++i)
     {
@@ -939,7 +939,7 @@ static bool test_sensor(RBRGen3 *instrument,
                  "%s",
                  tests[i].expected[0].key);
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_getSensorParameter(instrument, 1, &actual);
+        err = RBRGen3_getSensorParameter(instrument, 1, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_STR_EQ(tests[i].expected[0].key, actual.key);
         TEST_ASSERT_STR_EQ(tests[i].expected[0].value, actual.value);
@@ -953,13 +953,13 @@ static bool test_sensors(RBRGen3 *instrument,
                          SensorTest *tests)
 {
     RBRGen3Error err;
-    RBRInstrumentGen3SensorParameter actual[TEST_SENSOR_PARAMETER_MAX];
+    RBRGen3SensorParameter actual[TEST_SENSOR_PARAMETER_MAX];
 
     for (int i = 0; tests[i].response != NULL; ++i)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         int32_t size = TEST_SENSOR_PARAMETER_MAX;
-        err = RBRInstrumentGen3_getSensorParameters(instrument,
+        err = RBRGen3_getSensorParameters(instrument,
                                                 1,
                                                 &actual[0],
                                                 &size);

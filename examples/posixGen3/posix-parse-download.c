@@ -120,8 +120,8 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    RBRInstrumentGen3Channels channels;
-    RBRInstrumentGen3_getChannels(instrument, &channels);
+    RBRGen3Channels channels;
+    RBRGen3_getChannels(instrument, &channels);
 
     RBRParserGen3 *parser = NULL;
 

@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-#include "RBRInstrumentGen3Configuration.h"
+#include "RBRGen3Configuration.h"
 #include "RBRInstrumentGen3Schedule.h"
 #include "RBRInstrumentGen3Gating.h"
 #include "RBRInstrumentGen3Vehicle.h"

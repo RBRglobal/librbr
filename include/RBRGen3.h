@@ -95,8 +95,8 @@ extern const char *RBRGEN3_LIB_BUILD_DATE;
  * The default maximum of 32 channels is reflective of the maximum number of
  * channels supported by RBR instruments, but most instruments have far fewer.
  * Adjusting this value will dramatically affect the size of some structures;
- * notably RBRGen3Sample, but also RBRInstrumentGen3Channels (used by
- * RBRInstrumentGen3_getChannels()) and RBRInstrumentGen3ChannelsList (used by
+ * notably RBRGen3Sample, but also RBRGen3Channels (used by
+ * RBRGen3_getChannels()) and RBRInstrumentGen3ChannelsList (used by
  * RBRInstrumentGen3_getChannelsList()).
  */
 #ifndef RBRGEN3_CHANNEL_MAX

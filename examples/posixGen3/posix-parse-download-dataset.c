@@ -118,9 +118,9 @@ int main(int argc, char *argv[])
     RBRInstrumentGen3_setUSBStreamingState(instrument, false);
     RBRInstrumentGen3_setSerialStreamingState(instrument, false);
 
-    RBRInstrumentGen3Channels channels;
+    RBRGen3Channels channels;
     if (_downloadFrom == 1){
-        RBRInstrumentGen3_getChannels(instrument, &channels);
+        RBRGen3_getChannels(instrument, &channels);
     }
     else if(_downloadFrom == 4){
         //important!!!

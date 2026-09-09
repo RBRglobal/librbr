@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Configuration.c
+ * \file RBRGen3Configuration.c
  *
  * \brief Library implementation.
  *
@@ -18,30 +18,30 @@
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
 
-const char *RBRInstrumentGen3ChannelRangingMode_name(
-    RBRInstrumentGen3ChannelRangingMode mode)
+const char *RBRGen3ChannelRangingMode_name(
+    RBRGen3ChannelRangingMode mode)
 {
     switch (mode)
     {
-    case RBRINSTRUMENTGEN3_RANGING_NONE:
+    case RBRGEN3_RANGING_NONE:
         return "none";
-    case RBRINSTRUMENTGEN3_RANGING_MANUAL:
+    case RBRGEN3_RANGING_MANUAL:
         return "manual";
-    case RBRINSTRUMENTGEN3_RANGING_AUTO:
+    case RBRGEN3_RANGING_AUTO:
         return "auto";
-    case RBRINSTRUMENTGEN3_RANGING_COUNT:
+    case RBRGEN3_RANGING_COUNT:
         return "ranging mode count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_RANGING:
+    case RBRGEN3_UNKNOWN_RANGING:
     default:
         return "unknown ranging mode";
     }
 }
 
-static RBRGen3Error RBRInstrumentGen3_clearChannel(RBRInstrumentGen3Channel *channel)
+static RBRGen3Error RBRGen3_clearChannel(RBRGen3Channel *channel)
 {
     channel->gain.currentGain = NAN;
 
-    for (int32_t gain = 0; gain < RBRINSTRUMENTGEN3_CHANNEL_GAINS_MAX; ++gain)
+    for (int32_t gain = 0; gain < RBRGEN3_CHANNEL_GAINS_MAX; ++gain)
     {
         channel->gain.availableGains[gain] = NAN;
     }
@@ -49,13 +49,13 @@ static RBRGen3Error RBRInstrumentGen3_clearChannel(RBRInstrumentGen3Channel *cha
     snprintf(channel->label, sizeof(channel->label), "%s", "none");
 
     for (int32_t c = 0;
-         c < RBRINSTRUMENTGEN3_CALIBRATION_C_COEFFICIENT_MAX;
+         c < RBRGEN3_CALIBRATION_C_COEFFICIENT_MAX;
          ++c)
     {
         channel->calibration.c[c] = NAN;
     }
     for (int32_t x = 0;
-         x < RBRINSTRUMENTGEN3_CALIBRATION_X_COEFFICIENT_MAX;
+         x < RBRGEN3_CALIBRATION_X_COEFFICIENT_MAX;
          ++x)
     {
         channel->calibration.x[x] = NAN;
@@ -64,10 +64,10 @@ static RBRGen3Error RBRInstrumentGen3_clearChannel(RBRInstrumentGen3Channel *cha
     return RBRGEN3_SUCCESS;
 }
 
-static RBRGen3Error RBRInstrumentGen3_getChannelCoefficients(
+static RBRGen3Error RBRGen3_getChannelCoefficients(
     RBRGen3 *instrument,
     int32_t channelIndex,
-    RBRInstrumentGen3Channel *channel)
+    RBRGen3Channel *channel)
 {
     RBR_TRY(RBRGen3_converse(instrument, "calibration %d all",
                                    channelIndex + 1));
@@ -103,24 +103,24 @@ static RBRGen3Error RBRInstrumentGen3_getChannelCoefficients(
 
         if (parameter.key[0] == 'c'
             && index >= 0
-            && index < RBRINSTRUMENTGEN3_CALIBRATION_C_COEFFICIENT_MAX)
+            && index < RBRGEN3_CALIBRATION_C_COEFFICIENT_MAX)
         {
             channel->calibration.c[index] = strtod(parameter.value, NULL);
         }
         else if (parameter.key[0] == 'x'
                  && index >= 0
-                 && index < RBRINSTRUMENTGEN3_CALIBRATION_X_COEFFICIENT_MAX)
+                 && index < RBRGEN3_CALIBRATION_X_COEFFICIENT_MAX)
         {
             channel->calibration.x[index] = strtod(parameter.value, NULL);
         }
         else if (parameter.key[0] == 'n'
                  && index >= 0
-                 && index < RBRINSTRUMENTGEN3_CALIBRATION_N_COEFFICIENT_MAX)
+                 && index < RBRGEN3_CALIBRATION_N_COEFFICIENT_MAX)
         {
-            RBRInstrumentGen3ChannelIndex coefficient;
+            RBRGen3ChannelIndex coefficient;
             if (strcmp(parameter.value, "value") == 0)
             {
-                coefficient = RBRINSTRUMENTGEN3_VALUE_COEFFICIENT;
+                coefficient = RBRGEN3_VALUE_COEFFICIENT;
             }
             else
             {
@@ -134,10 +134,10 @@ static RBRGen3Error RBRInstrumentGen3_getChannelCoefficients(
     return RBRGEN3_SUCCESS;
 }
 
-static RBRGen3Error RBRInstrumentGen3_getChannel(
+static RBRGen3Error RBRGen3_getChannel(
     RBRGen3 *instrument,
     int32_t channelIndex,
-    RBRInstrumentGen3Channel *channel)
+    RBRGen3Channel *channel)
 {
     if (instrument->generation == RBRGEN3_LOGGER2)
     {
@@ -217,11 +217,11 @@ static RBRGen3Error RBRInstrumentGen3_getChannel(
             }
             else if (strcmp(parameter.value, "auto") == 0)
             {
-                channel->gain.rangingMode = RBRINSTRUMENTGEN3_RANGING_AUTO;
+                channel->gain.rangingMode = RBRGEN3_RANGING_AUTO;
             }
             else
             {
-                channel->gain.rangingMode = RBRINSTRUMENTGEN3_RANGING_MANUAL;
+                channel->gain.rangingMode = RBRGEN3_RANGING_MANUAL;
                 channel->gain.currentGain = strtod(parameter.value, NULL);
             }
         }
@@ -237,7 +237,7 @@ static RBRGen3Error RBRInstrumentGen3_getChannel(
             int32_t gainCount = 0;
             char *gain = NULL;
             while ((gain = strtok(gains, "|")) != NULL
-                   && gainCount < RBRINSTRUMENTGEN3_CHANNEL_GAINS_MAX)
+                   && gainCount < RBRGEN3_CHANNEL_GAINS_MAX)
             {
                 gains = NULL;
                 channel->gain.availableGains[gainCount++] = strtod(gain, NULL);
@@ -255,18 +255,18 @@ static RBRGen3Error RBRInstrumentGen3_getChannel(
     return RBRGEN3_SUCCESS;
 }
 
-typedef enum RBRInstrumentGen3ChannelDensity
+typedef enum RBRGen3ChannelDensity
 {
     /** Channel has no additional information populated. */
-    RBRINSTRUMENTGEN3_CHANNEL_SPARSE = 0,
+    RBRGEN3_CHANNEL_SPARSE = 0,
     /** Channel's calibration information is populated. */
-    RBRINSTRUMENTGEN3_CHANNEL_CALIBRATION = 1 << 0,
-} RBRInstrumentGen3ChannelDensity;
+    RBRGEN3_CHANNEL_CALIBRATION = 1 << 0,
+} RBRGen3ChannelDensity;
 
-static RBRGen3Error RBRInstrumentGen3_getChannelAll(
+static RBRGen3Error RBRGen3_getChannelAll(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Channels *channels,
-    RBRInstrumentGen3ChannelDensity density)
+    RBRGen3Channels *channels,
+    RBRGen3ChannelDensity density)
 {
     int32_t channel_count = channels->count;
     if (channel_count > RBRGEN3_CHANNEL_MAX)
@@ -276,13 +276,13 @@ static RBRGen3Error RBRInstrumentGen3_getChannelAll(
 
     for (int32_t idx = 0; idx < channel_count; ++idx)
     {
-        RBRInstrumentGen3Channel *channel = &channels->channels[idx];
-        RBRInstrumentGen3_clearChannel(channel);
-        RBR_TRY(RBRInstrumentGen3_getChannel(instrument, idx, channel));
+        RBRGen3Channel *channel = &channels->channels[idx];
+        RBRGen3_clearChannel(channel);
+        RBR_TRY(RBRGen3_getChannel(instrument, idx, channel));
 
-        if (density & RBRINSTRUMENTGEN3_CHANNEL_CALIBRATION)
+        if (density & RBRGEN3_CHANNEL_CALIBRATION)
         {
-            RBR_TRY(RBRInstrumentGen3_getChannelCoefficients(instrument,
+            RBR_TRY(RBRGen3_getChannelCoefficients(instrument,
                                                          idx,
                                                          channel));
         }
@@ -291,12 +291,12 @@ static RBRGen3Error RBRInstrumentGen3_getChannelAll(
     return RBRGEN3_SUCCESS;
 }
 
-static RBRGen3Error RBRInstrumentGen3_getChannelsWithDensity(
+static RBRGen3Error RBRGen3_getChannelsWithDensity(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Channels *channels,
-    RBRInstrumentGen3ChannelDensity density)
+    RBRGen3Channels *channels,
+    RBRGen3ChannelDensity density)
 {
-    memset(channels, 0, sizeof(RBRInstrumentGen3Channels));
+    memset(channels, 0, sizeof(RBRGen3Channels));
 
     RBR_TRY(RBRGen3_converse(instrument, "channels"));
 
@@ -336,33 +336,33 @@ static RBRGen3Error RBRInstrumentGen3_getChannelsWithDensity(
         }
     }
 
-    RBR_TRY(RBRInstrumentGen3_getChannelAll(instrument, channels, density));
+    RBR_TRY(RBRGen3_getChannelAll(instrument, channels, density));
 
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_getChannels(RBRGen3 *instrument,
-                                             RBRInstrumentGen3Channels *channels)
+RBRGen3Error RBRGen3_getChannels(RBRGen3 *instrument,
+                                             RBRGen3Channels *channels)
 {
-    return RBRInstrumentGen3_getChannelsWithDensity(
+    return RBRGen3_getChannelsWithDensity(
         instrument,
         channels,
-        RBRINSTRUMENTGEN3_CHANNEL_CALIBRATION);
+        RBRGEN3_CHANNEL_CALIBRATION);
 }
 
-RBRGen3Error RBRInstrumentGen3_getChannelsWithoutCalibrations(
+RBRGen3Error RBRGen3_getChannelsWithoutCalibrations(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Channels *channels)
+    RBRGen3Channels *channels)
 {
-    return RBRInstrumentGen3_getChannelsWithDensity(
+    return RBRGen3_getChannelsWithDensity(
         instrument,
         channels,
-        RBRINSTRUMENTGEN3_CHANNEL_SPARSE);
+        RBRGEN3_CHANNEL_SPARSE);
 }
 
-RBRGen3Error RBRInstrumentGen3_setChannelStatus(
+RBRGen3Error RBRGen3_setChannelStatus(
     RBRGen3 *instrument,
-    RBRInstrumentGen3ChannelIndex channel,
+    RBRGen3ChannelIndex channel,
     bool status)
 {
     return RBRGen3_converse(instrument,
@@ -371,17 +371,17 @@ RBRGen3Error RBRInstrumentGen3_setChannelStatus(
                                   status ? "on" : "off");
 }
 
-RBRGen3Error RBRInstrumentGen3_setChannelGain(
+RBRGen3Error RBRGen3_setChannelGain(
     RBRGen3 *instrument,
-    RBRInstrumentGen3ChannelIndex channel,
-    RBRInstrumentGen3ChannelGain *gain)
+    RBRGen3ChannelIndex channel,
+    RBRGen3ChannelGain *gain)
 {
-    if (gain->rangingMode == RBRINSTRUMENTGEN3_RANGING_MANUAL)
+    if (gain->rangingMode == RBRGEN3_RANGING_MANUAL)
     {
         bool validGain = false;
         int32_t i;
         for (i = 0;
-             i < RBRINSTRUMENTGEN3_CHANNEL_GAINS_MAX
+             i < RBRGEN3_CHANNEL_GAINS_MAX
              && !isnan(gain->availableGains[i]);
              ++i)
         {
@@ -402,7 +402,7 @@ RBRGen3Error RBRInstrumentGen3_setChannelGain(
                                       channel,
                                       (double) gain->currentGain);
     }
-    else if (gain->rangingMode == RBRINSTRUMENTGEN3_RANGING_AUTO)
+    else if (gain->rangingMode == RBRGEN3_RANGING_AUTO)
     {
         return RBRGen3_converse(instrument,
                                       "channel %d gain = auto",
@@ -414,10 +414,10 @@ RBRGen3Error RBRInstrumentGen3_setChannelGain(
     }
 }
 
-RBRGen3Error RBRInstrumentGen3_setCalibration(
+RBRGen3Error RBRGen3_setCalibration(
     RBRGen3 *instrument,
-    RBRInstrumentGen3ChannelIndex channel,
-    const RBRInstrumentGen3Calibration *calibration)
+    RBRGen3ChannelIndex channel,
+    const RBRGen3Calibration *calibration)
 {
     if (calibration->dateTime < RBRGEN3_DATETIME_MIN
         || calibration->dateTime > RBRGEN3_DATETIME_MAX)
@@ -434,7 +434,7 @@ RBRGen3Error RBRInstrumentGen3_setCalibration(
     bool populated = false;
 
     for (int32_t c = 0;
-         c < RBRINSTRUMENTGEN3_CALIBRATION_C_COEFFICIENT_MAX
+         c < RBRGEN3_CALIBRATION_C_COEFFICIENT_MAX
          && !isnan(calibration->c[c]);
          ++c)
     {
@@ -448,7 +448,7 @@ RBRGen3Error RBRInstrumentGen3_setCalibration(
                                        (double) calibration->c[c]));
     }
     for (int32_t x = 0;
-         x < RBRINSTRUMENTGEN3_CALIBRATION_X_COEFFICIENT_MAX
+         x < RBRGEN3_CALIBRATION_X_COEFFICIENT_MAX
          && !isnan(calibration->x[x]);
          ++x)
     {
@@ -470,7 +470,7 @@ RBRGen3Error RBRInstrumentGen3_setCalibration(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_getFetchPowerOffDelay(
+RBRGen3Error RBRGen3_getFetchPowerOffDelay(
     RBRGen3 *instrument,
     RBRGen3Period *fetchPowerOffDelay)
 {
@@ -480,7 +480,7 @@ RBRGen3Error RBRInstrumentGen3_getFetchPowerOffDelay(
                                 fetchPowerOffDelay);
 }
 
-RBRGen3Error RBRInstrumentGen3_setFetchPowerOffDelay(
+RBRGen3Error RBRGen3_setFetchPowerOffDelay(
     RBRGen3 *instrument,
     RBRGen3Period fetchPowerOffDelay)
 {
@@ -491,7 +491,7 @@ RBRGen3Error RBRInstrumentGen3_setFetchPowerOffDelay(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_isSensorPowerAlwaysOn(
+RBRGen3Error RBRGen3_isSensorPowerAlwaysOn(
     RBRGen3 *instrument,
     bool *sensorPowerAlwaysOn)
 {
@@ -501,7 +501,7 @@ RBRGen3Error RBRInstrumentGen3_isSensorPowerAlwaysOn(
                                  sensorPowerAlwaysOn);
 }
 
-RBRGen3Error RBRInstrumentGen3_setSensorPowerAlwaysOn(
+RBRGen3Error RBRGen3_setSensorPowerAlwaysOn(
     RBRGen3 *instrument,
     bool sensorPowerAlwaysOn)
 {
@@ -512,7 +512,7 @@ RBRGen3Error RBRInstrumentGen3_setSensorPowerAlwaysOn(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_getCastDetection(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getCastDetection(RBRGen3 *instrument,
                                                   bool *castDetection)
 {
     return RBRGen3_getBool(instrument,
@@ -521,7 +521,7 @@ RBRGen3Error RBRInstrumentGen3_getCastDetection(RBRGen3 *instrument,
                                  castDetection);
 }
 
-RBRGen3Error RBRInstrumentGen3_setCastDetection(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_setCastDetection(RBRGen3 *instrument,
                                                   bool castDetection)
 {
     RBR_TRY(RBRInstrumentGen3_permit(instrument, "settings"));
@@ -531,7 +531,7 @@ RBRGen3Error RBRInstrumentGen3_setCastDetection(RBRGen3 *instrument,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_getInputTimeout(
+RBRGen3Error RBRGen3_getInputTimeout(
     RBRGen3 *instrument,
     RBRGen3Period *inputTimeout)
 {
@@ -541,12 +541,12 @@ RBRGen3Error RBRInstrumentGen3_getInputTimeout(
                                 inputTimeout);
 }
 
-RBRGen3Error RBRInstrumentGen3_setInputTimeout(
+RBRGen3Error RBRGen3_setInputTimeout(
     RBRGen3 *instrument,
     RBRGen3Period inputTimeout)
 {
-    if (inputTimeout < RBRINSTRUMENTGEN3_INPUT_TIMEOUT_MIN
-        || inputTimeout > RBRINSTRUMENTGEN3_INPUT_TIMEOUT_MAX)
+    if (inputTimeout < RBRGEN3_INPUT_TIMEOUT_MIN
+        || inputTimeout > RBRGEN3_INPUT_TIMEOUT_MAX)
     {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
@@ -558,58 +558,58 @@ RBRGen3Error RBRInstrumentGen3_setInputTimeout(
     return RBRGEN3_SUCCESS;
 }
 
-const char *RBRInstrumentGen3ValueSetting_name(RBRInstrumentGen3ValueSetting setting)
+const char *RBRGen3ValueSetting_name(RBRGen3ValueSetting setting)
 {
     switch (setting)
     {
-    case RBRINSTRUMENTGEN3_SETTING_CONDUCTIVITY:
+    case RBRGEN3_SETTING_CONDUCTIVITY:
         return "conductivity";
-    case RBRINSTRUMENTGEN3_SETTING_SPECCONDTEMPCO:
+    case RBRGEN3_SETTING_SPECCONDTEMPCO:
         return "speccondtempco";
-    case RBRINSTRUMENTGEN3_SETTING_ALTITUDE:
+    case RBRGEN3_SETTING_ALTITUDE:
         return "altitude";
-    case RBRINSTRUMENTGEN3_SETTING_TEMPERATURE:
+    case RBRGEN3_SETTING_TEMPERATURE:
         return "temperature";
-    case RBRINSTRUMENTGEN3_SETTING_PRESSURE:
+    case RBRGEN3_SETTING_PRESSURE:
         return "pressure";
-    case RBRINSTRUMENTGEN3_SETTING_ATMOSPHERE:
+    case RBRGEN3_SETTING_ATMOSPHERE:
         return "atmosphere";
-    case RBRINSTRUMENTGEN3_SETTING_DENSITY:
+    case RBRGEN3_SETTING_DENSITY:
         return "density";
-    case RBRINSTRUMENTGEN3_SETTING_SALINITY:
+    case RBRGEN3_SETTING_SALINITY:
         return "salinity";
-    case RBRINSTRUMENTGEN3_SETTING_AVGSOUNDSPEED:
+    case RBRGEN3_SETTING_AVGSOUNDSPEED:
         return "avgsoundspeed";
-    case RBRINSTRUMENTGEN3_SETTING_COUNT:
+    case RBRGEN3_SETTING_COUNT:
         return "setting count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_SETTING:
+    case RBRGEN3_UNKNOWN_SETTING:
     default:
         return "unknown setting";
     }
 }
 
-RBRGen3Error RBRInstrumentGen3_getValueSetting(
+RBRGen3Error RBRGen3_getValueSetting(
     RBRGen3 *instrument,
-    RBRInstrumentGen3ValueSetting setting,
+    RBRGen3ValueSetting setting,
     float *value)
 {
-    if (setting < 0 || setting >= RBRINSTRUMENTGEN3_SETTING_COUNT)
+    if (setting < 0 || setting >= RBRGEN3_SETTING_COUNT)
     {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
     return RBRGen3_getFloat(instrument,
                                   "settings",
-                                  RBRInstrumentGen3ValueSetting_name(setting),
+                                  RBRGen3ValueSetting_name(setting),
                                   value);
 }
 
-RBRGen3Error RBRInstrumentGen3_setValueSetting(
+RBRGen3Error RBRGen3_setValueSetting(
     RBRGen3 *instrument,
-    RBRInstrumentGen3ValueSetting setting,
+    RBRGen3ValueSetting setting,
     float value)
 {
-    if (setting < 0 || setting >= RBRINSTRUMENTGEN3_SETTING_COUNT)
+    if (setting < 0 || setting >= RBRGEN3_SETTING_COUNT)
     {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
@@ -617,15 +617,15 @@ RBRGen3Error RBRInstrumentGen3_setValueSetting(
     RBR_TRY(RBRInstrumentGen3_permit(instrument, "settings"));
     RBR_TRY(RBRGen3_converse(instrument,
                                    "settings %s = %f",
-                                   RBRInstrumentGen3ValueSetting_name(setting),
+                                   RBRGen3ValueSetting_name(setting),
                                    (double) value));
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_getSensorParameter(
+RBRGen3Error RBRGen3_getSensorParameter(
     RBRGen3 *instrument,
-    RBRInstrumentGen3ChannelIndex channel,
-    RBRInstrumentGen3SensorParameter *parameter)
+    RBRGen3ChannelIndex channel,
+    RBRGen3SensorParameter *parameter)
 {
     memset(parameter->value, 0, sizeof(parameter->value));
 
@@ -681,10 +681,10 @@ RBRGen3Error RBRInstrumentGen3_getSensorParameter(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_getSensorParameters(
+RBRGen3Error RBRGen3_getSensorParameters(
     RBRGen3 *instrument,
-    RBRInstrumentGen3ChannelIndex channel,
-    RBRInstrumentGen3SensorParameter *parameters,
+    RBRGen3ChannelIndex channel,
+    RBRGen3SensorParameter *parameters,
     int32_t *size)
 {
     int32_t maxSize = *size;
@@ -695,7 +695,7 @@ RBRGen3Error RBRInstrumentGen3_getSensorParameters(
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    memset(parameters, 0, sizeof(RBRInstrumentGen3SensorParameter) * maxSize);
+    memset(parameters, 0, sizeof(RBRGen3SensorParameter) * maxSize);
 
     RBRGen3Error err;
     /* Logger2 returns “E0109 feature not available” for channels which have no
@@ -769,10 +769,10 @@ RBRGen3Error RBRInstrumentGen3_getSensorParameters(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_setSensorParameter(
+RBRGen3Error RBRGen3_setSensorParameter(
     RBRGen3 *instrument,
-    RBRInstrumentGen3ChannelIndex channel,
-    RBRInstrumentGen3SensorParameter *parameter)
+    RBRGen3ChannelIndex channel,
+    RBRGen3SensorParameter *parameter)
 {
     return RBRGen3_converse(instrument,
                                   "sensor %d %s = %s",

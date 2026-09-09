@@ -54,7 +54,7 @@ typedef struct RBRInstrumentGen3ChannelsList
  * by the instrument. Unpopulated entries will have zero-length name and unit
  * members.
  *
- * \nol2 Use RBRInstrumentGen3_getChannels() and RBRInstrumentGen3_getChannel().
+ * \nol2 Use RBRGen3_getChannels() and RBRGen3_getChannel().
  *
  * \param [in] instrument the instrument connection
  * \param [out] channelsList the channels list
@@ -95,7 +95,7 @@ typedef struct RBRInstrumentGen3LabelsList
  * RBRInstrumentGen3LabelsList.channels will be populated in the order reported
  * by the instrument. Unpopulated entries will be zero-length.
  *
- * \nol2 Use RBRInstrumentGen3_getChannels() and RBRInstrumentGen3_getChannel().
+ * \nol2 Use RBRGen3_getChannels() and RBRGen3_getChannel().
  *
  * \param [in] instrument the instrument connection
  * \param [out] labelsList the channel labels list
