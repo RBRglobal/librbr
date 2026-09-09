@@ -30,10 +30,10 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentError err;
-    RBRInstrument *instrument = NULL;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3 *instrument = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRInstrument instrumentSpace;
+    RBRInstrumentGen3 instrumentSpace;
     instrument = &instrumentSpace;
     #endif
 
@@ -56,49 +56,49 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENT_LIB_NAME,
-            RBRINSTRUMENT_LIB_VERSION);
+            RBRINSTRUMENTGEN3_LIB_NAME,
+            RBRINSTRUMENTGEN3_LIB_VERSION);
 
-    RBRInstrumentCallbacks callbacks = {
+    RBRInstrumentGen3Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrument_open(
+    if ((err = RBRInstrumentGen3_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENT_SUCCESS)
+             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentError_name(err));
+                RBRInstrumentGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
 
-    RBRInstrumentLink link;
-    RBRInstrument_getLink(instrument, &link);
+    RBRInstrumentGen3Link link;
+    RBRInstrumentGen3_getLink(instrument, &link);
     printf("Connected to the instrument via %s.\n",
-           RBRInstrumentLink_name(link));
+           RBRInstrumentGen3Link_name(link));
 
     switch (link)
     {
-    case RBRINSTRUMENT_LINK_USB:
-        RBRInstrument_setUSBStreamingState(instrument, false);
+    case RBRINSTRUMENTGEN3_LINK_USB:
+        RBRInstrumentGen3_setUSBStreamingState(instrument, false);
         break;
-    case RBRINSTRUMENT_LINK_SERIAL:
-    case RBRINSTRUMENT_LINK_WIFI:
+    case RBRINSTRUMENTGEN3_LINK_SERIAL:
+    case RBRINSTRUMENTGEN3_LINK_WIFI:
         {
-            RBRInstrumentSerial serial;
-            RBRInstrument_getSerial(instrument, &serial);
+            RBRInstrumentGen3Serial serial;
+            RBRInstrumentGen3_getSerial(instrument, &serial);
             printf("Connected in %s mode at %s baud.\n",
-                   RBRInstrumentSerialMode_name(serial.mode),
-                   RBRInstrumentSerialBaudRate_name(serial.baudRate));
+                   RBRInstrumentGen3SerialMode_name(serial.mode),
+                   RBRInstrumentGen3SerialBaudRate_name(serial.baudRate));
 
-            RBRInstrument_setSerialStreamingState(instrument, false);
+            RBRInstrumentGen3_setSerialStreamingState(instrument, false);
             break;
         }
     default:
@@ -108,28 +108,28 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    RBRInstrumentSample sample;
+    RBRInstrumentGen3Sample sample;
     while (true)
     {
-        err = RBRInstrument_fetch(instrument, NULL, false, &sample);
-        if (err != RBRINSTRUMENT_SUCCESS)
+        err = RBRInstrumentGen3_fetch(instrument, NULL, false, &sample);
+        if (err != RBRINSTRUMENTGEN3_SUCCESS)
         {
-            fprintf(stderr, "Error: %s\n", RBRInstrumentError_name(err));
+            fprintf(stderr, "Error: %s\n", RBRInstrumentGen3Error_name(err));
         }
         else
         {
             printf("%" PRIi64, sample.timestamp);
             for (int32_t i = 0; i < sample.channels; i++)
             {
-                switch (RBRInstrumentReading_getFlag(sample.readings[i]))
+                switch (RBRInstrumentGen3Reading_getFlag(sample.readings[i]))
                 {
-                case RBRINSTRUMENT_READING_FLAG_UNCALIBRATED:
+                case RBRINSTRUMENTGEN3_READING_FLAG_UNCALIBRATED:
                     printf(", ###");
                     break;
-                case RBRINSTRUMENT_READING_FLAG_ERROR:
-                    printf(", Error-%2d", RBRInstrumentReading_getError(sample.readings[i]));
+                case RBRINSTRUMENTGEN3_READING_FLAG_ERROR:
+                    printf(", Error-%2d", RBRInstrumentGen3Reading_getError(sample.readings[i]));
                     break;
-                case RBRINSTRUMENT_READING_FLAG_NONE:
+                case RBRINSTRUMENTGEN3_READING_FLAG_NONE:
                 default:
                     printf(", %lf", sample.readings[i]);
                     break;
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
     }
 
 instrumentCleanup:
-    RBRInstrument_close(instrument);
+    RBRInstrumentGen3_close(instrument);
 fileCleanup:
     close(instrumentFd);
 

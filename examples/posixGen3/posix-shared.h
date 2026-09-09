@@ -22,21 +22,21 @@ extern "C" {
 
 int openSerialFd(char *devicePath);
 
-RBRInstrumentError instrumentTime(const struct RBRInstrument *instrument,
-                                  RBRInstrumentDateTime *time);
+RBRInstrumentGen3Error instrumentTime(const struct RBRInstrumentGen3 *instrument,
+                                  RBRInstrumentGen3DateTime *time);
 
-RBRInstrumentError instrumentSleep(const struct RBRInstrument *instrument,
-                                   RBRInstrumentDateTime time);
+RBRInstrumentGen3Error instrumentSleep(const struct RBRInstrumentGen3 *instrument,
+                                   RBRInstrumentGen3DateTime time);
 
-RBRInstrumentError instrumentRead(const struct RBRInstrument *instrument,
+RBRInstrumentGen3Error instrumentRead(const struct RBRInstrumentGen3 *instrument,
                                   void *data,
                                   int32_t *size);
 
-RBRInstrumentError instrumentWrite(const struct RBRInstrument *instrument,
+RBRInstrumentGen3Error instrumentWrite(const struct RBRInstrumentGen3 *instrument,
                                    const void *const data,
                                    int32_t size);
 
-RBRInstrumentError instrumentStart(RBRInstrument *instrument);
+RBRInstrumentGen3Error instrumentStart(RBRInstrumentGen3 *instrument);
 
 #ifdef __cplusplus
 }

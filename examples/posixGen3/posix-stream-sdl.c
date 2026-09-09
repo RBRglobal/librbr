@@ -57,9 +57,9 @@ static int PLOT_COLORS[][3] = {
 };
 #define PLOT_COLORS_LEN (sizeof(PLOT_COLORS) / sizeof(PLOT_COLORS[0]))
 
-static RBRInstrumentSample callbackSample;
-static RBRInstrumentSample *samples = NULL;
-static SDL_Point *samplePoints[RBRINSTRUMENT_CHANNEL_MAX] = {
+static RBRInstrumentGen3Sample callbackSample;
+static RBRInstrumentGen3Sample *samples = NULL;
+static SDL_Point *samplePoints[RBRINSTRUMENTGEN3_CHANNEL_MAX] = {
     NULL
 };
 static int sampleCount = 0;
@@ -69,9 +69,9 @@ static int samplePointCount = 0;
 static SDL_Window *window;
 static SDL_Renderer *renderer;
 
-RBRInstrumentError instrumentSample(
-    const struct RBRInstrument *instrument,
-    const struct RBRInstrumentSample *const sample)
+RBRInstrumentGen3Error instrumentSample(
+    const struct RBRInstrumentGen3 *instrument,
+    const struct RBRInstrumentGen3Sample *const sample)
 {
     /* Unused. */
     (void) instrument;
@@ -80,12 +80,12 @@ RBRInstrumentError instrumentSample(
     {
         memmove(&samples[0],
                 &samples[1],
-                (sampleCount-- *sizeof(RBRInstrumentSample)));
+                (sampleCount-- *sizeof(RBRInstrumentGen3Sample)));
     }
 
-    memcpy(&samples[sampleCount++], sample, sizeof(RBRInstrumentSample));
+    memcpy(&samples[sampleCount++], sample, sizeof(RBRInstrumentGen3Sample));
 
-    return RBRINSTRUMENT_SUCCESS;
+    return RBRINSTRUMENTGEN3_SUCCESS;
 }
 
 static void recalculatePoints(void)
@@ -94,16 +94,16 @@ static void recalculatePoints(void)
     int height;
     SDL_GetRendererOutputSize(renderer, &width, &height);
 
-    RBRInstrumentDateTime minTime = samples[0].timestamp,
+    RBRInstrumentGen3DateTime minTime = samples[0].timestamp,
                           maxTime = samples[sampleCount - 1].timestamp;
-    RBRInstrumentDateTime duration = maxTime - minTime;
+    RBRInstrumentGen3DateTime duration = maxTime - minTime;
     double horScale = ((double) width) / duration;
 
-    samplePointChannelCount = RBRINSTRUMENT_CHANNEL_MAX;
-    double minVal[RBRINSTRUMENT_CHANNEL_MAX] = {
+    samplePointChannelCount = RBRINSTRUMENTGEN3_CHANNEL_MAX;
+    double minVal[RBRINSTRUMENTGEN3_CHANNEL_MAX] = {
         DBL_MAX
     };
-    double maxVal[RBRINSTRUMENT_CHANNEL_MAX] = {
+    double maxVal[RBRINSTRUMENTGEN3_CHANNEL_MAX] = {
         DBL_MIN
     };
     for (int i = 0; i < sampleCount; i++)
@@ -118,7 +118,7 @@ static void recalculatePoints(void)
                                   maxVal[channel]);
         }
     }
-    double verScale[RBRINSTRUMENT_CHANNEL_MAX];
+    double verScale[RBRINSTRUMENTGEN3_CHANNEL_MAX];
     for (int channel = 0; channel < samplePointChannelCount; channel++)
     {
         verScale[channel] = ((double) (height - 2 * VER_PAD)) / (maxVal[channel] - minVal[channel]);
@@ -126,7 +126,7 @@ static void recalculatePoints(void)
 
     for (int i = 0; i < sampleCount; i++)
     {
-        RBRInstrumentDateTime timestamp = samples[i].timestamp - minTime;
+        RBRInstrumentGen3DateTime timestamp = samples[i].timestamp - minTime;
         for (int channel = 0; channel < samplePointChannelCount; channel++)
         {
             double value = samples[i].readings[channel] - minVal[channel];
@@ -145,10 +145,10 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentError err;
-    RBRInstrument *instrument = NULL;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3 *instrument = NULL;
 
-    if ((samples = malloc(sizeof(RBRInstrumentSample) * SAMPLE_SIZE)) == NULL)
+    if ((samples = malloc(sizeof(RBRInstrumentGen3Sample) * SAMPLE_SIZE)) == NULL)
     {
         fprintf(stderr,
                 "%s: Failed to allocate sample buffer!\n",
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    for (int channel = 0; channel < RBRINSTRUMENT_CHANNEL_MAX; channel++)
+    for (int channel = 0; channel < RBRINSTRUMENTGEN3_CHANNEL_MAX; channel++)
     {
         if ((samplePoints[channel] = malloc(sizeof(SDL_Point) * SAMPLE_SIZE))
             == NULL)
@@ -188,10 +188,10 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENT_LIB_NAME,
-            RBRINSTRUMENT_LIB_VERSION);
+            RBRINSTRUMENTGEN3_LIB_NAME,
+            RBRINSTRUMENTGEN3_LIB_VERSION);
 
-    RBRInstrumentCallbacks callbacks = {
+    RBRInstrumentGen3Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
@@ -200,30 +200,30 @@ int main(int argc, char *argv[])
         .sampleBuffer = &callbackSample
     };
 
-    if ((err = RBRInstrument_open(
+    if ((err = RBRInstrumentGen3_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENT_SUCCESS)
+             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentError_name(err));
+                RBRInstrumentGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
 
-    RBRInstrumentLink link;
-    RBRInstrument_getLink(instrument, &link);
+    RBRInstrumentGen3Link link;
+    RBRInstrumentGen3_getLink(instrument, &link);
 
     switch (link)
     {
-    case RBRINSTRUMENT_LINK_USB:
-        RBRInstrument_setUSBStreamingState(instrument, true);
+    case RBRINSTRUMENTGEN3_LINK_USB:
+        RBRInstrumentGen3_setUSBStreamingState(instrument, true);
         break;
-    case RBRINSTRUMENT_LINK_SERIAL:
-    case RBRINSTRUMENT_LINK_WIFI:
-        RBRInstrument_setSerialStreamingState(instrument, true);
+    case RBRINSTRUMENTGEN3_LINK_SERIAL:
+    case RBRINSTRUMENTGEN3_LINK_WIFI:
+        RBRInstrumentGen3_setSerialStreamingState(instrument, true);
         break;
     default:
         fprintf(stderr,
@@ -233,20 +233,20 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    RBRInstrumentDeployment deployment;
-    RBRInstrument_getDeployment(instrument, &deployment);
-    if (deployment.status != RBRINSTRUMENT_STATUS_LOGGING)
+    RBRInstrumentGen3Deployment deployment;
+    RBRInstrumentGen3_getDeployment(instrument, &deployment);
+    if (deployment.status != RBRINSTRUMENTGEN3_STATUS_LOGGING)
     {
         printf("%s: Instrument is %s, not logging. I'm going to start it.\n",
                programName,
-               RBRInstrumentDeploymentStatus_name(deployment.status));
+               RBRInstrumentGen3DeploymentStatus_name(deployment.status));
 
-        if ((err = instrumentStart(instrument)) != RBRINSTRUMENT_SUCCESS)
+        if ((err = instrumentStart(instrument)) != RBRINSTRUMENTGEN3_SUCCESS)
         {
             fprintf(stderr,
                     "%s: Failed to start instrument: %s!\n",
                     programName,
-                    RBRInstrumentError_name(err));
+                    RBRInstrumentGen3Error_name(err));
             status = EXIT_FAILURE;
             goto instrumentCleanup;
         }
@@ -284,12 +284,12 @@ int main(int argc, char *argv[])
 
     while (!done)
     {
-        if ((err = RBRInstrument_readSample(instrument)) != RBRINSTRUMENT_SUCCESS)
+        if ((err = RBRInstrumentGen3_readSample(instrument)) != RBRINSTRUMENTGEN3_SUCCESS)
         {
             fprintf(stderr,
                     "%s: Error: %s\n",
                     programName,
-                    RBRInstrumentError_name(err));
+                    RBRInstrumentGen3Error_name(err));
         }
 
         /* We've received new samples; recalculate all the points. */
@@ -335,7 +335,7 @@ int main(int argc, char *argv[])
     }
 
 instrumentCleanup:
-    RBRInstrument_close(instrument);
+    RBRInstrumentGen3_close(instrument);
 fileCleanup:
     close(instrumentFd);
 

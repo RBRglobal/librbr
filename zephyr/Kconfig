@@ -17,7 +17,7 @@ config LIBRBR_GEN3
     bool "Gen3 (Logger2/Logger3) API"
     default y
     help
-        Compile the RBRInstrument_-prefixed API for Generation 3
+        Compile the RBRInstrumentGen3_-prefixed API for Generation 3
         (Logger2/Logger3) instruments — the same API shipped as libRBR 1.x.
 
 config LIBRBR_GEN4
@@ -29,22 +29,22 @@ config LIBRBR_GEN4
 
 if LIBRBR_GEN3
 
-# The following settings are reproduced from RBRInstrument.h. See
+# The following settings are reproduced from RBRInstrumentGen3.h. See
 # CMakeLists.txt for the Kconfig-to-precompiler-macro bindings.
 
-config RBRINSTRUMENT_COMMAND_BUFFER_MAX
+config RBRINSTRUMENTGEN3_COMMAND_BUFFER_MAX
     int "The size of the buffer storing commands destined for the instrument."
     default 120
     help
         Must be large enough to hold the largest command you will want to send
         to the instrument plus the trailing line termination (`\r\n\0`).
 
-        A buffer of this size is included in RBRInstrument. Whether you let
-        RBRInstrument_open() perform its own allocation or you perform your own
-        allocation based on `sizeof(RBRInstrument)`, a buffer of this size is
+        A buffer of this size is included in RBRInstrumentGen3. Whether you let
+        RBRInstrumentGen3_open() perform its own allocation or you perform your own
+        allocation based on `sizeof(RBRInstrumentGen3)`, a buffer of this size is
         included.
 
-config RBRINSTRUMENT_RESPONSE_BUFFER_MAX
+config RBRINSTRUMENTGEN3_RESPONSE_BUFFER_MAX
     int "The size of the buffer storing instrument responses."
     default 1024
     help
@@ -52,35 +52,35 @@ config RBRINSTRUMENT_RESPONSE_BUFFER_MAX
         to receive. This does not include download data, which is read directly
         into a user-managed buffer.
 
-        A buffer of this size is included in RBRInstrument. Whether you let
-        RBRInstrument_open() perform its own allocation or you perform your own
-        allocation based on `sizeof(RBRInstrument)`, a buffer of this size is
+        A buffer of this size is included in RBRInstrumentGen3. Whether you let
+        RBRInstrumentGen3_open() perform its own allocation or you perform your own
+        allocation based on `sizeof(RBRInstrumentGen3)`, a buffer of this size is
         included.
 
-config RBRINSTRUMENT_CHANNEL_MAX
+config RBRINSTRUMENTGEN3_CHANNEL_MAX
     int "The maximum number of channels present on an instrument."
     default 32
     help
         The default maximum of 32 channels is reflective of the maximum number
         of channels supported by RBR instruments, but most instruments have far
         fewer. Adjusting this value will dramatically affect the size of some
-        structures; notably RBRInstrumentSample, but also RBRInstrumentChannels
-        (used by RBRInstrument_getChannels()) and RBRInstrumentChannelsList
-        (used by RBRInstrument_getChannelsList()).
+        structures; notably RBRInstrumentGen3Sample, but also RBRInstrumentGen3Channels
+        (used by RBRInstrumentGen3_getChannels()) and RBRInstrumentGen3ChannelsList
+        (used by RBRInstrumentGen3_getChannelsList()).
 
-config RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX
+config RBRINSTRUMENTGEN3_CALIBRATION_C_COEFFICIENT_MAX
     int "The maximum number of C calibration coefficients per channel."
     default 8
 
-config RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX
+config RBRINSTRUMENTGEN3_CALIBRATION_X_COEFFICIENT_MAX
     int "The maximum number of X calibration coefficients per channel."
     default 16
 
-config RBRINSTRUMENT_CALIBRATION_N_COEFFICIENT_MAX
+config RBRINSTRUMENTGEN3_CALIBRATION_N_COEFFICIENT_MAX
     int "The maximum number of input channel indices per channel."
     default 8
 
-config RBRINSTRUMENT_CHANNEL_GAINS_MAX
+config RBRINSTRUMENTGEN3_CHANNEL_GAINS_MAX
     int "The maximum number of gain settings per channel."
     default 8
 

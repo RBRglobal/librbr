@@ -21,7 +21,7 @@ extern "C" {
 #include "RBRInstrumentGen3.h"
 
 /** \brief The maximum number of pieces of auxiliary data in an event. */
-#define RBRINSTRUMENT_EVENT_AUXILIARY_DATA_MAX 4
+#define RBRINSTRUMENTGEN3_EVENT_AUXILIARY_DATA_MAX 4
 
 struct RBRParser;
 
@@ -35,69 +35,69 @@ struct RBRParser;
  *
  * \param [in] parser the dataset parser which parsed the sample
  * \param [in] sample the parsed sample
- * \return #RBRINSTRUMENT_SUCCESS when the sample data is successfully consumed
- * \return #RBRINSTRUMENT_CALLBACK_ERROR when an unrecoverable error occurs
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the sample data is successfully consumed
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRInstrumentError (*RBRParserSampleCallback)(
+typedef RBRInstrumentGen3Error (*RBRParserSampleCallback)(
     const struct RBRParser *parser,
-    const struct RBRInstrumentSample *const sample);
+    const struct RBRInstrumentGen3Sample *const sample);
 
 /**
  * \brief Instrument event types.
  */
-typedef enum RBRInstrumentEventType
+typedef enum RBRInstrumentGen3EventType
 {
-    RBRINSTRUMENT_EVENT_UNKNOWN_OR_UNRECOGNIZED_EVENT                                     = 0x00,
-    RBRINSTRUMENT_EVENT_TIME_SYNCHRONIZATION_MARKER                                       = 0x01,
-    RBRINSTRUMENT_EVENT_DISABLE_COMMAND_RECEIVED                                          = 0x02,
-    RBRINSTRUMENT_EVENT_RUN_TIME_ERROR_ENCOUNTERED                                        = 0x03,
-    RBRINSTRUMENT_EVENT_CPU_RESET_DETECTED                                                = 0x04,
-    RBRINSTRUMENT_EVENT_ONE_OR_MORE_PARAMETERS_RECOVERED_AFTER_RESET                      = 0x05,
-    RBRINSTRUMENT_EVENT_RESTART_FAILED_RTC_CALENDAR_CONTENTS_NOT_VALID                    = 0x06,
-    RBRINSTRUMENT_EVENT_RESTART_FAILED_LOGGER_STATUS_NOT_VALID                            = 0x07,
-    RBRINSTRUMENT_EVENT_RESTART_FAILED_PRIMARY_SCHEDULE_PARAMETERS_COULD_NOT_BE_RECOVERED = 0x08,
-    RBRINSTRUMENT_EVENT_UNABLE_TO_LOAD_ALARM_TIME_FOR_NEXT_SAMPLE                         = 0x09,
-    RBRINSTRUMENT_EVENT_SAMPLING_RESTARTED_AFTER_RESETTING_RTC                            = 0x0A,
-    RBRINSTRUMENT_EVENT_PARAMETERS_RECOVERED_SAMPLING_RESTARTED_AFTER_RESETTING_RTC       = 0x0B,
-    RBRINSTRUMENT_EVENT_SAMPLING_STOPPED_END_TIME_REACHED                                 = 0x0C,
-    RBRINSTRUMENT_EVENT_START_OF_A_RECORDED_BURST                                         = 0x0D,
-    RBRINSTRUMENT_EVENT_START_OF_A_WAVE_BURST                                             = 0x0E,
-    RBRINSTRUMENT_EVENT_RESERVED1                                                         = 0x0F,
-    RBRINSTRUMENT_EVENT_STREAMING_NOW_OFF_FOR_BOTH_PORTS                                  = 0x10,
-    RBRINSTRUMENT_EVENT_STREAMING_ON_FOR_USB_OFF_FOR_SERIAL                               = 0x11,
-    RBRINSTRUMENT_EVENT_STREAMING_OFF_FOR_USB_ON_FOR_SERIAL                               = 0x12,
-    RBRINSTRUMENT_EVENT_STREAMING_NOW_ON_FOR_BOTH_PORTS                                   = 0x13,
-    RBRINSTRUMENT_EVENT_SAMPLING_STARTED_THRESHOLD_CONDITION_SATISFIED                    = 0x14,
-    RBRINSTRUMENT_EVENT_SAMPLING_PAUSED_THRESHOLD_CONDITION_NOT_MET                       = 0x15,
-    RBRINSTRUMENT_EVENT_POWER_SOURCE_SWITCHED_TO_INTERNAL_BATTERY                         = 0x16,
-    RBRINSTRUMENT_EVENT_POWER_SOURCE_SWITCHED_TO_EXTERNAL_BATTERY                         = 0x17,
-    RBRINSTRUMENT_EVENT_TWIST_ACTIVATION_STARTED_SAMPLING                                 = 0x18,
-    RBRINSTRUMENT_EVENT_TWIST_ACTIVATION_PAUSED_SAMPLING                                  = 0x19,
-    RBRINSTRUMENT_EVENT_WIFI_MODULE_DETECTED_AND_ACTIVATED                                = 0x1A,
-    RBRINSTRUMENT_EVENT_WIFI_MODULE_DEACTIVATED_REMOVED_OR_ACTIVITY_TIMEOUT               = 0x1B,
-    RBRINSTRUMENT_EVENT_REGIMES_ENABLED_BUT_NOT_YET_IN_A_REGIME                           = 0x1C,
-    RBRINSTRUMENT_EVENT_ENTERED_REGIME_1                                                  = 0x1D,
-    RBRINSTRUMENT_EVENT_ENTERED_REGIME_2                                                  = 0x1E,
-    RBRINSTRUMENT_EVENT_ENTERED_REGIME_3                                                  = 0x1F,
-    RBRINSTRUMENT_EVENT_START_OF_REGIME_BIN                                               = 0x20,
-    RBRINSTRUMENT_EVENT_BEGIN_PROFILING_UP_CAST                                           = 0x21,
-    RBRINSTRUMENT_EVENT_BEGIN_PROFILING_DOWN_CAST                                         = 0x22,
-    RBRINSTRUMENT_EVENT_END_OF_PROFILING_CAST                                             = 0x23,
-    RBRINSTRUMENT_EVENT_BATTERY_FAILED_SCHEDULE_FINISHED                                  = 0x24,
-    RBRINSTRUMENT_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_FAST_SAMPLING_MODE    = 0x25,
-    RBRINSTRUMENT_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_SLOW_SAMPLING_MODE    = 0x26,
-    RBRINSTRUMENT_EVENT_ENERGY_USED_MARKER_INTERNAL_BATTERY                               = 0x27,
-    RBRINSTRUMENT_EVENT_ENERGY_USED_MARKER_EXTERNAL_POWER_SOURCE                          = 0x28
-} RBRInstrumentEventType;
+    RBRINSTRUMENTGEN3_EVENT_UNKNOWN_OR_UNRECOGNIZED_EVENT                                     = 0x00,
+    RBRINSTRUMENTGEN3_EVENT_TIME_SYNCHRONIZATION_MARKER                                       = 0x01,
+    RBRINSTRUMENTGEN3_EVENT_DISABLE_COMMAND_RECEIVED                                          = 0x02,
+    RBRINSTRUMENTGEN3_EVENT_RUN_TIME_ERROR_ENCOUNTERED                                        = 0x03,
+    RBRINSTRUMENTGEN3_EVENT_CPU_RESET_DETECTED                                                = 0x04,
+    RBRINSTRUMENTGEN3_EVENT_ONE_OR_MORE_PARAMETERS_RECOVERED_AFTER_RESET                      = 0x05,
+    RBRINSTRUMENTGEN3_EVENT_RESTART_FAILED_RTC_CALENDAR_CONTENTS_NOT_VALID                    = 0x06,
+    RBRINSTRUMENTGEN3_EVENT_RESTART_FAILED_LOGGER_STATUS_NOT_VALID                            = 0x07,
+    RBRINSTRUMENTGEN3_EVENT_RESTART_FAILED_PRIMARY_SCHEDULE_PARAMETERS_COULD_NOT_BE_RECOVERED = 0x08,
+    RBRINSTRUMENTGEN3_EVENT_UNABLE_TO_LOAD_ALARM_TIME_FOR_NEXT_SAMPLE                         = 0x09,
+    RBRINSTRUMENTGEN3_EVENT_SAMPLING_RESTARTED_AFTER_RESETTING_RTC                            = 0x0A,
+    RBRINSTRUMENTGEN3_EVENT_PARAMETERS_RECOVERED_SAMPLING_RESTARTED_AFTER_RESETTING_RTC       = 0x0B,
+    RBRINSTRUMENTGEN3_EVENT_SAMPLING_STOPPED_END_TIME_REACHED                                 = 0x0C,
+    RBRINSTRUMENTGEN3_EVENT_START_OF_A_RECORDED_BURST                                         = 0x0D,
+    RBRINSTRUMENTGEN3_EVENT_START_OF_A_WAVE_BURST                                             = 0x0E,
+    RBRINSTRUMENTGEN3_EVENT_RESERVED1                                                         = 0x0F,
+    RBRINSTRUMENTGEN3_EVENT_STREAMING_NOW_OFF_FOR_BOTH_PORTS                                  = 0x10,
+    RBRINSTRUMENTGEN3_EVENT_STREAMING_ON_FOR_USB_OFF_FOR_SERIAL                               = 0x11,
+    RBRINSTRUMENTGEN3_EVENT_STREAMING_OFF_FOR_USB_ON_FOR_SERIAL                               = 0x12,
+    RBRINSTRUMENTGEN3_EVENT_STREAMING_NOW_ON_FOR_BOTH_PORTS                                   = 0x13,
+    RBRINSTRUMENTGEN3_EVENT_SAMPLING_STARTED_THRESHOLD_CONDITION_SATISFIED                    = 0x14,
+    RBRINSTRUMENTGEN3_EVENT_SAMPLING_PAUSED_THRESHOLD_CONDITION_NOT_MET                       = 0x15,
+    RBRINSTRUMENTGEN3_EVENT_POWER_SOURCE_SWITCHED_TO_INTERNAL_BATTERY                         = 0x16,
+    RBRINSTRUMENTGEN3_EVENT_POWER_SOURCE_SWITCHED_TO_EXTERNAL_BATTERY                         = 0x17,
+    RBRINSTRUMENTGEN3_EVENT_TWIST_ACTIVATION_STARTED_SAMPLING                                 = 0x18,
+    RBRINSTRUMENTGEN3_EVENT_TWIST_ACTIVATION_PAUSED_SAMPLING                                  = 0x19,
+    RBRINSTRUMENTGEN3_EVENT_WIFI_MODULE_DETECTED_AND_ACTIVATED                                = 0x1A,
+    RBRINSTRUMENTGEN3_EVENT_WIFI_MODULE_DEACTIVATED_REMOVED_OR_ACTIVITY_TIMEOUT               = 0x1B,
+    RBRINSTRUMENTGEN3_EVENT_REGIMES_ENABLED_BUT_NOT_YET_IN_A_REGIME                           = 0x1C,
+    RBRINSTRUMENTGEN3_EVENT_ENTERED_REGIME_1                                                  = 0x1D,
+    RBRINSTRUMENTGEN3_EVENT_ENTERED_REGIME_2                                                  = 0x1E,
+    RBRINSTRUMENTGEN3_EVENT_ENTERED_REGIME_3                                                  = 0x1F,
+    RBRINSTRUMENTGEN3_EVENT_START_OF_REGIME_BIN                                               = 0x20,
+    RBRINSTRUMENTGEN3_EVENT_BEGIN_PROFILING_UP_CAST                                           = 0x21,
+    RBRINSTRUMENTGEN3_EVENT_BEGIN_PROFILING_DOWN_CAST                                         = 0x22,
+    RBRINSTRUMENTGEN3_EVENT_END_OF_PROFILING_CAST                                             = 0x23,
+    RBRINSTRUMENTGEN3_EVENT_BATTERY_FAILED_SCHEDULE_FINISHED                                  = 0x24,
+    RBRINSTRUMENTGEN3_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_FAST_SAMPLING_MODE    = 0x25,
+    RBRINSTRUMENTGEN3_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_SLOW_SAMPLING_MODE    = 0x26,
+    RBRINSTRUMENTGEN3_EVENT_ENERGY_USED_MARKER_INTERNAL_BATTERY                               = 0x27,
+    RBRINSTRUMENTGEN3_EVENT_ENERGY_USED_MARKER_EXTERNAL_POWER_SOURCE                          = 0x28
+} RBRInstrumentGen3EventType;
 
 /**
  * \brief Get a human-readable string name for an event type type.
  *
  * \param [in] type the event type
  * \return a string name for the event type
- * \see RBRInstrumentError_name() for a description of the format of names
+ * \see RBRInstrumentGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentEventType_name(RBRInstrumentEventType type);
+const char *RBRInstrumentGen3EventType_name(RBRInstrumentGen3EventType type);
 
 /**
  * \brief An instrument event.
@@ -105,24 +105,24 @@ const char *RBRInstrumentEventType_name(RBRInstrumentEventType type);
  * \see https://docs.rbr-global.com/L3commandreference/format-of-stored-data/standard-rawbin00-format/standard-format-events-markers
  * \see https://docs.rbr-global.com/L3commandreference/format-of-stored-data/easyparse-calbin00-format/easyparse-format-events-markers
  */
-typedef struct RBRInstrumentEvent
+typedef struct RBRInstrumentGen3Event
 {
     /** \brief The type of the event. */
-    RBRInstrumentEventType type;
+    RBRInstrumentGen3EventType type;
     /** \brief The timestamp of the event. */
-    RBRInstrumentDateTime timestamp;
+    RBRInstrumentGen3DateTime timestamp;
     /**
      * \brief The number of populated entries in
-     * RBRInstrumentEvent.auxiliaryData.
+     * RBRInstrumentGen3Event.auxiliaryData.
      *
      * For EasyParse events, this will be either 0 or 1. For standard events,
-     * this may be up to RBRINSTRUMENT_EVENT_AUXILIARY_DATA_MAX depending on
+     * this may be up to RBRINSTRUMENTGEN3_EVENT_AUXILIARY_DATA_MAX depending on
      * the event type.
      */
     int32_t auxiliaryDataLength;
     /** \brief Auxiliary data for the event. */
-    uint32_t auxiliaryData[RBRINSTRUMENT_EVENT_AUXILIARY_DATA_MAX];
-} RBRInstrumentEvent;
+    uint32_t auxiliaryData[RBRINSTRUMENTGEN3_EVENT_AUXILIARY_DATA_MAX];
+} RBRInstrumentGen3Event;
 
 /**
  * \brief Callback to provide a parsed event to user code.
@@ -130,25 +130,25 @@ typedef struct RBRInstrumentEvent
  * The \a event pointer will be the same as given via
  * RBRParserCallbacks.eventBuffer. The event value will be overwritten every
  * time event parsing is attempted, which will be at least once per invocation
- * of RBRParser_parse() for dataset #RBRINSTRUMENT_DATASET_EASYPARSE_EVENTS
+ * of RBRParser_parse() for dataset #RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS
  * where the buffer is large enough. If you want to use the event after your
  * callback has returned, make a copy of it.
  *
  * \param [in] parser the dataset parser which parsed the event
  * \param [in] event the parsed event
- * \return #RBRINSTRUMENT_SUCCESS when the event data is successfully consumed
- * \return #RBRINSTRUMENT_CALLBACK_ERROR when an unrecoverable error occurs
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the event data is successfully consumed
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRInstrumentError (*RBRParserEventCallback)(
+typedef RBRInstrumentGen3Error (*RBRParserEventCallback)(
     const struct RBRParser *parser,
-    const struct RBRInstrumentEvent *const event);
+    const struct RBRInstrumentGen3Event *const event);
 
 /**
  * \brief A set of callbacks from parser to user code.
  *
  * All of the callback functions are optional; however, where any callback
  * function is provided, the corresponding buffer must also be provided, or
- * else RBRParser_init() will return #RBRINSTRUMENT_MISSING_CALLBACK.
+ * else RBRParser_init() will return #RBRINSTRUMENTGEN3_MISSING_CALLBACK.
  */
 typedef struct RBRParserCallbacks
 {
@@ -164,7 +164,7 @@ typedef struct RBRParserCallbacks
      *
      * Required only when RBRParserCallbacks.sample is populated.
      */
-    RBRInstrumentSample *sampleBuffer;
+    RBRInstrumentGen3Sample *sampleBuffer;
 
     /**
      * \brief Called when an event has been parsed.
@@ -178,7 +178,7 @@ typedef struct RBRParserCallbacks
      *
      * Required only when RBRParserCallbacks.event is populated.
      */
-    RBRInstrumentEvent *eventBuffer;
+    RBRInstrumentGen3Event *eventBuffer;
 } RBRParserCallbacks;
 
 /**
@@ -192,8 +192,8 @@ typedef struct RBRParserEasyParseConfig
      * \brief The number of instrument channels in each sample.
      *
      * If the value is less than or equal to 0 or exceeds
-     * #RBRINSTRUMENT_CHANNEL_MAX, then RBRParser_init() will return
-     * #RBRINSTRUMENT_INVALID_PARAMETER_VALUE.
+     * #RBRINSTRUMENTGEN3_CHANNEL_MAX, then RBRParser_init() will return
+     * #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE.
      */
     int32_t channels;
 } RBRParserEasyParseConfig;
@@ -204,7 +204,7 @@ typedef struct RBRParserEasyParseConfig
 typedef struct RBRParserConfig
 {
     /** \brief The format of memory being parsed. */
-    RBRInstrumentMemoryFormat format;
+    RBRInstrumentGen3MemoryFormat format;
 
     /** \brief Format-specific configuration. */
     union
@@ -247,27 +247,27 @@ typedef struct RBRParser
  * \brief Initialize a dataset parser.
  *
  * The use of the \a parser argument is the same as that of the \a instrument
- * argument to RBRInstrument_open(): when given as `NULL`, instance memory will
+ * argument to RBRInstrumentGen3_open(): when given as `NULL`, instance memory will
  * be allocated for you; otherwise, the pointer target will be used as instance
- * storage. See RBRInstrument_open() for “do”s and “don't”s inherent to this
+ * storage. See RBRInstrumentGen3_open() for “do”s and “don't”s inherent to this
  * approach.
  *
- * Again, as with the \a callbacks argument to RBRInstrument_open(), the
+ * Again, as with the \a callbacks argument to RBRInstrumentGen3_open(), the
  * \a config and \a callbacks structures will be copied into the RBRParser
  * structure and no references to them are retained.
  *
  * Currently, the only supported memory format is
- * #RBRINSTRUMENT_MEMFORMAT_CALBIN00 (“EasyParse”). Requesting any other format
- * via RBRParserConfig will cause #RBRINSTRUMENT_UNSUPPORTED to be returned.
+ * #RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00 (“EasyParse”). Requesting any other format
+ * via RBRParserConfig will cause #RBRINSTRUMENTGEN3_UNSUPPORTED to be returned.
  *
  * Both callback functions are optional, but that probably isn't very useful:
  * after all, you won't receive any data that way. Still, the library won't
  * complain. If any buffer is not given for a callback function which _is_
  * given, or if \a callbacks itself is given as `NULL`, then
- * #RBRINSTRUMENT_MISSING_CALLBACK is returned and the parser instantiation
+ * #RBRINSTRUMENTGEN3_MISSING_CALLBACK is returned and the parser instantiation
  * will not be completed.
  *
- * In the event of any return value other than #RBRINSTRUMENT_SUCCESS, any
+ * In the event of any return value other than #RBRINSTRUMENTGEN3_SUCCESS, any
  * memory allocated by this constructor is freed. That is, in the event of
  * failure, no cleanup of library resources is required. In the event of a
  * successful result, RBRParser_destroy() should be used to release allocated
@@ -277,14 +277,14 @@ typedef struct RBRParser
  * \param [in] callbacks the set of callbacks to be used by the parser
  * \param [in] config the parser configuration
  * \param [in] userData arbitrary user data; useful in callbacks
- * \return #RBRINSTRUMENT_SUCCESS if the parser was instantiated successfully
- * \return #RBRINSTRUMENT_ALLOCATION_FAILURE if memory allocation failed
- * \return #RBRINSTRUMENT_MISSING_CALLBACK if no callbacks were provided
- * \return #RBRINSTRUMENT_UNSUPPORTED if the memory format is unsupported
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE if the config is invalid
+ * \return #RBRINSTRUMENTGEN3_SUCCESS if the parser was instantiated successfully
+ * \return #RBRINSTRUMENTGEN3_ALLOCATION_FAILURE if memory allocation failed
+ * \return #RBRINSTRUMENTGEN3_MISSING_CALLBACK if no callbacks were provided
+ * \return #RBRINSTRUMENTGEN3_UNSUPPORTED if the memory format is unsupported
+ * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE if the config is invalid
  * \see RBRParser_destroy()
  */
-RBRInstrumentError RBRParser_init(RBRParser **parser,
+RBRInstrumentGen3Error RBRParser_init(RBRParser **parser,
                                   const RBRParserCallbacks *callbacks,
                                   const RBRParserConfig *config,
                                   void *userData);
@@ -295,10 +295,10 @@ RBRInstrumentError RBRParser_init(RBRParser **parser,
  * Frees the buffer allocated by RBRParser_init() if necessary.
  *
  * \param [in,out] parser the dataset parser to close
- * \return #RBRINSTRUMENT_SUCCESS if the parser was closed successfully
+ * \return #RBRINSTRUMENTGEN3_SUCCESS if the parser was closed successfully
  * \see RBRParser_init()
  */
-RBRInstrumentError RBRParser_destroy(RBRParser *parser);
+RBRInstrumentGen3Error RBRParser_destroy(RBRParser *parser);
 
 /**
  * \brief Get the parser configuration.
@@ -339,12 +339,12 @@ void RBRParser_setUserData(RBRParser *parser, void *userData);
 /**
  * \brief Parse a chunk of data.
  *
- * For a parser configured to parse #RBRINSTRUMENT_MEMFORMAT_CALBIN00-format
- * data, \a dataset may be given as #RBRINSTRUMENT_DATASET_EASYPARSE_EVENTS or
- * #RBRINSTRUMENT_DATASET_EASYPARSE_SAMPLE_DATA. Any other value (including
- * #RBRINSTRUMENT_DATASET_EASYPARSE_DEPLOYMENT_HEADER, which is currently
+ * For a parser configured to parse #RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00-format
+ * data, \a dataset may be given as #RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS or
+ * #RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA. Any other value (including
+ * #RBRINSTRUMENTGEN3_DATASET_EASYPARSE_DEPLOYMENT_HEADER, which is currently
  * unsupported) will cause the function to return
- * #RBRINSTRUMENT_INVALID_PARAMETER_VALUE and no data will be parsed.
+ * #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE and no data will be parsed.
  *
  * Parsed values will be returned via the RBRParserCallbacks provided to
  * RBRParser_init(). The value at \a size after completion of parsing indicates
@@ -356,14 +356,14 @@ void RBRParser_setUserData(RBRParser *parser, void *userData);
  * \param [in,out] size initially, the size of the data given by \a data; set
  *                                 by the callback to the number of bytes
  *                                 actually parsed
- * \return #RBRINSTRUMENT_SUCCESS when no parsing errors occur
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when an invalid dataset is
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when no parsing errors occur
+ * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is
  *                                                given, or when the parser
  *                                                configuration is incomplete
  *                                                or invalid
  */
-RBRInstrumentError RBRParser_parse(RBRParser *parser,
-                                   RBRInstrumentDataset dataset,
+RBRInstrumentGen3Error RBRParser_parse(RBRParser *parser,
+                                   RBRInstrumentGen3Dataset dataset,
                                    const void *const data,
                                    int32_t *size);
 

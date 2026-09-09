@@ -78,7 +78,7 @@ static int listenUdp( void );
 static int openSocketFd( void );
 static void rollingPush(struct timespec ts, int32_t offset);
 static double rollingRateBps(struct timespec now, int32_t currentOffset);
-static bool isRetriableDownloadError(RBRInstrumentError err);
+static bool isRetriableDownloadError(RBRInstrumentGen3Error err);
 /********************************/
 
 /**
@@ -315,12 +315,12 @@ static int openSocketFd( void )
  * same chunk. These all indicate a transport-level problem with the chunk
  * itself (short/garbled data) rather than something fatal to the connection.
  */
-static bool isRetriableDownloadError(RBRInstrumentError err)
+static bool isRetriableDownloadError(RBRInstrumentGen3Error err)
 {
-    return err == RBRINSTRUMENT_TIMEOUT
-           || err == RBRINSTRUMENT_CALLBACK_ERROR
-           || err == RBRINSTRUMENT_CHECKSUM_ERROR
-           || err == RBRINSTRUMENT_COMMUNICATION_ERROR;
+    return err == RBRINSTRUMENTGEN3_TIMEOUT
+           || err == RBRINSTRUMENTGEN3_CALLBACK_ERROR
+           || err == RBRINSTRUMENTGEN3_CHECKSUM_ERROR
+           || err == RBRINSTRUMENTGEN3_COMMUNICATION_ERROR;
 }
 
 int main(int argc, char *argv[])
@@ -336,10 +336,10 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentError err;
-    RBRInstrument *instrument = NULL;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3 *instrument = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRInstrument instrumentSpace;
+    RBRInstrumentGen3 instrumentSpace;
     instrument = &instrumentSpace;
     #endif
 
@@ -357,35 +357,35 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENT_LIB_NAME,
-            RBRINSTRUMENT_LIB_VERSION);
+            RBRINSTRUMENTGEN3_LIB_NAME,
+            RBRINSTRUMENTGEN3_LIB_VERSION);
 
-    RBRInstrumentCallbacks callbacks = {
+    RBRInstrumentGen3Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrument_open(
+    if ((err = RBRInstrumentGen3_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENT_SUCCESS)
+             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentError_name(err));
+                RBRInstrumentGen3Error_name(err));
         status = EXIT_FAILURE;
         goto socketCleanup;
     }
 
     printf(
         "Looks like I'm connected to a %s instrument.\n",
-        RBRInstrumentGeneration_name(RBRInstrument_getGeneration(instrument)));
+        RBRInstrumentGen3Generation_name(RBRInstrumentGen3_getGeneration(instrument)));
 
-    RBRInstrumentId id;
-    RBRInstrument_getId(instrument, &id);
+    RBRInstrumentGen3Id id;
+    RBRInstrumentGen3_getId(instrument, &id);
     printf("The instrument is an %s (fwtype %d), serial number %06d, with "
            "firmware v%s.\n",
            id.model,
@@ -393,37 +393,37 @@ int main(int argc, char *argv[])
            id.serial,
            id.version);
 
-    RBRInstrumentHardwareRevision hwrev;
-    RBRInstrument_getHardwareRevision(instrument, &hwrev);
+    RBRInstrumentGen3HardwareRevision hwrev;
+    RBRInstrumentGen3_getHardwareRevision(instrument, &hwrev);
     printf("It's PCB rev%c, CPU rev%s, BSL v%c.\n",
            hwrev.pcb,
            hwrev.cpu,
            hwrev.bsl);
 
-    RBRInstrumentMemoryInfo meminfo;
-    meminfo.dataset = RBRINSTRUMENT_DATASET_STANDARD;
-    RBRInstrument_getMemoryInfo(instrument, &meminfo);
+    RBRInstrumentGen3MemoryInfo meminfo;
+    meminfo.dataset = RBRINSTRUMENTGEN3_DATASET_STANDARD;
+    RBRInstrumentGen3_getMemoryInfo(instrument, &meminfo);
     printf("Dataset %s is %0.2f%% full (%" PRIi32 "B used).\n",
-           RBRInstrumentDataset_name(meminfo.dataset),
+           RBRInstrumentGen3Dataset_name(meminfo.dataset),
            ((double) meminfo.used) / meminfo.size * 100,
            meminfo.used);
 
-    RBRInstrumentMemoryFormat memformat;
-    RBRInstrument_getAvailableMemoryFormats(instrument, &memformat);
+    RBRInstrumentGen3MemoryFormat memformat;
+    RBRInstrumentGen3_getAvailableMemoryFormats(instrument, &memformat);
     printf("It supports these memory formats:\n");
-    for (int i = RBRINSTRUMENT_MEMFORMAT_NONE + 1;
-         i <= RBRINSTRUMENT_MEMFORMAT_MAX;
+    for (int i = RBRINSTRUMENTGEN3_MEMFORMAT_NONE + 1;
+         i <= RBRINSTRUMENTGEN3_MEMFORMAT_MAX;
          i <<= 1)
     {
         if (memformat & i)
         {
-            printf("\t%s\n", RBRInstrumentMemoryFormat_name(i));
+            printf("\t%s\n", RBRInstrumentGen3MemoryFormat_name(i));
         }
     }
 
-    RBRInstrument_getCurrentMemoryFormat(instrument, &memformat);
+    RBRInstrumentGen3_getCurrentMemoryFormat(instrument, &memformat);
     printf("It's currently storing data of format %s.\n",
-           RBRInstrumentMemoryFormat_name(memformat));
+           RBRInstrumentGen3MemoryFormat_name(memformat));
 
     char filename[PATH_MAX + 1];
     snprintf(filename, sizeof(filename), "%06d.bin", id.serial);
@@ -463,7 +463,7 @@ int main(int argc, char *argv[])
     }
 
     uint8_t buf[CHUNK_SIZE];
-    RBRInstrumentData data = {
+    RBRInstrumentGen3Data data = {
         .dataset = meminfo.dataset,
         .offset  = initialOffset,
         .data    = buf
@@ -481,21 +481,21 @@ int main(int argc, char *argv[])
     while (data.offset < meminfo.used)
     {
         data.size = sizeof(buf);
-        err = RBRInstrument_readData(instrument, &data);
-        if (err != RBRINSTRUMENT_SUCCESS)
+        err = RBRInstrumentGen3_readData(instrument, &data);
+        if (err != RBRINSTRUMENTGEN3_SUCCESS)
         {
             if (isRetriableDownloadError(err) && chunkRetries < MAX_CHUNK_RETRIES)
             {
                 chunkRetries++;
                 printf("\n%s at offset %" PRIi32 "B; re-requesting chunk "
                     "(attempt %d of %d)...\n",
-                    RBRInstrumentError_name(err),
+                    RBRInstrumentGen3Error_name(err),
                     data.offset,
                     chunkRetries,
                     MAX_CHUNK_RETRIES);
                 continue;
             } else {
-                printf("\nError: %s", RBRInstrumentError_name(err));
+                printf("\nError: %s", RBRInstrumentGen3Error_name(err));
                 break;
             }
         }
@@ -534,7 +534,7 @@ int main(int argc, char *argv[])
 fileCleanup:
     close(downloadFd);
 instrumentCleanup:
-    RBRInstrument_close(instrument);
+    RBRInstrumentGen3_close(instrument);
 socketCleanup:
     close(instrumentFd);
 

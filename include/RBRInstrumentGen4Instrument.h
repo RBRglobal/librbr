@@ -620,4 +620,4 @@ RBRInstrumentGen4Error RBRInstrumentGen4_reboot(RBRInstrumentGen4 *instrument,
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTOTHER_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN4INSTRUMENT_H */

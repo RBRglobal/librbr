@@ -44,7 +44,7 @@ export LIB_VERSION ?= $(shell ./tools/version.sh)
 ##
 ## The library contains two independent instrument APIs:
 ##
-## - `GEN3`: the `RBRInstrument_`-prefixed API for Logger2/Logger3
+## - `GEN3`: the `RBRInstrumentGen3_`-prefixed API for Logger2/Logger3
 ##   instruments — the same API shipped as libRBR 1.x;
 ## - `GEN4`: the `RBRInstrumentGen4_`-prefixed API for Generation 4
 ##   (SL4/SEN4/L4) instruments.
@@ -240,7 +240,7 @@ testsGen3/tests.c: $(foreach module,$(GEN3_TEST_MODULES),testsGen3/$(module).c)
 		| sed -e 's/$$/;/' >>$@
 	@echo "InstrumentTest instrumentTests[] = {" >>$@
 	@grep -ho 'TEST_LOGGER[23]([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRINSTRUMENT_LOGGER\1, test_\2_l\1},/' \
+		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRINSTRUMENTGEN3_LOGGER\1, test_\2_l\1},/' \
 		>>$@
 	@echo "    {0}" >>$@
 	@echo "};" >>$@

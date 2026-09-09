@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentDeployment.h
+ * \file RBRInstrumentGen3Deployment.h
  *
  * \brief Instrument commands and structures pertaining to deployments.
  *
@@ -10,8 +10,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTDEPLOYMENT_H
-#define LIBRBR_RBRINSTRUMENTDEPLOYMENT_H
+#ifndef LIBRBR_RBRINSTRUMENTGEN3DEPLOYMENT_H
+#define LIBRBR_RBRINSTRUMENTGEN3DEPLOYMENT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,7 +22,7 @@ extern "C" {
  *
  * A hardware error can be generated for a variety of reasons. See the `verify`
  * command documentation for a comprehensive list. In the event of a hardware
- * error, \a status will be set to #RBRINSTRUMENT_UNKNOWN_STATUS. While Logger2
+ * error, \a status will be set to #RBRINSTRUMENTGEN3_UNKNOWN_STATUS. While Logger2
  * hardware reports a status in addition to any error, Logger3 hardware does
  * not, and the value will always be the same as the current instrument status.
  *
@@ -31,65 +31,65 @@ extern "C" {
  * \param [in] instrument the instrument connection
  * \param [in] eraseMemory whether to erase memory before enabling logging
  * \param [out] status the status which would be produced by enabling logging
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR if an error would occur when enabling
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if an error would occur when enabling
  *                                       logging
- * \see RBRInstrument_enable()
+ * \see RBRInstrumentGen3_enable()
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/verify
  */
-RBRInstrumentError RBRInstrument_verify(
-    RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_verify(
+    RBRInstrumentGen3 *instrument,
     bool eraseMemory,
-    RBRInstrumentDeploymentStatus *status);
+    RBRInstrumentGen3DeploymentStatus *status);
 
 /**
  * \brief Enable the instrument to sample according to the programmed schedule.
  *
- * If \a eraseMemory is not `true`, RBRInstrument_memoryClear() must be used to
+ * If \a eraseMemory is not `true`, RBRInstrumentGen3_memoryClear() must be used to
  * erase the memory beforehand as necessary.
  *
  * A hardware error can be generated for a variety of reasons. See the `enable`
  * command documentation for a comprehensive list. In the event of a hardware
- * error, \a status will be set to #RBRINSTRUMENT_UNKNOWN_STATUS.
+ * error, \a status will be set to #RBRINSTRUMENTGEN3_UNKNOWN_STATUS.
  *
  * \param [in] instrument the instrument connection
  * \param [in] eraseMemory whether to erase memory before enabling logging
  * \param [out] status the instrument's status after having enabled logging
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR when an error occurs enabling logging
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when an error occurs enabling logging
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/enable
  */
-RBRInstrumentError RBRInstrument_enable(
-    RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_enable(
+    RBRInstrumentGen3 *instrument,
     bool eraseMemory,
-    RBRInstrumentDeploymentStatus *status);
+    RBRInstrumentGen3DeploymentStatus *status);
 
 /**
  * \brief If the instrument is logging, terminate the current deployment.
  *
  * \param [in] instrument the instrument connection
  * \param [out] status the instrument's status after having disabled logging
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/disable
  */
-RBRInstrumentError RBRInstrument_disable(
-    RBRInstrument *instrument,
-    RBRInstrumentDeploymentStatus *status);
+RBRInstrumentGen3Error RBRInstrumentGen3_disable(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3DeploymentStatus *status);
 
 /**
  * \brief Instrument `simulation` command parameters.
  *
- * \see RBRInstrument_getSimulation()
- * \see RBRInstrument_setSimulation()
+ * \see RBRInstrumentGen3_getSimulation()
+ * \see RBRInstrumentGen3_setSimulation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
-typedef struct RBRInstrumentSimulation
+typedef struct RBRInstrumentGen3Simulation
 {
     /** Whether simulation is enabled. */
     bool state;
@@ -98,23 +98,23 @@ typedef struct RBRInstrumentSimulation
      *
      * Specified in milliseconds. Must be greater than 0.
      */
-    RBRInstrumentPeriod period;
-} RBRInstrumentSimulation;
+    RBRInstrumentGen3Period period;
+} RBRInstrumentGen3Simulation;
 
 /**
  * \brief Get the instrument simulation settings.
  *
  * \param [in] instrument the instrument connection
  * \param [out] simulation the simulation parameters
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the feature is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
-RBRInstrumentError RBRInstrument_getSimulation(
-    RBRInstrument *instrument,
-    RBRInstrumentSimulation *simulation);
+RBRInstrumentGen3Error RBRInstrumentGen3_getSimulation(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3Simulation *simulation);
 
 /**
  * \brief Set the instrument simulation settings.
@@ -128,21 +128,21 @@ RBRInstrumentError RBRInstrument_getSimulation(
  *
  * \param [in] instrument the instrument connection
  * \param [out] simulation the simulation parameters
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR when the settings cannot be changed
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when an out-of-bounds
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when an out-of-bounds
  *                                                simulation period is
  *                                                requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
-RBRInstrumentError RBRInstrument_setSimulation(
-    RBRInstrument *instrument,
-    const RBRInstrumentSimulation *simulation);
+RBRInstrumentGen3Error RBRInstrumentGen3_setSimulation(
+    RBRInstrumentGen3 *instrument,
+    const RBRInstrumentGen3Simulation *simulation);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTDEPLOYMENT_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN3DEPLOYMENT_H */

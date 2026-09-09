@@ -7,7 +7,7 @@
 The library adheres
 to object-oriented design principles.
 The core context object for instrument communications
-is RBRInstrument,
+is RBRInstrumentGen3,
 and RBRParser for dataset parsing.
 The names of method functions
 are prefixed with the name of the type
@@ -18,9 +18,9 @@ This extends to many types
 beyond just the core context objects;
 for example,
 all enum types have a corresponding “name” method
-(e.g., #RBRInstrumentError and RBRInstrumentError_name()).
+(e.g., #RBRInstrumentGen3Error and RBRInstrumentGen3Error_name()).
 
-RBRInstrument and RBRParser
+RBRInstrumentGen3 and RBRParser
 are the only struct types which leverage
 the idea of getters and setters.
 While these are not “opaque” types,
@@ -43,7 +43,7 @@ as the need presents.
 All but the most simple,
 [functionally-pure][pure] functions
 return an error indicator
-of type #RBRInstrumentError.
+of type #RBRInstrumentGen3Error.
 Data is returned to the caller via out pointers.
 This means that a common pattern
 can be used for calling library functions
@@ -51,9 +51,9 @@ and either handling any error
 or passing it further up the call stack:
 
 ~~~{.c}
-RBRInstrumentError err;
-RBRInstrumentFoo foo;
-if ((err = RBRInstrument_foo(instrument, &foo)) != RBRINSTRUMENT_SUCCESS)
+RBRInstrumentGen3Error err;
+RBRInstrumentGen3Foo foo;
+if ((err = RBRInstrumentGen3_foo(instrument, &foo)) != RBRINSTRUMENTGEN3_SUCCESS)
 {
     return err;
 }
@@ -66,7 +66,7 @@ if ((err = RBRInstrument_foo(instrument, &foo)) != RBRINSTRUMENT_SUCCESS)
 
 The only dynamic memory allocations
 performed by the library
-occur within RBRInstrument_open()
+occur within RBRInstrumentGen3_open()
 and RBRParser_init(),
 as described in the documentation
 for those functions.

@@ -1906,4 +1906,4 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfigAll(
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTCONFIGURATION_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN4CONFIGURATION_H */

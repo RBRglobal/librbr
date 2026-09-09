@@ -16,26 +16,26 @@ typedef struct FetchingTest
     const char *command;
     const char *response;
     bool passChannels;
-    RBRInstrumentLabelsList channels;
+    RBRInstrumentGen3LabelsList channels;
     bool sleepAfter;
-    RBRInstrumentSample expected;
+    RBRInstrumentGen3Sample expected;
 } FetchingTest;
 
-static bool test_fetching(RBRInstrument *instrument,
+static bool test_fetching(RBRInstrumentGen3 *instrument,
                           TestIOBuffers *buffers,
                           FetchingTest *tests)
 {
-    RBRInstrumentError err;
-    RBRInstrumentSample actual;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3Sample actual;
 
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrument_fetch(instrument,
+        err = RBRInstrumentGen3_fetch(instrument,
                                   tests[i].passChannels ? &tests[i].channels : NULL,
                                   tests[i].sleepAfter,
                                   &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
         TEST_ASSERT_EQ(tests[i].expected.timestamp,
                        actual.timestamp,
@@ -46,22 +46,22 @@ static bool test_fetching(RBRInstrument *instrument,
         for (int32_t channel = 0; channel < actual.channels; ++channel)
         {
             TEST_ASSERT_ENUM_EQ(
-                RBRInstrumentReading_getFlag(
+                RBRInstrumentGen3Reading_getFlag(
                     tests[i].expected.readings[channel]),
-                RBRInstrumentReading_getFlag(actual.readings[channel]),
-                RBRInstrumentReadingFlag);
+                RBRInstrumentGen3Reading_getFlag(actual.readings[channel]),
+                RBRInstrumentGen3ReadingFlag);
 
-            switch (RBRInstrumentReading_getFlag(actual.readings[channel]))
+            switch (RBRInstrumentGen3Reading_getFlag(actual.readings[channel]))
             {
-            case RBRINSTRUMENT_READING_FLAG_UNCALIBRATED:
-            case RBRINSTRUMENT_READING_FLAG_ERROR:
+            case RBRINSTRUMENTGEN3_READING_FLAG_UNCALIBRATED:
+            case RBRINSTRUMENTGEN3_READING_FLAG_ERROR:
                 TEST_ASSERT_EQ(
-                    RBRInstrumentReading_getError(
+                    RBRInstrumentGen3Reading_getError(
                         tests[i].expected.readings[channel]),
-                    RBRInstrumentReading_getError(actual.readings[channel]),
+                    RBRInstrumentGen3Reading_getError(actual.readings[channel]),
                     "%" PRIi8);
                 break;
-            case RBRINSTRUMENT_READING_FLAG_NONE:
+            case RBRINSTRUMENTGEN3_READING_FLAG_NONE:
             default:
                 TEST_ASSERT_EQ(tests[i].expected.readings[channel],
                                actual.readings[channel],
@@ -105,14 +105,14 @@ TEST_LOGGER3(fetch)
                 .channels = 5,
                 .readings = {
                     -129.805680,
-                    RBRInstrumentReading_setError(
-                        RBRINSTRUMENT_READING_FLAG_ERROR,
+                    RBRInstrumentGen3Reading_setError(
+                        RBRINSTRUMENTGEN3_READING_FLAG_ERROR,
                         14),
-                    RBRInstrumentReading_setError(
-                        RBRINSTRUMENT_READING_FLAG_ERROR,
+                    RBRInstrumentGen3Reading_setError(
+                        RBRINSTRUMENTGEN3_READING_FLAG_ERROR,
                         14),
-                    RBRInstrumentReading_setError(
-                        RBRINSTRUMENT_READING_FLAG_ERROR,
+                    RBRInstrumentGen3Reading_setError(
+                        RBRINSTRUMENTGEN3_READING_FLAG_ERROR,
                         14),
                     1.0
                 }

@@ -795,4 +795,4 @@ uint16_t RBRInstrumentGen4_calculateCrc(
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTMEMORY_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN4MEMORY_H */

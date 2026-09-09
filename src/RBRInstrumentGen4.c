@@ -161,7 +161,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_populateGeneration(
      * Newer firmware versions and newer instruments within the generation will
      * report a firmware type of 100–103 (compact and standard loggers) or 200
      * (the RBRcoda T.ODO). This classification mirrors the Gen3 library's
-     * (see RBRInstrument.c) so the two APIs always agree on an instrument's
+     * (see RBRInstrumentGen3.c) so the two APIs always agree on an instrument's
      * generation. */
     if (instrument->id.fwtype == 0
         || (instrument->id.fwtype >= 100

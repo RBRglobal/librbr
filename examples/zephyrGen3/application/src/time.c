@@ -17,19 +17,19 @@
 
 LOG_MODULE_REGISTER(time, CONFIG_TIME_LOG_LEVEL);
 
-RBRInstrumentError ZephyrRBRInstrumentTime_get(const struct RBRInstrument *instrument,
-                                               RBRInstrumentDateTime *time)
+RBRInstrumentGen3Error ZephyrRBRInstrumentGen3Time_get(const struct RBRInstrumentGen3 *instrument,
+                                               RBRInstrumentGen3DateTime *time)
 {
     (void) instrument;
 
     *time = k_uptime_get();
     LOG_DBG("now %" PRIi64 " ms", *time);
 
-    return RBRINSTRUMENT_SUCCESS;
+    return RBRINSTRUMENTGEN3_SUCCESS;
 }
 
-RBRInstrumentError ZephyrRBRInstrumentTime_sleep(const struct RBRInstrument *instrument,
-                                                 RBRInstrumentDateTime time)
+RBRInstrumentGen3Error ZephyrRBRInstrumentGen3Time_sleep(const struct RBRInstrumentGen3 *instrument,
+                                                 RBRInstrumentGen3DateTime time)
 {
     (void) instrument;
 
@@ -37,5 +37,5 @@ RBRInstrumentError ZephyrRBRInstrumentTime_sleep(const struct RBRInstrument *ins
     k_sleep(K_MSEC(time));
     LOG_DBG("waking up again");
 
-    return RBRINSTRUMENT_SUCCESS;
+    return RBRINSTRUMENTGEN3_SUCCESS;
 }

@@ -77,8 +77,8 @@ int openSerialFd(char *devicePath)
     return instrumentFd;
 }
 
-RBRInstrumentError instrumentTime(const struct RBRInstrument *instrument,
-                                  RBRInstrumentDateTime *time)
+RBRInstrumentGen3Error instrumentTime(const struct RBRInstrumentGen3 *instrument,
+                                  RBRInstrumentGen3DateTime *time)
 {
     /* Unused. */
     (void) instrument;
@@ -86,11 +86,11 @@ RBRInstrumentError instrumentTime(const struct RBRInstrument *instrument,
     struct timespec result;
     clock_gettime(CLOCK_MONOTONIC, &result);
     *time = (result.tv_sec * 1000) + (result.tv_nsec / 1000000);
-    return RBRINSTRUMENT_SUCCESS;
+    return RBRINSTRUMENTGEN3_SUCCESS;
 }
 
-RBRInstrumentError instrumentSleep(const struct RBRInstrument *instrument,
-                                   RBRInstrumentDateTime time)
+RBRInstrumentGen3Error instrumentSleep(const struct RBRInstrumentGen3 *instrument,
+                                   RBRInstrumentGen3DateTime time)
 {
     /* Unused. */
     (void) instrument;
@@ -100,14 +100,14 @@ RBRInstrumentError instrumentSleep(const struct RBRInstrument *instrument,
         .tv_nsec = (time % 1000) * 1000000
     };
     nanosleep(&sleep, NULL);
-    return RBRINSTRUMENT_SUCCESS;
+    return RBRINSTRUMENTGEN3_SUCCESS;
 }
 
-RBRInstrumentError instrumentRead(const struct RBRInstrument *instrument,
+RBRInstrumentGen3Error instrumentRead(const struct RBRInstrumentGen3 *instrument,
                                   void *data,
                                   int32_t *size)
 {
-    int *instrumentFd = (int *) RBRInstrument_getUserData(instrument);
+    int *instrumentFd = (int *) RBRInstrumentGen3_getUserData(instrument);
 
     /* A select() call to enforce a read timeout is unnecessary because we
      * configured the serial port in noncanonical mode and specified a read
@@ -120,23 +120,23 @@ RBRInstrumentError instrumentRead(const struct RBRInstrument *instrument,
                  *size);
     if (*size == 0)
     {
-        return RBRINSTRUMENT_TIMEOUT;
+        return RBRINSTRUMENTGEN3_TIMEOUT;
     }
     else if (*size < 0)
     {
-        return RBRINSTRUMENT_CALLBACK_ERROR;
+        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
     }
     else
     {
-        return RBRINSTRUMENT_SUCCESS;
+        return RBRINSTRUMENTGEN3_SUCCESS;
     }
 }
 
-RBRInstrumentError instrumentWrite(const struct RBRInstrument *instrument,
+RBRInstrumentGen3Error instrumentWrite(const struct RBRInstrumentGen3 *instrument,
                                    const void *const data,
                                    int32_t size)
 {
-    int *instrumentFd = (int *) RBRInstrument_getUserData(instrument);
+    int *instrumentFd = (int *) RBRInstrumentGen3_getUserData(instrument);
     const uint8_t *const byteData = (const uint8_t *const) data;
     int32_t written = 0;
 
@@ -169,11 +169,11 @@ RBRInstrumentError instrumentWrite(const struct RBRInstrument *instrument,
                                      &writeTimeout);
         if (instrumentReady < 0)
         {
-            return RBRINSTRUMENT_CALLBACK_ERROR;
+            return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
         }
         else if (instrumentReady == 0)
         {
-            return RBRINSTRUMENT_TIMEOUT;
+            return RBRINSTRUMENTGEN3_TIMEOUT;
         }
 
         int32_t chunkWritten = write(*instrumentFd,
@@ -183,79 +183,79 @@ RBRInstrumentError instrumentWrite(const struct RBRInstrument *instrument,
          * an error, not just an unready device. */
         if (chunkWritten <= 0)
         {
-            return RBRINSTRUMENT_CALLBACK_ERROR;
+            return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
         }
 
         written += chunkWritten;
     }
 
-    return RBRINSTRUMENT_SUCCESS;
+    return RBRINSTRUMENTGEN3_SUCCESS;
 }
 
-RBRInstrumentError instrumentStart(RBRInstrument *instrument)
+RBRInstrumentGen3Error instrumentStart(RBRInstrumentGen3 *instrument)
 {
-    RBRInstrumentError err;
+    RBRInstrumentGen3Error err;
 
-    RBRInstrumentDeploymentStatus status;
-    if ((err = RBRInstrument_disable(instrument, &status))
-        != RBRINSTRUMENT_SUCCESS)
+    RBRInstrumentGen3DeploymentStatus status;
+    if ((err = RBRInstrumentGen3_disable(instrument, &status))
+        != RBRINSTRUMENTGEN3_SUCCESS)
     {
         return err;
     }
 
-    RBRInstrumentSampling sampling;
-    if ((err = RBRInstrument_getSampling(instrument, &sampling))
-        != RBRINSTRUMENT_SUCCESS)
+    RBRInstrumentGen3Sampling sampling;
+    if ((err = RBRInstrumentGen3_getSampling(instrument, &sampling))
+        != RBRINSTRUMENTGEN3_SUCCESS)
     {
         return err;
     }
-    sampling.mode = RBRINSTRUMENT_SAMPLING_CONTINUOUS;
+    sampling.mode = RBRINSTRUMENTGEN3_SAMPLING_CONTINUOUS;
     sampling.period = sampling.userPeriodLimit;
-    if ((err = RBRInstrument_setSampling(instrument, &sampling))
-        != RBRINSTRUMENT_SUCCESS)
+    if ((err = RBRInstrumentGen3_setSampling(instrument, &sampling))
+        != RBRINSTRUMENTGEN3_SUCCESS)
     {
         return err;
     }
 
-    RBRInstrumentDeployment deployment = {
-        .startTime = RBRINSTRUMENT_DATETIME_MIN,
-        .endTime = RBRINSTRUMENT_DATETIME_MAX
+    RBRInstrumentGen3Deployment deployment = {
+        .startTime = RBRINSTRUMENTGEN3_DATETIME_MIN,
+        .endTime = RBRINSTRUMENTGEN3_DATETIME_MAX
     };
-    if ((err = RBRInstrument_setDeployment(instrument, &deployment))
-        != RBRINSTRUMENT_SUCCESS)
+    if ((err = RBRInstrumentGen3_setDeployment(instrument, &deployment))
+        != RBRINSTRUMENTGEN3_SUCCESS)
     {
         return err;
     }
 
-    if ((err = RBRInstrument_setNewMemoryFormat(
+    if ((err = RBRInstrumentGen3_setNewMemoryFormat(
              instrument,
-             RBRINSTRUMENT_MEMFORMAT_CALBIN00))
-        != RBRINSTRUMENT_SUCCESS)
+             RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00))
+        != RBRINSTRUMENTGEN3_SUCCESS)
     {
         return err;
     }
 
-    RBRInstrumentThresholding thresholding;
-    err = RBRInstrument_getThresholding(instrument, &thresholding);
-    if (err == RBRINSTRUMENT_SUCCESS && thresholding.enabled)
+    RBRInstrumentGen3Thresholding thresholding;
+    err = RBRInstrumentGen3_getThresholding(instrument, &thresholding);
+    if (err == RBRINSTRUMENTGEN3_SUCCESS && thresholding.enabled)
     {
         thresholding.enabled = false;
-        RBRInstrument_setThresholding(instrument, &thresholding);
+        RBRInstrumentGen3_setThresholding(instrument, &thresholding);
     }
 
-    RBRInstrumentTwistActivation twistActivation;
-    err = RBRInstrument_getTwistActivation(instrument, &twistActivation);
-    if (err == RBRINSTRUMENT_SUCCESS && twistActivation.enabled)
+    RBRInstrumentGen3TwistActivation twistActivation;
+    err = RBRInstrumentGen3_getTwistActivation(instrument, &twistActivation);
+    if (err == RBRINSTRUMENTGEN3_SUCCESS && twistActivation.enabled)
     {
         twistActivation.enabled = false;
-        RBRInstrument_setTwistActivation(instrument, &twistActivation);
+        RBRInstrumentGen3_setTwistActivation(instrument, &twistActivation);
     }
 
-    if ((err = RBRInstrument_enable(instrument, true, &status))
-        != RBRINSTRUMENT_SUCCESS)
+    if ((err = RBRInstrumentGen3_enable(instrument, true, &status))
+        != RBRINSTRUMENTGEN3_SUCCESS)
     {
         return err;
     }
 
-    return RBRINSTRUMENT_SUCCESS;
+    return RBRINSTRUMENTGEN3_SUCCESS;
 }

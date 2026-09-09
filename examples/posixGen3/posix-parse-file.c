@@ -30,9 +30,9 @@
 #include "posix-shared.h"
 #include "RBRParserGen3.h"
 
-RBRInstrumentError parserSample(
+RBRInstrumentGen3Error parserSample(
     const struct RBRParser *parser,
-    const struct RBRInstrumentSample *const sample)
+    const struct RBRInstrumentGen3Sample *const sample)
 {
     /* Unused. */
     (void) parser;
@@ -50,7 +50,7 @@ RBRInstrumentError parserSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENT_SUCCESS;
+    return RBRINSTRUMENTGEN3_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -82,8 +82,8 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENT_LIB_NAME,
-            RBRINSTRUMENT_LIB_VERSION);
+            RBRINSTRUMENTGEN3_LIB_NAME,
+            RBRINSTRUMENTGEN3_LIB_VERSION);
 
     RBRParser *parser = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
@@ -91,14 +91,14 @@ int main(int argc, char *argv[])
     parser = &parserSpace;
     #endif
 
-    RBRInstrumentSample sampleBuffer;
+    RBRInstrumentGen3Sample sampleBuffer;
     RBRParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
 
     RBRParserConfig parserConfig = {
-        .format = RBRINSTRUMENT_MEMFORMAT_CALBIN00,
+        .format = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
                 .channels = channels
@@ -106,16 +106,16 @@ int main(int argc, char *argv[])
         }
     };
 
-    RBRInstrumentError err;
+    RBRInstrumentGen3Error err;
     if ((err = RBRParser_init(
              &parser,
              &parserCallbacks,
              &parserConfig,
-             NULL)) != RBRINSTRUMENT_SUCCESS)
+             NULL)) != RBRINSTRUMENTGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to initialize parser: %s!\n",
                 programName,
-                RBRInstrumentError_name(err));
+                RBRInstrumentGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
         bufSize += readSize;
         parsedSize = bufSize;
         RBRParser_parse(parser,
-                        RBRINSTRUMENT_DATASET_EASYPARSE_SAMPLE_DATA,
+                        RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize);
         bufSize -= parsedSize;

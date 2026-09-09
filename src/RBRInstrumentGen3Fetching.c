@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentFetching.c
+ * \file RBRInstrumentGen3Fetching.c
  *
  * \brief Library implementation.
  *
@@ -16,10 +16,10 @@
 #include "RBRInstrumentGen3.h"
 #include "RBRInstrumentGen3Internal.h"
 
-RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument,
-                                       RBRInstrumentLabelsList *channels,
+RBRInstrumentGen3Error RBRInstrumentGen3_fetch(RBRInstrumentGen3 *instrument,
+                                       RBRInstrumentGen3LabelsList *channels,
                                        bool sleepAfter,
-                                       RBRInstrumentSample *sample)
+                                       RBRInstrumentGen3Sample *sample)
 {
     char *commandBuffer = (char *) instrument->commandBuffer;
     int32_t *commandBufferLength = &instrument->commandBufferLength;
@@ -35,7 +35,7 @@ RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument,
      * the command buffer. We'll add each one to the buffer, and whenever we
      * run out of room, we'll flush.
      *
-     * The description of RBRInstrumentWriteCallback says:
+     * The description of RBRInstrumentGen3WriteCallback says:
      *
      * > The library will attempt to call this function only for complete
      * > commands
@@ -45,7 +45,7 @@ RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument,
      */
     if (channels != NULL
         && channels->count > 0
-        && instrument->generation != RBRINSTRUMENT_LOGGER2)
+        && instrument->generation != RBRINSTRUMENTGEN3_LOGGER2)
     {
         *commandBufferLength += snprintf(
             commandBuffer + *commandBufferLength,
@@ -58,7 +58,7 @@ RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument,
             if (*commandBufferLength + 1 + strlen(channels->labels[channel])
                 > sizeof(instrument->commandBuffer))
             {
-                RBR_TRY(RBRInstrument_sendBuffer(instrument));
+                RBR_TRY(RBRInstrumentGen3_sendBuffer(instrument));
                 *commandBufferLength = 0;
             }
 
@@ -72,40 +72,40 @@ RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument,
         }
     }
 
-    if ((size_t) *commandBufferLength + RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN
+    if ((size_t) *commandBufferLength + RBRINSTRUMENTGEN3_SEND_COMMAND_TERMINATOR_LEN
         > sizeof(instrument->commandBuffer))
     {
-        RBR_TRY(RBRInstrument_sendBuffer(instrument));
+        RBR_TRY(RBRInstrumentGen3_sendBuffer(instrument));
         *commandBufferLength = 0;
     }
 
     *commandBufferLength += snprintf(
         commandBuffer + *commandBufferLength,
         sizeof(instrument->commandBuffer) - *commandBufferLength,
-        RBRINSTRUMENT_SEND_COMMAND_TERMINATOR);
+        RBRINSTRUMENTGEN3_SEND_COMMAND_TERMINATOR);
 
-    RBR_TRY(RBRInstrument_sendBuffer(instrument));
+    RBR_TRY(RBRInstrumentGen3_sendBuffer(instrument));
 
-    RBRInstrumentError err;
-    /* RBRInstrument_readResponse() returns #RBRINSTRUMENT_SAMPLE when a sample
-     * is read to the given sample pointer; a return of #RBRINSTRUMENT_SUCCESS
+    RBRInstrumentGen3Error err;
+    /* RBRInstrumentGen3_readResponse() returns #RBRINSTRUMENTGEN3_SAMPLE when a sample
+     * is read to the given sample pointer; a return of #RBRINSTRUMENTGEN3_SUCCESS
      * means that it found some other command response instead, so we'll loop
      * until we get a “failure” value (which we hope is SAMPLE). */
     do
     {
-        err = RBRInstrument_readResponse(instrument, true, sample);
-    } while (err == RBRINSTRUMENT_SUCCESS);
+        err = RBRInstrumentGen3_readResponse(instrument, true, sample);
+    } while (err == RBRINSTRUMENTGEN3_SUCCESS);
     /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any
      * other errors can really be errors. */
-    if (err == RBRINSTRUMENT_SAMPLE)
+    if (err == RBRINSTRUMENTGEN3_SAMPLE)
     {
-        err = RBRINSTRUMENT_SUCCESS;
+        err = RBRINSTRUMENTGEN3_SUCCESS;
     }
     
     if(sleepAfter)
     {
     /* Instrument was put to sleep with "sleepAfter=true". */
-        instrument->lastActivityTime = RBRINSTRUMENT_NO_ACTIVITY;
+        instrument->lastActivityTime = RBRINSTRUMENTGEN3_NO_ACTIVITY;
     }
     return err;
 }

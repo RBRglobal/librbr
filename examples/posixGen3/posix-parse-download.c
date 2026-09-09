@@ -28,9 +28,9 @@
 
 #define CHUNK_SIZE 1024
 
-RBRInstrumentError parserSample(
+RBRInstrumentGen3Error parserSample(
     const struct RBRParser *parser,
-    const struct RBRInstrumentSample *const sample)
+    const struct RBRInstrumentGen3Sample *const sample)
 {
     (void) parser;
 
@@ -47,7 +47,7 @@ RBRInstrumentError parserSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENT_SUCCESS;
+    return RBRINSTRUMENTGEN3_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -58,10 +58,10 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentError err;
-    RBRInstrument *instrument = NULL;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3 *instrument = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRInstrument instrumentSpace;
+    RBRInstrumentGen3 instrumentSpace;
     instrument = &instrumentSpace;
     #endif
 
@@ -84,55 +84,55 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENT_LIB_NAME,
-            RBRINSTRUMENT_LIB_VERSION);
+            RBRINSTRUMENTGEN3_LIB_NAME,
+            RBRINSTRUMENTGEN3_LIB_VERSION);
 
-    RBRInstrumentCallbacks instrumentCallbacks = {
+    RBRInstrumentGen3Callbacks instrumentCallbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrument_open(
+    if ((err = RBRInstrumentGen3_open(
              &instrument,
              &instrumentCallbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENT_SUCCESS)
+             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentError_name(err));
+                RBRInstrumentGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
 
-    RBRInstrument_setUSBStreamingState(instrument, false);
-    RBRInstrument_setSerialStreamingState(instrument, false);
+    RBRInstrumentGen3_setUSBStreamingState(instrument, false);
+    RBRInstrumentGen3_setSerialStreamingState(instrument, false);
 
-    if ((err = instrumentStart(instrument)) != RBRINSTRUMENT_SUCCESS)
+    if ((err = instrumentStart(instrument)) != RBRINSTRUMENTGEN3_SUCCESS)
     {
         fprintf(stderr,
                 "%s: Failed to start instrument: %s!\n",
                 programName,
-                RBRInstrumentError_name(err));
+                RBRInstrumentGen3Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
 
-    RBRInstrumentChannels channels;
-    RBRInstrument_getChannels(instrument, &channels);
+    RBRInstrumentGen3Channels channels;
+    RBRInstrumentGen3_getChannels(instrument, &channels);
 
     RBRParser *parser = NULL;
 
-    RBRInstrumentSample sampleBuffer;
+    RBRInstrumentGen3Sample sampleBuffer;
     RBRParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
 
     RBRParserConfig parserConfig = {
-        .format = RBRINSTRUMENT_MEMFORMAT_CALBIN00,
+        .format = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
                 .channels = channels.on
@@ -144,19 +144,19 @@ int main(int argc, char *argv[])
              &parser,
              &parserCallbacks,
              &parserConfig,
-             NULL)) != RBRINSTRUMENT_SUCCESS)
+             NULL)) != RBRINSTRUMENTGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to initialize parser: %s!\n",
                 programName,
-                RBRInstrumentError_name(err));
+                RBRInstrumentGen3Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
 
     uint8_t buf[CHUNK_SIZE];
     int32_t bufSize = 0;
-    RBRInstrumentData data = {
-        .dataset = RBRINSTRUMENT_DATASET_EASYPARSE_SAMPLE_DATA,
+    RBRInstrumentGen3Data data = {
+        .dataset = RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
         .offset  = 0
     };
     int32_t parsedSize;
@@ -165,15 +165,15 @@ int main(int argc, char *argv[])
     {
         data.data = buf + bufSize;
         data.size = sizeof(buf) - bufSize;
-        err = RBRInstrument_readData(instrument, &data);
-        if (err == RBRINSTRUMENT_TIMEOUT)
+        err = RBRInstrumentGen3_readData(instrument, &data);
+        if (err == RBRINSTRUMENTGEN3_TIMEOUT)
         {
             printf("\nWarning: timeout. Retrying...\n");
             continue;
         }
-        else if (err != RBRINSTRUMENT_SUCCESS)
+        else if (err != RBRINSTRUMENTGEN3_SUCCESS)
         {
-            printf("\nError: %s", RBRInstrumentError_name(err));
+            printf("\nError: %s", RBRInstrumentGen3Error_name(err));
             break;
         }
 
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
         bufSize += data.size;
         parsedSize = bufSize;
         RBRParser_parse(parser,
-                        RBRINSTRUMENT_DATASET_EASYPARSE_SAMPLE_DATA,
+                        RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize);
         bufSize -= parsedSize;
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
         nanosleep(&sleep, NULL);
     }
 instrumentCleanup:
-    RBRInstrument_close(instrument);
+    RBRInstrumentGen3_close(instrument);
 fileCleanup:
     close(instrumentFd);
 

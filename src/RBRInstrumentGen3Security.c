@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentSecurity.c
+ * \file RBRInstrumentGen3Security.c
  *
  * \brief Library implementation.
  *
@@ -14,11 +14,11 @@
 #include "RBRInstrumentGen3.h"
 #include "RBRInstrumentGen3Internal.h"
 
-RBRInstrumentError RBRInstrument_permit(RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_permit(RBRInstrumentGen3 *instrument,
                                         const char *command)
 {
     const char *permitCommand;
-    if (instrument->generation == RBRINSTRUMENT_LOGGER2)
+    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
     {
         permitCommand = "permit = %s";
     }
@@ -26,55 +26,55 @@ RBRInstrumentError RBRInstrument_permit(RBRInstrument *instrument,
     {
         permitCommand = "permit command = %s";
     }
-    return RBRInstrument_converse(instrument, permitCommand, command);
+    return RBRInstrumentGen3_converse(instrument, permitCommand, command);
 }
 
-RBRInstrumentError RBRInstrument_getPrompt(RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_getPrompt(RBRInstrumentGen3 *instrument,
                                            bool *prompt)
 {
-    return RBRInstrument_getBool(instrument,
+    return RBRInstrumentGen3_getBool(instrument,
                                  "prompt",
                                  "state",
                                  prompt);
 }
 
-RBRInstrumentError RBRInstrument_setPrompt(RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_setPrompt(RBRInstrumentGen3 *instrument,
                                            bool prompt)
 {
-    return RBRInstrument_converse(instrument,
+    return RBRInstrumentGen3_converse(instrument,
                                   "prompt state = %s",
                                   prompt ? "on" : "off");
 }
 
-RBRInstrumentError RBRInstrument_getConfirmation(RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_getConfirmation(RBRInstrumentGen3 *instrument,
                                                  bool *confirmation)
 {
-    return RBRInstrument_getBool(instrument,
+    return RBRInstrumentGen3_getBool(instrument,
                                  "confirmation",
                                  "state",
                                  confirmation);
 }
 
-RBRInstrumentError RBRInstrument_setConfirmation(RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_setConfirmation(RBRInstrumentGen3 *instrument,
                                                  bool confirmation)
 {
     if (confirmation)
     {
-        return RBRInstrument_converse(instrument, "confirmation state = on");
+        return RBRInstrumentGen3_converse(instrument, "confirmation state = on");
     }
     else
     {
-        return RBRInstrument_sendCommand(instrument,
+        return RBRInstrumentGen3_sendCommand(instrument,
                                          "confirmation state = off");
     }
 }
 
-RBRInstrumentError RBRInstrument_reboot(RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_reboot(RBRInstrumentGen3 *instrument,
                                         int32_t delay)
 {
-    RBR_TRY(RBRInstrument_permit(instrument, "reboot"));
-    RBR_TRY(RBRInstrument_sendCommand(instrument, "reboot %" PRId32, delay));
+    RBR_TRY(RBRInstrumentGen3_permit(instrument, "reboot"));
+    RBR_TRY(RBRInstrumentGen3_sendCommand(instrument, "reboot %" PRId32, delay));
 
-    instrument->lastActivityTime = RBRINSTRUMENT_NO_ACTIVITY;
-    return RBRINSTRUMENT_SUCCESS;
+    instrument->lastActivityTime = RBRINSTRUMENTGEN3_NO_ACTIVITY;
+    return RBRINSTRUMENTGEN3_SUCCESS;
 }

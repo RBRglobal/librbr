@@ -13,22 +13,22 @@
 typedef struct LinkTest
 {
     const char *response;
-    RBRInstrumentLink expected;
+    RBRInstrumentGen3Link expected;
 } LinkTest;
 
-static bool test_link(RBRInstrument *instrument,
+static bool test_link(RBRInstrumentGen3 *instrument,
                       TestIOBuffers *buffers,
                       LinkTest *tests)
 {
-    RBRInstrumentError err;
-    RBRInstrumentLink actual;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3Link actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrument_getLink(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, RBRInstrumentLink);
+        err = RBRInstrumentGen3_getLink(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, RBRInstrumentGen3Link);
     }
 
     return true;
@@ -37,9 +37,9 @@ static bool test_link(RBRInstrument *instrument,
 TEST_LOGGER2(link)
 {
     LinkTest tests[] = {
-        {"link = usb" RESPONSE_TERMINATOR, RBRINSTRUMENT_LINK_USB},
-        {"link = serial" RESPONSE_TERMINATOR, RBRINSTRUMENT_LINK_SERIAL},
-        {"link = wifi" RESPONSE_TERMINATOR, RBRINSTRUMENT_LINK_WIFI},
+        {"link = usb" RESPONSE_TERMINATOR, RBRINSTRUMENTGEN3_LINK_USB},
+        {"link = serial" RESPONSE_TERMINATOR, RBRINSTRUMENTGEN3_LINK_SERIAL},
+        {"link = wifi" RESPONSE_TERMINATOR, RBRINSTRUMENTGEN3_LINK_WIFI},
         {0}
     };
 
@@ -49,9 +49,9 @@ TEST_LOGGER2(link)
 TEST_LOGGER3(link)
 {
     LinkTest tests[] = {
-        {"link type = usb" RESPONSE_TERMINATOR, RBRINSTRUMENT_LINK_USB},
-        {"link type = serial" RESPONSE_TERMINATOR, RBRINSTRUMENT_LINK_SERIAL},
-        {"link type = wifi" RESPONSE_TERMINATOR, RBRINSTRUMENT_LINK_WIFI},
+        {"link type = usb" RESPONSE_TERMINATOR, RBRINSTRUMENTGEN3_LINK_USB},
+        {"link type = serial" RESPONSE_TERMINATOR, RBRINSTRUMENTGEN3_LINK_SERIAL},
+        {"link type = wifi" RESPONSE_TERMINATOR, RBRINSTRUMENTGEN3_LINK_WIFI},
         {0}
     };
 
@@ -61,7 +61,7 @@ TEST_LOGGER3(link)
 typedef struct SerialTest
 {
     const char *response;
-    RBRInstrumentSerial expected;
+    RBRInstrumentGen3Serial expected;
 } SerialTest;
 
 TEST_LOGGER2(serial)
@@ -70,54 +70,54 @@ TEST_LOGGER2(serial)
         {
             "serial baudrate = 19200, mode = rs232" RESPONSE_TERMINATOR,
             {
-                RBRINSTRUMENT_SERIAL_BAUD_19200,
-                RBRINSTRUMENT_SERIAL_MODE_RS232,
-                RBRINSTRUMENT_SERIAL_BAUD_1200
-                | RBRINSTRUMENT_SERIAL_BAUD_2400
-                | RBRINSTRUMENT_SERIAL_BAUD_4800
-                | RBRINSTRUMENT_SERIAL_BAUD_9600
-                | RBRINSTRUMENT_SERIAL_BAUD_19200
-                | RBRINSTRUMENT_SERIAL_BAUD_115200,
-                RBRINSTRUMENT_SERIAL_MODE_RS232
-                | RBRINSTRUMENT_SERIAL_MODE_RS485F
-                | RBRINSTRUMENT_SERIAL_MODE_UART
-                | RBRINSTRUMENT_SERIAL_MODE_UART_IDLE_LOW
+                RBRINSTRUMENTGEN3_SERIAL_BAUD_19200,
+                RBRINSTRUMENTGEN3_SERIAL_MODE_RS232,
+                RBRINSTRUMENTGEN3_SERIAL_BAUD_1200
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_2400
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_4800
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_9600
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_19200
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_115200,
+                RBRINSTRUMENTGEN3_SERIAL_MODE_RS232
+                | RBRINSTRUMENTGEN3_SERIAL_MODE_RS485F
+                | RBRINSTRUMENTGEN3_SERIAL_MODE_UART
+                | RBRINSTRUMENTGEN3_SERIAL_MODE_UART_IDLE_LOW
             }
         },
         {
             "serial baudrate = 115200, mode = rs485f" RESPONSE_TERMINATOR,
             {
-                RBRINSTRUMENT_SERIAL_BAUD_115200,
-                RBRINSTRUMENT_SERIAL_MODE_RS485F,
-                RBRINSTRUMENT_SERIAL_BAUD_1200
-                | RBRINSTRUMENT_SERIAL_BAUD_2400
-                | RBRINSTRUMENT_SERIAL_BAUD_4800
-                | RBRINSTRUMENT_SERIAL_BAUD_9600
-                | RBRINSTRUMENT_SERIAL_BAUD_19200
-                | RBRINSTRUMENT_SERIAL_BAUD_115200,
-                RBRINSTRUMENT_SERIAL_MODE_RS232
-                | RBRINSTRUMENT_SERIAL_MODE_RS485F
-                | RBRINSTRUMENT_SERIAL_MODE_UART
-                | RBRINSTRUMENT_SERIAL_MODE_UART_IDLE_LOW
+                RBRINSTRUMENTGEN3_SERIAL_BAUD_115200,
+                RBRINSTRUMENTGEN3_SERIAL_MODE_RS485F,
+                RBRINSTRUMENTGEN3_SERIAL_BAUD_1200
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_2400
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_4800
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_9600
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_19200
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_115200,
+                RBRINSTRUMENTGEN3_SERIAL_MODE_RS232
+                | RBRINSTRUMENTGEN3_SERIAL_MODE_RS485F
+                | RBRINSTRUMENTGEN3_SERIAL_MODE_UART
+                | RBRINSTRUMENTGEN3_SERIAL_MODE_UART_IDLE_LOW
             }
         },
         {0}
     };
 
-    RBRInstrumentError err;
-    RBRInstrumentSerial actual;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3Serial actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrument_getSerial(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+        err = RBRInstrumentGen3_getSerial(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate,
                             actual.baudRate,
-                            RBRInstrumentSerialBaudRate);
+                            RBRInstrumentGen3SerialBaudRate);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.mode,
                             actual.mode,
-                            RBRInstrumentSerialMode);
+                            RBRInstrumentGen3SerialMode);
         TEST_ASSERT_EQ(tests[i].expected.availableBaudRates,
                        actual.availableBaudRates,
                        "0x%04X");
@@ -137,20 +137,20 @@ TEST_LOGGER3(serial)
             "115200|19200|9600|4800|2400|1200|230400|460800, availablemodes = "
             "rs232|rs485f|uart|uart_idlelow" RESPONSE_TERMINATOR,
             {
-                RBRINSTRUMENT_SERIAL_BAUD_19200,
-                RBRINSTRUMENT_SERIAL_MODE_RS232,
-                RBRINSTRUMENT_SERIAL_BAUD_1200
-                | RBRINSTRUMENT_SERIAL_BAUD_2400
-                | RBRINSTRUMENT_SERIAL_BAUD_4800
-                | RBRINSTRUMENT_SERIAL_BAUD_9600
-                | RBRINSTRUMENT_SERIAL_BAUD_19200
-                | RBRINSTRUMENT_SERIAL_BAUD_115200
-                | RBRINSTRUMENT_SERIAL_BAUD_230400
-                | RBRINSTRUMENT_SERIAL_BAUD_460800,
-                RBRINSTRUMENT_SERIAL_MODE_RS232
-                | RBRINSTRUMENT_SERIAL_MODE_RS485F
-                | RBRINSTRUMENT_SERIAL_MODE_UART
-                | RBRINSTRUMENT_SERIAL_MODE_UART_IDLE_LOW
+                RBRINSTRUMENTGEN3_SERIAL_BAUD_19200,
+                RBRINSTRUMENTGEN3_SERIAL_MODE_RS232,
+                RBRINSTRUMENTGEN3_SERIAL_BAUD_1200
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_2400
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_4800
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_9600
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_19200
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_115200
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_230400
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_460800,
+                RBRINSTRUMENTGEN3_SERIAL_MODE_RS232
+                | RBRINSTRUMENTGEN3_SERIAL_MODE_RS485F
+                | RBRINSTRUMENTGEN3_SERIAL_MODE_UART
+                | RBRINSTRUMENTGEN3_SERIAL_MODE_UART_IDLE_LOW
             }
         },
         {
@@ -158,39 +158,39 @@ TEST_LOGGER3(serial)
             "115200|19200|9600|4800|2400|1200|230400|460800, availablemodes = "
             "rs232|rs485f|uart|uart_idlelow" RESPONSE_TERMINATOR,
             {
-                RBRINSTRUMENT_SERIAL_BAUD_115200,
-                RBRINSTRUMENT_SERIAL_MODE_RS485F,
-                RBRINSTRUMENT_SERIAL_BAUD_1200
-                | RBRINSTRUMENT_SERIAL_BAUD_2400
-                | RBRINSTRUMENT_SERIAL_BAUD_4800
-                | RBRINSTRUMENT_SERIAL_BAUD_9600
-                | RBRINSTRUMENT_SERIAL_BAUD_19200
-                | RBRINSTRUMENT_SERIAL_BAUD_115200
-                | RBRINSTRUMENT_SERIAL_BAUD_230400
-                | RBRINSTRUMENT_SERIAL_BAUD_460800,
-                RBRINSTRUMENT_SERIAL_MODE_RS232
-                | RBRINSTRUMENT_SERIAL_MODE_RS485F
-                | RBRINSTRUMENT_SERIAL_MODE_UART
-                | RBRINSTRUMENT_SERIAL_MODE_UART_IDLE_LOW
+                RBRINSTRUMENTGEN3_SERIAL_BAUD_115200,
+                RBRINSTRUMENTGEN3_SERIAL_MODE_RS485F,
+                RBRINSTRUMENTGEN3_SERIAL_BAUD_1200
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_2400
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_4800
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_9600
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_19200
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_115200
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_230400
+                | RBRINSTRUMENTGEN3_SERIAL_BAUD_460800,
+                RBRINSTRUMENTGEN3_SERIAL_MODE_RS232
+                | RBRINSTRUMENTGEN3_SERIAL_MODE_RS485F
+                | RBRINSTRUMENTGEN3_SERIAL_MODE_UART
+                | RBRINSTRUMENTGEN3_SERIAL_MODE_UART_IDLE_LOW
             }
         },
         {0}
     };
 
-    RBRInstrumentError err;
-    RBRInstrumentSerial actual;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3Serial actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrument_getSerial(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+        err = RBRInstrumentGen3_getSerial(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate,
                             actual.baudRate,
-                            RBRInstrumentSerialBaudRate);
+                            RBRInstrumentGen3SerialBaudRate);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.mode,
                             actual.mode,
-                            RBRInstrumentSerialMode);
+                            RBRInstrumentGen3SerialMode);
         TEST_ASSERT_EQ(tests[i].expected.availableBaudRates,
                        actual.availableBaudRates,
                        "0x%04X");
@@ -205,8 +205,8 @@ TEST_LOGGER3(serial)
 TEST_LOGGER3(sleep)
 {
     TestIOBuffers_init(buffers, "", 0);
-    RBRInstrumentError err = RBRInstrument_sleep(instrument);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_sleep(instrument);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_STR_EQ("sleep" COMMAND_TERMINATOR,buffers->writeBuffer);
     TEST_ASSERT(instrument->lastActivityTime < 0);
 
@@ -216,26 +216,26 @@ TEST_LOGGER3(sleep)
 typedef struct WiFiTest
 {
     const char *response;
-    RBRInstrumentError expectedError;
-    RBRInstrumentWiFi expected;
+    RBRInstrumentGen3Error expectedError;
+    RBRInstrumentGen3WiFi expected;
 } WiFiTest;
 
-static bool test_wifi(RBRInstrument *instrument,
+static bool test_wifi(RBRInstrumentGen3 *instrument,
                       TestIOBuffers *buffers,
                       WiFiTest *tests)
 {
-    RBRInstrumentError err;
-    RBRInstrumentWiFi actual;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3WiFi actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrument_getWiFi(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentError);
+        err = RBRInstrumentGen3_getWiFi(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.enabled, actual.enabled, bool);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.state,
                             actual.state,
-                            RBRInstrumentWiFiState);
+                            RBRInstrumentGen3WiFiState);
         TEST_ASSERT_EQ(tests[i].expected.powerTimeout,
                        actual.powerTimeout,
                        "%" PRIi32);
@@ -244,7 +244,7 @@ static bool test_wifi(RBRInstrument *instrument,
                        "%" PRIi32);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate,
                             actual.baudRate,
-                            RBRInstrumentSerialBaudRate);
+                            RBRInstrumentGen3SerialBaudRate);
     }
 
     return true;
@@ -255,13 +255,13 @@ TEST_LOGGER2(wifi)
     WiFiTest tests[] = {
         {
             "wifi timeout = 60, commandtimeout = 90" RESPONSE_TERMINATOR,
-            RBRINSTRUMENT_SUCCESS,
+            RBRINSTRUMENTGEN3_SUCCESS,
             {
                 false,
-                RBRINSTRUMENT_UNKNOWN_WIFI,
+                RBRINSTRUMENTGEN3_UNKNOWN_WIFI,
                 60000,
                 90000,
-                RBRINSTRUMENT_SERIAL_BAUD_NONE
+                RBRINSTRUMENTGEN3_SERIAL_BAUD_NONE
             }
         },
         {0}
@@ -276,36 +276,36 @@ TEST_LOGGER3(wifi)
         {
             "wifi enabled = false, state = n/a, timeout = 60, "
             "commandtimeout = 60, baudrate = 921600" RESPONSE_TERMINATOR,
-            RBRINSTRUMENT_SUCCESS,
+            RBRINSTRUMENTGEN3_SUCCESS,
             {
                 false,
-                RBRINSTRUMENT_WIFI_NA,
+                RBRINSTRUMENTGEN3_WIFI_NA,
                 60000,
                 60000,
-                RBRINSTRUMENT_SERIAL_BAUD_921600
+                RBRINSTRUMENTGEN3_SERIAL_BAUD_921600
             }
         },
         {
             "wifi enabled = true, state = off, timeout = 90, "
             "commandtimeout = 30, baudrate = 921600" RESPONSE_TERMINATOR,
-            RBRINSTRUMENT_SUCCESS,
+            RBRINSTRUMENTGEN3_SUCCESS,
             {
                 true,
-                RBRINSTRUMENT_WIFI_OFF,
+                RBRINSTRUMENTGEN3_WIFI_OFF,
                 90000,
                 30000,
-                RBRINSTRUMENT_SERIAL_BAUD_921600
+                RBRINSTRUMENTGEN3_SERIAL_BAUD_921600
             }
         },
         {
             "E0109 feature not available" RESPONSE_TERMINATOR,
-            RBRINSTRUMENT_HARDWARE_ERROR,
+            RBRINSTRUMENTGEN3_HARDWARE_ERROR,
             {
                 false,
-                RBRINSTRUMENT_UNKNOWN_WIFI,
+                RBRINSTRUMENTGEN3_UNKNOWN_WIFI,
                 0,
                 0,
-                RBRINSTRUMENT_SERIAL_BAUD_NONE
+                RBRINSTRUMENTGEN3_SERIAL_BAUD_NONE
             }
         },
         {0}

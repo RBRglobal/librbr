@@ -13,120 +13,120 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTINTERNAL_H
-#define LIBRBR_RBRINSTRUMENTINTERNAL_H
+#ifndef LIBRBR_RBRINSTRUMENTGEN3INTERNAL_H
+#define LIBRBR_RBRINSTRUMENTGEN3INTERNAL_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /** \brief Timestamp indicating that no instrument activity has occurred. */
-#define RBRINSTRUMENT_NO_ACTIVITY ((RBRInstrumentDateTime) - 1)
+#define RBRINSTRUMENTGEN3_NO_ACTIVITY ((RBRInstrumentGen3DateTime) - 1)
 
 /** \brief The terminator at the end of a command sent to the instrument. */
-#define RBRINSTRUMENT_SEND_COMMAND_TERMINATOR "\r"
+#define RBRINSTRUMENTGEN3_SEND_COMMAND_TERMINATOR "\r"
 /** \brief The length of the command terminator. */
-#define RBRINSTRUMENT_SEND_COMMAND_TERMINATOR_LEN 1
+#define RBRINSTRUMENTGEN3_SEND_COMMAND_TERMINATOR_LEN 1
 /** \brief The terminator at the end of a command received from the instrument. */
-#define RBRINSTRUMENT_COMMAND_TERMINATOR "\r\n"
+#define RBRINSTRUMENTGEN3_COMMAND_TERMINATOR "\r\n"
 /** \brief The length of the command terminator. */
-#define RBRINSTRUMENT_COMMAND_TERMINATOR_LEN 2
+#define RBRINSTRUMENTGEN3_COMMAND_TERMINATOR_LEN 2
 
 /**
  * \brief The length of the timestamp of a streamed sample.
  *
  * “YYYY-mm-dd HH:MM:SS.sss” format.
  */
-#define RBRINSTRUMENT_SAMPLE_TIME_LEN 23
+#define RBRINSTRUMENTGEN3_SAMPLE_TIME_LEN 23
 
 /**
  * \brief The length of the timestamp of schedule settings.
  *
  * “YYYYmmddHHMMSS” format.
  */
-#define RBRINSTRUMENT_SCHEDULE_TIME_LEN 14
+#define RBRINSTRUMENTGEN3_SCHEDULE_TIME_LEN 14
 
 /**
  * \brief Simple error-checked return around a function call.
  *
  * Evaluates the function call passed as \a op. If it returns a value other
- * than #RBRINSTRUMENT_SUCCESS, then that value is returned again. Useful for
+ * than #RBRINSTRUMENTGEN3_SUCCESS, then that value is returned again. Useful for
  * forwarding errors from other API functions.
  */
 #define RBR_TRY(op) do { \
-        RBRInstrumentError _tryErr; \
-        if ((_tryErr = (op)) != RBRINSTRUMENT_SUCCESS) \
+        RBRInstrumentGen3Error _tryErr; \
+        if ((_tryErr = (op)) != RBRINSTRUMENTGEN3_SUCCESS) \
         { \
             return _tryErr; \
         } \
 } while (0)
 
 /**
- * Send the first RBRInstrument.commandBufferLength bytes of
- * RBRInstrument.commandBuffer to the instrument. No formatting or validation
+ * Send the first RBRInstrumentGen3.commandBufferLength bytes of
+ * RBRInstrumentGen3.commandBuffer to the instrument. No formatting or validation
  * of the contents of the buffer will be performed.
  *
- * You almost certainly want to use RBRInstrument_sendCommand() instead unless
+ * You almost certainly want to use RBRInstrumentGen3_sendCommand() instead unless
  * you have a specific requirement for custom buffer management (like sending
  * a very large command in multiple pieces).
  *
  * \param [in] instrument the instrument connection
- * \return #RBRINSTRUMENT_SUCCESS when the command is successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \see RBRInstrument_sendCommand() to send a string command
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the command is successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen3_sendCommand() to send a string command
  */
-RBRInstrumentError RBRInstrument_sendBuffer(RBRInstrument *instrument);
+RBRInstrumentGen3Error RBRInstrumentGen3_sendBuffer(RBRInstrumentGen3 *instrument);
 
 /**
  * Send a command to the instrument. The command will be formatted into
- * RBRInstrument.commandBuffer and RBRInstrument.commandBufferLength will be
+ * RBRInstrumentGen3.commandBuffer and RBRInstrumentGen3.commandBufferLength will be
  * updated accordingly. If the command does not include a terminating `\r\n`,
  * it will be added for you.
  *
  * This function should only be used to send commands which don't produce any
  * response, or in conjunction with response parsing via
- * RBRInstrument_readResponse(). If the command is known to produce a response
+ * RBRInstrumentGen3_readResponse(). If the command is known to produce a response
  * – even if you don't care about it – you should read it to get it out of the
  * response buffer. To combine command sending and response reading with basic
- * sanity-checking, use RBRInstrument_converse().
+ * sanity-checking, use RBRInstrumentGen3_converse().
  *
  * \param [in] instrument the instrument connection
  * \param [in] command the command to send as a printf-style format string
- * \return #RBRINSTRUMENT_SUCCESS when the command is successfully written
- * \return #RBRINSTRUMENT_BUFFER_TOO_SMALL when the formatted command is too
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the command is successfully written
+ * \return #RBRINSTRUMENTGEN3_BUFFER_TOO_SMALL when the formatted command is too
  *                                         large for the command buffer
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \see RBRInstrument_sendBuffer() to send raw data from the command buffer
- * \see RBRInstrument_readResponse() to read the command response
- * \see RBRInstrument_converse() for a send/receive shortcut
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen3_sendBuffer() to send raw data from the command buffer
+ * \see RBRInstrumentGen3_readResponse() to read the command response
+ * \see RBRInstrumentGen3_converse() for a send/receive shortcut
  */
-RBRInstrumentError RBRInstrument_sendCommand(RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_sendCommand(RBRInstrumentGen3 *instrument,
                                              const char *command,
                                              ...);
 
 /**
  * Read a response from the instrument. This function will block until a
  * complete response is read, or until the callback returns
- * #RBRINSTRUMENT_TIMEOUT or #RBRINSTRUMENT_CALLBACK_ERROR.
+ * #RBRINSTRUMENTGEN3_TIMEOUT or #RBRINSTRUMENTGEN3_CALLBACK_ERROR.
  *
- * The response will be returned via RBRInstrument.responseBuffer. The previous
+ * The response will be returned via RBRInstrumentGen3.responseBuffer. The previous
  * complete response, if any, will be removed, and newly-read data will be
  * appended to any trailing incomplete response. Some minor parsing of the
  * response will be performed: any leading prompt will be stripped off; the
  * carriage return portion of the response line terminator will be replaced
- * with a null terminator; and RBRInstrument.response and
- * RBRInstrument.lastResponseLength will be populated appropriately.
+ * with a null terminator; and RBRInstrumentGen3.response and
+ * RBRInstrumentGen3.lastResponseLength will be populated appropriately.
  *
  * If \a breakOnSample is true, then the function will return
- * #RBRINSTRUMENT_SAMPLE immediately after parsing a sample. Otherwise, it will
+ * #RBRINSTRUMENTGEN3_SAMPLE immediately after parsing a sample. Otherwise, it will
  * handle the sample then continue to read further responses.
  *
  * If \a sample is given as a non-`NULL` pointer and a sample response (either
  * streamed or fetched) is found, that sample will be written to \a sample.
- * Otherwise, sample data will be sent to the RBRInstrumentSampleCallback set
- * via RBRInstrumentCallbacks.sample, if populated. It doesn't make much sense
+ * Otherwise, sample data will be sent to the RBRInstrumentGen3SampleCallback set
+ * via RBRInstrumentGen3Callbacks.sample, if populated. It doesn't make much sense
  * to set this without also passing \a breakOnSample as true; if
  * \a breakOnSample is false then \a sample will be populated with the most
  * recent sample incidentally encountered while parsing other responses.
@@ -134,48 +134,48 @@ RBRInstrumentError RBRInstrument_sendCommand(RBRInstrument *instrument,
  * \param [in] instrument the instrument connection
  * \param [in] breakOnSample whether to return early when a sample is parsed
  * \param [out] sample where to put a parsed sample
- * \return #RBRINSTRUMENT_SUCCESS when a response was successfully read
- * \return #RBRINSTRUMENT_SAMPLE when a sample is read and \a sample is given
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR if the instrument indicated an error
- * \see RBRInstrument_sendCommand() to send a command
- * \see RBRInstrument_converse() for a send/receive shortcut
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when a response was successfully read
+ * \return #RBRINSTRUMENTGEN3_SAMPLE when a sample is read and \a sample is given
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \see RBRInstrumentGen3_sendCommand() to send a command
+ * \see RBRInstrumentGen3_converse() for a send/receive shortcut
  */
-RBRInstrumentError RBRInstrument_readResponse(RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_readResponse(RBRInstrumentGen3 *instrument,
                                               bool breakOnSample,
-                                              RBRInstrumentSample *sample);
+                                              RBRInstrumentGen3Sample *sample);
 
 /**
  * \brief Send a command to the instrument and await an appropriate response.
  *
- * This function is more than just a combination of RBRInstrument_sendCommand()
- * and RBRInstrument_readResponse(): because it knows which command was sent,
+ * This function is more than just a combination of RBRInstrumentGen3_sendCommand()
+ * and RBRInstrumentGen3_readResponse(): because it knows which command was sent,
  * it has some idea of which response should be received. As such, it will loop
- * on RBRInstrument_readResponse() until the first word of the response matches
- * the command sent. That means that a #RBRINSTRUMENT_TIMEOUT error returned
+ * on RBRInstrumentGen3_readResponse() until the first word of the response matches
+ * the command sent. That means that a #RBRINSTRUMENTGEN3_TIMEOUT error returned
  * from this function means that a timeout was reached waiting for the
  * _correct_ response, not just _any_ response.
  *
  * \param [in] instrument the instrument connection
  * \param [in] command the command to send as a printf-style format string
- * \return #RBRINSTRUMENT_SUCCESS when the command was successfully sent and a
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the command was successfully sent and a
  *                                response was read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR if the instrument indicated an error
- * \see RBRInstrument_sendCommand() to send a command
- * \see RBRInstrument_readResponse() to read the command response
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \see RBRInstrumentGen3_sendCommand() to send a command
+ * \see RBRInstrumentGen3_readResponse() to read the command response
  */
-RBRInstrumentError RBRInstrument_converse(RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_converse(RBRInstrumentGen3 *instrument,
                                           const char *command,
                                           ...);
 
 /**
  * \brief Read a single boolean parameter from the instrument.
  *
- * This function is a convenience specialization over RBRInstrument_converse()
- * and RBRInstrument_readResponse(): it sends a command in the standard format
+ * This function is a convenience specialization over RBRInstrumentGen3_converse()
+ * and RBRInstrumentGen3_readResponse(): it sends a command in the standard format
  * for retrieving a single parameter (`command parameter`), then parses the
  * response looking for the value of that single parameter.
  *
@@ -183,17 +183,17 @@ RBRInstrumentError RBRInstrument_converse(RBRInstrument *instrument,
  * \param [in] command the name of the command
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
- * \return #RBRINSTRUMENT_SUCCESS when the command was successfully sent and a
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the command was successfully sent and a
  *                                response was read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR if the instrument indicated an error
- * \see RBRInstrument_converse() to send a command
- * \see RBRInstrument_readResponse() to read the command response
- * \see RBRInstrument_getFloat() for the float equivalent
- * \see RBRInstrument_getInt() for the integer equivalent
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \see RBRInstrumentGen3_converse() to send a command
+ * \see RBRInstrumentGen3_readResponse() to read the command response
+ * \see RBRInstrumentGen3_getFloat() for the float equivalent
+ * \see RBRInstrumentGen3_getInt() for the integer equivalent
  */
-RBRInstrumentError RBRInstrument_getBool(RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_getBool(RBRInstrumentGen3 *instrument,
                                          const char *command,
                                          const char *parameter,
                                          bool *value);
@@ -201,8 +201,8 @@ RBRInstrumentError RBRInstrument_getBool(RBRInstrument *instrument,
 /**
  * \brief Read a single float parameter from the instrument.
  *
- * This function is a convenience specialization over RBRInstrument_converse()
- * and RBRInstrument_readResponse(): it sends a command in the standard format
+ * This function is a convenience specialization over RBRInstrumentGen3_converse()
+ * and RBRInstrumentGen3_readResponse(): it sends a command in the standard format
  * for retrieving a single parameter (`command parameter`), then parses the
  * response looking for the value of that single parameter.
  *
@@ -210,17 +210,17 @@ RBRInstrumentError RBRInstrument_getBool(RBRInstrument *instrument,
  * \param [in] command the name of the command
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
- * \return #RBRINSTRUMENT_SUCCESS when the command was successfully sent and a
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the command was successfully sent and a
  *                                response was read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR if the instrument indicated an error
- * \see RBRInstrument_converse() to send a command
- * \see RBRInstrument_readResponse() to read the command response
- * \see RBRInstrument_getBool() for the boolean equivalent
- * \see RBRInstrument_getInt() for the integer equivalent
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \see RBRInstrumentGen3_converse() to send a command
+ * \see RBRInstrumentGen3_readResponse() to read the command response
+ * \see RBRInstrumentGen3_getBool() for the boolean equivalent
+ * \see RBRInstrumentGen3_getInt() for the integer equivalent
  */
-RBRInstrumentError RBRInstrument_getFloat(RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_getFloat(RBRInstrumentGen3 *instrument,
                                           const char *command,
                                           const char *parameter,
                                           float *value);
@@ -228,8 +228,8 @@ RBRInstrumentError RBRInstrument_getFloat(RBRInstrument *instrument,
 /**
  * \brief Read a single integer parameter from the instrument.
  *
- * This function is a convenience specialization over RBRInstrument_converse()
- * and RBRInstrument_readResponse(): it sends a command in the standard format
+ * This function is a convenience specialization over RBRInstrumentGen3_converse()
+ * and RBRInstrumentGen3_readResponse(): it sends a command in the standard format
  * for retrieving a single parameter (`command parameter`), then parses the
  * response looking for the value of that single parameter.
  *
@@ -237,23 +237,23 @@ RBRInstrumentError RBRInstrument_getFloat(RBRInstrument *instrument,
  * \param [in] command the name of the command
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
- * \return #RBRINSTRUMENT_SUCCESS when the command was successfully sent and a
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the command was successfully sent and a
  *                                response was read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR if the instrument indicated an error
- * \see RBRInstrument_converse() to send a command
- * \see RBRInstrument_readResponse() to read the command response
- * \see RBRInstrument_getBool() for the boolean equivalent
- * \see RBRInstrument_getFloat() for the float equivalent
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \see RBRInstrumentGen3_converse() to send a command
+ * \see RBRInstrumentGen3_readResponse() to read the command response
+ * \see RBRInstrumentGen3_getBool() for the boolean equivalent
+ * \see RBRInstrumentGen3_getFloat() for the float equivalent
  */
-RBRInstrumentError RBRInstrument_getInt(RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_getInt(RBRInstrumentGen3 *instrument,
                                         const char *command,
                                         const char *parameter,
                                         int32_t *value);
 
 /** \brief A parameter (key/value pair) from an instrument response. */
-typedef struct RBRInstrumentResponseParameter
+typedef struct RBRInstrumentGen3ResponseParameter
 {
     /** \brief The number of index parameters prior to this parameter. */
     int32_t index;
@@ -265,7 +265,7 @@ typedef struct RBRInstrumentResponseParameter
     char *value;
     /** \brief The start of the next key. */
     char *nextKey;
-} RBRInstrumentResponseParameter;
+} RBRInstrumentGen3ResponseParameter;
 
 /**
  * \brief Attempt to parse (tokenize/split key/value pairs) a command response.
@@ -286,24 +286,24 @@ typedef struct RBRInstrumentResponseParameter
  * \param [in,out] command the name of the command as indicated by the response
  * \param [in,out] parameter the most-recently-parsed response parameter
  */
-void RBRInstrument_parseResponse(RBRInstrument *instrument,
+void RBRInstrumentGen3_parseResponse(RBRInstrumentGen3 *instrument,
                                  char **command,
-                                 RBRInstrumentResponseParameter *parameter);
+                                 RBRInstrumentGen3ResponseParameter *parameter);
 
 
 /**
  * \brief Check for errors or warnings in an instrument response.
  *
- * Updates RBRInstrument.response as appropriate.
+ * Updates RBRInstrumentGen3.response as appropriate.
  *
  * \param [in,out] instrument the instrument connection
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
- * \return #RBRINSTRUMENT_SUCCESS when the response is a warning or success
- * \return #RBRINSTRUMENT_HARDWARE_ERROR when the response indicates an error
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the response is a warning or success
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the response indicates an error
  */
-RBRInstrumentError RBRInstrument_errorCheckResponse(
-    RBRInstrument *instrument, 
+RBRInstrumentGen3Error RBRInstrumentGen3_errorCheckResponse(
+    RBRInstrumentGen3 *instrument, 
     char *beginning, 
     char *end);
 
@@ -318,12 +318,12 @@ RBRInstrumentError RBRInstrument_errorCheckResponse(
  * \param [in] s the sample date/time string
  * \param [out] timestamp the parsed timestamp
  * \param [out] end the first character not parsed
- * \return #RBRINSTRUMENT_SUCCESS when the timestamp is successfully parsed
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when the time is invalid
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the timestamp is successfully parsed
+ * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when the time is invalid
  */
-RBRInstrumentError RBRInstrumentDateTime_parseSampleTime(
+RBRInstrumentGen3Error RBRInstrumentGen3DateTime_parseSampleTime(
     const char *s,
-    RBRInstrumentDateTime *timestamp,
+    RBRInstrumentGen3DateTime *timestamp,
     char **end);
 
 /**
@@ -337,42 +337,42 @@ RBRInstrumentError RBRInstrumentDateTime_parseSampleTime(
  * \param [in] s the sample date/time string
  * \param [out] timestamp the parsed timestamp
  * \param [out] end the first character not parsed
- * \return #RBRINSTRUMENT_SUCCESS when the timestamp is successfully parsed
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when the time is invalid
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the timestamp is successfully parsed
+ * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when the time is invalid
  */
-RBRInstrumentError RBRInstrumentDateTime_parseScheduleTime(
+RBRInstrumentGen3Error RBRInstrumentGen3DateTime_parseScheduleTime(
     const char *s,
-    RBRInstrumentDateTime *timestamp,
+    RBRInstrumentGen3DateTime *timestamp,
     char **end);
 
 /**
  * \brief Convert a timestamp to a sample time/date string (i.e.,
  * “YYYY-mm-dd HH:MM:SS.sss” format).
  *
- * Exactly #RBRINSTRUMENT_SAMPLE_TIME_LEN + 1 characters will be written into
+ * Exactly #RBRINSTRUMENTGEN3_SAMPLE_TIME_LEN + 1 characters will be written into
  * the buffer for the timestamp plus null terminator.
  *
  * \param [in] timestamp the timestamp
  * \param [out] s the destination buffer
  */
-void RBRInstrumentDateTime_toSampleTime(RBRInstrumentDateTime timestamp,
+void RBRInstrumentGen3DateTime_toSampleTime(RBRInstrumentGen3DateTime timestamp,
                                         char *s);
 
 /**
  * \brief Convert a timestamp to a schedule setting time/date string (i.e.,
  * “YYYYmmddHHMMSS” format).
  *
- * Exactly #RBRINSTRUMENT_SCHEDULE_TIME_LEN + 1 characters will be written into
+ * Exactly #RBRINSTRUMENTGEN3_SCHEDULE_TIME_LEN + 1 characters will be written into
  * the buffer for the timestamp plus null terminator.
  *
  * \param [in] timestamp the timestamp
  * \param [out] s the destination buffer
  */
-void RBRInstrumentDateTime_toScheduleTime(RBRInstrumentDateTime timestamp,
+void RBRInstrumentGen3DateTime_toScheduleTime(RBRInstrumentGen3DateTime timestamp,
                                           char *s);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTINTERNAL_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN3INTERNAL_H */

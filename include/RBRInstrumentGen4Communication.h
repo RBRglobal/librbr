@@ -396,4 +396,4 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setWiFi(RBRInstrumentGen4 *instrument,
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTCOMMUNICATION_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN4COMMUNICATION_H */

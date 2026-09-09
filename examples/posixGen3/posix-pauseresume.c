@@ -31,10 +31,10 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentError err;
-    RBRInstrument *instrument = NULL;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3 *instrument = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRInstrument instrumentSpace;
+    RBRInstrumentGen3 instrumentSpace;
     instrument = &instrumentSpace;
     #endif
 
@@ -57,49 +57,49 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENT_LIB_NAME,
-            RBRINSTRUMENT_LIB_VERSION);
+            RBRINSTRUMENTGEN3_LIB_NAME,
+            RBRINSTRUMENTGEN3_LIB_VERSION);
 
-    RBRInstrumentCallbacks callbacks = {
+    RBRInstrumentGen3Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrument_open(
+    if ((err = RBRInstrumentGen3_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENT_SUCCESS)
+             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentError_name(err));
+                RBRInstrumentGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
 
-    RBRInstrumentLink link;
-    RBRInstrument_getLink(instrument, &link);
+    RBRInstrumentGen3Link link;
+    RBRInstrumentGen3_getLink(instrument, &link);
     printf("Connected to the instrument via %s.\n",
-           RBRInstrumentLink_name(link));
+           RBRInstrumentGen3Link_name(link));
 
     switch (link)
     {
-    case RBRINSTRUMENT_LINK_USB:
-        RBRInstrument_setUSBStreamingState(instrument, true);
+    case RBRINSTRUMENTGEN3_LINK_USB:
+        RBRInstrumentGen3_setUSBStreamingState(instrument, true);
         break;
-    case RBRINSTRUMENT_LINK_SERIAL:
-    case RBRINSTRUMENT_LINK_WIFI:
+    case RBRINSTRUMENTGEN3_LINK_SERIAL:
+    case RBRINSTRUMENTGEN3_LINK_WIFI:
         {
-            RBRInstrumentSerial serial;
-            RBRInstrument_getSerial(instrument, &serial);
+            RBRInstrumentGen3Serial serial;
+            RBRInstrumentGen3_getSerial(instrument, &serial);
             printf("Connected in %s mode at %s baud.\n",
-                   RBRInstrumentSerialMode_name(serial.mode),
-                   RBRInstrumentSerialBaudRate_name(serial.baudRate));
+                   RBRInstrumentGen3SerialMode_name(serial.mode),
+                   RBRInstrumentGen3SerialBaudRate_name(serial.baudRate));
 
-            RBRInstrument_setSerialStreamingState(instrument, true);
+            RBRInstrumentGen3_setSerialStreamingState(instrument, true);
             break;
         }
     default:
@@ -110,53 +110,53 @@ int main(int argc, char *argv[])
     }
 
 /* Get pauseresume state and report error (if any) according to response. */
-    RBRInstrumentPauseresumeState state;
-    state = RBRINSTRUMENT_UNKNOWN_PAUSERESUME;
+    RBRInstrumentGen3PauseresumeState state;
+    state = RBRINSTRUMENTGEN3_UNKNOWN_PAUSERESUME;
     /* pauseStatus will be used to decide if needs to proceed with "resume". */
-    RBRInstrumentPauseStatus pauseStatus;
-    pauseStatus = RBRINSTRUMENT_UNKNOWN_PAUSE;
+    RBRInstrumentGen3PauseStatus pauseStatus;
+    pauseStatus = RBRINSTRUMENTGEN3_UNKNOWN_PAUSE;
 
-    if((err = RBRInstrument_getPauseresume(instrument, &state)) != RBRINSTRUMENT_SUCCESS){
+    if((err = RBRInstrumentGen3_getPauseresume(instrument, &state)) != RBRINSTRUMENTGEN3_SUCCESS){
         /* if this isn't an RBR instrument, or if the firmware in use doesn't support pauseresume.*/
-        fprintf(stderr, "%s: Feature not supported: %s! \n", programName, RBRInstrumentError_name(err));
+        fprintf(stderr, "%s: Feature not supported: %s! \n", programName, RBRInstrumentGen3Error_name(err));
         status = EXIT_FAILURE;
         fprintf(stderr, "E%d %s\n", instrument->response.error, instrument->response.response);
         goto fileCleanup;
     };
 
-    const char *stateName = RBRInstrumentPauseresumeState_name(state);
+    const char *stateName = RBRInstrumentGen3PauseresumeState_name(state);
     printf("pauseresume state=%s\n", stateName);
 
     /* code below: print out human-readable errors. */
-    if(state == RBRINSTRUMENT_PAUSERESUME_NA){
+    if(state == RBRINSTRUMENTGEN3_PAUSERESUME_NA){
         printf("(Either the deployment has not been enabled, or the sampling mode is 'regimes'," 
                     " or more than one gating condition is enabled.)\n");
     }
 
     /* Proceeds with command 'pause' in this case. */
-    else if(state == RBRINSTRUMENT_PAUSERESUME_RUNNING){
-        err = RBRInstrument_pause(instrument, &pauseStatus);
-        const char *statusName = RBRInstrumentPauseStatus_name(pauseStatus);
+    else if(state == RBRINSTRUMENTGEN3_PAUSERESUME_RUNNING){
+        err = RBRInstrumentGen3_pause(instrument, &pauseStatus);
+        const char *statusName = RBRInstrumentGen3PauseStatus_name(pauseStatus);
         printf("pause status=%s\n", statusName);
-        if(pauseStatus == RBRINSTRUMENT_UNKNOWN_PAUSE){
+        if(pauseStatus == RBRINSTRUMENTGEN3_UNKNOWN_PAUSE){
             fprintf(stderr, "E%d %s\n", instrument->response.error, instrument->response.response);
         }
     }
 
     /* Proceeds with command 'resume' in this case. */
-    if(state == RBRINSTRUMENT_PAUSERESUME_PAUSED || pauseStatus == RBRINSTRUMENT_PAUSE_PAUSED){
-        RBRInstrumentResumeStatus resumeStatus;
-        resumeStatus = RBRINSTRUMENT_UNKNOWN_RESUME;
-        err = RBRInstrument_resume(instrument, &resumeStatus);
-        const char *statusName = RBRInstrumentResumeStatus_name(resumeStatus);
+    if(state == RBRINSTRUMENTGEN3_PAUSERESUME_PAUSED || pauseStatus == RBRINSTRUMENTGEN3_PAUSE_PAUSED){
+        RBRInstrumentGen3ResumeStatus resumeStatus;
+        resumeStatus = RBRINSTRUMENTGEN3_UNKNOWN_RESUME;
+        err = RBRInstrumentGen3_resume(instrument, &resumeStatus);
+        const char *statusName = RBRInstrumentGen3ResumeStatus_name(resumeStatus);
         printf("resume status=%s\n", statusName);
-        if(resumeStatus == RBRINSTRUMENT_UNKNOWN_RESUME){
+        if(resumeStatus == RBRINSTRUMENTGEN3_UNKNOWN_RESUME){
             fprintf(stderr, "E%d %s\n", instrument->response.error, instrument->response.response);
         }
     }
 
 instrumentCleanup:
-    RBRInstrument_close(instrument);
+    RBRInstrumentGen3_close(instrument);
 fileCleanup:
     close(instrumentFd);
     return status;

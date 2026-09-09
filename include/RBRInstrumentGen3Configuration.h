@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentConfiguration.h
+ * \file RBRInstrumentGen3Configuration.h
  *
  * \brief Instrument commands and structures pertaining to instrument
  * configuration information and calibration.
@@ -11,8 +11,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTCONFIGURATION_H
-#define LIBRBR_RBRINSTRUMENTCONFIGURATION_H
+#ifndef LIBRBR_RBRINSTRUMENTGEN3CONFIGURATION_H
+#define LIBRBR_RBRINSTRUMENTGEN3CONFIGURATION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,71 +21,71 @@ extern "C" {
 /**
  * \brief The maximum number of C calibration coefficients per channel.
  *
- * \see RBRInstrumentCalibration.c
+ * \see RBRInstrumentGen3Calibration.c
  */
-#ifndef RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX
-#define RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX 8
+#ifndef RBRINSTRUMENTGEN3_CALIBRATION_C_COEFFICIENT_MAX
+#define RBRINSTRUMENTGEN3_CALIBRATION_C_COEFFICIENT_MAX 8
 #endif
 
 /**
  * \brief The maximum number of X calibration coefficients per channel.
  *
- * \see RBRInstrumentCalibration.x
+ * \see RBRInstrumentGen3Calibration.x
  */
-#ifndef RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX
-#define RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX 16
+#ifndef RBRINSTRUMENTGEN3_CALIBRATION_X_COEFFICIENT_MAX
+#define RBRINSTRUMENTGEN3_CALIBRATION_X_COEFFICIENT_MAX 16
 #endif
 
 /**
  * \brief The maximum number of input channel indices per channel.
  *
- * \see RBRInstrumentCalibration.n
+ * \see RBRInstrumentGen3Calibration.n
  */
-#ifndef RBRINSTRUMENT_CALIBRATION_N_COEFFICIENT_MAX
-#define RBRINSTRUMENT_CALIBRATION_N_COEFFICIENT_MAX 8
+#ifndef RBRINSTRUMENTGEN3_CALIBRATION_N_COEFFICIENT_MAX
+#define RBRINSTRUMENTGEN3_CALIBRATION_N_COEFFICIENT_MAX 8
 #endif
 
 /**
  * \brief An in-band representation of the special “value” calibration
  * correction value.
  *
- * \see RBRInstrumentCalibration.n
+ * \see RBRInstrumentGen3Calibration.n
  */
-#define RBRINSTRUMENT_VALUE_COEFFICIENT 0xFF
+#define RBRINSTRUMENTGEN3_VALUE_COEFFICIENT 0xFF
 
 /**
  * \brief The maximum number of characters in a calibration equation name.
  *
  * Does not include any null terminator.
  */
-#define RBRINSTRUMENT_CALIBRATION_EQUATION_MAX 31
+#define RBRINSTRUMENTGEN3_CALIBRATION_EQUATION_MAX 31
 
 /**
  * \brief The maximum number of gain settings per channel.
  */
-#ifndef RBRINSTRUMENT_CHANNEL_GAINS_MAX
-#define RBRINSTRUMENT_CHANNEL_GAINS_MAX 8
+#ifndef RBRINSTRUMENTGEN3_CHANNEL_GAINS_MAX
+#define RBRINSTRUMENTGEN3_CHANNEL_GAINS_MAX 8
 #endif
 
 /** \brief The minimum input timeout. */
-#define RBRINSTRUMENT_INPUT_TIMEOUT_MIN 10000
+#define RBRINSTRUMENTGEN3_INPUT_TIMEOUT_MIN 10000
 
 /** \brief The maximum input timeout. */
-#define RBRINSTRUMENT_INPUT_TIMEOUT_MAX 240000
+#define RBRINSTRUMENTGEN3_INPUT_TIMEOUT_MAX 240000
 
 /**
  * \brief The maximum number of characters in a sensor parameter key.
  *
  * Does not include any null terminator.
  */
-#define RBRINSTRUMENT_SENSOR_PARAMETER_KEY_MAX 63
+#define RBRINSTRUMENTGEN3_SENSOR_PARAMETER_KEY_MAX 63
 
 /**
  * \brief The maximum number of characters in a sensor parameter value.
  *
  * Does not include any null terminator.
  */
-#define RBRINSTRUMENT_SENSOR_PARAMETER_VALUE_MAX 63
+#define RBRINSTRUMENTGEN3_SENSOR_PARAMETER_VALUE_MAX 63
 
 /**
  * \brief A channel identifier.
@@ -93,113 +93,113 @@ extern "C" {
  * Channel indices are always 1-based. A value of 0 means the index is unset
  * or empty.
  */
-typedef uint8_t RBRInstrumentChannelIndex;
+typedef uint8_t RBRInstrumentGen3ChannelIndex;
 
 /** \brief An internal module identifier. */
-typedef uint8_t RBRInstrumentModuleAddress;
+typedef uint8_t RBRInstrumentGen3ModuleAddress;
 
 /**
  * \brief A channel calibration.
  *
- * \see RBRInstrumentChannel
- * \see RBRInstrument_setCalibration()
+ * \see RBRInstrumentGen3Channel
+ * \see RBRInstrumentGen3_setCalibration()
  */
-typedef struct RBRInstrumentCalibration
+typedef struct RBRInstrumentGen3Calibration
 {
     /**
      * \brief The date/time of the calibration.
      *
      * Unused entries should be set to 0.
      */
-    RBRInstrumentDateTime dateTime;
+    RBRInstrumentGen3DateTime dateTime;
     /**
      *\brief Calibration C coefficients.
      *
      * Unused entries should be set to NaN.
      */
-    float c[RBRINSTRUMENT_CALIBRATION_C_COEFFICIENT_MAX];
+    float c[RBRINSTRUMENTGEN3_CALIBRATION_C_COEFFICIENT_MAX];
     /**
      *\brief Calibration X coefficients.
      *
      * Unused entries should be set to NaN.
      */
-    float x[RBRINSTRUMENT_CALIBRATION_X_COEFFICIENT_MAX];
+    float x[RBRINSTRUMENTGEN3_CALIBRATION_X_COEFFICIENT_MAX];
     /**
      *\brief Input channel indices.
      *
      * Unused entries should be set to 0. Entries corresponding to the special
-     * “value” value are set to #RBRINSTRUMENT_VALUE_COEFFICIENT.
+     * “value” value are set to #RBRINSTRUMENTGEN3_VALUE_COEFFICIENT.
      */
-    RBRInstrumentChannelIndex n[RBRINSTRUMENT_CALIBRATION_N_COEFFICIENT_MAX];
-} RBRInstrumentCalibration;
+    RBRInstrumentGen3ChannelIndex n[RBRINSTRUMENTGEN3_CALIBRATION_N_COEFFICIENT_MAX];
+} RBRInstrumentGen3Calibration;
 
 /**
  * \brief Possible channel gain ranging modes.
  *
- * \see RBRInstrumentChannel
+ * \see RBRInstrumentGen3Channel
  * \see https://docs.rbr-global.com/L3commandreference/format-of-stored-data/standard-rawbin00-format/deployment-header/version-2-001
  */
-typedef enum RBRInstrumentChannelRangingMode
+typedef enum RBRInstrumentGen3ChannelRangingMode
 {
     /** No gain ranging is available. */
-    RBRINSTRUMENT_RANGING_NONE,
+    RBRINSTRUMENTGEN3_RANGING_NONE,
     /** A fixed gain is used. */
-    RBRINSTRUMENT_RANGING_MANUAL,
+    RBRINSTRUMENTGEN3_RANGING_MANUAL,
     /** The channel auto-ranges over the available gain settings. */
-    RBRINSTRUMENT_RANGING_AUTO,
+    RBRINSTRUMENTGEN3_RANGING_AUTO,
     /** The number of specific gain ranging modes. */
-    RBRINSTRUMENT_RANGING_COUNT,
+    RBRINSTRUMENTGEN3_RANGING_COUNT,
     /** An unknown or unrecognized gain ranging mode. */
-    RBRINSTRUMENT_UNKNOWN_RANGING
-} RBRInstrumentChannelRangingMode;
+    RBRINSTRUMENTGEN3_UNKNOWN_RANGING
+} RBRInstrumentGen3ChannelRangingMode;
 
 /**
  * \brief Get a human-readable string name for a channel gain ranging mode.
  *
  * \param [in] mode the ranging mode
  * \return a string name for the ranging mode
- * \see RBRInstrumentError_name() for a description of the format of names
+ * \see RBRInstrumentGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentChannelRangingMode_name(
-    RBRInstrumentChannelRangingMode mode);
+const char *RBRInstrumentGen3ChannelRangingMode_name(
+    RBRInstrumentGen3ChannelRangingMode mode);
 
 /**
  * Gain parameters for a channel.
  *
- * \see RBRInstrumentChannel
- * \see RBRInstrument_setChannelGain()
+ * \see RBRInstrumentGen3Channel
+ * \see RBRInstrumentGen3_setChannelGain()
  */
-typedef struct RBRInstrumentChannelGain
+typedef struct RBRInstrumentGen3ChannelGain
 {
     /** \brief The gain selection mode employed by the sensor. */
-    RBRInstrumentChannelRangingMode rangingMode;
+    RBRInstrumentGen3ChannelRangingMode rangingMode;
 
     /**
      * \brief The gain value in use by the sensor.
      *
-     * Only applies when RBRInstrumentChannelGain.rangingMode is
-     * #RBRINSTRUMENT_RANGING_MANUAL. Otherwise set to NaN.
+     * Only applies when RBRInstrumentGen3ChannelGain.rangingMode is
+     * #RBRINSTRUMENTGEN3_RANGING_MANUAL. Otherwise set to NaN.
      */
     float currentGain;
 
     /**
      * \brief The gain settings supported by the sensor.
      *
-     * Only applies where RBRInstrumentChannelGain.rangingMode is
-     * #RBRINSTRUMENT_RANGING_MANUAL or #RBRINSTRUMENT_RANGING_AUTO. Otherwise
+     * Only applies where RBRInstrumentGen3ChannelGain.rangingMode is
+     * #RBRINSTRUMENTGEN3_RANGING_MANUAL or #RBRINSTRUMENTGEN3_RANGING_AUTO. Otherwise
      * all values are set to NaN.
      *
      * Unused entries are set to NaN.
      */
-    float availableGains[RBRINSTRUMENT_CHANNEL_GAINS_MAX];
-} RBRInstrumentChannelGain;
+    float availableGains[RBRINSTRUMENTGEN3_CHANNEL_GAINS_MAX];
+} RBRInstrumentGen3ChannelGain;
 
 /**
  * \brief Details reported by the instrument `channel` command.
  *
- * \see RBRInstrumentChannels
+ * \see RBRInstrumentGen3Channels
  */
-typedef struct RBRInstrumentChannel
+typedef struct RBRInstrumentGen3Channel
 {
     /**
      * \brief A short, pre-defined “generic” name for the installed channel as
@@ -209,15 +209,15 @@ typedef struct RBRInstrumentChannel
      *
      * \see https://docs.rbr-global.com/L3commandreference/supported-channel-types
      */
-    char type[RBRINSTRUMENT_CHANNEL_TYPE_MAX + 1];
+    char type[RBRINSTRUMENTGEN3_CHANNEL_TYPE_MAX + 1];
 
     /** \brief The internal address to which the channel responds. */
-    RBRInstrumentModuleAddress module;
+    RBRInstrumentGen3ModuleAddress module;
 
     /**
      * \brief Whether the channel is activated for sampling.
      *
-     * \see RBRInstrument_setChannelStatus()
+     * \see RBRInstrumentGen3_setChannelStatus()
      */
     bool status;
 
@@ -226,14 +226,14 @@ typedef struct RBRInstrumentChannel
      *
      * Specified in milliseconds.
      */
-    RBRInstrumentPeriod settlingTime;
+    RBRInstrumentGen3Period settlingTime;
 
     /**
      * \brief The typical data acquisition time required by this channel.
      *
      * Specified in milliseconds.
      */
-    RBRInstrumentPeriod readTime;
+    RBRInstrumentGen3Period readTime;
 
     /**
      * \brief The type of formula used to convert raw readings to physical
@@ -241,7 +241,7 @@ typedef struct RBRInstrumentChannel
      *
      * \see https://docs.rbr-global.com/L3commandreference/calibration-equations-and-cross-channel-dependencies
      */
-    char equation[RBRINSTRUMENT_CALIBRATION_EQUATION_MAX + 1];
+    char equation[RBRINSTRUMENTGEN3_CALIBRATION_EQUATION_MAX + 1];
 
     /**
      * \brief The unit in which processed data is normally reported from the
@@ -249,10 +249,10 @@ typedef struct RBRInstrumentChannel
      *
      * E.g., “C” for Celsius, “V” for Volts, “dbar” for decibars.
      */
-    char userUnits[RBRINSTRUMENT_CHANNEL_UNIT_MAX + 1];
+    char userUnits[RBRINSTRUMENTGEN3_CHANNEL_UNIT_MAX + 1];
 
     /** \brief Gain parameters for the channel. */
-    RBRInstrumentChannelGain gain;
+    RBRInstrumentGen3ChannelGain gain;
 
     /** \brief Whether the channel is a derived channel. */
     bool derived;
@@ -265,23 +265,23 @@ typedef struct RBRInstrumentChannel
      *
      * \nol2 Always populated with “none”.
      */
-    char label[RBRINSTRUMENT_CHANNEL_LABEL_MAX + 1];
+    char label[RBRINSTRUMENTGEN3_CHANNEL_LABEL_MAX + 1];
 
     /** \brief The calibration for the channel. */
-    RBRInstrumentCalibration calibration;
-} RBRInstrumentChannel;
+    RBRInstrumentGen3Calibration calibration;
+} RBRInstrumentGen3Channel;
 
 /**
  * \brief Details reported by a combination of the instrument `channels`,
  * `channel`, and `calibration` commands.
  *
- * \see RBRInstrument_getChannels()
- * \see RBRInstrument_getChannelsWithoutCalibrations()
+ * \see RBRInstrumentGen3_getChannels()
+ * \see RBRInstrumentGen3_getChannelsWithoutCalibrations()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channels
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/calibration
  */
-typedef struct RBRInstrumentChannels
+typedef struct RBRInstrumentGen3Channels
 {
     /** \brief The number of installed and configured instrument channels. */
     int32_t count;
@@ -289,7 +289,7 @@ typedef struct RBRInstrumentChannels
      * \brief The number of active channels, which excludes any turned off by
      * the user.
      *
-     * \see RBRInstrumentChannel.status
+     * \see RBRInstrumentGen3Channel.status
      */
     int32_t on;
     /**
@@ -298,26 +298,26 @@ typedef struct RBRInstrumentChannels
      *
      * Specified in milliseconds.
      */
-    RBRInstrumentPeriod settlingTime;
+    RBRInstrumentGen3Period settlingTime;
     /**
      * \brief The maximum overall reading time across all enabled channels.
      *
      * Specified in milliseconds.
      */
-    RBRInstrumentPeriod readTime;
+    RBRInstrumentGen3Period readTime;
     /**
      * \brief The minimum sampling period with the currently-active channels.
      *
      * Specified in milliseconds.
      */
-    RBRInstrumentPeriod minimumPeriod;
+    RBRInstrumentGen3Period minimumPeriod;
     /**
      * \brief Specific channel details.
      *
-     * The first RBRInstrumentChannel.count entries will be populated.
+     * The first RBRInstrumentGen3Channel.count entries will be populated.
      */
-    RBRInstrumentChannel channels[RBRINSTRUMENT_CHANNEL_MAX];
-} RBRInstrumentChannels;
+    RBRInstrumentGen3Channel channels[RBRINSTRUMENTGEN3_CHANNEL_MAX];
+} RBRInstrumentGen3Channels;
 
 /**
  * \brief Get channel information for the instrument.
@@ -328,39 +328,39 @@ typedef struct RBRInstrumentChannels
  *
  * \param [in] instrument the instrument connection
  * \param [out] channels the channel information
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \see RBRInstrument_getChannelsWithoutCalibrations()
- * \see RBRInstrument_getSensorParameters()
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen3_getChannelsWithoutCalibrations()
+ * \see RBRInstrumentGen3_getSensorParameters()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channels
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/calibration
  */
-RBRInstrumentError RBRInstrument_getChannels(RBRInstrument *instrument,
-                                             RBRInstrumentChannels *channels);
+RBRInstrumentGen3Error RBRInstrumentGen3_getChannels(RBRInstrumentGen3 *instrument,
+                                             RBRInstrumentGen3Channels *channels);
 
 /**
  * \brief Get channel information for the instrument without calibration data.
  *
  * Channel information is composed from combining the `channels` and `channel`
- * commands. Unlike RBRInstrument_getChannels(), calibration information is
+ * commands. Unlike RBRInstrumentGen3_getChannels(), calibration information is
  * _not_ populated. This saves bandwidth and time communicating with the
  * instrument when calibration information is unnecessary.
  *
  * \param [in] instrument the instrument connection
  * \param [out] channels the channel information
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \see RBRInstrument_getChannels()
- * \see RBRInstrument_getSensorParameters()
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen3_getChannels()
+ * \see RBRInstrumentGen3_getSensorParameters()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channels
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  */
-RBRInstrumentError RBRInstrument_getChannelsWithoutCalibrations(
-    RBRInstrument *instrument,
-    RBRInstrumentChannels *channels);
+RBRInstrumentGen3Error RBRInstrumentGen3_getChannelsWithoutCalibrations(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3Channels *channels);
 
 /**
  * \brief Set the status of a channel.
@@ -368,55 +368,55 @@ RBRInstrumentError RBRInstrument_getChannelsWithoutCalibrations(
  * \param [in] instrument the instrument connection
  * \param [in] channel the index of the channel to update
  * \param [in] status whether the channel is activated for sampling
- * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR if the instrument is logging
- * \see RBRInstrument_getChannels()
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the instrument is logging
+ * \see RBRInstrumentGen3_getChannels()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  */
-RBRInstrumentError RBRInstrument_setChannelStatus(
-    RBRInstrument *instrument,
-    RBRInstrumentChannelIndex channel,
+RBRInstrumentGen3Error RBRInstrumentGen3_setChannelStatus(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3ChannelIndex channel,
     bool status);
 
 /**
  * \brief Set the gain parameters of a channel.
  *
- * RBRInstrumentChannelGain.rangingMode must be either
- * #RBRINSTRUMENT_RANGING_MANUAL or #RBRINSTRUMENT_RANGING_AUTO. Otherwise,
- * #RBRINSTRUMENT_INVALID_PARAMETER_VALUE is returned.
+ * RBRInstrumentGen3ChannelGain.rangingMode must be either
+ * #RBRINSTRUMENTGEN3_RANGING_MANUAL or #RBRINSTRUMENTGEN3_RANGING_AUTO. Otherwise,
+ * #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE is returned.
  *
  * For manual gain selection, the gain given by
- * RBRInstrumentChannelGain.currentGain must be one of the available gains
+ * RBRInstrumentGen3ChannelGain.currentGain must be one of the available gains
  * reported by the instrument. Otherwise, the instrument will produce a
- * hardware error. If RBRInstrumentChannelGain.availableGains is populated
+ * hardware error. If RBRInstrumentGen3ChannelGain.availableGains is populated
  * (contains at least one leading non-NaN entry), this function will verify the
  * presence of the chosen gain. If it is not found,
- * #RBRINSTRUMENT_INVALID_PARAMETER_VALUE is returned.
+ * #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE is returned.
  *
- * RBRInstrumentChannelGain.availableGains is only used for parameter
+ * RBRInstrumentGen3ChannelGain.availableGains is only used for parameter
  * verification. It is not sent to the instrument.
  *
  * \param [in] instrument the instrument connection
  * \param [in] channel the index of the channel to update
  * \param [in] gain the gain parameters for the channel
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR if the instrument is logging, or an
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the instrument is logging, or an
  *                                       invalid gain value is given
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE if the ranging mode is
+ * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE if the ranging mode is
  *                                                invalid, or if the gain value
  *                                                can be conclusively
  *                                                determined to be invalid
- * \see RBRInstrument_getChannels()
+ * \see RBRInstrumentGen3_getChannels()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  */
-RBRInstrumentError RBRInstrument_setChannelGain(
-    RBRInstrument *instrument,
-    RBRInstrumentChannelIndex channel,
-    RBRInstrumentChannelGain *gain);
+RBRInstrumentGen3Error RBRInstrumentGen3_setChannelGain(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3ChannelIndex channel,
+    RBRInstrumentGen3ChannelGain *gain);
 
 /**
  * \brief Update a channel's calibration coefficients.
@@ -430,30 +430,30 @@ RBRInstrumentError RBRInstrument_setChannelGain(
  *
  * If coefficients used by the channel are omitted from the set sent, then
  * those coefficients will retain their current values. You can call
- * RBRInstrument_getChannels() after updating coefficients to confirm the
+ * RBRInstrumentGen3_getChannels() after updating coefficients to confirm the
  * values written.
  *
- * Values of in the _n_ coefficient group (RBRInstrumentCalibration.n) are
+ * Values of in the _n_ coefficient group (RBRInstrumentGen3Calibration.n) are
  * ignored.
  *
  * \param [in] instrument the instrument connection
  * \param [in] channel the index of the channel to update
  * \param [in] calibration the new calibration coefficients for the channel
- * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR when the calibration cannot be changed
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when the date/time of the
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the calibration cannot be changed
+ * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when the date/time of the
  *                                                calibration is out of range,
  *                                                or when no coefficients are
  *                                                populated
- * \see RBRInstrument_getChannels()
+ * \see RBRInstrumentGen3_getChannels()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/calibration
  */
-RBRInstrumentError RBRInstrument_setCalibration(
-    RBRInstrument *instrument,
-    RBRInstrumentChannelIndex channel,
-    const RBRInstrumentCalibration *calibration);
+RBRInstrumentGen3Error RBRInstrumentGen3_setCalibration(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3ChannelIndex channel,
+    const RBRInstrumentGen3Calibration *calibration);
 
 /**
  * \brief Get the fetch power-off delay.
@@ -464,15 +464,15 @@ RBRInstrumentError RBRInstrument_setCalibration(
  *
  * \param [in] instrument the instrument connection
  * \param [out] fetchPowerOffDelay the fetch power-off delay
- * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \see RBRInstrument_setFetchPowerOffDelay()
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen3_setFetchPowerOffDelay()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRInstrumentError RBRInstrument_getFetchPowerOffDelay(
-    RBRInstrument *instrument,
-    RBRInstrumentPeriod *fetchPowerOffDelay);
+RBRInstrumentGen3Error RBRInstrumentGen3_getFetchPowerOffDelay(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3Period *fetchPowerOffDelay);
 
 /**
  * \brief Set the fetch power-off delay.
@@ -484,16 +484,16 @@ RBRInstrumentError RBRInstrument_getFetchPowerOffDelay(
  *
  * \param [in] instrument the instrument connection
  * \param [in] fetchPowerOffDelay the fetch power-off delay
- * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR when the settings cannot be changed
- * \see RBRInstrument_getFetchPowerOffDelay()
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \see RBRInstrumentGen3_getFetchPowerOffDelay()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRInstrumentError RBRInstrument_setFetchPowerOffDelay(
-    RBRInstrument *instrument,
-    RBRInstrumentPeriod fetchPowerOffDelay);
+RBRInstrumentGen3Error RBRInstrumentGen3_setFetchPowerOffDelay(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3Period fetchPowerOffDelay);
 
 /**
  * \brief Get whether sensor power is always on.
@@ -504,14 +504,14 @@ RBRInstrumentError RBRInstrument_setFetchPowerOffDelay(
  *
  * \param [in] instrument the instrument connection
  * \param [out] sensorPowerAlwaysOn whether sensor power is always on
- * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \see RBRInstrument_setSensorPowerAlwaysOn()
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen3_setSensorPowerAlwaysOn()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRInstrumentError RBRInstrument_isSensorPowerAlwaysOn(
-    RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_isSensorPowerAlwaysOn(
+    RBRInstrumentGen3 *instrument,
     bool *sensorPowerAlwaysOn);
 
 /**
@@ -521,15 +521,15 @@ RBRInstrumentError RBRInstrument_isSensorPowerAlwaysOn(
  *
  * \param [in] instrument the instrument connection
  * \param [in] sensorPowerAlwaysOn whether sensor power is always on
- * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR if the instrument is logging
- * \see RBRInstrument_isSensorPowerAlwaysOn()
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the instrument is logging
+ * \see RBRInstrumentGen3_isSensorPowerAlwaysOn()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRInstrumentError RBRInstrument_setSensorPowerAlwaysOn(
-    RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_setSensorPowerAlwaysOn(
+    RBRInstrumentGen3 *instrument,
     bool sensorPowerAlwaysOn);
 
 /**
@@ -540,13 +540,13 @@ RBRInstrumentError RBRInstrument_setSensorPowerAlwaysOn(
  *
  * \param [in] instrument the instrument connection
  * \param [out] castDetection whether cast detection is enabled
- * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \see RBRInstrument_setCastDetection()
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen3_setCastDetection()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRInstrumentError RBRInstrument_getCastDetection(RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_getCastDetection(RBRInstrumentGen3 *instrument,
                                                   bool *castDetection);
 
 /**
@@ -556,14 +556,14 @@ RBRInstrumentError RBRInstrument_getCastDetection(RBRInstrument *instrument,
  *
  * \param [in] instrument the instrument connection
  * \param [in] castDetection whether cast detection is enabled
- * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR if the instrument is logging
- * \see RBRInstrument_getCastDetection()
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the instrument is logging
+ * \see RBRInstrumentGen3_getCastDetection()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRInstrumentError RBRInstrument_setCastDetection(RBRInstrument *instrument,
+RBRInstrumentGen3Error RBRInstrumentGen3_setCastDetection(RBRInstrumentGen3 *instrument,
                                                   bool castDetection);
 
 /**
@@ -575,15 +575,15 @@ RBRInstrumentError RBRInstrument_setCastDetection(RBRInstrument *instrument,
  *
  * \param [in] instrument the instrument connection
  * \param [out] inputTimeout the timeout for output suppression
- * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \see RBRInstrument_setInputTimeout()
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen3_setInputTimeout()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRInstrumentError RBRInstrument_getInputTimeout(
-    RBRInstrument *instrument,
-    RBRInstrumentPeriod *inputTimeout);
+RBRInstrumentGen3Error RBRInstrumentGen3_getInputTimeout(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3Period *inputTimeout);
 
 /**
  * \brief Set the timeout for output suppression while receiving commands.
@@ -595,16 +595,16 @@ RBRInstrumentError RBRInstrument_getInputTimeout(
  *
  * \param [in] instrument the instrument connection
  * \param [in] inputTimeout the timeout for output suppression
- * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR if the instrument is logging
- * \see RBRInstrument_getInputTimeout()
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the instrument is logging
+ * \see RBRInstrumentGen3_getInputTimeout()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRInstrumentError RBRInstrument_setInputTimeout(
-    RBRInstrument *instrument,
-    RBRInstrumentPeriod inputTimeout);
+RBRInstrumentGen3Error RBRInstrumentGen3_setInputTimeout(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3Period inputTimeout);
 
 /**
  * \brief Value settings the instrument uses for calculation of derived
@@ -614,11 +614,11 @@ RBRInstrumentError RBRInstrument_setInputTimeout(
  * See the command reference documentation for details on the use and default
  * values for each of these parameters.
  *
- * \see RBRInstrument_getValueSetting()
- * \see RBRInstrument_setValueSetting()
+ * \see RBRInstrumentGen3_getValueSetting()
+ * \see RBRInstrumentGen3_setValueSetting()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-typedef enum RBRInstrumentValueSetting
+typedef enum RBRInstrumentGen3ValueSetting
 {
     /**
      * The temperature coefficient used to correct the derived channel for
@@ -626,25 +626,25 @@ typedef enum RBRInstrumentValueSetting
      *
      * Specified in degrees Celsius.
      */
-    RBRINSTRUMENT_SETTING_SPECCONDTEMPCO,
+    RBRINSTRUMENTGEN3_SETTING_SPECCONDTEMPCO,
     /**
      * The height above the seabed at which the logger is deployed.
      *
      * Specified in metres.
      */
-    RBRINSTRUMENT_SETTING_ALTITUDE,
+    RBRINSTRUMENTGEN3_SETTING_ALTITUDE,
     /**
      * The default temperature.
      *
      * Specified in degrees Celsius.
      */
-    RBRINSTRUMENT_SETTING_TEMPERATURE,
+    RBRINSTRUMENTGEN3_SETTING_TEMPERATURE,
     /**
      * The default absolute pressure.
      *
      * Specified in dbar.
      */
-    RBRINSTRUMENT_SETTING_PRESSURE,
+    RBRINSTRUMENTGEN3_SETTING_PRESSURE,
     /**
      * The default conductivity.
      *
@@ -652,45 +652,45 @@ typedef enum RBRInstrumentValueSetting
      *
      * \nol3 It is only available on early Logger2 instruments.
      */
-    RBRINSTRUMENT_SETTING_CONDUCTIVITY,
+    RBRINSTRUMENTGEN3_SETTING_CONDUCTIVITY,
     /**
      * The default atmospheric pressure.
      *
      * Specified in dbar.
      */
-    RBRINSTRUMENT_SETTING_ATMOSPHERE,
+    RBRINSTRUMENTGEN3_SETTING_ATMOSPHERE,
     /**
      * The default water density.
      *
      * Specified in g/cm³.
      */
-    RBRINSTRUMENT_SETTING_DENSITY,
+    RBRINSTRUMENTGEN3_SETTING_DENSITY,
     /**
      * The default salinity.
      *
      * Specified in PSU.
      */
-    RBRINSTRUMENT_SETTING_SALINITY,
+    RBRINSTRUMENTGEN3_SETTING_SALINITY,
     /**
      * The default average speed of sound.
      *
      * Specified in m/s.
      */
-    RBRINSTRUMENT_SETTING_AVGSOUNDSPEED,
+    RBRINSTRUMENTGEN3_SETTING_AVGSOUNDSPEED,
     /** The number of specific value settings. */
-    RBRINSTRUMENT_SETTING_COUNT,
+    RBRINSTRUMENTGEN3_SETTING_COUNT,
     /** An unknown or unrecognized value setting. */
-    RBRINSTRUMENT_UNKNOWN_SETTING
-} RBRInstrumentValueSetting;
+    RBRINSTRUMENTGEN3_UNKNOWN_SETTING
+} RBRInstrumentGen3ValueSetting;
 
 /**
  * \brief Get a human-readable string name for an instrument value setting.
  *
  * \param [in] setting the value setting
  * \return a string name for the value setting
- * \see RBRInstrumentError_name() for a description of the format of names
+ * \see RBRInstrumentGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentValueSetting_name(RBRInstrumentValueSetting setting);
+const char *RBRInstrumentGen3ValueSetting_name(RBRInstrumentGen3ValueSetting setting);
 
 /**
  * \brief Read a value setting from the instrument.
@@ -698,17 +698,17 @@ const char *RBRInstrumentValueSetting_name(RBRInstrumentValueSetting setting);
  * \param [in] instrument the instrument connection
  * \param [in] setting the setting to retrieve
  * \param [out] value the value of the setting
- * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when an unrecognized setting
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when an unrecognized setting
  *                                                is requested
- * \see RBRInstrument_setValueSetting()
+ * \see RBRInstrumentGen3_setValueSetting()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRInstrumentError RBRInstrument_getValueSetting(
-    RBRInstrument *instrument,
-    RBRInstrumentValueSetting setting,
+RBRInstrumentGen3Error RBRInstrumentGen3_getValueSetting(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3ValueSetting setting,
     float *value);
 
 /**
@@ -719,35 +719,35 @@ RBRInstrumentError RBRInstrument_getValueSetting(
  * \param [in] instrument the instrument connection
  * \param [in] setting the setting to retrieve
  * \param [in] value the value of the setting
- * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR if the instrument is logging
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when an unrecognized setting
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the instrument is logging
+ * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when an unrecognized setting
  *                                                is requested or when the
  *                                                value is NaN
- * \see RBRInstrument_getValueSetting()
+ * \see RBRInstrumentGen3_getValueSetting()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRInstrumentError RBRInstrument_setValueSetting(
-    RBRInstrument *instrument,
-    RBRInstrumentValueSetting setting,
+RBRInstrumentGen3Error RBRInstrumentGen3_setValueSetting(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3ValueSetting setting,
     float value);
 
 /**
  * \brief A sensor parameter.
  *
- * \see RBRInstrument_getSensorParameter()
- * \see RBRInstrument_getSensorParameters()
- * \see RBRInstrument_setSensorParameter()
+ * \see RBRInstrumentGen3_getSensorParameter()
+ * \see RBRInstrumentGen3_getSensorParameters()
+ * \see RBRInstrumentGen3_setSensorParameter()
  */
-typedef struct RBRInstrumentSensorParameter
+typedef struct RBRInstrumentGen3SensorParameter
 {
     /** \brief The name of the parameter as a null-terminated C string. */
-    char key[RBRINSTRUMENT_SENSOR_PARAMETER_KEY_MAX + 1];
+    char key[RBRINSTRUMENTGEN3_SENSOR_PARAMETER_KEY_MAX + 1];
     /** \brief The parameter value as a null-terminated C string. */
-    char value[RBRINSTRUMENT_SENSOR_PARAMETER_VALUE_MAX + 1];
-} RBRInstrumentSensorParameter;
+    char value[RBRINSTRUMENTGEN3_SENSOR_PARAMETER_VALUE_MAX + 1];
+} RBRInstrumentGen3SensorParameter;
 
 /**
  * \brief Retrieve a single sensor parameter for a channel.
@@ -764,24 +764,24 @@ typedef struct RBRInstrumentSensorParameter
  *                     be retrieved
  * \param [in,out] parameter initially, the sensor parameter to be retrieved;
  *                           after return, the instrument response
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \see RBRInstrument_getChannels()
- * \see RBRInstrument_getSensorParameters()
- * \see RBRInstrument_setSensorParameter()
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen3_getChannels()
+ * \see RBRInstrumentGen3_getSensorParameters()
+ * \see RBRInstrumentGen3_setSensorParameter()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/sensor
  */
-RBRInstrumentError RBRInstrument_getSensorParameter(
-    RBRInstrument *instrument,
-    RBRInstrumentChannelIndex channel,
-    RBRInstrumentSensorParameter *parameter);
+RBRInstrumentGen3Error RBRInstrumentGen3_getSensorParameter(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3ChannelIndex channel,
+    RBRInstrumentGen3SensorParameter *parameter);
 
 /**
  * \brief Retrieve the sensor parameters for a channel.
  *
  * To ease memory requirements, sensor parameters are not included with other
- * channel information retrieved by RBRInstrument_getChannels().
+ * channel information retrieved by RBRInstrumentGen3_getChannels().
  *
  * \param instrument the instrument connection
  * \param [in] channel the index of the channel for which sensor parameters are
@@ -790,18 +790,18 @@ RBRInstrumentError RBRInstrument_getSensorParameter(
  * \param [in,out] size initially, the maximum number of elements which can be
  *                      written to \a parameters; after return, the number of
  *                      parameters actually written
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \see RBRInstrument_getChannels()
- * \see RBRInstrument_getSensorParameter()
- * \see RBRInstrument_setSensorParameter()
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRInstrumentGen3_getChannels()
+ * \see RBRInstrumentGen3_getSensorParameter()
+ * \see RBRInstrumentGen3_setSensorParameter()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/sensor
  */
-RBRInstrumentError RBRInstrument_getSensorParameters(
-    RBRInstrument *instrument,
-    RBRInstrumentChannelIndex channel,
-    RBRInstrumentSensorParameter *parameters,
+RBRInstrumentGen3Error RBRInstrumentGen3_getSensorParameters(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3ChannelIndex channel,
+    RBRInstrumentGen3SensorParameter *parameters,
     int32_t *size);
 
 /**
@@ -816,22 +816,22 @@ RBRInstrumentError RBRInstrument_getSensorParameters(
  * \param [in] channel the index of the channel the sensor parameter of which
  *                     is to be updated
  * \param [in] parameter the sensor parameter for the channel
- * \return #RBRINSTRUMENT_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR when the parameter cannot be changed
- * \see RBRInstrument_getChannels()
- * \see RBRInstrument_getSensorParameter()
- * \see RBRInstrument_getSensorParameters()
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the parameter cannot be changed
+ * \see RBRInstrumentGen3_getChannels()
+ * \see RBRInstrumentGen3_getSensorParameter()
+ * \see RBRInstrumentGen3_getSensorParameters()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/sensor
  */
-RBRInstrumentError RBRInstrument_setSensorParameter(
-    RBRInstrument *instrument,
-    RBRInstrumentChannelIndex channel,
-    RBRInstrumentSensorParameter *parameter);
+RBRInstrumentGen3Error RBRInstrumentGen3_setSensorParameter(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3ChannelIndex channel,
+    RBRInstrumentGen3SensorParameter *parameter);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTCONFIGURATION_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN3CONFIGURATION_H */

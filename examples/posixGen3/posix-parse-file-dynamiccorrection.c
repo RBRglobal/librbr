@@ -52,13 +52,13 @@
  * (this value is not stored within the binary data, example given is 2 sample/sec) */ 
 #define SAMPLING_RATE 2.0f
 
-RBRInstrumentDateTime g_timeReference = 0;
+RBRInstrumentGen3DateTime g_timeReference = 0;
 
 RBRDynamicCorrectionParams dynamicCorrParams;
 
-RBRInstrumentError parserSample(
+RBRInstrumentGen3Error parserSample(
     const struct RBRParser *parser,
-    const struct RBRInstrumentSample *const sample)
+    const struct RBRInstrumentGen3Sample *const sample)
 {
     /* struct for dynamic correction */
     RBRDynamicCorrectionError status;
@@ -90,7 +90,7 @@ RBRInstrumentError parserSample(
     /* wait until sufficient sample feed into algorithm */
     if ( status == RBR_DCORR_NOT_VALID_YET )
     {
-        return RBRINSTRUMENT_SUCCESS;
+        return RBRINSTRUMENTGEN3_SUCCESS;
     }
 
     if ( status != RBR_DCORR_SUCCESS )
@@ -110,7 +110,7 @@ RBRInstrumentError parserSample(
             (double) corrResult.corrSalinity,
             (double) meas.condTemperature);
 
-    return RBRINSTRUMENT_SUCCESS;
+    return RBRINSTRUMENTGEN3_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -144,8 +144,8 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENT_LIB_NAME,
-            RBRINSTRUMENT_LIB_VERSION);
+            RBRINSTRUMENTGEN3_LIB_NAME,
+            RBRINSTRUMENTGEN3_LIB_VERSION);
 
     printf("warning: this example works for data file with a fixed sampling rate of %.1f Hz.\n",
            (double) SAMPLING_RATE);
@@ -160,14 +160,14 @@ int main(int argc, char *argv[])
     parser = &parserSpace;
     #endif
 
-    RBRInstrumentSample sampleBuffer;
+    RBRInstrumentGen3Sample sampleBuffer;
     RBRParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
 
     RBRParserConfig parserConfig = {
-        .format = RBRINSTRUMENT_MEMFORMAT_CALBIN00,
+        .format = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
                 .channels = channels
@@ -190,16 +190,16 @@ int main(int argc, char *argv[])
         goto fileCleanup;
     }
 
-    RBRInstrumentError err;
+    RBRInstrumentGen3Error err;
     if ((err = RBRParser_init(
              &parser,
              &parserCallbacks,
              &parserConfig,
-             NULL)) != RBRINSTRUMENT_SUCCESS)
+             NULL)) != RBRINSTRUMENTGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to initialize parser: %s!\n",
                 programName,
-                RBRInstrumentError_name(err));
+                RBRInstrumentGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
         bufSize += readSize;
         parsedSize = bufSize;
         RBRParser_parse(parser,
-                        RBRINSTRUMENT_DATASET_EASYPARSE_SAMPLE_DATA,
+                        RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize); //parserSample() gets called and prints the sample.
         bufSize -= parsedSize;

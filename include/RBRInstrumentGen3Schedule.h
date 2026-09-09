@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentSchedule.h
+ * \file RBRInstrumentGen3Schedule.h
  *
  * \brief Instrument commands and structures pertaining to time and schedule.
  *
@@ -10,8 +10,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTSCHEDULE_H
-#define LIBRBR_RBRINSTRUMENTSCHEDULE_H
+#ifndef LIBRBR_RBRINSTRUMENTGEN3SCHEDULE_H
+#define LIBRBR_RBRINSTRUMENTGEN3SCHEDULE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,26 +21,26 @@ extern "C" {
  * \brief The maximum number of available fast sampling periods to parse from
  * the instrument.
  *
- * \see RBRInstrumentSampling.availableFastPeriods
+ * \see RBRInstrumentGen3Sampling.availableFastPeriods
  */
-#define RBRINSTRUMENT_AVAILABLE_FAST_PERIODS_MAX 32
+#define RBRINSTRUMENTGEN3_AVAILABLE_FAST_PERIODS_MAX 32
 
 /** \brief The maximum sampling period in milliseconds. */
-#define RBRINSTRUMENT_SAMPLING_PERIOD_MAX 86400000
+#define RBRINSTRUMENTGEN3_SAMPLING_PERIOD_MAX 86400000
 
 /**
  * \brief Instrument `clock` command parameters.
  *
- * \see RBRInstrument_getClock()
- * \see RBRInstrument_setClock()
+ * \see RBRInstrumentGen3_getClock()
+ * \see RBRInstrumentGen3_setClock()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
  */
-typedef struct RBRInstrumentClock
+typedef struct RBRInstrumentGen3Clock
 {
     /**
      * \brief The instrument's date and time.
      */
-    RBRInstrumentDateTime dateTime;
+    RBRInstrumentGen3DateTime dateTime;
     /**
      * \brief The offset of the instrument's date and time from UTC.
      *
@@ -57,7 +57,7 @@ typedef struct RBRInstrumentClock
      * instrument clock offset from UTC.
      */
     float offsetFromUtc;
-} RBRInstrumentClock;
+} RBRInstrumentGen3Clock;
 
 /**
  * \brief Get the instrument clock.
@@ -67,17 +67,17 @@ typedef struct RBRInstrumentClock
  * function will internally issue two commands to Logger2 instruments to
  * separately receive the time and UTC offset. When retrieving the clock from
  * older Logger2 instruments which do not support the `offsetfromutc` setting,
- * RBRInstrumentClock.offsetFromUtc will always be `NAN`.
+ * RBRInstrumentGen3Clock.offsetFromUtc will always be `NAN`.
  *
  * \param [in] instrument the instrument connection
  * \param [out] clock the clock value
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
  */
-RBRInstrumentError RBRInstrument_getClock(RBRInstrument *instrument,
-                                          RBRInstrumentClock *clock);
+RBRInstrumentGen3Error RBRInstrumentGen3_getClock(RBRInstrumentGen3 *instrument,
+                                          RBRInstrumentGen3Clock *clock);
 
 /**
  * \brief Set the instrument clock.
@@ -87,7 +87,7 @@ RBRInstrumentError RBRInstrument_getClock(RBRInstrument *instrument,
  * function will internally issue two commands to Logger2 instruments to
  * separately set the time and UTC offset. When setting the clock on older
  * Logger2 instruments which do not support the `offsetfromutc` setting, the
- * value of the RBRInstrumentClock.offsetFromUtc field will be ignored.
+ * value of the RBRInstrumentGen3Clock.offsetFromUtc field will be ignored.
  *
  * Hardware errors may occur if:
  *
@@ -96,150 +96,150 @@ RBRInstrumentError RBRInstrument_getClock(RBRInstrument *instrument,
  *
  * \param [in] instrument the instrument connection
  * \param [in] clock the clock value
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR when the settings cannot be changed
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when the clock values are out
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when the clock values are out
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
  */
-RBRInstrumentError RBRInstrument_setClock(RBRInstrument *instrument,
-                                          const RBRInstrumentClock *clock);
+RBRInstrumentGen3Error RBRInstrumentGen3_setClock(RBRInstrumentGen3 *instrument,
+                                          const RBRInstrumentGen3Clock *clock);
 
 /**
  * \brief Possible instrument sampling modes.
  *
- * \see RBRInstrumentSampling
+ * \see RBRInstrumentGen3Sampling
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  */
-typedef enum RBRInstrumentSamplingMode
+typedef enum RBRInstrumentGen3SamplingMode
 {
     /** Continuous sampling mode. */
-    RBRINSTRUMENT_SAMPLING_CONTINUOUS,
+    RBRINSTRUMENTGEN3_SAMPLING_CONTINUOUS,
     /** Burst sampling mode. */
-    RBRINSTRUMENT_SAMPLING_BURST,
+    RBRINSTRUMENTGEN3_SAMPLING_BURST,
     /** Wave sampling mode. */
-    RBRINSTRUMENT_SAMPLING_WAVE,
+    RBRINSTRUMENTGEN3_SAMPLING_WAVE,
     /** Average sampling mode. */
-    RBRINSTRUMENT_SAMPLING_AVERAGE,
+    RBRINSTRUMENTGEN3_SAMPLING_AVERAGE,
     /** Tide sampling mode. */
-    RBRINSTRUMENT_SAMPLING_TIDE,
+    RBRINSTRUMENTGEN3_SAMPLING_TIDE,
     /** Regime sampling mode. */
-    RBRINSTRUMENT_SAMPLING_REGIMES,
+    RBRINSTRUMENTGEN3_SAMPLING_REGIMES,
     /**
      * Direction-dependent sampling mode.
      *
-     * \see RBRInstrumentVehicle.h
-     * \see RBRInstrument_setDirectionDependentSampling()
+     * \see RBRInstrumentGen3Vehicle.h
+     * \see RBRInstrumentGen3_setDirectionDependentSampling()
      */
-    RBRINSTRUMENT_SAMPLING_DDSAMPLING,
+    RBRINSTRUMENTGEN3_SAMPLING_DDSAMPLING,
     /** The number of specific sampling modes. */
-    RBRINSTRUMENT_SAMPLING_COUNT,
+    RBRINSTRUMENTGEN3_SAMPLING_COUNT,
     /** An unknown or unrecognized sampling mode. */
-    RBRINSTRUMENT_UNKNOWN_SAMPLING
-} RBRInstrumentSamplingMode;
+    RBRINSTRUMENTGEN3_UNKNOWN_SAMPLING
+} RBRInstrumentGen3SamplingMode;
 
 /**
  * \brief Get a human-readable string name for a sampling mode.
  *
  * \param [in] mode the sampling mode
  * \return a string name for the sampling mode
- * \see RBRInstrumentError_name() for a description of the format of names
+ * \see RBRInstrumentGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentSamplingMode_name(RBRInstrumentSamplingMode mode);
+const char *RBRInstrumentGen3SamplingMode_name(RBRInstrumentGen3SamplingMode mode);
 
 /**
  * \brief Possible instrument gating conditions.
  *
- * \see RBRInstrumentSampling
- * \see RBRInstrumentGating.h
+ * \see RBRInstrumentGen3Sampling
+ * \see RBRInstrumentGen3Gating.h
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling
  */
-typedef enum RBRInstrumentGate
+typedef enum RBRInstrumentGen3Gate
 {
     /** No gating. */
-    RBRINSTRUMENT_GATE_NONE,
+    RBRINSTRUMENTGEN3_GATE_NONE,
     /**
      * Threshold gating.
      *
-     * \see RBRInstrument_setThresholding()
+     * \see RBRInstrumentGen3_setThresholding()
      */
-    RBRINSTRUMENT_GATE_THRESHOLDING,
+    RBRINSTRUMENTGEN3_GATE_THRESHOLDING,
     /**
      * Twist-activated gating.
      *
-     * \see RBRInstrument_setTwistActivation()
+     * \see RBRInstrumentGen3_setTwistActivation()
      */
-    RBRINSTRUMENT_GATE_TWISTACTIVATION,
+    RBRINSTRUMENTGEN3_GATE_TWISTACTIVATION,
     /** The instrument considers its gating condition to be invalid. */
-    RBRINSTRUMENT_GATE_INVALID,
+    RBRINSTRUMENTGEN3_GATE_INVALID,
     /** The number of specific sampling modes. */
-    RBRINSTRUMENT_GATE_COUNT,
+    RBRINSTRUMENTGEN3_GATE_COUNT,
     /** An unknown or unrecognized sampling mode. */
-    RBRINSTRUMENT_UNKNOWN_GATE
-} RBRInstrumentGate;
+    RBRINSTRUMENTGEN3_UNKNOWN_GATE
+} RBRInstrumentGen3Gate;
 
 /**
  * \brief Get a human-readable string name for a gating condition.
  *
  * \param [in] gate the gating condition
  * \return a string name for the gating condition
- * \see RBRInstrumentError_name() for a description of the format of names
+ * \see RBRInstrumentGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGate_name(RBRInstrumentGate gate);
+const char *RBRInstrumentGen3Gate_name(RBRInstrumentGen3Gate gate);
 
 /**
  * \brief Instrument `sampling` command parameters.
  *
  * See the command reference for details on valid parameter values.
  *
- * \see RBRInstrument_getSampling()
- * \see RBRInstrument_setSampling()
+ * \see RBRInstrumentGen3_getSampling()
+ * \see RBRInstrumentGen3_setSampling()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  */
-typedef struct RBRInstrumentSampling
+typedef struct RBRInstrumentGen3Sampling
 {
     /** \brief The instrument sampling mode. */
-    RBRInstrumentSamplingMode mode;
+    RBRInstrumentGen3SamplingMode mode;
     /**
      * \brief Time between measurements.
      *
      * Specified in milliseconds. Must be in the range
-     * RBRInstrumentSampling.userPeriodLimit—86,400,000.
+     * RBRInstrumentGen3Sampling.userPeriodLimit—86,400,000.
      *
-     * - When < 1,000, must be in RBRInstrumentSampling.availableFastPeriods.
+     * - When < 1,000, must be in RBRInstrumentGen3Sampling.availableFastPeriods.
      * - When ≥ 1,000, must be an integer multiple of 1,000.
      */
-    RBRInstrumentPeriod period;
+    RBRInstrumentGen3Period period;
     /**
      * \brief Fast measurement periods available for the logger for sampling
      * rates faster than 1Hz.
      *
      * Available fast periods are stored in the array in the order reported by
      * the instrument. Unused array elements are populated with `0`. If more
-     * than #RBRINSTRUMENT_AVAILABLE_FAST_PERIODS_MAX are available, trailing
+     * than #RBRINSTRUMENTGEN3_AVAILABLE_FAST_PERIODS_MAX are available, trailing
      * entries are discarded.
      *
      * Logger2 instruments do not report available fast periods. For
-     * convenience, RBRInstrument_getSampling() will synthesize the contents of
-     * this field based on the value of RBRInstrumentSampling.userPeriodLimit.
+     * convenience, RBRInstrumentGen3_getSampling() will synthesize the contents of
+     * this field based on the value of RBRInstrumentGen3Sampling.userPeriodLimit.
      *
      * \readonly
      */
-    const RBRInstrumentPeriod
-        availableFastPeriods[RBRINSTRUMENT_AVAILABLE_FAST_PERIODS_MAX];
+    const RBRInstrumentGen3Period
+        availableFastPeriods[RBRINSTRUMENTGEN3_AVAILABLE_FAST_PERIODS_MAX];
     /**
      * \brief The minimum period which can be used in fast sampling modes.
      *
      * Specified in milliseconds.
      *
-     * This is the minimum RBRInstrumentSampling.period value.
+     * This is the minimum RBRInstrumentGen3Sampling.period value.
      *
      * \readonly
      */
-    const RBRInstrumentPeriod userPeriodLimit;
+    const RBRInstrumentGen3Period userPeriodLimit;
     /**
      * \brief The number of measurements taken in each burst.
      *
@@ -251,53 +251,53 @@ typedef struct RBRInstrumentSampling
      *
      * Specified in milliseconds. Must be in the range 1,000—86,400,000 and
      * must be an integer multiple of 1,000. The burst interval is additionally
-     * constrained by the sampling period (RBRInstrumentSampling.period) and
-     * burst length (RBRInstrumentSampling.burstLength):
+     * constrained by the sampling period (RBRInstrumentGen3Sampling.period) and
+     * burst length (RBRInstrumentGen3Sampling.burstLength):
      *
      *     burst interval > (burst length × sampling period)
      */
-    RBRInstrumentPeriod burstInterval;
+    RBRInstrumentGen3Period burstInterval;
     /** \brief The sampling gating condition. */
-    RBRInstrumentGate gate;
-} RBRInstrumentSampling;
+    RBRInstrumentGen3Gate gate;
+} RBRInstrumentGen3Sampling;
 
 /**
  * \brief Get the instrument sampling parameters.
  *
  * \param [in] instrument the instrument connection
  * \param [out] sampling the sampling parameters
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  */
-RBRInstrumentError RBRInstrument_getSampling(
-    RBRInstrument *instrument,
-    RBRInstrumentSampling *sampling);
+RBRInstrumentGen3Error RBRInstrumentGen3_getSampling(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3Sampling *sampling);
 
 /**
  * \brief Set the instrument sampling mode and period.
  *
- * This does _not_ set burst parameters (RBRInstrumentSampling.burstLength and
- * RBRInstrumentSampling.burstInterval). On instruments which do not support
+ * This does _not_ set burst parameters (RBRInstrumentGen3Sampling.burstLength and
+ * RBRInstrumentGen3Sampling.burstInterval). On instruments which do not support
  * bursting/averaging, attempting to set these parameters results in a hardware
  * error; to avoid this, bursting parameters may be configured via
- * RBRInstrument_setBurstSampling().
+ * RBRInstrumentGen3_setBurstSampling().
  *
- * The values of RBRInstrumentSampling.userPeriodLimit and
- * RBRInstrumentSampling.availableFastPeriods are not sent to the instrument,
- * but they are used to validate the chosen RBRInstrumentSampling.period.
- * If RBRInstrumentSampling.userPeriodLimit is non-zero, then the specified
+ * The values of RBRInstrumentGen3Sampling.userPeriodLimit and
+ * RBRInstrumentGen3Sampling.availableFastPeriods are not sent to the instrument,
+ * but they are used to validate the chosen RBRInstrumentGen3Sampling.period.
+ * If RBRInstrumentGen3Sampling.userPeriodLimit is non-zero, then the specified
  * sampling period must be equal or greater. And if the period is less than
- * 1,000 and the RBRInstrumentSampling.availableFastPeriods are populated, then
+ * 1,000 and the RBRInstrumentGen3Sampling.availableFastPeriods are populated, then
  * the period must be one of those available fast periods.
  *
  * Periods greater than or equal to 1,000 (one second) must be an integer
  * multiple of 1,000 and must be less than or equal to 86,400,000 (24 hours).
  *
- * The value RBRInstrumentSampling.gate is also ignored. The gating mode is
+ * The value RBRInstrumentGen3Sampling.gate is also ignored. The gating mode is
  * controlled via commands for the individual gating mechanisms: see
- * RBRInstrument_setTwistActivation() and RBRInstrument_setThresholding().
+ * RBRInstrumentGen3_setTwistActivation() and RBRInstrumentGen3_setThresholding().
  *
  * Hardware errors may occur if:
  *
@@ -308,31 +308,31 @@ RBRInstrumentError RBRInstrument_getSampling(
  *
  * \param [in] instrument the instrument connection
  * \param [in] sampling the sampling parameters
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR when the settings cannot be changed
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when parameter values are out
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
- * \see RBRInstrument_setBurstSampling()
+ * \see RBRInstrumentGen3_setBurstSampling()
  */
-RBRInstrumentError RBRInstrument_setSampling(
-    RBRInstrument *instrument,
-    const RBRInstrumentSampling *sampling);
+RBRInstrumentGen3Error RBRInstrumentGen3_setSampling(
+    RBRInstrumentGen3 *instrument,
+    const RBRInstrumentGen3Sampling *sampling);
 
 /**
  * \brief Set the instrument burst sampling length and interval.
  *
- * This sets only burst parameters (RBRInstrumentSampling.burstLength and
- * RBRInstrumentSampling.burstInterval). To configure the sampling mode and
- * period, use RBRInstrument_setSampling().
+ * This sets only burst parameters (RBRInstrumentGen3Sampling.burstLength and
+ * RBRInstrumentGen3Sampling.burstInterval). To configure the sampling mode and
+ * period, use RBRInstrumentGen3_setSampling().
  *
  * Only burst parameters are sent to the instrument. However, the sampling
- * period (RBRInstrumentSampling.period) is used to validate the burst
- * interval, which is itself validated by RBRInstrumentSampling.userPeriodLimit
- * and RBRInstrumentSampling.availableFastPeriods. See
- * RBRInstrumentSampling.burstInterval for details.
+ * period (RBRInstrumentGen3Sampling.period) is used to validate the burst
+ * interval, which is itself validated by RBRInstrumentGen3Sampling.userPeriodLimit
+ * and RBRInstrumentGen3Sampling.availableFastPeriods. See
+ * RBRInstrumentGen3Sampling.burstInterval for details.
  *
  * Hardware errors may occur if:
  *
@@ -342,119 +342,119 @@ RBRInstrumentError RBRInstrument_setSampling(
  *
  * \param [in] instrument the instrument connection
  * \param [in] sampling the sampling parameters
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR when the settings cannot be changed
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when parameter values are out
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
- * \see RBRInstrument_setSampling()
+ * \see RBRInstrumentGen3_setSampling()
  */
-RBRInstrumentError RBRInstrument_setBurstSampling(
-    RBRInstrument *instrument,
-    const RBRInstrumentSampling *sampling);
+RBRInstrumentGen3Error RBRInstrumentGen3_setBurstSampling(
+    RBRInstrumentGen3 *instrument,
+    const RBRInstrumentGen3Sampling *sampling);
 
 /**
  * \brief Possible instrument logging statuses.
  *
- * \see RBRInstrumentDeployment
- * \see RBRInstrument_getDeployment()
- * \see RBRInstrument_enable()
+ * \see RBRInstrumentGen3Deployment
+ * \see RBRInstrumentGen3_getDeployment()
+ * \see RBRInstrumentGen3_enable()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/enable
  */
-typedef enum RBRInstrumentDeploymentStatus
+typedef enum RBRInstrumentGen3DeploymentStatus
 {
     /** Logging is not enabled. */
-    RBRINSTRUMENT_STATUS_DISABLED,
+    RBRINSTRUMENTGEN3_STATUS_DISABLED,
     /** Logging is enabled but the start time has not yet passed. */
-    RBRINSTRUMENT_STATUS_PENDING,
+    RBRINSTRUMENTGEN3_STATUS_PENDING,
     /** Logging is in progress. */
-    RBRINSTRUMENT_STATUS_LOGGING,
+    RBRINSTRUMENTGEN3_STATUS_LOGGING,
     /** Logging paused; awaiting satisfaction of a gating condition. */
-    RBRINSTRUMENT_STATUS_GATED,
+    RBRINSTRUMENTGEN3_STATUS_GATED,
     /** The programmed end time has been passed. */
-    RBRINSTRUMENT_STATUS_FINISHED,
+    RBRINSTRUMENTGEN3_STATUS_FINISHED,
     /**
      * A `disable` command was received.
      *
-     * \see RBRInstrument_disable()
+     * \see RBRInstrumentGen3_disable()
      */
-    RBRINSTRUMENT_STATUS_STOPPED,
+    RBRINSTRUMENTGEN3_STATUS_STOPPED,
     /** Memory full; logging has stopped. */
-    RBRINSTRUMENT_STATUS_FULLANDSTOPPED,
+    RBRINSTRUMENTGEN3_STATUS_FULLANDSTOPPED,
     /** Memory full; logger continues to stream data. */
-    RBRINSTRUMENT_STATUS_FULL,
+    RBRINSTRUMENTGEN3_STATUS_FULL,
     /** Stopped; internal error. */
-    RBRINSTRUMENT_STATUS_FAILED,
+    RBRINSTRUMENTGEN3_STATUS_FAILED,
     /** Memory failed to erase. */
-    RBRINSTRUMENT_STATUS_NOTBLANK,
+    RBRINSTRUMENTGEN3_STATUS_NOTBLANK,
     /** Instrument internal error; state unknown. */
-    RBRINSTRUMENT_STATUS_UNKNOWN,
+    RBRINSTRUMENTGEN3_STATUS_UNKNOWN,
     /** The number of specific statuses. */
-    RBRINSTRUMENT_STATUS_COUNT,
+    RBRINSTRUMENTGEN3_STATUS_COUNT,
     /** An unknown or unrecognized status. */
-    RBRINSTRUMENT_UNKNOWN_STATUS
-} RBRInstrumentDeploymentStatus;
+    RBRINSTRUMENTGEN3_UNKNOWN_STATUS
+} RBRInstrumentGen3DeploymentStatus;
 
 /**
  * \brief Get a human-readable string name for a deployment status.
  *
  * \param [in] status the deployment status
  * \return a string name for the deployment status
- * \see RBRInstrumentError_name() for a description of the format of names
+ * \see RBRInstrumentGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentDeploymentStatus_name(
-    RBRInstrumentDeploymentStatus status);
+const char *RBRInstrumentGen3DeploymentStatus_name(
+    RBRInstrumentGen3DeploymentStatus status);
 
 /**
  * \brief Instrument `deployment` command parameters.
  *
- * \see RBRInstrument_getDeployment()
- * \see RBRInstrument_setDeployment()
+ * \see RBRInstrumentGen3_getDeployment()
+ * \see RBRInstrumentGen3_setDeployment()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
-typedef struct RBRInstrumentDeployment
+typedef struct RBRInstrumentGen3Deployment
 {
     /**
      * \brief The deployment start date and time.
      *
      * Must be before the end time.
      */
-    RBRInstrumentDateTime startTime;
+    RBRInstrumentGen3DateTime startTime;
     /**
      * \brief The deployment end date and time.
      *
      * Must be after the start time.
      */
-    RBRInstrumentDateTime endTime;
+    RBRInstrumentGen3DateTime endTime;
     /**
      * \brief The deployment status.
      *
      * \readonly
      */
-    const RBRInstrumentDeploymentStatus status;
-} RBRInstrumentDeployment;
+    const RBRInstrumentGen3DeploymentStatus status;
+} RBRInstrumentGen3Deployment;
 
 /**
  * \brief Get the instrument deployment parameters.
  *
  * \param [in] instrument the instrument connection
  * \param [out] deployment the deployment parameters
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
-RBRInstrumentError RBRInstrument_getDeployment(
-    RBRInstrument *instrument,
-    RBRInstrumentDeployment *deployment);
+RBRInstrumentGen3Error RBRInstrumentGen3_getDeployment(
+    RBRInstrumentGen3 *instrument,
+    RBRInstrumentGen3Deployment *deployment);
 
 /**
  * \brief Set the instrument deployment parameters.
  *
- * As noted in the description of RBRInstrumentDeployment.status, that field is
+ * As noted in the description of RBRInstrumentGen3Deployment.status, that field is
  * ignored when setting the deployment.
  *
  * Hardware errors may occur if:
@@ -464,20 +464,20 @@ RBRInstrumentError RBRInstrument_getDeployment(
  *
  * \param [in] instrument the instrument connection
  * \param [in] deployment the deployment parameters
- * \return #RBRINSTRUMENT_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR when the settings cannot be changed
- * \return #RBRINSTRUMENT_INVALID_PARAMETER_VALUE when the start or end time
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when the start or end time
  *                                                values are out of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
-RBRInstrumentError RBRInstrument_setDeployment(
-    RBRInstrument *instrument,
-    const RBRInstrumentDeployment *deployment);
+RBRInstrumentGen3Error RBRInstrumentGen3_setDeployment(
+    RBRInstrumentGen3 *instrument,
+    const RBRInstrumentGen3Deployment *deployment);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTSCHEDULE_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN3SCHEDULE_H */

@@ -13,7 +13,7 @@
 typedef struct RegimesTest
 {
     const char *response;
-    RBRInstrumentRegimes expected;
+    RBRInstrumentGen3Regimes expected;
 } RegimesTest;
 
 TEST_LOGGER3(regimes)
@@ -23,40 +23,40 @@ TEST_LOGGER3(regimes)
             "regimes direction = ascending, count = 1, reference = absolute"
             RESPONSE_TERMINATOR,
             {
-                .direction = RBRINSTRUMENT_DIRECTION_ASCENDING,
+                .direction = RBRINSTRUMENTGEN3_DIRECTION_ASCENDING,
                 .count = 1,
-                .reference = RBRINSTRUMENT_REFERENCE_ABSOLUTE
+                .reference = RBRINSTRUMENTGEN3_REFERENCE_ABSOLUTE
             }
         },
         {
             "regimes direction = descending, count = 3, "
             "reference = seapressure" RESPONSE_TERMINATOR,
             {
-                .direction = RBRINSTRUMENT_DIRECTION_DESCENDING,
+                .direction = RBRINSTRUMENTGEN3_DIRECTION_DESCENDING,
                 .count = 3,
-                .reference = RBRINSTRUMENT_REFERENCE_SEAPRESSURE
+                .reference = RBRINSTRUMENTGEN3_REFERENCE_SEAPRESSURE
             }
         },
         {0}
     };
 
-    RBRInstrumentError err;
-    RBRInstrumentRegimes actual;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3Regimes actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrument_getRegimes(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+        err = RBRInstrumentGen3_getRegimes(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.direction,
                             actual.direction,
-                            RBRInstrumentDirection);
+                            RBRInstrumentGen3Direction);
         TEST_ASSERT_EQ(tests[i].expected.count,
                        actual.count,
                        "%" PRIi32);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.reference,
                             actual.reference,
-                            RBRInstrumentRegimesReference);
+                            RBRInstrumentGen3RegimesReference);
     }
 
     return true;
@@ -68,24 +68,24 @@ TEST_LOGGER3(regimes_set)
         {
             "regimes direction = ascending, count = 1, reference = absolute",
             {
-                .direction = RBRINSTRUMENT_DIRECTION_ASCENDING,
+                .direction = RBRINSTRUMENTGEN3_DIRECTION_ASCENDING,
                 .count = 1,
-                .reference = RBRINSTRUMENT_REFERENCE_ABSOLUTE
+                .reference = RBRINSTRUMENTGEN3_REFERENCE_ABSOLUTE
             }
         },
         {
             "regimes direction = descending, count = 3, "
             "reference = seapressure",
             {
-                .direction = RBRINSTRUMENT_DIRECTION_DESCENDING,
+                .direction = RBRINSTRUMENTGEN3_DIRECTION_DESCENDING,
                 .count = 3,
-                .reference = RBRINSTRUMENT_REFERENCE_SEAPRESSURE
+                .reference = RBRINSTRUMENTGEN3_REFERENCE_SEAPRESSURE
             }
         },
         {0}
     };
 
-    RBRInstrumentError err;
+    RBRInstrumentGen3Error err;
 
     char expectedCommand[COMMAND_RESPONSE_SIZE];
     char response[COMMAND_RESPONSE_SIZE];
@@ -93,8 +93,8 @@ TEST_LOGGER3(regimes_set)
     {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
-        err = RBRInstrument_setRegimes(instrument, &tests[i].expected);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+        err = RBRInstrumentGen3_setRegimes(instrument, &tests[i].expected);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     }
 
@@ -104,7 +104,7 @@ TEST_LOGGER3(regimes_set)
 typedef struct RegimeTest
 {
     const char *response;
-    RBRInstrumentRegime expected;
+    RBRInstrumentGen3Regime expected;
 } RegimeTest;
 
 TEST_LOGGER3(regime)
@@ -133,15 +133,15 @@ TEST_LOGGER3(regime)
         {0}
     };
 
-    RBRInstrumentError err;
-    RBRInstrumentRegime actual;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3Regime actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         actual.index = tests[i].expected.index;
-        err = RBRInstrument_getRegime(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+        err = RBRInstrumentGen3_getRegime(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
         TEST_ASSERT_EQ(tests[i].expected.index, actual.index, "%" PRIi8);
         TEST_ASSERT_FLOAT_EQ(tests[i].expected.boundary,
                              actual.boundary,
@@ -181,15 +181,15 @@ TEST_LOGGER3(regime_set)
         {0}
     };
 
-    RBRInstrumentError err;
+    RBRInstrumentGen3Error err;
     char expectedCommand[COMMAND_RESPONSE_SIZE];
     char response[COMMAND_RESPONSE_SIZE];
     for (int i = 0; tests[i].response != NULL; i++)
     {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
-        err = RBRInstrument_setRegime(instrument, &tests[i].expected);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+        err = RBRInstrumentGen3_setRegime(instrument, &tests[i].expected);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     }
 
@@ -199,7 +199,7 @@ TEST_LOGGER3(regime_set)
 typedef struct DirectionDependentSamplingTest
 {
     const char *response;
-    RBRInstrumentDirectionDependentSampling expected;
+    RBRInstrumentGen3DirectionDependentSampling expected;
 } DirectionDependentSamplingTest;
 
 TEST_LOGGER3(ddsampling)
@@ -210,7 +210,7 @@ TEST_LOGGER3(ddsampling)
             "slowperiod = 1000, fastthreshold = 3.0, slowthreshold = 3.0"
             RESPONSE_TERMINATOR,
             {
-                .direction = RBRINSTRUMENT_DIRECTION_ASCENDING,
+                .direction = RBRINSTRUMENTGEN3_DIRECTION_ASCENDING,
                 .fastPeriod = 63,
                 .slowPeriod = 1000,
                 .fastThreshold = 3.0,
@@ -220,17 +220,17 @@ TEST_LOGGER3(ddsampling)
         {0}
     };
 
-    RBRInstrumentError err;
-    RBRInstrumentDirectionDependentSampling actual;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3DirectionDependentSampling actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrument_getDirectionDependentSampling(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+        err = RBRInstrumentGen3_getDirectionDependentSampling(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.direction,
                             actual.direction,
-                            RBRInstrumentDirection);
+                            RBRInstrumentGen3Direction);
         TEST_ASSERT_EQ(tests[i].expected.fastPeriod,
                        actual.fastPeriod,
                        "%" PRIi32);
@@ -255,7 +255,7 @@ TEST_LOGGER3(ddsampling_set)
             "ddsampling direction = ascending, fastperiod = 63, "
             "slowperiod = 1000, fastthreshold = 3.0, slowthreshold = 3.0",
             {
-                .direction = RBRINSTRUMENT_DIRECTION_ASCENDING,
+                .direction = RBRINSTRUMENTGEN3_DIRECTION_ASCENDING,
                 .fastPeriod = 63,
                 .slowPeriod = 1000,
                 .fastThreshold = 3.0,
@@ -265,7 +265,7 @@ TEST_LOGGER3(ddsampling_set)
         {0}
     };
 
-    RBRInstrumentError err;
+    RBRInstrumentGen3Error err;
 
     char expectedCommand[COMMAND_RESPONSE_SIZE];
     char response[COMMAND_RESPONSE_SIZE];
@@ -273,9 +273,9 @@ TEST_LOGGER3(ddsampling_set)
     {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
-        err = RBRInstrument_setDirectionDependentSampling(instrument,
+        err = RBRInstrumentGen3_setDirectionDependentSampling(instrument,
                                                           &tests[i].expected);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     }
 

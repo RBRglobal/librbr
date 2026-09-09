@@ -10,70 +10,70 @@
 
 #include "instrument.h"
 
-RBRInstrumentError instrumentStart(RBRInstrument *instrument)
+RBRInstrumentGen3Error instrumentStart(RBRInstrumentGen3 *instrument)
 {
-    RBRInstrumentError err;
+    RBRInstrumentGen3Error err;
 
-    RBRInstrumentDeploymentStatus status;
-    if ((err = RBRInstrument_disable(instrument, &status))
-        != RBRINSTRUMENT_SUCCESS)
+    RBRInstrumentGen3DeploymentStatus status;
+    if ((err = RBRInstrumentGen3_disable(instrument, &status))
+        != RBRINSTRUMENTGEN3_SUCCESS)
     {
         return err;
     }
 
-    RBRInstrumentSampling sampling;
-    if ((err = RBRInstrument_getSampling(instrument, &sampling))
-        != RBRINSTRUMENT_SUCCESS)
+    RBRInstrumentGen3Sampling sampling;
+    if ((err = RBRInstrumentGen3_getSampling(instrument, &sampling))
+        != RBRINSTRUMENTGEN3_SUCCESS)
     {
         return err;
     }
-    sampling.mode = RBRINSTRUMENT_SAMPLING_CONTINUOUS;
+    sampling.mode = RBRINSTRUMENTGEN3_SAMPLING_CONTINUOUS;
     sampling.period = sampling.userPeriodLimit;
-    if ((err = RBRInstrument_setSampling(instrument, &sampling))
-        != RBRINSTRUMENT_SUCCESS)
+    if ((err = RBRInstrumentGen3_setSampling(instrument, &sampling))
+        != RBRINSTRUMENTGEN3_SUCCESS)
     {
         return err;
     }
 
-    RBRInstrumentDeployment deployment = {
-        .startTime = RBRINSTRUMENT_DATETIME_MIN,
-        .endTime = RBRINSTRUMENT_DATETIME_MAX
+    RBRInstrumentGen3Deployment deployment = {
+        .startTime = RBRINSTRUMENTGEN3_DATETIME_MIN,
+        .endTime = RBRINSTRUMENTGEN3_DATETIME_MAX
     };
-    if ((err = RBRInstrument_setDeployment(instrument, &deployment))
-        != RBRINSTRUMENT_SUCCESS)
+    if ((err = RBRInstrumentGen3_setDeployment(instrument, &deployment))
+        != RBRINSTRUMENTGEN3_SUCCESS)
     {
         return err;
     }
 
-    if ((err = RBRInstrument_setNewMemoryFormat(
+    if ((err = RBRInstrumentGen3_setNewMemoryFormat(
              instrument,
-             RBRINSTRUMENT_MEMFORMAT_CALBIN00))
-        != RBRINSTRUMENT_SUCCESS)
+             RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00))
+        != RBRINSTRUMENTGEN3_SUCCESS)
     {
         return err;
     }
 
-    RBRInstrumentThresholding thresholding;
-    err = RBRInstrument_getThresholding(instrument, &thresholding);
-    if (err == RBRINSTRUMENT_SUCCESS && thresholding.enabled)
+    RBRInstrumentGen3Thresholding thresholding;
+    err = RBRInstrumentGen3_getThresholding(instrument, &thresholding);
+    if (err == RBRINSTRUMENTGEN3_SUCCESS && thresholding.enabled)
     {
         thresholding.enabled = false;
-        RBRInstrument_setThresholding(instrument, &thresholding);
+        RBRInstrumentGen3_setThresholding(instrument, &thresholding);
     }
 
-    RBRInstrumentTwistActivation twistActivation;
-    err = RBRInstrument_getTwistActivation(instrument, &twistActivation);
-    if (err == RBRINSTRUMENT_SUCCESS && twistActivation.enabled)
+    RBRInstrumentGen3TwistActivation twistActivation;
+    err = RBRInstrumentGen3_getTwistActivation(instrument, &twistActivation);
+    if (err == RBRINSTRUMENTGEN3_SUCCESS && twistActivation.enabled)
     {
         twistActivation.enabled = false;
-        RBRInstrument_setTwistActivation(instrument, &twistActivation);
+        RBRInstrumentGen3_setTwistActivation(instrument, &twistActivation);
     }
 
-    if ((err = RBRInstrument_enable(instrument, true, &status))
-        != RBRINSTRUMENT_SUCCESS)
+    if ((err = RBRInstrumentGen3_enable(instrument, true, &status))
+        != RBRINSTRUMENTGEN3_SUCCESS)
     {
         return err;
     }
 
-    return RBRINSTRUMENT_SUCCESS;
+    return RBRINSTRUMENTGEN3_SUCCESS;
 }

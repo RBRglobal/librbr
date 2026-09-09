@@ -12,18 +12,18 @@
 
 TEST_LOGGER2(outputformat_channelslist)
 {
-    RBRInstrumentError err;
-    RBRInstrumentChannelsList channelsList;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3ChannelsList channelsList;
 
-    err = RBRInstrument_getChannelsList(instrument, &channelsList);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_UNSUPPORTED, err, RBRInstrumentError);
+    err = RBRInstrumentGen3_getChannelsList(instrument, &channelsList);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_UNSUPPORTED, err, RBRInstrumentGen3Error);
 
     return true;
 }
 
 TEST_LOGGER3(outputformat_channelslist)
 {
-    RBRInstrumentChannelsList expected = {
+    RBRInstrumentGen3ChannelsList expected = {
         .count = 5,
         .channels = {
             {.name = "temperature", .unit = "C"},
@@ -34,8 +34,8 @@ TEST_LOGGER3(outputformat_channelslist)
         }
     };
 
-    RBRInstrumentError err;
-    RBRInstrumentChannelsList actual;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3ChannelsList actual;
 
     TestIOBuffers_init(
         buffers,
@@ -43,11 +43,11 @@ TEST_LOGGER3(outputformat_channelslist)
         "|pressure(dbar)|depth(m)|measurement_count(counts)"
         RESPONSE_TERMINATOR,
         0);
-    err = RBRInstrument_getChannelsList(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    err = RBRInstrumentGen3_getChannelsList(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_EQ(expected.count, actual.count, "%" PRIi32);
 
-    for (int32_t channel = 0; channel < RBRINSTRUMENT_CHANNEL_MAX; channel++)
+    for (int32_t channel = 0; channel < RBRINSTRUMENTGEN3_CHANNEL_MAX; channel++)
     {
         TEST_ASSERT_STR_EQ(expected.channels[channel].name,
                            actual.channels[channel].name);
@@ -60,18 +60,18 @@ TEST_LOGGER3(outputformat_channelslist)
 
 TEST_LOGGER2(outputformat_labelslist)
 {
-    RBRInstrumentError err;
-    RBRInstrumentLabelsList labelsList;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3LabelsList labelsList;
 
-    err = RBRInstrument_getLabelsList(instrument, &labelsList);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_UNSUPPORTED, err, RBRInstrumentError);
+    err = RBRInstrumentGen3_getLabelsList(instrument, &labelsList);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_UNSUPPORTED, err, RBRInstrumentGen3Error);
 
     return true;
 }
 
 TEST_LOGGER3(outputformat_labelslist)
 {
-    RBRInstrumentLabelsList expected = {
+    RBRInstrumentGen3LabelsList expected = {
         .count = 5,
         .labels = {
             "temperature_00",
@@ -82,8 +82,8 @@ TEST_LOGGER3(outputformat_labelslist)
         }
     };
 
-    RBRInstrumentError err;
-    RBRInstrumentLabelsList actual;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3LabelsList actual;
 
     TestIOBuffers_init(
         buffers,
@@ -91,11 +91,11 @@ TEST_LOGGER3(outputformat_labelslist)
         "|depth_00|count_00"
         RESPONSE_TERMINATOR,
         0);
-    err = RBRInstrument_getLabelsList(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    err = RBRInstrumentGen3_getLabelsList(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_EQ(expected.count, actual.count, "%" PRIi32);
 
-    for (int32_t label = 0; label < RBRINSTRUMENT_CHANNEL_MAX; label++)
+    for (int32_t label = 0; label < RBRINSTRUMENTGEN3_CHANNEL_MAX; label++)
     {
         TEST_ASSERT_STR_EQ(expected.labels[label], actual.labels[label]);
     }
@@ -103,38 +103,38 @@ TEST_LOGGER3(outputformat_labelslist)
     return true;
 }
 
-bool test_outputformat_support(RBRInstrument *instrument)
+bool test_outputformat_support(RBRInstrumentGen3 *instrument)
 {
-    RBRInstrumentError err;
-    RBRInstrumentOutputFormat formats;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3OutputFormat formats;
 
-    err = RBRInstrument_getAvailableOutputFormats(instrument, &formats);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    err = RBRInstrumentGen3_getAvailableOutputFormats(instrument, &formats);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_EQ(
-        RBRINSTRUMENT_OUTFORMAT_CALTEXT01
-        | RBRINSTRUMENT_OUTFORMAT_CALTEXT02
-        | RBRINSTRUMENT_OUTFORMAT_CALTEXT03
-        | RBRINSTRUMENT_OUTFORMAT_CALTEXT04,
+        RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT01
+        | RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT02
+        | RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT03
+        | RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT04,
         formats,
         "0x%04X");
     return true;
 }
 
 /* test outputformat caltext07 for LOGGER3 with firmware >= 1.109. */
-bool test_outputformat_support_caltext07(RBRInstrument *instrument)
+bool test_outputformat_support_caltext07(RBRInstrumentGen3 *instrument)
 {
-    RBRInstrumentError err;
-    RBRInstrumentOutputFormat formats;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3OutputFormat formats;
 
-    err = RBRInstrument_getAvailableOutputFormats(instrument, &formats);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    err = RBRInstrumentGen3_getAvailableOutputFormats(instrument, &formats);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     /* assuming instrument->id.fwtype==104, and id.version>=1.109. */
     TEST_ASSERT_EQ(
-        RBRINSTRUMENT_OUTFORMAT_CALTEXT01
-        | RBRINSTRUMENT_OUTFORMAT_CALTEXT02
-        | RBRINSTRUMENT_OUTFORMAT_CALTEXT03
-        | RBRINSTRUMENT_OUTFORMAT_CALTEXT04
-        | RBRINSTRUMENT_OUTFORMAT_CALTEXT07,
+        RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT01
+        | RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT02
+        | RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT03
+        | RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT04
+        | RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT07,
         formats,
         "0x%04X");
     return true;
@@ -173,17 +173,17 @@ TEST_LOGGER3(outputformat_availabletypes_caltext07)
 
 TEST_LOGGER3(outputformat_type)
 {
-    RBRInstrumentError err;
-    RBRInstrumentOutputFormat format;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3OutputFormat format;
 
     TestIOBuffers_init(buffers,
                        "outputformat type = caltext01" RESPONSE_TERMINATOR,
                        0);
-    err = RBRInstrument_getOutputFormat(instrument, &format);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_OUTFORMAT_CALTEXT01,
+    err = RBRInstrumentGen3_getOutputFormat(instrument, &format);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_OUTFORMAT_CALTEXT01,
                         format,
-                        RBRInstrumentOutputFormat);
+                        RBRInstrumentGen3OutputFormat);
 
     return true;
 }
@@ -196,7 +196,7 @@ typedef struct ToggleTest
 
 TEST_LOGGER3(streamusb)
 {
-    RBRInstrumentError err;
+    RBRInstrumentGen3Error err;
     bool actual;
 
     ToggleTest tests[] = {
@@ -208,8 +208,8 @@ TEST_LOGGER3(streamusb)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrument_getUSBStreamingState(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+        err = RBRInstrumentGen3_getUSBStreamingState(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, bool);
     }
 
@@ -218,7 +218,7 @@ TEST_LOGGER3(streamusb)
 
 TEST_LOGGER3(streamserial)
 {
-    RBRInstrumentError err;
+    RBRInstrumentGen3Error err;
     bool actual;
 
     ToggleTest tests[] = {
@@ -230,8 +230,8 @@ TEST_LOGGER3(streamserial)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrument_getSerialStreamingState(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+        err = RBRInstrumentGen3_getSerialStreamingState(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, bool);
     }
 
@@ -240,17 +240,17 @@ TEST_LOGGER3(streamserial)
 
 TEST_LOGGER2(streamserial_aux)
 {
-    RBRInstrumentAuxOutput expected = {
+    RBRInstrumentGen3AuxOutput expected = {
         .aux = 1,
         .enabled = false,
         .setup = 1000,
         .hold = 1000,
-        .active = RBRINSTRUMENT_ACTIVE_HIGH,
-        .sleep = RBRINSTRUMENT_SLEEP_TRISTATE
+        .active = RBRINSTRUMENTGEN3_ACTIVE_HIGH,
+        .sleep = RBRINSTRUMENTGEN3_SLEEP_TRISTATE
     };
 
-    RBRInstrumentError err;
-    RBRInstrumentAuxOutput actual;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3AuxOutput actual;
     actual.aux = 1;
 
     TestIOBuffers_init(
@@ -258,34 +258,34 @@ TEST_LOGGER2(streamserial_aux)
         "streamserial aux1_state = off, aux1_setup = 1000, aux1_hold = 1000, "
         "aux1_active = high, aux1_sleep = tristate" RESPONSE_TERMINATOR,
         0);
-    err = RBRInstrument_getAuxOutput(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    err = RBRInstrumentGen3_getAuxOutput(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_EQ(expected.aux, actual.aux, "%" PRIi8);
     TEST_ASSERT_ENUM_EQ(expected.enabled, actual.enabled, bool);
     TEST_ASSERT_EQ(expected.setup, actual.setup, "%" PRIi32);
     TEST_ASSERT_EQ(expected.hold, actual.hold, "%" PRIi32);
     TEST_ASSERT_ENUM_EQ(expected.active,
                         actual.active,
-                        RBRInstrumentAuxOutputActiveLevel);
+                        RBRInstrumentGen3AuxOutputActiveLevel);
     TEST_ASSERT_ENUM_EQ(expected.sleep,
                         actual.sleep,
-                        RBRInstrumentAuxOutputSleepLevel);
+                        RBRInstrumentGen3AuxOutputSleepLevel);
 
     return true;
 }
 
 TEST_LOGGER2(streamserial_set_aux)
 {
-    RBRInstrumentAuxOutput auxOutput = {
+    RBRInstrumentGen3AuxOutput auxOutput = {
         .aux = 1,
         .enabled = true,
         .setup = 500,
         .hold = 750,
-        .active = RBRINSTRUMENT_ACTIVE_LOW,
-        .sleep = RBRINSTRUMENT_SLEEP_HIGH
+        .active = RBRINSTRUMENTGEN3_ACTIVE_LOW,
+        .sleep = RBRINSTRUMENTGEN3_SLEEP_HIGH
     };
 
-    RBRInstrumentError err;
+    RBRInstrumentGen3Error err;
 
     const char *text = "streamserial aux1_state = on, "
                            "aux1_setup = 500, aux1_hold = 750, "
@@ -295,8 +295,8 @@ TEST_LOGGER2(streamserial_set_aux)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRInstrument_setAuxOutput(instrument, &auxOutput);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    err = RBRInstrumentGen3_setAuxOutput(instrument, &auxOutput);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -304,17 +304,17 @@ TEST_LOGGER2(streamserial_set_aux)
 
 TEST_LOGGER3(streamserial_aux)
 {
-    RBRInstrumentAuxOutput expected = {
+    RBRInstrumentGen3AuxOutput expected = {
         .aux = 1,
         .enabled = false,
         .setup = 1000,
         .hold = 1000,
-        .active = RBRINSTRUMENT_ACTIVE_HIGH,
-        .sleep = RBRINSTRUMENT_SLEEP_TRISTATE
+        .active = RBRINSTRUMENTGEN3_ACTIVE_HIGH,
+        .sleep = RBRINSTRUMENTGEN3_SLEEP_TRISTATE
     };
 
-    RBRInstrumentError err;
-    RBRInstrumentAuxOutput actual;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3AuxOutput actual;
     actual.aux = 1;
 
     TestIOBuffers_init(
@@ -323,48 +323,48 @@ TEST_LOGGER3(streamserial_aux)
         "aux1_hold = 1000, aux1_active = high, aux1_sleep = tristate"
         RESPONSE_TERMINATOR,
         0);
-    err = RBRInstrument_getAuxOutput(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    err = RBRInstrumentGen3_getAuxOutput(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_EQ(expected.aux, actual.aux, "%" PRIi8);
     TEST_ASSERT_ENUM_EQ(expected.enabled, actual.enabled, bool);
     TEST_ASSERT_EQ(expected.setup, actual.setup, "%" PRIi32);
     TEST_ASSERT_EQ(expected.hold, actual.hold, "%" PRIi32);
     TEST_ASSERT_ENUM_EQ(expected.active,
                         actual.active,
-                        RBRInstrumentAuxOutputActiveLevel);
+                        RBRInstrumentGen3AuxOutputActiveLevel);
     TEST_ASSERT_ENUM_EQ(expected.sleep,
                         actual.sleep,
-                        RBRInstrumentAuxOutputSleepLevel);
+                        RBRInstrumentGen3AuxOutputSleepLevel);
 
     return true;
 }
 
 TEST_LOGGER3(streamserial_aux_invalid)
 {
-    RBRInstrumentError err;
-    RBRInstrumentAuxOutput auxOutput;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3AuxOutput auxOutput;
     auxOutput.aux = 0;
 
-    err = RBRInstrument_getAuxOutput(instrument, &auxOutput);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_INVALID_PARAMETER_VALUE,
+    err = RBRInstrumentGen3_getAuxOutput(instrument, &auxOutput);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE,
                         err,
-                        RBRInstrumentError);
+                        RBRInstrumentGen3Error);
 
     return true;
 }
 
 TEST_LOGGER3(streamserial_set_aux)
 {
-    RBRInstrumentAuxOutput auxOutput = {
+    RBRInstrumentGen3AuxOutput auxOutput = {
         .aux = 1,
         .enabled = true,
         .setup = 500,
         .hold = 750,
-        .active = RBRINSTRUMENT_ACTIVE_LOW,
-        .sleep = RBRINSTRUMENT_SLEEP_HIGH
+        .active = RBRINSTRUMENTGEN3_ACTIVE_LOW,
+        .sleep = RBRINSTRUMENTGEN3_SLEEP_HIGH
     };
 
-    RBRInstrumentError err;
+    RBRInstrumentGen3Error err;
 
     const char *text = "streamserial aux1_enabled = true, "
                            "aux1_setup = 500, aux1_hold = 750, "
@@ -374,8 +374,8 @@ TEST_LOGGER3(streamserial_set_aux)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRInstrument_setAuxOutput(instrument, &auxOutput);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    err = RBRInstrumentGen3_setAuxOutput(instrument, &auxOutput);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -383,14 +383,14 @@ TEST_LOGGER3(streamserial_set_aux)
 
 TEST_LOGGER3(stream_sample_parse)
 {
-    RBRInstrumentError err;
+    RBRInstrumentGen3Error err;
 
     TestIOBuffers_init(
         buffers,
         "2018-07-26 14:56:24.000, 10.1325" RESPONSE_TERMINATOR,
         0);
-    err = RBRInstrument_readSample(instrument);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    err = RBRInstrumentGen3_readSample(instrument);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_EQ(1, buffers->streamSample.channels, "%" PRIi32);
     TEST_ASSERT_EQ(10.1325, buffers->streamSample.readings[0], "%lf");
 

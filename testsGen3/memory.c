@@ -12,14 +12,14 @@
 
 TEST_LOGGER3(meminfo)
 {
-    RBRInstrumentMemoryInfo expected = {
-        .dataset = RBRINSTRUMENT_DATASET_STANDARD,
+    RBRInstrumentGen3MemoryInfo expected = {
+        .dataset = RBRINSTRUMENTGEN3_DATASET_STANDARD,
         .used = 1528,
         .remaining = 134216192,
         .size = 134217728
     };
-    RBRInstrumentMemoryInfo actual = {
-        .dataset = RBRINSTRUMENT_DATASET_STANDARD
+    RBRInstrumentGen3MemoryInfo actual = {
+        .dataset = RBRINSTRUMENTGEN3_DATASET_STANDARD
     };
 
     TestIOBuffers_init(buffers,
@@ -27,8 +27,8 @@ TEST_LOGGER3(meminfo)
                        "remaining = 134216192, size = 134217728"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentError err = RBRInstrument_getMemoryInfo(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_getMemoryInfo(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_EQ(expected.dataset, actual.dataset, "%" PRIi32);
     TEST_ASSERT_EQ(expected.used, actual.used, "%" PRIi32);
     TEST_ASSERT_EQ(expected.remaining, actual.remaining, "%" PRIi32);
@@ -41,15 +41,15 @@ TEST_LOGGER3(meminfo)
 
 TEST_LOGGER3(meminfo_invalid_dataset)
 {
-    RBRInstrumentMemoryInfo test = {
-        .dataset = RBRINSTRUMENT_UNKNOWN_DATASET
+    RBRInstrumentGen3MemoryInfo test = {
+        .dataset = RBRINSTRUMENTGEN3_UNKNOWN_DATASET
     };
 
     TestIOBuffers_init(buffers, "", 0);
-    RBRInstrumentError err = RBRInstrument_getMemoryInfo(instrument, &test);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_INVALID_PARAMETER_VALUE,
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_getMemoryInfo(instrument, &test);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE,
                         err,
-                        RBRInstrumentError);
+                        RBRInstrumentGen3Error);
 
     return true;
 }
@@ -57,14 +57,14 @@ TEST_LOGGER3(meminfo_invalid_dataset)
 TEST_LOGGER2(read)
 {
     uint8_t buf[1400];
-    RBRInstrumentData expected = {
-        .dataset = RBRINSTRUMENT_DATASET_STANDARD,
+    RBRInstrumentGen3Data expected = {
+        .dataset = RBRINSTRUMENTGEN3_DATASET_STANDARD,
         .size    = 8,
         .offset  = 2800,
         .data    = buf
     };
-    RBRInstrumentData actual = {
-        .dataset = RBRINSTRUMENT_DATASET_STANDARD,
+    RBRInstrumentGen3Data actual = {
+        .dataset = RBRINSTRUMENTGEN3_DATASET_STANDARD,
         .size    = 1400,
         .offset  = 2800,
         .data    = buf
@@ -76,8 +76,8 @@ TEST_LOGGER2(read)
                        "AAAAAAAA\045\224"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentError err = RBRInstrument_readData(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_readData(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_EQ(expected.dataset, actual.dataset, "%" PRIi32);
     TEST_ASSERT_EQ(expected.size, actual.size, "%" PRIi32);
     TEST_ASSERT_EQ(expected.offset, actual.offset, "%" PRIi32);
@@ -92,8 +92,8 @@ TEST_LOGGER2(read)
 TEST_LOGGER2(read_offset_mismatch)
 {
     uint8_t buf[1400];
-    RBRInstrumentData actual = {
-        .dataset = RBRINSTRUMENT_DATASET_STANDARD,
+    RBRInstrumentGen3Data actual = {
+        .dataset = RBRINSTRUMENTGEN3_DATASET_STANDARD,
         .size    = 1400,
         .offset  = 2800,
         .data    = buf
@@ -106,25 +106,25 @@ TEST_LOGGER2(read_offset_mismatch)
                        "AAAAAAAA\045\224"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentError err = RBRInstrument_readData(instrument, &actual);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_readData(instrument, &actual);
     TEST_ASSERT_STR_EQ("read data 1 1400 2800"
                        COMMAND_TERMINATOR,
                        buffers->writeBuffer);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_COMMUNICATION_ERROR, err, RBRInstrumentError);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_COMMUNICATION_ERROR, err, RBRInstrumentGen3Error);
     return true;
 }
 
 TEST_LOGGER3(readdata)
 {
     uint8_t buf[1400];
-    RBRInstrumentData expected = {
-        .dataset = RBRINSTRUMENT_DATASET_STANDARD,
+    RBRInstrumentGen3Data expected = {
+        .dataset = RBRINSTRUMENTGEN3_DATASET_STANDARD,
         .size    = 8,
         .offset  = 2800,
         .data    = buf
     };
-    RBRInstrumentData actual = {
-        .dataset = RBRINSTRUMENT_DATASET_STANDARD,
+    RBRInstrumentGen3Data actual = {
+        .dataset = RBRINSTRUMENTGEN3_DATASET_STANDARD,
         .size    = 1400,
         .offset  = 2800,
         .data    = buf
@@ -136,8 +136,8 @@ TEST_LOGGER3(readdata)
                        "AAAAAAAA\045\224"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentError err = RBRInstrument_readData(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_readData(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_EQ(expected.dataset, actual.dataset, "%" PRIi32);
     TEST_ASSERT_EQ(expected.size, actual.size, "%" PRIi32);
     TEST_ASSERT_EQ(expected.offset, actual.offset, "%" PRIi32);
@@ -152,8 +152,8 @@ TEST_LOGGER3(readdata)
 TEST_LOGGER3(readdata_offset_mismatch)
 {
     uint8_t buf[1400];
-    RBRInstrumentData actual = {
-        .dataset = RBRINSTRUMENT_DATASET_STANDARD,
+    RBRInstrumentGen3Data actual = {
+        .dataset = RBRINSTRUMENTGEN3_DATASET_STANDARD,
         .size    = 1400,
         .offset  = 2800,
         .data    = buf
@@ -165,28 +165,28 @@ TEST_LOGGER3(readdata_offset_mismatch)
                        "AAAAAAAA\045\024"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentError err = RBRInstrument_readData(instrument, &actual);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_readData(instrument, &actual);
     TEST_ASSERT_STR_EQ("readdata dataset = 1, size = 1400, offset = 2800"
                        COMMAND_TERMINATOR,
                        buffers->writeBuffer);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_COMMUNICATION_ERROR, err, RBRInstrumentError);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_COMMUNICATION_ERROR, err, RBRInstrumentGen3Error);
     return true;
 }
 
 TEST_LOGGER3(readdata_invalid_dataset)
 {
-    RBRInstrumentData test = {
-        .dataset = RBRINSTRUMENT_UNKNOWN_DATASET,
+    RBRInstrumentGen3Data test = {
+        .dataset = RBRINSTRUMENTGEN3_UNKNOWN_DATASET,
         .size    = 0,
         .offset  = 0,
         .data    = NULL
     };
 
     TestIOBuffers_init(buffers, "", 0);
-    RBRInstrumentError err = RBRInstrument_readData(instrument, &test);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_INVALID_PARAMETER_VALUE,
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_readData(instrument, &test);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE,
                         err,
-                        RBRInstrumentError);
+                        RBRInstrumentGen3Error);
 
     return true;
 }
@@ -194,14 +194,14 @@ TEST_LOGGER3(readdata_invalid_dataset)
 TEST_LOGGER3(readdata_crc_failure)
 {
     uint8_t buf[1400];
-    RBRInstrumentData expected = {
-        .dataset = RBRINSTRUMENT_DATASET_STANDARD,
+    RBRInstrumentGen3Data expected = {
+        .dataset = RBRINSTRUMENTGEN3_DATASET_STANDARD,
         .size    = 0,
         .offset  = 2800,
         .data    = buf
     };
-    RBRInstrumentData actual = {
-        .dataset = RBRINSTRUMENT_DATASET_STANDARD,
+    RBRInstrumentGen3Data actual = {
+        .dataset = RBRINSTRUMENTGEN3_DATASET_STANDARD,
         .size    = 1400,
         .offset  = 2800,
         .data    = buf
@@ -213,8 +213,8 @@ TEST_LOGGER3(readdata_crc_failure)
                        "AAAAAAAA00"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentError err = RBRInstrument_readData(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_CHECKSUM_ERROR, err, RBRInstrumentError);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_readData(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_CHECKSUM_ERROR, err, RBRInstrumentGen3Error);
     TEST_ASSERT_EQ(expected.dataset, actual.dataset, "%" PRIi32);
     TEST_ASSERT_EQ(expected.size, actual.size, "%" PRIi32);
     TEST_ASSERT_EQ(expected.offset, actual.offset, "%" PRIi32);
@@ -228,18 +228,18 @@ TEST_LOGGER3(readdata_crc_failure)
 
 TEST_LOGGER2(memformat_support)
 {
-    RBRInstrumentMemoryFormat expected = RBRINSTRUMENT_MEMFORMAT_RAWBIN00
-                                         | RBRINSTRUMENT_MEMFORMAT_CALBIN00;
-    RBRInstrumentMemoryFormat actual = RBRINSTRUMENT_MEMFORMAT_NONE;
+    RBRInstrumentGen3MemoryFormat expected = RBRINSTRUMENTGEN3_MEMFORMAT_RAWBIN00
+                                         | RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00;
+    RBRInstrumentGen3MemoryFormat actual = RBRINSTRUMENTGEN3_MEMFORMAT_NONE;
 
     TestIOBuffers_init(buffers,
                        "memformat support = rawbin00, calbin00"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentError err = RBRInstrument_getAvailableMemoryFormats(
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_getAvailableMemoryFormats(
         instrument,
         &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_EQ(expected, actual, "0x%04X");
     TEST_ASSERT_STR_EQ("memformat support" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -249,18 +249,18 @@ TEST_LOGGER2(memformat_support)
 
 TEST_LOGGER3(memformat_availabletypes)
 {
-    RBRInstrumentMemoryFormat expected = RBRINSTRUMENT_MEMFORMAT_RAWBIN00
-                                         | RBRINSTRUMENT_MEMFORMAT_CALBIN00;
-    RBRInstrumentMemoryFormat actual = RBRINSTRUMENT_MEMFORMAT_NONE;
+    RBRInstrumentGen3MemoryFormat expected = RBRINSTRUMENTGEN3_MEMFORMAT_RAWBIN00
+                                         | RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00;
+    RBRInstrumentGen3MemoryFormat actual = RBRINSTRUMENTGEN3_MEMFORMAT_NONE;
 
     TestIOBuffers_init(buffers,
                        "memformat availabletypes = rawbin00|calbin00"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentError err = RBRInstrument_getAvailableMemoryFormats(
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_getAvailableMemoryFormats(
         instrument,
         &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_EQ(expected, actual, "0x%04X");
     TEST_ASSERT_STR_EQ("memformat availabletypes" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -270,17 +270,17 @@ TEST_LOGGER3(memformat_availabletypes)
 
 TEST_LOGGER3(memformat_type)
 {
-    RBRInstrumentMemoryFormat expected = RBRINSTRUMENT_MEMFORMAT_RAWBIN00;
-    RBRInstrumentMemoryFormat actual = RBRINSTRUMENT_MEMFORMAT_NONE;
+    RBRInstrumentGen3MemoryFormat expected = RBRINSTRUMENTGEN3_MEMFORMAT_RAWBIN00;
+    RBRInstrumentGen3MemoryFormat actual = RBRINSTRUMENTGEN3_MEMFORMAT_NONE;
 
     TestIOBuffers_init(buffers,
                        "memformat type = rawbin00" RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentError err = RBRInstrument_getCurrentMemoryFormat(
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_getCurrentMemoryFormat(
         instrument,
         &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_ENUM_EQ(expected, actual, RBRInstrumentMemoryFormat);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(expected, actual, RBRInstrumentGen3MemoryFormat);
     TEST_ASSERT_STR_EQ("memformat type" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
 
@@ -289,17 +289,17 @@ TEST_LOGGER3(memformat_type)
 
 TEST_LOGGER3(memformat_newtype)
 {
-    RBRInstrumentMemoryFormat expected = RBRINSTRUMENT_MEMFORMAT_CALBIN00;
-    RBRInstrumentMemoryFormat actual = RBRINSTRUMENT_MEMFORMAT_NONE;
+    RBRInstrumentGen3MemoryFormat expected = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00;
+    RBRInstrumentGen3MemoryFormat actual = RBRINSTRUMENTGEN3_MEMFORMAT_NONE;
 
     TestIOBuffers_init(buffers,
                        "memformat newtype = calbin00" RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentError err = RBRInstrument_getNewMemoryFormat(
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_getNewMemoryFormat(
         instrument,
         &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_ENUM_EQ(expected, actual, RBRInstrumentMemoryFormat);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(expected, actual, RBRInstrumentGen3MemoryFormat);
     TEST_ASSERT_STR_EQ("memformat newtype" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
 
@@ -314,10 +314,10 @@ TEST_LOGGER3(memformat_newtype_set)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentError err = RBRInstrument_setNewMemoryFormat(
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_setNewMemoryFormat(
         instrument,
-        RBRINSTRUMENT_MEMFORMAT_CALBIN00);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+        RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -325,39 +325,39 @@ TEST_LOGGER3(memformat_newtype_set)
 
 TEST_LOGGER3(postprocessing)
 {
-    RBRInstrumentPostprocessing expected = {
-        .status = RBRINSTRUMENT_POSTPROCESSING_STATUS_IDLE,
+    RBRInstrumentGen3Postprocessing expected = {
+        .status = RBRINSTRUMENTGEN3_POSTPROCESSING_STATUS_IDLE,
         .channels = {
             .count = 5,
             .channels = {
                 {
-                    .function = RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_MEAN,
+                    .function = RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_MEAN,
                     .label = "pressure_01"
                 },
                 {
                     .function =
-                        RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
+                        RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
                     .label = "pressure_01"
                 },
                 {
-                    .function = RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_MEAN,
+                    .function = RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_MEAN,
                     .label = "temperature_01"
                 },
                 {
-                    .function = RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_STD,
+                    .function = RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_STD,
                     .label = "temperature_01"
                 },
                 {
-                    .function = RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_MEAN,
+                    .function = RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_MEAN,
                     .label = "conductivity_01"
                 }
             }
         },
         .binReference = "pressure_01",
-        .binFilter = RBRINSTRUMENT_POSTPROCESSING_BINFILTER_NONE,
+        .binFilter = RBRINSTRUMENTGEN3_POSTPROCESSING_BINFILTER_NONE,
         .binSize = 50.0,
-        .tstampMin = RBRINSTRUMENT_DATETIME_MIN,
-        .tstampMax = RBRINSTRUMENT_DATETIME_MAX,
+        .tstampMin = RBRINSTRUMENTGEN3_DATETIME_MIN,
+        .tstampMax = RBRINSTRUMENTGEN3_DATETIME_MAX,
         .depthMin = 10.0,
         .depthMax = 1000.0,
         .dcAlpha = 0.08,
@@ -365,7 +365,7 @@ TEST_LOGGER3(postprocessing)
         .dcTdelay = 0.35,
         .dcCtCoeff = 2.4e-4
     };
-    RBRInstrumentPostprocessing actual;
+    RBRInstrumentGen3Postprocessing actual;
 
     const char *response = "postprocessing status = idle, channels = "
                           "mean(pressure_01)|count(pressure_01)"
@@ -378,25 +378,25 @@ TEST_LOGGER3(postprocessing)
                           "binfilter = none, "
                           "dc_alpha = 0.08, dc_tau = 8.000, dc_tdelay = 0.35, dc_ctcoeff = 2.4e-4" RESPONSE_TERMINATOR;
     TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentError err = RBRInstrument_getPostprocessing(instrument,
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_getPostprocessing(instrument,
                                                              &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_ENUM_EQ(expected.status,
                         actual.status,
-                        RBRInstrumentPostprocessingStatus);
+                        RBRInstrumentGen3PostprocessingStatus);
     TEST_ASSERT_EQ(expected.channels.count, actual.channels.count, "%" PRIi32);
     for (int i = 0; i < expected.channels.count; i++)
     {
         TEST_ASSERT_ENUM_EQ(expected.channels.channels[i].function,
                             actual.channels.channels[i].function,
-                            RBRInstrumentPostprocessingAggregate);
+                            RBRInstrumentGen3PostprocessingAggregate);
         TEST_ASSERT_STR_EQ(expected.channels.channels[i].label,
                            actual.channels.channels[i].label);
     }
     TEST_ASSERT_STR_EQ(expected.binReference, actual.binReference);
     TEST_ASSERT_ENUM_EQ(expected.binFilter,
                         actual.binFilter,
-                        RBRInstrumentPostprocessingBinFilter);
+                        RBRInstrumentGen3PostprocessingBinFilter);
     TEST_ASSERT_FLOAT_EQ(expected.binSize, actual.binSize, 0.0f);
     TEST_ASSERT_EQ(expected.tstampMin, actual.tstampMin, "%" PRIi64);
     TEST_ASSERT_EQ(expected.tstampMax, actual.tstampMax, "%" PRIi64);
@@ -414,39 +414,39 @@ TEST_LOGGER3(postprocessing)
 
 TEST_LOGGER3(postprocessing_set)
 {
-    RBRInstrumentPostprocessing postprocessing = {
-        .status = RBRINSTRUMENT_UNKNOWN_POSTPROCESSING_STATUS,
+    RBRInstrumentGen3Postprocessing postprocessing = {
+        .status = RBRINSTRUMENTGEN3_UNKNOWN_POSTPROCESSING_STATUS,
         .channels = {
             .count = 5,
             .channels = {
                 {
-                    .function = RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_MEAN,
+                    .function = RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_MEAN,
                     .label = "pressure_01"
                 },
                 {
                     .function =
-                        RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
+                        RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
                     .label = "pressure_01"
                 },
                 {
-                    .function = RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_MEAN,
+                    .function = RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_MEAN,
                     .label = "temperature_01"
                 },
                 {
-                    .function = RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_STD,
+                    .function = RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_STD,
                     .label = "temperature_01"
                 },
                 {
-                    .function = RBRINSTRUMENT_POSTPROCESSING_AGGREGATE_MEAN,
+                    .function = RBRINSTRUMENTGEN3_POSTPROCESSING_AGGREGATE_MEAN,
                     .label = "conductivity_01"
                 }
             }
         },
         .binReference = "pressure_01",
-        .binFilter = RBRINSTRUMENT_POSTPROCESSING_BINFILTER_NONE,
+        .binFilter = RBRINSTRUMENTGEN3_POSTPROCESSING_BINFILTER_NONE,
         .binSize = 50.0,
-        .tstampMin = RBRINSTRUMENT_DATETIME_MIN,
-        .tstampMax = RBRINSTRUMENT_DATETIME_MAX,
+        .tstampMin = RBRINSTRUMENTGEN3_DATETIME_MIN,
+        .tstampMax = RBRINSTRUMENTGEN3_DATETIME_MAX,
         .depthMin = 10.0,
         .depthMax = 1000.0,
         .dcAlpha = 0.08,
@@ -488,9 +488,9 @@ TEST_LOGGER3(postprocessing_set)
                           RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentError err = RBRInstrument_setPostprocessing(instrument,
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_setPostprocessing(instrument,
                                                              &postprocessing);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -502,15 +502,15 @@ TEST_LOGGER3(postprocessing_command)
                           RESPONSE_TERMINATOR;
     TestIOBuffers_init(buffers, response, 0);
 
-    RBRInstrumentPostprocessingStatus result;
-    RBRInstrumentError err = RBRInstrument_setPostprocessingCommand(
+    RBRInstrumentGen3PostprocessingStatus result;
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_setPostprocessingCommand(
         instrument,
-        RBRINSTRUMENT_POSTPROCESSING_COMMAND_START,
+        RBRINSTRUMENTGEN3_POSTPROCESSING_COMMAND_START,
         &result);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_POSTPROCESSING_STATUS_PROCESSING,
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_POSTPROCESSING_STATUS_PROCESSING,
                         result,
-                        RBRInstrumentPostprocessingStatus);
+                        RBRInstrumentGen3PostprocessingStatus);
     TEST_ASSERT_STR_EQ("postprocessing command = start" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
 

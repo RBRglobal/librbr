@@ -19,7 +19,7 @@
 
 LOG_MODULE_REGISTER(io, CONFIG_IO_LOG_LEVEL);
 
-static int ZephyrRBRInstrumentIO_enableRead(ZephyrRBRInstrumentIO *io)
+static int ZephyrRBRInstrumentGen3IO_enableRead(ZephyrRBRInstrumentGen3IO *io)
 {
     return uart_rx_enable(io->dev,
                           io->rx.buf,
@@ -27,11 +27,11 @@ static int ZephyrRBRInstrumentIO_enableRead(ZephyrRBRInstrumentIO *io)
                           CONFIG_INSTRUMENT_INTER_CHARACTER_TIMEOUT_USEC);
 }
 
-static void ZephyrRBRInstrumentIO_event(const struct device *dev,
+static void ZephyrRBRInstrumentGen3IO_event(const struct device *dev,
                                         struct uart_event *event,
                                         void *userData)
 {
-    ZephyrRBRInstrumentIO *io = userData;
+    ZephyrRBRInstrumentGen3IO *io = userData;
 
     switch (event->type)
     {
@@ -94,12 +94,12 @@ static void ZephyrRBRInstrumentIO_event(const struct device *dev,
         __fallthrough;
     case UART_RX_DISABLED:
         /* We don't expect reading to stop, but if it does, start it again. */
-        (void) ZephyrRBRInstrumentIO_enableRead(io);
+        (void) ZephyrRBRInstrumentGen3IO_enableRead(io);
         return;
     }
 }
 
-RBRInstrumentError ZephyrRBRInstrumentIO_init(ZephyrRBRInstrumentIO *io,
+RBRInstrumentGen3Error ZephyrRBRInstrumentGen3IO_init(ZephyrRBRInstrumentGen3IO *io,
                                               const struct device *dev)
 {
     memset(io, 0, sizeof(*io));
@@ -112,35 +112,35 @@ RBRInstrumentError ZephyrRBRInstrumentIO_init(ZephyrRBRInstrumentIO *io,
     k_mutex_init(&io->tx.mut);
     k_sem_init(&io->tx.sem, 0, 1);
 
-    int err = uart_callback_set(io->dev, ZephyrRBRInstrumentIO_event, io);
+    int err = uart_callback_set(io->dev, ZephyrRBRInstrumentGen3IO_event, io);
     if (err != 0)
     {
-        return RBRINSTRUMENT_CALLBACK_ERROR;
+        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
     }
 
-    err = ZephyrRBRInstrumentIO_enableRead(io);
+    err = ZephyrRBRInstrumentGen3IO_enableRead(io);
     if (err != 0)
     {
         LOG_ERR("read: starting: %s", strerror(-err));
-        return RBRINSTRUMENT_CALLBACK_ERROR;
+        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
     }
 
-    return RBRINSTRUMENT_SUCCESS;
+    return RBRINSTRUMENTGEN3_SUCCESS;
 }
 
-RBRInstrumentError ZephyrRBRInstrumentIO_read(const struct RBRInstrument *instrument,
+RBRInstrumentGen3Error ZephyrRBRInstrumentGen3IO_read(const struct RBRInstrumentGen3 *instrument,
                                               void *data, int32_t *size)
 {
-    ZephyrRBRInstrumentIO *io = RBRInstrument_getUserData(instrument);
+    ZephyrRBRInstrumentGen3IO *io = RBRInstrumentGen3_getUserData(instrument);
 
-    k_timeout_t timeout = K_MSEC(RBRInstrument_getCommandTimeout(instrument));
+    k_timeout_t timeout = K_MSEC(RBRInstrumentGen3_getCommandTimeout(instrument));
     k_timepoint_t deadline = sys_timepoint_calc(timeout);
 
     int err = k_mutex_lock(&io->rx.mut, sys_timepoint_timeout(deadline));
     if (err != 0)
     {
         LOG_ERR("read: device busy");
-        return RBRINSTRUMENT_TIMEOUT;
+        return RBRINSTRUMENTGEN3_TIMEOUT;
     }
 
     size_t cap = *size;
@@ -187,27 +187,27 @@ done:
     switch (err)
     {
     case 0:
-        return RBRINSTRUMENT_SUCCESS;
+        return RBRINSTRUMENTGEN3_SUCCESS;
     case -EAGAIN:
-        return RBRINSTRUMENT_TIMEOUT;
+        return RBRINSTRUMENTGEN3_TIMEOUT;
     default:
-        return RBRINSTRUMENT_CALLBACK_ERROR;
+        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
     }
 }
 
-RBRInstrumentError ZephyrRBRInstrumentIO_write(const struct RBRInstrument *instrument,
+RBRInstrumentGen3Error ZephyrRBRInstrumentGen3IO_write(const struct RBRInstrumentGen3 *instrument,
                                                const void *const data, int32_t size)
 {
-    ZephyrRBRInstrumentIO *io = RBRInstrument_getUserData(instrument);
+    ZephyrRBRInstrumentGen3IO *io = RBRInstrumentGen3_getUserData(instrument);
 
-    k_timeout_t timeout = K_MSEC(RBRInstrument_getCommandTimeout(instrument));
+    k_timeout_t timeout = K_MSEC(RBRInstrumentGen3_getCommandTimeout(instrument));
     k_timepoint_t deadline = sys_timepoint_calc(timeout);
 
     int err = k_mutex_lock(&io->tx.mut, sys_timepoint_timeout(deadline));
     if (err != 0)
     {
         LOG_ERR("write: device busy");
-        return RBRINSTRUMENT_TIMEOUT;
+        return RBRINSTRUMENTGEN3_TIMEOUT;
     }
 
     /* Ensure there is no other write in progress. */
@@ -246,10 +246,10 @@ done:
     switch (err)
     {
     case 0:
-        return RBRINSTRUMENT_SUCCESS;
+        return RBRINSTRUMENTGEN3_SUCCESS;
     case -EAGAIN:
-        return RBRINSTRUMENT_TIMEOUT;
+        return RBRINSTRUMENTGEN3_TIMEOUT;
     default:
-        return RBRINSTRUMENT_CALLBACK_ERROR;
+        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
     }
 }

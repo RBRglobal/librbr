@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentCommands.h
+ * \file RBRInstrumentGen3Commands.h
  *
  * \brief Entry point for instrument command declarations.
  *
@@ -8,8 +8,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTCOMMANDS_H
-#define LIBRBR_RBRINSTRUMENTCOMMANDS_H
+#ifndef LIBRBR_RBRINSTRUMENTGEN3COMMANDS_H
+#define LIBRBR_RBRINSTRUMENTGEN3COMMANDS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,4 +32,4 @@ extern "C" {
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTCOMMANDS_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN3COMMANDS_H */

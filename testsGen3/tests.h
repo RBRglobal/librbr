@@ -242,7 +242,7 @@ typedef struct TestIOBuffers
     /** \brief How far into the write buffer the instrument has written. */
     int32_t writeBufferPos;
     /** \brief The last sample received from the test instrument. */
-    RBRInstrumentSample streamSample;
+    RBRInstrumentGen3Sample streamSample;
 } TestIOBuffers;
 
 /**
@@ -276,7 +276,7 @@ const char *bool_name(bool value);
  */
 /* Uncrustify thinks that asterisks in macros are multiplication operators and
  * incorrectly adds spacing, so we'll turn *INDENT-OFF* just for this. */
-#define _TEST(fn) bool test_##fn(RBRInstrument *instrument, \
+#define _TEST(fn) bool test_##fn(RBRInstrumentGen3 *instrument, \
                                  TestIOBuffers *buffers)
 /* *INDENT-ON* */
 
@@ -301,7 +301,7 @@ const char *bool_name(bool value);
  * \param buffers the test I/O buffers
  * \return whether the test passed
  */
-typedef bool (InstrumentTestFunction)(RBRInstrument *instrument,
+typedef bool (InstrumentTestFunction)(RBRInstrumentGen3 *instrument,
                                       TestIOBuffers *buffers);
 
 /**
@@ -314,7 +314,7 @@ typedef struct InstrumentTest
     /** \brief The name of the test. */
     const char *name;
     /** \brief The instrument generation to which this test applies. */
-    RBRInstrumentGeneration generation;
+    RBRInstrumentGen3Generation generation;
     /** \brief The test to be run. */
     InstrumentTestFunction *function;
 } InstrumentTest;
@@ -353,11 +353,11 @@ typedef struct TestParserBuffers
     /** \brief The length of TestParserBuffers.samples. */
     int32_t samplesLength;
     /** \brief Parsed samples. */
-    RBRInstrumentSample samples[TESTPARSERBUFFERS_SAMPLES_MAX];
+    RBRInstrumentGen3Sample samples[TESTPARSERBUFFERS_SAMPLES_MAX];
     /** \brief The length of TestParserBuffers.events. */
     int32_t eventsLength;
     /** \brief Parsed events. */
-    RBRInstrumentEvent events[TESTPARSERBUFFERS_EVENTS_MAX];
+    RBRInstrumentGen3Event events[TESTPARSERBUFFERS_EVENTS_MAX];
 } TestParserBuffers;
 
 /**

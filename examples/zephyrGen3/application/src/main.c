@@ -26,14 +26,14 @@ LOG_MODULE_REGISTER(main, CONFIG_MAIN_LOG_LEVEL);
 
 const static struct device *instrumentUart = DEVICE_DT_GET(DT_CHOSEN(rbr_instrument));
 
-RBRInstrument instrumentBuffer;
-RBRInstrumentSample sampleBuffer;
+RBRInstrumentGen3 instrumentBuffer;
+RBRInstrumentGen3Sample sampleBuffer;
 
-ZephyrRBRInstrumentIO io;
+ZephyrRBRInstrumentGen3IO io;
 
-RBRInstrumentError instrumentSample(
-    const struct RBRInstrument *instrument,
-    const struct RBRInstrumentSample *const sample)
+RBRInstrumentGen3Error instrumentSample(
+    const struct RBRInstrumentGen3 *instrument,
+    const struct RBRInstrumentGen3Sample *const sample)
 {
     /* Unused. */
     (void) instrument;
@@ -50,65 +50,65 @@ RBRInstrumentError instrumentSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENT_SUCCESS;
+    return RBRINSTRUMENTGEN3_SUCCESS;
 }
 
 int main(void)
 {
-    RBRInstrumentError err;
-    RBRInstrument *instrument = &instrumentBuffer;
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3 *instrument = &instrumentBuffer;
 
-    err = ZephyrRBRInstrumentIO_init(&io, instrumentUart);
-    if (err != RBRINSTRUMENT_SUCCESS)
+    err = ZephyrRBRInstrumentGen3IO_init(&io, instrumentUart);
+    if (err != RBRINSTRUMENTGEN3_SUCCESS)
     {
-        LOG_ERR("initializing UART: %s", RBRInstrumentError_name(err));
+        LOG_ERR("initializing UART: %s", RBRInstrumentGen3Error_name(err));
         return 0;
     }
 
     LOG_INF("using %s v%s",
-            RBRINSTRUMENT_LIB_NAME,
-            RBRINSTRUMENT_LIB_VERSION);
+            RBRINSTRUMENTGEN3_LIB_NAME,
+            RBRINSTRUMENTGEN3_LIB_VERSION);
 
-    RBRInstrumentCallbacks callbacks = {
-        .time = ZephyrRBRInstrumentTime_get,
-        .sleep = ZephyrRBRInstrumentTime_sleep,
-        .read = ZephyrRBRInstrumentIO_read,
-        .write = ZephyrRBRInstrumentIO_write,
+    RBRInstrumentGen3Callbacks callbacks = {
+        .time = ZephyrRBRInstrumentGen3Time_get,
+        .sleep = ZephyrRBRInstrumentGen3Time_sleep,
+        .read = ZephyrRBRInstrumentGen3IO_read,
+        .write = ZephyrRBRInstrumentGen3IO_write,
         .sample = instrumentSample,
         .sampleBuffer = &sampleBuffer,
     };
 
-    err = RBRInstrument_open(
+    err = RBRInstrumentGen3_open(
         &instrument,
         &callbacks,
         CONFIG_INSTRUMENT_COMMAND_TIMEOUT_MSEC,
         (void *) &io);
-    if (err != RBRINSTRUMENT_SUCCESS)
+    if (err != RBRINSTRUMENTGEN3_SUCCESS)
     {
         LOG_ERR("opening instrument: %s",
-                RBRInstrumentError_name(err));
+                RBRInstrumentGen3Error_name(err));
         return 0;
     }
 
-    RBRInstrumentLink link;
-    RBRInstrument_getLink(instrument, &link);
-    LOG_INF("connected via %s", RBRInstrumentLink_name(link));
+    RBRInstrumentGen3Link link;
+    RBRInstrumentGen3_getLink(instrument, &link);
+    LOG_INF("connected via %s", RBRInstrumentGen3Link_name(link));
 
     switch (link)
     {
-    case RBRINSTRUMENT_LINK_USB:
-        RBRInstrument_setUSBStreamingState(instrument, true);
+    case RBRINSTRUMENTGEN3_LINK_USB:
+        RBRInstrumentGen3_setUSBStreamingState(instrument, true);
         break;
-    case RBRINSTRUMENT_LINK_SERIAL:
-    case RBRINSTRUMENT_LINK_WIFI:
+    case RBRINSTRUMENTGEN3_LINK_SERIAL:
+    case RBRINSTRUMENTGEN3_LINK_WIFI:
         {
-            RBRInstrumentSerial serial;
-            RBRInstrument_getSerial(instrument, &serial);
+            RBRInstrumentGen3Serial serial;
+            RBRInstrumentGen3_getSerial(instrument, &serial);
             LOG_INF("connected in %s mode at %s baud",
-                    RBRInstrumentSerialMode_name(serial.mode),
-                    RBRInstrumentSerialBaudRate_name(serial.baudRate));
+                    RBRInstrumentGen3SerialMode_name(serial.mode),
+                    RBRInstrumentGen3SerialBaudRate_name(serial.baudRate));
 
-            RBRInstrument_setSerialStreamingState(instrument, true);
+            RBRInstrumentGen3_setSerialStreamingState(instrument, true);
             break;
         }
     default:
@@ -117,26 +117,26 @@ int main(void)
         return 0;
     }
 
-    RBRInstrumentDeployment deployment;
-    RBRInstrument_getDeployment(instrument, &deployment);
-    if (deployment.status != RBRINSTRUMENT_STATUS_LOGGING)
+    RBRInstrumentGen3Deployment deployment;
+    RBRInstrumentGen3_getDeployment(instrument, &deployment);
+    if (deployment.status != RBRINSTRUMENTGEN3_STATUS_LOGGING)
     {
         LOG_INF("instrument is %s, not logging; I'm going to start it",
-                RBRInstrumentDeploymentStatus_name(deployment.status));
+                RBRInstrumentGen3DeploymentStatus_name(deployment.status));
 
-        if ((err = instrumentStart(instrument)) != RBRINSTRUMENT_SUCCESS)
+        if ((err = instrumentStart(instrument)) != RBRINSTRUMENTGEN3_SUCCESS)
         {
             LOG_ERR("starting instrument: %s",
-                    RBRInstrumentError_name(err));
+                    RBRInstrumentGen3Error_name(err));
             return 0;
         }
     }
 
     while (true)
     {
-        if ((err = RBRInstrument_readSample(instrument)) != RBRINSTRUMENT_SUCCESS)
+        if ((err = RBRInstrumentGen3_readSample(instrument)) != RBRINSTRUMENTGEN3_SUCCESS)
         {
-            LOG_ERR("%s", RBRInstrumentError_name(err));
+            LOG_ERR("%s", RBRInstrumentGen3Error_name(err));
         }
     }
 }

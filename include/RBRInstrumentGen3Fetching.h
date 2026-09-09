@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentFetching.h
+ * \file RBRInstrumentGen3Fetching.h
  *
  * \brief Instrument commands and structures pertaining to on-demand data
  * acquisition.
@@ -11,8 +11,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTFETCHING_H
-#define LIBRBR_RBRINSTRUMENTFETCHING_H
+#ifndef LIBRBR_RBRINSTRUMENTGEN3FETCHING_H
+#define LIBRBR_RBRINSTRUMENTGEN3FETCHING_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,9 +21,9 @@ extern "C" {
 /**
  * \brief Requests an “on-demand” sample set from the logger.
  *
- * Unlike streaming data/RBRInstrument_readSample(), fetched data is returned
- * directly to the caller (independent of any RBRInstrumentSampleCallback
- * defined in RBRInstrumentCallbacks.sample).
+ * Unlike streaming data/RBRInstrumentGen3_readSample(), fetched data is returned
+ * directly to the caller (independent of any RBRInstrumentGen3SampleCallback
+ * defined in RBRInstrumentGen3Callbacks.sample).
  *
  * Because fetched samples are indistinguishable from streamed samples, this
  * function may return a streamed sample, _not_ a fetched sample, if the
@@ -35,26 +35,26 @@ extern "C" {
  * which channels are fetched. This can be useful to limit the use of
  * power-hungry sensors. If \a channels is not given as `NULL`, then readings
  * will be requested from channels corresponding to the first
- * RBRInstrumentLabelsList.count labels from the list. Otherwise, and for
+ * RBRInstrumentGen3LabelsList.count labels from the list. Otherwise, and for
  * Logger2 instruments, readings will be fetched from all enabled channels.
  *
  * \param [in] instrument the instrument connection
  * \param [in] channels the list of channels to be acquired (may be `NULL`)
  * \param [in] sleepAfter whether the instrument should sleep after fetching
  * \param [in,out] sample the fetched sample
- * \return #RBRINSTRUMENT_SUCCESS when a sample is successfully read
- * \return #RBRINSTRUMENT_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENT_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENT_HARDWARE_ERROR when an invalid channel is requested
+ * \return #RBRINSTRUMENTGEN3_SUCCESS when a sample is successfully read
+ * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when an invalid channel is requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/fetch
  */
-RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument,
-                                       RBRInstrumentLabelsList *channels,
+RBRInstrumentGen3Error RBRInstrumentGen3_fetch(RBRInstrumentGen3 *instrument,
+                                       RBRInstrumentGen3LabelsList *channels,
                                        bool sleepAfter,
-                                       RBRInstrumentSample *sample);
+                                       RBRInstrumentGen3Sample *sample);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTFETCHING_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN3FETCHING_H */

@@ -17,7 +17,7 @@ extern "C" {
 
 #include <RBRInstrumentGen3.h>
 
-RBRInstrumentError instrumentStart(RBRInstrument *instrument);
+RBRInstrumentGen3Error instrumentStart(RBRInstrumentGen3 *instrument);
 
 #ifdef __cplusplus
 }

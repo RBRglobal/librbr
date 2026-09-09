@@ -22,7 +22,7 @@ As of version 2.0.0,
 the library contains two independent APIs,
 one per instrument generation:
 the Gen3 API
-(`RBRInstrument_…`,
+(`RBRInstrumentGen3_…`,
 for Logger2/Logger3 instruments,
 unchanged from libRBR 1.x)
 and the Gen4 API
@@ -38,10 +38,10 @@ by default
 For example:
 
 ~~~{.c}
-RBRInstrumentSampling sampling;
-RBRInstrument_getSampling(instrument, &sampling);
+RBRInstrumentGen3Sampling sampling;
+RBRInstrumentGen3_getSampling(instrument, &sampling);
 printf("The instrument is performing %s sampling every %" PRIi32 "ms.\n",
-       RBRInstrumentSamplingMode_name(sampling.mode),
+       RBRInstrumentGen3SamplingMode_name(sampling.mode),
        sampling.period);
 ~~~
 
