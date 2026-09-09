@@ -17,8 +17,8 @@ config LIBRBR_GEN3
     bool "Gen3 (Logger2/Logger3) API"
     default y
     help
-        Compile the RBRGen3_-prefixed API for Generation 3
-        (Logger2/Logger3) instruments — the libRBR 1.x API, suffixed Gen3.
+        Compile the RBRGen3-prefixed API for Generation 3
+        (Logger2/Logger3) instruments — the libRBR 1.x API, renamed.
 
 config LIBRBR_GEN4
     bool "Gen4 (SL4/SEN4/L4) API"

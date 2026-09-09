@@ -22,20 +22,22 @@ Release TBD
 
 ### Changed
 
-* Suffixed every Gen3 file name and identifier with `Gen3`,
-  mirroring the Gen4 API (SYS-1877).
-  Behaviour is unchanged.
-* Renamed every Gen4 identifier and file name
-  to the `RBRGen4` prefix (SYS-1892):
-  `RBRInstrumentGen4` is now `RBRGen4`,
+* Renamed every identifier and file name
+  to a per-generation prefix (SYS-1877, SYS-1892):
+  the Gen3 API is `RBRGen3…`
+  (`RBRInstrument_open()` is now `RBRGen3_open()`,
+  `RBRParser` is `RBRGen3Parser`,
+  `RBRDynamicCorrection` is `RBRGen3DynamicCorrection`,
+  `RBRINSTRUMENT_SUCCESS` is `RBRGEN3_SUCCESS`,
+  and `RBRInstrument.h` is `RBRGen3.h`)
+  and the Gen4 API is `RBRGen4…`
+  (`RBRInstrumentGen4` is now `RBRGen4`,
   `RBRParserGen4` is `RBRGen4Parser`,
-  `RBRDynamicCorrectionGen4` is `RBRGen4DynamicCorrection`,
-  `RBRINSTRUMENTGEN4_SUCCESS` is `RBRGEN4_SUCCESS`,
-  and `RBRInstrumentGen4.h` is `RBRGen4.h`.
+  and `RBRDynamicCorrectionGen4` is `RBRGen4DynamicCorrection`).
   The Zephyr Kconfig buffer-size options follow
-  (`CONFIG_RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX`
-  is now `CONFIG_RBRGEN4_COMMAND_BUFFER_MAX`).
-  The connection parameter of every Gen4 method is now named `conn`
+  (`CONFIG_RBRINSTRUMENTGEN3_COMMAND_BUFFER_MAX`
+  is now `CONFIG_RBRGEN3_COMMAND_BUFFER_MAX`, and likewise for Gen4).
+  The connection parameter of every method is now named `conn`
   rather than `instrument`.
   Behaviour is unchanged.
 
