@@ -53,20 +53,20 @@ RBRGen3Error instrumentStart(RBRGen3 *instrument)
         return err;
     }
 
-    RBRInstrumentGen3Thresholding thresholding;
-    err = RBRInstrumentGen3_getThresholding(instrument, &thresholding);
+    RBRGen3Thresholding thresholding;
+    err = RBRGen3_getThresholding(instrument, &thresholding);
     if (err == RBRGEN3_SUCCESS && thresholding.enabled)
     {
         thresholding.enabled = false;
-        RBRInstrumentGen3_setThresholding(instrument, &thresholding);
+        RBRGen3_setThresholding(instrument, &thresholding);
     }
 
-    RBRInstrumentGen3TwistActivation twistActivation;
-    err = RBRInstrumentGen3_getTwistActivation(instrument, &twistActivation);
+    RBRGen3TwistActivation twistActivation;
+    err = RBRGen3_getTwistActivation(instrument, &twistActivation);
     if (err == RBRGEN3_SUCCESS && twistActivation.enabled)
     {
         twistActivation.enabled = false;
-        RBRInstrumentGen3_setTwistActivation(instrument, &twistActivation);
+        RBRGen3_setTwistActivation(instrument, &twistActivation);
     }
 
     if ((err = RBRGen3_enable(instrument, true, &status))

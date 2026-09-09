@@ -40,7 +40,7 @@ if(CONFIG_LIBRBR)
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Configuration.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Deployment.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Fetching.c
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen3Gating.c
+            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Gating.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3HardwareErrors.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Internal.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Internal.h

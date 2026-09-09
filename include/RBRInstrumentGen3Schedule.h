@@ -153,7 +153,7 @@ const char *RBRInstrumentGen3SamplingMode_name(RBRInstrumentGen3SamplingMode mod
  * \brief Possible instrument gating conditions.
  *
  * \see RBRInstrumentGen3Sampling
- * \see RBRInstrumentGen3Gating.h
+ * \see RBRGen3Gating.h
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling
  */
@@ -164,13 +164,13 @@ typedef enum RBRInstrumentGen3Gate
     /**
      * Threshold gating.
      *
-     * \see RBRInstrumentGen3_setThresholding()
+     * \see RBRGen3_setThresholding()
      */
     RBRINSTRUMENTGEN3_GATE_THRESHOLDING,
     /**
      * Twist-activated gating.
      *
-     * \see RBRInstrumentGen3_setTwistActivation()
+     * \see RBRGen3_setTwistActivation()
      */
     RBRINSTRUMENTGEN3_GATE_TWISTACTIVATION,
     /** The instrument considers its gating condition to be invalid. */
@@ -297,7 +297,7 @@ RBRGen3Error RBRInstrumentGen3_getSampling(
  *
  * The value RBRInstrumentGen3Sampling.gate is also ignored. The gating mode is
  * controlled via commands for the individual gating mechanisms: see
- * RBRInstrumentGen3_setTwistActivation() and RBRInstrumentGen3_setThresholding().
+ * RBRGen3_setTwistActivation() and RBRGen3_setThresholding().
  *
  * Hardware errors may occur if:
  *

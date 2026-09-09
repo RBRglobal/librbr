@@ -17,7 +17,7 @@ extern "C" {
 
 #include "RBRGen3Configuration.h"
 #include "RBRInstrumentGen3Schedule.h"
-#include "RBRInstrumentGen3Gating.h"
+#include "RBRGen3Gating.h"
 #include "RBRInstrumentGen3Vehicle.h"
 #include "RBRInstrumentGen3Streaming.h"
 #include "RBRGen3Deployment.h"

@@ -13,7 +13,7 @@
 typedef struct ThresholdingTest
 {
     const char *response;
-    RBRInstrumentGen3Thresholding expected;
+    RBRGen3Thresholding expected;
 } ThresholdingTest;
 
 static bool test_thresholding(RBRGen3 *instrument,
@@ -21,20 +21,20 @@ static bool test_thresholding(RBRGen3 *instrument,
                               ThresholdingTest *tests)
 {
     RBRGen3Error err;
-    RBRInstrumentGen3Thresholding actual;
+    RBRGen3Thresholding actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_getThresholding(instrument, &actual);
+        err = RBRGen3_getThresholding(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.enabled, actual.enabled, bool);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.state,
                             actual.state,
-                            RBRInstrumentGen3GatingState);
+                            RBRGen3GatingState);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.channelSelection,
                             actual.channelSelection,
-                            RBRInstrumentGen3ThresholdingChannelSelection);
+                            RBRGen3ThresholdingChannelSelection);
         TEST_ASSERT_EQ(tests[i].expected.channelIndex,
                        actual.channelIndex,
                        "%" PRIi32);
@@ -42,7 +42,7 @@ static bool test_thresholding(RBRGen3 *instrument,
                            actual.channelLabel);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.condition,
                             actual.condition,
-                            RBRInstrumentGen3ThresholdingCondition);
+                            RBRGen3ThresholdingCondition);
         TEST_ASSERT_FLOAT_EQ(tests[i].expected.value, actual.value, 0.0f);
         TEST_ASSERT_EQ(tests[i].expected.interval,
                        actual.interval,
@@ -60,11 +60,11 @@ TEST_LOGGER2(thresholding)
             "value = 0.0000, interval = 60000" RESPONSE_TERMINATOR,
             {
                 .enabled = false,
-                .state = RBRINSTRUMENTGEN3_UNKNOWN_GATING,
-                .channelSelection = RBRINSTRUMENTGEN3_THRESHOLD_CHANNEL_BY_INDEX,
+                .state = RBRGEN3_UNKNOWN_GATING,
+                .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
                 .channelIndex = 1,
                 .channelLabel = "",
-                .condition = RBRINSTRUMENTGEN3_THRESHOLDING_ABOVE,
+                .condition = RBRGEN3_THRESHOLDING_ABOVE,
                 .value = 0.0,
                 .interval = 60000
             }
@@ -84,11 +84,11 @@ TEST_LOGGER3(thresholding)
             "interval = 60000" RESPONSE_TERMINATOR,
             {
                 .enabled = false,
-                .state = RBRINSTRUMENTGEN3_GATING_NA,
-                .channelSelection = RBRINSTRUMENTGEN3_THRESHOLD_CHANNEL_BY_INDEX,
+                .state = RBRGEN3_GATING_NA,
+                .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
                 .channelIndex = 1,
                 .channelLabel = "temperature_00",
-                .condition = RBRINSTRUMENTGEN3_THRESHOLDING_ABOVE,
+                .condition = RBRGEN3_THRESHOLDING_ABOVE,
                 .value = 0.0,
                 .interval = 60000
             }
@@ -99,11 +99,11 @@ TEST_LOGGER3(thresholding)
             "interval = 10000" RESPONSE_TERMINATOR,
             {
                 .enabled = true,
-                .state = RBRINSTRUMENTGEN3_GATING_PAUSED,
-                .channelSelection = RBRINSTRUMENTGEN3_THRESHOLD_CHANNEL_BY_INDEX,
+                .state = RBRGEN3_GATING_PAUSED,
+                .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
                 .channelIndex = 2,
                 .channelLabel = "pressure_00",
-                .condition = RBRINSTRUMENTGEN3_THRESHOLDING_BELOW,
+                .condition = RBRGEN3_THRESHOLDING_BELOW,
                 .value = 600.0,
                 .interval = 10000
             }
@@ -115,11 +115,11 @@ TEST_LOGGER3(thresholding)
             RESPONSE_TERMINATOR,
             {
                 .enabled = true,
-                .state = RBRINSTRUMENTGEN3_GATING_PAUSED,
-                .channelSelection = RBRINSTRUMENTGEN3_THRESHOLD_CHANNEL_BY_INDEX,
+                .state = RBRGEN3_GATING_PAUSED,
+                .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
                 .channelIndex = 2,
                 .channelLabel = "thispressurelabelislongerthanth",
-                .condition = RBRINSTRUMENTGEN3_THRESHOLDING_BELOW,
+                .condition = RBRGEN3_THRESHOLDING_BELOW,
                 .value = 600.0,
                 .interval = 10000
             }
@@ -132,11 +132,11 @@ TEST_LOGGER3(thresholding)
 
 TEST_LOGGER2(thresholding_set)
 {
-    RBRInstrumentGen3Thresholding threshold = {
+    RBRGen3Thresholding threshold = {
         .enabled = true,
-        .channelSelection = RBRINSTRUMENTGEN3_THRESHOLD_CHANNEL_BY_INDEX,
+        .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
         .channelIndex = 1,
-        .condition = RBRINSTRUMENTGEN3_THRESHOLDING_ABOVE,
+        .condition = RBRGEN3_THRESHOLDING_ABOVE,
         .value = 0.0,
         .interval = 60000
     };
@@ -151,7 +151,7 @@ TEST_LOGGER2(thresholding_set)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRInstrumentGen3_setThresholding(instrument, &threshold);
+    err = RBRGen3_setThresholding(instrument, &threshold);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     return true;
@@ -159,11 +159,11 @@ TEST_LOGGER2(thresholding_set)
 
 TEST_LOGGER3(thresholding_set_channel_by_index)
 {
-    RBRInstrumentGen3Thresholding threshold = {
+    RBRGen3Thresholding threshold = {
         .enabled = true,
-        .channelSelection = RBRINSTRUMENTGEN3_THRESHOLD_CHANNEL_BY_INDEX,
+        .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
         .channelIndex = 1,
-        .condition = RBRINSTRUMENTGEN3_THRESHOLDING_ABOVE,
+        .condition = RBRGEN3_THRESHOLDING_ABOVE,
         .value = 0.0,
         .interval = 60000
     };
@@ -183,7 +183,7 @@ TEST_LOGGER3(thresholding_set_channel_by_index)
     //                         COMMAND_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRInstrumentGen3_setThresholding(instrument, &threshold);
+    err = RBRGen3_setThresholding(instrument, &threshold);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -192,11 +192,11 @@ TEST_LOGGER3(thresholding_set_channel_by_index)
 
 TEST_LOGGER3(thresholding_set_channel_by_label)
 {
-    RBRInstrumentGen3Thresholding threshold = {
+    RBRGen3Thresholding threshold = {
         .enabled = false,
-        .channelSelection = RBRINSTRUMENTGEN3_THRESHOLD_CHANNEL_BY_LABEL,
+        .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_LABEL,
         .channelLabel = "pressure_00",
-        .condition = RBRINSTRUMENTGEN3_THRESHOLDING_BELOW,
+        .condition = RBRGEN3_THRESHOLDING_BELOW,
         .value = 30.0,
         .interval = 30000
     };
@@ -211,7 +211,7 @@ TEST_LOGGER3(thresholding_set_channel_by_label)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRInstrumentGen3_setThresholding(instrument, &threshold);
+    err = RBRGen3_setThresholding(instrument, &threshold);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -221,7 +221,7 @@ TEST_LOGGER3(thresholding_set_channel_by_label)
 typedef struct TwistActivationTest
 {
     const char *response;
-    RBRInstrumentGen3TwistActivation expected;
+    RBRGen3TwistActivation expected;
 } TwistActivationTest;
 
 static bool test_twistactivation(RBRGen3 *instrument,
@@ -229,17 +229,17 @@ static bool test_twistactivation(RBRGen3 *instrument,
                                  TwistActivationTest *tests)
 {
     RBRGen3Error err;
-    RBRInstrumentGen3TwistActivation actual;
+    RBRGen3TwistActivation actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_getTwistActivation(instrument, &actual);
+        err = RBRGen3_getTwistActivation(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.enabled, actual.enabled, bool);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.state,
                             actual.state,
-                            RBRInstrumentGen3GatingState);
+                            RBRGen3GatingState);
     }
 
     return true;
@@ -252,14 +252,14 @@ TEST_LOGGER2(twistactivation)
             "twistactivation state = off, location = off" RESPONSE_TERMINATOR,
             {
                 .enabled = false,
-                .state = RBRINSTRUMENTGEN3_UNKNOWN_GATING
+                .state = RBRGEN3_UNKNOWN_GATING
             }
         },
         {
             "twistactivation state = on, location = who cares" RESPONSE_TERMINATOR,
             {
                 .enabled = true,
-                .state = RBRINSTRUMENTGEN3_UNKNOWN_GATING
+                .state = RBRGEN3_UNKNOWN_GATING
             }
         },
         {0}
@@ -275,7 +275,7 @@ TEST_LOGGER3(twistactivation)
             "twistactivation enabled = false, state = n/a" RESPONSE_TERMINATOR,
             {
                 .enabled = false,
-                .state = RBRINSTRUMENTGEN3_GATING_NA
+                .state = RBRGEN3_GATING_NA
             }
         },
         {
@@ -283,7 +283,7 @@ TEST_LOGGER3(twistactivation)
             RESPONSE_TERMINATOR,
             {
                 .enabled = true,
-                .state = RBRINSTRUMENTGEN3_GATING_PAUSED
+                .state = RBRGEN3_GATING_PAUSED
             }
         },
         {
@@ -291,7 +291,7 @@ TEST_LOGGER3(twistactivation)
             RESPONSE_TERMINATOR,
             {
                 .enabled = true,
-                .state = RBRINSTRUMENTGEN3_GATING_RUNNING
+                .state = RBRGEN3_GATING_RUNNING
             }
         },
         {0}
@@ -302,7 +302,7 @@ TEST_LOGGER3(twistactivation)
 
 TEST_LOGGER2(twistactivation_set)
 {
-    RBRInstrumentGen3TwistActivation twistActivation = {
+    RBRGen3TwistActivation twistActivation = {
         .enabled = true
     };
 
@@ -314,7 +314,7 @@ TEST_LOGGER2(twistactivation_set)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRInstrumentGen3_setTwistActivation(instrument, &twistActivation);
+    err = RBRGen3_setTwistActivation(instrument, &twistActivation);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -323,7 +323,7 @@ TEST_LOGGER2(twistactivation_set)
 
 TEST_LOGGER3(twistactivation_set)
 {
-    RBRInstrumentGen3TwistActivation twistActivation = {
+    RBRGen3TwistActivation twistActivation = {
         .enabled = true
     };
 
@@ -335,7 +335,7 @@ TEST_LOGGER3(twistactivation_set)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRInstrumentGen3_setTwistActivation(instrument, &twistActivation);
+    err = RBRGen3_setTwistActivation(instrument, &twistActivation);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
