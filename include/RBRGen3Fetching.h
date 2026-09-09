@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Fetching.h
+ * \file RBRGen3Fetching.h
  *
  * \brief Instrument commands and structures pertaining to on-demand data
  * acquisition.
@@ -11,8 +11,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTGEN3FETCHING_H
-#define LIBRBR_RBRINSTRUMENTGEN3FETCHING_H
+#ifndef LIBRBR_RBRGEN3FETCHING_H
+#define LIBRBR_RBRGEN3FETCHING_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,7 +48,7 @@ extern "C" {
  * \return #RBRGEN3_HARDWARE_ERROR when an invalid channel is requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/fetch
  */
-RBRGen3Error RBRInstrumentGen3_fetch(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_fetch(RBRGen3 *instrument,
                                        RBRInstrumentGen3LabelsList *channels,
                                        bool sleepAfter,
                                        RBRGen3Sample *sample);
@@ -57,4 +57,4 @@ RBRGen3Error RBRInstrumentGen3_fetch(RBRGen3 *instrument,
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTGEN3FETCHING_H */
+#endif /* LIBRBR_RBRGEN3FETCHING_H */

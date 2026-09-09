@@ -31,7 +31,7 @@ static bool test_fetching(RBRGen3 *instrument,
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_fetch(instrument,
+        err = RBRGen3_fetch(instrument,
                                   tests[i].passChannels ? &tests[i].channels : NULL,
                                   tests[i].sleepAfter,
                                   &actual);

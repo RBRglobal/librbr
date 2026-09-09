@@ -236,7 +236,7 @@ typedef enum RBRGen3Error
     /**
      * Used internally when the parser encounters a sample.
      *
-     * \see RBRInstrumentGen3_fetch()
+     * \see RBRGen3_fetch()
      * \see RBRInstrumentGen3_readSample()
      */
     RBRGEN3_SAMPLE,

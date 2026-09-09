@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
     RBRGen3Sample sample;
     while (true)
     {
-        err = RBRInstrumentGen3_fetch(instrument, NULL, false, &sample);
+        err = RBRGen3_fetch(instrument, NULL, false, &sample);
         if (err != RBRGEN3_SUCCESS)
         {
             fprintf(stderr, "Error: %s\n", RBRGen3Error_name(err));

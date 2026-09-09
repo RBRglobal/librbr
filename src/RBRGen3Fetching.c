@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Fetching.c
+ * \file RBRGen3Fetching.c
  *
  * \brief Library implementation.
  *
@@ -16,7 +16,7 @@
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
 
-RBRGen3Error RBRInstrumentGen3_fetch(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_fetch(RBRGen3 *instrument,
                                        RBRInstrumentGen3LabelsList *channels,
                                        bool sleepAfter,
                                        RBRGen3Sample *sample)
