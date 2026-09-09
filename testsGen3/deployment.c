@@ -52,7 +52,7 @@ TEST_LOGGER2(verify)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE
             },
             RBRINSTRUMENTGEN3_STATUS_PENDING
         },
@@ -61,7 +61,7 @@ TEST_LOGGER2(verify)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE
             },
             RBRINSTRUMENTGEN3_STATUS_LOGGING
         },
@@ -71,7 +71,7 @@ TEST_LOGGER2(verify)
             RBRGEN3_HARDWARE_ERROR,
             {
                 .type = RBRGEN3_RESPONSE_ERROR,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
+                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
             },
             RBRINSTRUMENTGEN3_UNKNOWN_STATUS
         },
@@ -99,7 +99,7 @@ TEST_LOGGER3(verify)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE
             },
             RBRINSTRUMENTGEN3_STATUS_PENDING
         },
@@ -108,7 +108,7 @@ TEST_LOGGER3(verify)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE
             },
             RBRINSTRUMENTGEN3_STATUS_LOGGING
         },
@@ -117,7 +117,7 @@ TEST_LOGGER3(verify)
             RBRGEN3_HARDWARE_ERROR,
             {
                 .type = RBRGEN3_RESPONSE_ERROR,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
+                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
             },
             RBRINSTRUMENTGEN3_UNKNOWN_STATUS
         },
@@ -170,7 +170,7 @@ TEST_LOGGER2(enable)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE
             },
             RBRINSTRUMENTGEN3_STATUS_PENDING
         },
@@ -179,7 +179,7 @@ TEST_LOGGER2(enable)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE
             },
             RBRINSTRUMENTGEN3_STATUS_LOGGING
         },
@@ -189,7 +189,7 @@ TEST_LOGGER2(enable)
             RBRGEN3_HARDWARE_ERROR,
             {
                 .type = RBRGEN3_RESPONSE_ERROR,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
+                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
             },
             RBRINSTRUMENTGEN3_UNKNOWN_STATUS
         },
@@ -217,7 +217,7 @@ TEST_LOGGER3(enable)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE
             },
             RBRINSTRUMENTGEN3_STATUS_PENDING
         },
@@ -226,7 +226,7 @@ TEST_LOGGER3(enable)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE
             },
             RBRINSTRUMENTGEN3_STATUS_LOGGING
         },
@@ -235,7 +235,7 @@ TEST_LOGGER3(enable)
             RBRGEN3_HARDWARE_ERROR,
             {
                 .type = RBRGEN3_RESPONSE_ERROR,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
+                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
             },
             RBRINSTRUMENTGEN3_UNKNOWN_STATUS
         },
@@ -288,7 +288,7 @@ TEST_LOGGER2(stop)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE
             },
             RBRINSTRUMENTGEN3_STATUS_STOPPED
         },
@@ -333,7 +333,7 @@ TEST_LOGGER3(disable)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE
             },
             RBRINSTRUMENTGEN3_STATUS_STOPPED
         },
@@ -342,7 +342,7 @@ TEST_LOGGER3(disable)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE
             },
             RBRINSTRUMENTGEN3_STATUS_FULLANDSTOPPED
         },
@@ -351,7 +351,7 @@ TEST_LOGGER3(disable)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE
             },
             RBRINSTRUMENTGEN3_STATUS_DISABLED
         },

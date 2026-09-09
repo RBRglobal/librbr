@@ -87,7 +87,7 @@
  * output doesn't distinguish between them – the consumer needs to be aware of
  * the difference. This is a list of error numbers which are actually warnings.
  */
-static const RBRInstrumentGen3HardwareError WARNING_NUMBERS[] = {
+static const RBRGen3HardwareError WARNING_NUMBERS[] = {
     RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
     RBRGEN3_HARDWARE_ERROR_NOT_LOGGING
 };
@@ -608,7 +608,7 @@ RBRGen3Error RBRGen3_errorCheckResponse(
     }
 
     instrument->response.type = RBRGEN3_RESPONSE_INFO;
-    instrument->response.error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE;
+    instrument->response.error = RBRGEN3_HARDWARE_ERROR_NONE;
     instrument->response.response = beginning;
 
     /*
@@ -643,7 +643,7 @@ RBRGen3Error RBRGen3_readResponse(RBRGen3 *instrument,
 {
     /* Reset the response state. */
     instrument->response.type = RBRGEN3_RESPONSE_UNKNOWN_TYPE;
-    instrument->response.error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE;
+    instrument->response.error = RBRGEN3_HARDWARE_ERROR_NONE;
     instrument->response.response = NULL;
 
     RBRGen3Sample *sampleTarget;
@@ -957,7 +957,7 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *instrument,
              */
             if (err == RBRGEN3_HARDWARE_ERROR
                 && (instrument->response.error ==
-                    RBRINSTRUMENTGEN3_HARDWARE_ERROR_INVALID_COMMAND))
+                    RBRGEN3_HARDWARE_ERROR_INVALID_COMMAND))
             {
                 /* We have no message to inspect, so we can only assume the
                  * error is legitimate and pass it along to the user. */

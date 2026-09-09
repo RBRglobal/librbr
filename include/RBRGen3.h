@@ -24,7 +24,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "RBRInstrumentGen3HardwareErrors.h"
+#include "RBRGen3HardwareErrors.h"
 
 /**
  * \brief The library name.
@@ -577,9 +577,9 @@ typedef struct RBRGen3Response
      * Will be `0` for informational responses. Otherwise, will include the
      * error number indicated by the instrument; e.g., for “E0109: feature not
      * available”, this field will contain `109`, aka
-     * RBRINSTRUMENTGEN3_HARDWARE_ERROR_FEATURE_NOT_AVAILABLE.
+     * RBRGEN3_HARDWARE_ERROR_FEATURE_NOT_AVAILABLE.
      */
-    RBRInstrumentGen3HardwareError error;
+    RBRGen3HardwareError error;
     /**
      * \brief The response, if available.
      *
@@ -840,7 +840,7 @@ void RBRGen3_setUserData(RBRGen3 *instrument, void *userData);
  *
  * If the instrument responded with an error or a warning to the last command,
  * this function returns that error. Otherwise, and before any commands have
- * been issued to the instrument, it returns RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE.
+ * been issued to the instrument, it returns RBRGEN3_HARDWARE_ERROR_NONE.
  *
  * Note that this information is _not_ recorded by the instrument: it is
  * recorded by the library as responses are parsed. Accordingly, the value will
@@ -855,7 +855,7 @@ void RBRGen3_setUserData(RBRGen3 *instrument, void *userData);
  * \return the last error
  * \see RBRGen3_getLastHardwareErrorMessage() for the error message
  */
-RBRInstrumentGen3HardwareError RBRGen3_getLastHardwareError(
+RBRGen3HardwareError RBRGen3_getLastHardwareError(
     const RBRGen3 *instrument);
 
 /**
@@ -867,7 +867,7 @@ RBRInstrumentGen3HardwareError RBRGen3_getLastHardwareError(
  * message. Otherwise, and before any commands have been issued to the
  * instrument, it returns `NULL`.
  *
- * This function differs from RBRInstrumentGen3HardwareError_name() in that it
+ * This function differs from RBRGen3HardwareError_name() in that it
  * returns the literal message produced by the instrument. This may include
  * instance-specific error details (e.g., in the case of an invalid parameter,
  * exactly which parameter was invalid). However, the enum name is a good

@@ -641,7 +641,7 @@ RBRGen3Error RBRInstrumentGen3_getSensorParameter(
     if (instrument->generation == RBRGEN3_LOGGER2
         && err == RBRGEN3_HARDWARE_ERROR
         && (instrument->response.error ==
-            RBRINSTRUMENTGEN3_HARDWARE_ERROR_ITEM_IS_NOT_CONFIGURED))
+            RBRGEN3_HARDWARE_ERROR_ITEM_IS_NOT_CONFIGURED))
     {
         snprintf(parameter->value,
                  sizeof(parameter->value),
@@ -706,7 +706,7 @@ RBRGen3Error RBRInstrumentGen3_getSensorParameters(
     if (instrument->generation == RBRGEN3_LOGGER2
         && err == RBRGEN3_HARDWARE_ERROR
         && (instrument->response.error ==
-            RBRINSTRUMENTGEN3_HARDWARE_ERROR_FEATURE_NOT_AVAILABLE))
+            RBRGEN3_HARDWARE_ERROR_FEATURE_NOT_AVAILABLE))
     {
         instrument->response.type = RBRGEN3_RESPONSE_INFO;
         return RBRGEN3_SUCCESS;

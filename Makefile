@@ -115,7 +115,7 @@ GEN3_OBJECTS := src/RBRGen3.o \
                 src/RBRInstrumentGen3Deployment.o \
                 src/RBRInstrumentGen3Fetching.o \
                 src/RBRInstrumentGen3Gating.o \
-                src/RBRInstrumentGen3HardwareErrors.o \
+                src/RBRGen3HardwareErrors.o \
                 src/RBRGen3Internal.o \
                 src/RBRInstrumentGen3Memory.o \
                 src/RBRInstrumentGen3Other.o \

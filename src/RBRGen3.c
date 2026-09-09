@@ -267,7 +267,7 @@ void RBRGen3_setUserData(RBRGen3 *instrument, void *userData)
     instrument->userData = userData;
 }
 
-RBRInstrumentGen3HardwareError RBRGen3_getLastHardwareError(
+RBRGen3HardwareError RBRGen3_getLastHardwareError(
     const RBRGen3 *instrument)
 {
     if (instrument->response.type == RBRGEN3_RESPONSE_ERROR
@@ -277,7 +277,7 @@ RBRInstrumentGen3HardwareError RBRGen3_getLastHardwareError(
     }
     else
     {
-        return RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE;
+        return RBRGEN3_HARDWARE_ERROR_NONE;
     }
 }
 
