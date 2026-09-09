@@ -70,7 +70,7 @@ fi
 sudo iw dev "$wl_name" connect -w "$rbr_wifi" >/dev/null 2>&1
 sudo dhclient "$wl_name" >/dev/null 2>&1
 echo "================================"
-$SCRIPT_DIR/../posix/posix-download-wifi
+$SCRIPT_DIR/../posixGen3/posix-download-wifi
 
 # put wpa_supplicant to initial state
 clean_up

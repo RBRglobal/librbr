@@ -34,7 +34,7 @@ Release TBD
   to save bandwidth and time
   when calibration information is unnecessary.
 * Improved 
-  [examples/posix/posix-download-wifi.c](examples/posix/posix-download-wifi.c)
+  [examples/posixGen3/posix-download-wifi.c](examples/posixGen3/posix-download-wifi.c)
   to show rolling average throughput and re-request chunks that fail to
   download.
 

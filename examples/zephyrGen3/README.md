@@ -28,7 +28,7 @@ by using Zephyr's async UART API.
 ## Organization
 
 This example is laid out like the [T2 topology].
-This directory (`examples/zephyr/`) is the Zephyr workspace;
+This directory (`examples/zephyrGen3/`) is the Zephyr workspace;
 the `application/` subdirectory holds the application.
 
 [T2 topology]: https://docs.zephyrproject.org/4.2.0/develop/west/workspaces.html#t2-star-topology-application-is-the-manifest-repository
@@ -51,8 +51,8 @@ in this directory:
 ~~~{.txt}
 $ west init --local application/
 === Initializing from existing manifest repository application
---- Creating /path/to/librbr/examples/zephyr/.west and local configuration file
-=== Initialized. Now run "west update" inside /path/to/librbr/examples/zephyr.
+--- Creating /path/to/librbr/examples/zephyrGen3/.west and local configuration file
+=== Initialized. Now run "west update" inside /path/to/librbr/examples/zephyrGen3.
 $ west update
 --- zephyr: initializing
 ...
@@ -66,12 +66,12 @@ $ cd application/
 $ west build --board=native_sim -- -DEXTRA_CONF_FILE=debug.conf
 -- west build: generating a build system
 Loading Zephyr default modules (Zephyr base).
--- Application: /path/to/librbr/examples/zephyr/application
+-- Application: /path/to/librbr/examples/zephyrGen3/application
 ...
 -- west build: building application
 ...
 [116/118] Linking C executable zephyr/zephyr.elf; Logical command for additional byproducts on target: zephyr_pre0
-Generating files from /path/to/librbr/examples/zephyr/application/build/zephyr/zephyr.elf for board: native_sim
+Generating files from /path/to/librbr/examples/zephyrGen3/application/build/zephyr/zephyr.elf for board: native_sim
 [118/118] Running utility command for native_runner_executable
 ~~~
 

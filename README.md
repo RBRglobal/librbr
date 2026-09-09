@@ -167,7 +167,7 @@ $ make all
 
 continue with commands below if one wants to use the posix example with dynamic correction:
 ~~~{.sh}
-$ cd <PATH>/librbr/examples/posix
+$ cd <PATH>/librbr/examples/posixGen3
 # Build all the posix example:
 # (ignore errors if any)
 $ make all
@@ -190,7 +190,7 @@ $ ./posix-stream-dynamiccorrection /dev/ttyS<number>
 
 or test with .csv file:
 ~~~{.sh}
-$ cd <PATH>/librbr/examples/dynamicCorrection
+$ cd <PATH>/librbr/examples/dynamicCorrectionGen3
 # Build the example:
 $ make
 # Test with the example file:
@@ -221,7 +221,7 @@ Then commands below shows how to use the library:
 $ make lib
 
 # Continue with commands below if one wants to use the posix example:
-$ cd <PATH>/librbr/examples/posix
+$ cd <PATH>/librbr/examples/posixGen3
 # Build the exmamples:
 $ make example
 ~~~

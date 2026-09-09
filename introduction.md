@@ -97,7 +97,7 @@ while parsing other command responses
 is forwarded to the user via a callback.
 This lets the user receive streaming samples
 without interrupting other instrument communication.
-See the `posix/posix-stream.c` example.
+See the `posixGen3/posix-stream.c` example.
 
 ### Parsing
 
@@ -108,4 +108,4 @@ This enables convenient interleaving
 of downloading and parsing,
 and similar implementation of handling
 for streamed and downloaded data.
-See the `posix/posix-parse-download.c` example.
+See the `posixGen3/posix-parse-download.c` example.

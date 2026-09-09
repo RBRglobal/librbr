@@ -24,7 +24,7 @@ Before building any examples, ensure these have been built:
 
 ~~~{.sh}
 $ pwd
-$ /path/to/librbr/examples/posix
+$ /path/to/librbr/examples/posixGen3
 $ make --directory=../../ lib libdynamiccorrection
 make: Leaving directory '/path/to/librbr'
 ~~~
@@ -68,10 +68,10 @@ the `cfsetospeed(3)` call in `./posix-shared.c`.
 For example, to use 115,200 baud:
 
 ~~~{.diff}
-diff --git a/examples/posix/posix-shared.c b/examples/posix/posix-shared.c
+diff --git a/examples/posixGen3/posix-shared.c b/examples/posixGen3/posix-shared.c
 index c50c366..8cb1b71 100644
---- a/examples/posix/posix-shared.c
-+++ b/examples/posix/posix-shared.c
+--- a/examples/posixGen3/posix-shared.c
++++ b/examples/posixGen3/posix-shared.c
 @@ -64,7 +64,7 @@ int openSerialFd(char *devicePath)
      /*important!!!
       change baudrate below if one is using 115200:

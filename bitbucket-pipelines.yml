@@ -18,7 +18,7 @@ definitions:
                 # the examples below link against the both-generation archive.
                 - make clean
                 - make lib libdynamiccorrection tests
-                - cd examples/posix
+                - cd examples/posixGen3
                 - make clean
                 - make nosdl
                 - cd ../posixGen4
@@ -79,7 +79,7 @@ pipelines:
                     - apt-get update && apt-get -y install libsdl2-dev
                     - export MAKEFLAGS=--jobs=$(nproc)
                     - make lib
-                    - cd examples/posix
+                    - cd examples/posixGen3
                     - make posix-stream-sdl
 
             - step:
@@ -88,7 +88,7 @@ pipelines:
                 # the Zephyr version specified in west.yml.
                 image: ghcr.io/zephyrproject-rtos/ci:v0.28.8
                 script:
-                    - cd examples/zephyr/
+                    - cd examples/zephyrGen3/
                     # We're in the unique position of trying to use a consume
                     # this repository as a West module from a West manifest
                     # stored within this repository. We'll rewrite the manifest
@@ -121,7 +121,7 @@ pipelines:
                     - make clean
                     - scan-build make lib libdynamiccorrection
                     - make tests
-                    - cd examples/posix
+                    - cd examples/posixGen3
                     - make clean
                     - scan-build make
                     - cd ../posixGen4
