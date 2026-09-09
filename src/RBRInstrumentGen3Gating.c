@@ -13,8 +13,8 @@
 /* Required for memset, strcmp. */
 #include <string.h>
 
-#include "RBRInstrumentGen3.h"
-#include "RBRInstrumentGen3Internal.h"
+#include "RBRGen3.h"
+#include "RBRGen3Internal.h"
 
 const char *RBRInstrumentGen3GatingState_name(RBRInstrumentGen3GatingState state)
 {
@@ -65,8 +65,8 @@ const char *RBRInstrumentGen3ThresholdingCondition_name(
     }
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getThresholding(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getThresholding(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Thresholding *threshold)
 {
     memset(threshold, 0, sizeof(RBRInstrumentGen3Thresholding));
@@ -79,13 +79,13 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getThresholding(
         (RBRInstrumentGen3ThresholdingCondition *) &threshold->condition;
     *condition = RBRINSTRUMENTGEN3_UNKNOWN_THRESHOLDING;
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "thresholding"));
+    RBR_TRY(RBRGen3_converse(instrument, "thresholding"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -99,7 +99,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getThresholding(
         }
         else if (strcmp(parameter.key, "state") == 0)
         {
-            if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+            if (instrument->generation == RBRGEN3_LOGGER2)
             {
                 threshold->enabled = (strcmp(parameter.value, "on") == 0);
             }
@@ -154,11 +154,11 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getThresholding(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setThresholding(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setThresholding(
+    RBRGen3 *instrument,
     const RBRInstrumentGen3Thresholding *threshold)
 {
     if (threshold->channelSelection < RBRINSTRUMENTGEN3_THRESHOLD_CHANNEL_BY_INDEX
@@ -167,10 +167,10 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setThresholding(
         || (threshold->channelSelection ==
             RBRINSTRUMENTGEN3_THRESHOLD_CHANNEL_BY_INDEX
             && (threshold->channelIndex < 1
-                || threshold->channelIndex > RBRINSTRUMENTGEN3_CHANNEL_MAX))
+                || threshold->channelIndex > RBRGEN3_CHANNEL_MAX))
         || (threshold->channelSelection ==
             RBRINSTRUMENTGEN3_THRESHOLD_CHANNEL_BY_LABEL
-            && (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2
+            && (instrument->generation == RBRGEN3_LOGGER2
                 || strlen(threshold->channelLabel) == 0))
         || threshold->condition < RBRINSTRUMENTGEN3_THRESHOLDING_ABOVE
         || threshold->condition > RBRINSTRUMENTGEN3_THRESHOLDING_BELOW
@@ -178,15 +178,15 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setThresholding(
         || threshold->interval > RBRINSTRUMENTGEN3_SAMPLING_PERIOD_MAX
         || (threshold->interval >= 1000 && threshold->interval % 1000 != 0))
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
     const char *enabledParameter;
     const char *enabledValue;
     const char *channelParameter;
-    char channelValue[RBRINSTRUMENTGEN3_CHANNEL_LABEL_MAX + 1];
+    char channelValue[RBRGEN3_CHANNEL_LABEL_MAX + 1];
 
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
         enabledParameter = "state";
         enabledValue = (threshold->enabled) ? "on" : "off";
@@ -216,7 +216,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setThresholding(
                  threshold->channelLabel);
     }
 
-    return RBRInstrumentGen3_converse(
+    return RBRGen3_converse(
         instrument,
         "thresholding %s = %s, %s = %s, condition = %s, value = %0.4f, "
         "interval = %d",
@@ -229,8 +229,8 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setThresholding(
         threshold->interval);
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getTwistActivation(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getTwistActivation(
+    RBRGen3 *instrument,
     RBRInstrumentGen3TwistActivation *twistActivation)
 {
     memset(twistActivation, 0, sizeof(RBRInstrumentGen3TwistActivation));
@@ -239,13 +239,13 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getTwistActivation(
         (RBRInstrumentGen3GatingState *) &twistActivation->state;
     *state = RBRINSTRUMENTGEN3_UNKNOWN_GATING;
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "twistactivation"));
+    RBR_TRY(RBRGen3_converse(instrument, "twistactivation"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -259,7 +259,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getTwistActivation(
         }
         else if (strcmp(parameter.key, "state") == 0)
         {
-            if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+            if (instrument->generation == RBRGEN3_LOGGER2)
             {
                 twistActivation->enabled =
                     (strcmp(parameter.value, "on") == 0);
@@ -281,17 +281,17 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getTwistActivation(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setTwistActivation(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setTwistActivation(
+    RBRGen3 *instrument,
     const RBRInstrumentGen3TwistActivation *twistActivation)
 {
     const char *enabledParameter;
     const char *enabledValue;
 
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
         enabledParameter = "state";
         enabledValue = (twistActivation->enabled) ? "on" : "off";
@@ -302,7 +302,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setTwistActivation(
         enabledValue = (twistActivation->enabled) ? "true" : "false";
     }
 
-    return RBRInstrumentGen3_converse(
+    return RBRGen3_converse(
         instrument,
         "twistactivation %s = %s",
         enabledParameter,

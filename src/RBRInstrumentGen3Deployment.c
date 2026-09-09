@@ -11,19 +11,19 @@
 /* Required for memset, strcmp. */
 #include <string.h>
 
-#include "RBRInstrumentGen3.h"
-#include "RBRInstrumentGen3Internal.h"
+#include "RBRGen3.h"
+#include "RBRGen3Internal.h"
 
-static RBRInstrumentGen3Error RBRInstrumentGen3_parseDeploymentResponse(
-    RBRInstrumentGen3 *instrument,
+static RBRGen3Error RBRInstrumentGen3_parseDeploymentResponse(
+    RBRGen3 *instrument,
     const char *deploymentCommand,
     RBRInstrumentGen3DeploymentStatus *status)
 {
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -50,17 +50,17 @@ static RBRInstrumentGen3Error RBRInstrumentGen3_parseDeploymentResponse(
         break;
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_verify(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_verify(
+    RBRGen3 *instrument,
     bool eraseMemory,
     RBRInstrumentGen3DeploymentStatus *status)
 {
     *status = RBRINSTRUMENTGEN3_UNKNOWN_STATUS;
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument,
+    RBR_TRY(RBRGen3_converse(instrument,
                                    "verify erasememory = %s",
                                    (eraseMemory) ? "true" : "false"));
 
@@ -69,14 +69,14 @@ RBRInstrumentGen3Error RBRInstrumentGen3_verify(
                                                  status);
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_enable(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_enable(
+    RBRGen3 *instrument,
     bool eraseMemory,
     RBRInstrumentGen3DeploymentStatus *status)
 {
     *status = RBRINSTRUMENTGEN3_UNKNOWN_STATUS;
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument,
+    RBR_TRY(RBRGen3_converse(instrument,
                                    "enable erasememory = %s",
                                    (eraseMemory) ? "true" : "false"));
 
@@ -85,14 +85,14 @@ RBRInstrumentGen3Error RBRInstrumentGen3_enable(
                                                  status);
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_disable(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_disable(
+    RBRGen3 *instrument,
     RBRInstrumentGen3DeploymentStatus *status)
 {
     *status = RBRINSTRUMENTGEN3_UNKNOWN_STATUS;
 
     const char *disableCommand;
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
         disableCommand = "stop";
     }
@@ -101,26 +101,26 @@ RBRInstrumentGen3Error RBRInstrumentGen3_disable(
         disableCommand = "disable";
     }
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, disableCommand));
+    RBR_TRY(RBRGen3_converse(instrument, disableCommand));
 
     return RBRInstrumentGen3_parseDeploymentResponse(instrument,
                                                  disableCommand,
                                                  status);
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getSimulation(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getSimulation(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Simulation *simulation)
 {
     memset(simulation, 0, sizeof(RBRInstrumentGen3Simulation));
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "simulation"));
+    RBR_TRY(RBRGen3_converse(instrument, "simulation"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -138,22 +138,22 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getSimulation(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setSimulation(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setSimulation(
+    RBRGen3 *instrument,
     const RBRInstrumentGen3Simulation *simulation)
 {
     if (simulation->period <= 0)
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
     RBR_TRY(RBRInstrumentGen3_permit(instrument, "simulation"));
-    RBR_TRY(RBRInstrumentGen3_converse(instrument,
+    RBR_TRY(RBRGen3_converse(instrument,
                                    "simulation state = %s, period = %i",
                                    (simulation->state) ? "on" : "off",
                                    simulation->period));
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }

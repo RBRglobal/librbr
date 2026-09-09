@@ -13,13 +13,13 @@
 /* Required for memset. */
 #include <string.h>
 
-#include "RBRInstrumentGen3.h"
-#include "RBRInstrumentGen3Internal.h"
+#include "RBRGen3.h"
+#include "RBRGen3Internal.h"
 
-RBRInstrumentGen3Error RBRInstrumentGen3_fetch(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_fetch(RBRGen3 *instrument,
                                        RBRInstrumentGen3LabelsList *channels,
                                        bool sleepAfter,
-                                       RBRInstrumentGen3Sample *sample)
+                                       RBRGen3Sample *sample)
 {
     char *commandBuffer = (char *) instrument->commandBuffer;
     int32_t *commandBufferLength = &instrument->commandBufferLength;
@@ -35,7 +35,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_fetch(RBRInstrumentGen3 *instrument,
      * the command buffer. We'll add each one to the buffer, and whenever we
      * run out of room, we'll flush.
      *
-     * The description of RBRInstrumentGen3WriteCallback says:
+     * The description of RBRGen3WriteCallback says:
      *
      * > The library will attempt to call this function only for complete
      * > commands
@@ -45,7 +45,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_fetch(RBRInstrumentGen3 *instrument,
      */
     if (channels != NULL
         && channels->count > 0
-        && instrument->generation != RBRINSTRUMENTGEN3_LOGGER2)
+        && instrument->generation != RBRGEN3_LOGGER2)
     {
         *commandBufferLength += snprintf(
             commandBuffer + *commandBufferLength,
@@ -58,7 +58,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_fetch(RBRInstrumentGen3 *instrument,
             if (*commandBufferLength + 1 + strlen(channels->labels[channel])
                 > sizeof(instrument->commandBuffer))
             {
-                RBR_TRY(RBRInstrumentGen3_sendBuffer(instrument));
+                RBR_TRY(RBRGen3_sendBuffer(instrument));
                 *commandBufferLength = 0;
             }
 
@@ -72,40 +72,40 @@ RBRInstrumentGen3Error RBRInstrumentGen3_fetch(RBRInstrumentGen3 *instrument,
         }
     }
 
-    if ((size_t) *commandBufferLength + RBRINSTRUMENTGEN3_SEND_COMMAND_TERMINATOR_LEN
+    if ((size_t) *commandBufferLength + RBRGEN3_SEND_COMMAND_TERMINATOR_LEN
         > sizeof(instrument->commandBuffer))
     {
-        RBR_TRY(RBRInstrumentGen3_sendBuffer(instrument));
+        RBR_TRY(RBRGen3_sendBuffer(instrument));
         *commandBufferLength = 0;
     }
 
     *commandBufferLength += snprintf(
         commandBuffer + *commandBufferLength,
         sizeof(instrument->commandBuffer) - *commandBufferLength,
-        RBRINSTRUMENTGEN3_SEND_COMMAND_TERMINATOR);
+        RBRGEN3_SEND_COMMAND_TERMINATOR);
 
-    RBR_TRY(RBRInstrumentGen3_sendBuffer(instrument));
+    RBR_TRY(RBRGen3_sendBuffer(instrument));
 
-    RBRInstrumentGen3Error err;
-    /* RBRInstrumentGen3_readResponse() returns #RBRINSTRUMENTGEN3_SAMPLE when a sample
-     * is read to the given sample pointer; a return of #RBRINSTRUMENTGEN3_SUCCESS
+    RBRGen3Error err;
+    /* RBRGen3_readResponse() returns #RBRGEN3_SAMPLE when a sample
+     * is read to the given sample pointer; a return of #RBRGEN3_SUCCESS
      * means that it found some other command response instead, so we'll loop
      * until we get a “failure” value (which we hope is SAMPLE). */
     do
     {
-        err = RBRInstrumentGen3_readResponse(instrument, true, sample);
-    } while (err == RBRINSTRUMENTGEN3_SUCCESS);
+        err = RBRGen3_readResponse(instrument, true, sample);
+    } while (err == RBRGEN3_SUCCESS);
     /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any
      * other errors can really be errors. */
-    if (err == RBRINSTRUMENTGEN3_SAMPLE)
+    if (err == RBRGEN3_SAMPLE)
     {
-        err = RBRINSTRUMENTGEN3_SUCCESS;
+        err = RBRGEN3_SUCCESS;
     }
     
     if(sleepAfter)
     {
     /* Instrument was put to sleep with "sleepAfter=true". */
-        instrument->lastActivityTime = RBRINSTRUMENTGEN3_NO_ACTIVITY;
+        instrument->lastActivityTime = RBRGEN3_NO_ACTIVITY;
     }
     return err;
 }

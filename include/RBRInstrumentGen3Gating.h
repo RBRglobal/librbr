@@ -37,7 +37,7 @@ typedef enum RBRInstrumentGen3GatingState
  *
  * \param [in] state the gating state
  * \return a string name for the gating state
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3GatingState_name(RBRInstrumentGen3GatingState state);
 
@@ -61,7 +61,7 @@ typedef enum RBRInstrumentGen3ThresholdingChannelSelection
  *
  * \param [in] selection the channel selection type
  * \return a string name for the channel selection type
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3ThresholdingChannelSelection_name(
     RBRInstrumentGen3ThresholdingChannelSelection selection);
@@ -89,7 +89,7 @@ typedef enum RBRInstrumentGen3ThresholdingCondition
  *
  * \param [in] condition the thresholding condition
  * \return a string name for the thresholding condition
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3ThresholdingCondition_name(
     RBRInstrumentGen3ThresholdingCondition condition);
@@ -122,7 +122,7 @@ typedef struct RBRInstrumentGen3Thresholding
      * channel labels, this must be given as
      * #RBRINSTRUMENTGEN3_THRESHOLD_CHANNEL_BY_INDEX or
      * RBRInstrumentGen3_setThresholding() will return
-     * #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE.
+     * #RBRGEN3_INVALID_PARAMETER_VALUE.
      *
      * \see RBRInstrumentGen3_setThresholding()
      */
@@ -148,7 +148,7 @@ typedef struct RBRInstrumentGen3Thresholding
      *
      * \nol2 Use RBRInstrumentGen3Thresholding.channelIndex instead.
      */
-    char channelLabel[RBRINSTRUMENTGEN3_CHANNEL_LABEL_MAX + 1];
+    char channelLabel[RBRGEN3_CHANNEL_LABEL_MAX + 1];
     /** \brief Specifies the condition under which sampling will occur. */
     RBRInstrumentGen3ThresholdingCondition condition;
     /** \brief The threshold value in calibrated units. */
@@ -160,7 +160,7 @@ typedef struct RBRInstrumentGen3Thresholding
      * a non-zero whole number of seconds (i.e., must be divisible by 1,000)
      * and must not be greater than 86,400,000 (24 hours).
      */
-    RBRInstrumentGen3Period interval;
+    RBRGen3Period interval;
 } RBRInstrumentGen3Thresholding;
 
 /**
@@ -168,14 +168,14 @@ typedef struct RBRInstrumentGen3Thresholding
  *
  * \param [in] instrument the instrument connection
  * \param [out] threshold the thresholding parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getThresholding(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getThresholding(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Thresholding *threshold);
 
 /**
@@ -190,16 +190,16 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getThresholding(
  *
  * \param [in] instrument the instrument connection
  * \param [in] threshold the thresholding parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the settings cannot be changed
- * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when parameter values are out
+ * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setThresholding(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setThresholding(
+    RBRGen3 *instrument,
     const RBRInstrumentGen3Thresholding *threshold);
 
 /**
@@ -228,14 +228,14 @@ typedef struct RBRInstrumentGen3TwistActivation
  *
  * \param [in] instrument the instrument connection
  * \param [out] twistActivation the twist activation parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/twistactivation
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getTwistActivation(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getTwistActivation(
+    RBRGen3 *instrument,
     RBRInstrumentGen3TwistActivation *twistActivation);
 
 /**
@@ -248,14 +248,14 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getTwistActivation(
  *
  * \param [in] instrument the instrument connection
  * \param [in] twistActivation the twist activation parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/twistactivation
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setTwistActivation(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setTwistActivation(
+    RBRGen3 *instrument,
     const RBRInstrumentGen3TwistActivation *twistActivation);
 
 #ifdef __cplusplus

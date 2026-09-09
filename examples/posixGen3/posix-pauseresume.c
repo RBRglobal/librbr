@@ -31,10 +31,10 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen3Error err;
-    RBRInstrumentGen3 *instrument = NULL;
+    RBRGen3Error err;
+    RBRGen3 *instrument = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRInstrumentGen3 instrumentSpace;
+    RBRGen3 instrumentSpace;
     instrument = &instrumentSpace;
     #endif
 
@@ -57,25 +57,25 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENTGEN3_LIB_NAME,
-            RBRINSTRUMENTGEN3_LIB_VERSION);
+            RBRGEN3_LIB_NAME,
+            RBRGEN3_LIB_VERSION);
 
-    RBRInstrumentGen3Callbacks callbacks = {
+    RBRGen3Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrumentGen3_open(
+    if ((err = RBRGen3_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
@@ -116,9 +116,9 @@ int main(int argc, char *argv[])
     RBRInstrumentGen3PauseStatus pauseStatus;
     pauseStatus = RBRINSTRUMENTGEN3_UNKNOWN_PAUSE;
 
-    if((err = RBRInstrumentGen3_getPauseresume(instrument, &state)) != RBRINSTRUMENTGEN3_SUCCESS){
+    if((err = RBRInstrumentGen3_getPauseresume(instrument, &state)) != RBRGEN3_SUCCESS){
         /* if this isn't an RBR instrument, or if the firmware in use doesn't support pauseresume.*/
-        fprintf(stderr, "%s: Feature not supported: %s! \n", programName, RBRInstrumentGen3Error_name(err));
+        fprintf(stderr, "%s: Feature not supported: %s! \n", programName, RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         fprintf(stderr, "E%d %s\n", instrument->response.error, instrument->response.response);
         goto fileCleanup;
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
     }
 
 instrumentCleanup:
-    RBRInstrumentGen3_close(instrument);
+    RBRGen3_close(instrument);
 fileCleanup:
     close(instrumentFd);
     return status;

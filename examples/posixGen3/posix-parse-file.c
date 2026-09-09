@@ -30,9 +30,9 @@
 #include "posix-shared.h"
 #include "RBRParserGen3.h"
 
-RBRInstrumentGen3Error parserSample(
+RBRGen3Error parserSample(
     const struct RBRParserGen3 *parser,
-    const struct RBRInstrumentGen3Sample *const sample)
+    const struct RBRGen3Sample *const sample)
 {
     /* Unused. */
     (void) parser;
@@ -50,7 +50,7 @@ RBRInstrumentGen3Error parserSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -82,8 +82,8 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENTGEN3_LIB_NAME,
-            RBRINSTRUMENTGEN3_LIB_VERSION);
+            RBRGEN3_LIB_NAME,
+            RBRGEN3_LIB_VERSION);
 
     RBRParserGen3 *parser = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
     parser = &parserSpace;
     #endif
 
-    RBRInstrumentGen3Sample sampleBuffer;
+    RBRGen3Sample sampleBuffer;
     RBRParserGen3Callbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
@@ -106,16 +106,16 @@ int main(int argc, char *argv[])
         }
     };
 
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
     if ((err = RBRParserGen3_init(
              &parser,
              &parserCallbacks,
              &parserConfig,
-             NULL)) != RBRINSTRUMENTGEN3_SUCCESS)
+             NULL)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to initialize parser: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }

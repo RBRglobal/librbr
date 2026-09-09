@@ -36,7 +36,7 @@ typedef enum RBRInstrumentGen3PauseresumeState
  *
  * \param [in] state the pauseresume state
  * \return a string name for the gating state
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3PauseresumeState_name(RBRInstrumentGen3PauseresumeState state);
 
@@ -59,7 +59,7 @@ typedef enum RBRInstrumentGen3PauseStatus
  *
  * \param [in] status the pause status
  * \return a string name for the pause status
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3PauseStatus_name(
     RBRInstrumentGen3PauseStatus status);
@@ -84,7 +84,7 @@ typedef enum RBRInstrumentGen3ResumeStatus
  *
  * \param [in] status the resume status
  * \return a string name for the resume status
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3ResumeStatus_name(
     RBRInstrumentGen3ResumeStatus status);
@@ -96,13 +96,13 @@ const char *RBRInstrumentGen3ResumeStatus_name(
  * 
  * \param [in] instrument the instrument connection
  * \param [in, out] state the state of pauseresume
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the state is one of the following:
+ * \return #RBRGEN3_SUCCESS when the state is one of the following:
  * "n/a", "paused", or "running".
- * \return #RBRINSTRUMENTGEN3_UNSUPPORTED when the current firmware doesn't support
+ * \return #RBRGEN3_UNSUPPORTED when the current firmware doesn't support
  * pauseresume feature, or pauseresume is not allowed.
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the response indicates an error.
+ * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getPauseresume(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getPauseresume(RBRGen3 *instrument,
                                        RBRInstrumentGen3PauseresumeState *state);
 
 /**
@@ -110,12 +110,12 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getPauseresume(RBRInstrumentGen3 *instr
  * 
  * \param [in] instrument the instrument connection
  * \param [in, out] status the status of pause
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the status is "paused".
- * \return #RBRINSTRUMENTGEN3_UNSUPPORTED when the current firmware doesn't support
+ * \return #RBRGEN3_SUCCESS when the status is "paused".
+ * \return #RBRGEN3_UNSUPPORTED when the current firmware doesn't support
  * pauseresume feature, or pauseresume is not allowed.
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the response indicates an error.
+ * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_pause(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_pause(RBRGen3 *instrument,
                                        RBRInstrumentGen3PauseStatus *status);
 /**
  * It resumes an enabled deployment which was previously
@@ -123,13 +123,13 @@ RBRInstrumentGen3Error RBRInstrumentGen3_pause(RBRInstrumentGen3 *instrument,
  * 
  * \param [in] instrument the instrument connection
  * \param [in, out] status the status of resume
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the state is one of the following:
+ * \return #RBRGEN3_SUCCESS when the state is one of the following:
  * "pending", "logging".
- * \return #RBRINSTRUMENTGEN3_UNSUPPORTED when the current firmware doesn't support
+ * \return #RBRGEN3_UNSUPPORTED when the current firmware doesn't support
  * pauseresume feature, or pauseresume is not allowed.
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the response indicates an error.
+ * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_resume(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_resume(RBRGen3 *instrument,
                                        RBRInstrumentGen3ResumeStatus *status);
 
 #ifdef __cplusplus

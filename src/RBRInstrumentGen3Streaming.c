@@ -15,32 +15,32 @@
 /* Required for snprintf. */
 #include <stdio.h>
 
-#include "RBRInstrumentGen3.h"
-#include "RBRInstrumentGen3Internal.h"
+#include "RBRGen3.h"
+#include "RBRGen3Internal.h"
 
 #define READING_FLAG_MASK     0x00FF0000
 #define READING_FLAG_OFFSET  (2 * 8)
 #define READING_ERROR_MASK    0x0000FFFF
 #define READING_ERROR_OFFSET (0 * 8)
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getChannelsList(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getChannelsList(
+    RBRGen3 *instrument,
     RBRInstrumentGen3ChannelsList *channelsList)
 {
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
-        return RBRINSTRUMENTGEN3_UNSUPPORTED;
+        return RBRGEN3_UNSUPPORTED;
     }
 
     memset(channelsList, 0, sizeof(RBRInstrumentGen3ChannelsList));
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "outputformat channelslist"));
+    RBR_TRY(RBRGen3_converse(instrument, "outputformat channelslist"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -84,27 +84,27 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getChannelsList(
         break;
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getLabelsList(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getLabelsList(
+    RBRGen3 *instrument,
     RBRInstrumentGen3LabelsList *labelsList)
 {
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
-        return RBRINSTRUMENTGEN3_UNSUPPORTED;
+        return RBRGEN3_UNSUPPORTED;
     }
 
     memset(labelsList, 0, sizeof(RBRInstrumentGen3LabelsList));
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "outputformat labelslist"));
+    RBR_TRY(RBRGen3_converse(instrument, "outputformat labelslist"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -133,7 +133,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getLabelsList(
         break;
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 const char *RBRInstrumentGen3OutputFormat_name(RBRInstrumentGen3OutputFormat format)
@@ -157,8 +157,8 @@ const char *RBRInstrumentGen3OutputFormat_name(RBRInstrumentGen3OutputFormat for
     }
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getAvailableOutputFormats(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getAvailableOutputFormats(
+    RBRGen3 *instrument,
     RBRInstrumentGen3OutputFormat *outputFormats)
 {
     *outputFormats = RBRINSTRUMENTGEN3_OUTFORMAT_NONE;
@@ -168,7 +168,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getAvailableOutputFormats(
     const char *separator;
     int32_t separatorLength;
 
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
         command = "outputformat support";
         searchKey = "support";
@@ -183,13 +183,13 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getAvailableOutputFormats(
         separatorLength = 1;
     }
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, command));
+    RBR_TRY(RBRGen3_converse(instrument, command));
 
     char *responseCommand = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &responseCommand,
                                     &parameter);
 
@@ -228,22 +228,22 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getAvailableOutputFormats(
         break;
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getOutputFormat(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getOutputFormat(
+    RBRGen3 *instrument,
     RBRInstrumentGen3OutputFormat *outputFormat)
 {
     *outputFormat = RBRINSTRUMENTGEN3_OUTFORMAT_NONE;
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "outputformat type"));
+    RBR_TRY(RBRGen3_converse(instrument, "outputformat type"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -271,78 +271,78 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getOutputFormat(
         break;
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setOutputFormat(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setOutputFormat(
+    RBRGen3 *instrument,
     RBRInstrumentGen3OutputFormat outputFormat)
 {
     const char *formatName = RBRInstrumentGen3OutputFormat_name(outputFormat);
     
     /* if it's caltext07, it is only available for LOGGER3 with fw 1.109 or later. */
     if (strcmp(formatName, "caltext07") == 0){
-        RBRInstrumentGen3Error err = RBRInstrumentGen3_getId(instrument, &instrument->id);
-        if (err != RBRINSTRUMENTGEN3_SUCCESS)
+        RBRGen3Error err = RBRInstrumentGen3_getId(instrument, &instrument->id);
+        if (err != RBRGEN3_SUCCESS)
         {
-            return RBRINSTRUMENTGEN3_UNSUPPORTED;
+            return RBRGEN3_UNSUPPORTED;
         }
         else{
             if (instrument->id.fwtype == 104
                 && (atof)(instrument-> id.version) >= 1.109)
             {
-                return RBRInstrumentGen3_converse(instrument,
+                return RBRGen3_converse(instrument,
                                     "outputformat type = %s",
                                     formatName);
             }
             else {
                 /* caltext07 is not supported by the firmware version in use. */
-                return RBRINSTRUMENTGEN3_UNSUPPORTED;
+                return RBRGEN3_UNSUPPORTED;
             }
         }
     }
-    return RBRInstrumentGen3_converse(instrument,
+    return RBRGen3_converse(instrument,
                                   "outputformat type = %s",
                                   formatName);
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getUSBStreamingState(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getUSBStreamingState(
+    RBRGen3 *instrument,
     bool *enabled)
 {
     *enabled = false;
-    return RBRInstrumentGen3_getBool(instrument,
+    return RBRGen3_getBool(instrument,
                                  "streamusb",
                                  "state",
                                  enabled);
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setUSBStreamingState(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setUSBStreamingState(
+    RBRGen3 *instrument,
     bool enabled)
 {
-    return RBRInstrumentGen3_converse(instrument,
+    return RBRGen3_converse(instrument,
                                   "streamusb state = %s",
                                   enabled ? "on" : "off");
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getSerialStreamingState(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getSerialStreamingState(
+    RBRGen3 *instrument,
     bool *enabled)
 {
     *enabled = false;
-    return RBRInstrumentGen3_getBool(instrument,
+    return RBRGen3_getBool(instrument,
                                  "streamserial",
                                  "state",
                                  enabled);
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setSerialStreamingState(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setSerialStreamingState(
+    RBRGen3 *instrument,
     bool enabled)
 {
-    return RBRInstrumentGen3_converse(instrument,
+    return RBRGen3_converse(instrument,
                                   "streamserial state = %s",
                                   enabled ? "on" : "off");
 }
@@ -383,13 +383,13 @@ const char *RBRInstrumentGen3AuxOutputSleepLevel_name(
     }
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getAuxOutput(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getAuxOutput(
+    RBRGen3 *instrument,
     RBRInstrumentGen3AuxOutput *auxOutput)
 {
     if (auxOutput->aux != 1)
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
     uint8_t aux = auxOutput->aux;
@@ -397,15 +397,15 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getAuxOutput(
     auxOutput->active = RBRINSTRUMENTGEN3_UNKNOWN_ACTIVE;
     auxOutput->sleep = RBRINSTRUMENTGEN3_UNKNOWN_SLEEP;
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument,
+    RBR_TRY(RBRGen3_converse(instrument,
                                    "streamserial aux%" PRIi8 "_all",
                                    aux));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -456,16 +456,16 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getAuxOutput(
     }
     auxOutput->aux = aux;
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setAuxOutput(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setAuxOutput(
+    RBRGen3 *instrument,
     const RBRInstrumentGen3AuxOutput *auxOutput)
 {
     const char *enabledParameter;
     const char *enabledValue;
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
         enabledParameter = "state";
         enabledValue = auxOutput->enabled ? "on" : "off";
@@ -476,7 +476,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setAuxOutput(
         enabledValue = auxOutput->enabled ? "true" : "false";
     }
 
-    return RBRInstrumentGen3_converse(
+    return RBRGen3_converse(
         instrument,
         "streamserial aux%" PRIi8 "_%s = %s, aux%" PRIi8 "_setup = %" PRIi32 ", "
         "aux%" PRIi8 "_hold = %" PRIi32 ", aux%" PRIi8 "_active = %s, "
@@ -500,9 +500,9 @@ const char *RBRInstrumentGen3ReadingFlag_name(RBRInstrumentGen3ReadingFlag flag)
     {
     case RBRINSTRUMENTGEN3_READING_FLAG_NONE:
         return "none";
-    case RBRINSTRUMENTGEN3_READING_FLAG_UNCALIBRATED:
+    case RBRGEN3_READING_FLAG_UNCALIBRATED:
         return "uncalibrated";
-    case RBRINSTRUMENTGEN3_READING_FLAG_ERROR:
+    case RBRGEN3_READING_FLAG_ERROR:
         return "error";
     case RBRINSTRUMENTGEN3_READING_FLAG_COUNT:
         return "reading flag count";
@@ -565,22 +565,22 @@ inline double RBRInstrumentGen3Reading_setError(RBRInstrumentGen3ReadingFlag fla
     return alias.reading;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_readSample(RBRInstrumentGen3 *instrument)
+RBRGen3Error RBRInstrumentGen3_readSample(RBRGen3 *instrument)
 {
-    RBRInstrumentGen3Error err;
-    /* RBRInstrumentGen3_readResponse() returns #RBRINSTRUMENTGEN3_SAMPLE when a sample
-     * is read to the given sample pointer; a return of #RBRINSTRUMENTGEN3_SUCCESS
+    RBRGen3Error err;
+    /* RBRGen3_readResponse() returns #RBRGEN3_SAMPLE when a sample
+     * is read to the given sample pointer; a return of #RBRGEN3_SUCCESS
      * means that it found some other command response instead, so we'll loop
      * until we get a “failure” value (which we hope is SAMPLE). */
     do
     {
-        err = RBRInstrumentGen3_readResponse(instrument, true, NULL);
-    } while (err == RBRINSTRUMENTGEN3_SUCCESS);
+        err = RBRGen3_readResponse(instrument, true, NULL);
+    } while (err == RBRGEN3_SUCCESS);
     /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any
      * other errors can really be errors. */
-    if (err == RBRINSTRUMENTGEN3_SAMPLE)
+    if (err == RBRGEN3_SAMPLE)
     {
-        err = RBRINSTRUMENTGEN3_SUCCESS;
+        err = RBRGEN3_SUCCESS;
     }
 
     return err;

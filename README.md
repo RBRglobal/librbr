@@ -121,9 +121,9 @@ The Gen3 API is the 1.x API
 with `Gen3` appended to every file name
 and every `RBRInstrument`, `RBRParser`,
 and `RBRDynamicCorrection` identifier
-(`RBRInstrument_open()` is now `RBRInstrumentGen3_open()`,
-`RBRINSTRUMENT_SUCCESS` is now `RBRINSTRUMENTGEN3_SUCCESS`,
-and `RBRInstrument.h` is now `RBRInstrumentGen3.h`);
+(`RBRInstrument_open()` is now `RBRGen3_open()`,
+`RBRINSTRUMENT_SUCCESS` is now `RBRGEN3_SUCCESS`,
+and `RBRInstrument.h` is now `RBRGen3.h`);
 the behaviour is unchanged.
 When building as a Zephyr module,
 the equivalent Kconfig options are

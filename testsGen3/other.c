@@ -39,21 +39,21 @@ TEST_LOGGER3(version_comparison)
 
 TEST_LOGGER2(id)
 {
-    RBRInstrumentGen3Id expected = {
+    RBRGen3Id expected = {
         .model = "RBRduo",
         .version = "1.440",
         .serial = 912345,
         .fwtype = 103,
         .mode = ""
     };
-    RBRInstrumentGen3Id actual;
+    RBRGen3Id actual;
 
     TestIOBuffers_init(buffers,
                        "id model = RBRduo, version = 1.440, "
                        "serial = 912345, fwtype = 103" RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getId(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    RBRGen3Error err = RBRInstrumentGen3_getId(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
     TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
@@ -65,22 +65,22 @@ TEST_LOGGER2(id)
 
 TEST_LOGGER3(id)
 {
-    RBRInstrumentGen3Id expected = {
+    RBRGen3Id expected = {
         .model = "RBRduo3",
         .version = "1.092",
         .serial = 923456,
         .fwtype = 104,
         .mode = ""
     };
-    RBRInstrumentGen3Id actual;
+    RBRGen3Id actual;
 
     TestIOBuffers_init(buffers,
                        "id model = RBRduo3, version = 1.092, "
                        "serial = 923456, fwtype = 104" RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getId(instrument, &actual);
+    RBRGen3Error err = RBRInstrumentGen3_getId(instrument, &actual);
     TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
     TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
@@ -92,23 +92,23 @@ TEST_LOGGER3(id)
 
 TEST_LOGGER3(id_simulated)
 {
-    RBRInstrumentGen3Id expected = {
+    RBRGen3Id expected = {
         .model = "RBRduo3",
         .version = "1.092",
         .serial = 923456,
         .fwtype = 104,
         .mode = "SIMULATED"
     };
-    RBRInstrumentGen3Id actual;
+    RBRGen3Id actual;
 
     TestIOBuffers_init(buffers,
                        "id mode = SIMULATED, model = RBRduo3, "
                        "version = 1.092, serial = 923456, fwtype = 104"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getId(instrument, &actual);
+    RBRGen3Error err = RBRInstrumentGen3_getId(instrument, &actual);
     TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
     TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
@@ -120,19 +120,19 @@ TEST_LOGGER3(id_simulated)
 
 TEST_LOGGER3(id_short)
 {
-    RBRInstrumentGen3Id expected = {
+    RBRGen3Id expected = {
         .model = "",
         .version = "",
         .serial = 0,
         .fwtype = 0,
         .mode = ""
     };
-    RBRInstrumentGen3Id actual;
+    RBRGen3Id actual;
 
     TestIOBuffers_init(buffers, "id" RESPONSE_TERMINATOR, 0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getId(instrument, &actual);
+    RBRGen3Error err = RBRInstrumentGen3_getId(instrument, &actual);
     TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
     TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
@@ -154,9 +154,9 @@ TEST_LOGGER2(hwrev)
                        "hwrev pcb = G, cpu = 5659A, bsl = A"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getHardwareRevision(instrument,
+    RBRGen3Error err = RBRInstrumentGen3_getHardwareRevision(instrument,
                                                                &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(expected.pcb, actual.pcb, "%c");
     TEST_ASSERT_STR_EQ(expected.cpu, actual.cpu);
     TEST_ASSERT_EQ(expected.bsl, actual.bsl, "%c");
@@ -177,9 +177,9 @@ TEST_LOGGER3(hwrev)
                        "hwrev pcb = J, cpu = 5659A, bsl = A"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getHardwareRevision(instrument,
+    RBRGen3Error err = RBRInstrumentGen3_getHardwareRevision(instrument,
                                                                &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(expected.pcb, actual.pcb, "%c");
     TEST_ASSERT_STR_EQ(expected.cpu, actual.cpu);
     TEST_ASSERT_EQ(expected.bsl, actual.bsl, "%c");
@@ -201,8 +201,8 @@ TEST_LOGGER2(powerstatus)
                        "powerstatus source = usb, int = 12.40, ext = 0.00, "
                        "capacity = 24.000" RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getPower(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    RBRGen3Error err = RBRInstrumentGen3_getPower(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected.source,
                         actual.source,
                         RBRInstrumentGen3PowerSource);
@@ -227,8 +227,8 @@ TEST_LOGGER3(power)
                        "power source = ext, int =  0.00, ext = 11.59, "
                        "reg = n/a" RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getPower(instrument, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    RBRGen3Error err = RBRInstrumentGen3_getPower(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected.source,
                         actual.source,
                         RBRInstrumentGen3PowerSource);
@@ -242,9 +242,9 @@ TEST_LOGGER3(power)
 TEST_LOGGER2(powerinternal)
 {
     RBRInstrumentGen3PowerInternal actual;
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getPowerInternal(instrument,
+    RBRGen3Error err = RBRInstrumentGen3_getPowerInternal(instrument,
                                                             &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_UNSUPPORTED, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_UNSUPPORTED, err, RBRGen3Error);
 
     return true;
 }
@@ -263,9 +263,9 @@ TEST_LOGGER3(powerinternal)
                        "capacity = 138.000e+003, used = 100.100e+003"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getPowerInternal(instrument,
+    RBRGen3Error err = RBRInstrumentGen3_getPowerInternal(instrument,
                                                             &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected.batteryType,
                         actual.batteryType,
                         RBRInstrumentGen3InternalBatteryType);
@@ -278,9 +278,9 @@ TEST_LOGGER3(powerinternal)
 TEST_LOGGER2(powerexternal)
 {
     RBRInstrumentGen3PowerExternal actual;
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getPowerExternal(instrument,
+    RBRGen3Error err = RBRInstrumentGen3_getPowerExternal(instrument,
                                                             &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_UNSUPPORTED, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_UNSUPPORTED, err, RBRGen3Error);
 
     return true;
 }
@@ -299,9 +299,9 @@ TEST_LOGGER3(powerexternal)
                        "capacity = 22.000e+006, used = 100.100e+003"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getPowerExternal(instrument,
+    RBRGen3Error err = RBRInstrumentGen3_getPowerExternal(instrument,
                                                             &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected.batteryType,
                         actual.batteryType,
                         RBRInstrumentGen3ExternalBatteryType);
@@ -318,9 +318,9 @@ TEST_LOGGER2(info)
     TestIOBuffers_init(buffers,
                        "E0102 invalid command 'info'" RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getInfo(instrument,
+    RBRGen3Error err = RBRInstrumentGen3_getInfo(instrument,
                                                    &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_UNSUPPORTED, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_UNSUPPORTED, err, RBRGen3Error);
 
     return true;
 }
@@ -337,9 +337,9 @@ TEST_LOGGER3(info)
                        "info pn = L3-M11-BEC11-SC11-ST11-SP11"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getInfo(instrument,
+    RBRGen3Error err = RBRInstrumentGen3_getInfo(instrument,
                                                    &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expected.partNumber, actual.partNumber);
     TEST_ASSERT_ENUM_EQ(expected.fwLock, actual.fwLock, bool);
 
@@ -359,9 +359,9 @@ TEST_LOGGER3(info_fwlock)
                        "info pn = L3-M11-F14-BEC11-G1-SCT12-SP11, fwlock = on"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getInfo(instrument,
+    RBRGen3Error err = RBRInstrumentGen3_getInfo(instrument,
                                                    &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expected.partNumber, actual.partNumber);
     TEST_ASSERT_ENUM_EQ(expected.fwLock, actual.fwLock, bool);
 

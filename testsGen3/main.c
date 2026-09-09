@@ -11,7 +11,7 @@
 /* Required for isprint. */
 #include <ctype.h>
 
-#include "RBRInstrumentGen3.h"
+#include "RBRGen3.h"
 #include "tests.h"
 
 char *rbr_strnesccntrl(char *destination, const char *source, size_t num)
@@ -84,30 +84,30 @@ void TestIOBuffers_init(TestIOBuffers *buffers,
     }
 }
 
-RBRInstrumentGen3Error TestIOBuffers_time(
-    const struct RBRInstrumentGen3 *instrument,
-    RBRInstrumentGen3DateTime *time)
+RBRGen3Error TestIOBuffers_time(
+    const struct RBRGen3 *instrument,
+    RBRGen3DateTime *time)
 {
     /* No-op. */
     *time = 0;
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error TestIOBuffers_sleep(
-    const struct RBRInstrumentGen3 *instrument,
-    RBRInstrumentGen3DateTime time)
+RBRGen3Error TestIOBuffers_sleep(
+    const struct RBRGen3 *instrument,
+    RBRGen3DateTime time)
 {
     /* No-op. */
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error TestIOBuffers_read(
-    const struct RBRInstrumentGen3 *instrument,
+RBRGen3Error TestIOBuffers_read(
+    const struct RBRGen3 *instrument,
     void *data,
     int32_t *size)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRInstrumentGen3_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen3_getUserData(instrument);
 
     int32_t readLength = buffers->readBufferSize - buffers->readBufferPos;
     /* If we're out of data, indicate a callback error. */
@@ -118,7 +118,7 @@ RBRInstrumentGen3Error TestIOBuffers_read(
             "%s line %d, TestIOBuffers_read: read buffer underrun! (%" PRIi32 "B "
             "requested.)\n",
             __FILE__, __LINE__, *size);
-        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
+        return RBRGEN3_CALLBACK_ERROR;
     }
     else if (readLength > *size)
     {
@@ -128,15 +128,15 @@ RBRInstrumentGen3Error TestIOBuffers_read(
     memcpy(data, buffers->readBuffer + buffers->readBufferPos, readLength);
     *size = readLength;
     buffers->readBufferPos += readLength;
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error TestIOBuffers_write(const struct RBRInstrumentGen3 *instrument,
+RBRGen3Error TestIOBuffers_write(const struct RBRGen3 *instrument,
                                        const void *const data,
                                        int32_t size)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRInstrumentGen3_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen3_getUserData(instrument);
 
     int32_t remaining
         = TESTIOBUFFERS_WRITE_BUFFER_SIZE - buffers->writeBufferPos;
@@ -149,46 +149,46 @@ RBRInstrumentGen3Error TestIOBuffers_write(const struct RBRInstrumentGen3 *instr
             "B but only had space for %" PRIi32 "B.)\n",
             size,
             remaining);
-        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
+        return RBRGEN3_CALLBACK_ERROR;
     }
     /* Otherwise, store the data to the write buffer. */
     memcpy(buffers->writeBuffer + buffers->writeBufferPos, data, size);
     buffers->writeBufferPos += size;
     /* Null-terminate the buffer so we can do string comparisons with it. */
     buffers->writeBuffer[buffers->writeBufferPos] = '\0';
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error TestIOBuffers_sample(
-    const struct RBRInstrumentGen3 *instrument,
-    const struct RBRInstrumentGen3Sample *const sample)
+RBRGen3Error TestIOBuffers_sample(
+    const struct RBRGen3 *instrument,
+    const struct RBRGen3Sample *const sample)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRInstrumentGen3_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen3_getUserData(instrument);
     if (sample != &buffers->streamSample)
     {
-        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
+        return RBRGEN3_CALLBACK_ERROR;
     }
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error TestParserBuffers_sample(
+RBRGen3Error TestParserBuffers_sample(
     const struct RBRParserGen3 *parser,
-    const struct RBRInstrumentGen3Sample *const sample)
+    const struct RBRGen3Sample *const sample)
 {
     TestParserBuffers *buffers;
     buffers = (TestParserBuffers *) RBRParserGen3_getUserData(parser);
     if (buffers->samplesLength >= TESTPARSERBUFFERS_SAMPLES_MAX)
     {
-        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
+        return RBRGEN3_CALLBACK_ERROR;
     }
     memcpy(&buffers->samples[buffers->samplesLength++],
            sample,
-           sizeof(RBRInstrumentGen3Sample));
-    return RBRINSTRUMENTGEN3_SUCCESS;
+           sizeof(RBRGen3Sample));
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error TestParserBuffers_event(
+RBRGen3Error TestParserBuffers_event(
     const struct RBRParserGen3 *parser,
     const struct RBRInstrumentGen3Event *const event)
 {
@@ -196,12 +196,12 @@ RBRInstrumentGen3Error TestParserBuffers_event(
     buffers = (TestParserBuffers *) RBRParserGen3_getUserData(parser);
     if (buffers->eventsLength >= TESTPARSERBUFFERS_EVENTS_MAX)
     {
-        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
+        return RBRGEN3_CALLBACK_ERROR;
     }
     memcpy(&buffers->events[buffers->eventsLength++],
            event,
            sizeof(RBRInstrumentGen3Event));
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 const char *bool_name(bool value)
@@ -221,9 +221,9 @@ int main(int argc, char *argv[])
     (void) argc;
     (void) argv;
 
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
     TestIOBuffers ioBuffers;
-    RBRInstrumentGen3Callbacks instrumentCallbacks = {
+    RBRGen3Callbacks instrumentCallbacks = {
         .time =  TestIOBuffers_time,
         .sleep = TestIOBuffers_sleep,
         .read = TestIOBuffers_read,
@@ -232,8 +232,8 @@ int main(int argc, char *argv[])
         .sampleBuffer = &ioBuffers.streamSample
     };
 
-    RBRInstrumentGen3 instrumentL2Buffer;
-    RBRInstrumentGen3 *instrumentL2 = &instrumentL2Buffer;
+    RBRGen3 instrumentL2Buffer;
+    RBRGen3 *instrumentL2 = &instrumentL2Buffer;
     TestIOBuffers_init(
         &ioBuffers,
         "RBR RBRoem 1.430 999999"
@@ -241,15 +241,15 @@ int main(int argc, char *argv[])
         "id model = RBRoem, version = 1.430, serial = 999999, fwtype = 103"
         RESPONSE_TERMINATOR,
         0);
-    err = RBRInstrumentGen3_open(&instrumentL2,
+    err = RBRGen3_open(&instrumentL2,
                              &instrumentCallbacks,
                              /* command timeout */ 0,
                              &ioBuffers);
-    if (err != RBRINSTRUMENTGEN3_SUCCESS)
+    if (err != RBRGEN3_SUCCESS)
     {
         fprintf(stderr,
                 "Failure initializing Logger2 test instrument: %s.\n",
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         return EXIT_FAILURE;
     }
     else
@@ -257,8 +257,8 @@ int main(int argc, char *argv[])
         printf("Initialized Logger2 test instrument.\n");
     }
 
-    RBRInstrumentGen3 instrumentL3Buffer;
-    RBRInstrumentGen3 *instrumentL3 = &instrumentL3Buffer;
+    RBRGen3 instrumentL3Buffer;
+    RBRGen3 *instrumentL3 = &instrumentL3Buffer;
     TestIOBuffers_init(
         &ioBuffers,
         "RBR RBRduo3 1.090 999999"
@@ -266,15 +266,15 @@ int main(int argc, char *argv[])
         "id model = RBRoem3, version = 1.134, serial = 999999, fwtype = 104"
         RESPONSE_TERMINATOR,
         0);
-    err = RBRInstrumentGen3_open(&instrumentL3,
+    err = RBRGen3_open(&instrumentL3,
                              &instrumentCallbacks,
                              /* command timeout */ 0,
                              &ioBuffers);
-    if (err != RBRINSTRUMENTGEN3_SUCCESS)
+    if (err != RBRGEN3_SUCCESS)
     {
         fprintf(stderr,
                 "Failure initializing Logger3 test instrument: %s.\n",
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         return EXIT_FAILURE;
     }
     else
@@ -282,37 +282,37 @@ int main(int argc, char *argv[])
         printf("Initialized Logger3 test instrument.\n");
     }
 
-    RBRInstrumentGen3 instrumentL4Buffer;
-    RBRInstrumentGen3 *instrumentL4 = &instrumentL4Buffer;
+    RBRGen3 instrumentL4Buffer;
+    RBRGen3 *instrumentL4 = &instrumentL4Buffer;
     TestIOBuffers_init(
         &ioBuffers,
         "id model = RBRduet4, version = 1.0.0, serial = 999999, fwtype = 131"
         RESPONSE_TERMINATOR,
         0);
-    err = RBRInstrumentGen3_open(&instrumentL4,
+    err = RBRGen3_open(&instrumentL4,
                              &instrumentCallbacks,
                              /* command timeout */ 0,
                              &ioBuffers);
-    if (err == RBRINSTRUMENTGEN3_SUCCESS)
+    if (err == RBRGEN3_SUCCESS)
     {
         fprintf(stderr,
                 "Unexpected success initializing Logger4 test instrument.\n");
         return EXIT_FAILURE;
     }
-    else if (err != RBRINSTRUMENTGEN3_UNSUPPORTED)
+    else if (err != RBRGEN3_UNSUPPORTED)
     {
         fprintf(stderr,
                 "Failure initializing Logger3 test instrument: %s.\n",
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         return EXIT_FAILURE;
     }
-    else /* RBRINSTRUMENTGEN3_UNSUPPORTED */
+    else /* RBRGEN3_UNSUPPORTED */
     {
-        if (instrumentL4->generation != RBRINSTRUMENTGEN3_LOGGER4)
+        if (instrumentL4->generation != RBRGEN3_LOGGER4)
         {
             fprintf(stderr,
                     "Unexpected generation Logger4 generation: %s.\n",
-                    RBRInstrumentGen3Generation_name(instrumentL4->generation));
+                    RBRGen3Generation_name(instrumentL4->generation));
             return EXIT_FAILURE;
         }
         else
@@ -322,7 +322,7 @@ int main(int argc, char *argv[])
     }
 
     TestParserBuffers parserBuffers;
-    RBRInstrumentGen3Sample parserSample;
+    RBRGen3Sample parserSample;
     RBRInstrumentGen3Event parserEvent;
     RBRParserGen3Callbacks parserCallbacks = {
         .sample = TestParserBuffers_sample,
@@ -336,12 +336,12 @@ int main(int argc, char *argv[])
 
     printf("Running tests...\n");
     int success = EXIT_SUCCESS;
-    RBRInstrumentGen3 *testInstrument;
+    RBRGen3 *testInstrument;
     int32_t testsTotal = 0;
     int32_t testsPassed = 0;
     for (int32_t i = 0; instrumentTests[i].function != NULL; i++)
     {
-        if (instrumentTests[i].generation == RBRINSTRUMENTGEN3_LOGGER2)
+        if (instrumentTests[i].generation == RBRGEN3_LOGGER2)
         {
             testInstrument = instrumentL2;
         }
@@ -351,7 +351,7 @@ int main(int argc, char *argv[])
         }
 
         printf("Running %s test \"%s\"...",
-               RBRInstrumentGen3Generation_name(instrumentTests[i].generation),
+               RBRGen3Generation_name(instrumentTests[i].generation),
                instrumentTests[i].name);
         ++testsTotal;
         if (instrumentTests[i].function(testInstrument, &ioBuffers))
@@ -377,10 +377,10 @@ int main(int argc, char *argv[])
                              &parserCallbacks,
                              parserTests[i].config,
                              &parserBuffers);
-        if (err != RBRINSTRUMENTGEN3_SUCCESS)
+        if (err != RBRGEN3_SUCCESS)
         {
             printf(" \033[31minit fail\033[0m: %s\n",
-                   RBRInstrumentGen3Error_name(err));
+                   RBRGen3Error_name(err));
             success = EXIT_FAILURE;
             continue;
         }

@@ -54,7 +54,7 @@ typedef enum RBRInstrumentGen3Direction
  *
  * \param [in] direction the direction
  * \return a string name for the direction
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3Direction_name(RBRInstrumentGen3Direction direction);
 
@@ -82,7 +82,7 @@ typedef enum RBRInstrumentGen3RegimesReference
  *
  * \param [in] reference the pressure reference
  * \return a string name for the pressure reference
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3RegimesReference_name(
     RBRInstrumentGen3RegimesReference reference);
@@ -113,14 +113,14 @@ typedef struct RBRInstrumentGen3Regimes
  *
  * \param [in] instrument the instrument connection
  * \param [out] regimes the regimes parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getRegimes(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getRegimes(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Regimes *regimes);
 
 /**
@@ -136,16 +136,16 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getRegimes(
  *
  * \param [in] instrument the instrument connection
  * \param [in] regimes the regimes parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the settings cannot be changed
- * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when too many regimes are
+ * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when too many regimes are
  *                                                requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setRegimes(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setRegimes(
+    RBRGen3 *instrument,
     const RBRInstrumentGen3Regimes *regimes);
 
 /** \brief A regime identifier. */
@@ -187,7 +187,7 @@ typedef struct RBRInstrumentGen3Regime
      *
      * May not be greater than 65,000.
      */
-    RBRInstrumentGen3Period samplingPeriod;
+    RBRGen3Period samplingPeriod;
 } RBRInstrumentGen3Regime;
 
 /**
@@ -196,24 +196,24 @@ typedef struct RBRInstrumentGen3Regime
  * Set RBRInstrumentGen3Regime.index to indicate which regime settings are to be
  * retrieved.
  *
- * #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE will be returned right away if a
- * regime index greater than 3 is requested. #RBRINSTRUMENTGEN3_HARDWARE_ERROR will
+ * #RBRGEN3_INVALID_PARAMETER_VALUE will be returned right away if a
+ * regime index greater than 3 is requested. #RBRGEN3_HARDWARE_ERROR will
  * be returned if a regime index is given which exceeds the number of regimes
  * currently configured (RBRInstrumentGen3Regimes.count).
  *
  * \param [in] instrument the instrument connection
  * \param [out] regime the regime parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the feature is unavailable, or if
+ * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or if
  *                                       an invalid regime index is given
- * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE if an invalid regime index
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE if an invalid regime index
  *                                                is given
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regime
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getRegime(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getRegime(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Regime *regime);
 
 /**
@@ -227,16 +227,16 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getRegime(
  *
  * \param [in] instrument the instrument connection
  * \param [in] regime the regime parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the settings cannot be changed
- * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when parameter values are out
+ * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regime
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setRegime(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setRegime(
+    RBRGen3 *instrument,
     const RBRInstrumentGen3Regime *regime);
 
 /**
@@ -256,14 +256,14 @@ typedef struct RBRInstrumentGen3DirectionDependentSampling
      *
      * Must be shorter than RBRInstrumentGen3DirectionDependentSampling.slowPeriod.
      */
-    RBRInstrumentGen3Period fastPeriod;
+    RBRGen3Period fastPeriod;
     /**
      * \brief The same meaning as RBRInstrumentGen3Sampling.period, but applies
      * only when the instrument is not moving in the preferred direction.
      *
      * Must be longer than RBRInstrumentGen3DirectionDependentSampling.fastPeriod.
      */
-    RBRInstrumentGen3Period slowPeriod;
+    RBRGen3Period slowPeriod;
     /**
      * \brief Sets the boundary, based on the previous profile, where the
      * instrument should switch to the fast period sampling.
@@ -287,14 +287,14 @@ typedef struct RBRInstrumentGen3DirectionDependentSampling
  *
  * \param [in] instrument the instrument connection
  * \param [out] ddsampling the direction-dependent sampling parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/ddsampling
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getDirectionDependentSampling(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getDirectionDependentSampling(
+    RBRGen3 *instrument,
     RBRInstrumentGen3DirectionDependentSampling *ddsampling);
 
 /**
@@ -308,16 +308,16 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getDirectionDependentSampling(
  *
  * \param [in] instrument the instrument connection
  * \param [in] ddsampling the direction-dependent sampling parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the settings cannot be changed
- * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when parameter values are out
+ * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/ddsampling
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setDirectionDependentSampling(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setDirectionDependentSampling(
+    RBRGen3 *instrument,
     RBRInstrumentGen3DirectionDependentSampling *ddsampling);
 
 #ifdef __cplusplus

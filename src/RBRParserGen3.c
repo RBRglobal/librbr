@@ -18,7 +18,7 @@
 
 #include "RBRParserGen3.h"
 /* Required for RBR_TRY. */
-#include "RBRInstrumentGen3Internal.h"
+#include "RBRGen3Internal.h"
 
 const char *RBRInstrumentGen3EventType_name(RBRInstrumentGen3EventType type)
 {
@@ -110,7 +110,7 @@ const char *RBRInstrumentGen3EventType_name(RBRInstrumentGen3EventType type)
     }
 }
 
-RBRInstrumentGen3Error RBRParserGen3_init(RBRParserGen3 **parser,
+RBRGen3Error RBRParserGen3_init(RBRParserGen3 **parser,
                                   const RBRParserGen3Callbacks *callbacks,
                                   const RBRParserGen3Config *config,
                                   void *userData)
@@ -119,18 +119,18 @@ RBRInstrumentGen3Error RBRParserGen3_init(RBRParserGen3 **parser,
         || (callbacks->sample != NULL && callbacks->sampleBuffer == NULL)
         || (callbacks->event != NULL && callbacks->eventBuffer == NULL))
     {
-        return RBRINSTRUMENTGEN3_MISSING_CALLBACK;
+        return RBRGEN3_MISSING_CALLBACK;
     }
 
     if (config->format != RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00)
     {
-        return RBRINSTRUMENTGEN3_UNSUPPORTED;
+        return RBRGEN3_UNSUPPORTED;
     }
 
     if (config->formatConfig.easyParse.channels <= 0
-        || config->formatConfig.easyParse.channels > RBRINSTRUMENTGEN3_CHANNEL_MAX)
+        || config->formatConfig.easyParse.channels > RBRGEN3_CHANNEL_MAX)
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
     bool allocated = false;
@@ -141,7 +141,7 @@ RBRInstrumentGen3Error RBRParserGen3_init(RBRParserGen3 **parser,
         if ((*parser = malloc(sizeof(RBRParserGen3))) == NULL)
         {
         #endif
-            return RBRINSTRUMENTGEN3_ALLOCATION_FAILURE;
+            return RBRGEN3_ALLOCATION_FAILURE;
         #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
         }
         #endif
@@ -153,11 +153,11 @@ RBRInstrumentGen3Error RBRParserGen3_init(RBRParserGen3 **parser,
     (*parser)->userData          = userData;
     (*parser)->managedAllocation = allocated;
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 
-RBRInstrumentGen3Error RBRParserGen3_destroy(RBRParserGen3 *parser)
+RBRGen3Error RBRParserGen3_destroy(RBRParserGen3 *parser)
 {
     if (parser->managedAllocation)
     {
@@ -166,7 +166,7 @@ RBRInstrumentGen3Error RBRParserGen3_destroy(RBRParserGen3 *parser)
         #endif
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 void RBRParserGen3_getConfig(const RBRParserGen3 *parser, RBRParserGen3Config *config)
@@ -191,7 +191,7 @@ void RBRParserGen3_setUserData(RBRParserGen3 *parser, void *userData)
 #define EP_EVENT_TIMESTAMP_OFFSET 4
 #define EP_EVENT_PAYLOAD_OFFSET   12
 
-static RBRInstrumentGen3Error RBRParserGen3_parseEPEvents(
+static RBRGen3Error RBRParserGen3_parseEPEvents(
     RBRParserGen3 *parser,
     const uint8_t *const data,
     int32_t *size)
@@ -202,7 +202,7 @@ static RBRInstrumentGen3Error RBRParserGen3_parseEPEvents(
     RBRInstrumentGen3Event *event = parser->callbacks.eventBuffer;
     if (event == NULL)
     {
-        return RBRINSTRUMENTGEN3_SUCCESS;
+        return RBRGEN3_SUCCESS;
     }
 
     for (; *size + EP_EVENT_SIZE <= maxSize; *size += EP_EVENT_SIZE)
@@ -211,7 +211,7 @@ static RBRInstrumentGen3Error RBRParserGen3_parseEPEvents(
 
         event->type = *(uint8_t *) (data + *size + EP_EVENT_TYPE_OFFSET);
         event->timestamp =
-            *(RBRInstrumentGen3DateTime *) (data
+            *(RBRGen3DateTime *) (data
                                         + *size
                                         + EP_EVENT_TIMESTAMP_OFFSET);
         switch (event->type)
@@ -234,13 +234,13 @@ static RBRInstrumentGen3Error RBRParserGen3_parseEPEvents(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-#define EP_SAMPLE_TIMESTAMP_SIZE ((int32_t) sizeof(RBRInstrumentGen3DateTime))
+#define EP_SAMPLE_TIMESTAMP_SIZE ((int32_t) sizeof(RBRGen3DateTime))
 #define EP_SAMPLE_READING_SIZE ((int32_t) sizeof(float))
 
-static RBRInstrumentGen3Error RBRParserGen3_parseEPSamples(
+static RBRGen3Error RBRParserGen3_parseEPSamples(
     RBRParserGen3 *parser,
     const uint8_t *const data,
     int32_t *size)
@@ -248,10 +248,10 @@ static RBRInstrumentGen3Error RBRParserGen3_parseEPSamples(
     int32_t maxSize = *size;
     *size = 0;
 
-    RBRInstrumentGen3Sample *sample = parser->callbacks.sampleBuffer;
+    RBRGen3Sample *sample = parser->callbacks.sampleBuffer;
     if (sample == NULL)
     {
-        return RBRINSTRUMENTGEN3_SUCCESS;
+        return RBRGEN3_SUCCESS;
     }
 
     int32_t channels = parser->config.formatConfig.easyParse.channels;
@@ -259,9 +259,9 @@ static RBRInstrumentGen3Error RBRParserGen3_parseEPSamples(
                          + EP_SAMPLE_READING_SIZE * channels;
     for (; *size + sampleSize <= maxSize; *size += sampleSize)
     {
-        memset(sample, 0, sizeof(RBRInstrumentGen3Sample));
+        memset(sample, 0, sizeof(RBRGen3Sample));
 
-        sample->timestamp = *(RBRInstrumentGen3DateTime *) (data + *size);
+        sample->timestamp = *(RBRGen3DateTime *) (data + *size);
         sample->channels = channels;
         for (int32_t channel = 0; channel < channels; ++channel)
         {
@@ -279,10 +279,10 @@ static RBRInstrumentGen3Error RBRParserGen3_parseEPSamples(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRParserGen3_parse(RBRParserGen3 *parser,
+RBRGen3Error RBRParserGen3_parse(RBRParserGen3 *parser,
                                    RBRInstrumentGen3Dataset dataset,
                                    const void *const data,
                                    int32_t *size)
@@ -297,6 +297,6 @@ RBRInstrumentGen3Error RBRParserGen3_parse(RBRParserGen3 *parser,
         return RBRParserGen3_parseEPSamples(parser, d, size);
     case RBRINSTRUMENTGEN3_DATASET_EASYPARSE_DEPLOYMENT_HEADER:
     default:
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 }

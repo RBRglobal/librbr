@@ -18,9 +18,9 @@ extern "C" {
 #include <zephyr/device.h>
 #include <zephyr/kernel.h>
 
-#include <RBRInstrumentGen3.h>
+#include <RBRGen3.h>
 
-/** State for bindings from RBRInstrumentGen3 callbacks to a Zephyr async UART. */
+/** State for bindings from RBRGen3 callbacks to a Zephyr async UART. */
 typedef struct ZephyrRBRInstrumentGen3IO
 {
     /** The UART device. */
@@ -52,14 +52,14 @@ typedef struct ZephyrRBRInstrumentGen3IO
     } tx;
 } ZephyrRBRInstrumentGen3IO;
 
-RBRInstrumentGen3Error ZephyrRBRInstrumentGen3IO_init(ZephyrRBRInstrumentGen3IO *io,
+RBRGen3Error ZephyrRBRInstrumentGen3IO_init(ZephyrRBRInstrumentGen3IO *io,
                                               const struct device *dev);
 
-RBRInstrumentGen3Error ZephyrRBRInstrumentGen3IO_read(const struct RBRInstrumentGen3 *instrument,
+RBRGen3Error ZephyrRBRInstrumentGen3IO_read(const struct RBRGen3 *instrument,
                                               void *data,
                                               int32_t *size);
 
-RBRInstrumentGen3Error ZephyrRBRInstrumentGen3IO_write(const struct RBRInstrumentGen3 *instrument,
+RBRGen3Error ZephyrRBRInstrumentGen3IO_write(const struct RBRGen3 *instrument,
                                                const void *const data,
                                                int32_t size);
 

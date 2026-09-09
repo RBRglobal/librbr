@@ -13,25 +13,25 @@
 /* Required for memset, strcmp. */
 #include <string.h>
 
-#include "RBRInstrumentGen3.h"
-#include "RBRInstrumentGen3Internal.h"
+#include "RBRGen3.h"
+#include "RBRGen3Internal.h"
 
-static RBRInstrumentGen3Error RBRInstrumentGen3_getClockL2(RBRInstrumentGen3 *instrument,
+static RBRGen3Error RBRInstrumentGen3_getClockL2(RBRGen3 *instrument,
                                                    RBRInstrumentGen3Clock *clock)
 {
     char *command;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
 
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_converse(instrument,
+    RBRGen3Error err = RBRGen3_converse(instrument,
                                                     "settings offsetfromutc");
     /* Older Logger2 firmware didn't support the `offsetfromutc` setting, so it
      * will indicate an error when we go looking for it. Just swallow the
      * error and move on to retrieving the time. */
-    if (err == RBRINSTRUMENTGEN3_HARDWARE_ERROR)
+    if (err == RBRGEN3_HARDWARE_ERROR)
     {
-        return RBRINSTRUMENTGEN3_SUCCESS;
+        return RBRGEN3_SUCCESS;
     }
-    else if (err != RBRINSTRUMENTGEN3_SUCCESS)
+    else if (err != RBRGEN3_SUCCESS)
     {
         return err;
     }
@@ -40,7 +40,7 @@ static RBRInstrumentGen3Error RBRInstrumentGen3_getClockL2(RBRInstrumentGen3 *in
         command = NULL;
         while (true)
         {
-            RBRInstrumentGen3_parseResponse(instrument,
+            RBRGen3_parseResponse(instrument,
                                         &command,
                                         &parameter);
 
@@ -62,12 +62,12 @@ static RBRInstrumentGen3Error RBRInstrumentGen3_getClockL2(RBRInstrumentGen3 *in
 
     /* Retrieve the time after the UTC offset so our return value is as close
      * as possible to the actual instrument time. */
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "now"));
+    RBR_TRY(RBRGen3_converse(instrument, "now"));
 
     command = NULL;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -80,24 +80,24 @@ static RBRInstrumentGen3Error RBRInstrumentGen3_getClockL2(RBRInstrumentGen3 *in
             continue;
         }
 
-        RBR_TRY(RBRInstrumentGen3DateTime_parseScheduleTime(parameter.value,
+        RBR_TRY(RBRGen3DateTime_parseScheduleTime(parameter.value,
                                                         &clock->dateTime,
                                                         NULL));
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-static RBRInstrumentGen3Error RBRInstrumentGen3_getClockL3(RBRInstrumentGen3 *instrument,
+static RBRGen3Error RBRInstrumentGen3_getClockL3(RBRGen3 *instrument,
                                                    RBRInstrumentGen3Clock *clock)
 {
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "clock"));
+    RBR_TRY(RBRGen3_converse(instrument, "clock"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -107,7 +107,7 @@ static RBRInstrumentGen3Error RBRInstrumentGen3_getClockL3(RBRInstrumentGen3 *in
         }
         else if (strcmp(parameter.key, "datetime") == 0)
         {
-            RBR_TRY(RBRInstrumentGen3DateTime_parseScheduleTime(parameter.value,
+            RBR_TRY(RBRGen3DateTime_parseScheduleTime(parameter.value,
                                                             &clock->dateTime,
                                                             NULL));
         }
@@ -118,16 +118,16 @@ static RBRInstrumentGen3Error RBRInstrumentGen3_getClockL3(RBRInstrumentGen3 *in
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getClock(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getClock(RBRGen3 *instrument,
                                           RBRInstrumentGen3Clock *clock)
 {
     clock->dateTime = 0;
     clock->offsetFromUtc = NAN;
 
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
         return RBRInstrumentGen3_getClockL2(instrument, clock);
     }
@@ -137,46 +137,46 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getClock(RBRInstrumentGen3 *instrument,
     }
 }
 
-static RBRInstrumentGen3Error RBRInstrumentGen3_setClockL2(
-    RBRInstrumentGen3 *instrument,
+static RBRGen3Error RBRInstrumentGen3_setClockL2(
+    RBRGen3 *instrument,
     const char *dateTime,
     float offsetFromUtc)
 {
     /* Set the clock as quickly as possible so that the hardware clock is as
      * close as possible to the provided value. */
-    RBR_TRY(RBRInstrumentGen3_converse(instrument,
+    RBR_TRY(RBRGen3_converse(instrument,
                                    "now = %s",
                                    dateTime));
 
     if (isnan(offsetFromUtc))
     {
-        return RBRINSTRUMENTGEN3_SUCCESS;
+        return RBRGEN3_SUCCESS;
     }
 
     RBR_TRY(RBRInstrumentGen3_permit(instrument, "settings"));
 
-    RBRInstrumentGen3Error err;
-    err = RBRInstrumentGen3_converse(instrument,
+    RBRGen3Error err;
+    err = RBRGen3_converse(instrument,
                                  "settings offsetfromutc = %02f",
                                  (double) offsetFromUtc);
     /* Older Logger2 firmware didn't support the `offsetfromutc` setting,
      * so it will indicate an error when we go looking for it. Just swallow
      * the error and move on to setting the time. */
-    if (err == RBRINSTRUMENTGEN3_HARDWARE_ERROR)
+    if (err == RBRGEN3_HARDWARE_ERROR)
     {
-        err = RBRINSTRUMENTGEN3_SUCCESS;
+        err = RBRGEN3_SUCCESS;
     }
     return err;
 }
 
-static RBRInstrumentGen3Error RBRInstrumentGen3_setClockL3(
-    RBRInstrumentGen3 *instrument,
+static RBRGen3Error RBRInstrumentGen3_setClockL3(
+    RBRGen3 *instrument,
     const char *dateTime,
     float offsetFromUtc)
 {
     if (!isnan(offsetFromUtc))
     {
-        return RBRInstrumentGen3_converse(
+        return RBRGen3_converse(
             instrument,
             "clock datetime = %s, offsetfromutc = %02f",
             dateTime,
@@ -184,25 +184,25 @@ static RBRInstrumentGen3Error RBRInstrumentGen3_setClockL3(
     }
     else
     {
-        return RBRInstrumentGen3_converse(instrument,
+        return RBRGen3_converse(instrument,
                                       "clock datetime = %s",
                                       dateTime);
     }
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setClock(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setClock(RBRGen3 *instrument,
                                           const RBRInstrumentGen3Clock *clock)
 {
-    if (clock->dateTime < RBRINSTRUMENTGEN3_DATETIME_MIN
-        || clock->dateTime > RBRINSTRUMENTGEN3_DATETIME_MAX)
+    if (clock->dateTime < RBRGEN3_DATETIME_MIN
+        || clock->dateTime > RBRGEN3_DATETIME_MAX)
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    char dateTime[RBRINSTRUMENTGEN3_SCHEDULE_TIME_LEN + 1];
-    RBRInstrumentGen3DateTime_toScheduleTime(clock->dateTime, dateTime);
+    char dateTime[RBRGEN3_SCHEDULE_TIME_LEN + 1];
+    RBRGen3DateTime_toScheduleTime(clock->dateTime, dateTime);
 
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
         return RBRInstrumentGen3_setClockL2(instrument,
                                         dateTime,
@@ -262,8 +262,8 @@ const char *RBRInstrumentGen3Gate_name(RBRInstrumentGen3Gate gate)
     }
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getSampling(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getSampling(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Sampling *sampling)
 {
     memset(sampling, 0, sizeof(RBRInstrumentGen3Sampling));
@@ -271,12 +271,12 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getSampling(
     sampling->gate = RBRINSTRUMENTGEN3_UNKNOWN_GATE;
     /* Very old Logger2 instruments didn't show the userperiodlimit parameter,
      * so we'll set the default value of the field conservatively. */
-    RBRInstrumentGen3Period *userPeriodLimit =
-        (RBRInstrumentGen3Period *) &sampling->userPeriodLimit;
+    RBRGen3Period *userPeriodLimit =
+        (RBRGen3Period *) &sampling->userPeriodLimit;
     *userPeriodLimit = 1000;
 
-    RBRInstrumentGen3Period *availableFastPeriods =
-        (RBRInstrumentGen3Period *) sampling->availableFastPeriods;
+    RBRGen3Period *availableFastPeriods =
+        (RBRGen3Period *) sampling->availableFastPeriods;
 
     /*
      * The `sampling` command format added support for the `all` parameter
@@ -295,7 +295,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getSampling(
      *     << sampling mode = continuous, period = 63, burstlength = 10, burstinterval = 10000, gate = none, userperiodlimit = 63, availablefastperiods = 500|250|125|63
      */
     const char *generationCommand;
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
         generationCommand = "sampling";
     }
@@ -304,13 +304,13 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getSampling(
         generationCommand = "sampling all";
     }
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, generationCommand));
+    RBR_TRY(RBRGen3_converse(instrument, generationCommand));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -359,7 +359,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getSampling(
 
             /* Logger3 will tell us available sampling rates, so we don't have
              * to guess them. */
-            if (instrument->generation != RBRINSTRUMENTGEN3_LOGGER2)
+            if (instrument->generation != RBRGEN3_LOGGER2)
             {
                 continue;
             }
@@ -425,10 +425,10 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getSampling(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3Sampling_validateSamplingPeriod(
+RBRGen3Error RBRInstrumentGen3Sampling_validateSamplingPeriod(
     const RBRInstrumentGen3Sampling *sampling)
 {
     if (sampling->period <= 0
@@ -438,7 +438,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3Sampling_validateSamplingPeriod(
         || (sampling->userPeriodLimit > 0
             && sampling->period < sampling->userPeriodLimit))
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
     /* If we're not doing fast sampling or we don't have any available fast
@@ -461,33 +461,33 @@ RBRInstrumentGen3Error RBRInstrumentGen3Sampling_validateSamplingPeriod(
 
         if (!hasFastPeriod)
         {
-            return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+            return RBRGEN3_INVALID_PARAMETER_VALUE;
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setSampling(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setSampling(
+    RBRGen3 *instrument,
     const RBRInstrumentGen3Sampling *sampling)
 {
     RBR_TRY(RBRInstrumentGen3Sampling_validateSamplingPeriod(sampling));
 
     if (sampling->mode < 0 || sampling->mode >= RBRINSTRUMENTGEN3_SAMPLING_COUNT)
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrumentGen3_converse(
+    return RBRGen3_converse(
         instrument,
         "sampling mode = %s, period = %d",
         RBRInstrumentGen3SamplingMode_name(sampling->mode),
         sampling->period);
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setBurstSampling(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setBurstSampling(
+    RBRGen3 *instrument,
     const RBRInstrumentGen3Sampling *sampling)
 {
     RBR_TRY(RBRInstrumentGen3Sampling_validateSamplingPeriod(sampling));
@@ -501,10 +501,10 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setBurstSampling(
         || sampling->burstInterval % 1000 != 0
         || sampling->burstInterval <= minBurstInterval)
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrumentGen3_converse(
+    return RBRGen3_converse(
         instrument,
         "sampling burstlength = %d, burstinterval = %d",
         sampling->burstLength,
@@ -546,21 +546,21 @@ const char *RBRInstrumentGen3DeploymentStatus_name(
     }
 }
 
-static RBRInstrumentGen3Error RBRInstrumentGen3_getDeploymentL2(
-    RBRInstrumentGen3 *instrument,
+static RBRGen3Error RBRInstrumentGen3_getDeploymentL2(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Deployment *deployment)
 {
     char *command;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
 
     /* Logger2 doesn't have a deployment command; it has separate starttime/
      * endtime/status commands. We'll call and parse each one separately. */
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "starttime"));
+    RBR_TRY(RBRGen3_converse(instrument, "starttime"));
     command = NULL;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -573,17 +573,17 @@ static RBRInstrumentGen3Error RBRInstrumentGen3_getDeploymentL2(
             continue;
         }
 
-        RBR_TRY(RBRInstrumentGen3DateTime_parseScheduleTime(
+        RBR_TRY(RBRGen3DateTime_parseScheduleTime(
                     parameter.value,
                     &deployment->startTime,
                     NULL));
     }
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "endtime"));
+    RBR_TRY(RBRGen3_converse(instrument, "endtime"));
     command = NULL;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -596,17 +596,17 @@ static RBRInstrumentGen3Error RBRInstrumentGen3_getDeploymentL2(
             continue;
         }
 
-        RBR_TRY(RBRInstrumentGen3DateTime_parseScheduleTime(
+        RBR_TRY(RBRGen3DateTime_parseScheduleTime(
                     parameter.value,
                     &deployment->endTime,
                     NULL));
     }
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "status"));
+    RBR_TRY(RBRGen3_converse(instrument, "status"));
     command = NULL;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -630,20 +630,20 @@ static RBRInstrumentGen3Error RBRInstrumentGen3_getDeploymentL2(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-static RBRInstrumentGen3Error RBRInstrumentGen3_getDeploymentL3(
-    RBRInstrumentGen3 *instrument,
+static RBRGen3Error RBRInstrumentGen3_getDeploymentL3(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Deployment *deployment)
 {
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "deployment"));
+    RBR_TRY(RBRGen3_converse(instrument, "deployment"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -653,14 +653,14 @@ static RBRInstrumentGen3Error RBRInstrumentGen3_getDeploymentL3(
         }
         else if (strcmp(parameter.key, "starttime") == 0)
         {
-            RBR_TRY(RBRInstrumentGen3DateTime_parseScheduleTime(
+            RBR_TRY(RBRGen3DateTime_parseScheduleTime(
                         parameter.value,
                         &deployment->startTime,
                         NULL));
         }
         else if (strcmp(parameter.key, "endtime") == 0)
         {
-            RBR_TRY(RBRInstrumentGen3DateTime_parseScheduleTime(
+            RBR_TRY(RBRGen3DateTime_parseScheduleTime(
                         parameter.value,
                         &deployment->endTime,
                         NULL));
@@ -679,11 +679,11 @@ static RBRInstrumentGen3Error RBRInstrumentGen3_getDeploymentL3(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getDeployment(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getDeployment(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Deployment *deployment)
 {
     memset(deployment, 0, sizeof(RBRInstrumentGen3Deployment));
@@ -691,7 +691,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getDeployment(
     *(RBRInstrumentGen3DeploymentStatus *) &deployment->status =
         RBRINSTRUMENTGEN3_UNKNOWN_STATUS;
 
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
         return RBRInstrumentGen3_getDeploymentL2(instrument, deployment);
     }
@@ -701,43 +701,43 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getDeployment(
     }
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setDeployment(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setDeployment(
+    RBRGen3 *instrument,
     const RBRInstrumentGen3Deployment *deployment)
 {
     if (deployment->endTime <= deployment->startTime
-        || deployment->startTime < RBRINSTRUMENTGEN3_DATETIME_MIN
-        || deployment->startTime > RBRINSTRUMENTGEN3_DATETIME_MAX
-        || deployment->endTime < RBRINSTRUMENTGEN3_DATETIME_MIN
-        || deployment->endTime > RBRINSTRUMENTGEN3_DATETIME_MAX)
+        || deployment->startTime < RBRGEN3_DATETIME_MIN
+        || deployment->startTime > RBRGEN3_DATETIME_MAX
+        || deployment->endTime < RBRGEN3_DATETIME_MIN
+        || deployment->endTime > RBRGEN3_DATETIME_MAX)
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    char startTime[RBRINSTRUMENTGEN3_SCHEDULE_TIME_LEN + 1];
-    RBRInstrumentGen3DateTime_toScheduleTime(deployment->startTime, startTime);
+    char startTime[RBRGEN3_SCHEDULE_TIME_LEN + 1];
+    RBRGen3DateTime_toScheduleTime(deployment->startTime, startTime);
 
-    char endTime[RBRINSTRUMENTGEN3_SCHEDULE_TIME_LEN + 1];
-    RBRInstrumentGen3DateTime_toScheduleTime(deployment->endTime, endTime);
+    char endTime[RBRGEN3_SCHEDULE_TIME_LEN + 1];
+    RBRGen3DateTime_toScheduleTime(deployment->endTime, endTime);
 
     /* As with reading deployment details, we'll have to call the starttime/
      * endtime commands each in turn for Logger2. */
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
-        RBR_TRY(RBRInstrumentGen3_converse(instrument,
+        RBR_TRY(RBRGen3_converse(instrument,
                                        "starttime = %s",
                                        startTime));
-        RBR_TRY(RBRInstrumentGen3_converse(instrument,
+        RBR_TRY(RBRGen3_converse(instrument,
                                        "endtime = %s",
                                        endTime));
     }
     else
     {
-        RBR_TRY(RBRInstrumentGen3_converse(
+        RBR_TRY(RBRGen3_converse(
                     instrument,
                     "deployment starttime = %s, endtime = %s",
                     startTime,
                     endTime));
     }
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }

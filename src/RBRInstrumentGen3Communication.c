@@ -11,8 +11,8 @@
 /* Required for strcmp. */
 #include <string.h>
 
-#include "RBRInstrumentGen3.h"
-#include "RBRInstrumentGen3Internal.h"
+#include "RBRGen3.h"
+#include "RBRGen3Internal.h"
 
 const char *RBRInstrumentGen3Link_name(RBRInstrumentGen3Link link)
 {
@@ -32,18 +32,18 @@ const char *RBRInstrumentGen3Link_name(RBRInstrumentGen3Link link)
     }
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getLink(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getLink(RBRGen3 *instrument,
                                          RBRInstrumentGen3Link *link)
 {
     *link = RBRINSTRUMENTGEN3_UNKNOWN_LINK;
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "link"));
+    RBR_TRY(RBRGen3_converse(instrument, "link"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -66,7 +66,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getLink(RBRInstrumentGen3 *instrument,
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 const char *RBRInstrumentGen3SerialBaudRate_name(RBRInstrumentGen3SerialBaudRate baud)
@@ -129,7 +129,7 @@ const char *RBRInstrumentGen3SerialMode_name(RBRInstrumentGen3SerialMode mode)
     }
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getSerial(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getSerial(RBRGen3 *instrument,
                                            RBRInstrumentGen3Serial *serial)
 {
     memset(serial, 0, sizeof(RBRInstrumentGen3Serial));
@@ -139,7 +139,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getSerial(RBRInstrumentGen3 *instrument
     RBRInstrumentGen3SerialMode *availableModes =
         (RBRInstrumentGen3SerialMode *) &serial->availableModes;
 
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
         *availableBaudRates = RBRINSTRUMENTGEN3_SERIAL_BAUD_1200
                               | RBRINSTRUMENTGEN3_SERIAL_BAUD_2400
@@ -152,21 +152,21 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getSerial(RBRInstrumentGen3 *instrument
                           | RBRINSTRUMENTGEN3_SERIAL_MODE_UART
                           | RBRINSTRUMENTGEN3_SERIAL_MODE_UART_IDLE_LOW;
 
-        RBR_TRY(RBRInstrumentGen3_converse(instrument, "serial"));
+        RBR_TRY(RBRGen3_converse(instrument, "serial"));
     }
     else
     {
         *availableBaudRates = RBRINSTRUMENTGEN3_SERIAL_BAUD_NONE;
         *availableModes = RBRINSTRUMENTGEN3_SERIAL_MODE_NONE;
 
-        RBR_TRY(RBRInstrumentGen3_converse(instrument, "serial all"));
+        RBR_TRY(RBRGen3_converse(instrument, "serial all"));
     }
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -254,10 +254,10 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getSerial(RBRInstrumentGen3 *instrument
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setSerial(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setSerial(RBRGen3 *instrument,
                                            const RBRInstrumentGen3Serial *serial)
 {
     if (serial->baudRate < 0
@@ -265,22 +265,22 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setSerial(RBRInstrumentGen3 *instrument
         || serial->mode < 0
         || serial->mode > RBRINSTRUMENTGEN3_SERIAL_MODE_MAX)
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrumentGen3_converse(
+    return RBRGen3_converse(
         instrument,
         "serial baudrate = %s, mode = %s",
         RBRInstrumentGen3SerialBaudRate_name(serial->baudRate),
         RBRInstrumentGen3SerialMode_name(serial->mode));
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_sleep(RBRInstrumentGen3 *instrument)
+RBRGen3Error RBRInstrumentGen3_sleep(RBRGen3 *instrument)
 {
-    RBR_TRY(RBRInstrumentGen3_sendCommand(instrument, "sleep"));
+    RBR_TRY(RBRGen3_sendCommand(instrument, "sleep"));
 
-    instrument->lastActivityTime = RBRINSTRUMENTGEN3_NO_ACTIVITY;
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    instrument->lastActivityTime = RBRGEN3_NO_ACTIVITY;
+    return RBRGEN3_SUCCESS;
 }
 
 const char *RBRInstrumentGen3WiFiState_name(RBRInstrumentGen3WiFiState state)
@@ -301,7 +301,7 @@ const char *RBRInstrumentGen3WiFiState_name(RBRInstrumentGen3WiFiState state)
     }
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getWiFi(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getWiFi(RBRGen3 *instrument,
                                          RBRInstrumentGen3WiFi *wifi)
 {
     memset(wifi, 0, sizeof(RBRInstrumentGen3WiFi));
@@ -310,13 +310,13 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getWiFi(RBRInstrumentGen3 *instrument,
         (RBRInstrumentGen3WiFiState *) &wifi->state;
     *state = RBRINSTRUMENTGEN3_UNKNOWN_WIFI;
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "wifi"));
+    RBR_TRY(RBRGen3_converse(instrument, "wifi"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -366,10 +366,10 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getWiFi(RBRInstrumentGen3 *instrument,
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setWiFi(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setWiFi(RBRGen3 *instrument,
                                          const RBRInstrumentGen3WiFi *wifi)
 {
     if (wifi->powerTimeout < 5000
@@ -379,12 +379,12 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setWiFi(RBRInstrumentGen3 *instrument,
         || wifi->commandTimeout > 600000
         || wifi->commandTimeout % 1000 != 0)
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
-        return RBRInstrumentGen3_converse(
+        return RBRGen3_converse(
             instrument,
             "wifi timeout = %d, commandtimeout = %d",
             wifi->powerTimeout / 1000,
@@ -392,7 +392,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setWiFi(RBRInstrumentGen3 *instrument,
     }
     else
     {
-        return RBRInstrumentGen3_converse(
+        return RBRGen3_converse(
             instrument,
             "wifi enabled = %s, timeout = %d, commandtimeout = %d",
             wifi->enabled ? "true" : "false",

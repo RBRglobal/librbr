@@ -16,18 +16,18 @@ typedef struct ThresholdingTest
     RBRInstrumentGen3Thresholding expected;
 } ThresholdingTest;
 
-static bool test_thresholding(RBRInstrumentGen3 *instrument,
+static bool test_thresholding(RBRGen3 *instrument,
                               TestIOBuffers *buffers,
                               ThresholdingTest *tests)
 {
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
     RBRInstrumentGen3Thresholding actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrumentGen3_getThresholding(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.enabled, actual.enabled, bool);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.state,
                             actual.state,
@@ -141,7 +141,7 @@ TEST_LOGGER2(thresholding_set)
         .interval = 60000
     };
 
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
 
     const char *text = "thresholding state = on, channel = 1, "
                            "condition = above, value = 0.0000, "
@@ -152,7 +152,7 @@ TEST_LOGGER2(thresholding_set)
 
     TestIOBuffers_init(buffers, response, 0);
     err = RBRInstrumentGen3_setThresholding(instrument, &threshold);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     return true;
 }
@@ -168,7 +168,7 @@ TEST_LOGGER3(thresholding_set_channel_by_index)
         .interval = 60000
     };
 
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
 
     const char *text = "thresholding enabled = true, channelindex = 1, "
                            "condition = above, value = 0.0000, "
@@ -184,7 +184,7 @@ TEST_LOGGER3(thresholding_set_channel_by_index)
 
     TestIOBuffers_init(buffers, response, 0);
     err = RBRInstrumentGen3_setThresholding(instrument, &threshold);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -201,7 +201,7 @@ TEST_LOGGER3(thresholding_set_channel_by_label)
         .interval = 30000
     };
 
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
 
     const char *text = "thresholding enabled = false, "
                            "channellabel = pressure_00, condition = below, "
@@ -212,7 +212,7 @@ TEST_LOGGER3(thresholding_set_channel_by_label)
 
     TestIOBuffers_init(buffers, response, 0);
     err = RBRInstrumentGen3_setThresholding(instrument, &threshold);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -224,18 +224,18 @@ typedef struct TwistActivationTest
     RBRInstrumentGen3TwistActivation expected;
 } TwistActivationTest;
 
-static bool test_twistactivation(RBRInstrumentGen3 *instrument,
+static bool test_twistactivation(RBRGen3 *instrument,
                                  TestIOBuffers *buffers,
                                  TwistActivationTest *tests)
 {
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
     RBRInstrumentGen3TwistActivation actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrumentGen3_getTwistActivation(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.enabled, actual.enabled, bool);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.state,
                             actual.state,
@@ -306,7 +306,7 @@ TEST_LOGGER2(twistactivation_set)
         .enabled = true
     };
 
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
 
     const char *text = "twistactivation state = on";
     char expectedCommand[COMMAND_RESPONSE_SIZE];
@@ -315,7 +315,7 @@ TEST_LOGGER2(twistactivation_set)
 
     TestIOBuffers_init(buffers, response, 0);
     err = RBRInstrumentGen3_setTwistActivation(instrument, &twistActivation);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -327,7 +327,7 @@ TEST_LOGGER3(twistactivation_set)
         .enabled = true
     };
 
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
 
     const char *text = "twistactivation enabled = true";
     char expectedCommand[COMMAND_RESPONSE_SIZE];
@@ -336,7 +336,7 @@ TEST_LOGGER3(twistactivation_set)
 
     TestIOBuffers_init(buffers, response, 0);
     err = RBRInstrumentGen3_setTwistActivation(instrument, &twistActivation);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;

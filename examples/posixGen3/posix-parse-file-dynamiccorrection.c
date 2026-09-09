@@ -52,13 +52,13 @@
  * (this value is not stored within the binary data, example given is 2 sample/sec) */ 
 #define SAMPLING_RATE 2.0f
 
-RBRInstrumentGen3DateTime g_timeReference = 0;
+RBRGen3DateTime g_timeReference = 0;
 
 RBRDynamicCorrectionGen3Params dynamicCorrParams;
 
-RBRInstrumentGen3Error parserSample(
+RBRGen3Error parserSample(
     const struct RBRParserGen3 *parser,
-    const struct RBRInstrumentGen3Sample *const sample)
+    const struct RBRGen3Sample *const sample)
 {
     /* struct for dynamic correction */
     RBRDynamicCorrectionGen3Error status;
@@ -90,7 +90,7 @@ RBRInstrumentGen3Error parserSample(
     /* wait until sufficient sample feed into algorithm */
     if ( status == RBRDYNAMICCORRECTIONGEN3_NOT_VALID_YET )
     {
-        return RBRINSTRUMENTGEN3_SUCCESS;
+        return RBRGEN3_SUCCESS;
     }
 
     if ( status != RBRDYNAMICCORRECTIONGEN3_SUCCESS )
@@ -110,7 +110,7 @@ RBRInstrumentGen3Error parserSample(
             (double) corrResult.corrSalinity,
             (double) meas.condTemperature);
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -144,8 +144,8 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENTGEN3_LIB_NAME,
-            RBRINSTRUMENTGEN3_LIB_VERSION);
+            RBRGEN3_LIB_NAME,
+            RBRGEN3_LIB_VERSION);
 
     printf("warning: this example works for data file with a fixed sampling rate of %.1f Hz.\n",
            (double) SAMPLING_RATE);
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
     parser = &parserSpace;
     #endif
 
-    RBRInstrumentGen3Sample sampleBuffer;
+    RBRGen3Sample sampleBuffer;
     RBRParserGen3Callbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
@@ -190,16 +190,16 @@ int main(int argc, char *argv[])
         goto fileCleanup;
     }
 
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
     if ((err = RBRParserGen3_init(
              &parser,
              &parserCallbacks,
              &parserConfig,
-             NULL)) != RBRINSTRUMENTGEN3_SUCCESS)
+             NULL)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to initialize parser: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }

@@ -11,8 +11,8 @@
 /* Required for memset, strcmp. */
 #include <string.h>
 
-#include "RBRInstrumentGen3.h"
-#include "RBRInstrumentGen3Internal.h"
+#include "RBRGen3.h"
+#include "RBRGen3Internal.h"
 
 const char *RBRInstrumentGen3Direction_name(RBRInstrumentGen3Direction direction)
 {
@@ -47,21 +47,21 @@ const char *RBRInstrumentGen3RegimesReference_name(
     }
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getRegimes(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getRegimes(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Regimes *regimes)
 {
     memset(regimes, 0, sizeof(RBRInstrumentGen3Regimes));
     regimes->direction = RBRINSTRUMENTGEN3_UNKNOWN_DIRECTION;
     regimes->reference = RBRINSTRUMENTGEN3_UNKNOWN_REFERENCE;
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "regimes"));
+    RBR_TRY(RBRGen3_converse(instrument, "regimes"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -99,11 +99,11 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getRegimes(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setRegimes(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setRegimes(
+    RBRGen3 *instrument,
     const RBRInstrumentGen3Regimes *regimes)
 {
     if (regimes->direction < 0
@@ -113,10 +113,10 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setRegimes(
         || regimes->reference < 0
         || regimes->reference >= RBRINSTRUMENTGEN3_REFERENCE_COUNT)
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrumentGen3_converse(
+    return RBRGen3_converse(
         instrument,
         "regimes direction = %s, count = %i, reference = %s",
         RBRInstrumentGen3Direction_name(regimes->direction),
@@ -124,27 +124,27 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setRegimes(
         RBRInstrumentGen3RegimesReference_name(regimes->reference));
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getRegime(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getRegime(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Regime *regime)
 {
     RBRInstrumentGen3RegimeIndex index = regime->index;
 
     if (index < 1 || index > RBRINSTRUMENTGEN3_REGIME_MAX)
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
     memset(regime, 0, sizeof(RBRInstrumentGen3Regime));
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "regime %i", index));
+    RBR_TRY(RBRGen3_converse(instrument, "regime %i", index));
 
     char *command = NULL;
     int32_t previousIndex = 0;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -172,11 +172,11 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getRegime(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setRegime(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setRegime(
+    RBRGen3 *instrument,
     const RBRInstrumentGen3Regime *regime)
 {
     if (regime->index < 1
@@ -190,10 +190,10 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setRegime(
         || (regime->samplingPeriod >= 1000
             && regime->samplingPeriod % 1000 != 0))
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrumentGen3_converse(
+    return RBRGen3_converse(
         instrument,
         "regime %d boundary = %.0f, binsize = %0.1f, samplingperiod = %i",
         regime->index,
@@ -202,20 +202,20 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setRegime(
         regime->samplingPeriod);
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getDirectionDependentSampling(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getDirectionDependentSampling(
+    RBRGen3 *instrument,
     RBRInstrumentGen3DirectionDependentSampling *ddsampling)
 {
     memset(ddsampling, 0, sizeof(RBRInstrumentGen3DirectionDependentSampling));
     ddsampling->direction = RBRINSTRUMENTGEN3_UNKNOWN_DIRECTION;
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "ddsampling"));
+    RBR_TRY(RBRGen3_converse(instrument, "ddsampling"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -253,11 +253,11 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getDirectionDependentSampling(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setDirectionDependentSampling(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setDirectionDependentSampling(
+    RBRGen3 *instrument,
     RBRInstrumentGen3DirectionDependentSampling *ddsampling)
 {
     if (ddsampling->direction < 0
@@ -272,10 +272,10 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setDirectionDependentSampling(
         || (ddsampling->slowPeriod >= 1000
             && ddsampling->slowPeriod % 1000 != 0))
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrumentGen3_converse(
+    return RBRGen3_converse(
         instrument,
         "ddsampling direction = %s, fastperiod = %i, slowperiod = %i, "
         "fastthreshold = %0.1f, slowthreshold = %0.1f",

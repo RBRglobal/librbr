@@ -15,28 +15,28 @@
 extern "C" {
 #endif
 
-#include "RBRInstrumentGen3.h"
+#include "RBRGen3.h"
 
 #define INSTRUMENT_CHARACTER_TIMEOUT_MSEC 4000
 #define INSTRUMENT_COMMAND_TIMEOUT_MSEC 10000
 
 int openSerialFd(char *devicePath);
 
-RBRInstrumentGen3Error instrumentTime(const struct RBRInstrumentGen3 *instrument,
-                                  RBRInstrumentGen3DateTime *time);
+RBRGen3Error instrumentTime(const struct RBRGen3 *instrument,
+                                  RBRGen3DateTime *time);
 
-RBRInstrumentGen3Error instrumentSleep(const struct RBRInstrumentGen3 *instrument,
-                                   RBRInstrumentGen3DateTime time);
+RBRGen3Error instrumentSleep(const struct RBRGen3 *instrument,
+                                   RBRGen3DateTime time);
 
-RBRInstrumentGen3Error instrumentRead(const struct RBRInstrumentGen3 *instrument,
+RBRGen3Error instrumentRead(const struct RBRGen3 *instrument,
                                   void *data,
                                   int32_t *size);
 
-RBRInstrumentGen3Error instrumentWrite(const struct RBRInstrumentGen3 *instrument,
+RBRGen3Error instrumentWrite(const struct RBRGen3 *instrument,
                                    const void *const data,
                                    int32_t size);
 
-RBRInstrumentGen3Error instrumentStart(RBRInstrumentGen3 *instrument);
+RBRGen3Error instrumentStart(RBRGen3 *instrument);
 
 #ifdef __cplusplus
 }

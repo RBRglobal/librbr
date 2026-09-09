@@ -19,7 +19,7 @@ typedef struct ClockTest
     RBRInstrumentGen3Clock expected;
 } ClockTest;
 
-static bool test_clock(RBRInstrumentGen3 *instrument,
+static bool test_clock(RBRGen3 *instrument,
                        TestIOBuffers *buffers,
                        ClockTest *tests)
 {
@@ -28,8 +28,8 @@ static bool test_clock(RBRInstrumentGen3 *instrument,
     for (int i = 0; tests[i].command != NULL; ++i)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        RBRInstrumentGen3Error err = RBRInstrumentGen3_getClock(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+        RBRGen3Error err = RBRInstrumentGen3_getClock(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_EQ(tests[i].expected.dateTime,
                        actual.dateTime,
                        "%" PRIi64);
@@ -68,7 +68,7 @@ TEST_LOGGER2(now)
             "settings offsetfromutc = unknown" RESPONSE_TERMINATOR
             "now = 20000101000000" RESPONSE_TERMINATOR,
             {
-                .dateTime = RBRINSTRUMENTGEN3_DATETIME_MIN,
+                .dateTime = RBRGEN3_DATETIME_MIN,
                 .offsetFromUtc = NAN
             }
         },
@@ -78,7 +78,7 @@ TEST_LOGGER2(now)
             "settings offsetfromutc = unknown" RESPONSE_TERMINATOR
             "now = 20991231235959" RESPONSE_TERMINATOR,
             {
-                .dateTime = RBRINSTRUMENTGEN3_DATETIME_MAX,
+                .dateTime = RBRGEN3_DATETIME_MAX,
                 .offsetFromUtc = NAN
             }
         },
@@ -126,8 +126,8 @@ TEST_LOGGER2(now_set)
                           RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_setClock(instrument, &now);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    RBRGen3Error err = RBRInstrumentGen3_setClock(instrument, &now);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -150,7 +150,7 @@ TEST_LOGGER3(clock)
             "clock datetime = 20000101000000, "
             "offsetfromutc = unknown" RESPONSE_TERMINATOR,
             {
-                .dateTime = RBRINSTRUMENTGEN3_DATETIME_MIN,
+                .dateTime = RBRGEN3_DATETIME_MIN,
                 .offsetFromUtc = NAN
             }
         },
@@ -159,7 +159,7 @@ TEST_LOGGER3(clock)
             "clock datetime = 20991231235959, "
             "offsetfromutc = unknown" RESPONSE_TERMINATOR,
             {
-                .dateTime = RBRINSTRUMENTGEN3_DATETIME_MAX,
+                .dateTime = RBRGEN3_DATETIME_MAX,
                 .offsetFromUtc = NAN
             }
         },
@@ -201,8 +201,8 @@ TEST_LOGGER3(clock_set)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_setClock(instrument, &now);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    RBRGen3Error err = RBRInstrumentGen3_setClock(instrument, &now);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -215,7 +215,7 @@ typedef struct SamplingTest
     RBRInstrumentGen3Sampling expected;
 } SamplingTest;
 
-static bool test_sampling(RBRInstrumentGen3 *instrument,
+static bool test_sampling(RBRGen3 *instrument,
                           TestIOBuffers *buffers,
                           SamplingTest *tests)
 {
@@ -224,9 +224,9 @@ static bool test_sampling(RBRInstrumentGen3 *instrument,
     for (int i = 0; tests[i].command != NULL; ++i)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        RBRInstrumentGen3Error err = RBRInstrumentGen3_getSampling(instrument,
+        RBRGen3Error err = RBRInstrumentGen3_getSampling(instrument,
                                                            &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.mode,
                             actual.mode,
                             RBRInstrumentGen3SamplingMode);
@@ -346,8 +346,8 @@ typedef struct SamplingSetTest
     RBRInstrumentGen3Sampling sampling;
     const char *response;
     const char *burstResponse;
-    RBRInstrumentGen3Error expectedError;
-    RBRInstrumentGen3Error expectedBurstError;
+    RBRGen3Error expectedError;
+    RBRGen3Error expectedBurstError;
 } SamplingSetTest;
 
 TEST_LOGGER3(sampling_set)
@@ -365,8 +365,8 @@ TEST_LOGGER3(sampling_set)
             },
             "sampling mode = continuous, period = 1000",
             "sampling burstlength = 240, burstinterval = 300000",
-            RBRINSTRUMENTGEN3_SUCCESS,
-            RBRINSTRUMENTGEN3_SUCCESS
+            RBRGEN3_SUCCESS,
+            RBRGEN3_SUCCESS
         },
         {
             {
@@ -381,8 +381,8 @@ TEST_LOGGER3(sampling_set)
             "",
             "",
             /* Failure because the period isn't in availableFastPeriods. */
-            RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE,
-            RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE,
+            RBRGEN3_INVALID_PARAMETER_VALUE
         },
         {
             {
@@ -397,8 +397,8 @@ TEST_LOGGER3(sampling_set)
             "",
             "",
             /* Failure because the period is less than userPeriodLimit. */
-            RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE,
-            RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE,
+            RBRGEN3_INVALID_PARAMETER_VALUE
         },
         {
             {
@@ -412,14 +412,14 @@ TEST_LOGGER3(sampling_set)
             },
             "sampling mode = continuous, period = 1000",
             "",
-            RBRINSTRUMENTGEN3_SUCCESS,
+            RBRGEN3_SUCCESS,
             /* Failure because the burst interval is inconsistent. */
-            RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE
         },
         {{0}, 0, 0, 0, 0}
     };
 
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
 
     char expectedCommand[COMMAND_RESPONSE_SIZE];
     char response[COMMAND_RESPONSE_SIZE];
@@ -428,7 +428,7 @@ TEST_LOGGER3(sampling_set)
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
         err = RBRInstrumentGen3_setSampling(instrument, &tests[i].sampling);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
         rbr_prepareCommandResponse(tests[i].burstResponse, expectedCommand, response);
@@ -436,7 +436,7 @@ TEST_LOGGER3(sampling_set)
         err = RBRInstrumentGen3_setBurstSampling(instrument, &tests[i].sampling);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedBurstError,
                             err,
-                            RBRInstrumentGen3Error);
+                            RBRGen3Error);
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     }
 
@@ -450,7 +450,7 @@ typedef struct DeploymentTest
     RBRInstrumentGen3Deployment expected;
 } DeploymentTest;
 
-static bool test_deployment(RBRInstrumentGen3 *instrument,
+static bool test_deployment(RBRGen3 *instrument,
                             TestIOBuffers *buffers,
                             DeploymentTest *tests)
 {
@@ -459,9 +459,9 @@ static bool test_deployment(RBRInstrumentGen3 *instrument,
     for (int i = 0; tests[i].command != NULL; ++i)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        RBRInstrumentGen3Error err = RBRInstrumentGen3_getDeployment(instrument,
+        RBRGen3Error err = RBRInstrumentGen3_getDeployment(instrument,
                                                              &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_EQ(tests[i].expected.startTime,
                        actual.startTime,
                        "%" PRIi64);
@@ -488,8 +488,8 @@ TEST_LOGGER2(deployment)
             "endtime = 2099123123595959" RESPONSE_TERMINATOR
             "status = disabled" RESPONSE_TERMINATOR,
             {
-                .startTime = RBRINSTRUMENTGEN3_DATETIME_MIN,
-                .endTime = RBRINSTRUMENTGEN3_DATETIME_MAX,
+                .startTime = RBRGEN3_DATETIME_MIN,
+                .endTime = RBRGEN3_DATETIME_MAX,
                 .status = RBRINSTRUMENTGEN3_STATUS_DISABLED
             }
         },
@@ -507,8 +507,8 @@ TEST_LOGGER3(deployment)
             "deployment starttime = 20000101000000, "
             "endtime = 2099123123595959, status = disabled" RESPONSE_TERMINATOR,
             {
-                .startTime = RBRINSTRUMENTGEN3_DATETIME_MIN,
-                .endTime = RBRINSTRUMENTGEN3_DATETIME_MAX,
+                .startTime = RBRGEN3_DATETIME_MIN,
+                .endTime = RBRGEN3_DATETIME_MAX,
                 .status = RBRINSTRUMENTGEN3_STATUS_DISABLED
             }
         },
@@ -522,7 +522,7 @@ typedef struct DeploymentSetTest
 {
     RBRInstrumentGen3Deployment deployment;
     const char *response;
-    RBRInstrumentGen3Error expectedError;
+    RBRGen3Error expectedError;
 } DeploymentSetTest;
 
 TEST_LOGGER3(deployment_set)
@@ -530,13 +530,13 @@ TEST_LOGGER3(deployment_set)
     DeploymentSetTest tests[] = {
         {
             {
-                .startTime = RBRINSTRUMENTGEN3_DATETIME_MIN,
-                .endTime = RBRINSTRUMENTGEN3_DATETIME_MAX,
+                .startTime = RBRGEN3_DATETIME_MIN,
+                .endTime = RBRGEN3_DATETIME_MAX,
                 .status = RBRINSTRUMENTGEN3_STATUS_DISABLED
             },
             "deployment starttime = 20000101000000, "
             "endtime = 20991231235959",
-            RBRINSTRUMENTGEN3_SUCCESS
+            RBRGEN3_SUCCESS
         },
         {
             {
@@ -546,7 +546,7 @@ TEST_LOGGER3(deployment_set)
             },
             "",
             /* Failure because the end time is before the start time. */
-            RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE
         },
         {
             {
@@ -556,7 +556,7 @@ TEST_LOGGER3(deployment_set)
             },
             "",
             /* Failure because the end time equals the start time. */
-            RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE
         },
         {
             {
@@ -566,7 +566,7 @@ TEST_LOGGER3(deployment_set)
             },
             "",
             /* Failure because the start time is before the epoch. */
-            RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE
         },
         {
             {
@@ -576,12 +576,12 @@ TEST_LOGGER3(deployment_set)
             },
             "",
             /* Failure because the end time is after the limit. */
-            RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE
         },
         {{0}, 0, 0}
     };
 
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
 
     char expectedCommand[COMMAND_RESPONSE_SIZE];
     char response[COMMAND_RESPONSE_SIZE];
@@ -590,7 +590,7 @@ TEST_LOGGER3(deployment_set)
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
         err = RBRInstrumentGen3_setDeployment(instrument, &tests[i].deployment);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen3Error);  
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);  
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     }
 

@@ -30,12 +30,12 @@
 
 #define _AbsP_To_SeaP        10.132507
 
-static RBRInstrumentGen3DateTime g_timeReference = 0;
-static RBRInstrumentGen3Sample g_sample;
+static RBRGen3DateTime g_timeReference = 0;
+static RBRGen3Sample g_sample;
 
-RBRInstrumentGen3Error instrumentSample(
-    const struct RBRInstrumentGen3 *instrument,
-    const struct RBRInstrumentGen3Sample *const sample)
+RBRGen3Error instrumentSample(
+    const struct RBRGen3 *instrument,
+    const struct RBRGen3Sample *const sample)
 {
     /* Unused. */
     (void) instrument;
@@ -53,12 +53,12 @@ RBRInstrumentGen3Error instrumentSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error streamCTD(RBRInstrumentGen3 *instrument, int dynamicCorrection_channel[], bool _flagAbsP, RBRDynamicCorrectionGen3Measurement *meas)
+RBRGen3Error streamCTD(RBRGen3 *instrument, int dynamicCorrection_channel[], bool _flagAbsP, RBRDynamicCorrectionGen3Measurement *meas)
 {
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
     /* if seapressure_00 channel is used, _flagAbsP will be false, isAbsolute = 0. 
      * Otherwise if pressure_00 channel is in use, it needs a conversion to sea pressure.
     */
@@ -70,9 +70,9 @@ RBRInstrumentGen3Error streamCTD(RBRInstrumentGen3 *instrument, int dynamicCorre
     }
     
     err = RBRInstrumentGen3_readSample(instrument);
-    if (err != RBRINSTRUMENTGEN3_SUCCESS)
+    if (err != RBRGEN3_SUCCESS)
     {
-        fprintf(stderr, "Error: %s\n", RBRInstrumentGen3Error_name(err));
+        fprintf(stderr, "Error: %s\n", RBRGen3Error_name(err));
         return err;
     }
     else {
@@ -91,10 +91,10 @@ RBRInstrumentGen3Error streamCTD(RBRInstrumentGen3 *instrument, int dynamicCorre
         meas->condTemperature = g_sample.readings[dynamicCorrection_channel[3]];
       }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error applyCorrection(RBRInstrumentGen3 *instrument, int dynamicCorrection_channel[], bool _flagAbsP, float Fs)
+RBRGen3Error applyCorrection(RBRGen3 *instrument, int dynamicCorrection_channel[], bool _flagAbsP, float Fs)
 {
     RBRDynamicCorrectionGen3Params params;
     RBRDynamicCorrectionGen3Error status;
@@ -110,7 +110,7 @@ RBRInstrumentGen3Error applyCorrection(RBRInstrumentGen3 *instrument, int dynami
     if ( status != RBRDYNAMICCORRECTIONGEN3_SUCCESS )
     {
         fprintf(stderr, "RBRDynamicCorrectionGen3_init() return error code %u\n", status);
-        return RBRINSTRUMENTGEN3_UNKNOWN_ERROR;
+        return RBRGEN3_UNKNOWN_ERROR;
     }
 
     while (1)
@@ -144,7 +144,7 @@ RBRInstrumentGen3Error applyCorrection(RBRInstrumentGen3 *instrument, int dynami
                 (double) meas.condTemperature);
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 
@@ -156,10 +156,10 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen3Error err;
-    RBRInstrumentGen3 *instrument = NULL;
+    RBRGen3Error err;
+    RBRGen3 *instrument = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRInstrumentGen3 instrumentSpace;
+    RBRGen3 instrumentSpace;
     instrument = &instrumentSpace;
     #endif
 
@@ -182,11 +182,11 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENTGEN3_LIB_NAME,
-            RBRINSTRUMENTGEN3_LIB_VERSION);
+            RBRGEN3_LIB_NAME,
+            RBRGEN3_LIB_VERSION);
 
 
-    RBRInstrumentGen3Callbacks callbacks = {
+    RBRGen3Callbacks callbacks = {
         .time = instrumentTime, //in millisecond
         .sleep = instrumentSleep,
         .read = instrumentRead,
@@ -195,15 +195,15 @@ int main(int argc, char *argv[])
         .sampleBuffer = &g_sample
     };
 
-    if ((err = RBRInstrumentGen3_open(
+    if ((err = RBRGen3_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
@@ -211,11 +211,11 @@ int main(int argc, char *argv[])
     /* query labels to check for CTD */
     RBRInstrumentGen3LabelsList labelList;
     err = RBRInstrumentGen3_getLabelsList(instrument, &labelList);
-    if ( err != RBRINSTRUMENTGEN3_SUCCESS )
+    if ( err != RBRGEN3_SUCCESS )
     {
             fprintf(stderr, "%s: Failed to query label list: %s!\n",
                     programName,
-                    RBRInstrumentGen3Error_name(err));
+                    RBRGen3Error_name(err));
             status = EXIT_FAILURE;
             goto fileCleanup;
     }
@@ -333,12 +333,12 @@ int main(int argc, char *argv[])
                programName,
                RBRInstrumentGen3DeploymentStatus_name(deployment.status));
 
-        if ((err = instrumentStart(instrument)) != RBRINSTRUMENTGEN3_SUCCESS)
+        if ((err = instrumentStart(instrument)) != RBRGEN3_SUCCESS)
         {
             fprintf(stderr,
                     "%s: Failed to start instrument: %s!\n",
                     programName,
-                    RBRInstrumentGen3Error_name(err));
+                    RBRGen3Error_name(err));
             status = EXIT_FAILURE;
             goto instrumentCleanup;
         }
@@ -346,12 +346,12 @@ int main(int argc, char *argv[])
 
     /* get sampling rate from instrument */
     RBRInstrumentGen3Sampling sampling;
-    if ((err = RBRInstrumentGen3_getSampling(instrument, &sampling)) != RBRINSTRUMENTGEN3_SUCCESS)
+    if ((err = RBRInstrumentGen3_getSampling(instrument, &sampling)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr,
                 "%s: Failed to query 'sampling' from instrument: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
@@ -360,14 +360,14 @@ int main(int argc, char *argv[])
 
     if(isCtd == true) {
         err = applyCorrection(instrument, dynamicCorrection_channel, _flagAbsP, samplingRate);
-        if (err != RBRINSTRUMENTGEN3_SUCCESS)
+        if (err != RBRGEN3_SUCCESS)
         {
             fprintf(stderr, "Unexpected termination\n");
         }
     }
 
 instrumentCleanup:
-    RBRInstrumentGen3_close(instrument);
+    RBRGen3_close(instrument);
 fileCleanup:
     close(instrumentFd);
 

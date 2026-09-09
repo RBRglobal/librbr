@@ -25,9 +25,9 @@
 
 #include "posix-shared.h"
 
-RBRInstrumentGen3Error instrumentSample(
-    const struct RBRInstrumentGen3 *instrument,
-    const struct RBRInstrumentGen3Sample *const sample)
+RBRGen3Error instrumentSample(
+    const struct RBRGen3 *instrument,
+    const struct RBRGen3Sample *const sample)
 {
     /* Unused. */
     (void) instrument;
@@ -45,7 +45,7 @@ RBRInstrumentGen3Error instrumentSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -56,10 +56,10 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen3Error err;
-    RBRInstrumentGen3 *instrument = NULL;
+    RBRGen3Error err;
+    RBRGen3 *instrument = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRInstrumentGen3 instrumentSpace;
+    RBRGen3 instrumentSpace;
     instrument = &instrumentSpace;
     #endif
 
@@ -82,11 +82,11 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENTGEN3_LIB_NAME,
-            RBRINSTRUMENTGEN3_LIB_VERSION);
+            RBRGEN3_LIB_NAME,
+            RBRGEN3_LIB_VERSION);
 
-    RBRInstrumentGen3Sample sampleBuffer;
-    RBRInstrumentGen3Callbacks callbacks = {
+    RBRGen3Sample sampleBuffer;
+    RBRGen3Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
@@ -95,15 +95,15 @@ int main(int argc, char *argv[])
         .sampleBuffer = &sampleBuffer
     };
 
-    if ((err = RBRInstrumentGen3_open(
+    if ((err = RBRGen3_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
@@ -145,12 +145,12 @@ int main(int argc, char *argv[])
                programName,
                RBRInstrumentGen3DeploymentStatus_name(deployment.status));
 
-        if ((err = instrumentStart(instrument)) != RBRINSTRUMENTGEN3_SUCCESS)
+        if ((err = instrumentStart(instrument)) != RBRGEN3_SUCCESS)
         {
             fprintf(stderr,
                     "%s: Failed to start instrument: %s!\n",
                     programName,
-                    RBRInstrumentGen3Error_name(err));
+                    RBRGen3Error_name(err));
             status = EXIT_FAILURE;
             goto instrumentCleanup;
         }
@@ -158,14 +158,14 @@ int main(int argc, char *argv[])
 
     while (true)
     {
-        if ((err = RBRInstrumentGen3_readSample(instrument)) != RBRINSTRUMENTGEN3_SUCCESS)
+        if ((err = RBRInstrumentGen3_readSample(instrument)) != RBRGEN3_SUCCESS)
         {
-            fprintf(stderr, "Error: %s\n", RBRInstrumentGen3Error_name(err));
+            fprintf(stderr, "Error: %s\n", RBRGen3Error_name(err));
         }
     }
 
 instrumentCleanup:
-    RBRInstrumentGen3_close(instrument);
+    RBRGen3_close(instrument);
 fileCleanup:
     close(instrumentFd);
 

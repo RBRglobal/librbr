@@ -109,14 +109,14 @@ libdynamiccorrection: bin/libRBRDynamicCorrection.a
 lib: bin/libRBR.a
 
 ## \brief Objects for the Gen3 (Logger2/Logger3) API.
-GEN3_OBJECTS := src/RBRInstrumentGen3.o \
+GEN3_OBJECTS := src/RBRGen3.o \
                 src/RBRInstrumentGen3Communication.o \
                 src/RBRInstrumentGen3Configuration.o \
                 src/RBRInstrumentGen3Deployment.o \
                 src/RBRInstrumentGen3Fetching.o \
                 src/RBRInstrumentGen3Gating.o \
                 src/RBRInstrumentGen3HardwareErrors.o \
-                src/RBRInstrumentGen3Internal.o \
+                src/RBRGen3Internal.o \
                 src/RBRInstrumentGen3Memory.o \
                 src/RBRInstrumentGen3Other.o \
                 src/RBRInstrumentGen3Pauseresume.o \
@@ -238,7 +238,7 @@ testsGen3/tests.c: $(foreach module,$(GEN3_TEST_MODULES),testsGen3/$(module).c)
 		| sed -e 's/$$/;/' >>$@
 	@echo "InstrumentTest instrumentTests[] = {" >>$@
 	@grep -ho 'TEST_LOGGER[23]([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRINSTRUMENTGEN3_LOGGER\1, test_\2_l\1},/' \
+		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRGEN3_LOGGER\1, test_\2_l\1},/' \
 		>>$@
 	@echo "    {0}" >>$@
 	@echo "};" >>$@

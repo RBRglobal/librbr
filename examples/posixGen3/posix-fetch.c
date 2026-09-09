@@ -30,10 +30,10 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen3Error err;
-    RBRInstrumentGen3 *instrument = NULL;
+    RBRGen3Error err;
+    RBRGen3 *instrument = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRInstrumentGen3 instrumentSpace;
+    RBRGen3 instrumentSpace;
     instrument = &instrumentSpace;
     #endif
 
@@ -56,25 +56,25 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENTGEN3_LIB_NAME,
-            RBRINSTRUMENTGEN3_LIB_VERSION);
+            RBRGEN3_LIB_NAME,
+            RBRGEN3_LIB_VERSION);
 
-    RBRInstrumentGen3Callbacks callbacks = {
+    RBRGen3Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrumentGen3_open(
+    if ((err = RBRGen3_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
@@ -108,13 +108,13 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    RBRInstrumentGen3Sample sample;
+    RBRGen3Sample sample;
     while (true)
     {
         err = RBRInstrumentGen3_fetch(instrument, NULL, false, &sample);
-        if (err != RBRINSTRUMENTGEN3_SUCCESS)
+        if (err != RBRGEN3_SUCCESS)
         {
-            fprintf(stderr, "Error: %s\n", RBRInstrumentGen3Error_name(err));
+            fprintf(stderr, "Error: %s\n", RBRGen3Error_name(err));
         }
         else
         {
@@ -123,10 +123,10 @@ int main(int argc, char *argv[])
             {
                 switch (RBRInstrumentGen3Reading_getFlag(sample.readings[i]))
                 {
-                case RBRINSTRUMENTGEN3_READING_FLAG_UNCALIBRATED:
+                case RBRGEN3_READING_FLAG_UNCALIBRATED:
                     printf(", ###");
                     break;
-                case RBRINSTRUMENTGEN3_READING_FLAG_ERROR:
+                case RBRGEN3_READING_FLAG_ERROR:
                     printf(", Error-%2d", RBRInstrumentGen3Reading_getError(sample.readings[i]));
                     break;
                 case RBRINSTRUMENTGEN3_READING_FLAG_NONE:
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
     }
 
 instrumentCleanup:
-    RBRInstrumentGen3_close(instrument);
+    RBRGen3_close(instrument);
 fileCleanup:
     close(instrumentFd);
 

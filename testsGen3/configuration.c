@@ -17,18 +17,18 @@ typedef struct ChannelsTest
     RBRInstrumentGen3Channels expected;
 } ChannelsTest;
 
-static bool test_channels(RBRInstrumentGen3 *instrument,
+static bool test_channels(RBRGen3 *instrument,
                           TestIOBuffers *buffers,
                           ChannelsTest *tests)
 {
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
     RBRInstrumentGen3Channels actual;
 
     for (int i = 0; tests[i].response != NULL; ++i)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrumentGen3_getChannels(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_EQ(tests[i].expected.count, actual.count, "%" PRIi32);
         TEST_ASSERT_EQ(tests[i].expected.on, actual.on, "%" PRIi32);
         TEST_ASSERT_EQ(tests[i].expected.settlingTime,
@@ -660,10 +660,10 @@ TEST_LOGGER3(channel_gain_set_auto)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_setChannelGain(instrument,
+    RBRGen3Error err = RBRInstrumentGen3_setChannelGain(instrument,
                                                           1,
                                                           &gain);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -683,10 +683,10 @@ TEST_LOGGER3(channel_gain_set_manual)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_setChannelGain(instrument,
+    RBRGen3Error err = RBRInstrumentGen3_setChannelGain(instrument,
                                                           1,
                                                           &gain);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -726,10 +726,10 @@ TEST_LOGGER3(calibration_set)
 
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_setCalibration(instrument,
+    RBRGen3Error err = RBRInstrumentGen3_setCalibration(instrument,
                                                           1,
                                                           &calibration);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -737,15 +737,15 @@ TEST_LOGGER3(calibration_set)
 
 TEST_LOGGER3(settings_fetchpoweroffdelay)
 {
-    RBRInstrumentGen3Period fetchPowerOffDelay = 0;
+    RBRGen3Period fetchPowerOffDelay = 0;
 
     TestIOBuffers_init(buffers,
                        "settings fetchpoweroffdelay = 8000" RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getFetchPowerOffDelay(
+    RBRGen3Error err = RBRInstrumentGen3_getFetchPowerOffDelay(
         instrument,
         &fetchPowerOffDelay);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(8000, fetchPowerOffDelay, "%" PRIi32);
 
     return true;
@@ -753,7 +753,7 @@ TEST_LOGGER3(settings_fetchpoweroffdelay)
 
 TEST_LOGGER3(settings_fetchpoweroffdelay_set)
 {
-    RBRInstrumentGen3Period fetchPowerOffDelay = 8000;
+    RBRGen3Period fetchPowerOffDelay = 8000;
     const char *expectedCommand = "permit command = settings" COMMAND_TERMINATOR
                           "settings fetchpoweroffdelay = 8000"
                           COMMAND_TERMINATOR;
@@ -763,10 +763,10 @@ TEST_LOGGER3(settings_fetchpoweroffdelay_set)
                           RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_setFetchPowerOffDelay(
+    RBRGen3Error err = RBRInstrumentGen3_setFetchPowerOffDelay(
         instrument,
         fetchPowerOffDelay);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -779,10 +779,10 @@ TEST_LOGGER3(settings_sensorpoweralwayson)
     TestIOBuffers_init(buffers,
                        "settings sensorpoweralwayson = on" RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_isSensorPowerAlwaysOn(
+    RBRGen3Error err = RBRInstrumentGen3_isSensorPowerAlwaysOn(
         instrument,
         &sensorPowerAlwaysOn);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(true, sensorPowerAlwaysOn, bool);
 
     return true;
@@ -790,7 +790,7 @@ TEST_LOGGER3(settings_sensorpoweralwayson)
 
 TEST_LOGGER3(settings_sensorpoweralwayson_set)
 {
-    RBRInstrumentGen3Period sensorPowerAlwaysOn = true;
+    RBRGen3Period sensorPowerAlwaysOn = true;
     const char *expectedCommand = "permit command = settings" COMMAND_TERMINATOR
                           "settings sensorpoweralwayson = on"
                           COMMAND_TERMINATOR;
@@ -799,10 +799,10 @@ TEST_LOGGER3(settings_sensorpoweralwayson_set)
                           RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_setSensorPowerAlwaysOn(
+    RBRGen3Error err = RBRInstrumentGen3_setSensorPowerAlwaysOn(
         instrument,
         sensorPowerAlwaysOn);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -815,10 +815,10 @@ TEST_LOGGER3(settings_castdetection)
     TestIOBuffers_init(buffers,
                        "settings castdetection = on" RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getCastDetection(
+    RBRGen3Error err = RBRInstrumentGen3_getCastDetection(
         instrument,
         &castDetection);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(true, castDetection, bool);
 
     return true;
@@ -826,7 +826,7 @@ TEST_LOGGER3(settings_castdetection)
 
 TEST_LOGGER3(settings_castdetection_set)
 {
-    RBRInstrumentGen3Period castDetection = true;
+    RBRGen3Period castDetection = true;
     const char *expectedCommand = "permit command = settings" COMMAND_TERMINATOR
                           "settings castdetection = on" COMMAND_TERMINATOR;
 
@@ -834,10 +834,10 @@ TEST_LOGGER3(settings_castdetection_set)
                           "settings castdetection = on" RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_setCastDetection(
+    RBRGen3Error err = RBRInstrumentGen3_setCastDetection(
         instrument,
         castDetection);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -845,15 +845,15 @@ TEST_LOGGER3(settings_castdetection_set)
 
 TEST_LOGGER3(settings_inputtimeout)
 {
-    RBRInstrumentGen3Period inputTimeout = 0;
+    RBRGen3Period inputTimeout = 0;
 
     TestIOBuffers_init(buffers,
                        "settings inputtimeout = 10000" RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getInputTimeout(
+    RBRGen3Error err = RBRInstrumentGen3_getInputTimeout(
         instrument,
         &inputTimeout);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(10000, inputTimeout, "%" PRIi32);
 
     return true;
@@ -861,7 +861,7 @@ TEST_LOGGER3(settings_inputtimeout)
 
 TEST_LOGGER3(settings_inputtimeout_set)
 {
-    RBRInstrumentGen3Period inputTimeout = 15000;
+    RBRGen3Period inputTimeout = 15000;
     const char *expectedCommand = "permit command = settings" COMMAND_TERMINATOR
                           "settings inputtimeout = 15000" COMMAND_TERMINATOR;
     
@@ -869,10 +869,10 @@ TEST_LOGGER3(settings_inputtimeout_set)
                           "settings inputtimeout = 15000" RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_setInputTimeout(
+    RBRGen3Error err = RBRInstrumentGen3_setInputTimeout(
         instrument,
         inputTimeout);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -885,11 +885,11 @@ TEST_LOGGER3(settings_atmosphere)
     TestIOBuffers_init(buffers,
                        "settings atmosphere = 10.1325010" RESPONSE_TERMINATOR,
                        0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getValueSetting(
+    RBRGen3Error err = RBRInstrumentGen3_getValueSetting(
         instrument,
         RBRINSTRUMENTGEN3_SETTING_ATMOSPHERE,
         &atmosphere);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_FLOAT_EQ(10.132501f, atmosphere, 0.000001f);
 
     return true;
@@ -906,11 +906,11 @@ TEST_LOGGER3(settings_atmosphere_set)
 
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_setValueSetting(
+    RBRGen3Error err = RBRInstrumentGen3_setValueSetting(
         instrument,
         RBRINSTRUMENTGEN3_SETTING_ATMOSPHERE,
         atmosphere);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
     return true;
@@ -925,11 +925,11 @@ typedef struct SensorTest
     int32_t size;
 } SensorTest;
 
-static bool test_sensor(RBRInstrumentGen3 *instrument,
+static bool test_sensor(RBRGen3 *instrument,
                         TestIOBuffers *buffers,
                         SensorTest *tests)
 {
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
     RBRInstrumentGen3SensorParameter actual;
 
     for (int i = 0; tests[i].response != NULL; ++i)
@@ -940,7 +940,7 @@ static bool test_sensor(RBRInstrumentGen3 *instrument,
                  tests[i].expected[0].key);
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrumentGen3_getSensorParameter(instrument, 1, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_STR_EQ(tests[i].expected[0].key, actual.key);
         TEST_ASSERT_STR_EQ(tests[i].expected[0].value, actual.value);
     }
@@ -948,11 +948,11 @@ static bool test_sensor(RBRInstrumentGen3 *instrument,
     return true;
 }
 
-static bool test_sensors(RBRInstrumentGen3 *instrument,
+static bool test_sensors(RBRGen3 *instrument,
                          TestIOBuffers *buffers,
                          SensorTest *tests)
 {
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
     RBRInstrumentGen3SensorParameter actual[TEST_SENSOR_PARAMETER_MAX];
 
     for (int i = 0; tests[i].response != NULL; ++i)
@@ -963,7 +963,7 @@ static bool test_sensors(RBRInstrumentGen3 *instrument,
                                                 1,
                                                 &actual[0],
                                                 &size);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_EQ(tests[i].size, size, "%" PRIi32);
 
         for (int parameter = 0; parameter < size; ++parameter)

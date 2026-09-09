@@ -8,7 +8,7 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#include "RBRInstrumentGen3.h"
+#include "RBRGen3.h"
 
 const char *RBRInstrumentGen3HardwareError_name(RBRInstrumentGen3HardwareError error)
 {
@@ -49,7 +49,7 @@ const char *RBRInstrumentGen3HardwareError_name(RBRInstrumentGen3HardwareError e
         return "unknown error";
     case RBRINSTRUMENTGEN3_HARDWARE_ERROR_MEMORY_ERASE_NOT_COMPLETED:
         return "memory erase not completed";
-    case RBRINSTRUMENTGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY:
+    case RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY:
         return "estimated memory usage exceeds capacity";
     case RBRINSTRUMENTGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST:
         return "memory not empty erase first";
@@ -59,7 +59,7 @@ const char *RBRInstrumentGen3HardwareError_name(RBRInstrumentGen3HardwareError e
         return "end time must be after current time";
     case RBRINSTRUMENTGEN3_HARDWARE_ERROR_FAILED_TO_ENABLE_FOR_LOGGING:
         return "failed to enable for logging";
-    case RBRINSTRUMENTGEN3_HARDWARE_ERROR_NOT_LOGGING:
+    case RBRGEN3_HARDWARE_ERROR_NOT_LOGGING:
         return "not logging";
     case RBRINSTRUMENTGEN3_HARDWARE_ERROR_LOGGING_ALREADY_ACTIVE:
         return "logging already active";

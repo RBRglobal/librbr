@@ -39,12 +39,12 @@ typedef enum RBRInstrumentGen3HardwareError
     RBRINSTRUMENTGEN3_HARDWARE_ERROR_UNKNOWN_ERROR3                                = 300,
     RBRINSTRUMENTGEN3_HARDWARE_ERROR_MEMORY_ERASE_NOT_COMPLETED                    = 301,
     RBRINSTRUMENTGEN3_HARDWARE_ERROR_UNKNOWN_ERROR4                                = 400,
-    RBRINSTRUMENTGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY       = 401,
+    RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY       = 401,
     RBRINSTRUMENTGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST                  = 402,
     RBRINSTRUMENTGEN3_HARDWARE_ERROR_END_TIME_MUST_BE_AFTER_START_TIME             = 403,
     RBRINSTRUMENTGEN3_HARDWARE_ERROR_END_TIME_MUST_BE_AFTER_CURRENT_TIME           = 404,
     RBRINSTRUMENTGEN3_HARDWARE_ERROR_FAILED_TO_ENABLE_FOR_LOGGING                  = 405,
-    RBRINSTRUMENTGEN3_HARDWARE_ERROR_NOT_LOGGING                                   = 406,
+    RBRGEN3_HARDWARE_ERROR_NOT_LOGGING                                   = 406,
     RBRINSTRUMENTGEN3_HARDWARE_ERROR_LOGGING_ALREADY_ACTIVE                        = 408,
     RBRINSTRUMENTGEN3_HARDWARE_ERROR_UNCLEARED_ERROR_USE_ERRORLOG                  = 409,
     RBRINSTRUMENTGEN3_HARDWARE_ERROR_NO_SAMPLING_CHANNELS_ACTIVE                   = 410,
@@ -78,7 +78,7 @@ typedef enum RBRInstrumentGen3HardwareError
  *
  * \param [in] error the hardware error
  * \return a string name for the hardware error
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3HardwareError_name(RBRInstrumentGen3HardwareError error);
 

@@ -18,15 +18,15 @@ typedef struct FetchingTest
     bool passChannels;
     RBRInstrumentGen3LabelsList channels;
     bool sleepAfter;
-    RBRInstrumentGen3Sample expected;
+    RBRGen3Sample expected;
 } FetchingTest;
 
-static bool test_fetching(RBRInstrumentGen3 *instrument,
+static bool test_fetching(RBRGen3 *instrument,
                           TestIOBuffers *buffers,
                           FetchingTest *tests)
 {
-    RBRInstrumentGen3Error err;
-    RBRInstrumentGen3Sample actual;
+    RBRGen3Error err;
+    RBRGen3Sample actual;
 
     for (int i = 0; tests[i].command != NULL; i++)
     {
@@ -35,7 +35,7 @@ static bool test_fetching(RBRInstrumentGen3 *instrument,
                                   tests[i].passChannels ? &tests[i].channels : NULL,
                                   tests[i].sleepAfter,
                                   &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
         TEST_ASSERT_EQ(tests[i].expected.timestamp,
                        actual.timestamp,
@@ -53,8 +53,8 @@ static bool test_fetching(RBRInstrumentGen3 *instrument,
 
             switch (RBRInstrumentGen3Reading_getFlag(actual.readings[channel]))
             {
-            case RBRINSTRUMENTGEN3_READING_FLAG_UNCALIBRATED:
-            case RBRINSTRUMENTGEN3_READING_FLAG_ERROR:
+            case RBRGEN3_READING_FLAG_UNCALIBRATED:
+            case RBRGEN3_READING_FLAG_ERROR:
                 TEST_ASSERT_EQ(
                     RBRInstrumentGen3Reading_getError(
                         tests[i].expected.readings[channel]),
@@ -106,13 +106,13 @@ TEST_LOGGER3(fetch)
                 .readings = {
                     -129.805680,
                     RBRInstrumentGen3Reading_setError(
-                        RBRINSTRUMENTGEN3_READING_FLAG_ERROR,
+                        RBRGEN3_READING_FLAG_ERROR,
                         14),
                     RBRInstrumentGen3Reading_setError(
-                        RBRINSTRUMENTGEN3_READING_FLAG_ERROR,
+                        RBRGEN3_READING_FLAG_ERROR,
                         14),
                     RBRInstrumentGen3Reading_setError(
-                        RBRINSTRUMENTGEN3_READING_FLAG_ERROR,
+                        RBRGEN3_READING_FLAG_ERROR,
                         14),
                     1.0
                 }

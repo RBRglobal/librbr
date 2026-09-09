@@ -28,18 +28,18 @@ TEST_PARSER(event, two_channels)
                         "\x00\x00\x00";
     int32_t size = sizeof(data) - 1;
 
-    RBRInstrumentGen3Error err = RBRParserGen3_parse(
+    RBRGen3Error err = RBRParserGen3_parse(
         parser,
         RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS,
         data,
         &size);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(16, size, "%" PRIi32);
     TEST_ASSERT_EQ(1, buffers->eventsLength, "%" PRIi32);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_EVENT_WIFI_MODULE_DETECTED_AND_ACTIVATED,
                         buffers->events[0].type,
                         RBRInstrumentGen3EventType);
-    TEST_ASSERT_EQ((RBRInstrumentGen3DateTime) 1541619802000LL,
+    TEST_ASSERT_EQ((RBRGen3DateTime) 1541619802000LL,
                    buffers->events[0].timestamp,
                    "%" PRIi64);
     TEST_ASSERT_EQ(0,
@@ -55,18 +55,18 @@ TEST_PARSER(event_with_auxiliary_data, two_channels)
                         "\x03\x00\x00";
     int32_t size = sizeof(data) - 1;
 
-    RBRInstrumentGen3Error err = RBRParserGen3_parse(
+    RBRGen3Error err = RBRParserGen3_parse(
         parser,
         RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS,
         data,
         &size);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(16, size, "%" PRIi32);
     TEST_ASSERT_EQ(1, buffers->eventsLength, "%" PRIi32);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_EVENT_BEGIN_PROFILING_UP_CAST,
                         buffers->events[0].type,
                         RBRInstrumentGen3EventType);
-    TEST_ASSERT_EQ((RBRInstrumentGen3DateTime) 1541619138000LL,
+    TEST_ASSERT_EQ((RBRGen3DateTime) 1541619138000LL,
                    buffers->events[0].timestamp,
                    "%" PRIi64);
     TEST_ASSERT_EQ(1,
@@ -86,12 +86,12 @@ TEST_PARSER(events, two_channels)
                         "\x00\x00\x00\x00\x00\x00";
     int32_t size = sizeof(data) - 1;
 
-    RBRInstrumentGen3Error err = RBRParserGen3_parse(
+    RBRGen3Error err = RBRParserGen3_parse(
         parser,
         RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS,
         data,
         &size);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(32, size, "%" PRIi32);
     TEST_ASSERT_EQ(2, buffers->eventsLength, "%" PRIi32);
 
@@ -99,7 +99,7 @@ TEST_PARSER(events, two_channels)
         RBRINSTRUMENTGEN3_EVENT_STREAMING_ON_FOR_USB_OFF_FOR_SERIAL,
         buffers->events[0].type,
         RBRInstrumentGen3EventType);
-    TEST_ASSERT_EQ((RBRInstrumentGen3DateTime) 1541620083000LL,
+    TEST_ASSERT_EQ((RBRGen3DateTime) 1541620083000LL,
                    buffers->events[0].timestamp,
                    "%" PRIi64);
     TEST_ASSERT_EQ(0,
@@ -110,7 +110,7 @@ TEST_PARSER(events, two_channels)
         RBRINSTRUMENTGEN3_EVENT_STREAMING_NOW_OFF_FOR_BOTH_PORTS,
         buffers->events[1].type,
         RBRInstrumentGen3EventType);
-    TEST_ASSERT_EQ((RBRInstrumentGen3DateTime) 1541620084000LL,
+    TEST_ASSERT_EQ((RBRGen3DateTime) 1541620084000LL,
                    buffers->events[1].timestamp,
                    "%" PRIi64);
     TEST_ASSERT_EQ(0,
@@ -130,7 +130,7 @@ TEST_PARSER(samples, two_channels)
         "\xD8\xB8\xB7\xEF\x66\x01\x00\x00\x00\x00\x10\x41\x00\x00\x20\x41";
     int32_t size = sizeof(data) - 1;
 
-    RBRInstrumentGen3Sample expected[] = {
+    RBRGen3Sample expected[] = {
         {
             .timestamp = 1541620083000LL,
             .channels = 2,
@@ -158,12 +158,12 @@ TEST_PARSER(samples, two_channels)
         }
     };
 
-    RBRInstrumentGen3Error err = RBRParserGen3_parse(
+    RBRGen3Error err = RBRParserGen3_parse(
         parser,
         RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
         data,
         &size);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(80, size, "%" PRIi32);
     TEST_ASSERT_EQ(5, buffers->samplesLength, "%" PRIi32);
 

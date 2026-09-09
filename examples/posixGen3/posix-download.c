@@ -41,10 +41,10 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen3Error err;
-    RBRInstrumentGen3 *instrument = NULL;
+    RBRGen3Error err;
+    RBRGen3 *instrument = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRInstrumentGen3 instrumentSpace;
+    RBRGen3 instrumentSpace;
     instrument = &instrumentSpace;
     #endif
 
@@ -67,33 +67,33 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENTGEN3_LIB_NAME,
-            RBRINSTRUMENTGEN3_LIB_VERSION);
+            RBRGEN3_LIB_NAME,
+            RBRGEN3_LIB_VERSION);
 
-    RBRInstrumentGen3Callbacks callbacks = {
+    RBRGen3Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrumentGen3_open(
+    if ((err = RBRGen3_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto serialCleanup;
     }
     printf(
         "Looks like I'm connected to a %s instrument.\n",
-        RBRInstrumentGen3Generation_name(RBRInstrumentGen3_getGeneration(instrument)));
+        RBRGen3Generation_name(RBRGen3_getGeneration(instrument)));
 
-    RBRInstrumentGen3Id id;
+    RBRGen3Id id;
     RBRInstrumentGen3_getId(instrument, &id);
     printf("The instrument is an %s (fwtype %d), serial number %06d, with "
            "firmware v%s.\n",
@@ -189,18 +189,18 @@ int main(int argc, char *argv[])
     {
         data.size = sizeof(buf);
         err = RBRInstrumentGen3_readData(instrument, &data);
-        if (err == RBRINSTRUMENTGEN3_SUCCESS)
+        if (err == RBRGEN3_SUCCESS)
         {
             write(downloadFd, data.data, data.size);
             data.offset += data.size;
         }
-        else if (err == RBRINSTRUMENTGEN3_TIMEOUT)
+        else if (err == RBRGEN3_TIMEOUT)
         {
             printf("\nWarning: timeout. Retrying...\n");
         }
         else
         {
-            printf("\nError: %s", RBRInstrumentGen3Error_name(err));
+            printf("\nError: %s", RBRGen3Error_name(err));
             break;
         }
 
@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
 fileCleanup:
     close(downloadFd);
 instrumentCleanup:
-    RBRInstrumentGen3_close(instrument);
+    RBRGen3_close(instrument);
 serialCleanup:
     close(instrumentFd);
 

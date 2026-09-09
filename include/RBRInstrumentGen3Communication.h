@@ -43,7 +43,7 @@ typedef enum RBRInstrumentGen3Link
  *
  * \param [in] link the communication link
  * \return a string name for the communication link
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3Link_name(RBRInstrumentGen3Link link);
 
@@ -52,13 +52,13 @@ const char *RBRInstrumentGen3Link_name(RBRInstrumentGen3Link link);
  *
  * \param [in] instrument the instrument connection
  * \param [out] link the link type
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/link
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getLink(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getLink(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Link *link);
 
 /**
@@ -114,7 +114,7 @@ typedef enum RBRInstrumentGen3SerialBaudRate
  *
  * \param [in] baud the baud rate
  * \return a string name for the baud rate
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3SerialBaudRate_name(RBRInstrumentGen3SerialBaudRate baud);
 
@@ -152,7 +152,7 @@ typedef enum RBRInstrumentGen3SerialMode
  *
  * \param [in] mode the serial mode
  * \return a string name for the serial mode
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3SerialMode_name(RBRInstrumentGen3SerialMode mode);
 
@@ -204,13 +204,13 @@ typedef struct RBRInstrumentGen3Serial
  *
  * \param [in] instrument the instrument connection
  * \param [out] serial the current and available serial parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen3_setSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getSerial(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getSerial(RBRGen3 *instrument,
                                            RBRInstrumentGen3Serial *serial);
 
 /**
@@ -227,15 +227,15 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getSerial(RBRInstrumentGen3 *instrument
  *
  * \param [in] instrument the instrument connection
  * \param [in] serial the new serial parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when a value is not supported
- * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when the baud/mode is invalid
+ * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when a value is not supported
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the baud/mode is invalid
  * \see RBRInstrumentGen3_getSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setSerial(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setSerial(RBRGen3 *instrument,
                                            const RBRInstrumentGen3Serial *serial);
 
 /**
@@ -243,11 +243,11 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setSerial(RBRInstrumentGen3 *instrument
  * power-saving measures.
  *
  * \param [in] instrument the instrument connection
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the instrument has been put to sleep
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the instrument has been put to sleep
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/sleep
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_sleep(RBRInstrumentGen3 *instrument);
+RBRGen3Error RBRInstrumentGen3_sleep(RBRGen3 *instrument);
 
 /**
  * \brief The state of the Wi-Fi connection.
@@ -273,7 +273,7 @@ typedef enum RBRInstrumentGen3WiFiState
  *
  * \param [in] state the Wi-Fi connection state
  * \return a string name for the Wi-Fi connection state
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3WiFiState_name(RBRInstrumentGen3WiFiState state);
 
@@ -332,14 +332,14 @@ typedef struct RBRInstrumentGen3WiFi
  *
  * \param [in] instrument the instrument connection
  * \param [out] wifi the current Wi-Fi parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
  * \see RBRInstrumentGen3_setWiFi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getWiFi(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getWiFi(RBRGen3 *instrument,
                                          RBRInstrumentGen3WiFi *wifi);
 
 /**
@@ -354,16 +354,16 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getWiFi(RBRInstrumentGen3 *instrument,
  *
  * \param [in] instrument the instrument connection
  * \param [out] wifi the new Wi-Fi parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the feature is unavailable
- * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when parameter values are out
+ * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see RBRInstrumentGen3_getWifi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setWiFi(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setWiFi(RBRGen3 *instrument,
                                          const RBRInstrumentGen3WiFi *wifi);
 
 #ifdef __cplusplus

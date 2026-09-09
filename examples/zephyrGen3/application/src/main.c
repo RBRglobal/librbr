@@ -16,7 +16,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
-#include <RBRInstrumentGen3.h>
+#include <RBRGen3.h>
 
 #include "instrument.h"
 #include "io.h"
@@ -26,14 +26,14 @@ LOG_MODULE_REGISTER(main, CONFIG_MAIN_LOG_LEVEL);
 
 const static struct device *instrumentUart = DEVICE_DT_GET(DT_CHOSEN(rbr_instrument));
 
-RBRInstrumentGen3 instrumentBuffer;
-RBRInstrumentGen3Sample sampleBuffer;
+RBRGen3 instrumentBuffer;
+RBRGen3Sample sampleBuffer;
 
 ZephyrRBRInstrumentGen3IO io;
 
-RBRInstrumentGen3Error instrumentSample(
-    const struct RBRInstrumentGen3 *instrument,
-    const struct RBRInstrumentGen3Sample *const sample)
+RBRGen3Error instrumentSample(
+    const struct RBRGen3 *instrument,
+    const struct RBRGen3Sample *const sample)
 {
     /* Unused. */
     (void) instrument;
@@ -50,26 +50,26 @@ RBRInstrumentGen3Error instrumentSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 int main(void)
 {
-    RBRInstrumentGen3Error err;
-    RBRInstrumentGen3 *instrument = &instrumentBuffer;
+    RBRGen3Error err;
+    RBRGen3 *instrument = &instrumentBuffer;
 
     err = ZephyrRBRInstrumentGen3IO_init(&io, instrumentUart);
-    if (err != RBRINSTRUMENTGEN3_SUCCESS)
+    if (err != RBRGEN3_SUCCESS)
     {
-        LOG_ERR("initializing UART: %s", RBRInstrumentGen3Error_name(err));
+        LOG_ERR("initializing UART: %s", RBRGen3Error_name(err));
         return 0;
     }
 
     LOG_INF("using %s v%s",
-            RBRINSTRUMENTGEN3_LIB_NAME,
-            RBRINSTRUMENTGEN3_LIB_VERSION);
+            RBRGEN3_LIB_NAME,
+            RBRGEN3_LIB_VERSION);
 
-    RBRInstrumentGen3Callbacks callbacks = {
+    RBRGen3Callbacks callbacks = {
         .time = ZephyrRBRInstrumentGen3Time_get,
         .sleep = ZephyrRBRInstrumentGen3Time_sleep,
         .read = ZephyrRBRInstrumentGen3IO_read,
@@ -78,15 +78,15 @@ int main(void)
         .sampleBuffer = &sampleBuffer,
     };
 
-    err = RBRInstrumentGen3_open(
+    err = RBRGen3_open(
         &instrument,
         &callbacks,
         CONFIG_INSTRUMENT_COMMAND_TIMEOUT_MSEC,
         (void *) &io);
-    if (err != RBRINSTRUMENTGEN3_SUCCESS)
+    if (err != RBRGEN3_SUCCESS)
     {
         LOG_ERR("opening instrument: %s",
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         return 0;
     }
 
@@ -124,19 +124,19 @@ int main(void)
         LOG_INF("instrument is %s, not logging; I'm going to start it",
                 RBRInstrumentGen3DeploymentStatus_name(deployment.status));
 
-        if ((err = instrumentStart(instrument)) != RBRINSTRUMENTGEN3_SUCCESS)
+        if ((err = instrumentStart(instrument)) != RBRGEN3_SUCCESS)
         {
             LOG_ERR("starting instrument: %s",
-                    RBRInstrumentGen3Error_name(err));
+                    RBRGen3Error_name(err));
             return 0;
         }
     }
 
     while (true)
     {
-        if ((err = RBRInstrumentGen3_readSample(instrument)) != RBRINSTRUMENTGEN3_SUCCESS)
+        if ((err = RBRInstrumentGen3_readSample(instrument)) != RBRGEN3_SUCCESS)
         {
-            LOG_ERR("%s", RBRInstrumentGen3Error_name(err));
+            LOG_ERR("%s", RBRGen3Error_name(err));
         }
     }
 }

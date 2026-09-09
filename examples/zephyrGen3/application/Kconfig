@@ -14,9 +14,9 @@ config INSTRUMENT_RX_BUFFER_SIZE
     default 256
     help
         Size of the instrument RX buffer. This buffer is continuously populated
-        by DMA before it is read by the RBRInstrumentGen3ReadCallback callback.
+        by DMA before it is read by the RBRGen3ReadCallback callback.
 
-        May be smaller than RBRINSTRUMENTGEN3_RESPONSE_BUFFER_MAX, depending on the
+        May be smaller than RBRGEN3_RESPONSE_BUFFER_MAX, depending on the
         UART FIFO size, the baud, and if reading can occur quickly enough.
 
 config INSTRUMENT_INTER_CHARACTER_TIMEOUT_USEC

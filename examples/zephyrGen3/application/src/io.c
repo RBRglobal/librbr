@@ -99,7 +99,7 @@ static void ZephyrRBRInstrumentGen3IO_event(const struct device *dev,
     }
 }
 
-RBRInstrumentGen3Error ZephyrRBRInstrumentGen3IO_init(ZephyrRBRInstrumentGen3IO *io,
+RBRGen3Error ZephyrRBRInstrumentGen3IO_init(ZephyrRBRInstrumentGen3IO *io,
                                               const struct device *dev)
 {
     memset(io, 0, sizeof(*io));
@@ -115,32 +115,32 @@ RBRInstrumentGen3Error ZephyrRBRInstrumentGen3IO_init(ZephyrRBRInstrumentGen3IO 
     int err = uart_callback_set(io->dev, ZephyrRBRInstrumentGen3IO_event, io);
     if (err != 0)
     {
-        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
+        return RBRGEN3_CALLBACK_ERROR;
     }
 
     err = ZephyrRBRInstrumentGen3IO_enableRead(io);
     if (err != 0)
     {
         LOG_ERR("read: starting: %s", strerror(-err));
-        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
+        return RBRGEN3_CALLBACK_ERROR;
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error ZephyrRBRInstrumentGen3IO_read(const struct RBRInstrumentGen3 *instrument,
+RBRGen3Error ZephyrRBRInstrumentGen3IO_read(const struct RBRGen3 *instrument,
                                               void *data, int32_t *size)
 {
-    ZephyrRBRInstrumentGen3IO *io = RBRInstrumentGen3_getUserData(instrument);
+    ZephyrRBRInstrumentGen3IO *io = RBRGen3_getUserData(instrument);
 
-    k_timeout_t timeout = K_MSEC(RBRInstrumentGen3_getCommandTimeout(instrument));
+    k_timeout_t timeout = K_MSEC(RBRGen3_getCommandTimeout(instrument));
     k_timepoint_t deadline = sys_timepoint_calc(timeout);
 
     int err = k_mutex_lock(&io->rx.mut, sys_timepoint_timeout(deadline));
     if (err != 0)
     {
         LOG_ERR("read: device busy");
-        return RBRINSTRUMENTGEN3_TIMEOUT;
+        return RBRGEN3_TIMEOUT;
     }
 
     size_t cap = *size;
@@ -187,27 +187,27 @@ done:
     switch (err)
     {
     case 0:
-        return RBRINSTRUMENTGEN3_SUCCESS;
+        return RBRGEN3_SUCCESS;
     case -EAGAIN:
-        return RBRINSTRUMENTGEN3_TIMEOUT;
+        return RBRGEN3_TIMEOUT;
     default:
-        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
+        return RBRGEN3_CALLBACK_ERROR;
     }
 }
 
-RBRInstrumentGen3Error ZephyrRBRInstrumentGen3IO_write(const struct RBRInstrumentGen3 *instrument,
+RBRGen3Error ZephyrRBRInstrumentGen3IO_write(const struct RBRGen3 *instrument,
                                                const void *const data, int32_t size)
 {
-    ZephyrRBRInstrumentGen3IO *io = RBRInstrumentGen3_getUserData(instrument);
+    ZephyrRBRInstrumentGen3IO *io = RBRGen3_getUserData(instrument);
 
-    k_timeout_t timeout = K_MSEC(RBRInstrumentGen3_getCommandTimeout(instrument));
+    k_timeout_t timeout = K_MSEC(RBRGen3_getCommandTimeout(instrument));
     k_timepoint_t deadline = sys_timepoint_calc(timeout);
 
     int err = k_mutex_lock(&io->tx.mut, sys_timepoint_timeout(deadline));
     if (err != 0)
     {
         LOG_ERR("write: device busy");
-        return RBRINSTRUMENTGEN3_TIMEOUT;
+        return RBRGEN3_TIMEOUT;
     }
 
     /* Ensure there is no other write in progress. */
@@ -246,10 +246,10 @@ done:
     switch (err)
     {
     case 0:
-        return RBRINSTRUMENTGEN3_SUCCESS;
+        return RBRGEN3_SUCCESS;
     case -EAGAIN:
-        return RBRINSTRUMENTGEN3_TIMEOUT;
+        return RBRGEN3_TIMEOUT;
     default:
-        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
+        return RBRGEN3_CALLBACK_ERROR;
     }
 }

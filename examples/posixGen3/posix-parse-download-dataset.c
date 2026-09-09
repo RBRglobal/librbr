@@ -26,9 +26,9 @@
 #include "posix-shared.h"
 #include "RBRParserGen3.h"
 
-RBRInstrumentGen3Error parserSample(
+RBRGen3Error parserSample(
     const struct RBRParserGen3 *parser,
-    const struct RBRInstrumentGen3Sample *const sample)
+    const struct RBRGen3Sample *const sample)
 {
     (void) parser;
 
@@ -44,7 +44,7 @@ RBRInstrumentGen3Error parserSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -56,10 +56,10 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen3Error err;
-    RBRInstrumentGen3 *instrument = NULL;
+    RBRGen3Error err;
+    RBRGen3 *instrument = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRInstrumentGen3 instrumentSpace;
+    RBRGen3 instrumentSpace;
     instrument = &instrumentSpace;
     #endif
 
@@ -92,25 +92,25 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENTGEN3_LIB_NAME,
-            RBRINSTRUMENTGEN3_LIB_VERSION);
+            RBRGEN3_LIB_NAME,
+            RBRGEN3_LIB_VERSION);
 
-    RBRInstrumentGen3Callbacks instrumentCallbacks = {
+    RBRGen3Callbacks instrumentCallbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrumentGen3_open(
+    if ((err = RBRGen3_open(
              &instrument,
              &instrumentCallbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 
     RBRParserGen3 *parser = NULL;
 
-    RBRInstrumentGen3Sample sampleBuffer;
+    RBRGen3Sample sampleBuffer;
     RBRParserGen3Callbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
@@ -153,11 +153,11 @@ int main(int argc, char *argv[])
              &parser,
              &parserCallbacks,
              &parserConfig,
-             NULL)) != RBRINSTRUMENTGEN3_SUCCESS)
+             NULL)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to initialize parser: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
@@ -177,14 +177,14 @@ int main(int argc, char *argv[])
         data.size = sizeof(buf) - bufSize;
         err = RBRInstrumentGen3_readData(instrument, &data);
 
-        if (err == RBRINSTRUMENTGEN3_TIMEOUT)
+        if (err == RBRGEN3_TIMEOUT)
         {
             printf("\nWarning: timeout. Retrying...\n");
             continue;
         }
-        else if (err != RBRINSTRUMENTGEN3_SUCCESS)
+        else if (err != RBRGEN3_SUCCESS)
         {
-            printf("\nError: %s", RBRInstrumentGen3Error_name(err));
+            printf("\nError: %s", RBRGen3Error_name(err));
             break;
         }
 
@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
     }
     
 instrumentCleanup:
-    RBRInstrumentGen3_close(instrument);
+    RBRGen3_close(instrument);
 fileCleanup:
     close(instrumentFd);
 

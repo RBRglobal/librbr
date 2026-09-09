@@ -13,8 +13,8 @@
 /* Required for memset. */
 #include <string.h>
 
-#include "RBRInstrumentGen3.h"
-#include "RBRInstrumentGen3Internal.h"
+#include "RBRGen3.h"
+#include "RBRGen3Internal.h"
 
 const char *RBRInstrumentGen3PauseresumeState_name(RBRInstrumentGen3PauseresumeState state)
 {
@@ -62,18 +62,18 @@ const char *RBRInstrumentGen3ResumeStatus_name(RBRInstrumentGen3ResumeStatus sta
     }
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getPauseresume(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getPauseresume(RBRGen3 *instrument,
                                                 RBRInstrumentGen3PauseresumeState *state)
 {
     /** To be safe, make *state = RBRINSTRUMENTGEN3_UNKNOWN_PAUSERESUME
      *  before using this function.
      */
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "pauseresume"));
+    RBR_TRY(RBRGen3_converse(instrument, "pauseresume"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
 
-    RBRInstrumentGen3_parseResponse(instrument, &command, &parameter);
+    RBRGen3_parseResponse(instrument, &command, &parameter);
 
     if (strcmp(parameter.key, "state") == 0)
     {
@@ -83,28 +83,28 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getPauseresume(RBRInstrumentGen3 *instr
             if (strcmp(RBRInstrumentGen3PauseresumeState_name(i), parameter.value) == 0)
             {
                 *state = i;
-                return RBRINSTRUMENTGEN3_SUCCESS;
+                return RBRGEN3_SUCCESS;
             }
         }
     }
     else
     {
         char *end = command + strlen(command);
-        return RBRInstrumentGen3_errorCheckResponse(instrument, command, end);
+        return RBRGen3_errorCheckResponse(instrument, command, end);
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_pause(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_pause(RBRGen3 *instrument,
                                        RBRInstrumentGen3PauseStatus *status)
 {
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "pause"));
+    RBR_TRY(RBRGen3_converse(instrument, "pause"));
 
     *status = RBRINSTRUMENTGEN3_UNKNOWN_PAUSE;
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
-    RBRInstrumentGen3_parseResponse(instrument, &command, &parameter);
+    RBRGen3ResponseParameter parameter;
+    RBRGen3_parseResponse(instrument, &command, &parameter);
     if (strcmp(parameter.key, "status") == 0)
     {
         int i = RBRINSTRUMENTGEN3_PAUSE_PAUSED;
@@ -112,26 +112,26 @@ RBRInstrumentGen3Error RBRInstrumentGen3_pause(RBRInstrumentGen3 *instrument,
         if (strcmp(RBRInstrumentGen3PauseStatus_name(i), parameter.value) == 0)
         {
             *status = i;
-            return RBRINSTRUMENTGEN3_SUCCESS;
+            return RBRGEN3_SUCCESS;
         }
     }
     else
     {
         char *end = command + strlen(command);
-        return RBRInstrumentGen3_errorCheckResponse(instrument, command, end);
+        return RBRGen3_errorCheckResponse(instrument, command, end);
     }
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_resume(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_resume(RBRGen3 *instrument,
                                         RBRInstrumentGen3ResumeStatus *status)
 {
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "resume"));
+    RBR_TRY(RBRGen3_converse(instrument, "resume"));
 
     *status = RBRINSTRUMENTGEN3_UNKNOWN_RESUME;
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
-    RBRInstrumentGen3_parseResponse(instrument, &command, &parameter);
+    RBRGen3ResponseParameter parameter;
+    RBRGen3_parseResponse(instrument, &command, &parameter);
     if (strcmp(parameter.key, "status") == 0)
     {
         for (int i = RBRINSTRUMENTGEN3_RESUME_PENDING; i < RBRINSTRUMENTGEN3_UNKNOWN_RESUME; i++)
@@ -140,14 +140,14 @@ RBRInstrumentGen3Error RBRInstrumentGen3_resume(RBRInstrumentGen3 *instrument,
             if (strcmp(RBRInstrumentGen3ResumeStatus_name(i), parameter.value) == 0)
             {
                 *status = i;
-                return RBRINSTRUMENTGEN3_SUCCESS;
+                return RBRGEN3_SUCCESS;
             }
         }
     }
     else
     {
         char *end = command + strlen(command);
-        return RBRInstrumentGen3_errorCheckResponse(instrument, command, end);
+        return RBRGen3_errorCheckResponse(instrument, command, end);
     }
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }

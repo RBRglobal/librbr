@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3.c
+ * \file RBRGen3.c
  *
  * \brief Library implementation.
  *
@@ -15,10 +15,10 @@
 #include <stdlib.h>
 #endif
 
-#include "RBRInstrumentGen3.h"
-#include "RBRInstrumentGen3Internal.h"
+#include "RBRGen3.h"
+#include "RBRGen3Internal.h"
 
-const char *RBRINSTRUMENTGEN3_LIB_NAME =
+const char *RBRGEN3_LIB_NAME =
 #ifdef RBR_LIB_NAME
     RBR_LIB_NAME
 #else
@@ -26,7 +26,7 @@ const char *RBRINSTRUMENTGEN3_LIB_NAME =
 #endif
 ;
 
-const char *RBRINSTRUMENTGEN3_LIB_VERSION =
+const char *RBRGEN3_LIB_VERSION =
 #ifdef RBR_LIB_VERSION
     RBR_LIB_VERSION
 #else
@@ -34,7 +34,7 @@ const char *RBRINSTRUMENTGEN3_LIB_VERSION =
 #endif
 ;
 
-const char *RBRINSTRUMENTGEN3_LIB_BUILD_DATE =
+const char *RBRGEN3_LIB_BUILD_DATE =
 #ifdef RBR_LIB_BUILD_DATE
     RBR_LIB_BUILD_DATE
 #else
@@ -42,89 +42,89 @@ const char *RBRINSTRUMENTGEN3_LIB_BUILD_DATE =
 #endif
 ;
 
-const char *RBRInstrumentGen3Error_name(RBRInstrumentGen3Error error)
+const char *RBRGen3Error_name(RBRGen3Error error)
 {
     switch (error)
     {
-    case RBRINSTRUMENTGEN3_SUCCESS:
+    case RBRGEN3_SUCCESS:
         return "success";
-    case RBRINSTRUMENTGEN3_ALLOCATION_FAILURE:
+    case RBRGEN3_ALLOCATION_FAILURE:
         return "allocation failure";
-    case RBRINSTRUMENTGEN3_BUFFER_TOO_SMALL:
+    case RBRGEN3_BUFFER_TOO_SMALL:
         return "buffer too small";
-    case RBRINSTRUMENTGEN3_MISSING_CALLBACK:
+    case RBRGEN3_MISSING_CALLBACK:
         return "missing callback";
-    case RBRINSTRUMENTGEN3_CALLBACK_ERROR:
+    case RBRGEN3_CALLBACK_ERROR:
         return "callback error";
-    case RBRINSTRUMENTGEN3_TIMEOUT:
+    case RBRGEN3_TIMEOUT:
         return "timeout";
-    case RBRINSTRUMENTGEN3_UNSUPPORTED:
+    case RBRGEN3_UNSUPPORTED:
         return "unsupported";
-    case RBRINSTRUMENTGEN3_HARDWARE_ERROR:
+    case RBRGEN3_HARDWARE_ERROR:
         return "hardware error";
-    case RBRINSTRUMENTGEN3_CHECKSUM_ERROR:
+    case RBRGEN3_CHECKSUM_ERROR:
         return "checksum error";
-    case RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE:
+    case RBRGEN3_INVALID_PARAMETER_VALUE:
         return "invalid parameter value";
-    case RBRINSTRUMENTGEN3_SAMPLE:
+    case RBRGEN3_SAMPLE:
         return "sample";
-    case RBRINSTRUMENTGEN3_ERROR_COUNT:
+    case RBRGEN3_ERROR_COUNT:
         return "error count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_ERROR:
+    case RBRGEN3_UNKNOWN_ERROR:
     default:
         return "unknown error";
     }
 }
 
-const char *RBRInstrumentGen3Generation_name(RBRInstrumentGen3Generation generation)
+const char *RBRGen3Generation_name(RBRGen3Generation generation)
 {
     switch (generation)
     {
-    case RBRINSTRUMENTGEN3_LOGGER1:
+    case RBRGEN3_LOGGER1:
         return "Logger1";
-    case RBRINSTRUMENTGEN3_LOGGER2:
+    case RBRGEN3_LOGGER2:
         return "Logger2";
-    case RBRINSTRUMENTGEN3_LOGGER3:
+    case RBRGEN3_LOGGER3:
         return "Logger3";
-    case RBRINSTRUMENTGEN3_LOGGER4:
+    case RBRGEN3_LOGGER4:
         return "Logger4";
-    case RBRINSTRUMENTGEN3_GENERATION_COUNT:
+    case RBRGEN3_GENERATION_COUNT:
         return "generation count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_GENERATION:
+    case RBRGEN3_UNKNOWN_GENERATION:
     default:
         return "unknown generation";
     }
 }
 
-const char *RBRInstrumentGen3ResponseType_name(RBRInstrumentGen3ResponseType type)
+const char *RBRGen3ResponseType_name(RBRGen3ResponseType type)
 {
     switch (type)
     {
-    case RBRINSTRUMENTGEN3_RESPONSE_INFO:
+    case RBRGEN3_RESPONSE_INFO:
         return "info";
-    case RBRINSTRUMENTGEN3_RESPONSE_WARNING:
+    case RBRGEN3_RESPONSE_WARNING:
         return "warning";
-    case RBRINSTRUMENTGEN3_RESPONSE_ERROR:
+    case RBRGEN3_RESPONSE_ERROR:
         return "error";
-    case RBRINSTRUMENTGEN3_RESPONSE_TYPE_COUNT:
+    case RBRGEN3_RESPONSE_TYPE_COUNT:
         return "response type count";
-    case RBRINSTRUMENTGEN3_RESPONSE_UNKNOWN_TYPE:
+    case RBRGEN3_RESPONSE_UNKNOWN_TYPE:
     default:
         return "unknown response type";
     }
 }
 
-static RBRInstrumentGen3Error RBRInstrumentGen3_populateGeneration(
-    RBRInstrumentGen3 *instrument)
+static RBRGen3Error RBRGen3_populateGeneration(
+    RBRGen3 *instrument)
 {
-    instrument->generation = RBRINSTRUMENTGEN3_UNKNOWN_GENERATION;
+    instrument->generation = RBRGEN3_UNKNOWN_GENERATION;
 
     /* If this isn't an RBR instrument, it'll just time out or the response
      * won't match. */
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getId(instrument, &instrument->id);
-    if (err != RBRINSTRUMENTGEN3_SUCCESS)
+    RBRGen3Error err = RBRInstrumentGen3_getId(instrument, &instrument->id);
+    if (err != RBRGEN3_SUCCESS)
     {
-        return RBRINSTRUMENTGEN3_UNSUPPORTED;
+        return RBRGEN3_UNSUPPORTED;
     }
 
     /* The concept of firmware type was introduced part-way through Logger2, so
@@ -137,25 +137,25 @@ static RBRInstrumentGen3Error RBRInstrumentGen3_populateGeneration(
             && instrument->id.fwtype <= 103)
         || instrument->id.fwtype == 200)
     {
-        instrument->generation = RBRINSTRUMENTGEN3_LOGGER2;
+        instrument->generation = RBRGEN3_LOGGER2;
     }
     else if ((instrument->id.fwtype >= 104
               && instrument->id.fwtype <= 110)
               || (instrument->id.fwtype >= 202
                   && instrument->id.fwtype <= 205))
     {
-        instrument->generation = RBRINSTRUMENTGEN3_LOGGER3;
+        instrument->generation = RBRGEN3_LOGGER3;
     }
     else
     {
-        instrument->generation = RBRINSTRUMENTGEN3_LOGGER4;
+        instrument->generation = RBRGEN3_LOGGER4;
     }
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_open(RBRInstrumentGen3 **instrument,
-                                      const RBRInstrumentGen3Callbacks *callbacks,
-                                      RBRInstrumentGen3DateTime commandTimeout,
+RBRGen3Error RBRGen3_open(RBRGen3 **instrument,
+                                      const RBRGen3Callbacks *callbacks,
+                                      RBRGen3DateTime commandTimeout,
                                       void *userData)
 {
     if (callbacks == NULL
@@ -165,7 +165,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_open(RBRInstrumentGen3 **instrument,
         || callbacks->write == NULL
         || (callbacks->sample != NULL && callbacks->sampleBuffer == NULL))
     {
-        return RBRINSTRUMENTGEN3_MISSING_CALLBACK;
+        return RBRGEN3_MISSING_CALLBACK;
     }
 
     bool allocated = false;
@@ -173,31 +173,31 @@ RBRInstrumentGen3Error RBRInstrumentGen3_open(RBRInstrumentGen3 **instrument,
     {
         allocated = true;
         #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
-        if ((*instrument = malloc(sizeof(RBRInstrumentGen3))) == NULL)
+        if ((*instrument = malloc(sizeof(RBRGen3))) == NULL)
         {
         #endif
-            return RBRINSTRUMENTGEN3_ALLOCATION_FAILURE;
+            return RBRGEN3_ALLOCATION_FAILURE;
         #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
         }
         #endif
     }
 
-    memset(*instrument, 0, sizeof(RBRInstrumentGen3));
+    memset(*instrument, 0, sizeof(RBRGen3));
     memcpy(&(*instrument)->callbacks,
            callbacks,
-           sizeof(RBRInstrumentGen3Callbacks));
+           sizeof(RBRGen3Callbacks));
     /* We don't want the streaming sample data callback to be called before the
      * constructor has finished. */
     (*instrument)->callbacks.sample  = NULL;
     (*instrument)->commandTimeout    = commandTimeout;
     (*instrument)->userData          = userData;
-    (*instrument)->lastActivityTime  = RBRINSTRUMENTGEN3_NO_ACTIVITY;
-    (*instrument)->response.type     = RBRINSTRUMENTGEN3_RESPONSE_UNKNOWN_TYPE;
+    (*instrument)->lastActivityTime  = RBRGEN3_NO_ACTIVITY;
+    (*instrument)->response.type     = RBRGEN3_RESPONSE_UNKNOWN_TYPE;
     (*instrument)->managedAllocation = allocated;
 
-    RBRInstrumentGen3Error err;
-    err = RBRInstrumentGen3_populateGeneration(*instrument);
-    if (err != RBRINSTRUMENTGEN3_SUCCESS)
+    RBRGen3Error err;
+    err = RBRGen3_populateGeneration(*instrument);
+    if (err != RBRGEN3_SUCCESS)
     {
         if (allocated)
         {
@@ -208,8 +208,8 @@ RBRInstrumentGen3Error RBRInstrumentGen3_open(RBRInstrumentGen3 **instrument,
         return err;
     }
 
-    if ((*instrument)->generation != RBRINSTRUMENTGEN3_LOGGER2
-        && (*instrument)->generation != RBRINSTRUMENTGEN3_LOGGER3)
+    if ((*instrument)->generation != RBRGEN3_LOGGER2
+        && (*instrument)->generation != RBRGEN3_LOGGER3)
     {
         if (allocated)
         {
@@ -217,17 +217,17 @@ RBRInstrumentGen3Error RBRInstrumentGen3_open(RBRInstrumentGen3 **instrument,
             free(*instrument);
             #endif
         }
-        return RBRINSTRUMENTGEN3_UNSUPPORTED;
+        return RBRGEN3_UNSUPPORTED;
     }
 
     /* Enable the streaming callback, if applicable. */
     (*instrument)->callbacks.sample = callbacks->sample;
     (*instrument)->callbacks.sampleBuffer = callbacks->sampleBuffer;
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_close(RBRInstrumentGen3 *instrument)
+RBRGen3Error RBRGen3_close(RBRGen3 *instrument)
 {
     if (instrument->managedAllocation)
     {
@@ -236,42 +236,42 @@ RBRInstrumentGen3Error RBRInstrumentGen3_close(RBRInstrumentGen3 *instrument)
     #endif
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Generation RBRInstrumentGen3_getGeneration(
-    const RBRInstrumentGen3 *instrument)
+RBRGen3Generation RBRGen3_getGeneration(
+    const RBRGen3 *instrument)
 {
     return instrument->generation;
 }
 
-RBRInstrumentGen3DateTime RBRInstrumentGen3_getCommandTimeout(
-    const RBRInstrumentGen3 *instrument)
+RBRGen3DateTime RBRGen3_getCommandTimeout(
+    const RBRGen3 *instrument)
 {
     return instrument->commandTimeout;
 }
 
-void RBRInstrumentGen3_setCommandTimeout(RBRInstrumentGen3 *instrument,
-                                     RBRInstrumentGen3DateTime commandTimeout)
+void RBRGen3_setCommandTimeout(RBRGen3 *instrument,
+                                     RBRGen3DateTime commandTimeout)
 {
     instrument->commandTimeout = commandTimeout;
 }
 
-void *RBRInstrumentGen3_getUserData(const RBRInstrumentGen3 *instrument)
+void *RBRGen3_getUserData(const RBRGen3 *instrument)
 {
     return instrument->userData;
 }
 
-void RBRInstrumentGen3_setUserData(RBRInstrumentGen3 *instrument, void *userData)
+void RBRGen3_setUserData(RBRGen3 *instrument, void *userData)
 {
     instrument->userData = userData;
 }
 
-RBRInstrumentGen3HardwareError RBRInstrumentGen3_getLastHardwareError(
-    const RBRInstrumentGen3 *instrument)
+RBRInstrumentGen3HardwareError RBRGen3_getLastHardwareError(
+    const RBRGen3 *instrument)
 {
-    if (instrument->response.type == RBRINSTRUMENTGEN3_RESPONSE_ERROR
-        || instrument->response.type == RBRINSTRUMENTGEN3_RESPONSE_WARNING)
+    if (instrument->response.type == RBRGEN3_RESPONSE_ERROR
+        || instrument->response.type == RBRGEN3_RESPONSE_WARNING)
     {
         return instrument->response.error;
     }
@@ -281,10 +281,10 @@ RBRInstrumentGen3HardwareError RBRInstrumentGen3_getLastHardwareError(
     }
 }
 
-const char *RBRInstrumentGen3_getLastHardwareErrorMessage(
-    const RBRInstrumentGen3 *instrument)
+const char *RBRGen3_getLastHardwareErrorMessage(
+    const RBRGen3 *instrument)
 {
-    if (instrument->response.type == RBRINSTRUMENTGEN3_RESPONSE_ERROR)
+    if (instrument->response.type == RBRGEN3_RESPONSE_ERROR)
     {
         return instrument->response.response;
     }

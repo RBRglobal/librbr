@@ -63,7 +63,7 @@ typedef enum RBRInstrumentGen3Dataset
  *
  * \param [in] dataset the dataset
  * \return a string name for the dataset
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3Dataset_name(RBRInstrumentGen3Dataset dataset);
 
@@ -99,16 +99,16 @@ typedef struct RBRInstrumentGen3MemoryInfo
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] memoryInfo data memory information
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is
+ * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is
  *                                                requested
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the dataset is unsupported
+ * \return #RBRGEN3_HARDWARE_ERROR if the dataset is unsupported
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/meminfo
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getMemoryInfo(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getMemoryInfo(
+    RBRGen3 *instrument,
     RBRInstrumentGen3MemoryInfo *memoryInfo);
 
 /**
@@ -167,16 +167,16 @@ typedef struct RBRInstrumentGen3Data
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] data the instrument data
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_CHECKSUM_ERROR in the event of a CRC failure
- * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is
+ * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_CHECKSUM_ERROR in the event of a CRC failure
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is
  *                                                requested
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the dataset is unsupported
+ * \return #RBRGEN3_HARDWARE_ERROR if the dataset is unsupported
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/readdata
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_readData(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_readData(RBRGen3 *instrument,
                                           RBRInstrumentGen3Data *data);
 
 /**
@@ -186,13 +186,13 @@ RBRInstrumentGen3Error RBRInstrumentGen3_readData(RBRInstrumentGen3 *instrument,
  * use.
  *
  * \param [in] instrument the instrument connection
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the memory failed to erase
+ * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR if the memory failed to erase
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memclear
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_memoryClear(RBRInstrumentGen3 *instrument);
+RBRGen3Error RBRInstrumentGen3_memoryClear(RBRGen3 *instrument);
 
 /**
  * \brief Instrument memory formats.
@@ -220,7 +220,7 @@ typedef enum RBRInstrumentGen3MemoryFormat
  *
  * \param [in] format the memory format
  * \return a string name for the memory format
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3MemoryFormat_name(RBRInstrumentGen3MemoryFormat format);
 
@@ -233,13 +233,13 @@ const char *RBRInstrumentGen3MemoryFormat_name(RBRInstrumentGen3MemoryFormat for
  *
  * \param [in] instrument the instrument connection
  * \param [out] memoryFormats available memory formats
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getAvailableMemoryFormats(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getAvailableMemoryFormats(
+    RBRGen3 *instrument,
     RBRInstrumentGen3MemoryFormat *memoryFormats);
 
 /**
@@ -252,13 +252,13 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getAvailableMemoryFormats(
  *
  * \param [in] instrument the instrument connection
  * \param [out] memoryFormat the current memory format
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getCurrentMemoryFormat(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getCurrentMemoryFormat(
+    RBRGen3 *instrument,
     RBRInstrumentGen3MemoryFormat *memoryFormat);
 
 /**
@@ -266,13 +266,13 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getCurrentMemoryFormat(
  *
  * \param [in] instrument the instrument connection
  * \param [out] memoryFormat the new memory format
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getNewMemoryFormat(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getNewMemoryFormat(
+    RBRGen3 *instrument,
     RBRInstrumentGen3MemoryFormat *memoryFormat);
 
 /**
@@ -285,18 +285,18 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getNewMemoryFormat(
  *
  * \param [in] instrument the instrument connection
  * \param [in] memoryFormat the new memory format
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when an invalid format is
+ * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid format is
  *                                                requested
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the instrument is logging or if
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging or if
  *                                       an unavailable memory format is
  *                                       selected
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setNewMemoryFormat(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setNewMemoryFormat(
+    RBRGen3 *instrument,
     RBRInstrumentGen3MemoryFormat memoryFormat);
 
 /**
@@ -330,7 +330,7 @@ typedef enum RBRInstrumentGen3PostprocessingAggregate
  *
  * \param [in] function the aggregate function
  * \return a string name for the aggregate function
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3PostprocessingAggregate_name(
     RBRInstrumentGen3PostprocessingAggregate function);
@@ -351,7 +351,7 @@ typedef struct RBRInstrumentGen3PostprocessingChannelsList
         /** \brief The function used to aggregate values within bins. */
         RBRInstrumentGen3PostprocessingAggregate function;
         /** \brief The label of the channel to aggregate. */
-        char label[RBRINSTRUMENTGEN3_CHANNEL_LABEL_MAX + 1];
+        char label[RBRGEN3_CHANNEL_LABEL_MAX + 1];
     } channels[RBRINSTRUMENTGEN3_POSTPROCESSING_CHANNEL_MAX];
 } RBRInstrumentGen3PostprocessingChannelsList;
 
@@ -382,7 +382,7 @@ typedef enum RBRInstrumentGen3PostprocessingStatus
  *
  * \param [in] status the post-processing status
  * \return a string name for the post-processing status
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3PostprocessingStatus_name(
     RBRInstrumentGen3PostprocessingStatus status);
@@ -412,7 +412,7 @@ typedef enum RBRInstrumentGen3PostprocessingCommand
  *
  * \param [in] command the post-processing command
  * \return a string name for the post-processing command
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3PostprocessingCommand_name(
     RBRInstrumentGen3PostprocessingCommand command);
@@ -452,7 +452,7 @@ typedef enum RBRInstrumentGen3PostprocessingBinFilter
  *
  * \param [in] filter the post-processing bin filter
  * \return a string name for the post-processing bin filter
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3PostprocessingBinFilter_name(
     RBRInstrumentGen3PostprocessingBinFilter filter);
@@ -489,7 +489,7 @@ typedef struct RBRInstrumentGen3Postprocessing
      * label of a pressure or sea pressure channel, the generated data is
      * binned by depth.
      */
-    char binReference[RBRINSTRUMENTGEN3_CHANNEL_LABEL_MAX + 1];
+    char binReference[RBRGEN3_CHANNEL_LABEL_MAX + 1];
     /** \brief How data should be filtered before binning. */
     RBRInstrumentGen3PostprocessingBinFilter binFilter;
     /**
@@ -513,14 +513,14 @@ typedef struct RBRInstrumentGen3Postprocessing
      * All samples with an earlier timestamp are excluded from post-processing
      * input. If time binning is used, this serves as the binning origin point.
      */
-    RBRInstrumentGen3DateTime tstampMin;
+    RBRGen3DateTime tstampMin;
     /**
      * \brief The maximum timestamp value.
      *
      * All samples with a later timestamp are excluded from post-processing
      * input.
      */
-    RBRInstrumentGen3DateTime tstampMax;
+    RBRGen3DateTime tstampMax;
     /**
      * \brief The minimum depth value.
      *
@@ -588,14 +588,14 @@ typedef struct RBRInstrumentGen3Postprocessing
  *
  * \param [in] instrument the instrument connection
  * \param [out] postprocessing the post-processing parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getPostprocessing(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getPostprocessing(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Postprocessing *postprocessing);
 
 /**
@@ -609,16 +609,16 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getPostprocessing(
  *
  * \param [in] instrument the instrument connection
  * \param [in] postprocessing the post-processing parameters
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the settings cannot be changed
- * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when parameter values are out
+ * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setPostprocessing(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setPostprocessing(
+    RBRGen3 *instrument,
     const RBRInstrumentGen3Postprocessing *postprocessing);
 
 /**
@@ -634,16 +634,16 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setPostprocessing(
  * \param [in] instrument the instrument connection
  * \param [in] command the post-processing command
  * \param [out] status the post-processing status after executing the command
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the settings cannot be changed
- * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when parameter values are out
+ * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setPostprocessingCommand(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setPostprocessingCommand(
+    RBRGen3 *instrument,
     RBRInstrumentGen3PostprocessingCommand command,
     RBRInstrumentGen3PostprocessingStatus *status);
 

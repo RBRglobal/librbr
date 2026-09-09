@@ -89,7 +89,7 @@ Technical pedantry:
     * Conventionally, `int32_t` is used as a counter
       even where it's far larger than necessary.
       This sort of consistency helps reduce mental overhead.
-* Most functions should return an `RBRInstrumentGen3Error`
+* Most functions should return an `RBRGen3Error`
   and pass actual values back to the caller via out pointers.
   Only the most trivial or pure functions
   should return a value directly.
@@ -143,12 +143,12 @@ A short example:
  * \param [in] becauseTheyFitOnTheLine a description of the second parameter
  * \return a description of the return value
  */
-int32_t RBRInstrumentGen3_examplePrototype(RBRInstrumentGen3 *instrument,
+int32_t RBRInstrumentGen3_examplePrototype(RBRGen3 *instrument,
                                        int32_t theseParametersAreAligned,
                                        int32_t *becauseTheyFitOnTheLine);
 
-RBRInstrumentGen3Error RBRInstrumentGen3_exampleOfAReallyLongFunctionName(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_exampleOfAReallyLongFunctionName(
+    RBRGen3 *instrument,
     int32_t theseParametersAreAllWrappedAndBroken,
     int32_t becauseTheyWouldPushPastTheLineLengthLimit,
     int32_t evenIf,

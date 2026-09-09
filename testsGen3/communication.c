@@ -16,18 +16,18 @@ typedef struct LinkTest
     RBRInstrumentGen3Link expected;
 } LinkTest;
 
-static bool test_link(RBRInstrumentGen3 *instrument,
+static bool test_link(RBRGen3 *instrument,
                       TestIOBuffers *buffers,
                       LinkTest *tests)
 {
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
     RBRInstrumentGen3Link actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrumentGen3_getLink(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, RBRInstrumentGen3Link);
     }
 
@@ -104,14 +104,14 @@ TEST_LOGGER2(serial)
         {0}
     };
 
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
     RBRInstrumentGen3Serial actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrumentGen3_getSerial(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate,
                             actual.baudRate,
                             RBRInstrumentGen3SerialBaudRate);
@@ -177,14 +177,14 @@ TEST_LOGGER3(serial)
         {0}
     };
 
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
     RBRInstrumentGen3Serial actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrumentGen3_getSerial(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate,
                             actual.baudRate,
                             RBRInstrumentGen3SerialBaudRate);
@@ -205,8 +205,8 @@ TEST_LOGGER3(serial)
 TEST_LOGGER3(sleep)
 {
     TestIOBuffers_init(buffers, "", 0);
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_sleep(instrument);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    RBRGen3Error err = RBRInstrumentGen3_sleep(instrument);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ("sleep" COMMAND_TERMINATOR,buffers->writeBuffer);
     TEST_ASSERT(instrument->lastActivityTime < 0);
 
@@ -216,22 +216,22 @@ TEST_LOGGER3(sleep)
 typedef struct WiFiTest
 {
     const char *response;
-    RBRInstrumentGen3Error expectedError;
+    RBRGen3Error expectedError;
     RBRInstrumentGen3WiFi expected;
 } WiFiTest;
 
-static bool test_wifi(RBRInstrumentGen3 *instrument,
+static bool test_wifi(RBRGen3 *instrument,
                       TestIOBuffers *buffers,
                       WiFiTest *tests)
 {
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
     RBRInstrumentGen3WiFi actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrumentGen3_getWiFi(instrument, &actual);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.enabled, actual.enabled, bool);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.state,
                             actual.state,
@@ -255,7 +255,7 @@ TEST_LOGGER2(wifi)
     WiFiTest tests[] = {
         {
             "wifi timeout = 60, commandtimeout = 90" RESPONSE_TERMINATOR,
-            RBRINSTRUMENTGEN3_SUCCESS,
+            RBRGEN3_SUCCESS,
             {
                 false,
                 RBRINSTRUMENTGEN3_UNKNOWN_WIFI,
@@ -276,7 +276,7 @@ TEST_LOGGER3(wifi)
         {
             "wifi enabled = false, state = n/a, timeout = 60, "
             "commandtimeout = 60, baudrate = 921600" RESPONSE_TERMINATOR,
-            RBRINSTRUMENTGEN3_SUCCESS,
+            RBRGEN3_SUCCESS,
             {
                 false,
                 RBRINSTRUMENTGEN3_WIFI_NA,
@@ -288,7 +288,7 @@ TEST_LOGGER3(wifi)
         {
             "wifi enabled = true, state = off, timeout = 90, "
             "commandtimeout = 30, baudrate = 921600" RESPONSE_TERMINATOR,
-            RBRINSTRUMENTGEN3_SUCCESS,
+            RBRGEN3_SUCCESS,
             {
                 true,
                 RBRINSTRUMENTGEN3_WIFI_OFF,
@@ -299,7 +299,7 @@ TEST_LOGGER3(wifi)
         },
         {
             "E0109 feature not available" RESPONSE_TERMINATOR,
-            RBRINSTRUMENTGEN3_HARDWARE_ERROR,
+            RBRGEN3_HARDWARE_ERROR,
             {
                 false,
                 RBRINSTRUMENTGEN3_UNKNOWN_WIFI,

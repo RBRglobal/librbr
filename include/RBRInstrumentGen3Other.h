@@ -51,13 +51,13 @@ int RBRInstrumentGen3Version_compare(const char *a, const char *b);
  *
  * \param [in] instrument the instrument connection
  * \param [out] id the instrument information
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the information is successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the information is successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/id
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getId(RBRInstrumentGen3 *instrument,
-                                       RBRInstrumentGen3Id *id);
+RBRGen3Error RBRInstrumentGen3_getId(RBRGen3 *instrument,
+                                       RBRGen3Id *id);
 
 /**
  * \brief Instrument `hwrev` command parameters.
@@ -80,13 +80,13 @@ typedef struct RBRInstrumentGen3HardwareRevision
  *
  * \param [in] instrument the instrument connection
  * \param [out] hwrev the hardware revision information
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the information is successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the information is successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/hwrev
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getHardwareRevision(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getHardwareRevision(
+    RBRGen3 *instrument,
     RBRInstrumentGen3HardwareRevision *hwrev);
 
 /**
@@ -113,7 +113,7 @@ typedef enum RBRInstrumentGen3PowerSource
  *
  * \param [in] source the power source
  * \return a string name for the power source
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3PowerSource_name(RBRInstrumentGen3PowerSource source);
 
@@ -149,13 +149,13 @@ typedef struct RBRInstrumentGen3Power
  *
  * \param [in] instrument the instrument connection
  * \param [out] power the power information
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the information is successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if an error occurs reading voltages
+ * \return #RBRGEN3_SUCCESS when the information is successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR if an error occurs reading voltages
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/power
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getPower(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getPower(RBRGen3 *instrument,
                                           RBRInstrumentGen3Power *power);
 
 /**
@@ -188,7 +188,7 @@ typedef enum RBRInstrumentGen3InternalBatteryType
  *
  * \param [in] type the battery type
  * \return a string name for the battery type
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  * \see RBRInstrumentGen3InternalBatteryType_displayName() for display names
  */
 const char *RBRInstrumentGen3InternalBatteryType_name(
@@ -234,54 +234,54 @@ typedef struct RBRInstrumentGen3PowerInternal
 /**
  * \brief Get instrument internal power information.
  *
- * \nol2 Always returns #RBRINSTRUMENTGEN3_UNSUPPORTED.
+ * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
  * \param [in] instrument the instrument connection
  * \param [out] power the power information
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the information is successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the information is successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen3_setPowerInternalBatteryType()
  * \see RBRInstrumentGen3_resetPowerInternalUsed()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getPowerInternal(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getPowerInternal(
+    RBRGen3 *instrument,
     RBRInstrumentGen3PowerInternal *power);
 
 /**
  * \brief Set the internal power battery type.
  *
- * \nol2 Always returns #RBRINSTRUMENTGEN3_UNSUPPORTED.
+ * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
  * \param [in] instrument the instrument connection
  * \param [in] type the battery type
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging
  * \see RBRInstrumentGen3_getPowerInternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setPowerInternalBatteryType(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setPowerInternalBatteryType(
+    RBRGen3 *instrument,
     RBRInstrumentGen3InternalBatteryType type);
 
 /**
  * \brief Reset the counter of energy used from the internal battery.
  *
- * \nol2 Always returns #RBRINSTRUMENTGEN3_UNSUPPORTED.
+ * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
  * \param [in] instrument the instrument connection
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging
  * \see RBRInstrumentGen3_getPowerInternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_resetPowerInternalUsed(
-    RBRInstrumentGen3 *instrument);
+RBRGen3Error RBRInstrumentGen3_resetPowerInternalUsed(
+    RBRGen3 *instrument);
 
 /**
  * External battery types.
@@ -319,7 +319,7 @@ typedef enum RBRInstrumentGen3ExternalBatteryType
  *
  * \param [in] type the battery type
  * \return a string name for the battery type
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  * \see RBRInstrumentGen3ExternalBatteryType_displayName() for display names
  */
 const char *RBRInstrumentGen3ExternalBatteryType_name(
@@ -367,52 +367,52 @@ typedef struct RBRInstrumentGen3PowerExternal
 /**
  * \brief Get instrument external power information.
  *
- * \nol2 Always returns #RBRINSTRUMENTGEN3_UNSUPPORTED.
+ * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
  * \param [in] instrument the instrument connection
  * \param [out] power the power information
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the information is successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the information is successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen3_setPowerExternalBatteryType()
  * \see RBRInstrumentGen3_resetPowerExternalUsed()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getPowerExternal(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getPowerExternal(
+    RBRGen3 *instrument,
     RBRInstrumentGen3PowerExternal *power);
 
 /**
  * \brief Set the external power battery type.
  *
- * \nol2 Always returns #RBRINSTRUMENTGEN3_UNSUPPORTED.
+ * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
  * \param [in] instrument the instrument connection
  * \param [in] type the battery type
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen3_getPowerExternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setPowerExternalBatteryType(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setPowerExternalBatteryType(
+    RBRGen3 *instrument,
     RBRInstrumentGen3ExternalBatteryType type);
 
 /**
  * \brief Reset the counter of energy used from the external battery.
  *
- * \nol2 Always returns #RBRINSTRUMENTGEN3_UNSUPPORTED.
+ * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
  * \param [in] instrument the instrument connection
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen3_getPowerExternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_resetPowerExternalUsed(
-    RBRInstrumentGen3 *instrument);
+RBRGen3Error RBRInstrumentGen3_resetPowerExternalUsed(
+    RBRGen3 *instrument);
 
 /**
  * \brief Instrument `info` command parameters.
@@ -435,14 +435,14 @@ typedef struct RBRInstrumentGen3Info
  *
  * \param [in] instrument the instrument connection
  * \param [out] info the extended instrument information
- * \return #RBRINSTRUMENTGEN3_UNSUPPORTED for Logger2 instruments
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the information is successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
+ * \return #RBRGEN3_SUCCESS when the information is successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/info
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getInfo(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getInfo(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Info *info);
 
 #ifdef __cplusplus

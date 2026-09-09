@@ -17,8 +17,8 @@
 /* Required for strtol. */
 #include <stdlib.h>
 
-#include "RBRInstrumentGen3.h"
-#include "RBRInstrumentGen3Internal.h"
+#include "RBRGen3.h"
+#include "RBRGen3Internal.h"
 
 /* The minimum length of a version string. */
 #define VERSION_MIN 3
@@ -121,18 +121,18 @@ int RBRInstrumentGen3Version_compare(const char *inA, const char *inB)
     return -(separatorA - separatorB);
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getId(RBRInstrumentGen3 *instrument,
-                                       RBRInstrumentGen3Id *id)
+RBRGen3Error RBRInstrumentGen3_getId(RBRGen3 *instrument,
+                                       RBRGen3Id *id)
 {
-    memset(id, 0, sizeof(RBRInstrumentGen3Id));
+    memset(id, 0, sizeof(RBRGen3Id));
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "id"));
+    RBR_TRY(RBRGen3_converse(instrument, "id"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     do
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -173,25 +173,25 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getId(RBRInstrumentGen3 *instrument,
 
     if (id != &instrument->id)
     {
-        memcpy(&instrument->id, id, sizeof(RBRInstrumentGen3Id));
+        memcpy(&instrument->id, id, sizeof(RBRGen3Id));
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getHardwareRevision(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getHardwareRevision(
+    RBRGen3 *instrument,
     RBRInstrumentGen3HardwareRevision *hwrev)
 {
     memset(hwrev, 0, sizeof(RBRInstrumentGen3HardwareRevision));
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "hwrev"));
+    RBR_TRY(RBRGen3_converse(instrument, "hwrev"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -216,7 +216,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getHardwareRevision(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 const char *RBRInstrumentGen3PowerSource_name(RBRInstrumentGen3PowerSource source)
@@ -237,7 +237,7 @@ const char *RBRInstrumentGen3PowerSource_name(RBRInstrumentGen3PowerSource sourc
     }
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getPower(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getPower(RBRGen3 *instrument,
                                           RBRInstrumentGen3Power *power)
 {
     memset(power, 0, sizeof(RBRInstrumentGen3Power));
@@ -245,20 +245,20 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getPower(RBRInstrumentGen3 *instrument,
     power->internal = NAN;
     power->regulator = NAN;
 
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
-        RBR_TRY(RBRInstrumentGen3_converse(instrument, "powerstatus"));
+        RBR_TRY(RBRGen3_converse(instrument, "powerstatus"));
     }
     else
     {
-        RBR_TRY(RBRInstrumentGen3_converse(instrument, "power"));
+        RBR_TRY(RBRGen3_converse(instrument, "power"));
     }
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -301,7 +301,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getPower(RBRInstrumentGen3 *instrument,
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 const char *RBRInstrumentGen3InternalBatteryType_name(
@@ -354,25 +354,25 @@ const char *RBRInstrumentGen3InternalBatteryType_displayName(
     }
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getPowerInternal(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getPowerInternal(
+    RBRGen3 *instrument,
     RBRInstrumentGen3PowerInternal *power)
 {
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
-        return RBRINSTRUMENTGEN3_UNSUPPORTED;
+        return RBRGEN3_UNSUPPORTED;
     }
 
     memset(power, 0, sizeof(RBRInstrumentGen3PowerInternal));
     power->batteryType = RBRINSTRUMENTGEN3_UNKNOWN_INTERNAL_BATTERY;
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "powerinternal"));
+    RBR_TRY(RBRGen3_converse(instrument, "powerinternal"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -402,28 +402,28 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getPowerInternal(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setPowerInternalBatteryType(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setPowerInternalBatteryType(
+    RBRGen3 *instrument,
     RBRInstrumentGen3InternalBatteryType type)
 {
     if (type < 0 || type >= RBRINSTRUMENTGEN3_INTERNAL_BATTERY_COUNT)
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrumentGen3_converse(
+    return RBRGen3_converse(
         instrument,
         "powerinternal batterytype = %s",
         RBRInstrumentGen3InternalBatteryType_name(type));
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_resetPowerInternalUsed(
-    RBRInstrumentGen3 *instrument)
+RBRGen3Error RBRInstrumentGen3_resetPowerInternalUsed(
+    RBRGen3 *instrument)
 {
-    return RBRInstrumentGen3_converse(instrument, "powerinternal used = 0");
+    return RBRGen3_converse(instrument, "powerinternal used = 0");
 }
 
 const char *RBRInstrumentGen3ExternalBatteryType_name(
@@ -488,25 +488,25 @@ const char *RBRInstrumentGen3ExternalBatteryType_displayName(
     }
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getPowerExternal(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getPowerExternal(
+    RBRGen3 *instrument,
     RBRInstrumentGen3PowerExternal *power)
 {
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
-        return RBRINSTRUMENTGEN3_UNSUPPORTED;
+        return RBRGEN3_UNSUPPORTED;
     }
 
     memset(power, 0, sizeof(RBRInstrumentGen3PowerExternal));
     power->batteryType = RBRINSTRUMENTGEN3_UNKNOWN_EXTERNAL_BATTERY;
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "powerexternal"));
+    RBR_TRY(RBRGen3_converse(instrument, "powerexternal"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -536,48 +536,48 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getPowerExternal(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_setPowerExternalBatteryType(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setPowerExternalBatteryType(
+    RBRGen3 *instrument,
     RBRInstrumentGen3ExternalBatteryType type)
 {
     if (type < 0 || type >= RBRINSTRUMENTGEN3_EXTERNAL_BATTERY_COUNT)
     {
-        return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrumentGen3_converse(
+    return RBRGen3_converse(
         instrument,
         "powerexternal batterytype = %s",
         RBRInstrumentGen3ExternalBatteryType_name(type));
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_resetPowerExternalUsed(
-    RBRInstrumentGen3 *instrument)
+RBRGen3Error RBRInstrumentGen3_resetPowerExternalUsed(
+    RBRGen3 *instrument)
 {
-    return RBRInstrumentGen3_converse(instrument, "powerexternal used = 0");
+    return RBRGen3_converse(instrument, "powerexternal used = 0");
 }
 
-RBRInstrumentGen3Error RBRInstrumentGen3_getInfo(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getInfo(
+    RBRGen3 *instrument,
     RBRInstrumentGen3Info *info)
 {
-    if (instrument->generation == RBRINSTRUMENTGEN3_LOGGER2)
+    if (instrument->generation == RBRGEN3_LOGGER2)
     {
-        return RBRINSTRUMENTGEN3_UNSUPPORTED;
+        return RBRGEN3_UNSUPPORTED;
     }
 
     memset(info, 0, sizeof(RBRInstrumentGen3Info));
 
-    RBR_TRY(RBRInstrumentGen3_converse(instrument, "info"));
+    RBR_TRY(RBRGen3_converse(instrument, "info"));
 
     char *command = NULL;
-    RBRInstrumentGen3ResponseParameter parameter;
+    RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(instrument,
                                     &command,
                                     &parameter);
 
@@ -598,5 +598,5 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getInfo(
         }
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }

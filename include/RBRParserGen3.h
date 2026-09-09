@@ -18,7 +18,7 @@ extern "C" {
 #include <inttypes.h>
 #include <stdbool.h>
 
-#include "RBRInstrumentGen3.h"
+#include "RBRGen3.h"
 
 /** \brief The maximum number of pieces of auxiliary data in an event. */
 #define RBRINSTRUMENTGEN3_EVENT_AUXILIARY_DATA_MAX 4
@@ -35,12 +35,12 @@ struct RBRParserGen3;
  *
  * \param [in] parser the dataset parser which parsed the sample
  * \param [in] sample the parsed sample
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the sample data is successfully consumed
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR when an unrecoverable error occurs
+ * \return #RBRGEN3_SUCCESS when the sample data is successfully consumed
+ * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRInstrumentGen3Error (*RBRParserGen3SampleCallback)(
+typedef RBRGen3Error (*RBRParserGen3SampleCallback)(
     const struct RBRParserGen3 *parser,
-    const struct RBRInstrumentGen3Sample *const sample);
+    const struct RBRGen3Sample *const sample);
 
 /**
  * \brief Instrument event types.
@@ -95,7 +95,7 @@ typedef enum RBRInstrumentGen3EventType
  *
  * \param [in] type the event type
  * \return a string name for the event type
- * \see RBRInstrumentGen3Error_name() for a description of the format of names
+ * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen3EventType_name(RBRInstrumentGen3EventType type);
 
@@ -110,7 +110,7 @@ typedef struct RBRInstrumentGen3Event
     /** \brief The type of the event. */
     RBRInstrumentGen3EventType type;
     /** \brief The timestamp of the event. */
-    RBRInstrumentGen3DateTime timestamp;
+    RBRGen3DateTime timestamp;
     /**
      * \brief The number of populated entries in
      * RBRInstrumentGen3Event.auxiliaryData.
@@ -136,10 +136,10 @@ typedef struct RBRInstrumentGen3Event
  *
  * \param [in] parser the dataset parser which parsed the event
  * \param [in] event the parsed event
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the event data is successfully consumed
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR when an unrecoverable error occurs
+ * \return #RBRGEN3_SUCCESS when the event data is successfully consumed
+ * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRInstrumentGen3Error (*RBRParserGen3EventCallback)(
+typedef RBRGen3Error (*RBRParserGen3EventCallback)(
     const struct RBRParserGen3 *parser,
     const struct RBRInstrumentGen3Event *const event);
 
@@ -148,7 +148,7 @@ typedef RBRInstrumentGen3Error (*RBRParserGen3EventCallback)(
  *
  * All of the callback functions are optional; however, where any callback
  * function is provided, the corresponding buffer must also be provided, or
- * else RBRParserGen3_init() will return #RBRINSTRUMENTGEN3_MISSING_CALLBACK.
+ * else RBRParserGen3_init() will return #RBRGEN3_MISSING_CALLBACK.
  */
 typedef struct RBRParserGen3Callbacks
 {
@@ -164,7 +164,7 @@ typedef struct RBRParserGen3Callbacks
      *
      * Required only when RBRParserGen3Callbacks.sample is populated.
      */
-    RBRInstrumentGen3Sample *sampleBuffer;
+    RBRGen3Sample *sampleBuffer;
 
     /**
      * \brief Called when an event has been parsed.
@@ -192,8 +192,8 @@ typedef struct RBRParserGen3EasyParseConfig
      * \brief The number of instrument channels in each sample.
      *
      * If the value is less than or equal to 0 or exceeds
-     * #RBRINSTRUMENTGEN3_CHANNEL_MAX, then RBRParserGen3_init() will return
-     * #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE.
+     * #RBRGEN3_CHANNEL_MAX, then RBRParserGen3_init() will return
+     * #RBRGEN3_INVALID_PARAMETER_VALUE.
      */
     int32_t channels;
 } RBRParserGen3EasyParseConfig;
@@ -247,27 +247,27 @@ typedef struct RBRParserGen3
  * \brief Initialize a dataset parser.
  *
  * The use of the \a parser argument is the same as that of the \a instrument
- * argument to RBRInstrumentGen3_open(): when given as `NULL`, instance memory will
+ * argument to RBRGen3_open(): when given as `NULL`, instance memory will
  * be allocated for you; otherwise, the pointer target will be used as instance
- * storage. See RBRInstrumentGen3_open() for “do”s and “don't”s inherent to this
+ * storage. See RBRGen3_open() for “do”s and “don't”s inherent to this
  * approach.
  *
- * Again, as with the \a callbacks argument to RBRInstrumentGen3_open(), the
+ * Again, as with the \a callbacks argument to RBRGen3_open(), the
  * \a config and \a callbacks structures will be copied into the RBRParserGen3
  * structure and no references to them are retained.
  *
  * Currently, the only supported memory format is
  * #RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00 (“EasyParse”). Requesting any other format
- * via RBRParserGen3Config will cause #RBRINSTRUMENTGEN3_UNSUPPORTED to be returned.
+ * via RBRParserGen3Config will cause #RBRGEN3_UNSUPPORTED to be returned.
  *
  * Both callback functions are optional, but that probably isn't very useful:
  * after all, you won't receive any data that way. Still, the library won't
  * complain. If any buffer is not given for a callback function which _is_
  * given, or if \a callbacks itself is given as `NULL`, then
- * #RBRINSTRUMENTGEN3_MISSING_CALLBACK is returned and the parser instantiation
+ * #RBRGEN3_MISSING_CALLBACK is returned and the parser instantiation
  * will not be completed.
  *
- * In the event of any return value other than #RBRINSTRUMENTGEN3_SUCCESS, any
+ * In the event of any return value other than #RBRGEN3_SUCCESS, any
  * memory allocated by this constructor is freed. That is, in the event of
  * failure, no cleanup of library resources is required. In the event of a
  * successful result, RBRParserGen3_destroy() should be used to release allocated
@@ -277,14 +277,14 @@ typedef struct RBRParserGen3
  * \param [in] callbacks the set of callbacks to be used by the parser
  * \param [in] config the parser configuration
  * \param [in] userData arbitrary user data; useful in callbacks
- * \return #RBRINSTRUMENTGEN3_SUCCESS if the parser was instantiated successfully
- * \return #RBRINSTRUMENTGEN3_ALLOCATION_FAILURE if memory allocation failed
- * \return #RBRINSTRUMENTGEN3_MISSING_CALLBACK if no callbacks were provided
- * \return #RBRINSTRUMENTGEN3_UNSUPPORTED if the memory format is unsupported
- * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE if the config is invalid
+ * \return #RBRGEN3_SUCCESS if the parser was instantiated successfully
+ * \return #RBRGEN3_ALLOCATION_FAILURE if memory allocation failed
+ * \return #RBRGEN3_MISSING_CALLBACK if no callbacks were provided
+ * \return #RBRGEN3_UNSUPPORTED if the memory format is unsupported
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE if the config is invalid
  * \see RBRParserGen3_destroy()
  */
-RBRInstrumentGen3Error RBRParserGen3_init(RBRParserGen3 **parser,
+RBRGen3Error RBRParserGen3_init(RBRParserGen3 **parser,
                                   const RBRParserGen3Callbacks *callbacks,
                                   const RBRParserGen3Config *config,
                                   void *userData);
@@ -295,10 +295,10 @@ RBRInstrumentGen3Error RBRParserGen3_init(RBRParserGen3 **parser,
  * Frees the buffer allocated by RBRParserGen3_init() if necessary.
  *
  * \param [in,out] parser the dataset parser to close
- * \return #RBRINSTRUMENTGEN3_SUCCESS if the parser was closed successfully
+ * \return #RBRGEN3_SUCCESS if the parser was closed successfully
  * \see RBRParserGen3_init()
  */
-RBRInstrumentGen3Error RBRParserGen3_destroy(RBRParserGen3 *parser);
+RBRGen3Error RBRParserGen3_destroy(RBRParserGen3 *parser);
 
 /**
  * \brief Get the parser configuration.
@@ -344,7 +344,7 @@ void RBRParserGen3_setUserData(RBRParserGen3 *parser, void *userData);
  * #RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA. Any other value (including
  * #RBRINSTRUMENTGEN3_DATASET_EASYPARSE_DEPLOYMENT_HEADER, which is currently
  * unsupported) will cause the function to return
- * #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE and no data will be parsed.
+ * #RBRGEN3_INVALID_PARAMETER_VALUE and no data will be parsed.
  *
  * Parsed values will be returned via the RBRParserGen3Callbacks provided to
  * RBRParserGen3_init(). The value at \a size after completion of parsing indicates
@@ -356,13 +356,13 @@ void RBRParserGen3_setUserData(RBRParserGen3 *parser, void *userData);
  * \param [in,out] size initially, the size of the data given by \a data; set
  *                                 by the callback to the number of bytes
  *                                 actually parsed
- * \return #RBRINSTRUMENTGEN3_SUCCESS when no parsing errors occur
- * \return #RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is
+ * \return #RBRGEN3_SUCCESS when no parsing errors occur
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is
  *                                                given, or when the parser
  *                                                configuration is incomplete
  *                                                or invalid
  */
-RBRInstrumentGen3Error RBRParserGen3_parse(RBRParserGen3 *parser,
+RBRGen3Error RBRParserGen3_parse(RBRParserGen3 *parser,
                                    RBRInstrumentGen3Dataset dataset,
                                    const void *const data,
                                    int32_t *size);

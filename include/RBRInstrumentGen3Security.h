@@ -28,13 +28,13 @@ extern "C" {
  *
  * \param [in] instrument the instrument connection
  * \param [in] command the command to permit
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the command has been permitted
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN3_HARDWARE_ERROR if the command can't be permitted
+ * \return #RBRGEN3_SUCCESS when the command has been permitted
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR if the command can't be permitted
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/permit
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_permit(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_permit(RBRGen3 *instrument,
                                         const char *command);
 
 /**
@@ -45,12 +45,12 @@ RBRInstrumentGen3Error RBRInstrumentGen3_permit(RBRInstrumentGen3 *instrument,
  *
  * \param [in] instrument the instrument connection
  * \param [out] prompt whether the prompt is enabled
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/prompt
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getPrompt(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getPrompt(RBRGen3 *instrument,
                                            bool *prompt);
 
 /**
@@ -58,12 +58,12 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getPrompt(RBRInstrumentGen3 *instrument
  *
  * \param [in] instrument the instrument connection
  * \param [in] prompt whether the prompt should be enabled
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/prompt
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setPrompt(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setPrompt(RBRGen3 *instrument,
                                            bool prompt);
 
 /**
@@ -74,12 +74,12 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setPrompt(RBRInstrumentGen3 *instrument
  *
  * \param [in] instrument the instrument connection
  * \param [out] confirmation whether confirmation is enabled
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/confirmation
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_getConfirmation(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_getConfirmation(RBRGen3 *instrument,
                                                  bool *confirmation);
 
 /**
@@ -91,12 +91,12 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getConfirmation(RBRInstrumentGen3 *inst
  *
  * \param [in] instrument the instrument connection
  * \param [in] confirmation whether confirmation should be enabled
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/confirmation
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setConfirmation(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_setConfirmation(RBRGen3 *instrument,
                                                  bool confirmation);
 
 /**
@@ -104,12 +104,12 @@ RBRInstrumentGen3Error RBRInstrumentGen3_setConfirmation(RBRInstrumentGen3 *inst
  *
  * \param [in] instrument the instrument connection
  * \param [in] delay time in milliseconds to wait before rebooting
- * \return #RBRINSTRUMENTGEN3_SUCCESS when the CPU has been rebooted
- * \return #RBRINSTRUMENTGEN3_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_SUCCESS when the CPU has been rebooted
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/reboot
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_reboot(RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRInstrumentGen3_reboot(RBRGen3 *instrument,
                                         int32_t delay);
 
 #ifdef __cplusplus
