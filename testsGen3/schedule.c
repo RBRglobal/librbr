@@ -16,19 +16,19 @@ typedef struct ClockTest
 {
     const char *command;
     const char *response;
-    RBRInstrumentGen3Clock expected;
+    RBRGen3Clock expected;
 } ClockTest;
 
 static bool test_clock(RBRGen3 *instrument,
                        TestIOBuffers *buffers,
                        ClockTest *tests)
 {
-    RBRInstrumentGen3Clock actual;
+    RBRGen3Clock actual;
 
     for (int i = 0; tests[i].command != NULL; ++i)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        RBRGen3Error err = RBRInstrumentGen3_getClock(instrument, &actual);
+        RBRGen3Error err = RBRGen3_getClock(instrument, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_EQ(tests[i].expected.dateTime,
                        actual.dateTime,
@@ -110,7 +110,7 @@ TEST_LOGGER2(now)
 
 TEST_LOGGER2(now_set)
 {
-    RBRInstrumentGen3Clock now = {
+    RBRGen3Clock now = {
         .dateTime = 1550264758524LL,
         .offsetFromUtc = 0
     };
@@ -126,7 +126,7 @@ TEST_LOGGER2(now_set)
                           RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRInstrumentGen3_setClock(instrument, &now);
+    RBRGen3Error err = RBRGen3_setClock(instrument, &now);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -189,7 +189,7 @@ TEST_LOGGER3(clock)
 
 TEST_LOGGER3(clock_set)
 {
-    RBRInstrumentGen3Clock now = {
+    RBRGen3Clock now = {
         .dateTime = 1550264758524LL,
         .offsetFromUtc = 0
     };
@@ -201,7 +201,7 @@ TEST_LOGGER3(clock_set)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRInstrumentGen3_setClock(instrument, &now);
+    RBRGen3Error err = RBRGen3_setClock(instrument, &now);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -212,28 +212,28 @@ typedef struct SamplingTest
 {
     const char *command;
     const char *response;
-    RBRInstrumentGen3Sampling expected;
+    RBRGen3Sampling expected;
 } SamplingTest;
 
 static bool test_sampling(RBRGen3 *instrument,
                           TestIOBuffers *buffers,
                           SamplingTest *tests)
 {
-    RBRInstrumentGen3Sampling actual;
+    RBRGen3Sampling actual;
 
     for (int i = 0; tests[i].command != NULL; ++i)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        RBRGen3Error err = RBRInstrumentGen3_getSampling(instrument,
+        RBRGen3Error err = RBRGen3_getSampling(instrument,
                                                            &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.mode,
                             actual.mode,
-                            RBRInstrumentGen3SamplingMode);
+                            RBRGen3SamplingMode);
         TEST_ASSERT_EQ(tests[i].expected.period, actual.period, "%" PRIi32);
 
         for (int period = 0;
-             period < RBRINSTRUMENTGEN3_AVAILABLE_FAST_PERIODS_MAX
+             period < RBRGEN3_AVAILABLE_FAST_PERIODS_MAX
              && (period == 0
                  || tests[i].expected.availableFastPeriods[period - 1] != 0);
              ++period)
@@ -254,7 +254,7 @@ static bool test_sampling(RBRGen3 *instrument,
                        "%" PRIi32);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.gate,
                             actual.gate,
-                            RBRInstrumentGen3Gate);
+                            RBRGen3Gate);
 
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
     }
@@ -271,13 +271,13 @@ TEST_LOGGER2(sampling)
             "burstlength = 10, burstinterval = 10000, gate = none, "
             "userperiodlimit = 167" RESPONSE_TERMINATOR,
             {
-                .mode = RBRINSTRUMENTGEN3_SAMPLING_CONTINUOUS,
+                .mode = RBRGEN3_SAMPLING_CONTINUOUS,
                 .period = 167,
                 .availableFastPeriods = {167, 250, 500, 0},
                 .userPeriodLimit = 167,
                 .burstLength = 10,
                 .burstInterval = 10000,
-                .gate = RBRINSTRUMENTGEN3_GATE_NONE
+                .gate = RBRGEN3_GATE_NONE
             }
         },
         {
@@ -286,13 +286,13 @@ TEST_LOGGER2(sampling)
             "burstlength = 10, burstinterval = 10000, gate = thresholding, "
             "userperiodlimit = 83" RESPONSE_TERMINATOR,
             {
-                .mode = RBRINSTRUMENTGEN3_SAMPLING_DDSAMPLING,
+                .mode = RBRGEN3_SAMPLING_DDSAMPLING,
                 .period = 83,
                 .availableFastPeriods = {83, 125, 167, 250, 500, 0},
                 .userPeriodLimit = 83,
                 .burstLength = 10,
                 .burstInterval = 10000,
-                .gate = RBRINSTRUMENTGEN3_GATE_THRESHOLDING
+                .gate = RBRGEN3_GATE_THRESHOLDING
             }
         },
         {0}
@@ -310,13 +310,13 @@ TEST_LOGGER3(sampling)
             "burstinterval = 300000, gate = none, userperiodlimit = 32, "
             "availablefastperiods = 500|250|125|63|32" RESPONSE_TERMINATOR,
             {
-                .mode = RBRINSTRUMENTGEN3_SAMPLING_CONTINUOUS,
+                .mode = RBRGEN3_SAMPLING_CONTINUOUS,
                 .period = 1000,
                 .availableFastPeriods = {500, 250, 125, 63, 32, 0},
                 .userPeriodLimit = 32,
                 .burstLength = 240,
                 .burstInterval = 300000,
-                .gate = RBRINSTRUMENTGEN3_GATE_NONE
+                .gate = RBRGEN3_GATE_NONE
             }
         },
         {
@@ -326,13 +326,13 @@ TEST_LOGGER3(sampling)
             "userperiodlimit = 1000, availablefastperiods = none"
             RESPONSE_TERMINATOR,
             {
-                .mode = RBRINSTRUMENTGEN3_SAMPLING_CONTINUOUS,
+                .mode = RBRGEN3_SAMPLING_CONTINUOUS,
                 .period = 1000,
                 .availableFastPeriods = {0},
                 .userPeriodLimit = 1000,
                 .burstLength = 10,
                 .burstInterval = 10000,
-                .gate = RBRINSTRUMENTGEN3_GATE_THRESHOLDING
+                .gate = RBRGEN3_GATE_THRESHOLDING
             }
         },
         {0}
@@ -343,7 +343,7 @@ TEST_LOGGER3(sampling)
 
 typedef struct SamplingSetTest
 {
-    RBRInstrumentGen3Sampling sampling;
+    RBRGen3Sampling sampling;
     const char *response;
     const char *burstResponse;
     RBRGen3Error expectedError;
@@ -355,13 +355,13 @@ TEST_LOGGER3(sampling_set)
     SamplingSetTest tests[] = {
         {
             {
-                .mode = RBRINSTRUMENTGEN3_SAMPLING_CONTINUOUS,
+                .mode = RBRGEN3_SAMPLING_CONTINUOUS,
                 .period = 1000,
                 .availableFastPeriods = {500, 250, 125, 63, 32, 0},
                 .userPeriodLimit = 32,
                 .burstLength = 240,
                 .burstInterval = 300000,
-                .gate = RBRINSTRUMENTGEN3_GATE_NONE
+                .gate = RBRGEN3_GATE_NONE
             },
             "sampling mode = continuous, period = 1000",
             "sampling burstlength = 240, burstinterval = 300000",
@@ -370,13 +370,13 @@ TEST_LOGGER3(sampling_set)
         },
         {
             {
-                .mode = RBRINSTRUMENTGEN3_SAMPLING_CONTINUOUS,
+                .mode = RBRGEN3_SAMPLING_CONTINUOUS,
                 .period = 100,
                 .availableFastPeriods = {500, 250, 125, 63, 0},
                 .userPeriodLimit = 63,
                 .burstLength = 10,
                 .burstInterval = 10000,
-                .gate = RBRINSTRUMENTGEN3_GATE_THRESHOLDING
+                .gate = RBRGEN3_GATE_THRESHOLDING
             },
             "",
             "",
@@ -386,13 +386,13 @@ TEST_LOGGER3(sampling_set)
         },
         {
             {
-                .mode = RBRINSTRUMENTGEN3_SAMPLING_CONTINUOUS,
+                .mode = RBRGEN3_SAMPLING_CONTINUOUS,
                 .period = 63,
                 .availableFastPeriods = {0},
                 .userPeriodLimit = 125,
                 .burstLength = 10,
                 .burstInterval = 10000,
-                .gate = RBRINSTRUMENTGEN3_GATE_THRESHOLDING
+                .gate = RBRGEN3_GATE_THRESHOLDING
             },
             "",
             "",
@@ -402,13 +402,13 @@ TEST_LOGGER3(sampling_set)
         },
         {
             {
-                .mode = RBRINSTRUMENTGEN3_SAMPLING_CONTINUOUS,
+                .mode = RBRGEN3_SAMPLING_CONTINUOUS,
                 .period = 1000,
                 .availableFastPeriods = {500, 250, 125, 63, 32, 0},
                 .userPeriodLimit = 32,
                 .burstLength = 240,
                 .burstInterval = 1000 * 240,
-                .gate = RBRINSTRUMENTGEN3_GATE_NONE
+                .gate = RBRGEN3_GATE_NONE
             },
             "sampling mode = continuous, period = 1000",
             "",
@@ -427,13 +427,13 @@ TEST_LOGGER3(sampling_set)
     {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
-        err = RBRInstrumentGen3_setSampling(instrument, &tests[i].sampling);
+        err = RBRGen3_setSampling(instrument, &tests[i].sampling);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
         rbr_prepareCommandResponse(tests[i].burstResponse, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
-        err = RBRInstrumentGen3_setBurstSampling(instrument, &tests[i].sampling);
+        err = RBRGen3_setBurstSampling(instrument, &tests[i].sampling);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedBurstError,
                             err,
                             RBRGen3Error);
@@ -459,7 +459,7 @@ static bool test_deployment(RBRGen3 *instrument,
     for (int i = 0; tests[i].command != NULL; ++i)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        RBRGen3Error err = RBRInstrumentGen3_getDeployment(instrument,
+        RBRGen3Error err = RBRGen3_getDeployment(instrument,
                                                              &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_EQ(tests[i].expected.startTime,
@@ -470,7 +470,7 @@ static bool test_deployment(RBRGen3 *instrument,
                        "%" PRIi64);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.status,
                             actual.status,
-                            RBRInstrumentGen3DeploymentStatus);
+                            RBRGen3DeploymentStatus);
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
     }
 
@@ -490,7 +490,7 @@ TEST_LOGGER2(deployment)
             {
                 .startTime = RBRGEN3_DATETIME_MIN,
                 .endTime = RBRGEN3_DATETIME_MAX,
-                .status = RBRINSTRUMENTGEN3_STATUS_DISABLED
+                .status = RBRGEN3_STATUS_DISABLED
             }
         },
         {0}
@@ -509,7 +509,7 @@ TEST_LOGGER3(deployment)
             {
                 .startTime = RBRGEN3_DATETIME_MIN,
                 .endTime = RBRGEN3_DATETIME_MAX,
-                .status = RBRINSTRUMENTGEN3_STATUS_DISABLED
+                .status = RBRGEN3_STATUS_DISABLED
             }
         },
         {0}
@@ -532,7 +532,7 @@ TEST_LOGGER3(deployment_set)
             {
                 .startTime = RBRGEN3_DATETIME_MIN,
                 .endTime = RBRGEN3_DATETIME_MAX,
-                .status = RBRINSTRUMENTGEN3_STATUS_DISABLED
+                .status = RBRGEN3_STATUS_DISABLED
             },
             "deployment starttime = 20000101000000, "
             "endtime = 20991231235959",
@@ -542,7 +542,7 @@ TEST_LOGGER3(deployment_set)
             {
                 .startTime = 1537556712000LL,
                 .endTime = 1537556699000LL,
-                .status = RBRINSTRUMENTGEN3_STATUS_DISABLED
+                .status = RBRGEN3_STATUS_DISABLED
             },
             "",
             /* Failure because the end time is before the start time. */
@@ -552,7 +552,7 @@ TEST_LOGGER3(deployment_set)
             {
                 .startTime = 1537556699000LL,
                 .endTime = 1537556699000LL,
-                .status = RBRINSTRUMENTGEN3_STATUS_DISABLED
+                .status = RBRGEN3_STATUS_DISABLED
             },
             "",
             /* Failure because the end time equals the start time. */
@@ -562,7 +562,7 @@ TEST_LOGGER3(deployment_set)
             {
                 .startTime = 915148800000LL,
                 .endTime = 1537556699000LL,
-                .status = RBRINSTRUMENTGEN3_STATUS_DISABLED
+                .status = RBRGEN3_STATUS_DISABLED
             },
             "",
             /* Failure because the start time is before the epoch. */
@@ -572,7 +572,7 @@ TEST_LOGGER3(deployment_set)
             {
                 .startTime = 915148800000LL,
                 .endTime = 4102444800000LL,
-                .status = RBRINSTRUMENTGEN3_STATUS_DISABLED
+                .status = RBRGEN3_STATUS_DISABLED
             },
             "",
             /* Failure because the end time is after the limit. */
@@ -589,7 +589,7 @@ TEST_LOGGER3(deployment_set)
     {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
-        err = RBRInstrumentGen3_setDeployment(instrument, &tests[i].deployment);
+        err = RBRGen3_setDeployment(instrument, &tests[i].deployment);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);  
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     }

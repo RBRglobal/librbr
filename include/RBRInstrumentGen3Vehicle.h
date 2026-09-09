@@ -126,8 +126,8 @@ RBRGen3Error RBRInstrumentGen3_getRegimes(
 /**
  * \brief Set the instrument regimes settings.
  *
- * These settings are only used when the RBRInstrumentGen3Sampling.mode is
- * #RBRINSTRUMENTGEN3_SAMPLING_REGIMES.
+ * These settings are only used when the RBRGen3Sampling.mode is
+ * #RBRGEN3_SAMPLING_REGIMES.
  *
  * Hardware errors may occur if:
  *
@@ -182,7 +182,7 @@ typedef struct RBRInstrumentGen3Regime
      */
     float binSize;
     /**
-     * \brief The same meaning as RBRInstrumentGen3Sampling.period, but applies
+     * \brief The same meaning as RBRGen3Sampling.period, but applies
      * only to this particular regime.
      *
      * May not be greater than 65,000.
@@ -251,14 +251,14 @@ typedef struct RBRInstrumentGen3DirectionDependentSampling
     /** \brief In which direction the instrument samples at the fast rate. */
     RBRInstrumentGen3Direction direction;
     /**
-     * \brief The same meaning as RBRInstrumentGen3Sampling.period, but applies
+     * \brief The same meaning as RBRGen3Sampling.period, but applies
      * only when the instrument is moving in the preferred direction.
      *
      * Must be shorter than RBRInstrumentGen3DirectionDependentSampling.slowPeriod.
      */
     RBRGen3Period fastPeriod;
     /**
-     * \brief The same meaning as RBRInstrumentGen3Sampling.period, but applies
+     * \brief The same meaning as RBRGen3Sampling.period, but applies
      * only when the instrument is not moving in the preferred direction.
      *
      * Must be longer than RBRInstrumentGen3DirectionDependentSampling.fastPeriod.

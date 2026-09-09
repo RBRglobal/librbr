@@ -118,11 +118,11 @@ int main(void)
     }
 
     RBRGen3Deployment deployment;
-    RBRInstrumentGen3_getDeployment(instrument, &deployment);
-    if (deployment.status != RBRINSTRUMENTGEN3_STATUS_LOGGING)
+    RBRGen3_getDeployment(instrument, &deployment);
+    if (deployment.status != RBRGEN3_STATUS_LOGGING)
     {
         LOG_INF("instrument is %s, not logging; I'm going to start it",
-                RBRInstrumentGen3DeploymentStatus_name(deployment.status));
+                RBRGen3DeploymentStatus_name(deployment.status));
 
         if ((err = instrumentStart(instrument)) != RBRGEN3_SUCCESS)
         {

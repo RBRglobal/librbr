@@ -38,10 +38,10 @@ by default
 For example:
 
 ~~~{.c}
-RBRInstrumentGen3Sampling sampling;
-RBRInstrumentGen3_getSampling(instrument, &sampling);
+RBRGen3Sampling sampling;
+RBRGen3_getSampling(instrument, &sampling);
 printf("The instrument is performing %s sampling every %" PRIi32 "ms.\n",
-       RBRInstrumentGen3SamplingMode_name(sampling.mode),
+       RBRGen3SamplingMode_name(sampling.mode),
        sampling.period);
 ~~~
 

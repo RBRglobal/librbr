@@ -196,22 +196,22 @@ RBRGen3Error instrumentStart(RBRGen3 *instrument)
 {
     RBRGen3Error err;
 
-    RBRInstrumentGen3DeploymentStatus status;
+    RBRGen3DeploymentStatus status;
     if ((err = RBRGen3_disable(instrument, &status))
         != RBRGEN3_SUCCESS)
     {
         return err;
     }
 
-    RBRInstrumentGen3Sampling sampling;
-    if ((err = RBRInstrumentGen3_getSampling(instrument, &sampling))
+    RBRGen3Sampling sampling;
+    if ((err = RBRGen3_getSampling(instrument, &sampling))
         != RBRGEN3_SUCCESS)
     {
         return err;
     }
-    sampling.mode = RBRINSTRUMENTGEN3_SAMPLING_CONTINUOUS;
+    sampling.mode = RBRGEN3_SAMPLING_CONTINUOUS;
     sampling.period = sampling.userPeriodLimit;
-    if ((err = RBRInstrumentGen3_setSampling(instrument, &sampling))
+    if ((err = RBRGen3_setSampling(instrument, &sampling))
         != RBRGEN3_SUCCESS)
     {
         return err;
@@ -221,7 +221,7 @@ RBRGen3Error instrumentStart(RBRGen3 *instrument)
         .startTime = RBRGEN3_DATETIME_MIN,
         .endTime = RBRGEN3_DATETIME_MAX
     };
-    if ((err = RBRInstrumentGen3_setDeployment(instrument, &deployment))
+    if ((err = RBRGen3_setDeployment(instrument, &deployment))
         != RBRGEN3_SUCCESS)
     {
         return err;

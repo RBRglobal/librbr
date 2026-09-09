@@ -22,7 +22,7 @@ extern "C" {
  *
  * A hardware error can be generated for a variety of reasons. See the `verify`
  * command documentation for a comprehensive list. In the event of a hardware
- * error, \a status will be set to #RBRINSTRUMENTGEN3_UNKNOWN_STATUS. While Logger2
+ * error, \a status will be set to #RBRGEN3_UNKNOWN_STATUS. While Logger2
  * hardware reports a status in addition to any error, Logger3 hardware does
  * not, and the value will always be the same as the current instrument status.
  *
@@ -42,7 +42,7 @@ extern "C" {
 RBRGen3Error RBRGen3_verify(
     RBRGen3 *instrument,
     bool eraseMemory,
-    RBRInstrumentGen3DeploymentStatus *status);
+    RBRGen3DeploymentStatus *status);
 
 /**
  * \brief Enable the instrument to sample according to the programmed schedule.
@@ -52,7 +52,7 @@ RBRGen3Error RBRGen3_verify(
  *
  * A hardware error can be generated for a variety of reasons. See the `enable`
  * command documentation for a comprehensive list. In the event of a hardware
- * error, \a status will be set to #RBRINSTRUMENTGEN3_UNKNOWN_STATUS.
+ * error, \a status will be set to #RBRGEN3_UNKNOWN_STATUS.
  *
  * \param [in] instrument the instrument connection
  * \param [in] eraseMemory whether to erase memory before enabling logging
@@ -66,7 +66,7 @@ RBRGen3Error RBRGen3_verify(
 RBRGen3Error RBRGen3_enable(
     RBRGen3 *instrument,
     bool eraseMemory,
-    RBRInstrumentGen3DeploymentStatus *status);
+    RBRGen3DeploymentStatus *status);
 
 /**
  * \brief If the instrument is logging, terminate the current deployment.
@@ -80,7 +80,7 @@ RBRGen3Error RBRGen3_enable(
  */
 RBRGen3Error RBRGen3_disable(
     RBRGen3 *instrument,
-    RBRInstrumentGen3DeploymentStatus *status);
+    RBRGen3DeploymentStatus *status);
 
 /**
  * \brief Instrument `simulation` command parameters.

@@ -264,11 +264,11 @@ RBRGen3Error RBRInstrumentGen3_setDirectionDependentSampling(
         || ddsampling->direction >= RBRINSTRUMENTGEN3_DIRECTION_COUNT
         || ddsampling->fastPeriod >= ddsampling->slowPeriod
         || ddsampling->fastPeriod <= 0
-        || ddsampling->fastPeriod > RBRINSTRUMENTGEN3_SAMPLING_PERIOD_MAX
+        || ddsampling->fastPeriod > RBRGEN3_SAMPLING_PERIOD_MAX
         || (ddsampling->fastPeriod >= 1000
             && ddsampling->fastPeriod % 1000 != 0)
         || ddsampling->slowPeriod <= 0
-        || ddsampling->slowPeriod > RBRINSTRUMENTGEN3_SAMPLING_PERIOD_MAX
+        || ddsampling->slowPeriod > RBRGEN3_SAMPLING_PERIOD_MAX
         || (ddsampling->slowPeriod >= 1000
             && ddsampling->slowPeriod % 1000 != 0))
     {

@@ -17,7 +17,7 @@
 static RBRGen3Error RBRGen3_parseDeploymentResponse(
     RBRGen3 *instrument,
     const char *deploymentCommand,
-    RBRInstrumentGen3DeploymentStatus *status)
+    RBRGen3DeploymentStatus *status)
 {
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
@@ -37,9 +37,9 @@ static RBRGen3Error RBRGen3_parseDeploymentResponse(
             continue;
         }
 
-        for (int i = 0; i < RBRINSTRUMENTGEN3_STATUS_COUNT; i++)
+        for (int i = 0; i < RBRGEN3_STATUS_COUNT; i++)
         {
-            if (strcmp(RBRInstrumentGen3DeploymentStatus_name(i),
+            if (strcmp(RBRGen3DeploymentStatus_name(i),
                        parameter.value) == 0)
             {
                 *status = i;
@@ -56,9 +56,9 @@ static RBRGen3Error RBRGen3_parseDeploymentResponse(
 RBRGen3Error RBRGen3_verify(
     RBRGen3 *instrument,
     bool eraseMemory,
-    RBRInstrumentGen3DeploymentStatus *status)
+    RBRGen3DeploymentStatus *status)
 {
-    *status = RBRINSTRUMENTGEN3_UNKNOWN_STATUS;
+    *status = RBRGEN3_UNKNOWN_STATUS;
 
     RBR_TRY(RBRGen3_converse(instrument,
                                    "verify erasememory = %s",
@@ -72,9 +72,9 @@ RBRGen3Error RBRGen3_verify(
 RBRGen3Error RBRGen3_enable(
     RBRGen3 *instrument,
     bool eraseMemory,
-    RBRInstrumentGen3DeploymentStatus *status)
+    RBRGen3DeploymentStatus *status)
 {
-    *status = RBRINSTRUMENTGEN3_UNKNOWN_STATUS;
+    *status = RBRGEN3_UNKNOWN_STATUS;
 
     RBR_TRY(RBRGen3_converse(instrument,
                                    "enable erasememory = %s",
@@ -87,9 +87,9 @@ RBRGen3Error RBRGen3_enable(
 
 RBRGen3Error RBRGen3_disable(
     RBRGen3 *instrument,
-    RBRInstrumentGen3DeploymentStatus *status)
+    RBRGen3DeploymentStatus *status)
 {
-    *status = RBRINSTRUMENTGEN3_UNKNOWN_STATUS;
+    *status = RBRGEN3_UNKNOWN_STATUS;
 
     const char *disableCommand;
     if (instrument->generation == RBRGEN3_LOGGER2)

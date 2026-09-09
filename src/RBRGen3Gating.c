@@ -175,7 +175,7 @@ RBRGen3Error RBRGen3_setThresholding(
         || threshold->condition < RBRGEN3_THRESHOLDING_ABOVE
         || threshold->condition > RBRGEN3_THRESHOLDING_BELOW
         || threshold->interval <= 0
-        || threshold->interval > RBRINSTRUMENTGEN3_SAMPLING_PERIOD_MAX
+        || threshold->interval > RBRGEN3_SAMPLING_PERIOD_MAX
         || (threshold->interval >= 1000 && threshold->interval % 1000 != 0))
     {
         return RBRGEN3_INVALID_PARAMETER_VALUE;

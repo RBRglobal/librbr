@@ -180,7 +180,7 @@ extern const char *RBRGEN3_LIB_BUILD_DATE;
 /**
  * A date and time in milliseconds since the Unix epoch
  * (1970-01-01T00:00:00.000Z). Instrument functions operating on time (e.g.,
- * RBRInstrumentGen3_getClock(), RBRInstrumentGen3_setClock()) will automatically
+ * RBRGen3_getClock(), RBRGen3_setClock()) will automatically
  * convert to and from the instrument's string time representation.
  *
  * The valid range for any instrument date/time parameter is

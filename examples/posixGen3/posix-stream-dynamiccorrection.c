@@ -326,12 +326,12 @@ int main(int argc, char *argv[])
     }
 
     RBRGen3Deployment deployment;
-    RBRInstrumentGen3_getDeployment(instrument, &deployment);
-    if (deployment.status != RBRINSTRUMENTGEN3_STATUS_LOGGING)
+    RBRGen3_getDeployment(instrument, &deployment);
+    if (deployment.status != RBRGEN3_STATUS_LOGGING)
     {
         printf("%s: Instrument is %s, not logging. I'm going to start it.\n",
                programName,
-               RBRInstrumentGen3DeploymentStatus_name(deployment.status));
+               RBRGen3DeploymentStatus_name(deployment.status));
 
         if ((err = instrumentStart(instrument)) != RBRGEN3_SUCCESS)
         {
@@ -345,8 +345,8 @@ int main(int argc, char *argv[])
     }
 
     /* get sampling rate from instrument */
-    RBRInstrumentGen3Sampling sampling;
-    if ((err = RBRInstrumentGen3_getSampling(instrument, &sampling)) != RBRGEN3_SUCCESS)
+    RBRGen3Sampling sampling;
+    if ((err = RBRGen3_getSampling(instrument, &sampling)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr,
                 "%s: Failed to query 'sampling' from instrument: %s!\n",
