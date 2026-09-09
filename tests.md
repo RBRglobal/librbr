@@ -1,14 +1,14 @@
 # Writing Tests
 
 Unit tests are found
-in the `tests/` subdirectory.
+in the `testsGen3/` subdirectory.
 
 ## Adding an Instrument Test
 
 You can use the `TEST_LOGGER2` and `TEST_LOGGER3` macros
 to declare instrument test functions
 within any of the test modules
-found within `tests/`.
+found within `testsGen3/`.
 The macros take a single argument:
 the name of the test.
 
@@ -126,7 +126,7 @@ If you need to add a new test,
 it likely fits within one of the existing modules.
 However, if you're sure you do need a new module,
 then you can add one
-by creating a `.c` file in the `tests/` subdirectory,
+by creating a `.c` file in the `testsGen3/` subdirectory,
 then adding its name (without extension)
 to the `TEST_MODULES` variable in the `Makefile`.
 Unless you have good reason not to,
@@ -136,7 +136,7 @@ of the module names in the declaration.
 For example,
 to add a new module
 for tests having to do with “frobbing”,
-create the file `tests/frobbing.c`,
+create the file `testsGen3/frobbing.c`,
 and add it to the Makefile:
 
 ~~~
