@@ -26,7 +26,7 @@
 #include <time.h>
 
 #include "RBRInstrumentGen3.h"
-#include "RBRInstrumentInternal.h"
+#include "RBRInstrumentGen3Internal.h"
 #include "RBRInstrumentGen3Memory.h"
 
 /** \brief 10-second command timeout. */

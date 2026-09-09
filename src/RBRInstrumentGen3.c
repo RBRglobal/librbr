@@ -16,7 +16,7 @@
 #endif
 
 #include "RBRInstrumentGen3.h"
-#include "RBRInstrumentInternal.h"
+#include "RBRInstrumentGen3Internal.h"
 
 const char *RBRINSTRUMENT_LIB_NAME =
 #ifdef RBR_LIB_NAME

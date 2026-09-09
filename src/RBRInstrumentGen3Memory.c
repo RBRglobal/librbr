@@ -16,7 +16,7 @@
 #include <stdlib.h>
 
 #include "RBRInstrumentGen3.h"
-#include "RBRInstrumentInternal.h"
+#include "RBRInstrumentGen3Internal.h"
 
 const char *RBRInstrumentDataset_name(RBRInstrumentDataset dataset)
 {

@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentInternal.h
+ * \file RBRInstrumentGen3Internal.h
  *
  * \brief Internal functions used across the library.
  *

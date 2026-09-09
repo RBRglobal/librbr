@@ -18,7 +18,7 @@
 #include <stdlib.h>
 
 #include "RBRInstrumentGen3.h"
-#include "RBRInstrumentInternal.h"
+#include "RBRInstrumentGen3Internal.h"
 
 /* The minimum length of a version string. */
 #define VERSION_MIN 3

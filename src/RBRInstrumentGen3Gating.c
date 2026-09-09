@@ -14,7 +14,7 @@
 #include <string.h>
 
 #include "RBRInstrumentGen3.h"
-#include "RBRInstrumentInternal.h"
+#include "RBRInstrumentGen3Internal.h"
 
 const char *RBRInstrumentGatingState_name(RBRInstrumentGatingState state)
 {

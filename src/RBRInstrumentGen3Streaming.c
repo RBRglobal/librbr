@@ -16,7 +16,7 @@
 #include <stdio.h>
 
 #include "RBRInstrumentGen3.h"
-#include "RBRInstrumentInternal.h"
+#include "RBRInstrumentGen3Internal.h"
 
 #define READING_FLAG_MASK     0x00FF0000
 #define READING_FLAG_OFFSET  (2 * 8)

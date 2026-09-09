@@ -12,7 +12,7 @@
 #include <string.h>
 
 #include "RBRInstrumentGen3.h"
-#include "RBRInstrumentInternal.h"
+#include "RBRInstrumentGen3Internal.h"
 
 const char *RBRInstrumentLink_name(RBRInstrumentLink link)
 {

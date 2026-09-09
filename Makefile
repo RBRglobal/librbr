@@ -110,22 +110,22 @@ libdynamiccorrection: bin/libRBRDynamicCorrection.a
 lib: bin/libRBR.a
 
 ## \brief Objects for the Gen3 (Logger2/Logger3) API.
-GEN3_OBJECTS := src/RBRInstrument.o \
-                src/RBRInstrumentCommunication.o \
-                src/RBRInstrumentConfiguration.o \
-                src/RBRInstrumentDeployment.o \
-                src/RBRInstrumentFetching.o \
-                src/RBRInstrumentGating.o \
-                src/RBRInstrumentHardwareErrors.o \
-                src/RBRInstrumentInternal.o \
-                src/RBRInstrumentMemory.o \
-                src/RBRInstrumentOther.o \
-                src/RBRInstrumentPauseresume.o \
-                src/RBRInstrumentSchedule.o \
-                src/RBRInstrumentSecurity.o \
-                src/RBRInstrumentStreaming.o \
-                src/RBRInstrumentVehicle.o \
-                src/RBRParser.o
+GEN3_OBJECTS := src/RBRInstrumentGen3.o \
+                src/RBRInstrumentGen3Communication.o \
+                src/RBRInstrumentGen3Configuration.o \
+                src/RBRInstrumentGen3Deployment.o \
+                src/RBRInstrumentGen3Fetching.o \
+                src/RBRInstrumentGen3Gating.o \
+                src/RBRInstrumentGen3HardwareErrors.o \
+                src/RBRInstrumentGen3Internal.o \
+                src/RBRInstrumentGen3Memory.o \
+                src/RBRInstrumentGen3Other.o \
+                src/RBRInstrumentGen3Pauseresume.o \
+                src/RBRInstrumentGen3Schedule.o \
+                src/RBRInstrumentGen3Security.o \
+                src/RBRInstrumentGen3Streaming.o \
+                src/RBRInstrumentGen3Vehicle.o \
+                src/RBRParserGen3.o
 
 ## \brief Objects for the Gen4 (SL4/SEN4/L4) API.
 GEN4_OBJECTS := src/RBRInstrumentGen4.o \
@@ -144,7 +144,7 @@ LIB_OBJECTS :=
 DYNAMICCORRECTION_OBJECTS :=
 ifeq ($(GEN3),1)
 LIB_OBJECTS += $(GEN3_OBJECTS)
-DYNAMICCORRECTION_OBJECTS += src/RBRDynamicCorrection.o
+DYNAMICCORRECTION_OBJECTS += src/RBRDynamicCorrectionGen3.o
 endif
 ifeq ($(GEN4),1)
 LIB_OBJECTS += $(GEN4_OBJECTS)

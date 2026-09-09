@@ -18,7 +18,7 @@
 
 #include "RBRParserGen3.h"
 /* Required for RBR_TRY. */
-#include "RBRInstrumentInternal.h"
+#include "RBRInstrumentGen3Internal.h"
 
 const char *RBRInstrumentEventType_name(RBRInstrumentEventType type)
 {

@@ -16,7 +16,7 @@
 #include <string.h>
 
 #include "RBRInstrumentGen3.h"
-#include "RBRInstrumentInternal.h"
+#include "RBRInstrumentGen3Internal.h"
 
 const char *RBRInstrumentChannelRangingMode_name(
     RBRInstrumentChannelRangingMode mode)
