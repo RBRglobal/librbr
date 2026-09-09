@@ -34,7 +34,7 @@ if(CONFIG_LIBRBR)
         )
 
         zephyr_library_sources(
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRDynamicCorrectionGen3.c
+            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3DynamicCorrection.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Communication.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Configuration.c

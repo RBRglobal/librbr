@@ -38,7 +38,7 @@
 
 #include "posix-shared.h"
 #include "RBRGen3Parser.h"
-#include "RBRDynamicCorrectionGen3.h"
+#include "RBRGen3DynamicCorrection.h"
 
 
 /* CSV column assignement */
@@ -54,16 +54,16 @@
 
 RBRGen3DateTime g_timeReference = 0;
 
-RBRDynamicCorrectionGen3Params dynamicCorrParams;
+RBRGen3DynamicCorrectionParams dynamicCorrParams;
 
 RBRGen3Error parserSample(
     const struct RBRGen3Parser *parser,
     const struct RBRGen3Sample *const sample)
 {
     /* struct for dynamic correction */
-    RBRDynamicCorrectionGen3Error status;
-    RBRDynamicCorrectionGen3Measurement meas;
-    RBRDynamicCorrectionGen3Result      corrResult;
+    RBRGen3DynamicCorrectionError status;
+    RBRGen3DynamicCorrectionMeasurement meas;
+    RBRGen3DynamicCorrectionResult      corrResult;
     static bool firstCall = true;   /* warning: this example is not designed to be reentrant */
     /* Unused. */
     (void) parser;
@@ -85,15 +85,15 @@ RBRGen3Error parserSample(
     meas.condTemperature = sample->readings[CHANNEL_T_COND - 1];
 
     /* feed the data into the correction algorithm */
-    status = RBRDynamicCorrectionGen3_addMeasurement(&dynamicCorrParams, &meas, &corrResult);
+    status = RBRGen3DynamicCorrection_addMeasurement(&dynamicCorrParams, &meas, &corrResult);
 
     /* wait until sufficient sample feed into algorithm */
-    if ( status == RBRDYNAMICCORRECTIONGEN3_NOT_VALID_YET )
+    if ( status == RBRGEN3DYNAMICCORRECTION_NOT_VALID_YET )
     {
         return RBRGEN3_SUCCESS;
     }
 
-    if ( status != RBRDYNAMICCORRECTIONGEN3_SUCCESS )
+    if ( status != RBRGEN3DYNAMICCORRECTION_SUCCESS )
     {
         /* timestamp and sea pressure are not corrected,
          * so they should still be valid */
@@ -175,13 +175,13 @@ int main(int argc, char *argv[])
         }
     };
 
-    RBRDynamicCorrectionGen3Error dynamicCorrStatus;
-    dynamicCorrStatus = RBRDynamicCorrectionGen3_init(&dynamicCorrParams, SAMPLING_RATE, DCORR_T_DELAY, 
+    RBRGen3DynamicCorrectionError dynamicCorrStatus;
+    dynamicCorrStatus = RBRGen3DynamicCorrection_init(&dynamicCorrParams, SAMPLING_RATE, DCORR_T_DELAY, 
                                     DCORR_ALPHA_A, DCORR_ALPHA_E,
                                     DCORR_TAU_A, DCORR_TAU_E,
                                     DCORR_CT_COEFF_A, DCORR_CT_COEFF_E,
                                     DCORR_VP_MIN, DCORR_VP_MAX, DCORR_VP_FC);
-    if ( dynamicCorrStatus != RBRDYNAMICCORRECTIONGEN3_SUCCESS )
+    if ( dynamicCorrStatus != RBRGEN3DYNAMICCORRECTION_SUCCESS )
     {
         fprintf(stderr, "%s: Failed to initialize dynamic correction library: err code %u!\n",
             programName,

@@ -26,7 +26,7 @@
 #include <unistd.h>
 
 #include "posix-shared.h"
-#include "RBRDynamicCorrectionGen3.h"
+#include "RBRGen3DynamicCorrection.h"
 
 #define _AbsP_To_SeaP        10.132507
 
@@ -56,7 +56,7 @@ RBRGen3Error instrumentSample(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error streamCTD(RBRGen3 *instrument, int dynamicCorrection_channel[], bool _flagAbsP, RBRDynamicCorrectionGen3Measurement *meas)
+RBRGen3Error streamCTD(RBRGen3 *instrument, int dynamicCorrection_channel[], bool _flagAbsP, RBRGen3DynamicCorrectionMeasurement *meas)
 {
     RBRGen3Error err;
     /* if seapressure_00 channel is used, _flagAbsP will be false, isAbsolute = 0. 
@@ -96,20 +96,20 @@ RBRGen3Error streamCTD(RBRGen3 *instrument, int dynamicCorrection_channel[], boo
 
 RBRGen3Error applyCorrection(RBRGen3 *instrument, int dynamicCorrection_channel[], bool _flagAbsP, float Fs)
 {
-    RBRDynamicCorrectionGen3Params params;
-    RBRDynamicCorrectionGen3Error status;
-    RBRDynamicCorrectionGen3Measurement meas;
-    RBRDynamicCorrectionGen3Result      corrResult;
+    RBRGen3DynamicCorrectionParams params;
+    RBRGen3DynamicCorrectionError status;
+    RBRGen3DynamicCorrectionMeasurement meas;
+    RBRGen3DynamicCorrectionResult      corrResult;
 
     /* first step, initialiaze the algorithm using the proper sampling rate */
-    status = RBRDynamicCorrectionGen3_init(&params, Fs, DCORR_T_DELAY, 
+    status = RBRGen3DynamicCorrection_init(&params, Fs, DCORR_T_DELAY, 
                                     DCORR_ALPHA_A, DCORR_ALPHA_E,
                                     DCORR_TAU_A, DCORR_TAU_E,
                                     DCORR_CT_COEFF_A, DCORR_CT_COEFF_E,
                                     DCORR_VP_MIN, DCORR_VP_MAX, DCORR_VP_FC);
-    if ( status != RBRDYNAMICCORRECTIONGEN3_SUCCESS )
+    if ( status != RBRGEN3DYNAMICCORRECTION_SUCCESS )
     {
-        fprintf(stderr, "RBRDynamicCorrectionGen3_init() return error code %u\n", status);
+        fprintf(stderr, "RBRGen3DynamicCorrection_init() return error code %u\n", status);
         return RBRGEN3_UNKNOWN_ERROR;
     }
 
@@ -119,15 +119,15 @@ RBRGen3Error applyCorrection(RBRGen3 *instrument, int dynamicCorrection_channel[
         streamCTD(instrument, dynamicCorrection_channel, _flagAbsP, &meas);
         
         /* feed the data into the correction algorithm */
-        status = RBRDynamicCorrectionGen3_addMeasurement(&params, &meas, &corrResult);
+        status = RBRGen3DynamicCorrection_addMeasurement(&params, &meas, &corrResult);
 
         /* wait until sufficient sample feed into algorithm */
-        if ( status == RBRDYNAMICCORRECTIONGEN3_NOT_VALID_YET )
+        if ( status == RBRGEN3DYNAMICCORRECTION_NOT_VALID_YET )
         {
             continue;
         }
 
-        if ( status != RBRDYNAMICCORRECTIONGEN3_SUCCESS )
+        if ( status != RBRGEN3DYNAMICCORRECTION_SUCCESS )
         {
             /* timestamp and pressure, conductivity are not corrected,
             * so they should still be valid */

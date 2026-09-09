@@ -1,5 +1,5 @@
 /**
- * \file RBRDynamicCorrectionGen3.h
+ * \file RBRGen3DynamicCorrection.h
  *
  * \brief Library for salinity dynamic correction
  *
@@ -8,8 +8,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRDYNAMICCORRECTIONGEN3_H
-#define LIBRBR_RBRDYNAMICCORRECTIONGEN3_H
+#ifndef LIBRBR_RBRGEN3DYNAMICCORRECTION_H
+#define LIBRBR_RBRGEN3DYNAMICCORRECTION_H
 
 #include <stdint.h>
 
@@ -93,31 +93,31 @@
 typedef enum
 {
     /** No error. */
-    RBRDYNAMICCORRECTIONGEN3_SUCCESS = 0,
+    RBRGEN3DYNAMICCORRECTION_SUCCESS = 0,
     /** Invalid sampling rate for given parameters */
-    RBRDYNAMICCORRECTIONGEN3_INVALID_SAMPLING_RATE,
+    RBRGEN3DYNAMICCORRECTION_INVALID_SAMPLING_RATE,
     /** Insufficient data injected in function to provide a result */
-    RBRDYNAMICCORRECTIONGEN3_NOT_VALID_YET,
+    RBRGEN3DYNAMICCORRECTION_NOT_VALID_YET,
     /** Invalid correction (could be related to previous input) */
-    RBRDYNAMICCORRECTIONGEN3_CORRUPTED,
+    RBRGEN3DYNAMICCORRECTION_CORRUPTED,
     /** Invalid parameters (initialization failure) */
-    RBRDYNAMICCORRECTIONGEN3_BAD_PARAMS,
+    RBRGEN3DYNAMICCORRECTION_BAD_PARAMS,
     /** Other error */
-    RBRDYNAMICCORRECTIONGEN3_UNKNOWN_ERROR
-} RBRDynamicCorrectionGen3Error;
+    RBRGEN3DYNAMICCORRECTION_UNKNOWN_ERROR
+} RBRGen3DynamicCorrectionError;
 
-/** @struct RBRDynamicCorrectionGen3Params
+/** @struct RBRGen3DynamicCorrectionParams
  *  This is a struct
  *
- *  @var RBRDynamicCorrectionGen3Params::t_delay
+ *  @var RBRGen3DynamicCorrectionParams::t_delay
  *    time delay (sec), or C-T lag
- *  @var RBRDynamicCorrectionGen3Params::Fs
+ *  @var RBRGen3DynamicCorrectionParams::Fs
  *    sampling rate (Hz)
- *  @var RBRDynamicCorrectionGen3Params::alpha
+ *  @var RBRGen3DynamicCorrectionParams::alpha
  *    magnitude of short-term thermal mass correction
- *  @var RBRDynamicCorrectionGen3Params::tau
+ *  @var RBRGen3DynamicCorrectionParams::tau
  *    time constant of short-term thermal mass correction
- *  @var RBRDynamicCorrectionGen3Params::CT_coeff
+ *  @var RBRGen3DynamicCorrectionParams::CT_coeff
  *    magnitude of long-term thermal mass correction
  */
 typedef struct
@@ -160,20 +160,20 @@ typedef struct
     float _P_meas_lagArray[DCORR_MAX_LAG_ARRAY];
     float _T_cond_lagArray[DCORR_MAX_LAG_ARRAY];
     /// @endcond
-} RBRDynamicCorrectionGen3Params;
+} RBRGen3DynamicCorrectionParams;
 
-/** @struct RBRDynamicCorrectionGen3Measurement
+/** @struct RBRGen3DynamicCorrectionMeasurement
  *  This is a struct
  *
- *  @var RBRDynamicCorrectionGen3Measurement::timestamp
+ *  @var RBRGen3DynamicCorrectionMeasurement::timestamp
  *    Time in milliseconds
- *  @var RBRDynamicCorrectionGen3Measurement::conductivity
+ *  @var RBRGen3DynamicCorrectionMeasurement::conductivity
  *    Conductivity measurement (mS/cm)
- *  @var RBRDynamicCorrectionGen3Measurement::marineTemperature
+ *  @var RBRGen3DynamicCorrectionMeasurement::marineTemperature
  *    Marine temperature measurement (°C)
- *  @var RBRDynamicCorrectionGen3Measurement::condTemperature
+ *  @var RBRGen3DynamicCorrectionMeasurement::condTemperature
  *    Temperature of conductivity cell measurement (°C)
- *  @var RBRDynamicCorrectionGen3Measurement::pressure
+ *  @var RBRGen3DynamicCorrectionMeasurement::pressure
  *    Pressure measurement (dbar)
  */
 typedef struct
@@ -183,20 +183,20 @@ typedef struct
     float marineTemperature;  // Marine temperature measurement (°C)
     float condTemperature;    // Temperature of conductivity cell measurement (°C)
     float pressure;           // Pressure measurement (dbar)
-} RBRDynamicCorrectionGen3Measurement;
+} RBRGen3DynamicCorrectionMeasurement;
 
-/** @struct RBRDynamicCorrectionGen3Result
+/** @struct RBRGen3DynamicCorrectionResult
  *  This is a struct
  *
- *  @var RBRDynamicCorrectionGen3Result::timestamp
+ *  @var RBRGen3DynamicCorrectionResult::timestamp
  *    Time in milliseconds
- *  @var RBRDynamicCorrectionGen3Result::conductivity
+ *  @var RBRGen3DynamicCorrectionResult::conductivity
  *    Conductivity measured (mS/cm)
- *  @var RBRDynamicCorrectionGen3Result::corrTemperature
+ *  @var RBRGen3DynamicCorrectionResult::corrTemperature
  *    Corrected temperature (°C)
- *  @var RBRDynamicCorrectionGen3Result::pressure
+ *  @var RBRGen3DynamicCorrectionResult::pressure
  *    Sea pressure measurement (dbar)
- *  @var RBRDynamicCorrectionGen3Result::corrSalinity
+ *  @var RBRGen3DynamicCorrectionResult::corrSalinity
  *    Practical salinity after all corrections (corrected, unitless)
  */
 typedef struct
@@ -206,7 +206,7 @@ typedef struct
     float corrTemperature;  // Corrected temperature (°C)
     float pressure;         // Sea pressure measurement (dbar)
     float corrSalinity;     // Practical salinity after all corrections (unitless)
-} RBRDynamicCorrectionGen3Result;
+} RBRGen3DynamicCorrectionResult;
 
 /**
  * @brief Initialize the dynamic correction algorithm.
@@ -227,7 +227,7 @@ typedef struct
  * @param Vp_fc default value DCORR_VP_FC used as input
  * @return error code (0 = no error)
  */
-RBRDynamicCorrectionGen3Error RBRDynamicCorrectionGen3_init(RBRDynamicCorrectionGen3Params *params, float Fs, float t_delay,
+RBRGen3DynamicCorrectionError RBRGen3DynamicCorrection_init(RBRGen3DynamicCorrectionParams *params, float Fs, float t_delay,
                                                     float alpha_a, float alpha_e, float tau_a, float tau_e,
                                                     float ctcoeff_a, float ctcoeff_e, float Vp_min, float Vp_max,
                                                     float Vp_fc);
@@ -239,7 +239,7 @@ RBRDynamicCorrectionGen3Error RBRDynamicCorrectionGen3_init(RBRDynamicCorrection
  * @param Fs sampling rate (Samples/sec)
  * @return error code (0 = no error)
  */
-RBRDynamicCorrectionGen3Error RBRDynamicCorrectionGen3_update_Fs(RBRDynamicCorrectionGen3Params *params, float Fs);
+RBRGen3DynamicCorrectionError RBRGen3DynamicCorrection_update_Fs(RBRGen3DynamicCorrectionParams *params, float Fs);
 
 /**
  * @brief Feed a new measurement in the algorithm.
@@ -251,8 +251,8 @@ RBRDynamicCorrectionGen3Error RBRDynamicCorrectionGen3_update_Fs(RBRDynamicCorre
  * @param corrMeasOut Output corrected measurements (time aligned)
  * @return error code (0 = no error)
  */
-RBRDynamicCorrectionGen3Error RBRDynamicCorrectionGen3_addMeasurement(RBRDynamicCorrectionGen3Params *params,
-                                                              const RBRDynamicCorrectionGen3Measurement *measIn,
-                                                              RBRDynamicCorrectionGen3Result *corrMeasOut);
+RBRGen3DynamicCorrectionError RBRGen3DynamicCorrection_addMeasurement(RBRGen3DynamicCorrectionParams *params,
+                                                              const RBRGen3DynamicCorrectionMeasurement *measIn,
+                                                              RBRGen3DynamicCorrectionResult *corrMeasOut);
 
-#endif  // LIBRBR_RBRDYNAMICCORRECTIONGEN3_H
+#endif  // LIBRBR_RBRGEN3DYNAMICCORRECTION_H
