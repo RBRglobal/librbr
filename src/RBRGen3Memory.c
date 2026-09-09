@@ -807,7 +807,7 @@ RBRGen3Error RBRGen3_setPostprocessing(
         (double) postprocessing->depthMax));
 
     /* on-board dynamic correction only available for firmware 1.134 and above */
-    if ( instrument->id.fwtype == 104 && RBRInstrumentGen3Version_compare(instrument->id.version, "1.134") >= 0 )
+    if ( instrument->id.fwtype == 104 && RBRGen3Version_compare(instrument->id.version, "1.134") >= 0 )
     {
        RBR_TRY(RBRGen3_converse(
             instrument,

@@ -118,7 +118,7 @@ GEN3_OBJECTS := src/RBRGen3.o \
                 src/RBRGen3HardwareErrors.o \
                 src/RBRGen3Internal.o \
                 src/RBRGen3Memory.o \
-                src/RBRInstrumentGen3Other.o \
+                src/RBRGen3Other.o \
                 src/RBRInstrumentGen3Pauseresume.o \
                 src/RBRInstrumentGen3Schedule.o \
                 src/RBRInstrumentGen3Security.o \

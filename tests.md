@@ -53,7 +53,7 @@ TEST_LOGGER3(id)
                        "serial = 923456, fwtype = 104" COMMAND_TERMINATOR,
                        0);
     /* Get the test instrument connection to send/parse the command. */
-    RBRGen3Error err = RBRInstrumentGen3_getId(instrument, &actual);
+    RBRGen3Error err = RBRGen3_getId(instrument, &actual);
     /* Check that the command sent matches our expectation. */
     TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
     /* Check the return value. */

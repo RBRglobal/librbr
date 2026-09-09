@@ -121,7 +121,7 @@ static RBRGen3Error RBRGen3_populateGeneration(
 
     /* If this isn't an RBR instrument, it'll just time out or the response
      * won't match. */
-    RBRGen3Error err = RBRInstrumentGen3_getId(instrument, &instrument->id);
+    RBRGen3Error err = RBRGen3_getId(instrument, &instrument->id);
     if (err != RBRGEN3_SUCCESS)
     {
         return RBRGEN3_UNSUPPORTED;

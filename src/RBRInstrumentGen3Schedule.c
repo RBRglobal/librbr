@@ -369,7 +369,7 @@ RBRGen3Error RBRInstrumentGen3_getSampling(
              * firmware version 1.360 on firmware type 103. */
             if (instrument->id.fwtype == 100
                 || (instrument->id.fwtype == 103
-                    && RBRInstrumentGen3Version_compare(instrument->id.version,
+                    && RBRGen3Version_compare(instrument->id.version,
                                                     "1.360") <= 0))
             {
                 has3Hz5HzAvailable = true;

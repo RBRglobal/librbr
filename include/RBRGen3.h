@@ -281,10 +281,10 @@ const char *RBRGen3Error_name(RBRGen3Error error);
 /**
  * \brief Instrument `id` command parameters.
  *
- * Externalized from RBRInstrumentGen3Other.h to facilitate inclusion by
+ * Externalized from RBRGen3Other.h to facilitate inclusion by
  * RBRGen3.
  *
- * \see RBRInstrumentGen3_getId()
+ * \see RBRGen3_getId()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/id
  */
 typedef struct RBRGen3Id
@@ -605,7 +605,7 @@ typedef struct RBRGen3
     /**
      * \brief The instrument identifier.
      *
-     * Cached every time RBRInstrumentGen3_getId() is called.
+     * Cached every time RBRGen3_getId() is called.
      */
     struct RBRGen3Id id;
 

@@ -283,7 +283,7 @@ RBRGen3Error RBRInstrumentGen3_setOutputFormat(
     
     /* if it's caltext07, it is only available for LOGGER3 with fw 1.109 or later. */
     if (strcmp(formatName, "caltext07") == 0){
-        RBRGen3Error err = RBRInstrumentGen3_getId(instrument, &instrument->id);
+        RBRGen3Error err = RBRGen3_getId(instrument, &instrument->id);
         if (err != RBRGEN3_SUCCESS)
         {
             return RBRGEN3_UNSUPPORTED;

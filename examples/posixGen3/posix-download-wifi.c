@@ -385,7 +385,7 @@ int main(int argc, char *argv[])
         RBRGen3Generation_name(RBRGen3_getGeneration(instrument)));
 
     RBRGen3Id id;
-    RBRInstrumentGen3_getId(instrument, &id);
+    RBRGen3_getId(instrument, &id);
     printf("The instrument is an %s (fwtype %d), serial number %06d, with "
            "firmware v%s.\n",
            id.model,
@@ -393,8 +393,8 @@ int main(int argc, char *argv[])
            id.serial,
            id.version);
 
-    RBRInstrumentGen3HardwareRevision hwrev;
-    RBRInstrumentGen3_getHardwareRevision(instrument, &hwrev);
+    RBRGen3HardwareRevision hwrev;
+    RBRGen3_getHardwareRevision(instrument, &hwrev);
     printf("It's PCB rev%c, CPU rev%s, BSL v%c.\n",
            hwrev.pcb,
            hwrev.cpu,
