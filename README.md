@@ -22,7 +22,7 @@ As of version 2.0.0,
 the library contains two independent APIs,
 one per instrument generation:
 the Gen3 API
-(`RBRInstrumentGen3_…`,
+(`RBRGen3_…`,
 for Logger2/Logger3 instruments,
 the libRBR 1.x API with every identifier suffixed `Gen3`)
 and the Gen4 API

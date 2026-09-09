@@ -17,10 +17,10 @@ extern "C" {
 
 #include <RBRGen3.h>
 
-RBRGen3Error ZephyrRBRInstrumentGen3Time_get(const struct RBRGen3 *instrument,
+RBRGen3Error ZephyrRBRGen3Time_get(const struct RBRGen3 *instrument,
                                                RBRGen3DateTime *time);
 
-RBRGen3Error ZephyrRBRInstrumentGen3Time_sleep(const struct RBRGen3 *instrument,
+RBRGen3Error ZephyrRBRGen3Time_sleep(const struct RBRGen3 *instrument,
                                                  RBRGen3DateTime time);
 
 #ifdef __cplusplus

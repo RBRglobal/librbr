@@ -52,8 +52,8 @@ or passing it further up the call stack:
 
 ~~~{.c}
 RBRGen3Error err;
-RBRInstrumentGen3Foo foo;
-if ((err = RBRInstrumentGen3_foo(instrument, &foo)) != RBRGEN3_SUCCESS)
+RBRGen3Foo foo;
+if ((err = RBRGen3_foo(instrument, &foo)) != RBRGEN3_SUCCESS)
 {
     return err;
 }

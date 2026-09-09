@@ -29,7 +29,7 @@ const static struct device *instrumentUart = DEVICE_DT_GET(DT_CHOSEN(rbr_instrum
 RBRGen3 instrumentBuffer;
 RBRGen3Sample sampleBuffer;
 
-ZephyrRBRInstrumentGen3IO io;
+ZephyrRBRGen3IO io;
 
 RBRGen3Error instrumentSample(
     const struct RBRGen3 *instrument,
@@ -58,7 +58,7 @@ int main(void)
     RBRGen3Error err;
     RBRGen3 *instrument = &instrumentBuffer;
 
-    err = ZephyrRBRInstrumentGen3IO_init(&io, instrumentUart);
+    err = ZephyrRBRGen3IO_init(&io, instrumentUart);
     if (err != RBRGEN3_SUCCESS)
     {
         LOG_ERR("initializing UART: %s", RBRGen3Error_name(err));
@@ -70,10 +70,10 @@ int main(void)
             RBRGEN3_LIB_VERSION);
 
     RBRGen3Callbacks callbacks = {
-        .time = ZephyrRBRInstrumentGen3Time_get,
-        .sleep = ZephyrRBRInstrumentGen3Time_sleep,
-        .read = ZephyrRBRInstrumentGen3IO_read,
-        .write = ZephyrRBRInstrumentGen3IO_write,
+        .time = ZephyrRBRGen3Time_get,
+        .sleep = ZephyrRBRGen3Time_sleep,
+        .read = ZephyrRBRGen3IO_read,
+        .write = ZephyrRBRGen3IO_write,
         .sample = instrumentSample,
         .sampleBuffer = &sampleBuffer,
     };

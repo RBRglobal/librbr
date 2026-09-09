@@ -302,7 +302,7 @@ RBRGen3Error RBRGen3_setNewMemoryFormat(
 /**
  * \brief Functions available to aggregate channel values within bins.
  *
- * \see RBRInstrumentGen3PostprocessingChannel
+ * \see RBRGen3PostprocessingChannel
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 typedef enum RBRGen3PostprocessingAggregate
@@ -476,7 +476,7 @@ typedef struct RBRGen3Postprocessing
      * \brief Post-processing statistics channel configurations.
      *
      * Functions which receive an RBRGen3Postprocessing instance will
-     * expect the first RBRInstrumentGen3PostprocessingChannelList.count entries to
+     * expect the first RBRGen3PostprocessingChannelList.count entries to
      * be populated, and functions which return a RBRGen3Postprocessing
      * instance will similarly indicate how many entries are populated.
      */

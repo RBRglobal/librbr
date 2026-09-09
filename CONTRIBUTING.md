@@ -143,11 +143,11 @@ A short example:
  * \param [in] becauseTheyFitOnTheLine a description of the second parameter
  * \return a description of the return value
  */
-int32_t RBRInstrumentGen3_examplePrototype(RBRGen3 *instrument,
+int32_t RBRGen3_examplePrototype(RBRGen3 *instrument,
                                        int32_t theseParametersAreAligned,
                                        int32_t *becauseTheyFitOnTheLine);
 
-RBRGen3Error RBRInstrumentGen3_exampleOfAReallyLongFunctionName(
+RBRGen3Error RBRGen3_exampleOfAReallyLongFunctionName(
     RBRGen3 *instrument,
     int32_t theseParametersAreAllWrappedAndBroken,
     int32_t becauseTheyWouldPushPastTheLineLengthLimit,

@@ -65,7 +65,7 @@ RBRGen3Error RBRGen3_getLink(
  * \brief Instrument serial baud rates.
  *
  * Most of these baud rates are unsupported by the instrument, but are included
- * for sake of completeness. Call RBRInstrumentGen3_getBaudRates() to determine
+ * for sake of completeness. Call RBRGen3_getBaudRates() to determine
  * which rates are supported by a given instrument.
  *
  * \see RBRGen3Serial
@@ -360,7 +360,7 @@ RBRGen3Error RBRGen3_getWiFi(RBRGen3 *instrument,
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
- * \see RBRInstrumentGen3_getWifi()
+ * \see RBRGen3_getWifi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
 RBRGen3Error RBRGen3_setWiFi(RBRGen3 *instrument,

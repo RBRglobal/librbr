@@ -21,7 +21,7 @@ extern "C" {
 #include <RBRGen3.h>
 
 /** State for bindings from RBRGen3 callbacks to a Zephyr async UART. */
-typedef struct ZephyrRBRInstrumentGen3IO
+typedef struct ZephyrRBRGen3IO
 {
     /** The UART device. */
     const struct device *dev;
@@ -50,16 +50,16 @@ typedef struct ZephyrRBRInstrumentGen3IO
         /** Given upon write completion. */
         struct k_sem sem;
     } tx;
-} ZephyrRBRInstrumentGen3IO;
+} ZephyrRBRGen3IO;
 
-RBRGen3Error ZephyrRBRInstrumentGen3IO_init(ZephyrRBRInstrumentGen3IO *io,
+RBRGen3Error ZephyrRBRGen3IO_init(ZephyrRBRGen3IO *io,
                                               const struct device *dev);
 
-RBRGen3Error ZephyrRBRInstrumentGen3IO_read(const struct RBRGen3 *instrument,
+RBRGen3Error ZephyrRBRGen3IO_read(const struct RBRGen3 *instrument,
                                               void *data,
                                               int32_t *size);
 
-RBRGen3Error ZephyrRBRInstrumentGen3IO_write(const struct RBRGen3 *instrument,
+RBRGen3Error ZephyrRBRGen3IO_write(const struct RBRGen3 *instrument,
                                                const void *const data,
                                                int32_t size);
 

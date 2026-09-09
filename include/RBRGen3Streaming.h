@@ -523,7 +523,7 @@ typedef struct RBRGen3Sample
  * \return #RBRGEN3_SUCCESS when a streaming sample has been read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen3_fetchSample() for on-demand sample fetching
+ * \see RBRGen3_fetchSample() for on-demand sample fetching
  */
 RBRGen3Error RBRGen3_readSample(RBRGen3 *instrument);
 

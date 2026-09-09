@@ -43,7 +43,7 @@ const char *RBRGen3PauseresumeState_name(RBRGen3PauseresumeState state);
 /**
  * \brief Possible instrument pause status.
  *
- * \see RBRInstrumentGen3Pause
+ * \see RBRGen3Pause
  * \see https://docs.rbr-global.com/L3commandreference/commands/pause
  */
 typedef enum RBRGen3PauseStatus
@@ -67,7 +67,7 @@ const char *RBRGen3PauseStatus_name(
 /**
  * \brief Possible instrument resume status.
  *
- * \see RBRInstrumentGen3Resume
+ * \see RBRGen3Resume
  * \see https://docs.rbr-global.com/L3commandreference/commands/resume
  */
 typedef enum RBRGen3ResumeStatus

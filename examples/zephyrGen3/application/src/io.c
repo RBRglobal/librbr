@@ -19,7 +19,7 @@
 
 LOG_MODULE_REGISTER(io, CONFIG_IO_LOG_LEVEL);
 
-static int ZephyrRBRInstrumentGen3IO_enableRead(ZephyrRBRInstrumentGen3IO *io)
+static int ZephyrRBRGen3IO_enableRead(ZephyrRBRGen3IO *io)
 {
     return uart_rx_enable(io->dev,
                           io->rx.buf,
@@ -27,11 +27,11 @@ static int ZephyrRBRInstrumentGen3IO_enableRead(ZephyrRBRInstrumentGen3IO *io)
                           CONFIG_INSTRUMENT_INTER_CHARACTER_TIMEOUT_USEC);
 }
 
-static void ZephyrRBRInstrumentGen3IO_event(const struct device *dev,
+static void ZephyrRBRGen3IO_event(const struct device *dev,
                                         struct uart_event *event,
                                         void *userData)
 {
-    ZephyrRBRInstrumentGen3IO *io = userData;
+    ZephyrRBRGen3IO *io = userData;
 
     switch (event->type)
     {
@@ -94,12 +94,12 @@ static void ZephyrRBRInstrumentGen3IO_event(const struct device *dev,
         __fallthrough;
     case UART_RX_DISABLED:
         /* We don't expect reading to stop, but if it does, start it again. */
-        (void) ZephyrRBRInstrumentGen3IO_enableRead(io);
+        (void) ZephyrRBRGen3IO_enableRead(io);
         return;
     }
 }
 
-RBRGen3Error ZephyrRBRInstrumentGen3IO_init(ZephyrRBRInstrumentGen3IO *io,
+RBRGen3Error ZephyrRBRGen3IO_init(ZephyrRBRGen3IO *io,
                                               const struct device *dev)
 {
     memset(io, 0, sizeof(*io));
@@ -112,13 +112,13 @@ RBRGen3Error ZephyrRBRInstrumentGen3IO_init(ZephyrRBRInstrumentGen3IO *io,
     k_mutex_init(&io->tx.mut);
     k_sem_init(&io->tx.sem, 0, 1);
 
-    int err = uart_callback_set(io->dev, ZephyrRBRInstrumentGen3IO_event, io);
+    int err = uart_callback_set(io->dev, ZephyrRBRGen3IO_event, io);
     if (err != 0)
     {
         return RBRGEN3_CALLBACK_ERROR;
     }
 
-    err = ZephyrRBRInstrumentGen3IO_enableRead(io);
+    err = ZephyrRBRGen3IO_enableRead(io);
     if (err != 0)
     {
         LOG_ERR("read: starting: %s", strerror(-err));
@@ -128,10 +128,10 @@ RBRGen3Error ZephyrRBRInstrumentGen3IO_init(ZephyrRBRInstrumentGen3IO *io,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error ZephyrRBRInstrumentGen3IO_read(const struct RBRGen3 *instrument,
+RBRGen3Error ZephyrRBRGen3IO_read(const struct RBRGen3 *instrument,
                                               void *data, int32_t *size)
 {
-    ZephyrRBRInstrumentGen3IO *io = RBRGen3_getUserData(instrument);
+    ZephyrRBRGen3IO *io = RBRGen3_getUserData(instrument);
 
     k_timeout_t timeout = K_MSEC(RBRGen3_getCommandTimeout(instrument));
     k_timepoint_t deadline = sys_timepoint_calc(timeout);
@@ -195,10 +195,10 @@ done:
     }
 }
 
-RBRGen3Error ZephyrRBRInstrumentGen3IO_write(const struct RBRGen3 *instrument,
+RBRGen3Error ZephyrRBRGen3IO_write(const struct RBRGen3 *instrument,
                                                const void *const data, int32_t size)
 {
-    ZephyrRBRInstrumentGen3IO *io = RBRGen3_getUserData(instrument);
+    ZephyrRBRGen3IO *io = RBRGen3_getUserData(instrument);
 
     k_timeout_t timeout = K_MSEC(RBRGen3_getCommandTimeout(instrument));
     k_timepoint_t deadline = sys_timepoint_calc(timeout);
