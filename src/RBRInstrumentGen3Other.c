@@ -329,7 +329,7 @@ const char *RBRInstrumentGen3InternalBatteryType_name(
     }
 }
 
-const char *RBRInstrumentGen3InternalBatteryType_dispalyName(
+const char *RBRInstrumentGen3InternalBatteryType_displayName(
     RBRInstrumentGen3InternalBatteryType type)
 {
     switch (type)

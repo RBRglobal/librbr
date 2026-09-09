@@ -263,7 +263,7 @@ RBRInstrumentGen3Error RBRInstrumentGen3_getPowerInternal(
  * \see RBRInstrumentGen3_getPowerInternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
-RBRInstrumentGen3Error RBRInstrumentGen3_setInternalBatteryType(
+RBRInstrumentGen3Error RBRInstrumentGen3_setPowerInternalBatteryType(
     RBRInstrumentGen3 *instrument,
     RBRInstrumentGen3InternalBatteryType type);
 
