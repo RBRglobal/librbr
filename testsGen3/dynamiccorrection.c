@@ -16,11 +16,11 @@
 #define TEST_DYNCORR_DATASET_SIZE    7
 
 /* declaration of private functions */
-float RBRDynamicCorrection_PSS78(float C, float T, float P);
+float RBRDynamicCorrectionGen3_PSS78(float C, float T, float P);
 
-float RBRDynamicCorrection_calcAscentRate(RBRDynamicCorrectionParams *params, int64_t timestamp, float pressure);
+float RBRDynamicCorrectionGen3_calcAscentRate(RBRDynamicCorrectionGen3Params *params, int64_t timestamp, float pressure);
 
-void RBRDynamicCorrection_updateVariables(RBRDynamicCorrectionParams *params, float Vp);
+void RBRDynamicCorrectionGen3_updateVariables(RBRDynamicCorrectionGen3Params *params, float Vp);
 
 
 typedef struct Pss78Test
@@ -47,7 +47,7 @@ static bool test_verify_pss78(Pss78Test *tests)
 
     for (int i = 0; tests[i].C_value > 0.0f; i++)
     {
-        S_result = RBRDynamicCorrection_PSS78(tests[i].C_value, tests[i].T_value, tests[i].P_value);
+        S_result = RBRDynamicCorrectionGen3_PSS78(tests[i].C_value, tests[i].T_value, tests[i].P_value);
 
         TEST_ASSERT_FLOAT_EQ(tests[i].S_expected, S_result, 1e-3f);
     }
@@ -57,7 +57,7 @@ static bool test_verify_pss78(Pss78Test *tests)
 
 static bool test_verify_ascent_rate(void)
 {
-    RBRDynamicCorrectionParams params;
+    RBRDynamicCorrectionGen3Params params;
     float pressure;
     int64_t t;
     float Vp;
@@ -97,7 +97,7 @@ static bool test_verify_ascent_rate(void)
             pressure = (3000.0f - 3.0f) - 0.1f*((t-60000)/1000.0f) + noise;
         }
         
-        Vp = RBRDynamicCorrection_calcAscentRate(&params, t + 9000000, pressure);
+        Vp = RBRDynamicCorrectionGen3_calcAscentRate(&params, t + 9000000, pressure);
 
         /* since the filter is dynamic, it is difficult to make
         * a condition for each time step.  In this case, just wait until
@@ -116,24 +116,24 @@ static bool test_verify_ascent_rate(void)
 
 static bool test_verify_coeff_alpha_tau_ctcoeff(DCorrCoeffTest *tests)
 {
-    RBRDynamicCorrectionParams params;
-    RBRDynamicCorrectionError status;
+    RBRDynamicCorrectionGen3Params params;
+    RBRDynamicCorrectionGen3Error status;
     float Vp;
 
     /* using Fs = 1.0f.  This parameter is not affecting the test result */
-    status = RBRDynamicCorrection_init(&params, 1.0f, DCORR_T_DELAY, 
+    status = RBRDynamicCorrectionGen3_init(&params, 1.0f, DCORR_T_DELAY, 
                                     DCORR_ALPHA_A, DCORR_ALPHA_E,
                                     DCORR_TAU_A, DCORR_TAU_E,
                                     DCORR_CT_COEFF_A, DCORR_CT_COEFF_E,
                                     DCORR_VP_MIN, DCORR_VP_MAX, DCORR_VP_FC);
     
-    TEST_ASSERT(status == RBR_DCORR_SUCCESS);
+    TEST_ASSERT(status == RBRDYNAMICCORRECTIONGEN3_SUCCESS);
 
     for (int i = 0; tests[i].Vp > 0.0f; i++)
     {
         Vp = tests[i].Vp;
 
-        RBRDynamicCorrection_updateVariables(&params, Vp);
+        RBRDynamicCorrectionGen3_updateVariables(&params, Vp);
 
         // the data is fitted.  Check we are within 5% of value
         TEST_ASSERT_FLOAT_EQ(tests[i].alpha_expected, params.alpha, params.alpha * 5e-2f);
@@ -147,21 +147,21 @@ static bool test_verify_coeff_alpha_tau_ctcoeff(DCorrCoeffTest *tests)
 /* run the dynamic correction test */
 static bool test_dynamic_correction(float *dataset, float Fs)
 {
-    RBRDynamicCorrectionError status;
-    RBRDynamicCorrectionParams params;
-    RBRDynamicCorrectionMeasurement measIn;
-    RBRDynamicCorrectionResult corrResult;
+    RBRDynamicCorrectionGen3Error status;
+    RBRDynamicCorrectionGen3Params params;
+    RBRDynamicCorrectionGen3Measurement measIn;
+    RBRDynamicCorrectionGen3Result corrResult;
     float *datasetPtr = dataset;
     float *resultPtr = dataset;
     float target_Tcor, target_Scor;
 
-    status = RBRDynamicCorrection_init(&params, Fs, DCORR_T_DELAY, 
+    status = RBRDynamicCorrectionGen3_init(&params, Fs, DCORR_T_DELAY, 
                                     DCORR_ALPHA_A, DCORR_ALPHA_E,
                                     DCORR_TAU_A, DCORR_TAU_E,
                                     DCORR_CT_COEFF_A, DCORR_CT_COEFF_E,
                                     DCORR_VP_MIN, DCORR_VP_MAX, DCORR_VP_FC);
 
-    TEST_ASSERT_EQ(RBR_DCORR_SUCCESS, status, "%d");
+    TEST_ASSERT_EQ(RBRDYNAMICCORRECTIONGEN3_SUCCESS, status, "%d");
 
     while ( datasetPtr[0] >= 0.0f )
     {
@@ -171,9 +171,9 @@ static bool test_dynamic_correction(float *dataset, float Fs)
         measIn.pressure = datasetPtr[3];
         measIn.condTemperature = datasetPtr[4];
         
-        status = RBRDynamicCorrection_addMeasurement(&params, &measIn, &corrResult);
+        status = RBRDynamicCorrectionGen3_addMeasurement(&params, &measIn, &corrResult);
 
-        if ( status != RBR_DCORR_NOT_VALID_YET )
+        if ( status != RBRDYNAMICCORRECTIONGEN3_NOT_VALID_YET )
         {
             /* check the result */
             target_Tcor = resultPtr[5];
