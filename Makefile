@@ -123,7 +123,7 @@ GEN3_OBJECTS := src/RBRGen3.o \
                 src/RBRGen3Schedule.o \
                 src/RBRGen3Security.o \
                 src/RBRGen3Streaming.o \
-                src/RBRInstrumentGen3Vehicle.o \
+                src/RBRGen3Vehicle.o \
                 src/RBRParserGen3.o
 
 ## \brief Objects for the Gen4 (SL4/SEN4/L4) API.

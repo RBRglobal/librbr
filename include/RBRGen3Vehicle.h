@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Vehicle.h
+ * \file RBRGen3Vehicle.h
  *
  * \brief Instrument commands and structures pertaining to vehicle support.
  *
@@ -10,44 +10,44 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTGEN3VEHICLE_H
-#define LIBRBR_RBRINSTRUMENTGEN3VEHICLE_H
+#ifndef LIBRBR_RBRGEN3VEHICLE_H
+#define LIBRBR_RBRGEN3VEHICLE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /** \brief The maximum number of regimes configurable on an instrument. */
-#define RBRINSTRUMENTGEN3_REGIME_MAX 3
+#define RBRGEN3_REGIME_MAX 3
 
 /** \brief The maximum regime boundary in dbar. */
-#define RBRINSTRUMENTGEN3_REGIME_BOUNDARY_MAX 65535
+#define RBRGEN3_REGIME_BOUNDARY_MAX 65535
 
 /** \brief The maximum regime bin size in dbar. */
-#define RBRINSTRUMENTGEN3_REGIME_BINSIZE_MAX 6553.5f
+#define RBRGEN3_REGIME_BINSIZE_MAX 6553.5f
 
 /** \brief The maximum sampling period within a regime. */
-#define RBRINSTRUMENTGEN3_REGIME_SAMPLING_PERIOD_MAX 65000
+#define RBRGEN3_REGIME_SAMPLING_PERIOD_MAX 65000
 
 /**
  * \brief Whether settings apply to ascent or descent.
  *
- * \see RBRInstrumentGen3Regimes
- * \see RBRInstrumentGen3DirectionDependentSampling
+ * \see RBRGen3Regimes
+ * \see RBRGen3DirectionDependentSampling
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/ddsampling
  */
-typedef enum RBRInstrumentGen3Direction
+typedef enum RBRGen3Direction
 {
     /** The settings apply while ascending. */
-    RBRINSTRUMENTGEN3_DIRECTION_ASCENDING,
+    RBRGEN3_DIRECTION_ASCENDING,
     /** The settings apply while descending. */
-    RBRINSTRUMENTGEN3_DIRECTION_DESCENDING,
+    RBRGEN3_DIRECTION_DESCENDING,
     /** The number of specific directions. */
-    RBRINSTRUMENTGEN3_DIRECTION_COUNT,
+    RBRGEN3_DIRECTION_COUNT,
     /** An unknown or unrecognized direction. */
-    RBRINSTRUMENTGEN3_UNKNOWN_DIRECTION
-} RBRInstrumentGen3Direction;
+    RBRGEN3_UNKNOWN_DIRECTION
+} RBRGen3Direction;
 
 /**
  * \brief Get a human-readable string name for an instrument direction.
@@ -56,26 +56,26 @@ typedef enum RBRInstrumentGen3Direction
  * \return a string name for the direction
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen3Direction_name(RBRInstrumentGen3Direction direction);
+const char *RBRGen3Direction_name(RBRGen3Direction direction);
 
 /**
  * \brief The types of pressure available for use a reference for the
  * determination of the current regime and bin.
  *
- * \see RBRInstrumentGen3Regimes
+ * \see RBRGen3Regimes
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  */
-typedef enum RBRInstrumentGen3RegimesReference
+typedef enum RBRGen3RegimesReference
 {
     /** Absolute pressure is used as the reference. */
-    RBRINSTRUMENTGEN3_REFERENCE_ABSOLUTE,
+    RBRGEN3_REFERENCE_ABSOLUTE,
     /** Sea pressure is used as the reference. */
-    RBRINSTRUMENTGEN3_REFERENCE_SEAPRESSURE,
+    RBRGEN3_REFERENCE_SEAPRESSURE,
     /** The number of specific regime reference types. */
-    RBRINSTRUMENTGEN3_REFERENCE_COUNT,
+    RBRGEN3_REFERENCE_COUNT,
     /** An unknown or unrecognized regime reference type. */
-    RBRINSTRUMENTGEN3_UNKNOWN_REFERENCE
-} RBRInstrumentGen3RegimesReference;
+    RBRGEN3_UNKNOWN_REFERENCE
+} RBRGen3RegimesReference;
 
 /**
  * \brief Get a human-readable string name for a regime pressure reference.
@@ -84,20 +84,20 @@ typedef enum RBRInstrumentGen3RegimesReference
  * \return a string name for the pressure reference
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen3RegimesReference_name(
-    RBRInstrumentGen3RegimesReference reference);
+const char *RBRGen3RegimesReference_name(
+    RBRGen3RegimesReference reference);
 
 /**
  * \brief Instrument `regimes` command parameters.
  *
- * \see RBRInstrumentGen3_getRegimes()
- * \see RBRInstrumentGen3_setRegimes()
+ * \see RBRGen3_getRegimes()
+ * \see RBRGen3_setRegimes()
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  */
-typedef struct RBRInstrumentGen3Regimes
+typedef struct RBRGen3Regimes
 {
     /** \brief The regimes-relevant direction through the water column. */
-    RBRInstrumentGen3Direction direction;
+    RBRGen3Direction direction;
     /**
      * \brief The number of regimes that are set.
      *
@@ -105,8 +105,8 @@ typedef struct RBRInstrumentGen3Regimes
      */
     int32_t count;
     /** \brief The pressure type used for regime and bin determination. */
-    RBRInstrumentGen3RegimesReference reference;
-} RBRInstrumentGen3Regimes;
+    RBRGen3RegimesReference reference;
+} RBRGen3Regimes;
 
 /**
  * \brief Get the instrument regimes settings.
@@ -119,9 +119,9 @@ typedef struct RBRInstrumentGen3Regimes
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  */
-RBRGen3Error RBRInstrumentGen3_getRegimes(
+RBRGen3Error RBRGen3_getRegimes(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Regimes *regimes);
+    RBRGen3Regimes *regimes);
 
 /**
  * \brief Set the instrument regimes settings.
@@ -144,21 +144,21 @@ RBRGen3Error RBRInstrumentGen3_getRegimes(
  *                                                requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  */
-RBRGen3Error RBRInstrumentGen3_setRegimes(
+RBRGen3Error RBRGen3_setRegimes(
     RBRGen3 *instrument,
-    const RBRInstrumentGen3Regimes *regimes);
+    const RBRGen3Regimes *regimes);
 
 /** \brief A regime identifier. */
-typedef uint8_t RBRInstrumentGen3RegimeIndex;
+typedef uint8_t RBRGen3RegimeIndex;
 
 /**
  * \brief Instrument `regime` command parameters.
  *
- * \see RBRInstrumentGen3_getRegime()
- * \see RBRInstrumentGen3_setRegime()
+ * \see RBRGen3_getRegime()
+ * \see RBRGen3_setRegime()
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regime
  */
-typedef struct RBRInstrumentGen3Regime
+typedef struct RBRGen3Regime
 {
     /**
      * \brief The index of the regime in question.
@@ -168,7 +168,7 @@ typedef struct RBRInstrumentGen3Regime
      *
      * Must be in the range 1–3.
      */
-    RBRInstrumentGen3RegimeIndex index;
+    RBRGen3RegimeIndex index;
     /**
      * \brief The first boundary in a region.
      *
@@ -188,18 +188,18 @@ typedef struct RBRInstrumentGen3Regime
      * May not be greater than 65,000.
      */
     RBRGen3Period samplingPeriod;
-} RBRInstrumentGen3Regime;
+} RBRGen3Regime;
 
 /**
  * \brief Get the instrument regime settings.
  *
- * Set RBRInstrumentGen3Regime.index to indicate which regime settings are to be
+ * Set RBRGen3Regime.index to indicate which regime settings are to be
  * retrieved.
  *
  * #RBRGEN3_INVALID_PARAMETER_VALUE will be returned right away if a
  * regime index greater than 3 is requested. #RBRGEN3_HARDWARE_ERROR will
  * be returned if a regime index is given which exceeds the number of regimes
- * currently configured (RBRInstrumentGen3Regimes.count).
+ * currently configured (RBRGen3Regimes.count).
  *
  * \param [in] instrument the instrument connection
  * \param [out] regime the regime parameters
@@ -212,9 +212,9 @@ typedef struct RBRInstrumentGen3Regime
  *                                                is given
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regime
  */
-RBRGen3Error RBRInstrumentGen3_getRegime(
+RBRGen3Error RBRGen3_getRegime(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Regime *regime);
+    RBRGen3Regime *regime);
 
 /**
  * \brief Set the instrument regime settings.
@@ -235,33 +235,33 @@ RBRGen3Error RBRInstrumentGen3_getRegime(
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regime
  */
-RBRGen3Error RBRInstrumentGen3_setRegime(
+RBRGen3Error RBRGen3_setRegime(
     RBRGen3 *instrument,
-    const RBRInstrumentGen3Regime *regime);
+    const RBRGen3Regime *regime);
 
 /**
  * \brief Instrument `ddsampling` command parameters.
  *
- * \see RBRInstrumentGen3_getDirectionDependentSampling()
- * \see RBRInstrumentGen3_setDirectionDependentSampling()
+ * \see RBRGen3_getDirectionDependentSampling()
+ * \see RBRGen3_setDirectionDependentSampling()
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/ddsampling
  */
-typedef struct RBRInstrumentGen3DirectionDependentSampling
+typedef struct RBRGen3DirectionDependentSampling
 {
     /** \brief In which direction the instrument samples at the fast rate. */
-    RBRInstrumentGen3Direction direction;
+    RBRGen3Direction direction;
     /**
      * \brief The same meaning as RBRGen3Sampling.period, but applies
      * only when the instrument is moving in the preferred direction.
      *
-     * Must be shorter than RBRInstrumentGen3DirectionDependentSampling.slowPeriod.
+     * Must be shorter than RBRGen3DirectionDependentSampling.slowPeriod.
      */
     RBRGen3Period fastPeriod;
     /**
      * \brief The same meaning as RBRGen3Sampling.period, but applies
      * only when the instrument is not moving in the preferred direction.
      *
-     * Must be longer than RBRInstrumentGen3DirectionDependentSampling.fastPeriod.
+     * Must be longer than RBRGen3DirectionDependentSampling.fastPeriod.
      */
     RBRGen3Period slowPeriod;
     /**
@@ -280,7 +280,7 @@ typedef struct RBRInstrumentGen3DirectionDependentSampling
      * greater than 0.
      */
     float slowThreshold;
-} RBRInstrumentGen3DirectionDependentSampling;
+} RBRGen3DirectionDependentSampling;
 
 /**
  * \brief Get the instrument direction-dependent sampling settings.
@@ -293,9 +293,9 @@ typedef struct RBRInstrumentGen3DirectionDependentSampling
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/ddsampling
  */
-RBRGen3Error RBRInstrumentGen3_getDirectionDependentSampling(
+RBRGen3Error RBRGen3_getDirectionDependentSampling(
     RBRGen3 *instrument,
-    RBRInstrumentGen3DirectionDependentSampling *ddsampling);
+    RBRGen3DirectionDependentSampling *ddsampling);
 
 /**
  * \brief Set the instrument regime settings.
@@ -316,12 +316,12 @@ RBRGen3Error RBRInstrumentGen3_getDirectionDependentSampling(
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/ddsampling
  */
-RBRGen3Error RBRInstrumentGen3_setDirectionDependentSampling(
+RBRGen3Error RBRGen3_setDirectionDependentSampling(
     RBRGen3 *instrument,
-    RBRInstrumentGen3DirectionDependentSampling *ddsampling);
+    RBRGen3DirectionDependentSampling *ddsampling);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTGEN3VEHICLE_H */
+#endif /* LIBRBR_RBRGEN3VEHICLE_H */

@@ -130,8 +130,8 @@ typedef enum RBRGen3SamplingMode
     /**
      * Direction-dependent sampling mode.
      *
-     * \see RBRInstrumentGen3Vehicle.h
-     * \see RBRInstrumentGen3_setDirectionDependentSampling()
+     * \see RBRGen3Vehicle.h
+     * \see RBRGen3_setDirectionDependentSampling()
      */
     RBRGEN3_SAMPLING_DDSAMPLING,
     /** The number of specific sampling modes. */

@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Vehicle.c
+ * \file RBRGen3Vehicle.c
  *
  * \brief Library implementation.
  *
@@ -14,46 +14,46 @@
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
 
-const char *RBRInstrumentGen3Direction_name(RBRInstrumentGen3Direction direction)
+const char *RBRGen3Direction_name(RBRGen3Direction direction)
 {
     switch (direction)
     {
-    case RBRINSTRUMENTGEN3_DIRECTION_ASCENDING:
+    case RBRGEN3_DIRECTION_ASCENDING:
         return "ascending";
-    case RBRINSTRUMENTGEN3_DIRECTION_DESCENDING:
+    case RBRGEN3_DIRECTION_DESCENDING:
         return "descending";
-    case RBRINSTRUMENTGEN3_DIRECTION_COUNT:
+    case RBRGEN3_DIRECTION_COUNT:
         return "direction count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_DIRECTION:
+    case RBRGEN3_UNKNOWN_DIRECTION:
     default:
         return "unknown direction";
     }
 }
 
-const char *RBRInstrumentGen3RegimesReference_name(
-    RBRInstrumentGen3RegimesReference reference)
+const char *RBRGen3RegimesReference_name(
+    RBRGen3RegimesReference reference)
 {
     switch (reference)
     {
-    case RBRINSTRUMENTGEN3_REFERENCE_ABSOLUTE:
+    case RBRGEN3_REFERENCE_ABSOLUTE:
         return "absolute";
-    case RBRINSTRUMENTGEN3_REFERENCE_SEAPRESSURE:
+    case RBRGEN3_REFERENCE_SEAPRESSURE:
         return "seapressure";
-    case RBRINSTRUMENTGEN3_REFERENCE_COUNT:
+    case RBRGEN3_REFERENCE_COUNT:
         return "regimes reference count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_REFERENCE:
+    case RBRGEN3_UNKNOWN_REFERENCE:
     default:
         return "unknown regimes reference";
     }
 }
 
-RBRGen3Error RBRInstrumentGen3_getRegimes(
+RBRGen3Error RBRGen3_getRegimes(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Regimes *regimes)
+    RBRGen3Regimes *regimes)
 {
-    memset(regimes, 0, sizeof(RBRInstrumentGen3Regimes));
-    regimes->direction = RBRINSTRUMENTGEN3_UNKNOWN_DIRECTION;
-    regimes->reference = RBRINSTRUMENTGEN3_UNKNOWN_REFERENCE;
+    memset(regimes, 0, sizeof(RBRGen3Regimes));
+    regimes->direction = RBRGEN3_UNKNOWN_DIRECTION;
+    regimes->reference = RBRGEN3_UNKNOWN_REFERENCE;
 
     RBR_TRY(RBRGen3_converse(instrument, "regimes"));
 
@@ -71,9 +71,9 @@ RBRGen3Error RBRInstrumentGen3_getRegimes(
         }
         else if (strcmp(parameter.key, "direction") == 0)
         {
-            for (int i = 0; i < RBRINSTRUMENTGEN3_DIRECTION_COUNT; i++)
+            for (int i = 0; i < RBRGEN3_DIRECTION_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentGen3Direction_name(i),
+                if (strcmp(RBRGen3Direction_name(i),
                            parameter.value) == 0)
                 {
                     regimes->direction = i;
@@ -87,9 +87,9 @@ RBRGen3Error RBRInstrumentGen3_getRegimes(
         }
         else if (strcmp(parameter.key, "reference") == 0)
         {
-            for (int i = 0; i < RBRINSTRUMENTGEN3_REFERENCE_COUNT; i++)
+            for (int i = 0; i < RBRGEN3_REFERENCE_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentGen3RegimesReference_name(i),
+                if (strcmp(RBRGen3RegimesReference_name(i),
                            parameter.value) == 0)
                 {
                     regimes->reference = i;
@@ -102,16 +102,16 @@ RBRGen3Error RBRInstrumentGen3_getRegimes(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_setRegimes(
+RBRGen3Error RBRGen3_setRegimes(
     RBRGen3 *instrument,
-    const RBRInstrumentGen3Regimes *regimes)
+    const RBRGen3Regimes *regimes)
 {
     if (regimes->direction < 0
-        || regimes->direction >= RBRINSTRUMENTGEN3_DIRECTION_COUNT
+        || regimes->direction >= RBRGEN3_DIRECTION_COUNT
         || regimes->count < 1
-        || regimes->count > RBRINSTRUMENTGEN3_REGIME_MAX
+        || regimes->count > RBRGEN3_REGIME_MAX
         || regimes->reference < 0
-        || regimes->reference >= RBRINSTRUMENTGEN3_REFERENCE_COUNT)
+        || regimes->reference >= RBRGEN3_REFERENCE_COUNT)
     {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
@@ -119,23 +119,23 @@ RBRGen3Error RBRInstrumentGen3_setRegimes(
     return RBRGen3_converse(
         instrument,
         "regimes direction = %s, count = %i, reference = %s",
-        RBRInstrumentGen3Direction_name(regimes->direction),
+        RBRGen3Direction_name(regimes->direction),
         regimes->count,
-        RBRInstrumentGen3RegimesReference_name(regimes->reference));
+        RBRGen3RegimesReference_name(regimes->reference));
 }
 
-RBRGen3Error RBRInstrumentGen3_getRegime(
+RBRGen3Error RBRGen3_getRegime(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Regime *regime)
+    RBRGen3Regime *regime)
 {
-    RBRInstrumentGen3RegimeIndex index = regime->index;
+    RBRGen3RegimeIndex index = regime->index;
 
-    if (index < 1 || index > RBRINSTRUMENTGEN3_REGIME_MAX)
+    if (index < 1 || index > RBRGEN3_REGIME_MAX)
     {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    memset(regime, 0, sizeof(RBRInstrumentGen3Regime));
+    memset(regime, 0, sizeof(RBRGen3Regime));
 
     RBR_TRY(RBRGen3_converse(instrument, "regime %i", index));
 
@@ -175,18 +175,18 @@ RBRGen3Error RBRInstrumentGen3_getRegime(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_setRegime(
+RBRGen3Error RBRGen3_setRegime(
     RBRGen3 *instrument,
-    const RBRInstrumentGen3Regime *regime)
+    const RBRGen3Regime *regime)
 {
     if (regime->index < 1
-        || regime->index >= RBRINSTRUMENTGEN3_REGIME_MAX
+        || regime->index >= RBRGEN3_REGIME_MAX
         || regime->boundary < 0
-        || regime->boundary > RBRINSTRUMENTGEN3_REGIME_BOUNDARY_MAX
+        || regime->boundary > RBRGEN3_REGIME_BOUNDARY_MAX
         || regime->binSize < 0
-        || regime->binSize > RBRINSTRUMENTGEN3_REGIME_BINSIZE_MAX
+        || regime->binSize > RBRGEN3_REGIME_BINSIZE_MAX
         || regime->samplingPeriod <= 0
-        || regime->samplingPeriod > RBRINSTRUMENTGEN3_REGIME_SAMPLING_PERIOD_MAX
+        || regime->samplingPeriod > RBRGEN3_REGIME_SAMPLING_PERIOD_MAX
         || (regime->samplingPeriod >= 1000
             && regime->samplingPeriod % 1000 != 0))
     {
@@ -202,12 +202,12 @@ RBRGen3Error RBRInstrumentGen3_setRegime(
         regime->samplingPeriod);
 }
 
-RBRGen3Error RBRInstrumentGen3_getDirectionDependentSampling(
+RBRGen3Error RBRGen3_getDirectionDependentSampling(
     RBRGen3 *instrument,
-    RBRInstrumentGen3DirectionDependentSampling *ddsampling)
+    RBRGen3DirectionDependentSampling *ddsampling)
 {
-    memset(ddsampling, 0, sizeof(RBRInstrumentGen3DirectionDependentSampling));
-    ddsampling->direction = RBRINSTRUMENTGEN3_UNKNOWN_DIRECTION;
+    memset(ddsampling, 0, sizeof(RBRGen3DirectionDependentSampling));
+    ddsampling->direction = RBRGEN3_UNKNOWN_DIRECTION;
 
     RBR_TRY(RBRGen3_converse(instrument, "ddsampling"));
 
@@ -225,9 +225,9 @@ RBRGen3Error RBRInstrumentGen3_getDirectionDependentSampling(
         }
         else if (strcmp(parameter.key, "direction") == 0)
         {
-            for (int i = 0; i < RBRINSTRUMENTGEN3_DIRECTION_COUNT; i++)
+            for (int i = 0; i < RBRGEN3_DIRECTION_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentGen3Direction_name(i),
+                if (strcmp(RBRGen3Direction_name(i),
                            parameter.value) == 0)
                 {
                     ddsampling->direction = i;
@@ -256,12 +256,12 @@ RBRGen3Error RBRInstrumentGen3_getDirectionDependentSampling(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_setDirectionDependentSampling(
+RBRGen3Error RBRGen3_setDirectionDependentSampling(
     RBRGen3 *instrument,
-    RBRInstrumentGen3DirectionDependentSampling *ddsampling)
+    RBRGen3DirectionDependentSampling *ddsampling)
 {
     if (ddsampling->direction < 0
-        || ddsampling->direction >= RBRINSTRUMENTGEN3_DIRECTION_COUNT
+        || ddsampling->direction >= RBRGEN3_DIRECTION_COUNT
         || ddsampling->fastPeriod >= ddsampling->slowPeriod
         || ddsampling->fastPeriod <= 0
         || ddsampling->fastPeriod > RBRGEN3_SAMPLING_PERIOD_MAX
@@ -279,7 +279,7 @@ RBRGen3Error RBRInstrumentGen3_setDirectionDependentSampling(
         instrument,
         "ddsampling direction = %s, fastperiod = %i, slowperiod = %i, "
         "fastthreshold = %0.1f, slowthreshold = %0.1f",
-        RBRInstrumentGen3Direction_name(ddsampling->direction),
+        RBRGen3Direction_name(ddsampling->direction),
         ddsampling->fastPeriod,
         ddsampling->slowPeriod,
         (double) ddsampling->fastThreshold,
