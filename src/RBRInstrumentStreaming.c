@@ -15,7 +15,7 @@
 /* Required for snprintf. */
 #include <stdio.h>
 
-#include "RBRInstrument.h"
+#include "RBRInstrumentGen3.h"
 #include "RBRInstrumentInternal.h"
 
 #define READING_FLAG_MASK     0x00FF0000

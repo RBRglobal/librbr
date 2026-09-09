@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-#include "RBRInstrument.h"
+#include "RBRInstrumentGen3.h"
 
 #define INSTRUMENT_CHARACTER_TIMEOUT_MSEC 4000
 #define INSTRUMENT_COMMAND_TIMEOUT_MSEC 10000

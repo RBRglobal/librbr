@@ -8,7 +8,7 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#include "RBRInstrument.h"
+#include "RBRInstrumentGen3.h"
 
 const char *RBRInstrumentHardwareError_name(RBRInstrumentHardwareError error)
 {

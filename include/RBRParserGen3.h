@@ -18,7 +18,7 @@ extern "C" {
 #include <inttypes.h>
 #include <stdbool.h>
 
-#include "RBRInstrument.h"
+#include "RBRInstrumentGen3.h"
 
 /** \brief The maximum number of pieces of auxiliary data in an event. */
 #define RBRINSTRUMENT_EVENT_AUXILIARY_DATA_MAX 4

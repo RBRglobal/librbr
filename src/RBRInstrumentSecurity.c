@@ -11,7 +11,7 @@
 /* Required for strcmp. */
 #include <string.h>
 
-#include "RBRInstrument.h"
+#include "RBRInstrumentGen3.h"
 #include "RBRInstrumentInternal.h"
 
 RBRInstrumentError RBRInstrument_permit(RBRInstrument *instrument,

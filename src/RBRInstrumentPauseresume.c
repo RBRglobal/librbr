@@ -13,7 +13,7 @@
 /* Required for memset. */
 #include <string.h>
 
-#include "RBRInstrument.h"
+#include "RBRInstrumentGen3.h"
 #include "RBRInstrumentInternal.h"
 
 const char *RBRInstrumentPauseresumeState_name(RBRInstrumentPauseresumeState state)

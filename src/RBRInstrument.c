@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #endif
 
-#include "RBRInstrument.h"
+#include "RBRInstrumentGen3.h"
 #include "RBRInstrumentInternal.h"
 
 const char *RBRINSTRUMENT_LIB_NAME =

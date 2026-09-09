@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-#include <RBRInstrument.h>
+#include <RBRInstrumentGen3.h>
 
 RBRInstrumentError instrumentStart(RBRInstrument *instrument);
 

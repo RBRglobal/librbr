@@ -11,7 +11,7 @@
 /* Required for memset, strcmp. */
 #include <string.h>
 
-#include "RBRInstrument.h"
+#include "RBRInstrumentGen3.h"
 #include "RBRInstrumentInternal.h"
 
 const char *RBRInstrumentDirection_name(RBRInstrumentDirection direction)

@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <stddef.h>
 
-#include "RBRParser.h"
+#include "RBRParserGen3.h"
 /* Required for RBR_TRY. */
 #include "RBRInstrumentInternal.h"
 

@@ -24,7 +24,7 @@ extern "C" {
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "RBRInstrumentHardwareErrors.h"
+#include "RBRInstrumentGen3HardwareErrors.h"
 
 /**
  * \brief The library name.
@@ -898,7 +898,7 @@ const char *RBRInstrument_getLastHardwareErrorMessage(
 /* To help keep declarations and documentation organized and discoverable,
  * instrument commands and structures are broken out into individual
  * categorical headers. */
-#include "RBRInstrumentCommands.h"
+#include "RBRInstrumentGen3Commands.h"
 
 #ifdef __cplusplus
 }

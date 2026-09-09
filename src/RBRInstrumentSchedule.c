@@ -13,7 +13,7 @@
 /* Required for memset, strcmp. */
 #include <string.h>
 
-#include "RBRInstrument.h"
+#include "RBRInstrumentGen3.h"
 #include "RBRInstrumentInternal.h"
 
 static RBRInstrumentError RBRInstrument_getClockL2(RBRInstrument *instrument,

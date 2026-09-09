@@ -18,7 +18,7 @@ extern "C" {
 #include <zephyr/device.h>
 #include <zephyr/kernel.h>
 
-#include <RBRInstrument.h>
+#include <RBRInstrumentGen3.h>
 
 /** State for bindings from RBRInstrument callbacks to a Zephyr async UART. */
 typedef struct ZephyrRBRInstrumentIO

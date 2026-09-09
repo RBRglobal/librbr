@@ -15,7 +15,7 @@
 /* Required for strtol. */
 #include <stdlib.h>
 
-#include "RBRInstrument.h"
+#include "RBRInstrumentGen3.h"
 #include "RBRInstrumentInternal.h"
 
 const char *RBRInstrumentDataset_name(RBRInstrumentDataset dataset)

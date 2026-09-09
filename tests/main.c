@@ -11,7 +11,7 @@
 /* Required for isprint. */
 #include <ctype.h>
 
-#include "RBRInstrument.h"
+#include "RBRInstrumentGen3.h"
 #include "tests.h"
 
 char *rbr_strnesccntrl(char *destination, const char *source, size_t num)

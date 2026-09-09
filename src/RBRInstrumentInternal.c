@@ -25,9 +25,9 @@
 /* Required for gmtime, struct tm, mktime. */
 #include <time.h>
 
-#include "RBRInstrument.h"
+#include "RBRInstrumentGen3.h"
 #include "RBRInstrumentInternal.h"
-#include "RBRInstrumentMemory.h"
+#include "RBRInstrumentGen3Memory.h"
 
 /** \brief 10-second command timeout. */
 #define COMMAND_TIMEOUT (10 * 1000)

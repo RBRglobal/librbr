@@ -13,7 +13,7 @@
 /* Required for memset. */
 #include <string.h>
 
-#include "RBRInstrument.h"
+#include "RBRInstrumentGen3.h"
 #include "RBRInstrumentInternal.h"
 
 RBRInstrumentError RBRInstrument_fetch(RBRInstrument *instrument,

@@ -17,7 +17,7 @@
 /* Required for strtol. */
 #include <stdlib.h>
 
-#include "RBRInstrument.h"
+#include "RBRInstrumentGen3.h"
 #include "RBRInstrumentInternal.h"
 
 /* The minimum length of a version string. */

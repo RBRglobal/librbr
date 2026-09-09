@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-#include <RBRInstrument.h>
+#include <RBRInstrumentGen3.h>
 
 RBRInstrumentError ZephyrRBRInstrumentTime_get(const struct RBRInstrument *instrument,
                                                RBRInstrumentDateTime *time);

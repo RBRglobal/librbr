@@ -16,7 +16,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
-#include <RBRInstrument.h>
+#include <RBRInstrumentGen3.h>
 
 #include "instrument.h"
 #include "io.h"

@@ -25,9 +25,9 @@ extern "C" {
 /* Required for strcmp, strlen. */
 #include <string.h>
 
-#include "RBRInstrument.h"
-#include "RBRDynamicCorrection.h"
-#include "RBRParser.h"
+#include "RBRInstrumentGen3.h"
+#include "RBRDynamicCorrectionGen3.h"
+#include "RBRParserGen3.h"
 
 /**
  * \brief Assert that a condition is true.

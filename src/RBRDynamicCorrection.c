@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "RBRDynamicCorrection.h"
+#include "RBRDynamicCorrectionGen3.h"
 
 /* need to using C99 standard to get NAN and isnan().
  * (some alternative definition otherwise) */
