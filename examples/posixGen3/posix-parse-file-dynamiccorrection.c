@@ -57,7 +57,7 @@ RBRInstrumentGen3DateTime g_timeReference = 0;
 RBRDynamicCorrectionParams dynamicCorrParams;
 
 RBRInstrumentGen3Error parserSample(
-    const struct RBRParser *parser,
+    const struct RBRParserGen3 *parser,
     const struct RBRInstrumentGen3Sample *const sample)
 {
     /* struct for dynamic correction */
@@ -154,19 +154,19 @@ int main(int argc, char *argv[])
     printf("timestamp(s) | T_cor(°C) | P_meas(sea pressure, dbar) | S_cor(PSU) | T_cond(°C)\n");
     printf("-----------------------------------------------------------------------------------\n");
     
-    RBRParser *parser = NULL;
+    RBRParserGen3 *parser = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRParser parserSpace;
+    RBRParserGen3 parserSpace;
     parser = &parserSpace;
     #endif
 
     RBRInstrumentGen3Sample sampleBuffer;
-    RBRParserCallbacks parserCallbacks = {
+    RBRParserGen3Callbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
 
-    RBRParserConfig parserConfig = {
+    RBRParserGen3Config parserConfig = {
         .format = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
     }
 
     RBRInstrumentGen3Error err;
-    if ((err = RBRParser_init(
+    if ((err = RBRParserGen3_init(
              &parser,
              &parserCallbacks,
              &parserConfig,
@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
 
         bufSize += readSize;
         parsedSize = bufSize;
-        RBRParser_parse(parser,
+        RBRParserGen3_parse(parser,
                         RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize); //parserSample() gets called and prints the sample.
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
         memmove(buf, buf + parsedSize, bufSize);
     }
 
-    RBRParser_destroy(parser);
+    RBRParserGen3_destroy(parser);
 fileCleanup:
     close(datasetFd);
 

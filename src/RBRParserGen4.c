@@ -1,5 +1,5 @@
 /**
- * \file RBRParser.c
+ * \file RBRParserGen4.c
  *
  * \brief Library implementation.
  *

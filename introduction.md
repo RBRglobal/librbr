@@ -8,7 +8,7 @@ The library adheres
 to object-oriented design principles.
 The core context object for instrument communications
 is RBRInstrumentGen3,
-and RBRParser for dataset parsing.
+and RBRParserGen3 for dataset parsing.
 The names of method functions
 are prefixed with the name of the type
 to which they apply,
@@ -20,7 +20,7 @@ for example,
 all enum types have a corresponding “name” method
 (e.g., #RBRInstrumentGen3Error and RBRInstrumentGen3Error_name()).
 
-RBRInstrumentGen3 and RBRParser
+RBRInstrumentGen3 and RBRParserGen3
 are the only struct types which leverage
 the idea of getters and setters.
 While these are not “opaque” types,
@@ -67,7 +67,7 @@ if ((err = RBRInstrumentGen3_foo(instrument, &foo)) != RBRINSTRUMENTGEN3_SUCCESS
 The only dynamic memory allocations
 performed by the library
 occur within RBRInstrumentGen3_open()
-and RBRParser_init(),
+and RBRParserGen3_init(),
 as described in the documentation
 for those functions.
 In all other cases,

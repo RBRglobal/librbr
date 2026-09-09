@@ -1,5 +1,5 @@
 /**
- * \file RBRParser.c
+ * \file RBRParserGen3.c
  *
  * \brief Library implementation.
  *
@@ -110,9 +110,9 @@ const char *RBRInstrumentGen3EventType_name(RBRInstrumentGen3EventType type)
     }
 }
 
-RBRInstrumentGen3Error RBRParser_init(RBRParser **parser,
-                                  const RBRParserCallbacks *callbacks,
-                                  const RBRParserConfig *config,
+RBRInstrumentGen3Error RBRParserGen3_init(RBRParserGen3 **parser,
+                                  const RBRParserGen3Callbacks *callbacks,
+                                  const RBRParserGen3Config *config,
                                   void *userData)
 {
     if (callbacks == NULL
@@ -138,7 +138,7 @@ RBRInstrumentGen3Error RBRParser_init(RBRParser **parser,
     {
         allocated = true;
         #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
-        if ((*parser = malloc(sizeof(RBRParser))) == NULL)
+        if ((*parser = malloc(sizeof(RBRParserGen3))) == NULL)
         {
         #endif
             return RBRINSTRUMENTGEN3_ALLOCATION_FAILURE;
@@ -147,9 +147,9 @@ RBRInstrumentGen3Error RBRParser_init(RBRParser **parser,
         #endif
     }
 
-    memset(*parser, 0, sizeof(RBRParser));
-    memcpy(&(*parser)->config, config, sizeof(RBRParserConfig));
-    memcpy(&(*parser)->callbacks, callbacks, sizeof(RBRParserCallbacks));
+    memset(*parser, 0, sizeof(RBRParserGen3));
+    memcpy(&(*parser)->config, config, sizeof(RBRParserGen3Config));
+    memcpy(&(*parser)->callbacks, callbacks, sizeof(RBRParserGen3Callbacks));
     (*parser)->userData          = userData;
     (*parser)->managedAllocation = allocated;
 
@@ -157,7 +157,7 @@ RBRInstrumentGen3Error RBRParser_init(RBRParser **parser,
 }
 
 
-RBRInstrumentGen3Error RBRParser_destroy(RBRParser *parser)
+RBRInstrumentGen3Error RBRParserGen3_destroy(RBRParserGen3 *parser)
 {
     if (parser->managedAllocation)
     {
@@ -169,17 +169,17 @@ RBRInstrumentGen3Error RBRParser_destroy(RBRParser *parser)
     return RBRINSTRUMENTGEN3_SUCCESS;
 }
 
-void RBRParser_getConfig(const RBRParser *parser, RBRParserConfig *config)
+void RBRParserGen3_getConfig(const RBRParserGen3 *parser, RBRParserGen3Config *config)
 {
-    memcpy(config, &parser->config, sizeof(RBRParserConfig));
+    memcpy(config, &parser->config, sizeof(RBRParserGen3Config));
 }
 
-void *RBRParser_getUserData(const RBRParser *parser)
+void *RBRParserGen3_getUserData(const RBRParserGen3 *parser)
 {
     return parser->userData;
 }
 
-void RBRParser_setUserData(RBRParser *parser, void *userData)
+void RBRParserGen3_setUserData(RBRParserGen3 *parser, void *userData)
 {
     parser->userData = userData;
 }
@@ -191,8 +191,8 @@ void RBRParser_setUserData(RBRParser *parser, void *userData)
 #define EP_EVENT_TIMESTAMP_OFFSET 4
 #define EP_EVENT_PAYLOAD_OFFSET   12
 
-static RBRInstrumentGen3Error RBRParser_parseEPEvents(
-    RBRParser *parser,
+static RBRInstrumentGen3Error RBRParserGen3_parseEPEvents(
+    RBRParserGen3 *parser,
     const uint8_t *const data,
     int32_t *size)
 {
@@ -240,8 +240,8 @@ static RBRInstrumentGen3Error RBRParser_parseEPEvents(
 #define EP_SAMPLE_TIMESTAMP_SIZE ((int32_t) sizeof(RBRInstrumentGen3DateTime))
 #define EP_SAMPLE_READING_SIZE ((int32_t) sizeof(float))
 
-static RBRInstrumentGen3Error RBRParser_parseEPSamples(
-    RBRParser *parser,
+static RBRInstrumentGen3Error RBRParserGen3_parseEPSamples(
+    RBRParserGen3 *parser,
     const uint8_t *const data,
     int32_t *size)
 {
@@ -282,7 +282,7 @@ static RBRInstrumentGen3Error RBRParser_parseEPSamples(
     return RBRINSTRUMENTGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error RBRParser_parse(RBRParser *parser,
+RBRInstrumentGen3Error RBRParserGen3_parse(RBRParserGen3 *parser,
                                    RBRInstrumentGen3Dataset dataset,
                                    const void *const data,
                                    int32_t *size)
@@ -292,9 +292,9 @@ RBRInstrumentGen3Error RBRParser_parse(RBRParser *parser,
     switch (dataset)
     {
     case RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS:
-        return RBRParser_parseEPEvents(parser, d, size);
+        return RBRParserGen3_parseEPEvents(parser, d, size);
     case RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA:
-        return RBRParser_parseEPSamples(parser, d, size);
+        return RBRParserGen3_parseEPSamples(parser, d, size);
     case RBRINSTRUMENTGEN3_DATASET_EASYPARSE_DEPLOYMENT_HEADER:
     default:
         return RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE;

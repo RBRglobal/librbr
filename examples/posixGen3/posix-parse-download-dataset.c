@@ -27,7 +27,7 @@
 #include "RBRParserGen3.h"
 
 RBRInstrumentGen3Error parserSample(
-    const struct RBRParser *parser,
+    const struct RBRParserGen3 *parser,
     const struct RBRInstrumentGen3Sample *const sample)
 {
     (void) parser;
@@ -132,15 +132,15 @@ int main(int argc, char *argv[])
         channels.minimumPeriod = 480;
     }
 
-    RBRParser *parser = NULL;
+    RBRParserGen3 *parser = NULL;
 
     RBRInstrumentGen3Sample sampleBuffer;
-    RBRParserCallbacks parserCallbacks = {
+    RBRParserGen3Callbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
 
-    RBRParserConfig parserConfig = {
+    RBRParserGen3Config parserConfig = {
         .format = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
         }
     };
 
-    if ((err = RBRParser_init(
+    if ((err = RBRParserGen3_init(
              &parser,
              &parserCallbacks,
              &parserConfig,
@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
 
         bufSize += data.size;
         parsedSize = bufSize;
-        RBRParser_parse(parser,
+        RBRParserGen3_parse(parser,
                         RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize);

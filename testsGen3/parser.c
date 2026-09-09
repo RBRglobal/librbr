@@ -28,7 +28,7 @@ TEST_PARSER(event, two_channels)
                         "\x00\x00\x00";
     int32_t size = sizeof(data) - 1;
 
-    RBRInstrumentGen3Error err = RBRParser_parse(
+    RBRInstrumentGen3Error err = RBRParserGen3_parse(
         parser,
         RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS,
         data,
@@ -55,7 +55,7 @@ TEST_PARSER(event_with_auxiliary_data, two_channels)
                         "\x03\x00\x00";
     int32_t size = sizeof(data) - 1;
 
-    RBRInstrumentGen3Error err = RBRParser_parse(
+    RBRInstrumentGen3Error err = RBRParserGen3_parse(
         parser,
         RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS,
         data,
@@ -86,7 +86,7 @@ TEST_PARSER(events, two_channels)
                         "\x00\x00\x00\x00\x00\x00";
     int32_t size = sizeof(data) - 1;
 
-    RBRInstrumentGen3Error err = RBRParser_parse(
+    RBRInstrumentGen3Error err = RBRParserGen3_parse(
         parser,
         RBRINSTRUMENTGEN3_DATASET_EASYPARSE_EVENTS,
         data,
@@ -158,7 +158,7 @@ TEST_PARSER(samples, two_channels)
         }
     };
 
-    RBRInstrumentGen3Error err = RBRParser_parse(
+    RBRInstrumentGen3Error err = RBRParserGen3_parse(
         parser,
         RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
         data,

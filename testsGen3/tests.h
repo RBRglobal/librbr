@@ -331,7 +331,7 @@ extern InstrumentTest instrumentTests[];
  *
  * \param [in] cfg the name of the configuration
  */
-#define TEST_PARSER_CONFIG(cfg) const RBRParserConfig test_##cfg##_parser_config
+#define TEST_PARSER_CONFIG(cfg) const RBRParserGen3Config test_##cfg##_parser_config
 
 /**
  * \brief Declare a parser test function.
@@ -341,7 +341,7 @@ extern InstrumentTest instrumentTests[];
  */
 /* *INDENT-OFF* */
 #define TEST_PARSER(fn, cfg) bool test_##fn##_parser( \
-    RBRParser *parser, \
+    RBRParserGen3 *parser, \
     TestParserBuffers *buffers)
 /* *INDENT-ON* */
 
@@ -367,7 +367,7 @@ typedef struct TestParserBuffers
  * \param buffers the parser result buffers
  * \return whether the test passed
  */
-typedef bool (ParserTestFunction)(RBRParser *parser,
+typedef bool (ParserTestFunction)(RBRParserGen3 *parser,
                                   TestParserBuffers *buffers);
 
 /**
@@ -380,7 +380,7 @@ typedef struct ParserTest
     /** \brief The name of the test. */
     const char *name;
     /** \brief The parser configuration. */
-    const RBRParserConfig *config;
+    const RBRParserGen3Config *config;
     /** \brief The test to be run. */
     ParserTestFunction *function;
 } ParserTest;

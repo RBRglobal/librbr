@@ -173,11 +173,11 @@ RBRInstrumentGen3Error TestIOBuffers_sample(
 }
 
 RBRInstrumentGen3Error TestParserBuffers_sample(
-    const struct RBRParser *parser,
+    const struct RBRParserGen3 *parser,
     const struct RBRInstrumentGen3Sample *const sample)
 {
     TestParserBuffers *buffers;
-    buffers = (TestParserBuffers *) RBRParser_getUserData(parser);
+    buffers = (TestParserBuffers *) RBRParserGen3_getUserData(parser);
     if (buffers->samplesLength >= TESTPARSERBUFFERS_SAMPLES_MAX)
     {
         return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
@@ -189,11 +189,11 @@ RBRInstrumentGen3Error TestParserBuffers_sample(
 }
 
 RBRInstrumentGen3Error TestParserBuffers_event(
-    const struct RBRParser *parser,
+    const struct RBRParserGen3 *parser,
     const struct RBRInstrumentGen3Event *const event)
 {
     TestParserBuffers *buffers;
-    buffers = (TestParserBuffers *) RBRParser_getUserData(parser);
+    buffers = (TestParserBuffers *) RBRParserGen3_getUserData(parser);
     if (buffers->eventsLength >= TESTPARSERBUFFERS_EVENTS_MAX)
     {
         return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
@@ -324,15 +324,15 @@ int main(int argc, char *argv[])
     TestParserBuffers parserBuffers;
     RBRInstrumentGen3Sample parserSample;
     RBRInstrumentGen3Event parserEvent;
-    RBRParserCallbacks parserCallbacks = {
+    RBRParserGen3Callbacks parserCallbacks = {
         .sample = TestParserBuffers_sample,
         .sampleBuffer = &parserSample,
         .event = TestParserBuffers_event,
         .eventBuffer = &parserEvent
     };
 
-    RBRParser parserBuffer;
-    RBRParser *parser = &parserBuffer;
+    RBRParserGen3 parserBuffer;
+    RBRParserGen3 *parser = &parserBuffer;
 
     printf("Running tests...\n");
     int success = EXIT_SUCCESS;
@@ -373,7 +373,7 @@ int main(int argc, char *argv[])
 
         memset(&parserBuffers, 0, sizeof(TestParserBuffers));
 
-        err = RBRParser_init(&parser,
+        err = RBRParserGen3_init(&parser,
                              &parserCallbacks,
                              parserTests[i].config,
                              &parserBuffers);
@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
             success = EXIT_FAILURE;
         }
 
-        RBRParser_destroy(parser);
+        RBRParserGen3_destroy(parser);
     }
 
     printf("Tests completed (%" PRIi32 "/%" PRIi32 " passed).\n",

@@ -246,7 +246,7 @@ testsGen3/tests.c: $(foreach module,$(GEN3_TEST_MODULES),testsGen3/$(module).c)
 	@echo "};" >>$@
 
 	@grep -ho 'TEST_PARSER_CONFIG([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_PARSER_CONFIG(\([^,]*\))/extern const RBRParserConfig test_\1_parser_config;/' \
+		| sed -e 's/^TEST_PARSER_CONFIG(\([^,]*\))/extern const RBRParserGen3Config test_\1_parser_config;/' \
 		>>$@
 
 	@echo "ParserTest parserTests[] = {" >>$@
