@@ -213,16 +213,16 @@ int main(int argc, char *argv[])
         goto fileCleanup;
     }
 
-    RBRInstrumentGen3Link link;
-    RBRInstrumentGen3_getLink(instrument, &link);
+    RBRGen3Link link;
+    RBRGen3_getLink(instrument, &link);
 
     switch (link)
     {
-    case RBRINSTRUMENTGEN3_LINK_USB:
+    case RBRGEN3_LINK_USB:
         RBRInstrumentGen3_setUSBStreamingState(instrument, true);
         break;
-    case RBRINSTRUMENTGEN3_LINK_SERIAL:
-    case RBRINSTRUMENTGEN3_LINK_WIFI:
+    case RBRGEN3_LINK_SERIAL:
+    case RBRGEN3_LINK_WIFI:
         RBRInstrumentGen3_setSerialStreamingState(instrument, true);
         break;
     default:

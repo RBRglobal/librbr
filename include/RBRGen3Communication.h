@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Communication.h
+ * \file RBRGen3Communication.h
  *
  * \brief Instrument commands and structures pertaining to the communication
  * interfaces of the instrument.
@@ -11,8 +11,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTGEN3COMMUNICATION_H
-#define LIBRBR_RBRINSTRUMENTGEN3COMMUNICATION_H
+#ifndef LIBRBR_RBRGEN3COMMUNICATION_H
+#define LIBRBR_RBRGEN3COMMUNICATION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,22 +21,22 @@ extern "C" {
 /**
  * \brief Instrument link types.
  *
- * \see RBRInstrumentGen3_getLink()
+ * \see RBRGen3_getLink()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/link
  */
-typedef enum RBRInstrumentGen3Link
+typedef enum RBRGen3Link
 {
     /** USB CDC connectivity. */
-    RBRINSTRUMENTGEN3_LINK_USB,
+    RBRGEN3_LINK_USB,
     /** Serial connectivity. */
-    RBRINSTRUMENTGEN3_LINK_SERIAL,
+    RBRGEN3_LINK_SERIAL,
     /** Wi-Fi connectivity. */
-    RBRINSTRUMENTGEN3_LINK_WIFI,
+    RBRGEN3_LINK_WIFI,
     /** The number of specific link types. */
-    RBRINSTRUMENTGEN3_LINK_COUNT,
+    RBRGEN3_LINK_COUNT,
     /** An unknown or unrecognized link type. */
-    RBRINSTRUMENTGEN3_UNKNOWN_LINK
-} RBRInstrumentGen3Link;
+    RBRGEN3_UNKNOWN_LINK
+} RBRGen3Link;
 
 /**
  * \brief Get a human-readable string name for a communication link.
@@ -45,7 +45,7 @@ typedef enum RBRInstrumentGen3Link
  * \return a string name for the communication link
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen3Link_name(RBRInstrumentGen3Link link);
+const char *RBRGen3Link_name(RBRGen3Link link);
 
 /**
  * \brief Get the type of connectivity for the instrument connection.
@@ -57,9 +57,9 @@ const char *RBRInstrumentGen3Link_name(RBRInstrumentGen3Link link);
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/link
  */
-RBRGen3Error RBRInstrumentGen3_getLink(
+RBRGen3Error RBRGen3_getLink(
     RBRGen3 *instrument,
-    RBRInstrumentGen3Link *link);
+    RBRGen3Link *link);
 
 /**
  * \brief Instrument serial baud rates.
@@ -68,46 +68,46 @@ RBRGen3Error RBRInstrumentGen3_getLink(
  * for sake of completeness. Call RBRInstrumentGen3_getBaudRates() to determine
  * which rates are supported by a given instrument.
  *
- * \see RBRInstrumentGen3Serial
- * \see RBRInstrumentGen3_getSerial()
- * \see RBRInstrumentGen3_setSerial()
+ * \see RBRGen3Serial
+ * \see RBRGen3_getSerial()
+ * \see RBRGen3_setSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-typedef enum RBRInstrumentGen3SerialBaudRate
+typedef enum RBRGen3SerialBaudRate
 {
     /** None */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_NONE   =       0,
+    RBRGEN3_SERIAL_BAUD_NONE   =       0,
     /** 300 Bd */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_300    = 1 <<  0,
+    RBRGEN3_SERIAL_BAUD_300    = 1 <<  0,
     /** 600 Bd */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_600    = 1 <<  1,
+    RBRGEN3_SERIAL_BAUD_600    = 1 <<  1,
     /** 1,200 Bd */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_1200   = 1 <<  2,
+    RBRGEN3_SERIAL_BAUD_1200   = 1 <<  2,
     /** 2,400 Bd */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_2400   = 1 <<  3,
+    RBRGEN3_SERIAL_BAUD_2400   = 1 <<  3,
     /** 4,800 Bd */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_4800   = 1 <<  4,
+    RBRGEN3_SERIAL_BAUD_4800   = 1 <<  4,
     /** 9,600 Bd */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_9600   = 1 <<  5,
+    RBRGEN3_SERIAL_BAUD_9600   = 1 <<  5,
     /** 19,200 Bd */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_19200  = 1 <<  6,
+    RBRGEN3_SERIAL_BAUD_19200  = 1 <<  6,
     /** 28,800 Bd */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_28800  = 1 <<  7,
+    RBRGEN3_SERIAL_BAUD_28800  = 1 <<  7,
     /** 38,400 Bd */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_38400  = 1 <<  8,
+    RBRGEN3_SERIAL_BAUD_38400  = 1 <<  8,
     /** 57,600 Bd */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_57600  = 1 <<  9,
+    RBRGEN3_SERIAL_BAUD_57600  = 1 <<  9,
     /** 115,200 Bd */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_115200 = 1 << 10,
+    RBRGEN3_SERIAL_BAUD_115200 = 1 << 10,
     /** 230,400 Bd */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_230400 = 1 << 11,
+    RBRGEN3_SERIAL_BAUD_230400 = 1 << 11,
     /** 460,800 Bd */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_460800 = 1 << 12,
+    RBRGEN3_SERIAL_BAUD_460800 = 1 << 12,
     /** 921,600 Bd */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_921600 = 1 << 13,
+    RBRGEN3_SERIAL_BAUD_921600 = 1 << 13,
     /** Corresponds to the largest baud rate enum value. */
-    RBRINSTRUMENTGEN3_SERIAL_BAUD_MAX    = RBRINSTRUMENTGEN3_SERIAL_BAUD_921600
-} RBRInstrumentGen3SerialBaudRate;
+    RBRGEN3_SERIAL_BAUD_MAX    = RBRGEN3_SERIAL_BAUD_921600
+} RBRGen3SerialBaudRate;
 
 /**
  * \brief Get a human-readable string name for a baud rate.
@@ -116,7 +116,7 @@ typedef enum RBRInstrumentGen3SerialBaudRate
  * \return a string name for the baud rate
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen3SerialBaudRate_name(RBRInstrumentGen3SerialBaudRate baud);
+const char *RBRGen3SerialBaudRate_name(RBRGen3SerialBaudRate baud);
 
 /**
  * \brief Instrument serial modes.
@@ -124,28 +124,28 @@ const char *RBRInstrumentGen3SerialBaudRate_name(RBRInstrumentGen3SerialBaudRate
  * All modes are 8N1, use no flow control, and are full-duplex unless otherwise
  * noted.
  *
- * \see RBRInstrumentGen3Serial
- * \see RBRInstrumentGen3_getSerial()
- * \see RBRInstrumentGen3_setSerial()
+ * \see RBRGen3Serial
+ * \see RBRGen3_getSerial()
+ * \see RBRGen3_setSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-typedef enum RBRInstrumentGen3SerialMode
+typedef enum RBRGen3SerialMode
 {
     /** No serial mode */
-    RBRINSTRUMENTGEN3_SERIAL_MODE_NONE          =      0,
+    RBRGEN3_SERIAL_MODE_NONE          =      0,
     /** RS-232/EIA-232/TIA-232. */
-    RBRINSTRUMENTGEN3_SERIAL_MODE_RS232         = 1 << 0,
+    RBRGEN3_SERIAL_MODE_RS232         = 1 << 0,
     /** RS-485/EIA-485/TIA-485. */
-    RBRINSTRUMENTGEN3_SERIAL_MODE_RS485F        = 1 << 1,
+    RBRGEN3_SERIAL_MODE_RS485F        = 1 << 1,
     /** RS-485/EIA-485/TIA-485 (half-duplex). Unimplemented by the logger. */
-    RBRINSTRUMENTGEN3_SERIAL_MODE_RS485H        = 1 << 2,
+    RBRGEN3_SERIAL_MODE_RS485H        = 1 << 2,
     /** 0-3.3V logic, idle high. */
-    RBRINSTRUMENTGEN3_SERIAL_MODE_UART          = 1 << 3,
+    RBRGEN3_SERIAL_MODE_UART          = 1 << 3,
     /** 0-3.3V logic, idle low. */
-    RBRINSTRUMENTGEN3_SERIAL_MODE_UART_IDLE_LOW = 1 << 4,
+    RBRGEN3_SERIAL_MODE_UART_IDLE_LOW = 1 << 4,
     /** Corresponds to the largest UART mode enum value. */
-    RBRINSTRUMENTGEN3_SERIAL_MODE_MAX = RBRINSTRUMENTGEN3_SERIAL_MODE_UART_IDLE_LOW
-} RBRInstrumentGen3SerialMode;
+    RBRGEN3_SERIAL_MODE_MAX = RBRGEN3_SERIAL_MODE_UART_IDLE_LOW
+} RBRGen3SerialMode;
 
 /**
  * \brief Get a human-readable string name for a serial mode.
@@ -154,50 +154,50 @@ typedef enum RBRInstrumentGen3SerialMode
  * \return a string name for the serial mode
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen3SerialMode_name(RBRInstrumentGen3SerialMode mode);
+const char *RBRGen3SerialMode_name(RBRGen3SerialMode mode);
 
 /**
  * \brief Instrument `serial` command parameters.
  *
- * \see RBRInstrumentGen3_getSerial()
- * \see RBRInstrumentGen3_setSerial()
+ * \see RBRGen3_getSerial()
+ * \see RBRGen3_setSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-typedef struct RBRInstrumentGen3Serial
+typedef struct RBRGen3Serial
 {
     /** \brief The baud rate of the instrument. */
-    RBRInstrumentGen3SerialBaudRate baudRate;
+    RBRGen3SerialBaudRate baudRate;
     /** \brief The serial mode of the instrument. */
-    RBRInstrumentGen3SerialMode mode;
+    RBRGen3SerialMode mode;
     /**
      * \brief Serial baud rates which the instrument can use.
      *
      * Treated as a bit field representation of available baud rates as defined
-     * by RBRInstrumentGen3SerialBaudRate. For details, consult
+     * by RBRGen3SerialBaudRate. For details, consult
      * [Working with Bit Fields](bitfields.md).
      *
      * \readonly
      *
      * The `serial availablebaudrates` command does not exist on Logger2
-     * instruments. RBRInstrumentGen3_getSerial() will populate this field with the
+     * instruments. RBRGen3_getSerial() will populate this field with the
      * baud rates supported by all Logger2 instruments.
      */
-    const RBRInstrumentGen3SerialBaudRate availableBaudRates;
+    const RBRGen3SerialBaudRate availableBaudRates;
     /**
      * \brief Serial modes which the instrument can use.
      *
      * Treated as a bit field representation of available modes as defined by
-     * RBRInstrumentGen3SerialMode. For details, consult
+     * RBRGen3SerialMode. For details, consult
      * [Working with Bit Fields](bitfields.md).
      *
      * \readonly
      *
      * The `serial availablemodes` command does not exist on Logger2
-     * instruments. RBRInstrumentGen3_getSerial() will populate this field with the
+     * instruments. RBRGen3_getSerial() will populate this field with the
      * baud rates supported by all Logger2 instruments.
      */
-    const RBRInstrumentGen3SerialMode availableModes;
-} RBRInstrumentGen3Serial;
+    const RBRGen3SerialMode availableModes;
+} RBRGen3Serial;
 
 /**
  * \brief Retrieve the current and available serial baud rates and modes.
@@ -207,18 +207,18 @@ typedef struct RBRInstrumentGen3Serial
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen3_setSerial()
+ * \see RBRGen3_setSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-RBRGen3Error RBRInstrumentGen3_getSerial(RBRGen3 *instrument,
-                                           RBRInstrumentGen3Serial *serial);
+RBRGen3Error RBRGen3_getSerial(RBRGen3 *instrument,
+                                           RBRGen3Serial *serial);
 
 /**
  * \brief Reconfigure the instrument serial baud rate and mode.
  *
  * A hardware error will occur if the baud rate or mode is unsupported by the
- * instrument. See RBRInstrumentGen3Serial.availableBaudRates and
- * RBRInstrumentGen3Serial.availableSerialModes to determine supported
+ * instrument. See RBRGen3Serial.availableBaudRates and
+ * RBRGen3Serial.availableSerialModes to determine supported
  * rates/modes.
  *
  * The new serial mode and/or baud rate will take effect immediately after the
@@ -232,11 +232,11 @@ RBRGen3Error RBRInstrumentGen3_getSerial(RBRGen3 *instrument,
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when a value is not supported
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the baud/mode is invalid
- * \see RBRInstrumentGen3_getSerial()
+ * \see RBRGen3_getSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-RBRGen3Error RBRInstrumentGen3_setSerial(RBRGen3 *instrument,
-                                           const RBRInstrumentGen3Serial *serial);
+RBRGen3Error RBRGen3_setSerial(RBRGen3 *instrument,
+                                           const RBRGen3Serial *serial);
 
 /**
  * \brief Immediately shut down communications and implement any possible
@@ -247,26 +247,26 @@ RBRGen3Error RBRInstrumentGen3_setSerial(RBRGen3 *instrument,
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/sleep
  */
-RBRGen3Error RBRInstrumentGen3_sleep(RBRGen3 *instrument);
+RBRGen3Error RBRGen3_sleep(RBRGen3 *instrument);
 
 /**
  * \brief The state of the Wi-Fi connection.
  *
- * \see RBRInstrumentGen3WiFi
+ * \see RBRGen3WiFi
  */
-typedef enum RBRInstrumentGen3WiFiState
+typedef enum RBRGen3WiFiState
 {
     /** \brief The Wi-Fi connection is disabled. */
-    RBRINSTRUMENTGEN3_WIFI_NA,
+    RBRGEN3_WIFI_NA,
     /** \brief The Wi-Fi radio is powered up and ready to communicate. */
-    RBRINSTRUMENTGEN3_WIFI_ON,
+    RBRGEN3_WIFI_ON,
     /** \brief The Wi-Fi radio is powered down. */
-    RBRINSTRUMENTGEN3_WIFI_OFF,
+    RBRGEN3_WIFI_OFF,
     /** The number of specific states. */
-    RBRINSTRUMENTGEN3_WIFI_COUNT,
+    RBRGEN3_WIFI_COUNT,
     /** An unknown or unrecognized state. */
-    RBRINSTRUMENTGEN3_UNKNOWN_WIFI
-} RBRInstrumentGen3WiFiState;
+    RBRGEN3_UNKNOWN_WIFI
+} RBRGen3WiFiState;
 
 /**
  * \brief Get a human-readable string name for a Wi-Fi connection state.
@@ -275,16 +275,16 @@ typedef enum RBRInstrumentGen3WiFiState
  * \return a string name for the Wi-Fi connection state
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen3WiFiState_name(RBRInstrumentGen3WiFiState state);
+const char *RBRGen3WiFiState_name(RBRGen3WiFiState state);
 
 /**
  * \brief Instrument `wifi` command parameters.
  *
- * \see RBRInstrumentGen3_getWiFi()
- * \see RBRInstrumentGen3_setWiFi()
+ * \see RBRGen3_getWiFi()
+ * \see RBRGen3_setWiFi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-typedef struct RBRInstrumentGen3WiFi
+typedef struct RBRGen3WiFi
 {
     /**
      * \brief Enables or disables Wi-Fi connectivity.
@@ -297,9 +297,9 @@ typedef struct RBRInstrumentGen3WiFi
      *
      * \readonly
      *
-     * \nol2 Will be retrieved as #RBRINSTRUMENTGEN3_UNKNOWN_WIFI.
+     * \nol2 Will be retrieved as #RBRGEN3_UNKNOWN_WIFI.
      */
-    const RBRInstrumentGen3WiFiState state;
+    const RBRGen3WiFiState state;
     /**
      * \brief How long the instrument will wait for a valid command after
      * first powering up the Wi-Fi radio before powering it back down.
@@ -322,10 +322,10 @@ typedef struct RBRInstrumentGen3WiFi
      *
      * \readonly
      *
-     * \nol2 Will be retrieved as #RBRINSTRUMENTGEN3_SERIAL_BAUD_NONE.
+     * \nol2 Will be retrieved as #RBRGEN3_SERIAL_BAUD_NONE.
      */
-    const RBRInstrumentGen3SerialBaudRate baudRate;
-} RBRInstrumentGen3WiFi;
+    const RBRGen3SerialBaudRate baudRate;
+} RBRGen3WiFi;
 
 /**
  * \brief Retrieve the current instrument Wi-Fi settings.
@@ -336,20 +336,20 @@ typedef struct RBRInstrumentGen3WiFi
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
- * \see RBRInstrumentGen3_setWiFi()
+ * \see RBRGen3_setWiFi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-RBRGen3Error RBRInstrumentGen3_getWiFi(RBRGen3 *instrument,
-                                         RBRInstrumentGen3WiFi *wifi);
+RBRGen3Error RBRGen3_getWiFi(RBRGen3 *instrument,
+                                         RBRGen3WiFi *wifi);
 
 /**
  * \brief Reconfigure the instrument Wi-Fi settings.
  *
- * For Logger3 instruments, this sends the values of RBRInstrumentGen3WiFi.enabled,
- * RBRInstrumentGen3WiFi.powerTimeout, and RBRInstrumentGen3WiFi.commandTimeout. For
+ * For Logger3 instruments, this sends the values of RBRGen3WiFi.enabled,
+ * RBRGen3WiFi.powerTimeout, and RBRGen3WiFi.commandTimeout. For
  * Logger2 instruments, this sends only the values of
- * RBRInstrumentGen3WiFi.powerTimeout and RBRInstrumentGen3WiFi.commandTimeout as the
- * RBRInstrumentGen3WiFi.enabled parameter does not exist for that generation of
+ * RBRGen3WiFi.powerTimeout and RBRGen3WiFi.commandTimeout as the
+ * RBRGen3WiFi.enabled parameter does not exist for that generation of
  * instruments.
  *
  * \param [in] instrument the instrument connection
@@ -363,11 +363,11 @@ RBRGen3Error RBRInstrumentGen3_getWiFi(RBRGen3 *instrument,
  * \see RBRInstrumentGen3_getWifi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-RBRGen3Error RBRInstrumentGen3_setWiFi(RBRGen3 *instrument,
-                                         const RBRInstrumentGen3WiFi *wifi);
+RBRGen3Error RBRGen3_setWiFi(RBRGen3 *instrument,
+                                         const RBRGen3WiFi *wifi);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTGEN3COMMUNICATION_H */
+#endif /* LIBRBR_RBRGEN3COMMUNICATION_H */

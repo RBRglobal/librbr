@@ -22,7 +22,7 @@ extern "C" {
 #include "RBRInstrumentGen3Streaming.h"
 #include "RBRInstrumentGen3Deployment.h"
 #include "RBRInstrumentGen3Memory.h"
-#include "RBRInstrumentGen3Communication.h"
+#include "RBRGen3Communication.h"
 #include "RBRInstrumentGen3Other.h"
 #include "RBRInstrumentGen3Fetching.h"
 #include "RBRInstrumentGen3Security.h"

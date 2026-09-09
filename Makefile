@@ -110,7 +110,7 @@ lib: bin/libRBR.a
 
 ## \brief Objects for the Gen3 (Logger2/Logger3) API.
 GEN3_OBJECTS := src/RBRGen3.o \
-                src/RBRInstrumentGen3Communication.o \
+                src/RBRGen3Communication.o \
                 src/RBRInstrumentGen3Configuration.o \
                 src/RBRInstrumentGen3Deployment.o \
                 src/RBRInstrumentGen3Fetching.o \

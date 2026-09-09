@@ -108,24 +108,24 @@ int main(int argc, char *argv[])
         goto fileCleanup;
     }
 
-    RBRInstrumentGen3Link link;
-    RBRInstrumentGen3_getLink(instrument, &link);
+    RBRGen3Link link;
+    RBRGen3_getLink(instrument, &link);
     printf("Connected to the instrument via %s.\n",
-           RBRInstrumentGen3Link_name(link));
+           RBRGen3Link_name(link));
 
     switch (link)
     {
-    case RBRINSTRUMENTGEN3_LINK_USB:
+    case RBRGEN3_LINK_USB:
         RBRInstrumentGen3_setUSBStreamingState(instrument, true);
         break;
-    case RBRINSTRUMENTGEN3_LINK_SERIAL:
-    case RBRINSTRUMENTGEN3_LINK_WIFI:
+    case RBRGEN3_LINK_SERIAL:
+    case RBRGEN3_LINK_WIFI:
         {
-            RBRInstrumentGen3Serial serial;
-            RBRInstrumentGen3_getSerial(instrument, &serial);
+            RBRGen3Serial serial;
+            RBRGen3_getSerial(instrument, &serial);
             printf("Connected in %s mode at %s baud.\n",
-                   RBRInstrumentGen3SerialMode_name(serial.mode),
-                   RBRInstrumentGen3SerialBaudRate_name(serial.baudRate));
+                   RBRGen3SerialMode_name(serial.mode),
+                   RBRGen3SerialBaudRate_name(serial.baudRate));
 
             RBRInstrumentGen3_setSerialStreamingState(instrument, true);
             break;

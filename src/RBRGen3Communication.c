@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Communication.c
+ * \file RBRGen3Communication.c
  *
  * \brief Library implementation.
  *
@@ -14,28 +14,28 @@
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
 
-const char *RBRInstrumentGen3Link_name(RBRInstrumentGen3Link link)
+const char *RBRGen3Link_name(RBRGen3Link link)
 {
     switch (link)
     {
-    case RBRINSTRUMENTGEN3_LINK_USB:
+    case RBRGEN3_LINK_USB:
         return "usb";
-    case RBRINSTRUMENTGEN3_LINK_SERIAL:
+    case RBRGEN3_LINK_SERIAL:
         return "serial";
-    case RBRINSTRUMENTGEN3_LINK_WIFI:
+    case RBRGEN3_LINK_WIFI:
         return "wifi";
-    case RBRINSTRUMENTGEN3_LINK_COUNT:
+    case RBRGEN3_LINK_COUNT:
         return "link count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_LINK:
+    case RBRGEN3_UNKNOWN_LINK:
     default:
         return "unknown link";
     }
 }
 
-RBRGen3Error RBRInstrumentGen3_getLink(RBRGen3 *instrument,
-                                         RBRInstrumentGen3Link *link)
+RBRGen3Error RBRGen3_getLink(RBRGen3 *instrument,
+                                         RBRGen3Link *link)
 {
-    *link = RBRINSTRUMENTGEN3_UNKNOWN_LINK;
+    *link = RBRGEN3_UNKNOWN_LINK;
 
     RBR_TRY(RBRGen3_converse(instrument, "link"));
 
@@ -54,9 +54,9 @@ RBRGen3Error RBRInstrumentGen3_getLink(RBRGen3 *instrument,
         else if (strcmp(parameter.key, "link") == 0
                  || strcmp(parameter.key, "type") == 0)
         {
-            for (int i = 0; i < RBRINSTRUMENTGEN3_LINK_COUNT; i++)
+            for (int i = 0; i < RBRGEN3_LINK_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentGen3Link_name(i),
+                if (strcmp(RBRGen3Link_name(i),
                            parameter.value) == 0)
                 {
                     *link = i;
@@ -69,95 +69,95 @@ RBRGen3Error RBRInstrumentGen3_getLink(RBRGen3 *instrument,
     return RBRGEN3_SUCCESS;
 }
 
-const char *RBRInstrumentGen3SerialBaudRate_name(RBRInstrumentGen3SerialBaudRate baud)
+const char *RBRGen3SerialBaudRate_name(RBRGen3SerialBaudRate baud)
 {
     switch (baud)
     {
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_NONE:
+    case RBRGEN3_SERIAL_BAUD_NONE:
         return "none";
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_300:
+    case RBRGEN3_SERIAL_BAUD_300:
         return "300";
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_600:
+    case RBRGEN3_SERIAL_BAUD_600:
         return "600";
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_1200:
+    case RBRGEN3_SERIAL_BAUD_1200:
         return "1200";
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_2400:
+    case RBRGEN3_SERIAL_BAUD_2400:
         return "2400";
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_4800:
+    case RBRGEN3_SERIAL_BAUD_4800:
         return "4800";
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_9600:
+    case RBRGEN3_SERIAL_BAUD_9600:
         return "9600";
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_19200:
+    case RBRGEN3_SERIAL_BAUD_19200:
         return "19200";
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_28800:
+    case RBRGEN3_SERIAL_BAUD_28800:
         return "28800";
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_38400:
+    case RBRGEN3_SERIAL_BAUD_38400:
         return "38400";
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_57600:
+    case RBRGEN3_SERIAL_BAUD_57600:
         return "57600";
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_115200:
+    case RBRGEN3_SERIAL_BAUD_115200:
         return "115200";
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_230400:
+    case RBRGEN3_SERIAL_BAUD_230400:
         return "230400";
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_460800:
+    case RBRGEN3_SERIAL_BAUD_460800:
         return "460800";
-    case RBRINSTRUMENTGEN3_SERIAL_BAUD_921600:
+    case RBRGEN3_SERIAL_BAUD_921600:
         return "921600";
     default:
         return "unknown baud";
     }
 }
 
-const char *RBRInstrumentGen3SerialMode_name(RBRInstrumentGen3SerialMode mode)
+const char *RBRGen3SerialMode_name(RBRGen3SerialMode mode)
 {
     switch (mode)
     {
-    case RBRINSTRUMENTGEN3_SERIAL_MODE_NONE:
+    case RBRGEN3_SERIAL_MODE_NONE:
         return "none";
-    case RBRINSTRUMENTGEN3_SERIAL_MODE_RS232:
+    case RBRGEN3_SERIAL_MODE_RS232:
         return "rs232";
-    case RBRINSTRUMENTGEN3_SERIAL_MODE_RS485F:
+    case RBRGEN3_SERIAL_MODE_RS485F:
         return "rs485f";
-    case RBRINSTRUMENTGEN3_SERIAL_MODE_RS485H:
+    case RBRGEN3_SERIAL_MODE_RS485H:
         return "rs485h";
-    case RBRINSTRUMENTGEN3_SERIAL_MODE_UART:
+    case RBRGEN3_SERIAL_MODE_UART:
         return "uart";
-    case RBRINSTRUMENTGEN3_SERIAL_MODE_UART_IDLE_LOW:
+    case RBRGEN3_SERIAL_MODE_UART_IDLE_LOW:
         return "uart_idlelow";
     default:
         return "unknown serial mode";
     }
 }
 
-RBRGen3Error RBRInstrumentGen3_getSerial(RBRGen3 *instrument,
-                                           RBRInstrumentGen3Serial *serial)
+RBRGen3Error RBRGen3_getSerial(RBRGen3 *instrument,
+                                           RBRGen3Serial *serial)
 {
-    memset(serial, 0, sizeof(RBRInstrumentGen3Serial));
+    memset(serial, 0, sizeof(RBRGen3Serial));
 
-    RBRInstrumentGen3SerialBaudRate *availableBaudRates =
-        (RBRInstrumentGen3SerialBaudRate *) &serial->availableBaudRates;
-    RBRInstrumentGen3SerialMode *availableModes =
-        (RBRInstrumentGen3SerialMode *) &serial->availableModes;
+    RBRGen3SerialBaudRate *availableBaudRates =
+        (RBRGen3SerialBaudRate *) &serial->availableBaudRates;
+    RBRGen3SerialMode *availableModes =
+        (RBRGen3SerialMode *) &serial->availableModes;
 
     if (instrument->generation == RBRGEN3_LOGGER2)
     {
-        *availableBaudRates = RBRINSTRUMENTGEN3_SERIAL_BAUD_1200
-                              | RBRINSTRUMENTGEN3_SERIAL_BAUD_2400
-                              | RBRINSTRUMENTGEN3_SERIAL_BAUD_4800
-                              | RBRINSTRUMENTGEN3_SERIAL_BAUD_9600
-                              | RBRINSTRUMENTGEN3_SERIAL_BAUD_19200
-                              | RBRINSTRUMENTGEN3_SERIAL_BAUD_115200;
-        *availableModes = RBRINSTRUMENTGEN3_SERIAL_MODE_RS232
-                          | RBRINSTRUMENTGEN3_SERIAL_MODE_RS485F
-                          | RBRINSTRUMENTGEN3_SERIAL_MODE_UART
-                          | RBRINSTRUMENTGEN3_SERIAL_MODE_UART_IDLE_LOW;
+        *availableBaudRates = RBRGEN3_SERIAL_BAUD_1200
+                              | RBRGEN3_SERIAL_BAUD_2400
+                              | RBRGEN3_SERIAL_BAUD_4800
+                              | RBRGEN3_SERIAL_BAUD_9600
+                              | RBRGEN3_SERIAL_BAUD_19200
+                              | RBRGEN3_SERIAL_BAUD_115200;
+        *availableModes = RBRGEN3_SERIAL_MODE_RS232
+                          | RBRGEN3_SERIAL_MODE_RS485F
+                          | RBRGEN3_SERIAL_MODE_UART
+                          | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW;
 
         RBR_TRY(RBRGen3_converse(instrument, "serial"));
     }
     else
     {
-        *availableBaudRates = RBRINSTRUMENTGEN3_SERIAL_BAUD_NONE;
-        *availableModes = RBRINSTRUMENTGEN3_SERIAL_MODE_NONE;
+        *availableBaudRates = RBRGEN3_SERIAL_BAUD_NONE;
+        *availableModes = RBRGEN3_SERIAL_MODE_NONE;
 
         RBR_TRY(RBRGen3_converse(instrument, "serial all"));
     }
@@ -176,11 +176,11 @@ RBRGen3Error RBRInstrumentGen3_getSerial(RBRGen3 *instrument,
         }
         else if (strcmp(parameter.key, "baudrate") == 0)
         {
-            for (int i = RBRINSTRUMENTGEN3_SERIAL_BAUD_NONE + 1;
-                 i <= RBRINSTRUMENTGEN3_SERIAL_BAUD_MAX;
+            for (int i = RBRGEN3_SERIAL_BAUD_NONE + 1;
+                 i <= RBRGEN3_SERIAL_BAUD_MAX;
                  i <<= 1)
             {
-                if (strcmp(RBRInstrumentGen3SerialBaudRate_name(i),
+                if (strcmp(RBRGen3SerialBaudRate_name(i),
                            parameter.value) == 0)
                 {
                     serial->baudRate = i;
@@ -190,11 +190,11 @@ RBRGen3Error RBRInstrumentGen3_getSerial(RBRGen3 *instrument,
         }
         else if (strcmp(parameter.key, "mode") == 0)
         {
-            for (int i = RBRINSTRUMENTGEN3_SERIAL_MODE_NONE + 1;
-                 i <= RBRINSTRUMENTGEN3_SERIAL_MODE_MAX;
+            for (int i = RBRGEN3_SERIAL_MODE_NONE + 1;
+                 i <= RBRGEN3_SERIAL_MODE_MAX;
                  i <<= 1)
             {
-                if (strcmp(RBRInstrumentGen3SerialMode_name(i),
+                if (strcmp(RBRGen3SerialMode_name(i),
                            parameter.value) == 0)
                 {
                     serial->mode = i;
@@ -213,11 +213,11 @@ RBRGen3Error RBRInstrumentGen3_getSerial(RBRGen3 *instrument,
                     nextValue++;
                 }
 
-                for (int i = RBRINSTRUMENTGEN3_SERIAL_BAUD_NONE + 1;
-                     i <= RBRINSTRUMENTGEN3_SERIAL_BAUD_MAX;
+                for (int i = RBRGEN3_SERIAL_BAUD_NONE + 1;
+                     i <= RBRGEN3_SERIAL_BAUD_MAX;
                      i <<= 1)
                 {
-                    if (strcmp(RBRInstrumentGen3SerialBaudRate_name(i),
+                    if (strcmp(RBRGen3SerialBaudRate_name(i),
                                parameter.value) == 0)
                     {
                         *availableBaudRates |= i;
@@ -238,11 +238,11 @@ RBRGen3Error RBRInstrumentGen3_getSerial(RBRGen3 *instrument,
                     nextValue++;
                 }
 
-                for (int i = RBRINSTRUMENTGEN3_SERIAL_MODE_NONE + 1;
-                     i <= RBRINSTRUMENTGEN3_SERIAL_MODE_MAX;
+                for (int i = RBRGEN3_SERIAL_MODE_NONE + 1;
+                     i <= RBRGEN3_SERIAL_MODE_MAX;
                      i <<= 1)
                 {
-                    if (strcmp(RBRInstrumentGen3SerialMode_name(i),
+                    if (strcmp(RBRGen3SerialMode_name(i),
                                parameter.value) == 0)
                     {
                         *availableModes |= i;
@@ -257,13 +257,13 @@ RBRGen3Error RBRInstrumentGen3_getSerial(RBRGen3 *instrument,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_setSerial(RBRGen3 *instrument,
-                                           const RBRInstrumentGen3Serial *serial)
+RBRGen3Error RBRGen3_setSerial(RBRGen3 *instrument,
+                                           const RBRGen3Serial *serial)
 {
     if (serial->baudRate < 0
-        || serial->baudRate > RBRINSTRUMENTGEN3_SERIAL_BAUD_MAX
+        || serial->baudRate > RBRGEN3_SERIAL_BAUD_MAX
         || serial->mode < 0
-        || serial->mode > RBRINSTRUMENTGEN3_SERIAL_MODE_MAX)
+        || serial->mode > RBRGEN3_SERIAL_MODE_MAX)
     {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
@@ -271,11 +271,11 @@ RBRGen3Error RBRInstrumentGen3_setSerial(RBRGen3 *instrument,
     return RBRGen3_converse(
         instrument,
         "serial baudrate = %s, mode = %s",
-        RBRInstrumentGen3SerialBaudRate_name(serial->baudRate),
-        RBRInstrumentGen3SerialMode_name(serial->mode));
+        RBRGen3SerialBaudRate_name(serial->baudRate),
+        RBRGen3SerialMode_name(serial->mode));
 }
 
-RBRGen3Error RBRInstrumentGen3_sleep(RBRGen3 *instrument)
+RBRGen3Error RBRGen3_sleep(RBRGen3 *instrument)
 {
     RBR_TRY(RBRGen3_sendCommand(instrument, "sleep"));
 
@@ -283,32 +283,32 @@ RBRGen3Error RBRInstrumentGen3_sleep(RBRGen3 *instrument)
     return RBRGEN3_SUCCESS;
 }
 
-const char *RBRInstrumentGen3WiFiState_name(RBRInstrumentGen3WiFiState state)
+const char *RBRGen3WiFiState_name(RBRGen3WiFiState state)
 {
     switch (state)
     {
-    case RBRINSTRUMENTGEN3_WIFI_NA:
+    case RBRGEN3_WIFI_NA:
         return "n/a";
-    case RBRINSTRUMENTGEN3_WIFI_ON:
+    case RBRGEN3_WIFI_ON:
         return "on";
-    case RBRINSTRUMENTGEN3_WIFI_OFF:
+    case RBRGEN3_WIFI_OFF:
         return "off";
-    case RBRINSTRUMENTGEN3_WIFI_COUNT:
+    case RBRGEN3_WIFI_COUNT:
         return "state count";
-    case RBRINSTRUMENTGEN3_UNKNOWN_WIFI:
+    case RBRGEN3_UNKNOWN_WIFI:
     default:
         return "unknown state";
     }
 }
 
-RBRGen3Error RBRInstrumentGen3_getWiFi(RBRGen3 *instrument,
-                                         RBRInstrumentGen3WiFi *wifi)
+RBRGen3Error RBRGen3_getWiFi(RBRGen3 *instrument,
+                                         RBRGen3WiFi *wifi)
 {
-    memset(wifi, 0, sizeof(RBRInstrumentGen3WiFi));
+    memset(wifi, 0, sizeof(RBRGen3WiFi));
 
-    RBRInstrumentGen3WiFiState *state =
-        (RBRInstrumentGen3WiFiState *) &wifi->state;
-    *state = RBRINSTRUMENTGEN3_UNKNOWN_WIFI;
+    RBRGen3WiFiState *state =
+        (RBRGen3WiFiState *) &wifi->state;
+    *state = RBRGEN3_UNKNOWN_WIFI;
 
     RBR_TRY(RBRGen3_converse(instrument, "wifi"));
 
@@ -330,11 +330,11 @@ RBRGen3Error RBRInstrumentGen3_getWiFi(RBRGen3 *instrument,
         }
         else if (strcmp(parameter.key, "state") == 0)
         {
-            for (int i = RBRINSTRUMENTGEN3_WIFI_NA;
-                 i < RBRINSTRUMENTGEN3_WIFI_COUNT;
+            for (int i = RBRGEN3_WIFI_NA;
+                 i < RBRGEN3_WIFI_COUNT;
                  i++)
             {
-                if (strcmp(RBRInstrumentGen3WiFiState_name(i),
+                if (strcmp(RBRGen3WiFiState_name(i),
                            parameter.value) == 0)
                 {
                     *state = i;
@@ -352,14 +352,14 @@ RBRGen3Error RBRInstrumentGen3_getWiFi(RBRGen3 *instrument,
         }
         else if (strcmp(parameter.key, "baudrate") == 0)
         {
-            for (int i = RBRINSTRUMENTGEN3_SERIAL_BAUD_NONE + 1;
-                 i <= RBRINSTRUMENTGEN3_SERIAL_BAUD_MAX;
+            for (int i = RBRGEN3_SERIAL_BAUD_NONE + 1;
+                 i <= RBRGEN3_SERIAL_BAUD_MAX;
                  i <<= 1)
             {
-                if (strcmp(RBRInstrumentGen3SerialBaudRate_name(i),
+                if (strcmp(RBRGen3SerialBaudRate_name(i),
                            parameter.value) == 0)
                 {
-                    *(RBRInstrumentGen3SerialBaudRate *) &wifi->baudRate = i;
+                    *(RBRGen3SerialBaudRate *) &wifi->baudRate = i;
                     break;
                 }
             }
@@ -369,8 +369,8 @@ RBRGen3Error RBRInstrumentGen3_getWiFi(RBRGen3 *instrument,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_setWiFi(RBRGen3 *instrument,
-                                         const RBRInstrumentGen3WiFi *wifi)
+RBRGen3Error RBRGen3_setWiFi(RBRGen3 *instrument,
+                                         const RBRGen3WiFi *wifi)
 {
     if (wifi->powerTimeout < 5000
         || wifi->powerTimeout > 600000

@@ -90,23 +90,23 @@ int main(void)
         return 0;
     }
 
-    RBRInstrumentGen3Link link;
-    RBRInstrumentGen3_getLink(instrument, &link);
-    LOG_INF("connected via %s", RBRInstrumentGen3Link_name(link));
+    RBRGen3Link link;
+    RBRGen3_getLink(instrument, &link);
+    LOG_INF("connected via %s", RBRGen3Link_name(link));
 
     switch (link)
     {
-    case RBRINSTRUMENTGEN3_LINK_USB:
+    case RBRGEN3_LINK_USB:
         RBRInstrumentGen3_setUSBStreamingState(instrument, true);
         break;
-    case RBRINSTRUMENTGEN3_LINK_SERIAL:
-    case RBRINSTRUMENTGEN3_LINK_WIFI:
+    case RBRGEN3_LINK_SERIAL:
+    case RBRGEN3_LINK_WIFI:
         {
-            RBRInstrumentGen3Serial serial;
-            RBRInstrumentGen3_getSerial(instrument, &serial);
+            RBRGen3Serial serial;
+            RBRGen3_getSerial(instrument, &serial);
             LOG_INF("connected in %s mode at %s baud",
-                    RBRInstrumentGen3SerialMode_name(serial.mode),
-                    RBRInstrumentGen3SerialBaudRate_name(serial.baudRate));
+                    RBRGen3SerialMode_name(serial.mode),
+                    RBRGen3SerialBaudRate_name(serial.baudRate));
 
             RBRInstrumentGen3_setSerialStreamingState(instrument, true);
             break;
