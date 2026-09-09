@@ -95,17 +95,17 @@
 typedef enum RBRDynamicCorrectionGen4Error
 {
     /** No error. */
-    RBR_DCORR_SUCCESS = 0,
+    RBRDYNAMICCORRECTIONGEN4_SUCCESS = 0,
     /** Invalid sampling rate for given parameters */
-    RBR_DCORR_INVALID_SAMPLING_RATE,
+    RBRDYNAMICCORRECTIONGEN4_INVALID_SAMPLING_RATE,
     /** Insufficient data injected in function to provide a result */
-    RBR_DCORR_NOT_VALID_YET,
+    RBRDYNAMICCORRECTIONGEN4_NOT_VALID_YET,
     /** Invalid correction (could be related to previous input) */
-    DYN_CORR_CORRUPTED,
+    RBRDYNAMICCORRECTIONGEN4_CORRUPTED,
     /** Invalid parameters (initialization failure) */
-    DYN_CORR_BAD_PARAMS,
+    RBRDYNAMICCORRECTIONGEN4_BAD_PARAMS,
     /** Other error */
-    DYN_CORR_UNKNOWN_ERROR
+    RBRDYNAMICCORRECTIONGEN4_UNKNOWN_ERROR
 } RBRDynamicCorrectionGen4Error;
 
 /** \brief RBRDynamicCorrectionGen4Params
