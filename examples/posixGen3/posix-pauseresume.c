@@ -110,13 +110,13 @@ int main(int argc, char *argv[])
     }
 
 /* Get pauseresume state and report error (if any) according to response. */
-    RBRInstrumentGen3PauseresumeState state;
-    state = RBRINSTRUMENTGEN3_UNKNOWN_PAUSERESUME;
+    RBRGen3PauseresumeState state;
+    state = RBRGEN3_UNKNOWN_PAUSERESUME;
     /* pauseStatus will be used to decide if needs to proceed with "resume". */
-    RBRInstrumentGen3PauseStatus pauseStatus;
-    pauseStatus = RBRINSTRUMENTGEN3_UNKNOWN_PAUSE;
+    RBRGen3PauseStatus pauseStatus;
+    pauseStatus = RBRGEN3_UNKNOWN_PAUSE;
 
-    if((err = RBRInstrumentGen3_getPauseresume(instrument, &state)) != RBRGEN3_SUCCESS){
+    if((err = RBRGen3_getPauseresume(instrument, &state)) != RBRGEN3_SUCCESS){
         /* if this isn't an RBR instrument, or if the firmware in use doesn't support pauseresume.*/
         fprintf(stderr, "%s: Feature not supported: %s! \n", programName, RBRGen3Error_name(err));
         status = EXIT_FAILURE;
@@ -124,33 +124,33 @@ int main(int argc, char *argv[])
         goto fileCleanup;
     };
 
-    const char *stateName = RBRInstrumentGen3PauseresumeState_name(state);
+    const char *stateName = RBRGen3PauseresumeState_name(state);
     printf("pauseresume state=%s\n", stateName);
 
     /* code below: print out human-readable errors. */
-    if(state == RBRINSTRUMENTGEN3_PAUSERESUME_NA){
+    if(state == RBRGEN3_PAUSERESUME_NA){
         printf("(Either the deployment has not been enabled, or the sampling mode is 'regimes'," 
                     " or more than one gating condition is enabled.)\n");
     }
 
     /* Proceeds with command 'pause' in this case. */
-    else if(state == RBRINSTRUMENTGEN3_PAUSERESUME_RUNNING){
-        err = RBRInstrumentGen3_pause(instrument, &pauseStatus);
-        const char *statusName = RBRInstrumentGen3PauseStatus_name(pauseStatus);
+    else if(state == RBRGEN3_PAUSERESUME_RUNNING){
+        err = RBRGen3_pause(instrument, &pauseStatus);
+        const char *statusName = RBRGen3PauseStatus_name(pauseStatus);
         printf("pause status=%s\n", statusName);
-        if(pauseStatus == RBRINSTRUMENTGEN3_UNKNOWN_PAUSE){
+        if(pauseStatus == RBRGEN3_UNKNOWN_PAUSE){
             fprintf(stderr, "E%d %s\n", instrument->response.error, instrument->response.response);
         }
     }
 
     /* Proceeds with command 'resume' in this case. */
-    if(state == RBRINSTRUMENTGEN3_PAUSERESUME_PAUSED || pauseStatus == RBRINSTRUMENTGEN3_PAUSE_PAUSED){
-        RBRInstrumentGen3ResumeStatus resumeStatus;
-        resumeStatus = RBRINSTRUMENTGEN3_UNKNOWN_RESUME;
-        err = RBRInstrumentGen3_resume(instrument, &resumeStatus);
-        const char *statusName = RBRInstrumentGen3ResumeStatus_name(resumeStatus);
+    if(state == RBRGEN3_PAUSERESUME_PAUSED || pauseStatus == RBRGEN3_PAUSE_PAUSED){
+        RBRGen3ResumeStatus resumeStatus;
+        resumeStatus = RBRGEN3_UNKNOWN_RESUME;
+        err = RBRGen3_resume(instrument, &resumeStatus);
+        const char *statusName = RBRGen3ResumeStatus_name(resumeStatus);
         printf("resume status=%s\n", statusName);
-        if(resumeStatus == RBRINSTRUMENTGEN3_UNKNOWN_RESUME){
+        if(resumeStatus == RBRGEN3_UNKNOWN_RESUME){
             fprintf(stderr, "E%d %s\n", instrument->response.error, instrument->response.response);
         }
     }

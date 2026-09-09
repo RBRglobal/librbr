@@ -26,7 +26,7 @@ extern "C" {
 #include "RBRGen3Other.h"
 #include "RBRGen3Fetching.h"
 #include "RBRInstrumentGen3Security.h"
-#include "RBRInstrumentGen3Pauseresume.h"
+#include "RBRGen3Pauseresume.h"
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Pauseresume.c
+ * \file RBRGen3Pauseresume.c
  *
  * \brief Library implementation.
  *
@@ -16,56 +16,56 @@
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
 
-const char *RBRInstrumentGen3PauseresumeState_name(RBRInstrumentGen3PauseresumeState state)
+const char *RBRGen3PauseresumeState_name(RBRGen3PauseresumeState state)
 {
     switch (state)
     {
     /* Either the deployment has not been enabled or the samling mode is 'regimes' */
-    case RBRINSTRUMENTGEN3_PAUSERESUME_NA:
+    case RBRGEN3_PAUSERESUME_NA:
         return "n/a";
     /* The deployment has been enabled and is paused */
-    case RBRINSTRUMENTGEN3_PAUSERESUME_PAUSED:
+    case RBRGEN3_PAUSERESUME_PAUSED:
         return "paused";
     /* The deployment has been enabled and is not paused */
-    case RBRINSTRUMENTGEN3_PAUSERESUME_RUNNING:
+    case RBRGEN3_PAUSERESUME_RUNNING:
         return "running";
     /* The feature is not allowed on this instrument */
-    case RBRINSTRUMENTGEN3_UNKNOWN_PAUSERESUME:
+    case RBRGEN3_UNKNOWN_PAUSERESUME:
     default:
         return "unknown pauseresume state";
     }
 }
 
-const char *RBRInstrumentGen3PauseStatus_name(RBRInstrumentGen3PauseStatus status)
+const char *RBRGen3PauseStatus_name(RBRGen3PauseStatus status)
 {
     switch (status)
     {
-    case RBRINSTRUMENTGEN3_PAUSE_PAUSED:
+    case RBRGEN3_PAUSE_PAUSED:
         return "paused";
-    case RBRINSTRUMENTGEN3_UNKNOWN_PAUSE:
+    case RBRGEN3_UNKNOWN_PAUSE:
     default:
         return "unknown pause status";
     }
 }
 
-const char *RBRInstrumentGen3ResumeStatus_name(RBRInstrumentGen3ResumeStatus status)
+const char *RBRGen3ResumeStatus_name(RBRGen3ResumeStatus status)
 {
     switch (status)
     {
-    case RBRINSTRUMENTGEN3_RESUME_PENDING:
+    case RBRGEN3_RESUME_PENDING:
         return "pending";
-    case RBRINSTRUMENTGEN3_RESUME_LOGGING:
+    case RBRGEN3_RESUME_LOGGING:
         return "logging";
-    case RBRINSTRUMENTGEN3_UNKNOWN_RESUME:
+    case RBRGEN3_UNKNOWN_RESUME:
     default:
         return "unknown resume status";
     }
 }
 
-RBRGen3Error RBRInstrumentGen3_getPauseresume(RBRGen3 *instrument,
-                                                RBRInstrumentGen3PauseresumeState *state)
+RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *instrument,
+                                                RBRGen3PauseresumeState *state)
 {
-    /** To be safe, make *state = RBRINSTRUMENTGEN3_UNKNOWN_PAUSERESUME
+    /** To be safe, make *state = RBRGEN3_UNKNOWN_PAUSERESUME
      *  before using this function.
      */
     RBR_TRY(RBRGen3_converse(instrument, "pauseresume"));
@@ -77,10 +77,10 @@ RBRGen3Error RBRInstrumentGen3_getPauseresume(RBRGen3 *instrument,
 
     if (strcmp(parameter.key, "state") == 0)
     {
-        for (int i = RBRINSTRUMENTGEN3_PAUSERESUME_NA; i < RBRINSTRUMENTGEN3_UNKNOWN_PAUSERESUME; i++)
+        for (int i = RBRGEN3_PAUSERESUME_NA; i < RBRGEN3_UNKNOWN_PAUSERESUME; i++)
         {
-            /* refer to RBRInstrumentGen3PauseresumeState_name */
-            if (strcmp(RBRInstrumentGen3PauseresumeState_name(i), parameter.value) == 0)
+            /* refer to RBRGen3PauseresumeState_name */
+            if (strcmp(RBRGen3PauseresumeState_name(i), parameter.value) == 0)
             {
                 *state = i;
                 return RBRGEN3_SUCCESS;
@@ -96,20 +96,20 @@ RBRGen3Error RBRInstrumentGen3_getPauseresume(RBRGen3 *instrument,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_pause(RBRGen3 *instrument,
-                                       RBRInstrumentGen3PauseStatus *status)
+RBRGen3Error RBRGen3_pause(RBRGen3 *instrument,
+                                       RBRGen3PauseStatus *status)
 {
     RBR_TRY(RBRGen3_converse(instrument, "pause"));
 
-    *status = RBRINSTRUMENTGEN3_UNKNOWN_PAUSE;
+    *status = RBRGEN3_UNKNOWN_PAUSE;
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     RBRGen3_parseResponse(instrument, &command, &parameter);
     if (strcmp(parameter.key, "status") == 0)
     {
-        int i = RBRINSTRUMENTGEN3_PAUSE_PAUSED;
-        /* refer to RBRInstrumentGen3PauseStatus_name */
-        if (strcmp(RBRInstrumentGen3PauseStatus_name(i), parameter.value) == 0)
+        int i = RBRGEN3_PAUSE_PAUSED;
+        /* refer to RBRGen3PauseStatus_name */
+        if (strcmp(RBRGen3PauseStatus_name(i), parameter.value) == 0)
         {
             *status = i;
             return RBRGEN3_SUCCESS;
@@ -123,21 +123,21 @@ RBRGen3Error RBRInstrumentGen3_pause(RBRGen3 *instrument,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRInstrumentGen3_resume(RBRGen3 *instrument,
-                                        RBRInstrumentGen3ResumeStatus *status)
+RBRGen3Error RBRGen3_resume(RBRGen3 *instrument,
+                                        RBRGen3ResumeStatus *status)
 {
     RBR_TRY(RBRGen3_converse(instrument, "resume"));
 
-    *status = RBRINSTRUMENTGEN3_UNKNOWN_RESUME;
+    *status = RBRGEN3_UNKNOWN_RESUME;
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     RBRGen3_parseResponse(instrument, &command, &parameter);
     if (strcmp(parameter.key, "status") == 0)
     {
-        for (int i = RBRINSTRUMENTGEN3_RESUME_PENDING; i < RBRINSTRUMENTGEN3_UNKNOWN_RESUME; i++)
+        for (int i = RBRGEN3_RESUME_PENDING; i < RBRGEN3_UNKNOWN_RESUME; i++)
         {
-            /* refer to RBRInstrumentGen3ResumeStatus_name */
-            if (strcmp(RBRInstrumentGen3ResumeStatus_name(i), parameter.value) == 0)
+            /* refer to RBRGen3ResumeStatus_name */
+            if (strcmp(RBRGen3ResumeStatus_name(i), parameter.value) == 0)
             {
                 *status = i;
                 return RBRGEN3_SUCCESS;

@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Pauseresume.h
+ * \file RBRGen3Pauseresume.h
  *
  * \brief Instrument commands and structures pertaining to pauseresume.
  * This feature is available in firmware versions 1.116 or later.
@@ -11,25 +11,25 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTGEN3PAUSERESUME_H
-#define LIBRBR_RBRINSTRUMENTGEN3PAUSERESUME_H
+#ifndef LIBRBR_RBRGEN3PAUSERESUME_H
+#define LIBRBR_RBRGEN3PAUSERESUME_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /** \brief The state of a pauseresume condition. */
-typedef enum RBRInstrumentGen3PauseresumeState
+typedef enum RBRGen3PauseresumeState
 {
     /** \brief The pauseresuming condition is disabled, or sampling mode is regimes. */
-    RBRINSTRUMENTGEN3_PAUSERESUME_NA,
+    RBRGEN3_PAUSERESUME_NA,
     /** \brief Deployment is enaled and paused. */
-    RBRINSTRUMENTGEN3_PAUSERESUME_PAUSED,
+    RBRGEN3_PAUSERESUME_PAUSED,
     /** \brief Deployment is enabled and not paused. */
-    RBRINSTRUMENTGEN3_PAUSERESUME_RUNNING,
+    RBRGEN3_PAUSERESUME_RUNNING,
     /** feature is not allowed, or firmware in use doesn't support this feature. */
-    RBRINSTRUMENTGEN3_UNKNOWN_PAUSERESUME
-} RBRInstrumentGen3PauseresumeState;
+    RBRGEN3_UNKNOWN_PAUSERESUME
+} RBRGen3PauseresumeState;
 
 /**
  * \brief Get a human-readable string name for a pauseresume state.
@@ -38,7 +38,7 @@ typedef enum RBRInstrumentGen3PauseresumeState
  * \return a string name for the gating state
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen3PauseresumeState_name(RBRInstrumentGen3PauseresumeState state);
+const char *RBRGen3PauseresumeState_name(RBRGen3PauseresumeState state);
 
 /**
  * \brief Possible instrument pause status.
@@ -46,13 +46,13 @@ const char *RBRInstrumentGen3PauseresumeState_name(RBRInstrumentGen3PauseresumeS
  * \see RBRInstrumentGen3Pause
  * \see https://docs.rbr-global.com/L3commandreference/commands/pause
  */
-typedef enum RBRInstrumentGen3PauseStatus
+typedef enum RBRGen3PauseStatus
 {
     /** Deployment is paused and no more samples will be taken once the current acquisition finishes. */
-    RBRINSTRUMENTGEN3_PAUSE_PAUSED,
+    RBRGEN3_PAUSE_PAUSED,
     /** An unknown or unrecognized pause status. */
-    RBRINSTRUMENTGEN3_UNKNOWN_PAUSE
-} RBRInstrumentGen3PauseStatus;
+    RBRGEN3_UNKNOWN_PAUSE
+} RBRGen3PauseStatus;
 
 /**
  * \brief Get a human-readable string name for a pause status.
@@ -61,8 +61,8 @@ typedef enum RBRInstrumentGen3PauseStatus
  * \return a string name for the pause status
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen3PauseStatus_name(
-    RBRInstrumentGen3PauseStatus status);
+const char *RBRGen3PauseStatus_name(
+    RBRGen3PauseStatus status);
 
 /**
  * \brief Possible instrument resume status.
@@ -70,14 +70,14 @@ const char *RBRInstrumentGen3PauseStatus_name(
  * \see RBRInstrumentGen3Resume
  * \see https://docs.rbr-global.com/L3commandreference/commands/resume
  */
-typedef enum RBRInstrumentGen3ResumeStatus
+typedef enum RBRGen3ResumeStatus
 {
     /** Deployment has resumed running as scheduled. */
-    RBRINSTRUMENTGEN3_RESUME_PENDING,
-    RBRINSTRUMENTGEN3_RESUME_LOGGING,
+    RBRGEN3_RESUME_PENDING,
+    RBRGEN3_RESUME_LOGGING,
     /** An unknown or unrecognized resume status. */
-    RBRINSTRUMENTGEN3_UNKNOWN_RESUME
-} RBRInstrumentGen3ResumeStatus;
+    RBRGEN3_UNKNOWN_RESUME
+} RBRGen3ResumeStatus;
 
 /**
  * \brief Get a human-readable string name for a resume status.
@@ -86,8 +86,8 @@ typedef enum RBRInstrumentGen3ResumeStatus
  * \return a string name for the resume status
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen3ResumeStatus_name(
-    RBRInstrumentGen3ResumeStatus status);
+const char *RBRGen3ResumeStatus_name(
+    RBRGen3ResumeStatus status);
 
 /**
  * It allows the host to determine if the pauseresume feature is available on
@@ -102,8 +102,8 @@ const char *RBRInstrumentGen3ResumeStatus_name(
  * pauseresume feature, or pauseresume is not allowed.
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
-RBRGen3Error RBRInstrumentGen3_getPauseresume(RBRGen3 *instrument,
-                                       RBRInstrumentGen3PauseresumeState *state);
+RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *instrument,
+                                       RBRGen3PauseresumeState *state);
 
 /**
  * It pauses an enabled deloyment.
@@ -115,8 +115,8 @@ RBRGen3Error RBRInstrumentGen3_getPauseresume(RBRGen3 *instrument,
  * pauseresume feature, or pauseresume is not allowed.
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
-RBRGen3Error RBRInstrumentGen3_pause(RBRGen3 *instrument,
-                                       RBRInstrumentGen3PauseStatus *status);
+RBRGen3Error RBRGen3_pause(RBRGen3 *instrument,
+                                       RBRGen3PauseStatus *status);
 /**
  * It resumes an enabled deployment which was previously
  * paused using the pause command
@@ -129,11 +129,11 @@ RBRGen3Error RBRInstrumentGen3_pause(RBRGen3 *instrument,
  * pauseresume feature, or pauseresume is not allowed.
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
-RBRGen3Error RBRInstrumentGen3_resume(RBRGen3 *instrument,
-                                       RBRInstrumentGen3ResumeStatus *status);
+RBRGen3Error RBRGen3_resume(RBRGen3 *instrument,
+                                       RBRGen3ResumeStatus *status);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTGEN3PAUSERESUME_H */
+#endif /* LIBRBR_RBRGEN3PAUSERESUME_H */

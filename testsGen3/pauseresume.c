@@ -14,21 +14,21 @@ typedef struct PauseresumeTest
 {
     const char *command;
     const char *response;
-    RBRInstrumentGen3PauseresumeState state;
+    RBRGen3PauseresumeState state;
 } PauseresumeTest;
 
 typedef struct PauseTest
 {
     const char *command;
     const char *response;
-    RBRInstrumentGen3PauseStatus status;
+    RBRGen3PauseStatus status;
 } PauseTest;
 
 typedef struct ResumeTest
 {
     const char *command;
     const char *response;
-    RBRInstrumentGen3ResumeStatus status;
+    RBRGen3ResumeStatus status;
 } ResumeTest;
 
 static bool test_pauseresume_error(RBRGen3 *instrument,
@@ -36,14 +36,14 @@ static bool test_pauseresume_error(RBRGen3 *instrument,
                                    PauseresumeTest *tests)
 {
     RBRGen3Error err;
-    RBRInstrumentGen3PauseresumeState state;
+    RBRGen3PauseresumeState state;
     state = 3;
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_getPauseresume(instrument, &state);
+        err = RBRGen3_getPauseresume(instrument, &state);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_HARDWARE_ERROR, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].state, state, RBRInstrumentGen3PauseresumeState);
+        TEST_ASSERT_ENUM_EQ(tests[i].state, state, RBRGen3PauseresumeState);
     }
     return true;
 }
@@ -53,14 +53,14 @@ static bool test_pause_error(RBRGen3 *instrument,
                              PauseTest *tests)
 {
     RBRGen3Error err;
-    RBRInstrumentGen3PauseStatus status;
+    RBRGen3PauseStatus status;
     status = 1;
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_pause(instrument, &status);
+        err = RBRGen3_pause(instrument, &status);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_HARDWARE_ERROR, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].status, status, RBRInstrumentGen3PauseStatus);
+        TEST_ASSERT_ENUM_EQ(tests[i].status, status, RBRGen3PauseStatus);
     }
     return true;
 }
@@ -70,14 +70,14 @@ static bool test_resume_error(RBRGen3 *instrument,
                               ResumeTest *tests)
 {
     RBRGen3Error err;
-    RBRInstrumentGen3ResumeStatus status;
+    RBRGen3ResumeStatus status;
     status = 2;
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_resume(instrument, &status);
+        err = RBRGen3_resume(instrument, &status);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_HARDWARE_ERROR, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].status, status, RBRInstrumentGen3ResumeStatus);
+        TEST_ASSERT_ENUM_EQ(tests[i].status, status, RBRGen3ResumeStatus);
     }
     return true;
 }
@@ -174,15 +174,15 @@ static bool test_pauseresume(RBRGen3 *instrument,
                              PauseresumeTest *tests)
 {
     RBRGen3Error err;
-    RBRInstrumentGen3PauseresumeState state;
+    RBRGen3PauseresumeState state;
     state = 3;
 
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_getPauseresume(instrument, &state);
+        err = RBRGen3_getPauseresume(instrument, &state);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].state, state, RBRInstrumentGen3PauseresumeState);
+        TEST_ASSERT_ENUM_EQ(tests[i].state, state, RBRGen3PauseresumeState);
     }
     return true;
 }
@@ -192,14 +192,14 @@ static bool test_pause(RBRGen3 *instrument,
                        PauseTest *tests)
 {
     RBRGen3Error err;
-    RBRInstrumentGen3PauseStatus status;
+    RBRGen3PauseStatus status;
     status = 1;
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_pause(instrument, &status);
+        err = RBRGen3_pause(instrument, &status);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].status, status, RBRInstrumentGen3PauseStatus);
+        TEST_ASSERT_ENUM_EQ(tests[i].status, status, RBRGen3PauseStatus);
     }
     return true;
 }
@@ -209,14 +209,14 @@ static bool test_resume(RBRGen3 *instrument,
                               ResumeTest *tests)
 {
     RBRGen3Error err;
-    RBRInstrumentGen3ResumeStatus status;
+    RBRGen3ResumeStatus status;
     status = 2;
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen3_resume(instrument, &status);
+        err = RBRGen3_resume(instrument, &status);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].status, status, RBRInstrumentGen3ResumeStatus);
+        TEST_ASSERT_ENUM_EQ(tests[i].status, status, RBRGen3ResumeStatus);
     }
     return true;
 }
