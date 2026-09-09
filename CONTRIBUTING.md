@@ -138,17 +138,17 @@ A short example:
  *
  * A longer description of the function.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] theseParametersAreAligned a description of the first parameter
  * \param [in] becauseTheyFitOnTheLine a description of the second parameter
  * \return a description of the return value
  */
-int32_t RBRGen3_examplePrototype(RBRGen3 *instrument,
-                                       int32_t theseParametersAreAligned,
-                                       int32_t *becauseTheyFitOnTheLine);
+int32_t RBRGen3_examplePrototype(RBRGen3 *conn,
+                                 int32_t theseParametersAreAligned,
+                                 int32_t *becauseTheyFitOnTheLine);
 
 RBRGen3Error RBRGen3_exampleOfAReallyLongFunctionName(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     int32_t theseParametersAreAllWrappedAndBroken,
     int32_t becauseTheyWouldPushPastTheLineLengthLimit,
     int32_t evenIf,

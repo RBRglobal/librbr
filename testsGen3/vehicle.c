@@ -46,7 +46,7 @@ TEST_LOGGER3(regimes)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_getRegimes(instrument, &actual);
+        err = RBRGen3_getRegimes(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.direction,
                             actual.direction,
@@ -93,7 +93,7 @@ TEST_LOGGER3(regimes_set)
     {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
-        err = RBRGen3_setRegimes(instrument, &tests[i].expected);
+        err = RBRGen3_setRegimes(conn, &tests[i].expected);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     }
@@ -140,7 +140,7 @@ TEST_LOGGER3(regime)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         actual.index = tests[i].expected.index;
-        err = RBRGen3_getRegime(instrument, &actual);
+        err = RBRGen3_getRegime(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_EQ(tests[i].expected.index, actual.index, "%" PRIi8);
         TEST_ASSERT_FLOAT_EQ(tests[i].expected.boundary,
@@ -188,7 +188,7 @@ TEST_LOGGER3(regime_set)
     {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
-        err = RBRGen3_setRegime(instrument, &tests[i].expected);
+        err = RBRGen3_setRegime(conn, &tests[i].expected);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     }
@@ -226,7 +226,7 @@ TEST_LOGGER3(ddsampling)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_getDirectionDependentSampling(instrument, &actual);
+        err = RBRGen3_getDirectionDependentSampling(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.direction,
                             actual.direction,
@@ -273,7 +273,7 @@ TEST_LOGGER3(ddsampling_set)
     {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
-        err = RBRGen3_setDirectionDependentSampling(instrument,
+        err = RBRGen3_setDirectionDependentSampling(conn,
                                                           &tests[i].expected);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);

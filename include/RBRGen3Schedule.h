@@ -69,14 +69,14 @@ typedef struct RBRGen3Clock
  * older Logger2 instruments which do not support the `offsetfromutc` setting,
  * RBRGen3Clock.offsetFromUtc will always be `NAN`.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] clock the clock value
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
  */
-RBRGen3Error RBRGen3_getClock(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getClock(RBRGen3 *conn,
                                           RBRGen3Clock *clock);
 
 /**
@@ -94,7 +94,7 @@ RBRGen3Error RBRGen3_getClock(RBRGen3 *instrument,
  * - the instrument is logging
  * - you set an out-of-bounds time the library fails to detect
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] clock the clock value
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -104,7 +104,7 @@ RBRGen3Error RBRGen3_getClock(RBRGen3 *instrument,
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
  */
-RBRGen3Error RBRGen3_setClock(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_setClock(RBRGen3 *conn,
                                           const RBRGen3Clock *clock);
 
 /**
@@ -264,7 +264,7 @@ typedef struct RBRGen3Sampling
 /**
  * \brief Get the instrument sampling parameters.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] sampling the sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -272,7 +272,7 @@ typedef struct RBRGen3Sampling
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  */
 RBRGen3Error RBRGen3_getSampling(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Sampling *sampling);
 
 /**
@@ -306,7 +306,7 @@ RBRGen3Error RBRGen3_getSampling(
  * - you attempt to set sampling parameters for an RBRcoda (where sampling is
  *   not supported)
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] sampling the sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -318,7 +318,7 @@ RBRGen3Error RBRGen3_getSampling(
  * \see RBRGen3_setBurstSampling()
  */
 RBRGen3Error RBRGen3_setSampling(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3Sampling *sampling);
 
 /**
@@ -340,7 +340,7 @@ RBRGen3Error RBRGen3_setSampling(
  * - you set an out-of-bounds parameter the library fails to detect
  * - bursting/averaging is not supported by the instrument
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] sampling the sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -352,7 +352,7 @@ RBRGen3Error RBRGen3_setSampling(
  * \see RBRGen3_setSampling()
  */
 RBRGen3Error RBRGen3_setBurstSampling(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3Sampling *sampling);
 
 /**
@@ -440,7 +440,7 @@ typedef struct RBRGen3Deployment
 /**
  * \brief Get the instrument deployment parameters.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] deployment the deployment parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -448,7 +448,7 @@ typedef struct RBRGen3Deployment
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
 RBRGen3Error RBRGen3_getDeployment(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Deployment *deployment);
 
 /**
@@ -462,7 +462,7 @@ RBRGen3Error RBRGen3_getDeployment(
  * - the instrument is logging
  * - you set an out-of-bounds parameter the library fails to detect
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] deployment the deployment parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -473,7 +473,7 @@ RBRGen3Error RBRGen3_getDeployment(
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
 RBRGen3Error RBRGen3_setDeployment(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3Deployment *deployment);
 
 #ifdef __cplusplus

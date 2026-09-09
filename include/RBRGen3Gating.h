@@ -166,7 +166,7 @@ typedef struct RBRGen3Thresholding
 /**
  * \brief Get the instrument thresholding settings.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] threshold the thresholding parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -175,7 +175,7 @@ typedef struct RBRGen3Thresholding
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
 RBRGen3Error RBRGen3_getThresholding(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Thresholding *threshold);
 
 /**
@@ -188,7 +188,7 @@ RBRGen3Error RBRGen3_getThresholding(
  * - you set an out-of-bounds parameter the library fails to detect
  * - the thresholding channel selected is uncalibrated
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] threshold the thresholding parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -199,7 +199,7 @@ RBRGen3Error RBRGen3_getThresholding(
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
 RBRGen3Error RBRGen3_setThresholding(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3Thresholding *threshold);
 
 /**
@@ -226,7 +226,7 @@ typedef struct RBRGen3TwistActivation
 /**
  * \brief Get the instrument twist activation settings.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] twistActivation the twist activation parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -235,7 +235,7 @@ typedef struct RBRGen3TwistActivation
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/twistactivation
  */
 RBRGen3Error RBRGen3_getTwistActivation(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3TwistActivation *twistActivation);
 
 /**
@@ -246,7 +246,7 @@ RBRGen3Error RBRGen3_getTwistActivation(
  * - twist activation is not available for the instrument
  * - the instrument is logging
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] twistActivation the twist activation parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -255,7 +255,7 @@ RBRGen3Error RBRGen3_getTwistActivation(
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/twistactivation
  */
 RBRGen3Error RBRGen3_setTwistActivation(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3TwistActivation *twistActivation);
 
 #ifdef __cplusplus

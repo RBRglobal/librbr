@@ -17,10 +17,10 @@
 
 LOG_MODULE_REGISTER(time, CONFIG_TIME_LOG_LEVEL);
 
-RBRGen3Error ZephyrRBRGen3Time_get(const struct RBRGen3 *instrument,
+RBRGen3Error ZephyrRBRGen3Time_get(const struct RBRGen3 *conn,
                                                RBRGen3DateTime *time)
 {
-    (void) instrument;
+    (void) conn;
 
     *time = k_uptime_get();
     LOG_DBG("now %" PRIi64 " ms", *time);
@@ -28,10 +28,10 @@ RBRGen3Error ZephyrRBRGen3Time_get(const struct RBRGen3 *instrument,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error ZephyrRBRGen3Time_sleep(const struct RBRGen3 *instrument,
+RBRGen3Error ZephyrRBRGen3Time_sleep(const struct RBRGen3 *conn,
                                                  RBRGen3DateTime time)
 {
-    (void) instrument;
+    (void) conn;
 
     LOG_DBG("sleeping %" PRIi64 " ms...", time);
     k_sleep(K_MSEC(time));

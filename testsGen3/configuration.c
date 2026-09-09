@@ -17,7 +17,7 @@ typedef struct ChannelsTest
     RBRGen3Channels expected;
 } ChannelsTest;
 
-static bool test_channels(RBRGen3 *instrument,
+static bool test_channels(RBRGen3 *conn,
                           TestIOBuffers *buffers,
                           ChannelsTest *tests)
 {
@@ -27,7 +27,7 @@ static bool test_channels(RBRGen3 *instrument,
     for (int i = 0; tests[i].response != NULL; ++i)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_getChannels(instrument, &actual);
+        err = RBRGen3_getChannels(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_EQ(tests[i].expected.count, actual.count, "%" PRIi32);
         TEST_ASSERT_EQ(tests[i].expected.on, actual.on, "%" PRIi32);
@@ -342,7 +342,7 @@ TEST_LOGGER2(channels)
         {0}
     };
 
-    return test_channels(instrument, buffers, tests);
+    return test_channels(conn, buffers, tests);
 }
 
 TEST_LOGGER3(channels)
@@ -645,7 +645,7 @@ TEST_LOGGER3(channels)
         {0}
     };
 
-    return test_channels(instrument, buffers, tests);
+    return test_channels(conn, buffers, tests);
 }
 
 TEST_LOGGER3(channel_gain_set_auto)
@@ -660,7 +660,7 @@ TEST_LOGGER3(channel_gain_set_auto)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRGen3_setChannelGain(instrument,
+    RBRGen3Error err = RBRGen3_setChannelGain(conn,
                                                           1,
                                                           &gain);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -683,7 +683,7 @@ TEST_LOGGER3(channel_gain_set_manual)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRGen3_setChannelGain(instrument,
+    RBRGen3Error err = RBRGen3_setChannelGain(conn,
                                                           1,
                                                           &gain);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -726,7 +726,7 @@ TEST_LOGGER3(calibration_set)
 
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRGen3_setCalibration(instrument,
+    RBRGen3Error err = RBRGen3_setCalibration(conn,
                                                           1,
                                                           &calibration);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -743,7 +743,7 @@ TEST_LOGGER3(settings_fetchpoweroffdelay)
                        "settings fetchpoweroffdelay = 8000" RESPONSE_TERMINATOR,
                        0);
     RBRGen3Error err = RBRGen3_getFetchPowerOffDelay(
-        instrument,
+        conn,
         &fetchPowerOffDelay);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(8000, fetchPowerOffDelay, "%" PRIi32);
@@ -764,7 +764,7 @@ TEST_LOGGER3(settings_fetchpoweroffdelay_set)
 
     TestIOBuffers_init(buffers, response, 0);
     RBRGen3Error err = RBRGen3_setFetchPowerOffDelay(
-        instrument,
+        conn,
         fetchPowerOffDelay);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
@@ -780,7 +780,7 @@ TEST_LOGGER3(settings_sensorpoweralwayson)
                        "settings sensorpoweralwayson = on" RESPONSE_TERMINATOR,
                        0);
     RBRGen3Error err = RBRGen3_isSensorPowerAlwaysOn(
-        instrument,
+        conn,
         &sensorPowerAlwaysOn);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(true, sensorPowerAlwaysOn, bool);
@@ -800,7 +800,7 @@ TEST_LOGGER3(settings_sensorpoweralwayson_set)
 
     TestIOBuffers_init(buffers, response, 0);
     RBRGen3Error err = RBRGen3_setSensorPowerAlwaysOn(
-        instrument,
+        conn,
         sensorPowerAlwaysOn);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
@@ -816,7 +816,7 @@ TEST_LOGGER3(settings_castdetection)
                        "settings castdetection = on" RESPONSE_TERMINATOR,
                        0);
     RBRGen3Error err = RBRGen3_getCastDetection(
-        instrument,
+        conn,
         &castDetection);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(true, castDetection, bool);
@@ -835,7 +835,7 @@ TEST_LOGGER3(settings_castdetection_set)
 
     TestIOBuffers_init(buffers, response, 0);
     RBRGen3Error err = RBRGen3_setCastDetection(
-        instrument,
+        conn,
         castDetection);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
@@ -851,7 +851,7 @@ TEST_LOGGER3(settings_inputtimeout)
                        "settings inputtimeout = 10000" RESPONSE_TERMINATOR,
                        0);
     RBRGen3Error err = RBRGen3_getInputTimeout(
-        instrument,
+        conn,
         &inputTimeout);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(10000, inputTimeout, "%" PRIi32);
@@ -870,7 +870,7 @@ TEST_LOGGER3(settings_inputtimeout_set)
 
     TestIOBuffers_init(buffers, response, 0);
     RBRGen3Error err = RBRGen3_setInputTimeout(
-        instrument,
+        conn,
         inputTimeout);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
@@ -886,7 +886,7 @@ TEST_LOGGER3(settings_atmosphere)
                        "settings atmosphere = 10.1325010" RESPONSE_TERMINATOR,
                        0);
     RBRGen3Error err = RBRGen3_getValueSetting(
-        instrument,
+        conn,
         RBRGEN3_SETTING_ATMOSPHERE,
         &atmosphere);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -907,7 +907,7 @@ TEST_LOGGER3(settings_atmosphere_set)
 
     TestIOBuffers_init(buffers, response, 0);
     RBRGen3Error err = RBRGen3_setValueSetting(
-        instrument,
+        conn,
         RBRGEN3_SETTING_ATMOSPHERE,
         atmosphere);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -925,7 +925,7 @@ typedef struct SensorTest
     int32_t size;
 } SensorTest;
 
-static bool test_sensor(RBRGen3 *instrument,
+static bool test_sensor(RBRGen3 *conn,
                         TestIOBuffers *buffers,
                         SensorTest *tests)
 {
@@ -939,7 +939,7 @@ static bool test_sensor(RBRGen3 *instrument,
                  "%s",
                  tests[i].expected[0].key);
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_getSensorParameter(instrument, 1, &actual);
+        err = RBRGen3_getSensorParameter(conn, 1, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_STR_EQ(tests[i].expected[0].key, actual.key);
         TEST_ASSERT_STR_EQ(tests[i].expected[0].value, actual.value);
@@ -948,7 +948,7 @@ static bool test_sensor(RBRGen3 *instrument,
     return true;
 }
 
-static bool test_sensors(RBRGen3 *instrument,
+static bool test_sensors(RBRGen3 *conn,
                          TestIOBuffers *buffers,
                          SensorTest *tests)
 {
@@ -959,7 +959,7 @@ static bool test_sensors(RBRGen3 *instrument,
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         int32_t size = TEST_SENSOR_PARAMETER_MAX;
-        err = RBRGen3_getSensorParameters(instrument,
+        err = RBRGen3_getSensorParameters(conn,
                                                 1,
                                                 &actual[0],
                                                 &size);
@@ -1004,7 +1004,7 @@ TEST_LOGGER2(sensor)
         {0}
     };
 
-    return test_sensor(instrument, buffers, tests);
+    return test_sensor(conn, buffers, tests);
 }
 
 TEST_LOGGER2(sensor_all)
@@ -1046,7 +1046,7 @@ TEST_LOGGER2(sensor_all)
         {0}
     };
 
-    return test_sensors(instrument, buffers, tests);
+    return test_sensors(conn, buffers, tests);
 }
 
 TEST_LOGGER3(sensor)
@@ -1075,7 +1075,7 @@ TEST_LOGGER3(sensor)
         {0}
     };
 
-    return test_sensor(instrument, buffers, tests);
+    return test_sensor(conn, buffers, tests);
 }
 
 TEST_LOGGER3(sensor_all)
@@ -1136,5 +1136,5 @@ TEST_LOGGER3(sensor_all)
         {0}
     };
 
-    return test_sensors(instrument, buffers, tests);
+    return test_sensors(conn, buffers, tests);
 }

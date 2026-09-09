@@ -16,7 +16,7 @@ typedef struct LinkTest
     RBRGen3Link expected;
 } LinkTest;
 
-static bool test_link(RBRGen3 *instrument,
+static bool test_link(RBRGen3 *conn,
                       TestIOBuffers *buffers,
                       LinkTest *tests)
 {
@@ -26,7 +26,7 @@ static bool test_link(RBRGen3 *instrument,
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_getLink(instrument, &actual);
+        err = RBRGen3_getLink(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, RBRGen3Link);
     }
@@ -43,7 +43,7 @@ TEST_LOGGER2(link)
         {0}
     };
 
-    return test_link(instrument, buffers, tests);
+    return test_link(conn, buffers, tests);
 }
 
 TEST_LOGGER3(link)
@@ -55,7 +55,7 @@ TEST_LOGGER3(link)
         {0}
     };
 
-    return test_link(instrument, buffers, tests);
+    return test_link(conn, buffers, tests);
 }
 
 typedef struct SerialTest
@@ -110,7 +110,7 @@ TEST_LOGGER2(serial)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_getSerial(instrument, &actual);
+        err = RBRGen3_getSerial(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate,
                             actual.baudRate,
@@ -183,7 +183,7 @@ TEST_LOGGER3(serial)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_getSerial(instrument, &actual);
+        err = RBRGen3_getSerial(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate,
                             actual.baudRate,
@@ -205,10 +205,10 @@ TEST_LOGGER3(serial)
 TEST_LOGGER3(sleep)
 {
     TestIOBuffers_init(buffers, "", 0);
-    RBRGen3Error err = RBRGen3_sleep(instrument);
+    RBRGen3Error err = RBRGen3_sleep(conn);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ("sleep" COMMAND_TERMINATOR,buffers->writeBuffer);
-    TEST_ASSERT(instrument->lastActivityTime < 0);
+    TEST_ASSERT(conn->lastActivityTime < 0);
 
     return true;
 }
@@ -220,7 +220,7 @@ typedef struct WiFiTest
     RBRGen3WiFi expected;
 } WiFiTest;
 
-static bool test_wifi(RBRGen3 *instrument,
+static bool test_wifi(RBRGen3 *conn,
                       TestIOBuffers *buffers,
                       WiFiTest *tests)
 {
@@ -230,7 +230,7 @@ static bool test_wifi(RBRGen3 *instrument,
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_getWiFi(instrument, &actual);
+        err = RBRGen3_getWiFi(conn, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.enabled, actual.enabled, bool);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.state,
@@ -267,7 +267,7 @@ TEST_LOGGER2(wifi)
         {0}
     };
 
-    return test_wifi(instrument, buffers, tests);
+    return test_wifi(conn, buffers, tests);
 }
 
 TEST_LOGGER3(wifi)
@@ -311,5 +311,5 @@ TEST_LOGGER3(wifi)
         {0}
     };
 
-    return test_wifi(instrument, buffers, tests);
+    return test_wifi(conn, buffers, tests);
 }

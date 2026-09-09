@@ -52,7 +52,7 @@ TEST_LOGGER2(id)
                        "id model = RBRduo, version = 1.440, "
                        "serial = 912345, fwtype = 103" RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_getId(instrument, &actual);
+    RBRGen3Error err = RBRGen3_getId(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
@@ -78,7 +78,7 @@ TEST_LOGGER3(id)
                        "id model = RBRduo3, version = 1.092, "
                        "serial = 923456, fwtype = 104" RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_getId(instrument, &actual);
+    RBRGen3Error err = RBRGen3_getId(conn, &actual);
     TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
@@ -106,7 +106,7 @@ TEST_LOGGER3(id_simulated)
                        "version = 1.092, serial = 923456, fwtype = 104"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_getId(instrument, &actual);
+    RBRGen3Error err = RBRGen3_getId(conn, &actual);
     TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
@@ -130,7 +130,7 @@ TEST_LOGGER3(id_short)
     RBRGen3Id actual;
 
     TestIOBuffers_init(buffers, "id" RESPONSE_TERMINATOR, 0);
-    RBRGen3Error err = RBRGen3_getId(instrument, &actual);
+    RBRGen3Error err = RBRGen3_getId(conn, &actual);
     TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
@@ -154,7 +154,7 @@ TEST_LOGGER2(hwrev)
                        "hwrev pcb = G, cpu = 5659A, bsl = A"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_getHardwareRevision(instrument,
+    RBRGen3Error err = RBRGen3_getHardwareRevision(conn,
                                                                &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(expected.pcb, actual.pcb, "%c");
@@ -177,7 +177,7 @@ TEST_LOGGER3(hwrev)
                        "hwrev pcb = J, cpu = 5659A, bsl = A"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_getHardwareRevision(instrument,
+    RBRGen3Error err = RBRGen3_getHardwareRevision(conn,
                                                                &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(expected.pcb, actual.pcb, "%c");
@@ -201,7 +201,7 @@ TEST_LOGGER2(powerstatus)
                        "powerstatus source = usb, int = 12.40, ext = 0.00, "
                        "capacity = 24.000" RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_getPower(instrument, &actual);
+    RBRGen3Error err = RBRGen3_getPower(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected.source,
                         actual.source,
@@ -227,7 +227,7 @@ TEST_LOGGER3(power)
                        "power source = ext, int =  0.00, ext = 11.59, "
                        "reg = n/a" RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_getPower(instrument, &actual);
+    RBRGen3Error err = RBRGen3_getPower(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected.source,
                         actual.source,
@@ -242,7 +242,7 @@ TEST_LOGGER3(power)
 TEST_LOGGER2(powerinternal)
 {
     RBRGen3PowerInternal actual;
-    RBRGen3Error err = RBRGen3_getPowerInternal(instrument,
+    RBRGen3Error err = RBRGen3_getPowerInternal(conn,
                                                             &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_UNSUPPORTED, err, RBRGen3Error);
 
@@ -263,7 +263,7 @@ TEST_LOGGER3(powerinternal)
                        "capacity = 138.000e+003, used = 100.100e+003"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_getPowerInternal(instrument,
+    RBRGen3Error err = RBRGen3_getPowerInternal(conn,
                                                             &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected.batteryType,
@@ -278,7 +278,7 @@ TEST_LOGGER3(powerinternal)
 TEST_LOGGER2(powerexternal)
 {
     RBRGen3PowerExternal actual;
-    RBRGen3Error err = RBRGen3_getPowerExternal(instrument,
+    RBRGen3Error err = RBRGen3_getPowerExternal(conn,
                                                             &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_UNSUPPORTED, err, RBRGen3Error);
 
@@ -299,7 +299,7 @@ TEST_LOGGER3(powerexternal)
                        "capacity = 22.000e+006, used = 100.100e+003"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_getPowerExternal(instrument,
+    RBRGen3Error err = RBRGen3_getPowerExternal(conn,
                                                             &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected.batteryType,
@@ -318,7 +318,7 @@ TEST_LOGGER2(info)
     TestIOBuffers_init(buffers,
                        "E0102 invalid command 'info'" RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_getInfo(instrument,
+    RBRGen3Error err = RBRGen3_getInfo(conn,
                                                    &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_UNSUPPORTED, err, RBRGen3Error);
 
@@ -337,7 +337,7 @@ TEST_LOGGER3(info)
                        "info pn = L3-M11-BEC11-SC11-ST11-SP11"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_getInfo(instrument,
+    RBRGen3Error err = RBRGen3_getInfo(conn,
                                                    &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expected.partNumber, actual.partNumber);
@@ -359,7 +359,7 @@ TEST_LOGGER3(info_fwlock)
                        "info pn = L3-M11-F14-BEC11-G1-SCT12-SP11, fwlock = on"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_getInfo(instrument,
+    RBRGen3Error err = RBRGen3_getInfo(conn,
                                                    &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expected.partNumber, actual.partNumber);

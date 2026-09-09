@@ -21,7 +21,7 @@ typedef struct FetchingTest
     RBRGen3Sample expected;
 } FetchingTest;
 
-static bool test_fetching(RBRGen3 *instrument,
+static bool test_fetching(RBRGen3 *conn,
                           TestIOBuffers *buffers,
                           FetchingTest *tests)
 {
@@ -31,7 +31,7 @@ static bool test_fetching(RBRGen3 *instrument,
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_fetch(instrument,
+        err = RBRGen3_fetch(conn,
                                   tests[i].passChannels ? &tests[i].channels : NULL,
                                   tests[i].sleepAfter,
                                   &actual);
@@ -241,5 +241,5 @@ TEST_LOGGER3(fetch)
         {0}
     };
 
-    return test_fetching(instrument, buffers, tests);
+    return test_fetching(conn, buffers, tests);
 }

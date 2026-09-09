@@ -38,7 +38,7 @@ extern "C" {
  * RBRGen3LabelsList.count labels from the list. Otherwise, and for
  * Logger2 instruments, readings will be fetched from all enabled channels.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] channels the list of channels to be acquired (may be `NULL`)
  * \param [in] sleepAfter whether the instrument should sleep after fetching
  * \param [in,out] sample the fetched sample
@@ -48,7 +48,7 @@ extern "C" {
  * \return #RBRGEN3_HARDWARE_ERROR when an invalid channel is requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/fetch
  */
-RBRGen3Error RBRGen3_fetch(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_fetch(RBRGen3 *conn,
                                        RBRGen3LabelsList *channels,
                                        bool sleepAfter,
                                        RBRGen3Sample *sample);

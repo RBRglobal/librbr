@@ -57,10 +57,10 @@ int main(int argc, char *argv[])
     int instrumentFd;
 
     RBRGen3Error err;
-    RBRGen3 *instrument = NULL;
+    RBRGen3 *conn = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
     RBRGen3 instrumentSpace;
-    instrument = &instrumentSpace;
+    conn = &instrumentSpace;
     #endif
 
     if (argc < 3)
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
     };
 
     if ((err = RBRGen3_open(
-             &instrument,
+             &conn,
              &instrumentCallbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
              (void *) &instrumentFd)) != RBRGEN3_SUCCESS)
@@ -115,12 +115,12 @@ int main(int argc, char *argv[])
         goto fileCleanup;
     }
 
-    RBRGen3_setUSBStreamingState(instrument, false);
-    RBRGen3_setSerialStreamingState(instrument, false);
+    RBRGen3_setUSBStreamingState(conn, false);
+    RBRGen3_setSerialStreamingState(conn, false);
 
     RBRGen3Channels channels;
     if (_downloadFrom == 1){
-        RBRGen3_getChannels(instrument, &channels);
+        RBRGen3_getChannels(conn, &channels);
     }
     else if(_downloadFrom == 4){
         //important!!!
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
     {
         data.data = buf + bufSize;
         data.size = sizeof(buf) - bufSize;
-        err = RBRGen3_readData(instrument, &data);
+        err = RBRGen3_readData(conn, &data);
 
         if (err == RBRGEN3_TIMEOUT)
         {
@@ -210,7 +210,7 @@ int main(int argc, char *argv[])
     }
     
 instrumentCleanup:
-    RBRGen3_close(instrument);
+    RBRGen3_close(conn);
 fileCleanup:
     close(instrumentFd);
 

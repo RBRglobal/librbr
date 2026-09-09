@@ -28,7 +28,7 @@ extern "C" {
  *
  * The \a eraseMemory parameter is ignored by Logger2 instruments.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] eraseMemory whether to erase memory before enabling logging
  * \param [out] status the status which would be produced by enabling logging
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -40,7 +40,7 @@ extern "C" {
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/verify
  */
 RBRGen3Error RBRGen3_verify(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     bool eraseMemory,
     RBRGen3DeploymentStatus *status);
 
@@ -54,7 +54,7 @@ RBRGen3Error RBRGen3_verify(
  * command documentation for a comprehensive list. In the event of a hardware
  * error, \a status will be set to #RBRGEN3_UNKNOWN_STATUS.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] eraseMemory whether to erase memory before enabling logging
  * \param [out] status the instrument's status after having enabled logging
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -64,14 +64,14 @@ RBRGen3Error RBRGen3_verify(
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/enable
  */
 RBRGen3Error RBRGen3_enable(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     bool eraseMemory,
     RBRGen3DeploymentStatus *status);
 
 /**
  * \brief If the instrument is logging, terminate the current deployment.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] status the instrument's status after having disabled logging
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -79,7 +79,7 @@ RBRGen3Error RBRGen3_enable(
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/disable
  */
 RBRGen3Error RBRGen3_disable(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3DeploymentStatus *status);
 
 /**
@@ -104,7 +104,7 @@ typedef struct RBRGen3Simulation
 /**
  * \brief Get the instrument simulation settings.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] simulation the simulation parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -113,7 +113,7 @@ typedef struct RBRGen3Simulation
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
 RBRGen3Error RBRGen3_getSimulation(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Simulation *simulation);
 
 /**
@@ -126,7 +126,7 @@ RBRGen3Error RBRGen3_getSimulation(
  * - the instrument is logging
  * - you set an out-of-bounds parameter the library fails to detect
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] simulation the simulation parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -138,7 +138,7 @@ RBRGen3Error RBRGen3_getSimulation(
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
 RBRGen3Error RBRGen3_setSimulation(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3Simulation *simulation);
 
 #ifdef __cplusplus

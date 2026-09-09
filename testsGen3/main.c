@@ -85,7 +85,7 @@ void TestIOBuffers_init(TestIOBuffers *buffers,
 }
 
 RBRGen3Error TestIOBuffers_time(
-    const struct RBRGen3 *instrument,
+    const struct RBRGen3 *conn,
     RBRGen3DateTime *time)
 {
     /* No-op. */
@@ -94,7 +94,7 @@ RBRGen3Error TestIOBuffers_time(
 }
 
 RBRGen3Error TestIOBuffers_sleep(
-    const struct RBRGen3 *instrument,
+    const struct RBRGen3 *conn,
     RBRGen3DateTime time)
 {
     /* No-op. */
@@ -102,12 +102,12 @@ RBRGen3Error TestIOBuffers_sleep(
 }
 
 RBRGen3Error TestIOBuffers_read(
-    const struct RBRGen3 *instrument,
+    const struct RBRGen3 *conn,
     void *data,
     int32_t *size)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRGen3_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen3_getUserData(conn);
 
     int32_t readLength = buffers->readBufferSize - buffers->readBufferPos;
     /* If we're out of data, indicate a callback error. */
@@ -131,12 +131,12 @@ RBRGen3Error TestIOBuffers_read(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error TestIOBuffers_write(const struct RBRGen3 *instrument,
+RBRGen3Error TestIOBuffers_write(const struct RBRGen3 *conn,
                                        const void *const data,
                                        int32_t size)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRGen3_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen3_getUserData(conn);
 
     int32_t remaining
         = TESTIOBUFFERS_WRITE_BUFFER_SIZE - buffers->writeBufferPos;
@@ -160,11 +160,11 @@ RBRGen3Error TestIOBuffers_write(const struct RBRGen3 *instrument,
 }
 
 RBRGen3Error TestIOBuffers_sample(
-    const struct RBRGen3 *instrument,
+    const struct RBRGen3 *conn,
     const struct RBRGen3Sample *const sample)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRGen3_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen3_getUserData(conn);
     if (sample != &buffers->streamSample)
     {
         return RBRGEN3_CALLBACK_ERROR;

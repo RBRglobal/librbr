@@ -24,7 +24,7 @@ are available:
 
 ~~~{.c}
 RBRGen3OutputFormat outputFormats;
-RBRGen3_getAvailableOutputFormats(instrument, &outputFormats);
+RBRGen3_getAvailableOutputFormats(conn, &outputFormats);
 assert(outputFormats == RBRGEN3_CALTEXT01
                       | RBRGEN3_CALTEXT02
                       | RBRGEN3_CALTEXT03
@@ -36,7 +36,7 @@ And to check if a specific format is supported, e.g., `caltext03`:
 
 ~~~{.c}
 RBRGen3OutputFormat outputFormats;
-RBRGen3_getAvailableOutputFormats(instrument, &outputFormats);
+RBRGen3_getAvailableOutputFormats(conn, &outputFormats);
 if (outputFormats | RBRGEN3_CALTEXT03)
 {
     ...

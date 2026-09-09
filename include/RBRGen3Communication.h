@@ -50,7 +50,7 @@ const char *RBRGen3Link_name(RBRGen3Link link);
 /**
  * \brief Get the type of connectivity for the instrument connection.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] link the link type
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -58,7 +58,7 @@ const char *RBRGen3Link_name(RBRGen3Link link);
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/link
  */
 RBRGen3Error RBRGen3_getLink(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Link *link);
 
 /**
@@ -202,7 +202,7 @@ typedef struct RBRGen3Serial
 /**
  * \brief Retrieve the current and available serial baud rates and modes.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] serial the current and available serial parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -210,7 +210,7 @@ typedef struct RBRGen3Serial
  * \see RBRGen3_setSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-RBRGen3Error RBRGen3_getSerial(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn,
                                            RBRGen3Serial *serial);
 
 /**
@@ -225,7 +225,7 @@ RBRGen3Error RBRGen3_getSerial(RBRGen3 *instrument,
  * response to this command has been produced. Make sure you alter the
  * configuration of your connection to the instrument correspondingly.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] serial the new serial parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -235,19 +235,19 @@ RBRGen3Error RBRGen3_getSerial(RBRGen3 *instrument,
  * \see RBRGen3_getSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-RBRGen3Error RBRGen3_setSerial(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_setSerial(RBRGen3 *conn,
                                            const RBRGen3Serial *serial);
 
 /**
  * \brief Immediately shut down communications and implement any possible
  * power-saving measures.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the instrument has been put to sleep
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/sleep
  */
-RBRGen3Error RBRGen3_sleep(RBRGen3 *instrument);
+RBRGen3Error RBRGen3_sleep(RBRGen3 *conn);
 
 /**
  * \brief The state of the Wi-Fi connection.
@@ -330,7 +330,7 @@ typedef struct RBRGen3WiFi
 /**
  * \brief Retrieve the current instrument Wi-Fi settings.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] wifi the current Wi-Fi parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -339,7 +339,7 @@ typedef struct RBRGen3WiFi
  * \see RBRGen3_setWiFi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-RBRGen3Error RBRGen3_getWiFi(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn,
                                          RBRGen3WiFi *wifi);
 
 /**
@@ -352,7 +352,7 @@ RBRGen3Error RBRGen3_getWiFi(RBRGen3 *instrument,
  * RBRGen3WiFi.enabled parameter does not exist for that generation of
  * instruments.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] wifi the new Wi-Fi parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -363,7 +363,7 @@ RBRGen3Error RBRGen3_getWiFi(RBRGen3 *instrument,
  * \see RBRGen3_getWifi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-RBRGen3Error RBRGen3_setWiFi(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_setWiFi(RBRGen3 *conn,
                                          const RBRGen3WiFi *wifi);
 
 #ifdef __cplusplus

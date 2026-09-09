@@ -31,10 +31,10 @@ int main(int argc, char *argv[])
     int instrumentFd;
 
     RBRGen3Error err;
-    RBRGen3 *instrument = NULL;
+    RBRGen3 *conn = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
     RBRGen3 instrumentSpace;
-    instrument = &instrumentSpace;
+    conn = &instrumentSpace;
     #endif
 
     if (argc < 2)
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     };
 
     if ((err = RBRGen3_open(
-             &instrument,
+             &conn,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
              (void *) &instrumentFd)) != RBRGEN3_SUCCESS)
@@ -80,25 +80,25 @@ int main(int argc, char *argv[])
     }
 
     RBRGen3Link link;
-    RBRGen3_getLink(instrument, &link);
+    RBRGen3_getLink(conn, &link);
     printf("Connected to the instrument via %s.\n",
            RBRGen3Link_name(link));
 
     switch (link)
     {
     case RBRGEN3_LINK_USB:
-        RBRGen3_setUSBStreamingState(instrument, false);
+        RBRGen3_setUSBStreamingState(conn, false);
         break;
     case RBRGEN3_LINK_SERIAL:
     case RBRGEN3_LINK_WIFI:
         {
             RBRGen3Serial serial;
-            RBRGen3_getSerial(instrument, &serial);
+            RBRGen3_getSerial(conn, &serial);
             printf("Connected in %s mode at %s baud.\n",
                    RBRGen3SerialMode_name(serial.mode),
                    RBRGen3SerialBaudRate_name(serial.baudRate));
 
-            RBRGen3_setSerialStreamingState(instrument, false);
+            RBRGen3_setSerialStreamingState(conn, false);
             break;
         }
     default:
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
     RBRGen3Sample sample;
     while (true)
     {
-        err = RBRGen3_fetch(instrument, NULL, false, &sample);
+        err = RBRGen3_fetch(conn, NULL, false, &sample);
         if (err != RBRGEN3_SUCCESS)
         {
             fprintf(stderr, "Error: %s\n", RBRGen3Error_name(err));
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
     }
 
 instrumentCleanup:
-    RBRGen3_close(instrument);
+    RBRGen3_close(conn);
 fileCleanup:
     close(instrumentFd);
 

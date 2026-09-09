@@ -38,7 +38,7 @@ const char *RBRGen3Dataset_name(RBRGen3Dataset dataset)
 }
 
 RBRGen3Error RBRGen3_getMemoryInfo(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3MemoryInfo *memoryInfo)
 {
     if (memoryInfo->dataset < RBRGEN3_DATASET_EASYPARSE_EVENTS
@@ -51,7 +51,7 @@ RBRGen3Error RBRGen3_getMemoryInfo(
     RBRGen3Dataset dataset = memoryInfo->dataset;
     memset(memoryInfo, 0, sizeof(RBRGen3MemoryInfo));
 
-    RBR_TRY(RBRGen3_converse(instrument,
+    RBR_TRY(RBRGen3_converse(conn,
                                    "meminfo dataset = %d",
                                    dataset));
 
@@ -59,7 +59,7 @@ RBRGen3Error RBRGen3_getMemoryInfo(
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -89,10 +89,10 @@ RBRGen3Error RBRGen3_getMemoryInfo(
 }
 
 static RBRGen3Error RBRGen3L2_parseDataResponse(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Data *data)
 {
-    sscanf(instrument->response.response,
+    sscanf(conn->response.response,
            "data %d %d %d",
            (int *) &data->dataset,
            &data->size,
@@ -101,14 +101,14 @@ static RBRGen3Error RBRGen3L2_parseDataResponse(
 }
 
 static RBRGen3Error RBRGen3L3_parseDataResponse(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Data *data)
 {
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -140,12 +140,12 @@ static RBRGen3Error RBRGen3L3_parseDataResponse(
  * begins to read from the instrument. As a result, \a data must not be
  * RBRGen3.responseBuffer!
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] data the buffer to write into
  * \param [in] size the amount of data to write into the buffer
  */
 static RBRGen3Error RBRGen3_fixedRead(
-    struct RBRGen3 *instrument,
+    struct RBRGen3 *conn,
     void *data,
     int32_t size)
 {
@@ -153,22 +153,22 @@ static RBRGen3Error RBRGen3_fixedRead(
     int32_t readLength;
 
     /* Can we steal from the response buffer? */
-    if (instrument->lastResponseLength < instrument->responseBufferLength)
+    if (conn->lastResponseLength < conn->responseBufferLength)
     {
-        readLength = instrument->responseBufferLength
-                     - instrument->lastResponseLength;
+        readLength = conn->responseBufferLength
+                     - conn->lastResponseLength;
         if (readLength > size)
         {
             readLength = size;
         }
 
         memcpy(data,
-               ((uint8_t *) instrument->responseBuffer)
-               + instrument->lastResponseLength,
+               ((uint8_t *) conn->responseBuffer)
+               + conn->lastResponseLength,
                readLength);
 
         bufferLength = readLength;
-        instrument->lastResponseLength += readLength;
+        conn->lastResponseLength += readLength;
     }
 
     /* Now poll the instrument. */
@@ -176,8 +176,8 @@ static RBRGen3Error RBRGen3_fixedRead(
     {
         readLength = size - bufferLength;
 
-        RBR_TRY(instrument->callbacks.read(
-                    instrument,
+        RBR_TRY(conn->callbacks.read(
+                    conn,
                     ((uint8_t *) data) + bufferLength,
                     &readLength));
 
@@ -215,7 +215,7 @@ uint16_t calculateCrc(const void *data, int32_t size)
     return crc;
 }
 
-RBRGen3Error RBRGen3_readData(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_readData(RBRGen3 *conn,
                                           RBRGen3Data *data)
 {
     if (data->dataset < RBRGEN3_DATASET_EASYPARSE_EVENTS
@@ -244,7 +244,7 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *instrument,
      *     << readdata dataset = <dataset>, size = <size>, offset = <offset>
      */
     const char *generationCommand;
-    if (instrument->generation == RBRGEN3_LOGGER2)
+    if (conn->generation == RBRGEN3_LOGGER2)
     {
         generationCommand = "read data %d %" PRId32 " %" PRId32;
     }
@@ -255,7 +255,7 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *instrument,
                             ", offset = %" PRId32;
     }
 
-    RBR_TRY(RBRGen3_converse(instrument,
+    RBR_TRY(RBRGen3_converse(conn,
                                    generationCommand,
                                    workingData.dataset,
                                    workingData.size,
@@ -263,13 +263,13 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *instrument,
 
     /* Because the response format for L2 is so nonstandard, we'll have to
      * parse it with sscanf. We can just do things the normal way for L3. */
-    if (instrument->generation == RBRGEN3_LOGGER2)
+    if (conn->generation == RBRGEN3_LOGGER2)
     {
-        RBR_TRY(RBRGen3L2_parseDataResponse(instrument, &workingData));
+        RBR_TRY(RBRGen3L2_parseDataResponse(conn, &workingData));
     }
     else
     {
-        RBR_TRY(RBRGen3L3_parseDataResponse(instrument, &workingData));
+        RBR_TRY(RBRGen3L3_parseDataResponse(conn, &workingData));
     }
 
     /* check if offset in response matches requested offset. If not, return error. */
@@ -280,7 +280,7 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *instrument,
     /* Fill the user-provided buffer. RBRGen3_fixedRead() will first pull
      * leftover data from RBRGen3.responseBuffer, then read from the
      * instrument. */
-    RBR_TRY(RBRGen3_fixedRead(instrument, data->data, workingData.size));
+    RBR_TRY(RBRGen3_fixedRead(conn, data->data, workingData.size));
 
     /* CRC check the last two bytes. */
     union
@@ -290,7 +290,7 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *instrument,
     }
     crc;
 
-    RBR_TRY(RBRGen3_fixedRead(instrument, crc.buf, 2));
+    RBR_TRY(RBRGen3_fixedRead(conn, crc.buf, 2));
     /* The logger reports the CRC as big-endian. Under the assumption that the
      * host is little-endian, we'll byte swap it before using it for
      * comparison. ntohs() is POSIX but not part of the C standard, and we want
@@ -309,10 +309,10 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *instrument,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRGen3_memoryClear(RBRGen3 *instrument)
+RBRGen3Error RBRGen3_memoryClear(RBRGen3 *conn)
 {
-    RBR_TRY(RBRGen3_permit(instrument, "memclear"));
-    RBR_TRY(RBRGen3_converse(instrument, "memclear"));
+    RBR_TRY(RBRGen3_permit(conn, "memclear"));
+    RBR_TRY(RBRGen3_converse(conn, "memclear"));
     return RBRGEN3_SUCCESS;
 }
 
@@ -332,7 +332,7 @@ const char *RBRGen3MemoryFormat_name(RBRGen3MemoryFormat format)
 }
 
 RBRGen3Error RBRGen3_getAvailableMemoryFormats(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3MemoryFormat *memoryFormats)
 {
     *memoryFormats = RBRGEN3_MEMFORMAT_NONE;
@@ -354,7 +354,7 @@ RBRGen3Error RBRGen3_getAvailableMemoryFormats(
     const char *generationCommand;
     const char *separator;
     int32_t separatorLen;
-    if (instrument->generation == RBRGEN3_LOGGER2)
+    if (conn->generation == RBRGEN3_LOGGER2)
     {
         generationCommand = "memformat support";
         separator = ", ";
@@ -366,13 +366,13 @@ RBRGen3Error RBRGen3_getAvailableMemoryFormats(
         separator = "|";
         separatorLen = 1;
     }
-    RBR_TRY(RBRGen3_converse(instrument, generationCommand));
+    RBR_TRY(RBRGen3_converse(conn, generationCommand));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -416,18 +416,18 @@ RBRGen3Error RBRGen3_getAvailableMemoryFormats(
 }
 
 RBRGen3Error RBRGen3_getCurrentMemoryFormat(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3MemoryFormat *memoryFormat)
 {
     *memoryFormat = RBRGEN3_MEMFORMAT_NONE;
 
-    RBR_TRY(RBRGen3_converse(instrument, "memformat type"));
+    RBR_TRY(RBRGen3_converse(conn, "memformat type"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -459,18 +459,18 @@ RBRGen3Error RBRGen3_getCurrentMemoryFormat(
 }
 
 RBRGen3Error RBRGen3_getNewMemoryFormat(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3MemoryFormat *memoryFormat)
 {
     *memoryFormat = RBRGEN3_MEMFORMAT_NONE;
 
-    RBR_TRY(RBRGen3_converse(instrument, "memformat newtype"));
+    RBR_TRY(RBRGen3_converse(conn, "memformat newtype"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -502,7 +502,7 @@ RBRGen3Error RBRGen3_getNewMemoryFormat(
 }
 
 RBRGen3Error RBRGen3_setNewMemoryFormat(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3MemoryFormat memoryFormat)
 {
     if (memoryFormat < RBRGEN3_MEMFORMAT_NONE
@@ -512,7 +512,7 @@ RBRGen3Error RBRGen3_setNewMemoryFormat(
     }
 
     const char *formatName = RBRGen3MemoryFormat_name(memoryFormat);
-    return RBRGen3_converse(instrument,
+    return RBRGen3_converse(conn,
                                   "memformat newtype = %s",
                                   formatName);
 }
@@ -596,20 +596,20 @@ const char *RBRGen3PostprocessingBinFilter_name(
 }
 
 RBRGen3Error RBRGen3_getPostprocessing(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Postprocessing *postprocessing)
 {
     memset(postprocessing, 0, sizeof(RBRGen3Postprocessing));
     postprocessing->status = RBRGEN3_UNKNOWN_POSTPROCESSING_STATUS;
     postprocessing->binFilter = RBRGEN3_UNKNOWN_POSTPROCESSING_BINFILTER;
 
-    RBR_TRY(RBRGen3_converse(instrument, "postprocessing all"));
+    RBR_TRY(RBRGen3_converse(conn, "postprocessing all"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument, &command, &parameter);
+        RBRGen3_parseResponse(conn, &command, &parameter);
 
         if (parameter.key == NULL || parameter.value == NULL)
         {
@@ -738,7 +738,7 @@ RBRGen3Error RBRGen3_getPostprocessing(
 }
 
 RBRGen3Error RBRGen3_setPostprocessing(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3Postprocessing *postprocessing)
 {
     bool timeBinning = strcmp(postprocessing->binReference, "tstamp") == 0;
@@ -780,7 +780,7 @@ RBRGen3Error RBRGen3_setPostprocessing(
      * a typical postprocessing command exceeds that length. We'll send
      * parameters in groups instead of all at once. */
     RBR_TRY(RBRGen3_converse(
-        instrument,
+        conn,
         "postprocessing binreference = %s, binfilter = %s, binsize = %.1f",
         postprocessing->binReference,
         RBRGen3PostprocessingBinFilter_name(postprocessing->binFilter),
@@ -790,27 +790,27 @@ RBRGen3Error RBRGen3_setPostprocessing(
 
     RBRGen3DateTime_toScheduleTime(postprocessing->tstampMin, tstamp);
     RBR_TRY(RBRGen3_converse(
-        instrument,
+        conn,
         "postprocessing tstamp_min = %s",
         tstamp));
 
     RBRGen3DateTime_toScheduleTime(postprocessing->tstampMax, tstamp);
     RBR_TRY(RBRGen3_converse(
-        instrument,
+        conn,
         "postprocessing tstamp_max = %s",
         tstamp));
 
     RBR_TRY(RBRGen3_converse(
-        instrument,
+        conn,
         "postprocessing depth_min = %.1f, depth_max = %.1f",
         (double) postprocessing->depthMin,
         (double) postprocessing->depthMax));
 
     /* on-board dynamic correction only available for firmware 1.134 and above */
-    if ( instrument->id.fwtype == 104 && RBRGen3Version_compare(instrument->id.version, "1.134") >= 0 )
+    if ( conn->id.fwtype == 104 && RBRGen3Version_compare(conn->id.version, "1.134") >= 0 )
     {
        RBR_TRY(RBRGen3_converse(
-            instrument,
+            conn,
             "postprocessing dc_alpha = %.3f, dc_tau = %.3f, dc_tdelay = %.3f, dc_ctcoeff = %.4e",
             (double) postprocessing->dcAlpha,
             (double) postprocessing->dcTau,
@@ -818,12 +818,12 @@ RBRGen3Error RBRGen3_setPostprocessing(
             (double) postprocessing->dcCtCoeff));
     }
 
-    char *commandBuffer = (char *) instrument->commandBuffer;
-    int32_t *commandBufferLength = &instrument->commandBufferLength;
+    char *commandBuffer = (char *) conn->commandBuffer;
+    int32_t *commandBufferLength = &conn->commandBufferLength;
 
     *commandBufferLength = snprintf(
         commandBuffer,
-        sizeof(instrument->commandBuffer),
+        sizeof(conn->commandBuffer),
         "postprocessing channels =");
 
     /* As with fetching, we want to be cautious that we don't exceed the length
@@ -840,15 +840,15 @@ RBRGen3Error RBRGen3_setPostprocessing(
             + 3 /* separator + paren pair */
             + strlen(functionName)
             + strlen(channelsList->channels[channel].label)
-            > sizeof(instrument->commandBuffer))
+            > sizeof(conn->commandBuffer))
         {
-            RBR_TRY(RBRGen3_sendBuffer(instrument));
+            RBR_TRY(RBRGen3_sendBuffer(conn));
             *commandBufferLength = 0;
         }
 
         *commandBufferLength += snprintf(
             commandBuffer + *commandBufferLength,
-            sizeof(instrument->commandBuffer) - *commandBufferLength,
+            sizeof(conn->commandBuffer) - *commandBufferLength,
             "%c%s(%s)",
             separator,
             functionName,
@@ -857,18 +857,18 @@ RBRGen3Error RBRGen3_setPostprocessing(
     }
 
     if ((size_t) *commandBufferLength + RBRGEN3_SEND_COMMAND_TERMINATOR_LEN
-        > sizeof(instrument->commandBuffer))
+        > sizeof(conn->commandBuffer))
     {
-        RBR_TRY(RBRGen3_sendBuffer(instrument));
+        RBR_TRY(RBRGen3_sendBuffer(conn));
         *commandBufferLength = 0;
     }
 
     *commandBufferLength += snprintf(
         commandBuffer + *commandBufferLength,
-        sizeof(instrument->commandBuffer) - *commandBufferLength,
+        sizeof(conn->commandBuffer) - *commandBufferLength,
         RBRGEN3_SEND_COMMAND_TERMINATOR);
 
-    RBR_TRY(RBRGen3_sendBuffer(instrument));
+    RBR_TRY(RBRGen3_sendBuffer(conn));
 
     /* We don't need anything back from the response, but we do want to make
      * sure that an appropriate response is received. Because we're not issuing
@@ -878,8 +878,8 @@ RBRGen3Error RBRGen3_setPostprocessing(
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBR_TRY(RBRGen3_readResponse(instrument, false, NULL));
-        RBRGen3_parseResponse(instrument, &command, &parameter);
+        RBR_TRY(RBRGen3_readResponse(conn, false, NULL));
+        RBRGen3_parseResponse(conn, &command, &parameter);
         if (strcmp(command, "postprocessing") == 0)
         {
             break;
@@ -890,7 +890,7 @@ RBRGen3Error RBRGen3_setPostprocessing(
 }
 
 RBRGen3Error RBRGen3_setPostprocessingCommand(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3PostprocessingCommand command,
     RBRGen3PostprocessingStatus *status)
 {
@@ -903,13 +903,13 @@ RBRGen3Error RBRGen3_setPostprocessingCommand(
     *status = RBRGEN3_UNKNOWN_POSTPROCESSING_STATUS;
 
     RBR_TRY(RBRGen3_converse(
-                instrument,
+                conn,
                 "postprocessing command = %s",
                 RBRGen3PostprocessingCommand_name(command)));
 
     char *instrumentCommand = NULL;
     RBRGen3ResponseParameter parameter;
-    while (RBRGen3_parseResponse(instrument,
+    while (RBRGen3_parseResponse(conn,
                                        &instrumentCommand,
                                        &parameter),
            parameter.key != NULL && parameter.value != NULL)

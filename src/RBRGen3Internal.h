@@ -70,13 +70,13 @@ extern "C" {
  * you have a specific requirement for custom buffer management (like sending
  * a very large command in multiple pieces).
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the command is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_sendCommand() to send a string command
  */
-RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *instrument);
+RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *conn);
 
 /**
  * Send a command to the instrument. The command will be formatted into
@@ -91,7 +91,7 @@ RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *instrument);
  * response buffer. To combine command sending and response reading with basic
  * sanity-checking, use RBRGen3_converse().
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] command the command to send as a printf-style format string
  * \return #RBRGEN3_SUCCESS when the command is successfully written
  * \return #RBRGEN3_BUFFER_TOO_SMALL when the formatted command is too
@@ -102,7 +102,7 @@ RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *instrument);
  * \see RBRGen3_readResponse() to read the command response
  * \see RBRGen3_converse() for a send/receive shortcut
  */
-RBRGen3Error RBRGen3_sendCommand(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_sendCommand(RBRGen3 *conn,
                                              const char *command,
                                              ...);
 
@@ -131,7 +131,7 @@ RBRGen3Error RBRGen3_sendCommand(RBRGen3 *instrument,
  * \a breakOnSample is false then \a sample will be populated with the most
  * recent sample incidentally encountered while parsing other responses.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] breakOnSample whether to return early when a sample is parsed
  * \param [out] sample where to put a parsed sample
  * \return #RBRGEN3_SUCCESS when a response was successfully read
@@ -142,7 +142,7 @@ RBRGen3Error RBRGen3_sendCommand(RBRGen3 *instrument,
  * \see RBRGen3_sendCommand() to send a command
  * \see RBRGen3_converse() for a send/receive shortcut
  */
-RBRGen3Error RBRGen3_readResponse(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn,
                                               bool breakOnSample,
                                               RBRGen3Sample *sample);
 
@@ -157,7 +157,7 @@ RBRGen3Error RBRGen3_readResponse(RBRGen3 *instrument,
  * from this function means that a timeout was reached waiting for the
  * _correct_ response, not just _any_ response.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] command the command to send as a printf-style format string
  * \return #RBRGEN3_SUCCESS when the command was successfully sent and a
  *                                response was read
@@ -167,7 +167,7 @@ RBRGen3Error RBRGen3_readResponse(RBRGen3 *instrument,
  * \see RBRGen3_sendCommand() to send a command
  * \see RBRGen3_readResponse() to read the command response
  */
-RBRGen3Error RBRGen3_converse(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_converse(RBRGen3 *conn,
                                           const char *command,
                                           ...);
 
@@ -179,7 +179,7 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *instrument,
  * for retrieving a single parameter (`command parameter`), then parses the
  * response looking for the value of that single parameter.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] command the name of the command
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
@@ -193,7 +193,7 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *instrument,
  * \see RBRGen3_getFloat() for the float equivalent
  * \see RBRGen3_getInt() for the integer equivalent
  */
-RBRGen3Error RBRGen3_getBool(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getBool(RBRGen3 *conn,
                                          const char *command,
                                          const char *parameter,
                                          bool *value);
@@ -206,7 +206,7 @@ RBRGen3Error RBRGen3_getBool(RBRGen3 *instrument,
  * for retrieving a single parameter (`command parameter`), then parses the
  * response looking for the value of that single parameter.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] command the name of the command
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
@@ -220,7 +220,7 @@ RBRGen3Error RBRGen3_getBool(RBRGen3 *instrument,
  * \see RBRGen3_getBool() for the boolean equivalent
  * \see RBRGen3_getInt() for the integer equivalent
  */
-RBRGen3Error RBRGen3_getFloat(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getFloat(RBRGen3 *conn,
                                           const char *command,
                                           const char *parameter,
                                           float *value);
@@ -233,7 +233,7 @@ RBRGen3Error RBRGen3_getFloat(RBRGen3 *instrument,
  * for retrieving a single parameter (`command parameter`), then parses the
  * response looking for the value of that single parameter.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] command the name of the command
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
@@ -247,7 +247,7 @@ RBRGen3Error RBRGen3_getFloat(RBRGen3 *instrument,
  * \see RBRGen3_getBool() for the boolean equivalent
  * \see RBRGen3_getFloat() for the float equivalent
  */
-RBRGen3Error RBRGen3_getInt(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getInt(RBRGen3 *conn,
                                         const char *command,
                                         const char *parameter,
                                         int32_t *value);
@@ -282,11 +282,11 @@ typedef struct RBRGen3ResponseParameter
  * This function mutates the instrument response buffer. As such, it can't be
  * called more than once on the same response.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] command the name of the command as indicated by the response
  * \param [in,out] parameter the most-recently-parsed response parameter
  */
-void RBRGen3_parseResponse(RBRGen3 *instrument,
+void RBRGen3_parseResponse(RBRGen3 *conn,
                                  char **command,
                                  RBRGen3ResponseParameter *parameter);
 
@@ -296,14 +296,14 @@ void RBRGen3_parseResponse(RBRGen3 *instrument,
  *
  * Updates RBRGen3.response as appropriate.
  *
- * \param [in,out] instrument the instrument connection
+ * \param [in,out] conn the instrument connection
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
  * \return #RBRGEN3_SUCCESS when the response is a warning or success
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error
  */
 RBRGen3Error RBRGen3_errorCheckResponse(
-    RBRGen3 *instrument, 
+    RBRGen3 *conn, 
     char *beginning, 
     char *end);
 

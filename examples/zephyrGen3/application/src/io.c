@@ -128,12 +128,12 @@ RBRGen3Error ZephyrRBRGen3IO_init(ZephyrRBRGen3IO *io,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error ZephyrRBRGen3IO_read(const struct RBRGen3 *instrument,
+RBRGen3Error ZephyrRBRGen3IO_read(const struct RBRGen3 *conn,
                                               void *data, int32_t *size)
 {
-    ZephyrRBRGen3IO *io = RBRGen3_getUserData(instrument);
+    ZephyrRBRGen3IO *io = RBRGen3_getUserData(conn);
 
-    k_timeout_t timeout = K_MSEC(RBRGen3_getCommandTimeout(instrument));
+    k_timeout_t timeout = K_MSEC(RBRGen3_getCommandTimeout(conn));
     k_timepoint_t deadline = sys_timepoint_calc(timeout);
 
     int err = k_mutex_lock(&io->rx.mut, sys_timepoint_timeout(deadline));
@@ -195,12 +195,12 @@ done:
     }
 }
 
-RBRGen3Error ZephyrRBRGen3IO_write(const struct RBRGen3 *instrument,
+RBRGen3Error ZephyrRBRGen3IO_write(const struct RBRGen3 *conn,
                                                const void *const data, int32_t size)
 {
-    ZephyrRBRGen3IO *io = RBRGen3_getUserData(instrument);
+    ZephyrRBRGen3IO *io = RBRGen3_getUserData(conn);
 
-    k_timeout_t timeout = K_MSEC(RBRGen3_getCommandTimeout(instrument));
+    k_timeout_t timeout = K_MSEC(RBRGen3_getCommandTimeout(conn));
     k_timepoint_t deadline = sys_timepoint_calc(timeout);
 
     int err = k_mutex_lock(&io->tx.mut, sys_timepoint_timeout(deadline));

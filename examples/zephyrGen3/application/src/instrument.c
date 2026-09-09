@@ -10,26 +10,26 @@
 
 #include "instrument.h"
 
-RBRGen3Error instrumentStart(RBRGen3 *instrument)
+RBRGen3Error instrumentStart(RBRGen3 *conn)
 {
     RBRGen3Error err;
 
     RBRGen3DeploymentStatus status;
-    if ((err = RBRGen3_disable(instrument, &status))
+    if ((err = RBRGen3_disable(conn, &status))
         != RBRGEN3_SUCCESS)
     {
         return err;
     }
 
     RBRGen3Sampling sampling;
-    if ((err = RBRGen3_getSampling(instrument, &sampling))
+    if ((err = RBRGen3_getSampling(conn, &sampling))
         != RBRGEN3_SUCCESS)
     {
         return err;
     }
     sampling.mode = RBRGEN3_SAMPLING_CONTINUOUS;
     sampling.period = sampling.userPeriodLimit;
-    if ((err = RBRGen3_setSampling(instrument, &sampling))
+    if ((err = RBRGen3_setSampling(conn, &sampling))
         != RBRGEN3_SUCCESS)
     {
         return err;
@@ -39,14 +39,14 @@ RBRGen3Error instrumentStart(RBRGen3 *instrument)
         .startTime = RBRGEN3_DATETIME_MIN,
         .endTime = RBRGEN3_DATETIME_MAX
     };
-    if ((err = RBRGen3_setDeployment(instrument, &deployment))
+    if ((err = RBRGen3_setDeployment(conn, &deployment))
         != RBRGEN3_SUCCESS)
     {
         return err;
     }
 
     if ((err = RBRGen3_setNewMemoryFormat(
-             instrument,
+             conn,
              RBRGEN3_MEMFORMAT_CALBIN00))
         != RBRGEN3_SUCCESS)
     {
@@ -54,22 +54,22 @@ RBRGen3Error instrumentStart(RBRGen3 *instrument)
     }
 
     RBRGen3Thresholding thresholding;
-    err = RBRGen3_getThresholding(instrument, &thresholding);
+    err = RBRGen3_getThresholding(conn, &thresholding);
     if (err == RBRGEN3_SUCCESS && thresholding.enabled)
     {
         thresholding.enabled = false;
-        RBRGen3_setThresholding(instrument, &thresholding);
+        RBRGen3_setThresholding(conn, &thresholding);
     }
 
     RBRGen3TwistActivation twistActivation;
-    err = RBRGen3_getTwistActivation(instrument, &twistActivation);
+    err = RBRGen3_getTwistActivation(conn, &twistActivation);
     if (err == RBRGEN3_SUCCESS && twistActivation.enabled)
     {
         twistActivation.enabled = false;
-        RBRGen3_setTwistActivation(instrument, &twistActivation);
+        RBRGen3_setTwistActivation(conn, &twistActivation);
     }
 
-    if ((err = RBRGen3_enable(instrument, true, &status))
+    if ((err = RBRGen3_enable(conn, true, &status))
         != RBRGEN3_SUCCESS)
     {
         return err;

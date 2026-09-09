@@ -53,7 +53,7 @@ or passing it further up the call stack:
 ~~~{.c}
 RBRGen3Error err;
 RBRGen3Foo foo;
-if ((err = RBRGen3_foo(instrument, &foo)) != RBRGEN3_SUCCESS)
+if ((err = RBRGen3_foo(conn, &foo)) != RBRGEN3_SUCCESS)
 {
     return err;
 }

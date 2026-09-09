@@ -121,18 +121,18 @@ int RBRGen3Version_compare(const char *inA, const char *inB)
     return -(separatorA - separatorB);
 }
 
-RBRGen3Error RBRGen3_getId(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getId(RBRGen3 *conn,
                                        RBRGen3Id *id)
 {
     memset(id, 0, sizeof(RBRGen3Id));
 
-    RBR_TRY(RBRGen3_converse(instrument, "id"));
+    RBR_TRY(RBRGen3_converse(conn, "id"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     do
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -171,27 +171,27 @@ RBRGen3Error RBRGen3_getId(RBRGen3 *instrument,
         }
     } while (true);
 
-    if (id != &instrument->id)
+    if (id != &conn->id)
     {
-        memcpy(&instrument->id, id, sizeof(RBRGen3Id));
+        memcpy(&conn->id, id, sizeof(RBRGen3Id));
     }
 
     return RBRGEN3_SUCCESS;
 }
 
 RBRGen3Error RBRGen3_getHardwareRevision(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3HardwareRevision *hwrev)
 {
     memset(hwrev, 0, sizeof(RBRGen3HardwareRevision));
 
-    RBR_TRY(RBRGen3_converse(instrument, "hwrev"));
+    RBR_TRY(RBRGen3_converse(conn, "hwrev"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -237,7 +237,7 @@ const char *RBRGen3PowerSource_name(RBRGen3PowerSource source)
     }
 }
 
-RBRGen3Error RBRGen3_getPower(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getPower(RBRGen3 *conn,
                                           RBRGen3Power *power)
 {
     memset(power, 0, sizeof(RBRGen3Power));
@@ -245,20 +245,20 @@ RBRGen3Error RBRGen3_getPower(RBRGen3 *instrument,
     power->internal = NAN;
     power->regulator = NAN;
 
-    if (instrument->generation == RBRGEN3_LOGGER2)
+    if (conn->generation == RBRGEN3_LOGGER2)
     {
-        RBR_TRY(RBRGen3_converse(instrument, "powerstatus"));
+        RBR_TRY(RBRGen3_converse(conn, "powerstatus"));
     }
     else
     {
-        RBR_TRY(RBRGen3_converse(instrument, "power"));
+        RBR_TRY(RBRGen3_converse(conn, "power"));
     }
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -355,10 +355,10 @@ const char *RBRGen3InternalBatteryType_displayName(
 }
 
 RBRGen3Error RBRGen3_getPowerInternal(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3PowerInternal *power)
 {
-    if (instrument->generation == RBRGEN3_LOGGER2)
+    if (conn->generation == RBRGEN3_LOGGER2)
     {
         return RBRGEN3_UNSUPPORTED;
     }
@@ -366,13 +366,13 @@ RBRGen3Error RBRGen3_getPowerInternal(
     memset(power, 0, sizeof(RBRGen3PowerInternal));
     power->batteryType = RBRGEN3_UNKNOWN_INTERNAL_BATTERY;
 
-    RBR_TRY(RBRGen3_converse(instrument, "powerinternal"));
+    RBR_TRY(RBRGen3_converse(conn, "powerinternal"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -406,7 +406,7 @@ RBRGen3Error RBRGen3_getPowerInternal(
 }
 
 RBRGen3Error RBRGen3_setPowerInternalBatteryType(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3InternalBatteryType type)
 {
     if (type < 0 || type >= RBRGEN3_INTERNAL_BATTERY_COUNT)
@@ -415,15 +415,15 @@ RBRGen3Error RBRGen3_setPowerInternalBatteryType(
     }
 
     return RBRGen3_converse(
-        instrument,
+        conn,
         "powerinternal batterytype = %s",
         RBRGen3InternalBatteryType_name(type));
 }
 
 RBRGen3Error RBRGen3_resetPowerInternalUsed(
-    RBRGen3 *instrument)
+    RBRGen3 *conn)
 {
-    return RBRGen3_converse(instrument, "powerinternal used = 0");
+    return RBRGen3_converse(conn, "powerinternal used = 0");
 }
 
 const char *RBRGen3ExternalBatteryType_name(
@@ -489,10 +489,10 @@ const char *RBRGen3ExternalBatteryType_displayName(
 }
 
 RBRGen3Error RBRGen3_getPowerExternal(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3PowerExternal *power)
 {
-    if (instrument->generation == RBRGEN3_LOGGER2)
+    if (conn->generation == RBRGEN3_LOGGER2)
     {
         return RBRGEN3_UNSUPPORTED;
     }
@@ -500,13 +500,13 @@ RBRGen3Error RBRGen3_getPowerExternal(
     memset(power, 0, sizeof(RBRGen3PowerExternal));
     power->batteryType = RBRGEN3_UNKNOWN_EXTERNAL_BATTERY;
 
-    RBR_TRY(RBRGen3_converse(instrument, "powerexternal"));
+    RBR_TRY(RBRGen3_converse(conn, "powerexternal"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -540,7 +540,7 @@ RBRGen3Error RBRGen3_getPowerExternal(
 }
 
 RBRGen3Error RBRGen3_setPowerExternalBatteryType(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3ExternalBatteryType type)
 {
     if (type < 0 || type >= RBRGEN3_EXTERNAL_BATTERY_COUNT)
@@ -549,35 +549,35 @@ RBRGen3Error RBRGen3_setPowerExternalBatteryType(
     }
 
     return RBRGen3_converse(
-        instrument,
+        conn,
         "powerexternal batterytype = %s",
         RBRGen3ExternalBatteryType_name(type));
 }
 
 RBRGen3Error RBRGen3_resetPowerExternalUsed(
-    RBRGen3 *instrument)
+    RBRGen3 *conn)
 {
-    return RBRGen3_converse(instrument, "powerexternal used = 0");
+    return RBRGen3_converse(conn, "powerexternal used = 0");
 }
 
 RBRGen3Error RBRGen3_getInfo(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Info *info)
 {
-    if (instrument->generation == RBRGEN3_LOGGER2)
+    if (conn->generation == RBRGEN3_LOGGER2)
     {
         return RBRGEN3_UNSUPPORTED;
     }
 
     memset(info, 0, sizeof(RBRGen3Info));
 
-    RBR_TRY(RBRGen3_converse(instrument, "info"));
+    RBR_TRY(RBRGen3_converse(conn, "info"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 

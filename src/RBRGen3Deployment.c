@@ -15,7 +15,7 @@
 #include "RBRGen3Internal.h"
 
 static RBRGen3Error RBRGen3_parseDeploymentResponse(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const char *deploymentCommand,
     RBRGen3DeploymentStatus *status)
 {
@@ -23,7 +23,7 @@ static RBRGen3Error RBRGen3_parseDeploymentResponse(
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -54,45 +54,45 @@ static RBRGen3Error RBRGen3_parseDeploymentResponse(
 }
 
 RBRGen3Error RBRGen3_verify(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     bool eraseMemory,
     RBRGen3DeploymentStatus *status)
 {
     *status = RBRGEN3_UNKNOWN_STATUS;
 
-    RBR_TRY(RBRGen3_converse(instrument,
+    RBR_TRY(RBRGen3_converse(conn,
                                    "verify erasememory = %s",
                                    (eraseMemory) ? "true" : "false"));
 
-    return RBRGen3_parseDeploymentResponse(instrument,
+    return RBRGen3_parseDeploymentResponse(conn,
                                                  "verify",
                                                  status);
 }
 
 RBRGen3Error RBRGen3_enable(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     bool eraseMemory,
     RBRGen3DeploymentStatus *status)
 {
     *status = RBRGEN3_UNKNOWN_STATUS;
 
-    RBR_TRY(RBRGen3_converse(instrument,
+    RBR_TRY(RBRGen3_converse(conn,
                                    "enable erasememory = %s",
                                    (eraseMemory) ? "true" : "false"));
 
-    return RBRGen3_parseDeploymentResponse(instrument,
+    return RBRGen3_parseDeploymentResponse(conn,
                                                  "enable",
                                                  status);
 }
 
 RBRGen3Error RBRGen3_disable(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3DeploymentStatus *status)
 {
     *status = RBRGEN3_UNKNOWN_STATUS;
 
     const char *disableCommand;
-    if (instrument->generation == RBRGEN3_LOGGER2)
+    if (conn->generation == RBRGEN3_LOGGER2)
     {
         disableCommand = "stop";
     }
@@ -101,26 +101,26 @@ RBRGen3Error RBRGen3_disable(
         disableCommand = "disable";
     }
 
-    RBR_TRY(RBRGen3_converse(instrument, disableCommand));
+    RBR_TRY(RBRGen3_converse(conn, disableCommand));
 
-    return RBRGen3_parseDeploymentResponse(instrument,
+    return RBRGen3_parseDeploymentResponse(conn,
                                                  disableCommand,
                                                  status);
 }
 
 RBRGen3Error RBRGen3_getSimulation(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Simulation *simulation)
 {
     memset(simulation, 0, sizeof(RBRGen3Simulation));
 
-    RBR_TRY(RBRGen3_converse(instrument, "simulation"));
+    RBR_TRY(RBRGen3_converse(conn, "simulation"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -142,7 +142,7 @@ RBRGen3Error RBRGen3_getSimulation(
 }
 
 RBRGen3Error RBRGen3_setSimulation(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3Simulation *simulation)
 {
     if (simulation->period <= 0)
@@ -150,8 +150,8 @@ RBRGen3Error RBRGen3_setSimulation(
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    RBR_TRY(RBRGen3_permit(instrument, "simulation"));
-    RBR_TRY(RBRGen3_converse(instrument,
+    RBR_TRY(RBRGen3_permit(conn, "simulation"));
+    RBR_TRY(RBRGen3_converse(conn,
                                    "simulation state = %s, period = %i",
                                    (simulation->state) ? "on" : "off",
                                    simulation->period));

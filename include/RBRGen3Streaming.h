@@ -56,7 +56,7 @@ typedef struct RBRGen3ChannelsList
  *
  * \nol2 Use RBRGen3_getChannels() and RBRGen3_getChannel().
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] channelsList the channels list
  * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -67,7 +67,7 @@ typedef struct RBRGen3ChannelsList
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
 RBRGen3Error RBRGen3_getChannelsList(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3ChannelsList *channelsList);
 
 /**
@@ -97,7 +97,7 @@ typedef struct RBRGen3LabelsList
  *
  * \nol2 Use RBRGen3_getChannels() and RBRGen3_getChannel().
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] labelsList the channel labels list
  * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -108,7 +108,7 @@ typedef struct RBRGen3LabelsList
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
 RBRGen3Error RBRGen3_getLabelsList(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3LabelsList *labelsList);
 
 /**
@@ -158,7 +158,7 @@ const char *RBRGen3OutputFormat_name(RBRGen3OutputFormat format);
  * output formats as defined by RBRGen3OutputFormat. For details, consult
  * [Working with Bit Fields](bitfields.md).
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] outputFormats available output formats
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -166,13 +166,13 @@ const char *RBRGen3OutputFormat_name(RBRGen3OutputFormat format);
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
 RBRGen3Error RBRGen3_getAvailableOutputFormats(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3OutputFormat *outputFormats);
 
 /**
  * \brief Get the current output format.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] outputFormat the current output format
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -180,13 +180,13 @@ RBRGen3Error RBRGen3_getAvailableOutputFormats(
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
 RBRGen3Error RBRGen3_getOutputFormat(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3OutputFormat *outputFormat);
 
 /**
  * \brief Set the current output format.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] outputFormat the current output format
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -196,13 +196,13 @@ RBRGen3Error RBRGen3_getOutputFormat(
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
 RBRGen3Error RBRGen3_setOutputFormat(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3OutputFormat outputFormat);
 
 /**
  * \brief Get the USB streaming state.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] enabled whether USB streaming is enabled
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -211,13 +211,13 @@ RBRGen3Error RBRGen3_setOutputFormat(
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamusb
  */
 RBRGen3Error RBRGen3_getUSBStreamingState(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     bool *enabled);
 
 /**
  * \brief Set the USB streaming state.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] enabled whether USB streaming is enabled
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -226,13 +226,13 @@ RBRGen3Error RBRGen3_getUSBStreamingState(
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamusb
  */
 RBRGen3Error RBRGen3_setUSBStreamingState(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     bool enabled);
 
 /**
  * \brief Get the serial streaming state.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] enabled whether serial streaming is enabled
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -241,13 +241,13 @@ RBRGen3Error RBRGen3_setUSBStreamingState(
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
 RBRGen3Error RBRGen3_getSerialStreamingState(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     bool *enabled);
 
 /**
  * \brief Set the serial streaming state.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] enabled whether serial streaming is enabled
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -256,7 +256,7 @@ RBRGen3Error RBRGen3_getSerialStreamingState(
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
 RBRGen3Error RBRGen3_setSerialStreamingState(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     bool enabled);
 
 /**
@@ -385,7 +385,7 @@ typedef struct RBRGen3AuxOutput
  * RBRGen3_getAuxOutput(instrument, &auxOutput);
  * ~~~
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] auxOutput the auxiliary output signal parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -397,7 +397,7 @@ typedef struct RBRGen3AuxOutput
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
 RBRGen3Error RBRGen3_getAuxOutput(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3AuxOutput *auxOutput);
 
 /**
@@ -408,7 +408,7 @@ RBRGen3Error RBRGen3_getAuxOutput(
  * - the auxiliary output signal is not available for the instrument
  * - you set an out-of-bounds parameter the library fails to detect
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] auxOutput the auxiliary output signal parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -419,7 +419,7 @@ RBRGen3Error RBRGen3_getAuxOutput(
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
 RBRGen3Error RBRGen3_setAuxOutput(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3AuxOutput *auxOutput);
 
 /**
@@ -519,13 +519,13 @@ typedef struct RBRGen3Sample
  * the RBRGen3SampleCallback provided to the instrument via
  * RBRGen3Callbacks.sample.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when a streaming sample has been read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_fetchSample() for on-demand sample fetching
  */
-RBRGen3Error RBRGen3_readSample(RBRGen3 *instrument);
+RBRGen3Error RBRGen3_readSample(RBRGen3 *conn);
 
 #ifdef __cplusplus
 }

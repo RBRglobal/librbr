@@ -77,11 +77,11 @@ int openSerialFd(char *devicePath)
     return instrumentFd;
 }
 
-RBRGen3Error instrumentTime(const struct RBRGen3 *instrument,
+RBRGen3Error instrumentTime(const struct RBRGen3 *conn,
                                   RBRGen3DateTime *time)
 {
     /* Unused. */
-    (void) instrument;
+    (void) conn;
 
     struct timespec result;
     clock_gettime(CLOCK_MONOTONIC, &result);
@@ -89,11 +89,11 @@ RBRGen3Error instrumentTime(const struct RBRGen3 *instrument,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error instrumentSleep(const struct RBRGen3 *instrument,
+RBRGen3Error instrumentSleep(const struct RBRGen3 *conn,
                                    RBRGen3DateTime time)
 {
     /* Unused. */
-    (void) instrument;
+    (void) conn;
 
     struct timespec sleep = {
         .tv_sec  =  time / 1000,
@@ -103,11 +103,11 @@ RBRGen3Error instrumentSleep(const struct RBRGen3 *instrument,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error instrumentRead(const struct RBRGen3 *instrument,
+RBRGen3Error instrumentRead(const struct RBRGen3 *conn,
                                   void *data,
                                   int32_t *size)
 {
-    int *instrumentFd = (int *) RBRGen3_getUserData(instrument);
+    int *instrumentFd = (int *) RBRGen3_getUserData(conn);
 
     /* A select() call to enforce a read timeout is unnecessary because we
      * configured the serial port in noncanonical mode and specified a read
@@ -132,11 +132,11 @@ RBRGen3Error instrumentRead(const struct RBRGen3 *instrument,
     }
 }
 
-RBRGen3Error instrumentWrite(const struct RBRGen3 *instrument,
+RBRGen3Error instrumentWrite(const struct RBRGen3 *conn,
                                    const void *const data,
                                    int32_t size)
 {
-    int *instrumentFd = (int *) RBRGen3_getUserData(instrument);
+    int *instrumentFd = (int *) RBRGen3_getUserData(conn);
     const uint8_t *const byteData = (const uint8_t *const) data;
     int32_t written = 0;
 
@@ -192,26 +192,26 @@ RBRGen3Error instrumentWrite(const struct RBRGen3 *instrument,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error instrumentStart(RBRGen3 *instrument)
+RBRGen3Error instrumentStart(RBRGen3 *conn)
 {
     RBRGen3Error err;
 
     RBRGen3DeploymentStatus status;
-    if ((err = RBRGen3_disable(instrument, &status))
+    if ((err = RBRGen3_disable(conn, &status))
         != RBRGEN3_SUCCESS)
     {
         return err;
     }
 
     RBRGen3Sampling sampling;
-    if ((err = RBRGen3_getSampling(instrument, &sampling))
+    if ((err = RBRGen3_getSampling(conn, &sampling))
         != RBRGEN3_SUCCESS)
     {
         return err;
     }
     sampling.mode = RBRGEN3_SAMPLING_CONTINUOUS;
     sampling.period = sampling.userPeriodLimit;
-    if ((err = RBRGen3_setSampling(instrument, &sampling))
+    if ((err = RBRGen3_setSampling(conn, &sampling))
         != RBRGEN3_SUCCESS)
     {
         return err;
@@ -221,14 +221,14 @@ RBRGen3Error instrumentStart(RBRGen3 *instrument)
         .startTime = RBRGEN3_DATETIME_MIN,
         .endTime = RBRGEN3_DATETIME_MAX
     };
-    if ((err = RBRGen3_setDeployment(instrument, &deployment))
+    if ((err = RBRGen3_setDeployment(conn, &deployment))
         != RBRGEN3_SUCCESS)
     {
         return err;
     }
 
     if ((err = RBRGen3_setNewMemoryFormat(
-             instrument,
+             conn,
              RBRGEN3_MEMFORMAT_CALBIN00))
         != RBRGEN3_SUCCESS)
     {
@@ -236,22 +236,22 @@ RBRGen3Error instrumentStart(RBRGen3 *instrument)
     }
 
     RBRGen3Thresholding thresholding;
-    err = RBRGen3_getThresholding(instrument, &thresholding);
+    err = RBRGen3_getThresholding(conn, &thresholding);
     if (err == RBRGEN3_SUCCESS && thresholding.enabled)
     {
         thresholding.enabled = false;
-        RBRGen3_setThresholding(instrument, &thresholding);
+        RBRGen3_setThresholding(conn, &thresholding);
     }
 
     RBRGen3TwistActivation twistActivation;
-    err = RBRGen3_getTwistActivation(instrument, &twistActivation);
+    err = RBRGen3_getTwistActivation(conn, &twistActivation);
     if (err == RBRGEN3_SUCCESS && twistActivation.enabled)
     {
         twistActivation.enabled = false;
-        RBRGen3_setTwistActivation(instrument, &twistActivation);
+        RBRGen3_setTwistActivation(conn, &twistActivation);
     }
 
-    if ((err = RBRGen3_enable(instrument, true, &status))
+    if ((err = RBRGen3_enable(conn, true, &status))
         != RBRGEN3_SUCCESS)
     {
         return err;

@@ -276,7 +276,7 @@ const char *bool_name(bool value);
  */
 /* Uncrustify thinks that asterisks in macros are multiplication operators and
  * incorrectly adds spacing, so we'll turn *INDENT-OFF* just for this. */
-#define _TEST(fn) bool test_##fn(RBRGen3 *instrument, \
+#define _TEST(fn) bool test_##fn(RBRGen3 *conn, \
                                  TestIOBuffers *buffers)
 /* *INDENT-ON* */
 
@@ -297,11 +297,11 @@ const char *bool_name(bool value);
 /**
  * \brief An instrument test to be run.
  *
- * \param instrument the instrument connection
+ * \param conn the instrument connection
  * \param buffers the test I/O buffers
  * \return whether the test passed
  */
-typedef bool (InstrumentTestFunction)(RBRGen3 *instrument,
+typedef bool (InstrumentTestFunction)(RBRGen3 *conn,
                                       TestIOBuffers *buffers);
 
 /**

@@ -32,11 +32,11 @@ RBRGen3Sample sampleBuffer;
 ZephyrRBRGen3IO io;
 
 RBRGen3Error instrumentSample(
-    const struct RBRGen3 *instrument,
+    const struct RBRGen3 *conn,
     const struct RBRGen3Sample *const sample)
 {
     /* Unused. */
-    (void) instrument;
+    (void) conn;
 
     char ftime[128];
     time_t sampleSeconds = (time_t) (sample->timestamp / 1000);
@@ -56,7 +56,7 @@ RBRGen3Error instrumentSample(
 int main(void)
 {
     RBRGen3Error err;
-    RBRGen3 *instrument = &instrumentBuffer;
+    RBRGen3 *conn = &instrumentBuffer;
 
     err = ZephyrRBRGen3IO_init(&io, instrumentUart);
     if (err != RBRGEN3_SUCCESS)
@@ -79,7 +79,7 @@ int main(void)
     };
 
     err = RBRGen3_open(
-        &instrument,
+        &conn,
         &callbacks,
         CONFIG_INSTRUMENT_COMMAND_TIMEOUT_MSEC,
         (void *) &io);
@@ -91,24 +91,24 @@ int main(void)
     }
 
     RBRGen3Link link;
-    RBRGen3_getLink(instrument, &link);
+    RBRGen3_getLink(conn, &link);
     LOG_INF("connected via %s", RBRGen3Link_name(link));
 
     switch (link)
     {
     case RBRGEN3_LINK_USB:
-        RBRGen3_setUSBStreamingState(instrument, true);
+        RBRGen3_setUSBStreamingState(conn, true);
         break;
     case RBRGEN3_LINK_SERIAL:
     case RBRGEN3_LINK_WIFI:
         {
             RBRGen3Serial serial;
-            RBRGen3_getSerial(instrument, &serial);
+            RBRGen3_getSerial(conn, &serial);
             LOG_INF("connected in %s mode at %s baud",
                     RBRGen3SerialMode_name(serial.mode),
                     RBRGen3SerialBaudRate_name(serial.baudRate));
 
-            RBRGen3_setSerialStreamingState(instrument, true);
+            RBRGen3_setSerialStreamingState(conn, true);
             break;
         }
     default:
@@ -118,13 +118,13 @@ int main(void)
     }
 
     RBRGen3Deployment deployment;
-    RBRGen3_getDeployment(instrument, &deployment);
+    RBRGen3_getDeployment(conn, &deployment);
     if (deployment.status != RBRGEN3_STATUS_LOGGING)
     {
         LOG_INF("instrument is %s, not logging; I'm going to start it",
                 RBRGen3DeploymentStatus_name(deployment.status));
 
-        if ((err = instrumentStart(instrument)) != RBRGEN3_SUCCESS)
+        if ((err = instrumentStart(conn)) != RBRGEN3_SUCCESS)
         {
             LOG_ERR("starting instrument: %s",
                     RBRGen3Error_name(err));
@@ -134,7 +134,7 @@ int main(void)
 
     while (true)
     {
-        if ((err = RBRGen3_readSample(instrument)) != RBRGEN3_SUCCESS)
+        if ((err = RBRGen3_readSample(conn)) != RBRGEN3_SUCCESS)
         {
             LOG_ERR("%s", RBRGen3Error_name(err));
         }

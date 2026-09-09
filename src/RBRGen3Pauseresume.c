@@ -62,18 +62,18 @@ const char *RBRGen3ResumeStatus_name(RBRGen3ResumeStatus status)
     }
 }
 
-RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *conn,
                                                 RBRGen3PauseresumeState *state)
 {
     /** To be safe, make *state = RBRGEN3_UNKNOWN_PAUSERESUME
      *  before using this function.
      */
-    RBR_TRY(RBRGen3_converse(instrument, "pauseresume"));
+    RBR_TRY(RBRGen3_converse(conn, "pauseresume"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
 
-    RBRGen3_parseResponse(instrument, &command, &parameter);
+    RBRGen3_parseResponse(conn, &command, &parameter);
 
     if (strcmp(parameter.key, "state") == 0)
     {
@@ -90,21 +90,21 @@ RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *instrument,
     else
     {
         char *end = command + strlen(command);
-        return RBRGen3_errorCheckResponse(instrument, command, end);
+        return RBRGen3_errorCheckResponse(conn, command, end);
     }
 
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRGen3_pause(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_pause(RBRGen3 *conn,
                                        RBRGen3PauseStatus *status)
 {
-    RBR_TRY(RBRGen3_converse(instrument, "pause"));
+    RBR_TRY(RBRGen3_converse(conn, "pause"));
 
     *status = RBRGEN3_UNKNOWN_PAUSE;
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
-    RBRGen3_parseResponse(instrument, &command, &parameter);
+    RBRGen3_parseResponse(conn, &command, &parameter);
     if (strcmp(parameter.key, "status") == 0)
     {
         int i = RBRGEN3_PAUSE_PAUSED;
@@ -118,20 +118,20 @@ RBRGen3Error RBRGen3_pause(RBRGen3 *instrument,
     else
     {
         char *end = command + strlen(command);
-        return RBRGen3_errorCheckResponse(instrument, command, end);
+        return RBRGen3_errorCheckResponse(conn, command, end);
     }
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRGen3_resume(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_resume(RBRGen3 *conn,
                                         RBRGen3ResumeStatus *status)
 {
-    RBR_TRY(RBRGen3_converse(instrument, "resume"));
+    RBR_TRY(RBRGen3_converse(conn, "resume"));
 
     *status = RBRGEN3_UNKNOWN_RESUME;
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
-    RBRGen3_parseResponse(instrument, &command, &parameter);
+    RBRGen3_parseResponse(conn, &command, &parameter);
     if (strcmp(parameter.key, "status") == 0)
     {
         for (int i = RBRGEN3_RESUME_PENDING; i < RBRGEN3_UNKNOWN_RESUME; i++)
@@ -147,7 +147,7 @@ RBRGen3Error RBRGen3_resume(RBRGen3 *instrument,
     else
     {
         char *end = command + strlen(command);
-        return RBRGen3_errorCheckResponse(instrument, command, end);
+        return RBRGen3_errorCheckResponse(conn, command, end);
     }
     return RBRGEN3_SUCCESS;
 }

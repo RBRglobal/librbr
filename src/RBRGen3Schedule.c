@@ -16,13 +16,13 @@
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
 
-static RBRGen3Error RBRGen3_getClockL2(RBRGen3 *instrument,
+static RBRGen3Error RBRGen3_getClockL2(RBRGen3 *conn,
                                                    RBRGen3Clock *clock)
 {
     char *command;
     RBRGen3ResponseParameter parameter;
 
-    RBRGen3Error err = RBRGen3_converse(instrument,
+    RBRGen3Error err = RBRGen3_converse(conn,
                                                     "settings offsetfromutc");
     /* Older Logger2 firmware didn't support the `offsetfromutc` setting, so it
      * will indicate an error when we go looking for it. Just swallow the
@@ -40,7 +40,7 @@ static RBRGen3Error RBRGen3_getClockL2(RBRGen3 *instrument,
         command = NULL;
         while (true)
         {
-            RBRGen3_parseResponse(instrument,
+            RBRGen3_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -62,12 +62,12 @@ static RBRGen3Error RBRGen3_getClockL2(RBRGen3 *instrument,
 
     /* Retrieve the time after the UTC offset so our return value is as close
      * as possible to the actual instrument time. */
-    RBR_TRY(RBRGen3_converse(instrument, "now"));
+    RBR_TRY(RBRGen3_converse(conn, "now"));
 
     command = NULL;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -88,16 +88,16 @@ static RBRGen3Error RBRGen3_getClockL2(RBRGen3 *instrument,
     return RBRGEN3_SUCCESS;
 }
 
-static RBRGen3Error RBRGen3_getClockL3(RBRGen3 *instrument,
+static RBRGen3Error RBRGen3_getClockL3(RBRGen3 *conn,
                                                    RBRGen3Clock *clock)
 {
-    RBR_TRY(RBRGen3_converse(instrument, "clock"));
+    RBR_TRY(RBRGen3_converse(conn, "clock"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -121,30 +121,30 @@ static RBRGen3Error RBRGen3_getClockL3(RBRGen3 *instrument,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRGen3_getClock(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getClock(RBRGen3 *conn,
                                           RBRGen3Clock *clock)
 {
     clock->dateTime = 0;
     clock->offsetFromUtc = NAN;
 
-    if (instrument->generation == RBRGEN3_LOGGER2)
+    if (conn->generation == RBRGEN3_LOGGER2)
     {
-        return RBRGen3_getClockL2(instrument, clock);
+        return RBRGen3_getClockL2(conn, clock);
     }
     else
     {
-        return RBRGen3_getClockL3(instrument, clock);
+        return RBRGen3_getClockL3(conn, clock);
     }
 }
 
 static RBRGen3Error RBRGen3_setClockL2(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const char *dateTime,
     float offsetFromUtc)
 {
     /* Set the clock as quickly as possible so that the hardware clock is as
      * close as possible to the provided value. */
-    RBR_TRY(RBRGen3_converse(instrument,
+    RBR_TRY(RBRGen3_converse(conn,
                                    "now = %s",
                                    dateTime));
 
@@ -153,10 +153,10 @@ static RBRGen3Error RBRGen3_setClockL2(
         return RBRGEN3_SUCCESS;
     }
 
-    RBR_TRY(RBRGen3_permit(instrument, "settings"));
+    RBR_TRY(RBRGen3_permit(conn, "settings"));
 
     RBRGen3Error err;
-    err = RBRGen3_converse(instrument,
+    err = RBRGen3_converse(conn,
                                  "settings offsetfromutc = %02f",
                                  (double) offsetFromUtc);
     /* Older Logger2 firmware didn't support the `offsetfromutc` setting,
@@ -170,27 +170,27 @@ static RBRGen3Error RBRGen3_setClockL2(
 }
 
 static RBRGen3Error RBRGen3_setClockL3(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const char *dateTime,
     float offsetFromUtc)
 {
     if (!isnan(offsetFromUtc))
     {
         return RBRGen3_converse(
-            instrument,
+            conn,
             "clock datetime = %s, offsetfromutc = %02f",
             dateTime,
             (double) offsetFromUtc);
     }
     else
     {
-        return RBRGen3_converse(instrument,
+        return RBRGen3_converse(conn,
                                       "clock datetime = %s",
                                       dateTime);
     }
 }
 
-RBRGen3Error RBRGen3_setClock(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_setClock(RBRGen3 *conn,
                                           const RBRGen3Clock *clock)
 {
     if (clock->dateTime < RBRGEN3_DATETIME_MIN
@@ -202,15 +202,15 @@ RBRGen3Error RBRGen3_setClock(RBRGen3 *instrument,
     char dateTime[RBRGEN3_SCHEDULE_TIME_LEN + 1];
     RBRGen3DateTime_toScheduleTime(clock->dateTime, dateTime);
 
-    if (instrument->generation == RBRGEN3_LOGGER2)
+    if (conn->generation == RBRGEN3_LOGGER2)
     {
-        return RBRGen3_setClockL2(instrument,
+        return RBRGen3_setClockL2(conn,
                                         dateTime,
                                         clock->offsetFromUtc);
     }
     else
     {
-        return RBRGen3_setClockL3(instrument,
+        return RBRGen3_setClockL3(conn,
                                         dateTime,
                                         clock->offsetFromUtc);
     }
@@ -263,7 +263,7 @@ const char *RBRGen3Gate_name(RBRGen3Gate gate)
 }
 
 RBRGen3Error RBRGen3_getSampling(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Sampling *sampling)
 {
     memset(sampling, 0, sizeof(RBRGen3Sampling));
@@ -295,7 +295,7 @@ RBRGen3Error RBRGen3_getSampling(
      *     << sampling mode = continuous, period = 63, burstlength = 10, burstinterval = 10000, gate = none, userperiodlimit = 63, availablefastperiods = 500|250|125|63
      */
     const char *generationCommand;
-    if (instrument->generation == RBRGEN3_LOGGER2)
+    if (conn->generation == RBRGEN3_LOGGER2)
     {
         generationCommand = "sampling";
     }
@@ -304,13 +304,13 @@ RBRGen3Error RBRGen3_getSampling(
         generationCommand = "sampling all";
     }
 
-    RBR_TRY(RBRGen3_converse(instrument, generationCommand));
+    RBR_TRY(RBRGen3_converse(conn, generationCommand));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -359,7 +359,7 @@ RBRGen3Error RBRGen3_getSampling(
 
             /* Logger3 will tell us available sampling rates, so we don't have
              * to guess them. */
-            if (instrument->generation != RBRGEN3_LOGGER2)
+            if (conn->generation != RBRGEN3_LOGGER2)
             {
                 continue;
             }
@@ -367,9 +367,9 @@ RBRGen3Error RBRGen3_getSampling(
             bool has3Hz5HzAvailable = false;
             /* 200/333 are only available on firmware type 100/up to
              * firmware version 1.360 on firmware type 103. */
-            if (instrument->id.fwtype == 100
-                || (instrument->id.fwtype == 103
-                    && RBRGen3Version_compare(instrument->id.version,
+            if (conn->id.fwtype == 100
+                || (conn->id.fwtype == 103
+                    && RBRGen3Version_compare(conn->id.version,
                                                     "1.360") <= 0))
             {
                 has3Hz5HzAvailable = true;
@@ -469,7 +469,7 @@ RBRGen3Error RBRGen3Sampling_validateSamplingPeriod(
 }
 
 RBRGen3Error RBRGen3_setSampling(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3Sampling *sampling)
 {
     RBR_TRY(RBRGen3Sampling_validateSamplingPeriod(sampling));
@@ -480,14 +480,14 @@ RBRGen3Error RBRGen3_setSampling(
     }
 
     return RBRGen3_converse(
-        instrument,
+        conn,
         "sampling mode = %s, period = %d",
         RBRGen3SamplingMode_name(sampling->mode),
         sampling->period);
 }
 
 RBRGen3Error RBRGen3_setBurstSampling(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3Sampling *sampling)
 {
     RBR_TRY(RBRGen3Sampling_validateSamplingPeriod(sampling));
@@ -505,7 +505,7 @@ RBRGen3Error RBRGen3_setBurstSampling(
     }
 
     return RBRGen3_converse(
-        instrument,
+        conn,
         "sampling burstlength = %d, burstinterval = %d",
         sampling->burstLength,
         sampling->burstInterval);
@@ -547,7 +547,7 @@ const char *RBRGen3DeploymentStatus_name(
 }
 
 static RBRGen3Error RBRGen3_getDeploymentL2(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Deployment *deployment)
 {
     char *command;
@@ -556,11 +556,11 @@ static RBRGen3Error RBRGen3_getDeploymentL2(
     /* Logger2 doesn't have a deployment command; it has separate starttime/
      * endtime/status commands. We'll call and parse each one separately. */
 
-    RBR_TRY(RBRGen3_converse(instrument, "starttime"));
+    RBR_TRY(RBRGen3_converse(conn, "starttime"));
     command = NULL;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -579,11 +579,11 @@ static RBRGen3Error RBRGen3_getDeploymentL2(
                     NULL));
     }
 
-    RBR_TRY(RBRGen3_converse(instrument, "endtime"));
+    RBR_TRY(RBRGen3_converse(conn, "endtime"));
     command = NULL;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -602,11 +602,11 @@ static RBRGen3Error RBRGen3_getDeploymentL2(
                     NULL));
     }
 
-    RBR_TRY(RBRGen3_converse(instrument, "status"));
+    RBR_TRY(RBRGen3_converse(conn, "status"));
     command = NULL;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -634,16 +634,16 @@ static RBRGen3Error RBRGen3_getDeploymentL2(
 }
 
 static RBRGen3Error RBRGen3_getDeploymentL3(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Deployment *deployment)
 {
-    RBR_TRY(RBRGen3_converse(instrument, "deployment"));
+    RBR_TRY(RBRGen3_converse(conn, "deployment"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -683,7 +683,7 @@ static RBRGen3Error RBRGen3_getDeploymentL3(
 }
 
 RBRGen3Error RBRGen3_getDeployment(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Deployment *deployment)
 {
     memset(deployment, 0, sizeof(RBRGen3Deployment));
@@ -691,18 +691,18 @@ RBRGen3Error RBRGen3_getDeployment(
     *(RBRGen3DeploymentStatus *) &deployment->status =
         RBRGEN3_UNKNOWN_STATUS;
 
-    if (instrument->generation == RBRGEN3_LOGGER2)
+    if (conn->generation == RBRGEN3_LOGGER2)
     {
-        return RBRGen3_getDeploymentL2(instrument, deployment);
+        return RBRGen3_getDeploymentL2(conn, deployment);
     }
     else
     {
-        return RBRGen3_getDeploymentL3(instrument, deployment);
+        return RBRGen3_getDeploymentL3(conn, deployment);
     }
 }
 
 RBRGen3Error RBRGen3_setDeployment(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3Deployment *deployment)
 {
     if (deployment->endTime <= deployment->startTime
@@ -722,19 +722,19 @@ RBRGen3Error RBRGen3_setDeployment(
 
     /* As with reading deployment details, we'll have to call the starttime/
      * endtime commands each in turn for Logger2. */
-    if (instrument->generation == RBRGEN3_LOGGER2)
+    if (conn->generation == RBRGEN3_LOGGER2)
     {
-        RBR_TRY(RBRGen3_converse(instrument,
+        RBR_TRY(RBRGen3_converse(conn,
                                        "starttime = %s",
                                        startTime));
-        RBR_TRY(RBRGen3_converse(instrument,
+        RBR_TRY(RBRGen3_converse(conn,
                                        "endtime = %s",
                                        endTime));
     }
     else
     {
         RBR_TRY(RBRGen3_converse(
-                    instrument,
+                    conn,
                     "deployment starttime = %s, endtime = %s",
                     startTime,
                     endTime));

@@ -326,7 +326,7 @@ typedef struct RBRGen3Channels
  * `channel`, and `calibration` commands. The information returned by this
  * function should comprise a complete model of an instrument's channels.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] channels the channel information
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -337,7 +337,7 @@ typedef struct RBRGen3Channels
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/calibration
  */
-RBRGen3Error RBRGen3_getChannels(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getChannels(RBRGen3 *conn,
                                              RBRGen3Channels *channels);
 
 /**
@@ -348,7 +348,7 @@ RBRGen3Error RBRGen3_getChannels(RBRGen3 *instrument,
  * _not_ populated. This saves bandwidth and time communicating with the
  * instrument when calibration information is unnecessary.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] channels the channel information
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -359,13 +359,13 @@ RBRGen3Error RBRGen3_getChannels(RBRGen3 *instrument,
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  */
 RBRGen3Error RBRGen3_getChannelsWithoutCalibrations(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Channels *channels);
 
 /**
  * \brief Set the status of a channel.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] channel the index of the channel to update
  * \param [in] status whether the channel is activated for sampling
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
@@ -376,7 +376,7 @@ RBRGen3Error RBRGen3_getChannelsWithoutCalibrations(
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  */
 RBRGen3Error RBRGen3_setChannelStatus(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3ChannelIndex channel,
     bool status);
 
@@ -398,7 +398,7 @@ RBRGen3Error RBRGen3_setChannelStatus(
  * RBRGen3ChannelGain.availableGains is only used for parameter
  * verification. It is not sent to the instrument.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] channel the index of the channel to update
  * \param [in] gain the gain parameters for the channel
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
@@ -414,7 +414,7 @@ RBRGen3Error RBRGen3_setChannelStatus(
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  */
 RBRGen3Error RBRGen3_setChannelGain(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3ChannelIndex channel,
     RBRGen3ChannelGain *gain);
 
@@ -436,7 +436,7 @@ RBRGen3Error RBRGen3_setChannelGain(
  * Values of in the _n_ coefficient group (RBRGen3Calibration.n) are
  * ignored.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] channel the index of the channel to update
  * \param [in] calibration the new calibration coefficients for the channel
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
@@ -451,7 +451,7 @@ RBRGen3Error RBRGen3_setChannelGain(
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/calibration
  */
 RBRGen3Error RBRGen3_setCalibration(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3ChannelIndex channel,
     const RBRGen3Calibration *calibration);
 
@@ -462,7 +462,7 @@ RBRGen3Error RBRGen3_setCalibration(
  * completion of a fetch command and power to the front end sensors being
  * removed by the instrument.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] fetchPowerOffDelay the fetch power-off delay
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -471,7 +471,7 @@ RBRGen3Error RBRGen3_setCalibration(
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
 RBRGen3Error RBRGen3_getFetchPowerOffDelay(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Period *fetchPowerOffDelay);
 
 /**
@@ -482,7 +482,7 @@ RBRGen3Error RBRGen3_getFetchPowerOffDelay(
  * - the instrument is logging
  * - you set an out-of-bounds time the library fails to detect
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] fetchPowerOffDelay the fetch power-off delay
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -492,7 +492,7 @@ RBRGen3Error RBRGen3_getFetchPowerOffDelay(
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
 RBRGen3Error RBRGen3_setFetchPowerOffDelay(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Period fetchPowerOffDelay);
 
 /**
@@ -502,7 +502,7 @@ RBRGen3Error RBRGen3_setFetchPowerOffDelay(
  * samples. This can be useful for sensors with very long power-on
  * stabilization times.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] sensorPowerAlwaysOn whether sensor power is always on
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -511,7 +511,7 @@ RBRGen3Error RBRGen3_setFetchPowerOffDelay(
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
 RBRGen3Error RBRGen3_isSensorPowerAlwaysOn(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     bool *sensorPowerAlwaysOn);
 
 /**
@@ -519,7 +519,7 @@ RBRGen3Error RBRGen3_isSensorPowerAlwaysOn(
  *
  * A hardware error will occur if the instrument is logging.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] sensorPowerAlwaysOn whether sensor power is always on
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -529,7 +529,7 @@ RBRGen3Error RBRGen3_isSensorPowerAlwaysOn(
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
 RBRGen3Error RBRGen3_setSensorPowerAlwaysOn(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     bool sensorPowerAlwaysOn);
 
 /**
@@ -538,7 +538,7 @@ RBRGen3Error RBRGen3_setSensorPowerAlwaysOn(
  * The instrument can automatically detect upcasts and downcasts and generate
  * cast detection events in the datastream.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] castDetection whether cast detection is enabled
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -546,7 +546,7 @@ RBRGen3Error RBRGen3_setSensorPowerAlwaysOn(
  * \see RBRGen3_setCastDetection()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRGen3Error RBRGen3_getCastDetection(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getCastDetection(RBRGen3 *conn,
                                                   bool *castDetection);
 
 /**
@@ -554,7 +554,7 @@ RBRGen3Error RBRGen3_getCastDetection(RBRGen3 *instrument,
  *
  * A hardware error will occur if the instrument is logging.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] castDetection whether cast detection is enabled
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -563,7 +563,7 @@ RBRGen3Error RBRGen3_getCastDetection(RBRGen3 *instrument,
  * \see RBRGen3_getCastDetection()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRGen3Error RBRGen3_setCastDetection(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_setCastDetection(RBRGen3 *conn,
                                                   bool castDetection);
 
 /**
@@ -573,7 +573,7 @@ RBRGen3Error RBRGen3_setCastDetection(RBRGen3 *instrument,
  * inclusive; partial seconds are rounded up to the next whole second by the
  * instrument.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] inputTimeout the timeout for output suppression
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -582,7 +582,7 @@ RBRGen3Error RBRGen3_setCastDetection(RBRGen3 *instrument,
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
 RBRGen3Error RBRGen3_getInputTimeout(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Period *inputTimeout);
 
 /**
@@ -593,7 +593,7 @@ RBRGen3Error RBRGen3_getInputTimeout(
  *
  * A hardware error will occur if the instrument is logging.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] inputTimeout the timeout for output suppression
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -603,7 +603,7 @@ RBRGen3Error RBRGen3_getInputTimeout(
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
 RBRGen3Error RBRGen3_setInputTimeout(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Period inputTimeout);
 
 /**
@@ -695,7 +695,7 @@ const char *RBRGen3ValueSetting_name(RBRGen3ValueSetting setting);
 /**
  * \brief Read a value setting from the instrument.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] setting the setting to retrieve
  * \param [out] value the value of the setting
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
@@ -707,7 +707,7 @@ const char *RBRGen3ValueSetting_name(RBRGen3ValueSetting setting);
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
 RBRGen3Error RBRGen3_getValueSetting(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3ValueSetting setting,
     float *value);
 
@@ -716,7 +716,7 @@ RBRGen3Error RBRGen3_getValueSetting(
  *
  * A hardware error will occur if the instrument is logging.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] setting the setting to retrieve
  * \param [in] value the value of the setting
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
@@ -730,7 +730,7 @@ RBRGen3Error RBRGen3_getValueSetting(
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
 RBRGen3Error RBRGen3_setValueSetting(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3ValueSetting setting,
     float value);
 
@@ -759,7 +759,7 @@ typedef struct RBRGen3SensorParameter
  * things for users, the library emulates the Logger3 behaviour for Logger2
  * instruments.
  *
- * \param instrument the instrument connection
+ * \param conn the instrument connection
  * \param [in] channel the index of the channel from which the parameter is to
  *                     be retrieved
  * \param [in,out] parameter initially, the sensor parameter to be retrieved;
@@ -773,7 +773,7 @@ typedef struct RBRGen3SensorParameter
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/sensor
  */
 RBRGen3Error RBRGen3_getSensorParameter(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3ChannelIndex channel,
     RBRGen3SensorParameter *parameter);
 
@@ -783,7 +783,7 @@ RBRGen3Error RBRGen3_getSensorParameter(
  * To ease memory requirements, sensor parameters are not included with other
  * channel information retrieved by RBRGen3_getChannels().
  *
- * \param instrument the instrument connection
+ * \param conn the instrument connection
  * \param [in] channel the index of the channel for which sensor parameters are
  *                     to be retrieved
  * \param [out] parameters the sensor parameters for the channel
@@ -799,7 +799,7 @@ RBRGen3Error RBRGen3_getSensorParameter(
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/sensor
  */
 RBRGen3Error RBRGen3_getSensorParameters(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3ChannelIndex channel,
     RBRGen3SensorParameter *parameters,
     int32_t *size);
@@ -812,7 +812,7 @@ RBRGen3Error RBRGen3_getSensorParameters(
  * - the instrument is logging
  * - the parameter name has not been defined at the RBR factory
  *
- * \param instrument the instrument connection
+ * \param conn the instrument connection
  * \param [in] channel the index of the channel the sensor parameter of which
  *                     is to be updated
  * \param [in] parameter the sensor parameter for the channel
@@ -826,7 +826,7 @@ RBRGen3Error RBRGen3_getSensorParameters(
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/sensor
  */
 RBRGen3Error RBRGen3_setSensorParameter(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3ChannelIndex channel,
     RBRGen3SensorParameter *parameter);
 

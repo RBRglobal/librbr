@@ -27,7 +27,7 @@ TEST_LOGGER3(meminfo)
                        "remaining = 134216192, size = 134217728"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_getMemoryInfo(instrument, &actual);
+    RBRGen3Error err = RBRGen3_getMemoryInfo(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(expected.dataset, actual.dataset, "%" PRIi32);
     TEST_ASSERT_EQ(expected.used, actual.used, "%" PRIi32);
@@ -46,7 +46,7 @@ TEST_LOGGER3(meminfo_invalid_dataset)
     };
 
     TestIOBuffers_init(buffers, "", 0);
-    RBRGen3Error err = RBRGen3_getMemoryInfo(instrument, &test);
+    RBRGen3Error err = RBRGen3_getMemoryInfo(conn, &test);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE,
                         err,
                         RBRGen3Error);
@@ -76,7 +76,7 @@ TEST_LOGGER2(read)
                        "AAAAAAAA\045\224"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_readData(instrument, &actual);
+    RBRGen3Error err = RBRGen3_readData(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(expected.dataset, actual.dataset, "%" PRIi32);
     TEST_ASSERT_EQ(expected.size, actual.size, "%" PRIi32);
@@ -106,7 +106,7 @@ TEST_LOGGER2(read_offset_mismatch)
                        "AAAAAAAA\045\224"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_readData(instrument, &actual);
+    RBRGen3Error err = RBRGen3_readData(conn, &actual);
     TEST_ASSERT_STR_EQ("read data 1 1400 2800"
                        COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -136,7 +136,7 @@ TEST_LOGGER3(readdata)
                        "AAAAAAAA\045\224"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_readData(instrument, &actual);
+    RBRGen3Error err = RBRGen3_readData(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(expected.dataset, actual.dataset, "%" PRIi32);
     TEST_ASSERT_EQ(expected.size, actual.size, "%" PRIi32);
@@ -165,7 +165,7 @@ TEST_LOGGER3(readdata_offset_mismatch)
                        "AAAAAAAA\045\024"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_readData(instrument, &actual);
+    RBRGen3Error err = RBRGen3_readData(conn, &actual);
     TEST_ASSERT_STR_EQ("readdata dataset = 1, size = 1400, offset = 2800"
                        COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -183,7 +183,7 @@ TEST_LOGGER3(readdata_invalid_dataset)
     };
 
     TestIOBuffers_init(buffers, "", 0);
-    RBRGen3Error err = RBRGen3_readData(instrument, &test);
+    RBRGen3Error err = RBRGen3_readData(conn, &test);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE,
                         err,
                         RBRGen3Error);
@@ -213,7 +213,7 @@ TEST_LOGGER3(readdata_crc_failure)
                        "AAAAAAAA00"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRGen3_readData(instrument, &actual);
+    RBRGen3Error err = RBRGen3_readData(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_CHECKSUM_ERROR, err, RBRGen3Error);
     TEST_ASSERT_EQ(expected.dataset, actual.dataset, "%" PRIi32);
     TEST_ASSERT_EQ(expected.size, actual.size, "%" PRIi32);
@@ -237,7 +237,7 @@ TEST_LOGGER2(memformat_support)
                        RESPONSE_TERMINATOR,
                        0);
     RBRGen3Error err = RBRGen3_getAvailableMemoryFormats(
-        instrument,
+        conn,
         &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(expected, actual, "0x%04X");
@@ -258,7 +258,7 @@ TEST_LOGGER3(memformat_availabletypes)
                        RESPONSE_TERMINATOR,
                        0);
     RBRGen3Error err = RBRGen3_getAvailableMemoryFormats(
-        instrument,
+        conn,
         &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(expected, actual, "0x%04X");
@@ -277,7 +277,7 @@ TEST_LOGGER3(memformat_type)
                        "memformat type = rawbin00" RESPONSE_TERMINATOR,
                        0);
     RBRGen3Error err = RBRGen3_getCurrentMemoryFormat(
-        instrument,
+        conn,
         &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected, actual, RBRGen3MemoryFormat);
@@ -296,7 +296,7 @@ TEST_LOGGER3(memformat_newtype)
                        "memformat newtype = calbin00" RESPONSE_TERMINATOR,
                        0);
     RBRGen3Error err = RBRGen3_getNewMemoryFormat(
-        instrument,
+        conn,
         &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected, actual, RBRGen3MemoryFormat);
@@ -315,7 +315,7 @@ TEST_LOGGER3(memformat_newtype_set)
 
     TestIOBuffers_init(buffers, response, 0);
     RBRGen3Error err = RBRGen3_setNewMemoryFormat(
-        instrument,
+        conn,
         RBRGEN3_MEMFORMAT_CALBIN00);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
@@ -378,7 +378,7 @@ TEST_LOGGER3(postprocessing)
                           "binfilter = none, "
                           "dc_alpha = 0.08, dc_tau = 8.000, dc_tdelay = 0.35, dc_ctcoeff = 2.4e-4" RESPONSE_TERMINATOR;
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRGen3_getPostprocessing(instrument,
+    RBRGen3Error err = RBRGen3_getPostprocessing(conn,
                                                              &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected.status,
@@ -488,7 +488,7 @@ TEST_LOGGER3(postprocessing_set)
                           RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRGen3_setPostprocessing(instrument,
+    RBRGen3Error err = RBRGen3_setPostprocessing(conn,
                                                              &postprocessing);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
@@ -504,7 +504,7 @@ TEST_LOGGER3(postprocessing_command)
 
     RBRGen3PostprocessingStatus result;
     RBRGen3Error err = RBRGen3_setPostprocessingCommand(
-        instrument,
+        conn,
         RBRGEN3_POSTPROCESSING_COMMAND_START,
         &result);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);

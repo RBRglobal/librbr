@@ -49,14 +49,14 @@ int RBRGen3Version_compare(const char *a, const char *b);
 /**
  * \brief Get identification information from the instrument.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] id the instrument information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/id
  */
-RBRGen3Error RBRGen3_getId(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getId(RBRGen3 *conn,
                                        RBRGen3Id *id);
 
 /**
@@ -78,7 +78,7 @@ typedef struct RBRGen3HardwareRevision
 /**
  * \brief Get instrument hardware revision information.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] hwrev the hardware revision information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -86,7 +86,7 @@ typedef struct RBRGen3HardwareRevision
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/hwrev
  */
 RBRGen3Error RBRGen3_getHardwareRevision(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3HardwareRevision *hwrev);
 
 /**
@@ -147,7 +147,7 @@ typedef struct RBRGen3Power
 /**
  * \brief Get instrument power information.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] power the power information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -155,7 +155,7 @@ typedef struct RBRGen3Power
  * \return #RBRGEN3_HARDWARE_ERROR if an error occurs reading voltages
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/power
  */
-RBRGen3Error RBRGen3_getPower(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getPower(RBRGen3 *conn,
                                           RBRGen3Power *power);
 
 /**
@@ -236,7 +236,7 @@ typedef struct RBRGen3PowerInternal
  *
  * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] power the power information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -246,7 +246,7 @@ typedef struct RBRGen3PowerInternal
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
 RBRGen3Error RBRGen3_getPowerInternal(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3PowerInternal *power);
 
 /**
@@ -254,7 +254,7 @@ RBRGen3Error RBRGen3_getPowerInternal(
  *
  * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] type the battery type
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -264,7 +264,7 @@ RBRGen3Error RBRGen3_getPowerInternal(
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
 RBRGen3Error RBRGen3_setPowerInternalBatteryType(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3InternalBatteryType type);
 
 /**
@@ -272,7 +272,7 @@ RBRGen3Error RBRGen3_setPowerInternalBatteryType(
  *
  * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -281,7 +281,7 @@ RBRGen3Error RBRGen3_setPowerInternalBatteryType(
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
 RBRGen3Error RBRGen3_resetPowerInternalUsed(
-    RBRGen3 *instrument);
+    RBRGen3 *conn);
 
 /**
  * External battery types.
@@ -369,7 +369,7 @@ typedef struct RBRGen3PowerExternal
  *
  * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] power the power information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -379,7 +379,7 @@ typedef struct RBRGen3PowerExternal
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
 RBRGen3Error RBRGen3_getPowerExternal(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3PowerExternal *power);
 
 /**
@@ -387,7 +387,7 @@ RBRGen3Error RBRGen3_getPowerExternal(
  *
  * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] type the battery type
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -396,7 +396,7 @@ RBRGen3Error RBRGen3_getPowerExternal(
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
 RBRGen3Error RBRGen3_setPowerExternalBatteryType(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3ExternalBatteryType type);
 
 /**
@@ -404,7 +404,7 @@ RBRGen3Error RBRGen3_setPowerExternalBatteryType(
  *
  * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -412,7 +412,7 @@ RBRGen3Error RBRGen3_setPowerExternalBatteryType(
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
 RBRGen3Error RBRGen3_resetPowerExternalUsed(
-    RBRGen3 *instrument);
+    RBRGen3 *conn);
 
 /**
  * \brief Instrument `info` command parameters.
@@ -433,7 +433,7 @@ typedef struct RBRGen3Info
  *
  * \nol2
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] info the extended instrument information
  * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \return #RBRGEN3_SUCCESS when the information is successfully read
@@ -442,7 +442,7 @@ typedef struct RBRGen3Info
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/info
  */
 RBRGen3Error RBRGen3_getInfo(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Info *info);
 
 #ifdef __cplusplus

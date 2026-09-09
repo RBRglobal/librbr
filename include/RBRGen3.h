@@ -347,7 +347,7 @@ struct RBRGen3;
  * based on CLOCK_BOOTTIME (or CLOCK_MONOTONIC on older systems where
  * CLOCK_BOOTTIME is unavailable).
  *
- * \param [in] instrument the instrument for which the time is being requested
+ * \param [in] conn the instrument for which the time is being requested
  * \param [out] time the current platform time in milliseconds
  * \return #RBRGEN3_SUCCESS when the time is successfully retrieved
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
@@ -355,7 +355,7 @@ struct RBRGen3;
  *                                  user callback functions are used
  */
 typedef RBRGen3Error (*RBRGen3TimeCallback)(
-    const struct RBRGen3 *instrument,
+    const struct RBRGen3 *conn,
     RBRGen3DateTime *time);
 
 /**
@@ -367,7 +367,7 @@ typedef RBRGen3Error (*RBRGen3TimeCallback)(
  * Library functions will call this user code to suspend activity for a fixed amount
  * of time.
  *
- * \param [in] instrument the instrument for which sleep is being requested
+ * \param [in] conn the instrument for which sleep is being requested
  * \param [in] time the duration for which a sleep is requested in milliseconds
  * \return #RBRGEN3_SUCCESS when the time is successfully retrieved
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
@@ -375,7 +375,7 @@ typedef RBRGen3Error (*RBRGen3TimeCallback)(
  *                                  user callback functions are used
  */
 typedef RBRGen3Error (*RBRGen3SleepCallback)(
-    const struct RBRGen3 *instrument,
+    const struct RBRGen3 *conn,
     RBRGen3DateTime time);
 
 /**
@@ -411,7 +411,7 @@ typedef RBRGen3Error (*RBRGen3SleepCallback)(
  * constant read/write timeout, or a per-connection timeout tied to the
  * instrument by the user data pointer; the library is unopinionated.
  *
- * \param [in] instrument the instrument for which data is being requested
+ * \param [in] conn the instrument for which data is being requested
  * \param [in,out] data where up to \a size bytes of data can be written
  * \param [in,out] size initially, the maximum amount of data which can be
  *                      written to \a data; set by the callback to the number
@@ -421,7 +421,7 @@ typedef RBRGen3Error (*RBRGen3SleepCallback)(
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
  */
 typedef RBRGen3Error (*RBRGen3ReadCallback)(
-    const struct RBRGen3 *instrument,
+    const struct RBRGen3 *conn,
     void *data,
     int32_t *size);
 
@@ -442,7 +442,7 @@ typedef RBRGen3Error (*RBRGen3ReadCallback)(
  * for a IP transport, to know that each callback payload could be sent as an
  * individual packet).
  *
- * \param [in] instrument the instrument for which data is being sent
+ * \param [in] conn the instrument for which data is being sent
  * \param [in] data the data to be written to the instrument
  * \param [in] size the size of the data given by \a data
  * \return #RBRGEN3_SUCCESS when the data is successfully written
@@ -452,7 +452,7 @@ typedef RBRGen3Error (*RBRGen3ReadCallback)(
  *                                  user callback functions are used
  */
 typedef RBRGen3Error (*RBRGen3WriteCallback)(
-    const struct RBRGen3 *instrument,
+    const struct RBRGen3 *conn,
     const void *const data,
     int32_t size);
 
@@ -476,13 +476,13 @@ struct RBRGen3Sample;
  * activity. As such, this callback should execute quickly to avoid blocking
  * anything else.
  *
- * \param [in] instrument the instrument from which the sample was received
+ * \param [in] conn the instrument from which the sample was received
  * \param [in] sample the sample received from the instrument
  * \return #RBRGEN3_SUCCESS when the sample data is successfully consumed
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
  */
 typedef RBRGen3Error (*RBRGen3SampleCallback)(
-    const struct RBRGen3 *instrument,
+    const struct RBRGen3 *conn,
     const struct RBRGen3Sample *const sample);
 
 /**
@@ -755,7 +755,7 @@ typedef struct RBRGen3
  * successful result, RBRGen3_close() should be used to terminate the
  * instrument connection.
  *
- * \param [in,out] instrument the context object to populate
+ * \param [in,out] conn the context object to populate
  * \param [in] callbacks the set of callbacks to be used by the connection
  * \param [in] commandTimeout the command timeout in milliseconds
  * \param [in] userData arbitrary user data; useful in callbacks
@@ -767,7 +767,7 @@ typedef struct RBRGen3
  * \return #RBRGEN3_UNSUPPORTED if the instrument is unsupported
  * \see RBRGen3_close()
  */
-RBRGen3Error RBRGen3_open(RBRGen3 **instrument,
+RBRGen3Error RBRGen3_open(RBRGen3 **conn,
                                       const RBRGen3Callbacks *callbacks,
                                       RBRGen3DateTime commandTimeout,
                                       void *userData);
@@ -778,39 +778,39 @@ RBRGen3Error RBRGen3_open(RBRGen3 **instrument,
  * Frees the buffer allocated by RBRGen3_open() if necessary. Does not
  * perform any communication with the instrument.
  *
- * \param [in,out] instrument the instrument connection to terminate
+ * \param [in,out] conn the instrument connection to terminate
  * \return #RBRGEN3_SUCCESS if the instrument was closed successfully
  * \see RBRGen3_open()
  */
-RBRGen3Error RBRGen3_close(RBRGen3 *instrument);
+RBRGen3Error RBRGen3_close(RBRGen3 *conn);
 
 /**
  * \brief Get the generation of an instrument.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return the instrument generation
  */
 RBRGen3Generation RBRGen3_getGeneration(
-    const RBRGen3 *instrument);
+    const RBRGen3 *conn);
 
 /**
  * \brief Get the command timeout.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return the command timeout
  * \see RBRGen3_setCommandTimeout()
  */
 RBRGen3DateTime RBRGen3_getCommandTimeout(
-    const RBRGen3 *instrument);
+    const RBRGen3 *conn);
 
 /**
  * \brief Set the command timeout.
  *
- * \param [in,out] instrument the instrument connection
+ * \param [in,out] conn the instrument connection
  * \param [in] commandTimeout the new command timeout
  * \see RBRGen3_getCommandTimeout()
  */
-void RBRGen3_setCommandTimeout(RBRGen3 *instrument,
+void RBRGen3_setCommandTimeout(RBRGen3 *conn,
                                      RBRGen3DateTime commandTimeout);
 
 /**
@@ -819,20 +819,20 @@ void RBRGen3_setCommandTimeout(RBRGen3 *instrument,
  * Returns whatever arbitrary pointer the user has most recently provided,
  * either via RBRGen3_open() or RBRGen3_setUserData().
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return the arbitrary user data pointer
  * \see RBRGen3_setUserData()
  */
-void *RBRGen3_getUserData(const RBRGen3 *instrument);
+void *RBRGen3_getUserData(const RBRGen3 *conn);
 
 /**
  * \brief Change the arbitrary user data pointer.
  *
- * \param [in,out] instrument the instrument connection
+ * \param [in,out] conn the instrument connection
  * \param [in] userData the new user data
  * \see RBRGen3_getUserData()
  */
-void RBRGen3_setUserData(RBRGen3 *instrument, void *userData);
+void RBRGen3_setUserData(RBRGen3 *conn, void *userData);
 
 /**
  * \brief Get the error which resulted from the last instrument command, if
@@ -851,12 +851,12 @@ void RBRGen3_setUserData(RBRGen3 *instrument, void *userData);
  * '<invalid-argument>'”) both include user-provided data. Make sure you
  * perform bounds-checking as necessary when consuming them.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return the last error
  * \see RBRGen3_getLastHardwareErrorMessage() for the error message
  */
 RBRGen3HardwareError RBRGen3_getLastHardwareError(
-    const RBRGen3 *instrument);
+    const RBRGen3 *conn);
 
 /**
  * \brief Get the error message which resulted from the last instrument
@@ -888,12 +888,12 @@ RBRGen3HardwareError RBRGen3_getLastHardwareError(
  * '<invalid-argument>'”) both include user-provided data. Make sure you
  * perform bounds-checking as necessary when consuming them.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return the last error message
  * \see RBRGen3_getLastHardwareError() for the error number/presence
  */
 const char *RBRGen3_getLastHardwareErrorMessage(
-    const RBRGen3 *instrument);
+    const RBRGen3 *conn);
 
 /* To help keep declarations and documentation organized and discoverable,
  * instrument commands and structures are broken out into individual

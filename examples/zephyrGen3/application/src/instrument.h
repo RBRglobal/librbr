@@ -17,7 +17,7 @@ extern "C" {
 
 #include <RBRGen3.h>
 
-RBRGen3Error instrumentStart(RBRGen3 *instrument);
+RBRGen3Error instrumentStart(RBRGen3 *conn);
 
 #ifdef __cplusplus
 }

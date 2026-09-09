@@ -19,7 +19,7 @@ typedef struct ClockTest
     RBRGen3Clock expected;
 } ClockTest;
 
-static bool test_clock(RBRGen3 *instrument,
+static bool test_clock(RBRGen3 *conn,
                        TestIOBuffers *buffers,
                        ClockTest *tests)
 {
@@ -28,7 +28,7 @@ static bool test_clock(RBRGen3 *instrument,
     for (int i = 0; tests[i].command != NULL; ++i)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        RBRGen3Error err = RBRGen3_getClock(instrument, &actual);
+        RBRGen3Error err = RBRGen3_getClock(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_EQ(tests[i].expected.dateTime,
                        actual.dateTime,
@@ -105,7 +105,7 @@ TEST_LOGGER2(now)
         {0}
     };
 
-    return test_clock(instrument, buffers, tests);
+    return test_clock(conn, buffers, tests);
 }
 
 TEST_LOGGER2(now_set)
@@ -126,7 +126,7 @@ TEST_LOGGER2(now_set)
                           RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRGen3_setClock(instrument, &now);
+    RBRGen3Error err = RBRGen3_setClock(conn, &now);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -184,7 +184,7 @@ TEST_LOGGER3(clock)
         {0}
     };
 
-    return test_clock(instrument, buffers, tests);
+    return test_clock(conn, buffers, tests);
 }
 
 TEST_LOGGER3(clock_set)
@@ -201,7 +201,7 @@ TEST_LOGGER3(clock_set)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRGen3_setClock(instrument, &now);
+    RBRGen3Error err = RBRGen3_setClock(conn, &now);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -215,7 +215,7 @@ typedef struct SamplingTest
     RBRGen3Sampling expected;
 } SamplingTest;
 
-static bool test_sampling(RBRGen3 *instrument,
+static bool test_sampling(RBRGen3 *conn,
                           TestIOBuffers *buffers,
                           SamplingTest *tests)
 {
@@ -224,7 +224,7 @@ static bool test_sampling(RBRGen3 *instrument,
     for (int i = 0; tests[i].command != NULL; ++i)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        RBRGen3Error err = RBRGen3_getSampling(instrument,
+        RBRGen3Error err = RBRGen3_getSampling(conn,
                                                            &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.mode,
@@ -298,7 +298,7 @@ TEST_LOGGER2(sampling)
         {0}
     };
 
-    return test_sampling(instrument, buffers, tests);
+    return test_sampling(conn, buffers, tests);
 }
 
 TEST_LOGGER3(sampling)
@@ -338,7 +338,7 @@ TEST_LOGGER3(sampling)
         {0}
     };
 
-    return test_sampling(instrument, buffers, tests);
+    return test_sampling(conn, buffers, tests);
 }
 
 typedef struct SamplingSetTest
@@ -427,13 +427,13 @@ TEST_LOGGER3(sampling_set)
     {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
-        err = RBRGen3_setSampling(instrument, &tests[i].sampling);
+        err = RBRGen3_setSampling(conn, &tests[i].sampling);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
         rbr_prepareCommandResponse(tests[i].burstResponse, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
-        err = RBRGen3_setBurstSampling(instrument, &tests[i].sampling);
+        err = RBRGen3_setBurstSampling(conn, &tests[i].sampling);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedBurstError,
                             err,
                             RBRGen3Error);
@@ -450,7 +450,7 @@ typedef struct DeploymentTest
     RBRGen3Deployment expected;
 } DeploymentTest;
 
-static bool test_deployment(RBRGen3 *instrument,
+static bool test_deployment(RBRGen3 *conn,
                             TestIOBuffers *buffers,
                             DeploymentTest *tests)
 {
@@ -459,7 +459,7 @@ static bool test_deployment(RBRGen3 *instrument,
     for (int i = 0; tests[i].command != NULL; ++i)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        RBRGen3Error err = RBRGen3_getDeployment(instrument,
+        RBRGen3Error err = RBRGen3_getDeployment(conn,
                                                              &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_EQ(tests[i].expected.startTime,
@@ -496,7 +496,7 @@ TEST_LOGGER2(deployment)
         {0}
     };
 
-    return test_deployment(instrument, buffers, tests);
+    return test_deployment(conn, buffers, tests);
 }
 
 TEST_LOGGER3(deployment)
@@ -515,7 +515,7 @@ TEST_LOGGER3(deployment)
         {0}
     };
 
-    return test_deployment(instrument, buffers, tests);
+    return test_deployment(conn, buffers, tests);
 }
 
 typedef struct DeploymentSetTest
@@ -589,7 +589,7 @@ TEST_LOGGER3(deployment_set)
     {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
-        err = RBRGen3_setDeployment(instrument, &tests[i].deployment);
+        err = RBRGen3_setDeployment(conn, &tests[i].deployment);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);  
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     }

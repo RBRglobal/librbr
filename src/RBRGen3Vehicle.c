@@ -48,20 +48,20 @@ const char *RBRGen3RegimesReference_name(
 }
 
 RBRGen3Error RBRGen3_getRegimes(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Regimes *regimes)
 {
     memset(regimes, 0, sizeof(RBRGen3Regimes));
     regimes->direction = RBRGEN3_UNKNOWN_DIRECTION;
     regimes->reference = RBRGEN3_UNKNOWN_REFERENCE;
 
-    RBR_TRY(RBRGen3_converse(instrument, "regimes"));
+    RBR_TRY(RBRGen3_converse(conn, "regimes"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -103,7 +103,7 @@ RBRGen3Error RBRGen3_getRegimes(
 }
 
 RBRGen3Error RBRGen3_setRegimes(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3Regimes *regimes)
 {
     if (regimes->direction < 0
@@ -117,7 +117,7 @@ RBRGen3Error RBRGen3_setRegimes(
     }
 
     return RBRGen3_converse(
-        instrument,
+        conn,
         "regimes direction = %s, count = %i, reference = %s",
         RBRGen3Direction_name(regimes->direction),
         regimes->count,
@@ -125,7 +125,7 @@ RBRGen3Error RBRGen3_setRegimes(
 }
 
 RBRGen3Error RBRGen3_getRegime(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Regime *regime)
 {
     RBRGen3RegimeIndex index = regime->index;
@@ -137,14 +137,14 @@ RBRGen3Error RBRGen3_getRegime(
 
     memset(regime, 0, sizeof(RBRGen3Regime));
 
-    RBR_TRY(RBRGen3_converse(instrument, "regime %i", index));
+    RBR_TRY(RBRGen3_converse(conn, "regime %i", index));
 
     char *command = NULL;
     int32_t previousIndex = 0;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -176,7 +176,7 @@ RBRGen3Error RBRGen3_getRegime(
 }
 
 RBRGen3Error RBRGen3_setRegime(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3Regime *regime)
 {
     if (regime->index < 1
@@ -194,7 +194,7 @@ RBRGen3Error RBRGen3_setRegime(
     }
 
     return RBRGen3_converse(
-        instrument,
+        conn,
         "regime %d boundary = %.0f, binsize = %0.1f, samplingperiod = %i",
         regime->index,
         (double) regime->boundary,
@@ -203,19 +203,19 @@ RBRGen3Error RBRGen3_setRegime(
 }
 
 RBRGen3Error RBRGen3_getDirectionDependentSampling(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3DirectionDependentSampling *ddsampling)
 {
     memset(ddsampling, 0, sizeof(RBRGen3DirectionDependentSampling));
     ddsampling->direction = RBRGEN3_UNKNOWN_DIRECTION;
 
-    RBR_TRY(RBRGen3_converse(instrument, "ddsampling"));
+    RBR_TRY(RBRGen3_converse(conn, "ddsampling"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true)
     {
-        RBRGen3_parseResponse(instrument,
+        RBRGen3_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -257,7 +257,7 @@ RBRGen3Error RBRGen3_getDirectionDependentSampling(
 }
 
 RBRGen3Error RBRGen3_setDirectionDependentSampling(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3DirectionDependentSampling *ddsampling)
 {
     if (ddsampling->direction < 0
@@ -276,7 +276,7 @@ RBRGen3Error RBRGen3_setDirectionDependentSampling(
     }
 
     return RBRGen3_converse(
-        instrument,
+        conn,
         "ddsampling direction = %s, fastperiod = %i, slowperiod = %i, "
         "fastthreshold = %0.1f, slowthreshold = %0.1f",
         RBRGen3Direction_name(ddsampling->direction),

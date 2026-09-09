@@ -111,7 +111,7 @@ typedef struct RBRGen3Regimes
 /**
  * \brief Get the instrument regimes settings.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] regimes the regimes parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -120,7 +120,7 @@ typedef struct RBRGen3Regimes
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  */
 RBRGen3Error RBRGen3_getRegimes(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Regimes *regimes);
 
 /**
@@ -134,7 +134,7 @@ RBRGen3Error RBRGen3_getRegimes(
  * - regimes are not available for the instrument
  * - the instrument is logging
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] regimes the regimes parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -145,7 +145,7 @@ RBRGen3Error RBRGen3_getRegimes(
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  */
 RBRGen3Error RBRGen3_setRegimes(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3Regimes *regimes);
 
 /** \brief A regime identifier. */
@@ -201,7 +201,7 @@ typedef struct RBRGen3Regime
  * be returned if a regime index is given which exceeds the number of regimes
  * currently configured (RBRGen3Regimes.count).
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] regime the regime parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -213,7 +213,7 @@ typedef struct RBRGen3Regime
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regime
  */
 RBRGen3Error RBRGen3_getRegime(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3Regime *regime);
 
 /**
@@ -225,7 +225,7 @@ RBRGen3Error RBRGen3_getRegime(
  * - the instrument is logging
  * - you set an out-of-bounds parameter the library fails to detect
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] regime the regime parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -236,7 +236,7 @@ RBRGen3Error RBRGen3_getRegime(
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regime
  */
 RBRGen3Error RBRGen3_setRegime(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     const RBRGen3Regime *regime);
 
 /**
@@ -285,7 +285,7 @@ typedef struct RBRGen3DirectionDependentSampling
 /**
  * \brief Get the instrument direction-dependent sampling settings.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] ddsampling the direction-dependent sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -294,7 +294,7 @@ typedef struct RBRGen3DirectionDependentSampling
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/ddsampling
  */
 RBRGen3Error RBRGen3_getDirectionDependentSampling(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3DirectionDependentSampling *ddsampling);
 
 /**
@@ -306,7 +306,7 @@ RBRGen3Error RBRGen3_getDirectionDependentSampling(
  * - the instrument is logging
  * - you set an out-of-bounds parameter the library fails to detect
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] ddsampling the direction-dependent sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -317,7 +317,7 @@ RBRGen3Error RBRGen3_getDirectionDependentSampling(
  * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/ddsampling
  */
 RBRGen3Error RBRGen3_setDirectionDependentSampling(
-    RBRGen3 *instrument,
+    RBRGen3 *conn,
     RBRGen3DirectionDependentSampling *ddsampling);
 
 #ifdef __cplusplus

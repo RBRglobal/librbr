@@ -18,7 +18,7 @@ typedef struct StatusTest
     RBRGen3DeploymentStatus expected;
 } StatusTest;
 
-static bool test_verify(RBRGen3 *instrument,
+static bool test_verify(RBRGen3 *conn,
                         TestIOBuffers *buffers,
                         StatusTest *tests)
 {
@@ -28,13 +28,13 @@ static bool test_verify(RBRGen3 *instrument,
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_verify(instrument, false, &actual);
+        err = RBRGen3_verify(conn, false, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
-                            instrument->response.type,
+                            conn->response.type,
                             RBRGen3ResponseType);
         TEST_ASSERT_EQ(tests[i].expectedResponse.error,
-                       instrument->response.error,
+                       conn->response.error,
                        "%" PRIi32);
         TEST_ASSERT_ENUM_EQ(tests[i].expected,
                             actual,
@@ -88,7 +88,7 @@ TEST_LOGGER2(verify)
         {0}
     };
 
-    return test_verify(instrument, buffers, tests);
+    return test_verify(conn, buffers, tests);
 }
 
 TEST_LOGGER3(verify)
@@ -133,10 +133,10 @@ TEST_LOGGER3(verify)
         {0}
     };
 
-    return test_verify(instrument, buffers, tests);
+    return test_verify(conn, buffers, tests);
 }
 
-static bool test_enable(RBRGen3 *instrument,
+static bool test_enable(RBRGen3 *conn,
                         TestIOBuffers *buffers,
                         StatusTest *tests)
 {
@@ -146,13 +146,13 @@ static bool test_enable(RBRGen3 *instrument,
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_enable(instrument, false, &actual);
+        err = RBRGen3_enable(conn, false, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
-                            instrument->response.type,
+                            conn->response.type,
                             RBRGen3ResponseType);
         TEST_ASSERT_EQ(tests[i].expectedResponse.error,
-                       instrument->response.error,
+                       conn->response.error,
                        "%" PRIi32);
         TEST_ASSERT_ENUM_EQ(tests[i].expected,
                             actual,
@@ -206,7 +206,7 @@ TEST_LOGGER2(enable)
         {0}
     };
 
-    return test_enable(instrument, buffers, tests);
+    return test_enable(conn, buffers, tests);
 }
 
 TEST_LOGGER3(enable)
@@ -251,10 +251,10 @@ TEST_LOGGER3(enable)
         {0}
     };
 
-    return test_enable(instrument, buffers, tests);
+    return test_enable(conn, buffers, tests);
 }
 
-static bool test_disable(RBRGen3 *instrument,
+static bool test_disable(RBRGen3 *conn,
                          TestIOBuffers *buffers,
                          StatusTest *tests)
 {
@@ -264,13 +264,13 @@ static bool test_disable(RBRGen3 *instrument,
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_disable(instrument, &actual);
+        err = RBRGen3_disable(conn, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
-                            instrument->response.type,
+                            conn->response.type,
                             RBRGen3ResponseType);
         TEST_ASSERT_EQ(tests[i].expectedResponse.error,
-                       instrument->response.error,
+                       conn->response.error,
                        "%" PRIi32);
         TEST_ASSERT_ENUM_EQ(tests[i].expected,
                             actual,
@@ -322,7 +322,7 @@ TEST_LOGGER2(stop)
         {0}
     };
 
-    return test_disable(instrument, buffers, tests);
+    return test_disable(conn, buffers, tests);
 }
 
 TEST_LOGGER3(disable)
@@ -358,7 +358,7 @@ TEST_LOGGER3(disable)
         {0}
     };
 
-    return test_disable(instrument, buffers, tests);
+    return test_disable(conn, buffers, tests);
 }
 
 typedef struct SimulationTest
@@ -393,7 +393,7 @@ TEST_LOGGER3(simulation)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_getSimulation(instrument, &actual);
+        err = RBRGen3_getSimulation(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.state, actual.state, bool);
         TEST_ASSERT_EQ(tests[i].expected.period, actual.period, "%" PRIi32);
@@ -464,7 +464,7 @@ TEST_LOGGER3(simulation_set)
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_setSimulation(instrument, &tests[i].simulation);
+        err = RBRGen3_setSimulation(conn, &tests[i].simulation);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
     }

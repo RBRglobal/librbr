@@ -16,7 +16,7 @@ typedef struct ThresholdingTest
     RBRGen3Thresholding expected;
 } ThresholdingTest;
 
-static bool test_thresholding(RBRGen3 *instrument,
+static bool test_thresholding(RBRGen3 *conn,
                               TestIOBuffers *buffers,
                               ThresholdingTest *tests)
 {
@@ -26,7 +26,7 @@ static bool test_thresholding(RBRGen3 *instrument,
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_getThresholding(instrument, &actual);
+        err = RBRGen3_getThresholding(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.enabled, actual.enabled, bool);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.state,
@@ -72,7 +72,7 @@ TEST_LOGGER2(thresholding)
         {0}
     };
 
-    return test_thresholding(instrument, buffers, tests);
+    return test_thresholding(conn, buffers, tests);
 }
 
 TEST_LOGGER3(thresholding)
@@ -127,7 +127,7 @@ TEST_LOGGER3(thresholding)
         {0}
     };
 
-    return test_thresholding(instrument, buffers, tests);
+    return test_thresholding(conn, buffers, tests);
 }
 
 TEST_LOGGER2(thresholding_set)
@@ -151,7 +151,7 @@ TEST_LOGGER2(thresholding_set)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRGen3_setThresholding(instrument, &threshold);
+    err = RBRGen3_setThresholding(conn, &threshold);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     return true;
@@ -183,7 +183,7 @@ TEST_LOGGER3(thresholding_set_channel_by_index)
     //                         COMMAND_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRGen3_setThresholding(instrument, &threshold);
+    err = RBRGen3_setThresholding(conn, &threshold);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -211,7 +211,7 @@ TEST_LOGGER3(thresholding_set_channel_by_label)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRGen3_setThresholding(instrument, &threshold);
+    err = RBRGen3_setThresholding(conn, &threshold);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -224,7 +224,7 @@ typedef struct TwistActivationTest
     RBRGen3TwistActivation expected;
 } TwistActivationTest;
 
-static bool test_twistactivation(RBRGen3 *instrument,
+static bool test_twistactivation(RBRGen3 *conn,
                                  TestIOBuffers *buffers,
                                  TwistActivationTest *tests)
 {
@@ -234,7 +234,7 @@ static bool test_twistactivation(RBRGen3 *instrument,
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_getTwistActivation(instrument, &actual);
+        err = RBRGen3_getTwistActivation(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.enabled, actual.enabled, bool);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.state,
@@ -265,7 +265,7 @@ TEST_LOGGER2(twistactivation)
         {0}
     };
 
-    return test_twistactivation(instrument, buffers, tests);
+    return test_twistactivation(conn, buffers, tests);
 }
 
 TEST_LOGGER3(twistactivation)
@@ -297,7 +297,7 @@ TEST_LOGGER3(twistactivation)
         {0}
     };
 
-    return test_twistactivation(instrument, buffers, tests);
+    return test_twistactivation(conn, buffers, tests);
 }
 
 TEST_LOGGER2(twistactivation_set)
@@ -314,7 +314,7 @@ TEST_LOGGER2(twistactivation_set)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRGen3_setTwistActivation(instrument, &twistActivation);
+    err = RBRGen3_setTwistActivation(conn, &twistActivation);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -335,7 +335,7 @@ TEST_LOGGER3(twistactivation_set)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRGen3_setTwistActivation(instrument, &twistActivation);
+    err = RBRGen3_setTwistActivation(conn, &twistActivation);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 

@@ -94,7 +94,7 @@ const char *RBRGen3ResumeStatus_name(
  * the instrument. It allows an elevated host to allow and deny the feature
  * for the instrument.
  * 
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in, out] state the state of pauseresume
  * \return #RBRGEN3_SUCCESS when the state is one of the following:
  * "n/a", "paused", or "running".
@@ -102,26 +102,26 @@ const char *RBRGen3ResumeStatus_name(
  * pauseresume feature, or pauseresume is not allowed.
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
-RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *conn,
                                        RBRGen3PauseresumeState *state);
 
 /**
  * It pauses an enabled deloyment.
  * 
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in, out] status the status of pause
  * \return #RBRGEN3_SUCCESS when the status is "paused".
  * \return #RBRGEN3_UNSUPPORTED when the current firmware doesn't support
  * pauseresume feature, or pauseresume is not allowed.
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
-RBRGen3Error RBRGen3_pause(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_pause(RBRGen3 *conn,
                                        RBRGen3PauseStatus *status);
 /**
  * It resumes an enabled deployment which was previously
  * paused using the pause command
  * 
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in, out] status the status of resume
  * \return #RBRGEN3_SUCCESS when the state is one of the following:
  * "pending", "logging".
@@ -129,7 +129,7 @@ RBRGen3Error RBRGen3_pause(RBRGen3 *instrument,
  * pauseresume feature, or pauseresume is not allowed.
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
-RBRGen3Error RBRGen3_resume(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_resume(RBRGen3 *conn,
                                        RBRGen3ResumeStatus *status);
 
 #ifdef __cplusplus
