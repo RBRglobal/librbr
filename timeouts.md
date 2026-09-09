@@ -18,8 +18,8 @@ when sending subsequent commands.
 This process should be transparent
 to users of the library.
 For implementation details,
-see `RBRInstrument_wake()`
-in `RBRInstrumentInternal.c`.
+see `RBRInstrumentGen3_wake()`
+in `RBRInstrumentGen3Internal.c`.
 
 [the command reference]: https://docs.rbr-global.com/L3commandreference/introduction/command-processing-and-timeouts/timeouts-output-blanking-and-power-saving
 
@@ -27,8 +27,8 @@ in `RBRInstrumentInternal.c`.
 
 The second type of timeout,
 configured by the user
-via the \a commandTimeout value passed to RBRInstrument_open()
-or RBRInstrument_setCommandTimeout(),
+via the \a commandTimeout value passed to RBRInstrumentGen3_open()
+or RBRInstrumentGen3_setCommandTimeout(),
 defines the minimum amount of time the library will wait
 for a complete response from the instrument.
 
@@ -41,7 +41,7 @@ between read operations.
 ## Character Timeout
 
 Because character reads are implemented by the user
-via the RBRInstrumentReadCallback() callback function,
+via the RBRInstrumentGen3ReadCallback() callback function,
 any character timeout must also be implemented by the user.
 On POSIX systems, this can be done by using `select(3)`
 to determine whether a file descriptor is ready for reading

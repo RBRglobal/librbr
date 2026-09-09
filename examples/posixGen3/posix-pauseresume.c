@@ -1,0 +1,163 @@
+/**
+ * \file posix-pauseresume.c
+ *
+ * \brief Example of using the library to pauseresume instrument data in a POSIX
+ * environment.
+ *
+ * \copyright
+ * Copyright (c) 2022 RBR Ltd.
+ * Licensed under the Apache License, Version 2.0.
+ */
+
+/* Required for errno. */
+#include <errno.h>
+/* Required for fprintf, printf. */
+#include <stdio.h>
+/* Required for strerror. */
+#include <string.h>
+/* Required for gmtime_r, time_t, strftime. */
+#include <time.h>
+/* Required for close. */
+#include <unistd.h>
+
+#include "posix-shared.h"
+
+int main(int argc, char *argv[])
+{
+    /* first argv is program name, second argv is devicePath */
+    char *programName = argv[0];
+    char *devicePath;
+
+    int status = EXIT_SUCCESS;
+    int instrumentFd;
+
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3 *instrument = NULL;
+    #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
+    RBRInstrumentGen3 instrumentSpace;
+    instrument = &instrumentSpace;
+    #endif
+
+    if (argc < 2)
+    {
+        fprintf(stderr, "Usage: %s device\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    devicePath = argv[1];
+
+    if ((instrumentFd = openSerialFd(devicePath)) < 0)
+    {
+        fprintf(stderr, "%s: Failed to open serial device: %s!\n",
+                programName,
+                strerror(errno));
+        return EXIT_FAILURE;
+    }
+
+    fprintf(stderr,
+            "%s: Using %s v%s.\n",
+            programName,
+            RBRINSTRUMENTGEN3_LIB_NAME,
+            RBRINSTRUMENTGEN3_LIB_VERSION);
+
+    RBRInstrumentGen3Callbacks callbacks = {
+        .time = instrumentTime,
+        .sleep = instrumentSleep,
+        .read = instrumentRead,
+        .write = instrumentWrite
+    };
+
+    if ((err = RBRInstrumentGen3_open(
+             &instrument,
+             &callbacks,
+             INSTRUMENT_COMMAND_TIMEOUT_MSEC,
+             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
+    {
+        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
+                programName,
+                RBRInstrumentGen3Error_name(err));
+        status = EXIT_FAILURE;
+        goto fileCleanup;
+    }
+
+    RBRInstrumentGen3Link link;
+    RBRInstrumentGen3_getLink(instrument, &link);
+    printf("Connected to the instrument via %s.\n",
+           RBRInstrumentGen3Link_name(link));
+
+    switch (link)
+    {
+    case RBRINSTRUMENTGEN3_LINK_USB:
+        RBRInstrumentGen3_setUSBStreamingState(instrument, true);
+        break;
+    case RBRINSTRUMENTGEN3_LINK_SERIAL:
+    case RBRINSTRUMENTGEN3_LINK_WIFI:
+        {
+            RBRInstrumentGen3Serial serial;
+            RBRInstrumentGen3_getSerial(instrument, &serial);
+            printf("Connected in %s mode at %s baud.\n",
+                   RBRInstrumentGen3SerialMode_name(serial.mode),
+                   RBRInstrumentGen3SerialBaudRate_name(serial.baudRate));
+
+            RBRInstrumentGen3_setSerialStreamingState(instrument, true);
+            break;
+        }
+    default:
+        fprintf(stderr,
+                "I don't know how I'm connected to the instrument, so I can't"
+                " enable streaming. Giving up.\n");
+        goto instrumentCleanup;
+    }
+
+/* Get pauseresume state and report error (if any) according to response. */
+    RBRInstrumentGen3PauseresumeState state;
+    state = RBRINSTRUMENTGEN3_UNKNOWN_PAUSERESUME;
+    /* pauseStatus will be used to decide if needs to proceed with "resume". */
+    RBRInstrumentGen3PauseStatus pauseStatus;
+    pauseStatus = RBRINSTRUMENTGEN3_UNKNOWN_PAUSE;
+
+    if((err = RBRInstrumentGen3_getPauseresume(instrument, &state)) != RBRINSTRUMENTGEN3_SUCCESS){
+        /* if this isn't an RBR instrument, or if the firmware in use doesn't support pauseresume.*/
+        fprintf(stderr, "%s: Feature not supported: %s! \n", programName, RBRInstrumentGen3Error_name(err));
+        status = EXIT_FAILURE;
+        fprintf(stderr, "E%d %s\n", instrument->response.error, instrument->response.response);
+        goto fileCleanup;
+    };
+
+    const char *stateName = RBRInstrumentGen3PauseresumeState_name(state);
+    printf("pauseresume state=%s\n", stateName);
+
+    /* code below: print out human-readable errors. */
+    if(state == RBRINSTRUMENTGEN3_PAUSERESUME_NA){
+        printf("(Either the deployment has not been enabled, or the sampling mode is 'regimes'," 
+                    " or more than one gating condition is enabled.)\n");
+    }
+
+    /* Proceeds with command 'pause' in this case. */
+    else if(state == RBRINSTRUMENTGEN3_PAUSERESUME_RUNNING){
+        err = RBRInstrumentGen3_pause(instrument, &pauseStatus);
+        const char *statusName = RBRInstrumentGen3PauseStatus_name(pauseStatus);
+        printf("pause status=%s\n", statusName);
+        if(pauseStatus == RBRINSTRUMENTGEN3_UNKNOWN_PAUSE){
+            fprintf(stderr, "E%d %s\n", instrument->response.error, instrument->response.response);
+        }
+    }
+
+    /* Proceeds with command 'resume' in this case. */
+    if(state == RBRINSTRUMENTGEN3_PAUSERESUME_PAUSED || pauseStatus == RBRINSTRUMENTGEN3_PAUSE_PAUSED){
+        RBRInstrumentGen3ResumeStatus resumeStatus;
+        resumeStatus = RBRINSTRUMENTGEN3_UNKNOWN_RESUME;
+        err = RBRInstrumentGen3_resume(instrument, &resumeStatus);
+        const char *statusName = RBRInstrumentGen3ResumeStatus_name(resumeStatus);
+        printf("resume status=%s\n", statusName);
+        if(resumeStatus == RBRINSTRUMENTGEN3_UNKNOWN_RESUME){
+            fprintf(stderr, "E%d %s\n", instrument->response.error, instrument->response.response);
+        }
+    }
+
+instrumentCleanup:
+    RBRInstrumentGen3_close(instrument);
+fileCleanup:
+    close(instrumentFd);
+    return status;
+}

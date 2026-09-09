@@ -297,7 +297,7 @@ RBRDynamicCorrectionGen4Error RBRDynamicCorrectionGen4_update_Fs(const float Fs,
     /* sanity check */
     if ( DCORR_MAX_LAG_ARRAY/Fs < DCORR_T_DELAY )
     {
-        return RBR_DCORR_INVALID_SAMPLING_RATE;
+        return RBRDYNAMICCORRECTIONGEN4_INVALID_SAMPLING_RATE;
     }
 
     // parameters _cte_a and _cte_b no longer valid.
@@ -310,7 +310,7 @@ RBRDynamicCorrectionGen4Error RBRDynamicCorrectionGen4_update_Fs(const float Fs,
     RBRDynamicCorrectionGen4_initCorrectionCoeff(params, Fs);
     RBRDynamicCorrectionGen4_resampleLag(params, params->_timestamp_lagArray[0], Fs);
 
-    return RBR_DCORR_SUCCESS;
+    return RBRDYNAMICCORRECTIONGEN4_SUCCESS;
 }
 
 /* calculate the ascent rate (in our case, using the pressure as unit).
@@ -407,15 +407,15 @@ RBRDynamicCorrectionGen4Error RBRDynamicCorrectionGen4_init(const float Fs,
     /* sanity check */
     if ( DCORR_MAX_LAG_ARRAY/Fs < DCORR_T_DELAY )
     {
-        return DYN_CORR_BAD_PARAMS;
+        return RBRDYNAMICCORRECTIONGEN4_BAD_PARAMS;
     }
     if ( Vp_min < 0.0f || Vp_max < 0.0f )
     {
-        return DYN_CORR_BAD_PARAMS;
+        return RBRDYNAMICCORRECTIONGEN4_BAD_PARAMS;
     }
     if ( Vp_max < Vp_min )
     {
-        return DYN_CORR_BAD_PARAMS;
+        return RBRDYNAMICCORRECTIONGEN4_BAD_PARAMS;
     }
 
     params->Fs = Fs;
@@ -447,7 +447,7 @@ RBRDynamicCorrectionGen4Error RBRDynamicCorrectionGen4_init(const float Fs,
     RBRDynamicCorrectionGen4_initCorrectionCoeff(params, Fs);
     RBRDynamicCorrectionGen4_initLagArray(params);
 
-    return RBR_DCORR_SUCCESS;
+    return RBRDYNAMICCORRECTIONGEN4_SUCCESS;
 }
 
 
@@ -462,7 +462,7 @@ RBRDynamicCorrectionGen4Error RBRDynamicCorrectionGen4_addMeasurement(const RBRD
     int32_t isFasterSampling;
     int32_t isValid;
     int32_t isDataError = 0;
-    RBRDynamicCorrectionGen4Error statusCode = DYN_CORR_UNKNOWN_ERROR;
+    RBRDynamicCorrectionGen4Error statusCode = RBRDYNAMICCORRECTIONGEN4_UNKNOWN_ERROR;
 
     /* flag to indicate 'fast sampling (>= 1Hz)'.
      * In this case, the data won't go through the 0.35s lag and
@@ -515,7 +515,7 @@ RBRDynamicCorrectionGen4Error RBRDynamicCorrectionGen4_addMeasurement(const RBRD
 
     if ( !isValid )
     {
-        statusCode = RBR_DCORR_NOT_VALID_YET;
+        statusCode = RBRDYNAMICCORRECTIONGEN4_NOT_VALID_YET;
     }
 
     if ( isValid )
@@ -567,13 +567,13 @@ RBRDynamicCorrectionGen4Error RBRDynamicCorrectionGen4_addMeasurement(const RBRD
         corrMeasOut->pressure = P_meas;
         corrMeasOut->corrSalinity = S_cor;
 
-        statusCode = RBR_DCORR_SUCCESS;
+        statusCode = RBRDYNAMICCORRECTIONGEN4_SUCCESS;
     }
 
     /* flag the data with potential issue */
     if ( isDataError )
     {
-        statusCode = DYN_CORR_CORRUPTED;
+        statusCode = RBRDYNAMICCORRECTIONGEN4_CORRUPTED;
     }
 
     return statusCode;

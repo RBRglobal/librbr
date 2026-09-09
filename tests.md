@@ -1,14 +1,14 @@
 # Writing Tests
 
 Unit tests are found
-in the `tests/` subdirectory.
+in the `testsGen3/` subdirectory.
 
 ## Adding an Instrument Test
 
 You can use the `TEST_LOGGER2` and `TEST_LOGGER3` macros
 to declare instrument test functions
 within any of the test modules
-found within `tests/`.
+found within `testsGen3/`.
 The macros take a single argument:
 the name of the test.
 
@@ -39,13 +39,13 @@ let's consider the test for the `id` command:
 TEST_LOGGER3(id)
 {
     /* This is the result we expect from command parsing. */
-    RBRInstrumentId expected = {
+    RBRInstrumentGen3Id expected = {
         .model = "RBRduo3",
         .version = "1.092",
         .serial = 923456,
         .fwtype = 104
     };
-    RBRInstrumentId actual;
+    RBRInstrumentGen3Id actual;
 
     /* Populate the read buffer with the command response. */
     TestIOBuffers_init(buffers,
@@ -53,11 +53,11 @@ TEST_LOGGER3(id)
                        "serial = 923456, fwtype = 104" COMMAND_TERMINATOR,
                        0);
     /* Get the test instrument connection to send/parse the command. */
-    RBRInstrumentError err = RBRInstrument_getId(instrument, &actual);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_getId(instrument, &actual);
     /* Check that the command sent matches our expectation. */
     TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
     /* Check the return value. */
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENT_SUCCESS, err, RBRInstrumentError);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
     /* Check the struct members. */
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
@@ -96,7 +96,7 @@ For example,
 
 ~~~{.c}
 TEST_PARSER_CONFIG(two_channels) = {
-    .format = RBRINSTRUMENT_MEMFORMAT_CALBIN00,
+    .format = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00,
     .formatConfig = {
         .easyParse = {
             .channels = 2
@@ -126,7 +126,7 @@ If you need to add a new test,
 it likely fits within one of the existing modules.
 However, if you're sure you do need a new module,
 then you can add one
-by creating a `.c` file in the `tests/` subdirectory,
+by creating a `.c` file in the `testsGen3/` subdirectory,
 then adding its name (without extension)
 to the `TEST_MODULES` variable in the `Makefile`.
 Unless you have good reason not to,
@@ -136,7 +136,7 @@ of the module names in the declaration.
 For example,
 to add a new module
 for tests having to do with “frobbing”,
-create the file `tests/frobbing.c`,
+create the file `testsGen3/frobbing.c`,
 and add it to the Makefile:
 
 ~~~

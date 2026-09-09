@@ -1,0 +1,473 @@
+/**
+ * \file deployment.c
+ *
+ * \brief Tests for instrument deployment commands.
+ *
+ * \copyright
+ * Copyright (c) 2018 RBR Ltd.
+ * Licensed under the Apache License, Version 2.0.
+ */
+
+#include "tests.h"
+
+typedef struct StatusTest
+{
+    const char *response;
+    RBRInstrumentGen3Error expectedError;
+    RBRInstrumentGen3Response expectedResponse;
+    RBRInstrumentGen3DeploymentStatus expected;
+} StatusTest;
+
+static bool test_verify(RBRInstrumentGen3 *instrument,
+                        TestIOBuffers *buffers,
+                        StatusTest *tests)
+{
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3DeploymentStatus actual;
+
+    for (int i = 0; tests[i].response != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen3_verify(instrument, false, &actual);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
+                            instrument->response.type,
+                            RBRInstrumentGen3ResponseType);
+        TEST_ASSERT_EQ(tests[i].expectedResponse.error,
+                       instrument->response.error,
+                       "%" PRIi32);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected,
+                            actual,
+                            RBRInstrumentGen3DeploymentStatus);
+    }
+
+    return true;
+}
+
+TEST_LOGGER2(verify)
+{
+    StatusTest tests[] = {
+        {
+            "verify = pending" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_INFO,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+            },
+            RBRINSTRUMENTGEN3_STATUS_PENDING
+        },
+        {
+            "verify = logging" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_INFO,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+            },
+            RBRINSTRUMENTGEN3_STATUS_LOGGING
+        },
+        {
+            "E0402 memory not empty, erase first, verify = stopped"
+            RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_HARDWARE_ERROR,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_ERROR,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
+            },
+            RBRINSTRUMENTGEN3_UNKNOWN_STATUS
+        },
+        {
+            "E0401 estimated memory usage exceeds capacity, verify = logging"
+            RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_WARNING,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY
+            },
+            RBRINSTRUMENTGEN3_STATUS_LOGGING
+        },
+        {0}
+    };
+
+    return test_verify(instrument, buffers, tests);
+}
+
+TEST_LOGGER3(verify)
+{
+    StatusTest tests[] = {
+        {
+            "verify status = pending, warning = none" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_INFO,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+            },
+            RBRINSTRUMENTGEN3_STATUS_PENDING
+        },
+        {
+            "verify status = logging, warning = none" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_INFO,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+            },
+            RBRINSTRUMENTGEN3_STATUS_LOGGING
+        },
+        {
+            "E0402 memory not empty, erase first" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_HARDWARE_ERROR,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_ERROR,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
+            },
+            RBRINSTRUMENTGEN3_UNKNOWN_STATUS
+        },
+        {
+            "verify status = logging, warning = W0401" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_WARNING,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY
+            },
+            RBRINSTRUMENTGEN3_STATUS_LOGGING
+        },
+        {0}
+    };
+
+    return test_verify(instrument, buffers, tests);
+}
+
+static bool test_enable(RBRInstrumentGen3 *instrument,
+                        TestIOBuffers *buffers,
+                        StatusTest *tests)
+{
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3DeploymentStatus actual;
+
+    for (int i = 0; tests[i].response != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen3_enable(instrument, false, &actual);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
+                            instrument->response.type,
+                            RBRInstrumentGen3ResponseType);
+        TEST_ASSERT_EQ(tests[i].expectedResponse.error,
+                       instrument->response.error,
+                       "%" PRIi32);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected,
+                            actual,
+                            RBRInstrumentGen3DeploymentStatus);
+    }
+
+    return true;
+}
+
+TEST_LOGGER2(enable)
+{
+    StatusTest tests[] = {
+        {
+            "enable = pending" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_INFO,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+            },
+            RBRINSTRUMENTGEN3_STATUS_PENDING
+        },
+        {
+            "enable = logging" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_INFO,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+            },
+            RBRINSTRUMENTGEN3_STATUS_LOGGING
+        },
+        {
+            "E0402 memory not empty, erase first"
+            RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_HARDWARE_ERROR,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_ERROR,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
+            },
+            RBRINSTRUMENTGEN3_UNKNOWN_STATUS
+        },
+        {
+            "E0401 estimated memory usage exceeds capacity, enable = logging"
+            RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_WARNING,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY
+            },
+            RBRINSTRUMENTGEN3_STATUS_LOGGING
+        },
+        {0}
+    };
+
+    return test_enable(instrument, buffers, tests);
+}
+
+TEST_LOGGER3(enable)
+{
+    StatusTest tests[] = {
+        {
+            "enable status = pending, warning = none" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_INFO,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+            },
+            RBRINSTRUMENTGEN3_STATUS_PENDING
+        },
+        {
+            "enable status = logging, warning = none" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_INFO,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+            },
+            RBRINSTRUMENTGEN3_STATUS_LOGGING
+        },
+        {
+            "E0402 memory not empty, erase first" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_HARDWARE_ERROR,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_ERROR,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
+            },
+            RBRINSTRUMENTGEN3_UNKNOWN_STATUS
+        },
+        {
+            "enable status = logging, warning = W0401" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_WARNING,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY
+            },
+            RBRINSTRUMENTGEN3_STATUS_LOGGING
+        },
+        {0}
+    };
+
+    return test_enable(instrument, buffers, tests);
+}
+
+static bool test_disable(RBRInstrumentGen3 *instrument,
+                         TestIOBuffers *buffers,
+                         StatusTest *tests)
+{
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3DeploymentStatus actual;
+
+    for (int i = 0; tests[i].response != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen3_disable(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
+                            instrument->response.type,
+                            RBRInstrumentGen3ResponseType);
+        TEST_ASSERT_EQ(tests[i].expectedResponse.error,
+                       instrument->response.error,
+                       "%" PRIi32);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected,
+                            actual,
+                            RBRInstrumentGen3DeploymentStatus);
+    }
+
+    return true;
+}
+
+TEST_LOGGER2(stop)
+{
+    StatusTest tests[] = {
+        {
+            "stop = stopped" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_INFO,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+            },
+            RBRINSTRUMENTGEN3_STATUS_STOPPED
+        },
+        {
+            "E0406 not logging, stop = stopped" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_WARNING,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NOT_LOGGING
+            },
+            RBRINSTRUMENTGEN3_STATUS_STOPPED
+        },
+        {
+            "E0406 not logging, stop = fullandstopped" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_WARNING,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NOT_LOGGING
+            },
+            RBRINSTRUMENTGEN3_STATUS_FULLANDSTOPPED
+        },
+        {
+            "E0406 not logging, stop = disabled" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_WARNING,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NOT_LOGGING
+            },
+            RBRINSTRUMENTGEN3_STATUS_DISABLED
+        },
+        {0}
+    };
+
+    return test_disable(instrument, buffers, tests);
+}
+
+TEST_LOGGER3(disable)
+{
+    StatusTest tests[] = {
+        {
+            "disable status = stopped" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_INFO,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+            },
+            RBRINSTRUMENTGEN3_STATUS_STOPPED
+        },
+        {
+            "disable status = fullandstopped" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_INFO,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+            },
+            RBRINSTRUMENTGEN3_STATUS_FULLANDSTOPPED
+        },
+        {
+            "disable status = disabled" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS,
+            {
+                .type = RBRINSTRUMENTGEN3_RESPONSE_INFO,
+                .error = RBRINSTRUMENTGEN3_HARDWARE_ERROR_NONE
+            },
+            RBRINSTRUMENTGEN3_STATUS_DISABLED
+        },
+        {0}
+    };
+
+    return test_disable(instrument, buffers, tests);
+}
+
+typedef struct SimulationTest
+{
+    const char *response;
+    RBRInstrumentGen3Simulation expected;
+} SimulationTest;
+
+TEST_LOGGER3(simulation)
+{
+    SimulationTest tests[] = {
+        {
+            "simulation state = off, period = 3600000" RESPONSE_TERMINATOR,
+            {
+                .state = false,
+                .period = 3600000
+            }
+        },
+        {
+            "simulation state = on, period = 3600000" RESPONSE_TERMINATOR,
+            {
+                .state = true,
+                .period = 3600000
+            }
+        },
+        {0}
+    };
+
+    RBRInstrumentGen3Error err;
+    RBRInstrumentGen3Simulation actual;
+
+    for (int i = 0; tests[i].response != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen3_getSimulation(instrument, &actual);
+        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.state, actual.state, bool);
+        TEST_ASSERT_EQ(tests[i].expected.period, actual.period, "%" PRIi32);
+    }
+
+    return true;
+}
+
+typedef struct SimulationSetTest
+{
+    RBRInstrumentGen3Simulation simulation;
+    const char *command;
+    const char *response;
+    RBRInstrumentGen3Error expectedError;
+} SimulationSetTest;
+
+TEST_LOGGER3(simulation_set)
+{
+    SimulationSetTest tests[] = {
+        {
+            {
+                .state = false,
+                .period = 3600000
+            },
+            "permit command = simulation" COMMAND_TERMINATOR
+            "simulation state = off, period = 3600000" COMMAND_TERMINATOR,
+            "permit command = simulation" RESPONSE_TERMINATOR
+            "simulation state = off, period = 3600000" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS
+        },
+        {
+            {
+                .state = true,
+                .period = 3600000
+            },
+            "permit command = simulation" COMMAND_TERMINATOR
+            "simulation state = on, period = 3600000" COMMAND_TERMINATOR,
+            "permit command = simulation" RESPONSE_TERMINATOR
+            "simulation state = on, period = 3600000" RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_SUCCESS
+        },
+        {
+            {
+                .state = true,
+                .period = 123
+            },
+            "permit command = simulation" COMMAND_TERMINATOR
+            "simulation state = on, period = 123" COMMAND_TERMINATOR,
+            "permit command = simulation" RESPONSE_TERMINATOR
+            "E0108 invalid argument to command: '123'"
+            RESPONSE_TERMINATOR,
+            RBRINSTRUMENTGEN3_HARDWARE_ERROR
+        },
+        {
+            {
+                .state = false,
+                .period = 0
+            },
+            "",
+            "",
+            RBRINSTRUMENTGEN3_INVALID_PARAMETER_VALUE
+        },
+        {{0}, 0, 0, 0}
+    };
+
+    RBRInstrumentGen3Error err;
+
+    for (int i = 0; tests[i].command != NULL; i++)
+    {
+        TestIOBuffers_init(buffers, tests[i].response, 0);
+        err = RBRInstrumentGen3_setSimulation(instrument, &tests[i].simulation);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen3Error);
+        TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
+    }
+
+    return true;
+}

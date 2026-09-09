@@ -105,4 +105,4 @@ const char *RBRInstrumentGen4HardwareError_name(RBRInstrumentGen4HardwareError e
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTINTERNAL_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN4HARDWAREERRORS_H */

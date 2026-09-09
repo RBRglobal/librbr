@@ -51,5 +51,5 @@ then
     uncrustify --no-backup -c "$SCRIPT_DIR"/"uncrustify.cfg" "$@"
 else
     uncrustify --no-backup -c "$SCRIPT_DIR"/"uncrustify.cfg" src/*.[ch] \
-                                                             tests/*.[ch]
+                                                             testsGen3/*.[ch]
 fi

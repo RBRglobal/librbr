@@ -30,5 +30,5 @@ extern "C" {
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTCOMMANDS_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN4COMMANDS_H */
 

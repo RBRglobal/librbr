@@ -22,9 +22,9 @@ As of version 2.0.0,
 the library contains two independent APIs,
 one per instrument generation:
 the Gen3 API
-(`RBRInstrument_…`,
+(`RBRInstrumentGen3_…`,
 for Logger2/Logger3 instruments,
-unchanged from libRBR 1.x)
+the libRBR 1.x API with every identifier suffixed `Gen3`)
 and the Gen4 API
 (`RBRInstrumentGen4_…`,
 for Generation 4 instruments,
@@ -38,10 +38,10 @@ by default
 For example:
 
 ~~~{.c}
-RBRInstrumentSampling sampling;
-RBRInstrument_getSampling(instrument, &sampling);
+RBRInstrumentGen3Sampling sampling;
+RBRInstrumentGen3_getSampling(instrument, &sampling);
 printf("The instrument is performing %s sampling every %" PRIi32 "ms.\n",
-       RBRInstrumentSamplingMode_name(sampling.mode),
+       RBRInstrumentGen3SamplingMode_name(sampling.mode),
        sampling.period);
 ~~~
 
@@ -109,7 +109,7 @@ select the generations to include:
 ~~~{.sh}
 # Both generations (the default):
 $ make lib
-# Gen3 only — equivalent to the libRBR 1.x library:
+# Gen3 only:
 $ make GEN4=0 lib
 # Gen4 only:
 $ make GEN3=0 lib
@@ -117,10 +117,14 @@ $ make GEN3=0 lib
 
 At least one generation must be enabled.
 Coming from libRBR 1.2.x?
-Nothing changes for Gen3 applications:
-the Gen3 API is source-compatible,
-and `make GEN4=0` produces
-exactly the 1.x library contents.
+The Gen3 API is the 1.x API
+with `Gen3` appended to every file name
+and every `RBRInstrument`, `RBRParser`,
+and `RBRDynamicCorrection` identifier
+(`RBRInstrument_open()` is now `RBRInstrumentGen3_open()`,
+`RBRINSTRUMENT_SUCCESS` is now `RBRINSTRUMENTGEN3_SUCCESS`,
+and `RBRInstrument.h` is now `RBRInstrumentGen3.h`);
+the behaviour is unchanged.
 When building as a Zephyr module,
 the equivalent Kconfig options are
 `CONFIG_LIBRBR_GEN3` and `CONFIG_LIBRBR_GEN4`.
@@ -167,7 +171,7 @@ $ make all
 
 continue with commands below if one wants to use the posix example with dynamic correction:
 ~~~{.sh}
-$ cd <PATH>/librbr/examples/posix
+$ cd <PATH>/librbr/examples/posixGen3
 # Build all the posix example:
 # (ignore errors if any)
 $ make all
@@ -190,7 +194,7 @@ $ ./posix-stream-dynamiccorrection /dev/ttyS<number>
 
 or test with .csv file:
 ~~~{.sh}
-$ cd <PATH>/librbr/examples/dynamicCorrection
+$ cd <PATH>/librbr/examples/dynamicCorrectionGen3
 # Build the example:
 $ make
 # Test with the example file:
@@ -221,7 +225,7 @@ Then commands below shows how to use the library:
 $ make lib
 
 # Continue with commands below if one wants to use the posix example:
-$ cd <PATH>/librbr/examples/posix
+$ cd <PATH>/librbr/examples/posixGen3
 # Build the exmamples:
 $ make example
 ~~~

@@ -1,0 +1,130 @@
+/**
+ * \file security.c
+ *
+ * \brief Tests for instrument security commands.
+ *
+ * \copyright
+ * Copyright (c) 2018 RBR Ltd.
+ * Licensed under the Apache License, Version 2.0.
+ */
+
+#include "tests.h"
+
+TEST_LOGGER2(permit)
+{
+    const char *text = "permit = foo";
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
+
+    TestIOBuffers_init(buffers, response, 0);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_permit(instrument, "foo");
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER3(permit)
+{
+    const char *text = "permit command = foo";
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
+
+    TestIOBuffers_init(buffers, response, 0);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_permit(instrument, "foo");
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER3(prompt)
+{
+    bool expected = true;
+    bool actual = false;
+
+    TestIOBuffers_init(buffers, "prompt state = on" RESPONSE_TERMINATOR, 0);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_getPrompt(instrument, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(expected, actual, bool);
+    TEST_ASSERT_STR_EQ("prompt state" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER3(prompt_set)
+{
+    const char *text = "prompt state = on";
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
+
+    TestIOBuffers_init(buffers, response, 0);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_setPrompt(instrument, true);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER3(confirmation)
+{
+    bool expected = true;
+    bool actual = false;
+
+    TestIOBuffers_init(buffers,
+                       "confirmation state = on" RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_getConfirmation(instrument,
+                                                           &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(expected, actual, bool);
+    TEST_ASSERT_STR_EQ("confirmation state" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER3(confirmation_set_on)
+{
+    const char *text = "confirmation state = on";
+    char expectedCommand[COMMAND_RESPONSE_SIZE];
+    char response[COMMAND_RESPONSE_SIZE];
+    rbr_prepareCommandResponse(text, expectedCommand, response);
+
+    TestIOBuffers_init(buffers, response, 0);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_setConfirmation(instrument, true);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER3(confirmation_set_off)
+{
+    TestIOBuffers_init(buffers, "", 0);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_setConfirmation(instrument, false);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_STR_EQ("confirmation state = off" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER3(reboot)
+{
+    TestIOBuffers_init(buffers,
+                       "permit command = reboot" RESPONSE_TERMINATOR,
+                       0);
+    RBRInstrumentGen3Error err = RBRInstrumentGen3_reboot(instrument, 123);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_STR_EQ("permit command = reboot" COMMAND_TERMINATOR
+                       "reboot 123" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+    TEST_ASSERT(instrument->lastActivityTime < 0);
+
+    return true;
+}

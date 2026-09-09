@@ -381,4 +381,4 @@ RBRInstrumentGen4Error RBRInstrumentGen4_disable(
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTDEPLOYMENT_H */
+#endif /* LIBRBR_RBRINSTRUMENTGEN4DEPLOYMENT_H */
