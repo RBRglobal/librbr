@@ -24,12 +24,12 @@
 #include <unistd.h>
 
 #include "posix-shared.h"
-#include "RBRParserGen3.h"
+#include "RBRGen3Parser.h"
 
 #define CHUNK_SIZE 1024
 
 RBRGen3Error parserSample(
-    const struct RBRParserGen3 *parser,
+    const struct RBRGen3Parser *parser,
     const struct RBRGen3Sample *const sample)
 {
     (void) parser;
@@ -123,15 +123,15 @@ int main(int argc, char *argv[])
     RBRGen3Channels channels;
     RBRGen3_getChannels(instrument, &channels);
 
-    RBRParserGen3 *parser = NULL;
+    RBRGen3Parser *parser = NULL;
 
     RBRGen3Sample sampleBuffer;
-    RBRParserGen3Callbacks parserCallbacks = {
+    RBRGen3ParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
 
-    RBRParserGen3Config parserConfig = {
+    RBRGen3ParserConfig parserConfig = {
         .format = RBRGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
         }
     };
 
-    if ((err = RBRParserGen3_init(
+    if ((err = RBRGen3Parser_init(
              &parser,
              &parserCallbacks,
              &parserConfig,
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 
         bufSize += data.size;
         parsedSize = bufSize;
-        RBRParserGen3_parse(parser,
+        RBRGen3Parser_parse(parser,
                         RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize);

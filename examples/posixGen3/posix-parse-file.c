@@ -28,10 +28,10 @@
 #include <unistd.h>
 
 #include "posix-shared.h"
-#include "RBRParserGen3.h"
+#include "RBRGen3Parser.h"
 
 RBRGen3Error parserSample(
-    const struct RBRParserGen3 *parser,
+    const struct RBRGen3Parser *parser,
     const struct RBRGen3Sample *const sample)
 {
     /* Unused. */
@@ -85,19 +85,19 @@ int main(int argc, char *argv[])
             RBRGEN3_LIB_NAME,
             RBRGEN3_LIB_VERSION);
 
-    RBRParserGen3 *parser = NULL;
+    RBRGen3Parser *parser = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRParserGen3 parserSpace;
+    RBRGen3Parser parserSpace;
     parser = &parserSpace;
     #endif
 
     RBRGen3Sample sampleBuffer;
-    RBRParserGen3Callbacks parserCallbacks = {
+    RBRGen3ParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
 
-    RBRParserGen3Config parserConfig = {
+    RBRGen3ParserConfig parserConfig = {
         .format = RBRGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
     };
 
     RBRGen3Error err;
-    if ((err = RBRParserGen3_init(
+    if ((err = RBRGen3Parser_init(
              &parser,
              &parserCallbacks,
              &parserConfig,
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
 
         bufSize += readSize;
         parsedSize = bufSize;
-        RBRParserGen3_parse(parser,
+        RBRGen3Parser_parse(parser,
                         RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize);
@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
         memmove(buf, buf + parsedSize, bufSize);
     }
 
-    RBRParserGen3_destroy(parser);
+    RBRGen3Parser_destroy(parser);
 fileCleanup:
     close(datasetFd);
 

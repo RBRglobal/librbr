@@ -124,7 +124,7 @@ GEN3_OBJECTS := src/RBRGen3.o \
                 src/RBRGen3Security.o \
                 src/RBRGen3Streaming.o \
                 src/RBRGen3Vehicle.o \
-                src/RBRParserGen3.o
+                src/RBRGen3Parser.o
 
 ## \brief Objects for the Gen4 (SL4/SEN4/L4) API.
 GEN4_OBJECTS := src/RBRGen4.o \
@@ -244,7 +244,7 @@ testsGen3/tests.c: $(foreach module,$(GEN3_TEST_MODULES),testsGen3/$(module).c)
 	@echo "};" >>$@
 
 	@grep -ho 'TEST_PARSER_CONFIG([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_PARSER_CONFIG(\([^,]*\))/extern const RBRParserGen3Config test_\1_parser_config;/' \
+		| sed -e 's/^TEST_PARSER_CONFIG(\([^,]*\))/extern const RBRGen3ParserConfig test_\1_parser_config;/' \
 		>>$@
 
 	@echo "ParserTest parserTests[] = {" >>$@

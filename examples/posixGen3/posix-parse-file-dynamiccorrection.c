@@ -37,7 +37,7 @@
 #include <unistd.h>
 
 #include "posix-shared.h"
-#include "RBRParserGen3.h"
+#include "RBRGen3Parser.h"
 #include "RBRDynamicCorrectionGen3.h"
 
 
@@ -57,7 +57,7 @@ RBRGen3DateTime g_timeReference = 0;
 RBRDynamicCorrectionGen3Params dynamicCorrParams;
 
 RBRGen3Error parserSample(
-    const struct RBRParserGen3 *parser,
+    const struct RBRGen3Parser *parser,
     const struct RBRGen3Sample *const sample)
 {
     /* struct for dynamic correction */
@@ -154,19 +154,19 @@ int main(int argc, char *argv[])
     printf("timestamp(s) | T_cor(°C) | P_meas(sea pressure, dbar) | S_cor(PSU) | T_cond(°C)\n");
     printf("-----------------------------------------------------------------------------------\n");
     
-    RBRParserGen3 *parser = NULL;
+    RBRGen3Parser *parser = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRParserGen3 parserSpace;
+    RBRGen3Parser parserSpace;
     parser = &parserSpace;
     #endif
 
     RBRGen3Sample sampleBuffer;
-    RBRParserGen3Callbacks parserCallbacks = {
+    RBRGen3ParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
 
-    RBRParserGen3Config parserConfig = {
+    RBRGen3ParserConfig parserConfig = {
         .format = RBRGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
     }
 
     RBRGen3Error err;
-    if ((err = RBRParserGen3_init(
+    if ((err = RBRGen3Parser_init(
              &parser,
              &parserCallbacks,
              &parserConfig,
@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
 
         bufSize += readSize;
         parsedSize = bufSize;
-        RBRParserGen3_parse(parser,
+        RBRGen3Parser_parse(parser,
                         RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize); //parserSample() gets called and prints the sample.
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
         memmove(buf, buf + parsedSize, bufSize);
     }
 
-    RBRParserGen3_destroy(parser);
+    RBRGen3Parser_destroy(parser);
 fileCleanup:
     close(datasetFd);
 
