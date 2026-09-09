@@ -150,7 +150,7 @@ RBRGen3Error RBRGen3_setSimulation(
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    RBR_TRY(RBRInstrumentGen3_permit(instrument, "simulation"));
+    RBR_TRY(RBRGen3_permit(instrument, "simulation"));
     RBR_TRY(RBRGen3_converse(instrument,
                                    "simulation state = %s, period = %i",
                                    (simulation->state) ? "on" : "off",

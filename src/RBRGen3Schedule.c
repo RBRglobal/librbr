@@ -153,7 +153,7 @@ static RBRGen3Error RBRGen3_setClockL2(
         return RBRGEN3_SUCCESS;
     }
 
-    RBR_TRY(RBRInstrumentGen3_permit(instrument, "settings"));
+    RBR_TRY(RBRGen3_permit(instrument, "settings"));
 
     RBRGen3Error err;
     err = RBRGen3_converse(instrument,

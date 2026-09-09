@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Security.h
+ * \file RBRGen3Security.h
  *
  * \brief Instrument commands and structures pertaining to command security and
  * interaction.
@@ -11,8 +11,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTGEN3SECURITY_H
-#define LIBRBR_RBRINSTRUMENTGEN3SECURITY_H
+#ifndef LIBRBR_RBRGEN3SECURITY_H
+#define LIBRBR_RBRGEN3SECURITY_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +34,7 @@ extern "C" {
  * \return #RBRGEN3_HARDWARE_ERROR if the command can't be permitted
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/permit
  */
-RBRGen3Error RBRInstrumentGen3_permit(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_permit(RBRGen3 *instrument,
                                         const char *command);
 
 /**
@@ -50,7 +50,7 @@ RBRGen3Error RBRInstrumentGen3_permit(RBRGen3 *instrument,
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/prompt
  */
-RBRGen3Error RBRInstrumentGen3_getPrompt(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getPrompt(RBRGen3 *instrument,
                                            bool *prompt);
 
 /**
@@ -63,7 +63,7 @@ RBRGen3Error RBRInstrumentGen3_getPrompt(RBRGen3 *instrument,
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/prompt
  */
-RBRGen3Error RBRInstrumentGen3_setPrompt(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_setPrompt(RBRGen3 *instrument,
                                            bool prompt);
 
 /**
@@ -79,7 +79,7 @@ RBRGen3Error RBRInstrumentGen3_setPrompt(RBRGen3 *instrument,
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/confirmation
  */
-RBRGen3Error RBRInstrumentGen3_getConfirmation(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getConfirmation(RBRGen3 *instrument,
                                                  bool *confirmation);
 
 /**
@@ -96,7 +96,7 @@ RBRGen3Error RBRInstrumentGen3_getConfirmation(RBRGen3 *instrument,
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/confirmation
  */
-RBRGen3Error RBRInstrumentGen3_setConfirmation(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_setConfirmation(RBRGen3 *instrument,
                                                  bool confirmation);
 
 /**
@@ -109,11 +109,11 @@ RBRGen3Error RBRInstrumentGen3_setConfirmation(RBRGen3 *instrument,
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/reboot
  */
-RBRGen3Error RBRInstrumentGen3_reboot(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_reboot(RBRGen3 *instrument,
                                         int32_t delay);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTGEN3SECURITY_H */
+#endif /* LIBRBR_RBRGEN3SECURITY_H */

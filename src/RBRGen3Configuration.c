@@ -484,7 +484,7 @@ RBRGen3Error RBRGen3_setFetchPowerOffDelay(
     RBRGen3 *instrument,
     RBRGen3Period fetchPowerOffDelay)
 {
-    RBR_TRY(RBRInstrumentGen3_permit(instrument, "settings"));
+    RBR_TRY(RBRGen3_permit(instrument, "settings"));
     RBR_TRY(RBRGen3_converse(instrument,
                                    "settings fetchpoweroffdelay = %d",
                                    fetchPowerOffDelay));
@@ -505,7 +505,7 @@ RBRGen3Error RBRGen3_setSensorPowerAlwaysOn(
     RBRGen3 *instrument,
     bool sensorPowerAlwaysOn)
 {
-    RBR_TRY(RBRInstrumentGen3_permit(instrument, "settings"));
+    RBR_TRY(RBRGen3_permit(instrument, "settings"));
     RBR_TRY(RBRGen3_converse(instrument,
                                    "settings sensorpoweralwayson = %s",
                                    sensorPowerAlwaysOn ? "on" : "off"));
@@ -524,7 +524,7 @@ RBRGen3Error RBRGen3_getCastDetection(RBRGen3 *instrument,
 RBRGen3Error RBRGen3_setCastDetection(RBRGen3 *instrument,
                                                   bool castDetection)
 {
-    RBR_TRY(RBRInstrumentGen3_permit(instrument, "settings"));
+    RBR_TRY(RBRGen3_permit(instrument, "settings"));
     RBR_TRY(RBRGen3_converse(instrument,
                                    "settings castdetection = %s",
                                    castDetection ? "on" : "off"));
@@ -551,7 +551,7 @@ RBRGen3Error RBRGen3_setInputTimeout(
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    RBR_TRY(RBRInstrumentGen3_permit(instrument, "settings"));
+    RBR_TRY(RBRGen3_permit(instrument, "settings"));
     RBR_TRY(RBRGen3_converse(instrument,
                                    "settings inputtimeout = %d",
                                    inputTimeout));
@@ -614,7 +614,7 @@ RBRGen3Error RBRGen3_setValueSetting(
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    RBR_TRY(RBRInstrumentGen3_permit(instrument, "settings"));
+    RBR_TRY(RBRGen3_permit(instrument, "settings"));
     RBR_TRY(RBRGen3_converse(instrument,
                                    "settings %s = %f",
                                    RBRGen3ValueSetting_name(setting),

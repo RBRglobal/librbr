@@ -18,7 +18,7 @@ TEST_LOGGER2(permit)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRInstrumentGen3_permit(instrument, "foo");
+    RBRGen3Error err = RBRGen3_permit(instrument, "foo");
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -33,7 +33,7 @@ TEST_LOGGER3(permit)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRInstrumentGen3_permit(instrument, "foo");
+    RBRGen3Error err = RBRGen3_permit(instrument, "foo");
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -46,7 +46,7 @@ TEST_LOGGER3(prompt)
     bool actual = false;
 
     TestIOBuffers_init(buffers, "prompt state = on" RESPONSE_TERMINATOR, 0);
-    RBRGen3Error err = RBRInstrumentGen3_getPrompt(instrument, &actual);
+    RBRGen3Error err = RBRGen3_getPrompt(instrument, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected, actual, bool);
     TEST_ASSERT_STR_EQ("prompt state" COMMAND_TERMINATOR,
@@ -63,7 +63,7 @@ TEST_LOGGER3(prompt_set)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRInstrumentGen3_setPrompt(instrument, true);
+    RBRGen3Error err = RBRGen3_setPrompt(instrument, true);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -78,7 +78,7 @@ TEST_LOGGER3(confirmation)
     TestIOBuffers_init(buffers,
                        "confirmation state = on" RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRInstrumentGen3_getConfirmation(instrument,
+    RBRGen3Error err = RBRGen3_getConfirmation(instrument,
                                                            &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected, actual, bool);
@@ -96,7 +96,7 @@ TEST_LOGGER3(confirmation_set_on)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRInstrumentGen3_setConfirmation(instrument, true);
+    RBRGen3Error err = RBRGen3_setConfirmation(instrument, true);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -106,7 +106,7 @@ TEST_LOGGER3(confirmation_set_on)
 TEST_LOGGER3(confirmation_set_off)
 {
     TestIOBuffers_init(buffers, "", 0);
-    RBRGen3Error err = RBRInstrumentGen3_setConfirmation(instrument, false);
+    RBRGen3Error err = RBRGen3_setConfirmation(instrument, false);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ("confirmation state = off" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -119,7 +119,7 @@ TEST_LOGGER3(reboot)
     TestIOBuffers_init(buffers,
                        "permit command = reboot" RESPONSE_TERMINATOR,
                        0);
-    RBRGen3Error err = RBRInstrumentGen3_reboot(instrument, 123);
+    RBRGen3Error err = RBRGen3_reboot(instrument, 123);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ("permit command = reboot" COMMAND_TERMINATOR
                        "reboot 123" COMMAND_TERMINATOR,

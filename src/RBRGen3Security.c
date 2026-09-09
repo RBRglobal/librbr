@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen3Security.c
+ * \file RBRGen3Security.c
  *
  * \brief Library implementation.
  *
@@ -14,7 +14,7 @@
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
 
-RBRGen3Error RBRInstrumentGen3_permit(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_permit(RBRGen3 *instrument,
                                         const char *command)
 {
     const char *permitCommand;
@@ -29,7 +29,7 @@ RBRGen3Error RBRInstrumentGen3_permit(RBRGen3 *instrument,
     return RBRGen3_converse(instrument, permitCommand, command);
 }
 
-RBRGen3Error RBRInstrumentGen3_getPrompt(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getPrompt(RBRGen3 *instrument,
                                            bool *prompt)
 {
     return RBRGen3_getBool(instrument,
@@ -38,7 +38,7 @@ RBRGen3Error RBRInstrumentGen3_getPrompt(RBRGen3 *instrument,
                                  prompt);
 }
 
-RBRGen3Error RBRInstrumentGen3_setPrompt(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_setPrompt(RBRGen3 *instrument,
                                            bool prompt)
 {
     return RBRGen3_converse(instrument,
@@ -46,7 +46,7 @@ RBRGen3Error RBRInstrumentGen3_setPrompt(RBRGen3 *instrument,
                                   prompt ? "on" : "off");
 }
 
-RBRGen3Error RBRInstrumentGen3_getConfirmation(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_getConfirmation(RBRGen3 *instrument,
                                                  bool *confirmation)
 {
     return RBRGen3_getBool(instrument,
@@ -55,7 +55,7 @@ RBRGen3Error RBRInstrumentGen3_getConfirmation(RBRGen3 *instrument,
                                  confirmation);
 }
 
-RBRGen3Error RBRInstrumentGen3_setConfirmation(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_setConfirmation(RBRGen3 *instrument,
                                                  bool confirmation)
 {
     if (confirmation)
@@ -69,10 +69,10 @@ RBRGen3Error RBRInstrumentGen3_setConfirmation(RBRGen3 *instrument,
     }
 }
 
-RBRGen3Error RBRInstrumentGen3_reboot(RBRGen3 *instrument,
+RBRGen3Error RBRGen3_reboot(RBRGen3 *instrument,
                                         int32_t delay)
 {
-    RBR_TRY(RBRInstrumentGen3_permit(instrument, "reboot"));
+    RBR_TRY(RBRGen3_permit(instrument, "reboot"));
     RBR_TRY(RBRGen3_sendCommand(instrument, "reboot %" PRId32, delay));
 
     instrument->lastActivityTime = RBRGEN3_NO_ACTIVITY;

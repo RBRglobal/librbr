@@ -311,7 +311,7 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *instrument,
 
 RBRGen3Error RBRGen3_memoryClear(RBRGen3 *instrument)
 {
-    RBR_TRY(RBRInstrumentGen3_permit(instrument, "memclear"));
+    RBR_TRY(RBRGen3_permit(instrument, "memclear"));
     RBR_TRY(RBRGen3_converse(instrument, "memclear"));
     return RBRGEN3_SUCCESS;
 }
