@@ -45,14 +45,13 @@ export LIB_VERSION ?= $(shell ./tools/version.sh)
 ## The library contains two independent instrument APIs:
 ##
 ## - `GEN3`: the `RBRInstrumentGen3_`-prefixed API for Logger2/Logger3
-##   instruments — the same API shipped as libRBR 1.x;
+##   instruments — the libRBR 1.x API, suffixed `Gen3`;
 ## - `GEN4`: the `RBRInstrumentGen4_`-prefixed API for Generation 4
 ##   (SL4/SEN4/L4) instruments.
 ##
 ## Both are enabled (`1`) by default and both land in the same
 ## `bin/libRBR.a`; disable one by passing `GEN3=0` or `GEN4=0` to `make(1)`.
-## A `GEN4=0` build is equivalent to the libRBR 1.x library. At least one
-## generation must be enabled.
+## At least one generation must be enabled.
 GEN3 ?= 1
 GEN4 ?= 1
 

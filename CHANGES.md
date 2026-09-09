@@ -11,15 +11,20 @@ Release TBD
   The Gen4 API (`RBRInstrumentGen4_…`, `RBRParserGen4_…`,
   `RBRDynamicCorrectionGen4_…`),
   harvested from the 2023–2024 Gen4 development branches,
-  now lives alongside the unchanged Gen3 API
+  now lives alongside the Gen3 API
   and is under active development.
 * Added the `GEN3` and `GEN4` Makefile options
   (and `CONFIG_LIBRBR_GEN3`/`CONFIG_LIBRBR_GEN4` Kconfig options
   for Zephyr builds)
   to select the instrument generations
   compiled into `bin/libRBR.a`.
-  Both default to enabled;
-  a `GEN4=0` build is equivalent to the libRBR 1.x library.
+  Both default to enabled.
+
+### Changed
+
+* Suffixed every Gen3 file name and identifier with `Gen3`,
+  mirroring the Gen4 API (SYS-1877).
+  Behaviour is unchanged.
 
 ## v1.3.0
 

@@ -24,7 +24,7 @@ one per instrument generation:
 the Gen3 API
 (`RBRInstrumentGen3_…`,
 for Logger2/Logger3 instruments,
-unchanged from libRBR 1.x)
+the libRBR 1.x API with every identifier suffixed `Gen3`)
 and the Gen4 API
 (`RBRInstrumentGen4_…`,
 for Generation 4 instruments,
@@ -109,7 +109,7 @@ select the generations to include:
 ~~~{.sh}
 # Both generations (the default):
 $ make lib
-# Gen3 only — equivalent to the libRBR 1.x library:
+# Gen3 only:
 $ make GEN4=0 lib
 # Gen4 only:
 $ make GEN3=0 lib
@@ -117,10 +117,14 @@ $ make GEN3=0 lib
 
 At least one generation must be enabled.
 Coming from libRBR 1.2.x?
-Nothing changes for Gen3 applications:
-the Gen3 API is source-compatible,
-and `make GEN4=0` produces
-exactly the 1.x library contents.
+The Gen3 API is the 1.x API
+with `Gen3` appended to every file name
+and every `RBRInstrument`, `RBRParser`,
+and `RBRDynamicCorrection` identifier
+(`RBRInstrument_open()` is now `RBRInstrumentGen3_open()`,
+`RBRINSTRUMENT_SUCCESS` is now `RBRINSTRUMENTGEN3_SUCCESS`,
+and `RBRInstrument.h` is now `RBRInstrumentGen3.h`);
+the behaviour is unchanged.
 When building as a Zephyr module,
 the equivalent Kconfig options are
 `CONFIG_LIBRBR_GEN3` and `CONFIG_LIBRBR_GEN4`.
