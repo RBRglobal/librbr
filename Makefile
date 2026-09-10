@@ -188,6 +188,19 @@ tests: LDLIBS += -lRBR -lRBRDynamicCorrection -lm
 tests: bin $(TEST_BINARIES)
 	$(foreach test,$(TEST_BINARIES),./$(test) &&) true
 
+## \brief Fail if the library archives reference dynamic memory allocation.
+##
+## The library never allocates memory, so none of its objects may leave
+## malloc, calloc, realloc, or free unresolved. The symbol listing goes
+## through a file so that a failing nm fails the target rather than
+## producing an empty listing that trivially passes; the optional leading
+## underscore covers platforms (e.g. macOS) which prefix C symbols.
+CHECKNOALLOC_SYMBOLS := bin/undefined-symbols.txt
+.PHONY: checknoalloc
+checknoalloc: bin/libRBR.a bin/libRBRDynamicCorrection.a
+	nm --undefined-only $^ > $(CHECKNOALLOC_SYMBOLS)
+	! grep --word-regexp --extended-regexp '_?(malloc|calloc|realloc|free)' $(CHECKNOALLOC_SYMBOLS)
+
 ## \brief Gen3 test modules.
 ##
 ## Each one of these names corresponds to a C source file in the `testsGen3/`

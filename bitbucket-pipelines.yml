@@ -10,14 +10,14 @@ definitions:
                 - export MAKEFLAGS=--jobs=$(nproc)
                 # Gen3-only configuration (equivalent to libRBR 1.x).
                 - make clean
-                - make GEN4=0 lib libdynamiccorrection tests
+                - make GEN4=0 lib libdynamiccorrection tests checknoalloc
                 # Gen4-only configuration.
                 - make clean
-                - make GEN3=0 lib libdynamiccorrection tests
+                - make GEN3=0 lib libdynamiccorrection tests checknoalloc
                 # Both generations (the default configuration). Built last so
                 # the examples below link against the both-generation archive.
                 - make clean
-                - make lib libdynamiccorrection tests
+                - make lib libdynamiccorrection tests checknoalloc
                 - cd examples/posixGen3
                 - make clean
                 - make nosdl
