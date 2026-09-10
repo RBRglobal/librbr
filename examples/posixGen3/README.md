@@ -47,16 +47,6 @@ invoke one of three Make targets:
   $ make nosdl
   ~~~
 
-* To build examples that do not depend on dynamic memory allocation,
-  ensure that the library code has also been built to not depend on malloc,
-  then invoke the “nomalloc” target:
-
-  ~~~{.sh}
-  $ make --directory=../../ clean
-  $ make --directory=../../ nomalloc
-  $ make nomalloc
-  ~~~
-
 ## Tips
 
 ### Check the baud rate

@@ -42,8 +42,6 @@ const char *RBRGen3Error_name(RBRGen3Error error)
     switch (error) {
     case RBRGEN3_SUCCESS:
         return "success";
-    case RBRGEN3_ALLOCATION_FAILURE:
-        return "allocation failure";
     case RBRGEN3_BUFFER_TOO_SMALL:
         return "buffer too small";
     case RBRGEN3_MISSING_CALLBACK:

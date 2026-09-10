@@ -247,18 +247,6 @@ Take streaming as example:
    # This command would make the instrument start streaming:
    $ ./posix-stream /dev/ttyS<number>
 
-option 4: build librbr with dynamic correction feature, but no malloc() used
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Assuming cygwin is used, and current path is ``<PATH>/librbr``:
-
-.. code-block:: sh
-
-   # Build both librbr and libRBRDynamicCorrection:
-   $ make nomalloc
-
-   # Note: If this is used, please build posix examples with "$ make nomalloc" too.
-
 Using
 -----
 

@@ -188,9 +188,6 @@ tests: LDLIBS += -lRBR -lRBRDynamicCorrection -lm
 tests: bin $(TEST_BINARIES)
 	$(foreach test,$(TEST_BINARIES),./$(test) &&) true
 
-nomalloc: CFLAGS += -DRBR_LIB_NODYNAMICMEMORYALLOCATION
-nomalloc: lib libdynamiccorrection docs tests
-
 ## \brief Gen3 test modules.
 ##
 ## Each one of these names corresponds to a C source file in the `testsGen3/`

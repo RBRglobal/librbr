@@ -204,8 +204,6 @@ typedef int32_t RBRGen3Period;
 typedef enum RBRGen3Error {
     /** No error. */
     RBRGEN3_SUCCESS,
-    /** An error occurred while allocating memory. This is typically fatal. */
-    RBRGEN3_ALLOCATION_FAILURE,
     /** The command buffer was too small to hold the outbound command. */
     RBRGEN3_BUFFER_TOO_SMALL,
     /** A required callback function was not provided. */
