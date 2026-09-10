@@ -154,11 +154,7 @@ int main(int argc, char *argv[])
     printf("timestamp(s) | T_cor(°C) | P_meas(sea pressure, dbar) | S_cor(PSU) | T_cond(°C)\n");
     printf("-----------------------------------------------------------------------------------\n");
     
-    RBRGen3Parser *parser = NULL;
-    #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRGen3Parser parserSpace;
-    parser = &parserSpace;
-    #endif
+    RBRGen3Parser parser;
 
     RBRGen3Sample sampleBuffer;
     RBRGen3ParserCallbacks parserCallbacks = {
@@ -230,7 +226,7 @@ int main(int argc, char *argv[])
 
         bufSize += readSize;
         parsedSize = bufSize;
-        RBRGen3Parser_parse(parser,
+        RBRGen3Parser_parse(&parser,
                         RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize); //parserSample() gets called and prints the sample.
@@ -238,7 +234,7 @@ int main(int argc, char *argv[])
         memmove(buf, buf + parsedSize, bufSize);
     }
 
-    RBRGen3Parser_destroy(parser);
+    RBRGen3Parser_destroy(&parser);
 fileCleanup:
     close(datasetFd);
 

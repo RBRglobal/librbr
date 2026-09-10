@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
         channels.minimumPeriod = 480;
     }
 
-    RBRGen3Parser *parser = NULL;
+    RBRGen3Parser parser;
 
     RBRGen3Sample sampleBuffer;
     RBRGen3ParserCallbacks parserCallbacks = {
@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
 
         bufSize += data.size;
         parsedSize = bufSize;
-        RBRGen3Parser_parse(parser,
+        RBRGen3Parser_parse(&parser,
                         RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize);

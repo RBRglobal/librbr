@@ -226,24 +226,16 @@ typedef struct RBRGen3Parser {
 
     /** \brief Arbitrary user data; useful in callbacks. */
     void *userData;
-
-    /**
-     * \brief Whether the instance memory was dynamically allocated by the
-     * constructor.
-     */
-    bool managedAllocation;
 } RBRGen3Parser;
 
 /**
  * \brief Initialize a dataset parser.
  *
- * The use of the \a parser argument is the same as that of the \a conn
- * argument to RBRGen3_open(): when given as `NULL`, instance memory will
- * be allocated for you; otherwise, the pointer target will be used as instance
- * storage. See RBRGen3_open() for “do”s and “don't”s inherent to this
- * approach.
+ * As with the \a conn argument to RBRGen3_open(), the caller provides the
+ * RBRGen3Parser instance and it is initialized in place; the library never
+ * allocates memory.
  *
- * Again, as with the \a callbacks argument to RBRGen3_open(), the
+ * As with the \a callbacks argument to RBRGen3_open(), the
  * \a config and \a callbacks structures will be copied into the RBRGen3Parser
  * structure and no references to them are retained.
  *
@@ -258,30 +250,28 @@ typedef struct RBRGen3Parser {
  * #RBRGEN3_MISSING_CALLBACK is returned and the parser instantiation
  * will not be completed.
  *
- * In the event of any return value other than #RBRGEN3_SUCCESS, any
- * memory allocated by this constructor is freed. That is, in the event of
- * failure, no cleanup of library resources is required. In the event of a
- * successful result, RBRGen3Parser_destroy() should be used to release allocated
- * resources.
+ * In the event of any return value other than #RBRGEN3_SUCCESS, no cleanup of
+ * library resources is required. In the event of a successful result,
+ * RBRGen3Parser_destroy() should be used to close the parser.
  *
- * \param [in,out] parser the context object to populate
+ * \param [out] parser the context object to populate
  * \param [in] callbacks the set of callbacks to be used by the parser
  * \param [in] config the parser configuration
  * \param [in] userData arbitrary user data; useful in callbacks
  * \return #RBRGEN3_SUCCESS if the parser was instantiated successfully
- * \return #RBRGEN3_ALLOCATION_FAILURE if memory allocation failed
  * \return #RBRGEN3_MISSING_CALLBACK if no callbacks were provided
  * \return #RBRGEN3_UNSUPPORTED if the memory format is unsupported
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE if the config is invalid
  * \see RBRGen3Parser_destroy()
  */
-RBRGen3Error RBRGen3Parser_init(RBRGen3Parser **parser, const RBRGen3ParserCallbacks *callbacks,
+RBRGen3Error RBRGen3Parser_init(RBRGen3Parser *parser, const RBRGen3ParserCallbacks *callbacks,
                                 const RBRGen3ParserConfig *config, void *userData);
 
 /**
- * \brief Release any resources held by the parser.
+ * \brief Close the parser.
  *
- * Frees the buffer allocated by RBRGen3Parser_init() if necessary.
+ * Clears the parser state. Does not release the caller-provided instance
+ * memory.
  *
  * \param [in,out] parser the dataset parser to close
  * \return #RBRGEN3_SUCCESS if the parser was closed successfully
