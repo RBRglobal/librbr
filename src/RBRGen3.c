@@ -10,11 +10,6 @@
 
 /* Required for memcpy, memcmp, memset, strlen. */
 #include <string.h>
-/* Required for free/malloc. */
-#ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
-#include <stdlib.h>
-#endif
-
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
 
@@ -139,7 +134,7 @@ static RBRGen3Error RBRGen3_populateGeneration(RBRGen3 *conn)
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRGen3_open(RBRGen3 **conn, const RBRGen3Callbacks *callbacks,
+RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Callbacks *callbacks,
                           RBRGen3DateTime commandTimeout, void *userData)
 {
     if (callbacks == NULL || callbacks->time == NULL || callbacks->sleep == NULL ||
@@ -148,64 +143,36 @@ RBRGen3Error RBRGen3_open(RBRGen3 **conn, const RBRGen3Callbacks *callbacks,
         return RBRGEN3_MISSING_CALLBACK;
     }
 
-    bool allocated = false;
-    if (*conn == NULL) {
-        allocated = true;
-#ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
-        if ((*conn = malloc(sizeof(RBRGen3))) == NULL) {
-#endif
-            return RBRGEN3_ALLOCATION_FAILURE;
-#ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
-        }
-#endif
-    }
-
-    memset(*conn, 0, sizeof(RBRGen3));
-    memcpy(&(*conn)->callbacks, callbacks, sizeof(RBRGen3Callbacks));
+    memset(conn, 0, sizeof(RBRGen3));
+    memcpy(&conn->callbacks, callbacks, sizeof(RBRGen3Callbacks));
     /* We don't want the streaming sample data callback to be called before the
      * constructor has finished. */
-    (*conn)->callbacks.sample = NULL;
-    (*conn)->commandTimeout = commandTimeout;
-    (*conn)->userData = userData;
-    (*conn)->lastActivityTime = RBRGEN3_NO_ACTIVITY;
-    (*conn)->response.type = RBRGEN3_RESPONSE_UNKNOWN_TYPE;
-    (*conn)->managedAllocation = allocated;
+    conn->callbacks.sample = NULL;
+    conn->commandTimeout = commandTimeout;
+    conn->userData = userData;
+    conn->lastActivityTime = RBRGEN3_NO_ACTIVITY;
+    conn->response.type = RBRGEN3_RESPONSE_UNKNOWN_TYPE;
 
     RBRGen3Error err;
-    err = RBRGen3_populateGeneration(*conn);
+    err = RBRGen3_populateGeneration(conn);
     if (err != RBRGEN3_SUCCESS) {
-        if (allocated) {
-#ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
-            free(*conn);
-#endif
-        }
         return err;
     }
 
-    if ((*conn)->generation != RBRGEN3_LOGGER2 && (*conn)->generation != RBRGEN3_LOGGER3) {
-        if (allocated) {
-#ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
-            free(*conn);
-#endif
-        }
+    if (conn->generation != RBRGEN3_LOGGER2 && conn->generation != RBRGEN3_LOGGER3) {
         return RBRGEN3_UNSUPPORTED;
     }
 
     /* Enable the streaming callback, if applicable. */
-    (*conn)->callbacks.sample = callbacks->sample;
-    (*conn)->callbacks.sampleBuffer = callbacks->sampleBuffer;
+    conn->callbacks.sample = callbacks->sample;
+    conn->callbacks.sampleBuffer = callbacks->sampleBuffer;
 
     return RBRGEN3_SUCCESS;
 }
 
 RBRGen3Error RBRGen3_close(RBRGen3 *conn)
 {
-    if (conn->managedAllocation) {
-#ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
-        free(conn);
-#endif
-    }
-
+    memset(conn, 0, sizeof(RBRGen3));
     return RBRGEN3_SUCCESS;
 }
 

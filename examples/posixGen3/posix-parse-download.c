@@ -59,11 +59,7 @@ int main(int argc, char *argv[])
     int instrumentFd;
 
     RBRGen3Error err;
-    RBRGen3 *conn = NULL;
-    #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRGen3 instrumentSpace;
-    conn = &instrumentSpace;
-    #endif
+    RBRGen3 conn;
 
     if (argc < 2)
     {
@@ -107,10 +103,10 @@ int main(int argc, char *argv[])
         goto fileCleanup;
     }
 
-    RBRGen3_setUSBStreamingState(conn, false);
-    RBRGen3_setSerialStreamingState(conn, false);
+    RBRGen3_setUSBStreamingState(&conn, false);
+    RBRGen3_setSerialStreamingState(&conn, false);
 
-    if ((err = instrumentStart(conn)) != RBRGEN3_SUCCESS)
+    if ((err = instrumentStart(&conn)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr,
                 "%s: Failed to start instrument: %s!\n",
@@ -121,7 +117,7 @@ int main(int argc, char *argv[])
     }
 
     RBRGen3Channels channels;
-    RBRGen3_getChannels(conn, &channels);
+    RBRGen3_getChannels(&conn, &channels);
 
     RBRGen3Parser *parser = NULL;
 
@@ -165,7 +161,7 @@ int main(int argc, char *argv[])
     {
         data.data = buf + bufSize;
         data.size = sizeof(buf) - bufSize;
-        err = RBRGen3_readData(conn, &data);
+        err = RBRGen3_readData(&conn, &data);
         if (err == RBRGEN3_TIMEOUT)
         {
             printf("\nWarning: timeout. Retrying...\n");
@@ -197,7 +193,7 @@ int main(int argc, char *argv[])
         nanosleep(&sleep, NULL);
     }
 instrumentCleanup:
-    RBRGen3_close(conn);
+    RBRGen3_close(&conn);
 fileCleanup:
     close(instrumentFd);
 
