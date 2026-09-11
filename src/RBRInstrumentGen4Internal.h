@@ -155,6 +155,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_sendCommand(RBRInstrumentGen4 *instrume
  * \param [in] instrument the instrument connection
  * \param [in] breakOnSample whether to return early when a sample is parsed
  * \param [out] sample where to put a parsed sample
+ * \param [in] startTime when the caller began waiting for this response
+ * \param [in] timeout the longest to wait, in milliseconds, from \a startTime
  * \return #RBRINSTRUMENTGEN4_SUCCESS when a response was successfully read
  * \return #RBRINSTRUMENTGEN4_SAMPLE when a sample is read and \a sample is given
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
@@ -165,7 +167,9 @@ RBRInstrumentGen4Error RBRInstrumentGen4_sendCommand(RBRInstrumentGen4 *instrume
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_readResponse(RBRInstrumentGen4 *instrument,
                                               bool breakOnSample,
-                                              RBRInstrumentGen4Sample *sample);
+                                              RBRInstrumentGen4Sample *sample,
+                                              RBRInstrumentGen4DateTime startTime,
+                                              RBRInstrumentGen4DateTime timeout);
 
 /**
  * Deliver a sample to the RBRInstrumentGen4SampleCallback set via

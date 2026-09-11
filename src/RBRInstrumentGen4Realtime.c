@@ -49,6 +49,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_sendPoll(
     RBR_TRY(RBRInstrumentGen4_sendBuffer(instrument));
 
     RBRInstrumentGen4Error err;
+    RBRInstrumentGen4DateTime now;
     /* RBRInstrumentGen4_readResponse() returns #RBRINSTRUMENTGEN4_SAMPLE when
      * a sample is read to the given sample pointer; a return of
      * #RBRINSTRUMENTGEN4_SUCCESS means that it found some other command
@@ -56,7 +57,12 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_sendPoll(
      * we hope is SAMPLE). */
     do
     {
-        err = RBRInstrumentGen4_readResponse(instrument, true, sample);
+        RBR_TRY(instrument->callbacks.time(instrument, &now));
+        err = RBRInstrumentGen4_readResponse(instrument,
+                                             true,
+                                             sample,
+                                             now,
+                                             instrument->pollTimeout);
     } while (err == RBRINSTRUMENTGEN4_SUCCESS);
     /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any
      * other errors can really be errors. */

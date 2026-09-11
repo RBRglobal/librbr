@@ -81,13 +81,19 @@ inline double RBRInstrumentGen4Reading_setError(RBRInstrumentGen4ReadingError er
 RBRInstrumentGen4Error RBRInstrumentGen4_readSample(RBRInstrumentGen4 *instrument)
 {
     RBRInstrumentGen4Error err;
+    RBRInstrumentGen4DateTime now;
     /* RBRInstrumentGen4_readResponse() returns #RBRINSTRUMENTGEN4_SAMPLE when a sample
      * is read to the given sample pointer; a return of #RBRINSTRUMENTGEN4_SUCCESS
      * means that it found some other command response instead, so we'll loop
      * until we get a “failure” value (which we hope is SAMPLE). */
     do
     {
-        err = RBRInstrumentGen4_readResponse(instrument, true, NULL);
+        RBR_TRY(instrument->callbacks.time(instrument, &now));
+        err = RBRInstrumentGen4_readResponse(instrument,
+                                             true,
+                                             NULL,
+                                             now,
+                                             instrument->commandTimeout);
     } while (err == RBRINSTRUMENTGEN4_SUCCESS);
     /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any
      * other errors can really be errors. */

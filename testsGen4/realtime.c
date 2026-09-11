@@ -419,3 +419,62 @@ TEST_LOGGER4(poll)
 
     return true;
 }
+
+/** \brief A fake clock, advanced by pollSlowResponseTime() on every call. */
+static RBRInstrumentGen4DateTime pollSlowResponseClock;
+
+/** \brief A time callback that advances #pollSlowResponseClock by more than
+ * a small commandTimeout on every call, so that a wait spanning several
+ * such ticks can be exercised without waiting in real time. */
+static RBRInstrumentGen4Error pollSlowResponseTime(
+    const struct RBRInstrumentGen4 *instrument,
+    RBRInstrumentGen4DateTime *time)
+{
+    (void) instrument;
+    *time = pollSlowResponseClock;
+    pollSlowResponseClock += 500;
+    return RBRINSTRUMENTGEN4_SUCCESS;
+}
+
+TEST_LOGGER4(pollSlowResponse)
+{
+    RBRInstrumentGen4Error err;
+    RBRInstrumentGen4Sample actual;
+    RBRInstrumentGen4TimeCallback savedTime = instrument->callbacks.time;
+    RBRInstrumentGen4DateTime savedCommandTimeout
+        = instrument->commandTimeout;
+    RBRInstrumentGen4DateTime savedPollTimeout = instrument->pollTimeout;
+
+    pollSlowResponseClock = 0;
+    instrument->callbacks.time = pollSlowResponseTime;
+    /* commandTimeout is small enough that it would trip on its own between
+     * clock ticks; only pollTimeout is large enough to bound the wait. */
+    instrument->commandTimeout = 100;
+    instrument->pollTimeout = 10000;
+
+    instrument->outputFormat = (RBRInstrumentGen4OutputFormat) {
+        .sn = false,
+        .scheduleLabel = true,
+        .dateTime = false,
+        .crc = false
+    };
+    /* A single polled sample, arriving only after silence long enough to
+     * exceed commandTimeout. */
+    TestIOBuffers_init(
+        buffers,
+        "polling 12.5364470e+000 9.91695000e+000" RESPONSE_TERMINATOR,
+        0);
+
+    err = RBRInstrumentGen4_poll(instrument, &actual);
+
+    instrument->callbacks.time = savedTime;
+    instrument->commandTimeout = savedCommandTimeout;
+    instrument->pollTimeout = savedPollTimeout;
+
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(2, actual.channelCount, "%" PRIi32);
+
+    return true;
+}

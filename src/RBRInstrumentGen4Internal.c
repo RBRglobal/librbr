@@ -255,6 +255,7 @@ static void RBRInstrumentGen4_removeLastResponse(RBRInstrumentGen4 *instrument)
  *
  * \param [in,out] instrument the instrument connection
  * \param [in] startTime when we started trying to read the command response
+ * \param [in] timeout the longest to wait, in milliseconds, from \a startTime
  * \param [out] end the end of the response within the response buffer
  * \return #RBRINSTRUMENTGEN4_SUCCESS when data is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
@@ -263,6 +264,7 @@ static void RBRInstrumentGen4_removeLastResponse(RBRInstrumentGen4 *instrument)
 static RBRInstrumentGen4Error RBRInstrumentGen4_readSingleResponse(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4DateTime startTime,
+    RBRInstrumentGen4DateTime timeout,
     char **end)
 {
     /*
@@ -279,7 +281,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_readSingleResponse(
         /*
          * If we're not seeing any response at all then the read callback
          * should return a character-level timeout. But if we're reading
-         * characters, then we could also hit the command timeout if:
+         * characters, then we could also hit the timeout if:
          *
          * - We're not seeing the command terminator. This could happen if our
          *   connection to the instrument isn't direct and there's some
@@ -289,9 +291,10 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_readSingleResponse(
          *   responses have been samples. If the command got lost en-route and
          *   the instrument is streaming then we'll keep seeing complete
          *   responses, but none of them will be for the command. Because the
-         *   start time is set in RBRInstrumentGen4_readResponse(), we have context
-         *   for the total amount of time spent attempting to read a command
-         *   response, not just how long has been spent on _this_ response.
+         *   start time is supplied by the caller of RBRInstrumentGen4_readResponse(),
+         *   we have context for the total amount of time spent attempting to
+         *   read a command response, not just how long has been spent on
+         *   _this_ response.
          *
          * In either of these cases, we want to give up and indicate a timeout
          * to the caller.
@@ -300,13 +303,13 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_readSingleResponse(
 
         /*
         fprintf(stdout,
-                "now: %ld, startTime: %ld, now - startTime: %ld, commandTimeout: %ld\n",
+                "now: %ld, startTime: %ld, now - startTime: %ld, timeout: %ld\n",
                 now,
                 startTime,
                 now - startTime,
-                instrument->commandTimeout);
+                timeout);
         */
-        if (now - startTime > instrument->commandTimeout)
+        if (now - startTime > timeout)
         {
             return RBRINSTRUMENTGEN4_TIMEOUT;
         }
@@ -682,7 +685,9 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deliverSample(
 
 RBRInstrumentGen4Error RBRInstrumentGen4_readResponse(RBRInstrumentGen4 *instrument,
                                                       bool breakOnSample,
-                                                      RBRInstrumentGen4Sample *sample)
+                                                      RBRInstrumentGen4Sample *sample,
+                                                      RBRInstrumentGen4DateTime startTime,
+                                                      RBRInstrumentGen4DateTime timeout)
 {
     /* Reset the response state. */
     instrument->response.type = RBRINSTRUMENTGEN4_RESPONSE_UNKNOWN_TYPE;
@@ -700,15 +705,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_readResponse(RBRInstrumentGen4 *instrum
     }
 
     /* Skip over streaming samples until we find a real command response, or
-     * until we exceed the command timeout. */
-    RBRInstrumentGen4DateTime startTime;
-    RBR_TRY(instrument->callbacks.time(instrument, &startTime));
+     * until we exceed the timeout. */
     while (true)
     {
         RBRInstrumentGen4_removeLastResponse(instrument);
         char *beginning;
         char *end;
-        RBR_TRY(RBRInstrumentGen4_readSingleResponse(instrument, startTime, &end));
+        RBR_TRY(RBRInstrumentGen4_readSingleResponse(instrument, startTime, timeout, &end));
 
         RBRInstrumentGen4_terminateResponse(instrument, &beginning, end);
 
@@ -935,7 +938,17 @@ RBRInstrumentGen4Error RBRInstrumentGen4_converse(RBRInstrumentGen4 *instrument,
 
         do
         {
-            err = RBRInstrumentGen4_readResponse(instrument, false, NULL);
+            RBRInstrumentGen4DateTime now;
+            err = instrument->callbacks.time(instrument, &now);
+            if (err != RBRINSTRUMENTGEN4_SUCCESS)
+            {
+                break;
+            }
+            err = RBRInstrumentGen4_readResponse(instrument,
+                                                 false,
+                                                 NULL,
+                                                 now,
+                                                 instrument->commandTimeout);
             /*
              * There are a few reasons the instrument might generate an “E0102
              * invalid command” error, and we can make the user's life a bit

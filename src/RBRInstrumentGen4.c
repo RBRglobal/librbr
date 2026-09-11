@@ -209,6 +209,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_open(RBRInstrumentGen4 **instrument,
      * constructor has finished. */
     (*instrument)->callbacks.sample  = NULL;
     (*instrument)->commandTimeout    = commandTimeout;
+    (*instrument)->pollTimeout       = 2 * commandTimeout;
     (*instrument)->userData          = userData;
     (*instrument)->lastActivityTime  = RBRINSTRUMENTGEN4_NO_ACTIVITY;
     (*instrument)->response.type     = RBRINSTRUMENTGEN4_RESPONSE_UNKNOWN_TYPE;
@@ -277,6 +278,18 @@ void RBRInstrumentGen4_setCommandTimeout(RBRInstrumentGen4 *instrument,
                                      const RBRInstrumentGen4DateTime commandTimeout)
 {
     instrument->commandTimeout = commandTimeout;
+}
+
+RBRInstrumentGen4DateTime RBRInstrumentGen4_getPollTimeout(
+    const RBRInstrumentGen4 *instrument)
+{
+    return instrument->pollTimeout;
+}
+
+void RBRInstrumentGen4_setPollTimeout(RBRInstrumentGen4 *instrument,
+                                     const RBRInstrumentGen4DateTime pollTimeout)
+{
+    instrument->pollTimeout = pollTimeout;
 }
 
 void *RBRInstrumentGen4_getUserData(const RBRInstrumentGen4 *instrument)
