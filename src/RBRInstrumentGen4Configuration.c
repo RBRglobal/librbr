@@ -1800,7 +1800,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
     {
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
-    RBR_TRY(RBRInstrumentGen4_checkLabelList(groupList));
+    if (groupList != NULL)
+    {
+        RBR_TRY(RBRInstrumentGen4_checkLabelList(groupList));
+    }
 
     RBRInstrumentGen4Period period;
     RBRInstrumentGen4Period measurementPeriod = 0;
@@ -1825,12 +1828,21 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
         return RBRINSTRUMENTGEN4_UNSUPPORTED;
     }
 
-    char groups[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX];
-    RBR_TRY(RBRInstrumentGen4_formatLabelList(
-                groups,
-                (int32_t) sizeof(groups),
-                (const RBRInstrumentGen4Label *) groupList->labels,
-                groupList->count));
+    /* A NULL list leaves the instrument's group list unchanged. */
+    char groups[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX] = "";
+    if (groupList != NULL)
+    {
+        const char prefix[] = "grouplist=";
+        memcpy(groups, prefix, sizeof(prefix));
+        int32_t length = (int32_t) sizeof(prefix) - 1;
+        /* Leave room for the separating space. */
+        RBR_TRY(RBRInstrumentGen4_formatLabelList(
+                    groups + length,
+                    (int32_t) sizeof(groups) - length - 1,
+                    (const RBRInstrumentGen4Label *) groupList->labels,
+                    groupList->count));
+        strcat(groups, " ");
+    }
 
     /* Sending a `storage` the getter never read would be an error. */
     const char *storage = "";
@@ -1844,7 +1856,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
 /* The parameters every mode sends, shared by the two forms below so the
  * spelling cannot drift between them. */
 #define SCHEDULE_COMMON \
-    "schedule %s grouplist=%s stream=%s %scastdetection=%s mode=%s"
+    "schedule %s %sstream=%s %scastdetection=%s mode=%s"
 
     if (schedule->mode == RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS)
     {

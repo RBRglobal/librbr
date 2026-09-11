@@ -1548,13 +1548,15 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
  * \brief Set the parameters of a schedule.
  *
  * `storage` is only available on some instrument configurations. An empty
- * \a groupList sends `none`.
+ * \a groupList sends `none`; a `NULL` \a groupList leaves the instrument's
+ * group list unchanged.
  *
  * \note Issues the `schedule <schedule_label>` command.
  *
  * \param [in] instrument the instrument connection
  * \param [in] schedule the schedule to write
- * \param [in] groupList the groups the schedule samples
+ * \param [in] groupList the groups the schedule samples, or `NULL` to leave
+ *                       them as they are
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully written
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback

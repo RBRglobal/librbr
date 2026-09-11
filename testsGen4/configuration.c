@@ -2178,6 +2178,35 @@ TEST_LOGGER4(scheduleSet)
     return true;
 }
 
+TEST_LOGGER4(scheduleSetWithoutGroupList)
+{
+    RBRInstrumentGen4Schedule schedule = {
+        .label = "s_cap",
+        .stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_OFF,
+        .storage = RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE,
+        .castDetection = true,
+        .mode = RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS,
+        .parameters = { .continuous = { .period = 2000 } }
+    };
+
+    TestIOBuffers_init(buffers,
+                       "schedule s_cap stream=off castdetection=on "
+                       "mode=continuous period=2000"
+                       RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setSchedule(instrument,
+                                                              &schedule,
+                                                              NULL);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("schedule s_cap stream=off castdetection=on "
+                       "mode=continuous period=2000"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
 TEST_LOGGER4(scheduleSetWithStorage)
 {
     RBRInstrumentGen4Schedule schedule = {
