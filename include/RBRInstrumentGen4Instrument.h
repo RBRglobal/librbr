@@ -286,8 +286,12 @@ const char *RBRInstrumentGen4InternalBatteryType_displayName(
  */
 typedef struct RBRInstrumentGen4PowerInternal
 {
-    /** \brief The measured voltage of any internal power source. */
-    const float voltage;
+    /**
+     * \brief The measured voltage of any internal power source.
+     *
+     * \readonly
+     */
+    float voltage;
     /** \brief The type of battery. */
     RBRInstrumentGen4InternalBatteryType batteryType;
     /**
@@ -419,8 +423,12 @@ const char *RBRInstrumentGen4ExternalBatteryType_displayName(
  */
 typedef struct RBRInstrumentGen4PowerExternal
 {
-    /** \brief The measured voltage of any external power source. */
-    const float voltage;
+    /**
+     * \brief The measured voltage of any external power source.
+     *
+     * \readonly
+     */
+    float voltage;
     /** \brief The type of battery. */
     RBRInstrumentGen4ExternalBatteryType batteryType;
     /**

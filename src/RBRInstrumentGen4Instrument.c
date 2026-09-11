@@ -128,14 +128,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
 
         if (strcmp(key, "model") == 0)
         {
-            RBRInstrumentGen4_copyTrimmed((char *) (id->model),
+            RBRInstrumentGen4_copyTrimmed(id->model,
                                           sizeof(id->model),
                                           assignment + 1,
                                           end);
         }
         else if (strcmp(key, "version") == 0)
         {
-            RBRInstrumentGen4_copyTrimmed((char *) (id->fwversion),
+            RBRInstrumentGen4_copyTrimmed(id->fwversion,
                                           sizeof(id->fwversion),
                                           assignment + 1,
                                           end);
@@ -182,21 +182,21 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getId4(RBRInstrumentGen4 *instrument,
         }
         if (strcmp(parameter.key, "model") == 0)
         {
-            snprintf((char *)(id->model),
+            snprintf(id->model,
                      sizeof(id->model),
                      "%s",
                      parameter.value);
         }
         else if (strcmp(parameter.key, "fwversion") == 0)
         {
-            snprintf((char *)(id->fwversion),
+            snprintf(id->fwversion,
                      sizeof(id->fwversion),
                      "%s",
                      parameter.value);
         }
         else if (strcmp(parameter.key, "semver") == 0)
         {
-            snprintf((char *)(id->semver),
+            snprintf(id->semver,
                      sizeof(id->semver),
                      "%s",
                      parameter.value);
@@ -253,7 +253,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPcbaPool(
                     nextValue++;
                 }
 
-                snprintf((char *)(pcbaPool->pool[pcba].label),
+                snprintf(pcbaPool->pool[pcba].label,
                          sizeof(pcbaPool->pool[pcba].label),
                          "%s",
                          parameter.value);
@@ -457,7 +457,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPowerInternal(
         }
         else if (strcmp(parameter.key, "voltage") == 0)
         {
-            *(float *) &power->voltage = strtod(parameter.value, NULL);
+            power->voltage = strtod(parameter.value, NULL);
         }
         else if (strcmp(parameter.key, "batterytype") == 0)
         {
@@ -594,7 +594,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPowerExternal(
         }
         else if (strcmp(parameter.key, "voltage") == 0)
         {
-            *(float *) &power->voltage = strtod(parameter.value, NULL);
+            power->voltage = strtod(parameter.value, NULL);
         }
         else if (strcmp(parameter.key, "batterytype") == 0)
         {

@@ -168,12 +168,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
 {
     memset(deployment, 0, sizeof(RBRInstrumentGen4Deployment));
 
-    /* Cast away const to reach the read-only parameters of the response. */
-    RBRInstrumentGen4DeploymentStatus *status =
-        (RBRInstrumentGen4DeploymentStatus *) &deployment->status;
-    bool *simulation = (bool *) &deployment->simulation;
-
-    *status = RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS;
+    deployment->status = RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS;
     deployment->gate = RBRINSTRUMENTGEN4_UNKNOWN_GATE;
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "deployment"));
@@ -199,7 +194,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
         }
         else if (strcmp(parameter.key, "status") == 0)
         {
-            *status = RBRInstrumentGen4DeploymentStatus_parse(parameter.value);
+            deployment->status =
+                RBRInstrumentGen4DeploymentStatus_parse(parameter.value);
         }
         else if (strcmp(parameter.key, "gate") == 0)
         {
@@ -207,7 +203,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
         }
         else if (strcmp(parameter.key, "simulation") == 0)
         {
-            *simulation = strcmp(parameter.value, "on") == 0;
+            deployment->simulation = strcmp(parameter.value, "on") == 0;
         }
     }
 

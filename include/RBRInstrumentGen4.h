@@ -83,19 +83,12 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
  *
  * The default maximum of 32 channels is reflective of the maximum number of
  * channels supported by RBR instruments, but most instruments have far fewer.
- * Adjusting this value will dramatically affect the size of some structures;
- * notably RBRInstrumentGen4Sample, but also RBRInstrumentGen4Calibration.n
+ * Adjusting this value will dramatically affect the size of some structures,
+ * notably RBRInstrumentGen4Sample.
  */
 #ifndef RBRINSTRUMENTGEN4_CHANNEL_MAX
 #define RBRINSTRUMENTGEN4_CHANNEL_MAX 32
 #endif
-
-/** \brief Stringize the result of macro expansion. */
-#define xstr(s) str(s)
-/** \brief Stringize the macro argument. */
-#define str(s) #s
-/** \brief The string length of the maximum number of instrument channels. */
-#define RBRINSTRUMENTGEN4_CHANNEL_MAX_LEN sizeof(xstr(RBRINSTRUMENTGEN4_CHANNEL_MAX))
 
 /**
  * \brief The maximum number of characters in a channel type (e.g., “temp09”).
@@ -201,9 +194,6 @@ typedef struct RBRInstrumentGen4LabelList
     /** \brief User provided array of labels. */
     RBRInstrumentGen4Label *labels;
 } RBRInstrumentGen4LabelList;
-
-/** \brief The maximum length of characters within a dataset block name.*/
-#define RBRINSTRUMENTGEN4_DATABLOCK_NAME_MAX 6
 
 /**
  * A date and time in milliseconds since the Unix epoch
@@ -440,10 +430,18 @@ typedef struct RBRInstrumentGen4OutputFormat
  */
 typedef struct RBRInstrumentGen4Id
 {
-    /** The instrument model. */
-    const char model[RBRINSTRUMENTGEN4_ID_MODEL_MAX + 1];
-    /** The instrument firmware version. */
-    const char fwversion[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
+    /**
+     * \brief The instrument model.
+     *
+     * \readonly
+     */
+    char model[RBRINSTRUMENTGEN4_ID_MODEL_MAX + 1];
+    /**
+     * \brief The instrument firmware version.
+     *
+     * \readonly
+     */
+    char fwversion[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
     /** The serial number of the instrument. */
     int32_t sn;
     /** The firmware type of the instrument. */
@@ -458,16 +456,26 @@ typedef struct RBRInstrumentGen4Id
  */
 typedef struct RBRInstrumentGen4Id4
 {
-    /** The instrument model. */
-    const char model[RBRINSTRUMENTGEN4_ID_MODEL_MAX + 1];
-    /** The instrument firmware version. */
-    const char fwversion[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
+    /**
+     * \brief The instrument model.
+     *
+     * \readonly
+     */
+    char model[RBRINSTRUMENTGEN4_ID_MODEL_MAX + 1];
+    /**
+     * \brief The instrument firmware version.
+     *
+     * \readonly
+     */
+    char fwversion[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
     /**
      * \brief The instrument firmware version in Semantic Version form.
      *
      * For example, `2.0.0-rc1-10-g148bc5eb1`.
+     *
+     * \readonly
      */
-    const char semver[RBRINSTRUMENTGEN4_ID_SEMVER_MAX + 1];
+    char semver[RBRINSTRUMENTGEN4_ID_SEMVER_MAX + 1];
     /** The serial number of the instrument. */
     int32_t sn;
     /** The firmware type of the instrument. */

@@ -182,7 +182,7 @@ typedef struct RBRInstrumentGen4LinkSerial
      *
      * \readonly
      */
-    const RBRInstrumentGen4LinkSerialBaudRate availableBaudRates;
+    RBRInstrumentGen4LinkSerialBaudRate availableBaudRates;
     /**
      * \brief Serial modes which the instrument can use.
      *
@@ -192,7 +192,7 @@ typedef struct RBRInstrumentGen4LinkSerial
      *
      * \readonly
      */
-    const RBRInstrumentGen4LinkSerialMode availableModes;
+    RBRInstrumentGen4LinkSerialMode availableModes;
 } RBRInstrumentGen4LinkSerial;
 
 /**
@@ -321,7 +321,7 @@ typedef struct RBRInstrumentGen4WiFi
      *
      * \nol2 Will be retrieved as #RBRINSTRUMENTGEN4_UNKNOWN_WIFI.
      */
-    const RBRInstrumentGen4WiFiState state;
+    RBRInstrumentGen4WiFiState state;
     /**
      * \brief How long the instrument will wait for a valid command after
      * first powering up the Wi-Fi radio before powering it back down.
@@ -346,7 +346,7 @@ typedef struct RBRInstrumentGen4WiFi
      *
      * \nol2 Will be retrieved as #RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_NONE.
      */
-    const RBRInstrumentGen4LinkSerialBaudRate baudRate;
+    RBRInstrumentGen4LinkSerialBaudRate baudRate;
 } RBRInstrumentGen4WiFi;
 
 /**

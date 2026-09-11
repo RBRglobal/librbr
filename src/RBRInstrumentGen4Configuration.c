@@ -59,7 +59,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getNode(
         else if (strcmp(parameter.key, "portlist") == 0)
         {
             /* A node with no ports reports `none`, not an empty list. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -139,7 +139,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getNodePool(
         else if (strcmp(parameter.key, "list") == 0)
         {
             /* An instrument with no nodes reports `none` to indicate an empty list */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -293,7 +293,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPort(
         else if (strcmp(parameter.key, "devicelist") == 0)
         {
             /* A port with no devices reports `none`, not an empty list. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -356,7 +356,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPortPool(
         else if (strcmp(parameter.key, "list") == 0)
         {
             /* An instrument with no ports reports `none`, not an empty list. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -487,7 +487,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDevice(
         else if (strcmp(parameter.key, "channellist") == 0)
         {
             /* A device with no channels reports `none`, not an empty list. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -570,7 +570,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDevicePool(
         {
             /* An instrument with no devices reports `none`, not an empty
              * list. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -629,7 +629,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_discoverDevices(
         {
             /* Discovery finding nothing reports `none`, not an empty list.
              * There is no count to read: the list is the whole answer. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -694,7 +694,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
 
         if (strcmp(parameter.key, "equation") == 0)
         {
-            snprintf((char *) calibration->equation,
+            snprintf(calibration->equation,
                      sizeof(calibration->equation),
                      "%s",
                      parameter.value);
@@ -977,7 +977,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_parseChannelPool(
         {
             /* An instrument with no channels reports `none`, not an empty
              * list. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -1022,8 +1022,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
                                        "channel %s",
                                        channel->label));
 
-    *(RBRInstrumentGen4ChannelNature *) &channel->nature =
-        RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE;
+    channel->nature = RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE;
 
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
@@ -1039,25 +1038,22 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
         }
         else if (strcmp(parameter.key, "type") == 0)
         {
-            snprintf((char *) channel->type,
+            snprintf(channel->type,
                      sizeof(channel->type),
                      "%s",
                      parameter.value);
         }
         else if (strcmp(parameter.key, "settlingtime") == 0)
         {
-            *(RBRInstrumentGen4Period *) &channel->settlingTime =
-                strtol(parameter.value, NULL, 10);
+            channel->settlingTime = strtol(parameter.value, NULL, 10);
         }
         else if (strcmp(parameter.key, "measuringtime") == 0)
         {
-            *(RBRInstrumentGen4Period *) &channel->measuringTime =
-                strtol(parameter.value, NULL, 10);
+            channel->measuringTime = strtol(parameter.value, NULL, 10);
         }
         else if (strcmp(parameter.key, "readouttime") == 0)
         {
-            *(RBRInstrumentGen4Period *) &channel->readOutTime =
-                strtol(parameter.value, NULL, 10);
+            channel->readOutTime = strtol(parameter.value, NULL, 10);
         }
         else if (strcmp(parameter.key, "userunits") == 0)
         {
@@ -1068,29 +1064,28 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
         }
         else if (strcmp(parameter.key, "nature") == 0)
         {
-            *(RBRInstrumentGen4ChannelNature *) &channel->nature =
+            channel->nature =
                 RBRInstrumentGen4ChannelNature_parse(parameter.value);
         }
         else if (strcmp(parameter.key, "derived") == 0)
         {
-            *(bool *) &channel->derived = (strcmp(parameter.value,
-                                                  "true") == 0);
+            channel->derived = (strcmp(parameter.value, "true") == 0);
         }
         else if (strcmp(parameter.key, "node") == 0)
         {
-            RBRInstrumentGen4_copyOptionalLabel((char *) channel->node,
+            RBRInstrumentGen4_copyOptionalLabel(channel->node,
                                                 sizeof(channel->node),
                                                 parameter.value);
         }
         else if (strcmp(parameter.key, "port") == 0)
         {
-            RBRInstrumentGen4_copyOptionalLabel((char *) channel->port,
+            RBRInstrumentGen4_copyOptionalLabel(channel->port,
                                                 sizeof(channel->port),
                                                 parameter.value);
         }
         else if (strcmp(parameter.key, "device") == 0)
         {
-            RBRInstrumentGen4_copyOptionalLabel((char *) channel->device,
+            RBRInstrumentGen4_copyOptionalLabel(channel->device,
                                                 sizeof(channel->device),
                                                 parameter.value);
         }
@@ -1391,7 +1386,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getGroupPool(
         else if (strcmp(parameter.key, "list") == 0)
         {
             /* An empty pool reports `none`. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -1552,7 +1547,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getConfigPool(
         else if (strcmp(parameter.key, "list") == 0)
         {
             /* An empty pool reports `none`. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -1944,7 +1939,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
         else if (strcmp(parameter.key, "list") == 0)
         {
             /* An empty pool reports `none`. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -1986,7 +1981,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
         else if (strcmp(parameter.key, "availablefastperiods") == 0)
         {
             /* No fast periods reports `none`. */
-            if (strcmp(parameter.value, "none") == 0)
+            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
