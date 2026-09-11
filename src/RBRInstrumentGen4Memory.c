@@ -128,10 +128,15 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetPool(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4DatasetPool *datasetPool)
 {
-    memset(datasetPool, 0, sizeof(RBRInstrumentGen4DatasetPool));
+    datasetPool->count = 0;
+    datasetPool->maxCount = 0;
+    memset(datasetPool->pool,
+           0,
+           datasetPool->size * sizeof(RBRInstrumentGen4Dataset));
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "dataset"));
 
+    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
@@ -160,16 +165,20 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetPool(
                 continue;
             }
 
+            /* Datasets past the pool's capacity are discarded. */
             char *value = parameter.value;
-            for (int32_t dataset = 0;
-                 value != NULL
-                 && dataset < RBRINSTRUMENTGEN4_DATASET_COUNT_MAX;
-                 dataset++)
+            for (int32_t i = 0; value != NULL; i++)
             {
+                if (i >= datasetPool->size)
+                {
+                    err = RBRINSTRUMENTGEN4_TRUNCATED;
+                    break;
+                }
+
                 char *nextValue = RBRInstrumentGen4_splitListValue(value);
 
-                snprintf(datasetPool->pool[dataset].label,
-                         sizeof(datasetPool->pool[dataset].label),
+                snprintf(datasetPool->pool[i].label,
+                         sizeof(datasetPool->pool[i].label),
                          "%s",
                          value);
 
@@ -178,28 +187,32 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetPool(
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return err;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getDataset(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Dataset *dataset)
+    RBRInstrumentGen4Dataset *dataset,
+    RBRInstrumentGen4LabelList *scheduleList)
 {
     if (dataset->label[0] == '\0')
     {
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
+    RBR_RESET_EXCEPT(dataset, label);
     dataset->status = RBRINSTRUMENTGEN4_UNKNOWN_DATASET_STATUS;
-    dataset->scheduleCount = 0;
-    memset(dataset->scheduleList, 0, sizeof(dataset->scheduleList));
-    dataset->byteCount = 0;
     dataset->dataType = RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE;
+    if (scheduleList != NULL)
+    {
+        scheduleList->count = 0;
+    }
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument,
                                        "dataset %s",
                                        dataset->label));
 
+    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
@@ -224,24 +237,11 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDataset(
                 }
             }
         }
-        else if (strcmp(parameter.key, "schedulelist") == 0)
+        else if (strcmp(parameter.key, "schedulelist") == 0
+                 && scheduleList != NULL)
         {
-            char *value = parameter.value;
-            int32_t schedule = 0;
-            while (value != NULL
-                   && schedule < RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX)
-            {
-                char *nextValue = RBRInstrumentGen4_splitListValue(value);
-
-                snprintf(dataset->scheduleList[schedule],
-                         sizeof(dataset->scheduleList[schedule]),
-                         "%s",
-                         value);
-
-                value = nextValue;
-                schedule++;
-            }
-            dataset->scheduleCount = schedule;
+            err = RBRInstrumentGen4_copyLabelList(scheduleList,
+                                                  parameter.value);
         }
         else if (strcmp(parameter.key, "bytecount") == 0)
         {
@@ -261,7 +261,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDataset(
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return err;
 }
 
 const char *RBRInstrumentGen4Block_name(RBRInstrumentGen4Block block){

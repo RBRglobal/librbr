@@ -62,6 +62,8 @@ const char *RBRInstrumentGen4Error_name(RBRInstrumentGen4Error error)
         return "checksum error";
     case RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE:
         return "invalid parameter value";
+    case RBRINSTRUMENTGEN4_TRUNCATED:
+        return "truncated";
     case RBRINSTRUMENTGEN4_SAMPLE:
         return "sample";
     case RBRINSTRUMENTGEN4_ERROR_COUNT:

@@ -194,6 +194,78 @@ extern "C" {
 #define COMMAND_RESPONSE_SIZE 1024
 
 /**
+ * \brief Declare an empty RBRInstrumentGen4LabelList named \a name over a
+ * buffer of \a size_ entries declared alongside it as `name##Buffer`.
+ */
+#define RBRINSTRUMENTGEN4_LABEL_LIST_DECL(name, size_) \
+    RBRInstrumentGen4Label name##Buffer[size_]; \
+    RBRInstrumentGen4LabelList name = (RBRInstrumentGen4LabelList) { \
+        .size = (size_), \
+        .count = 0, \
+        .labels = name##Buffer \
+    }
+
+/**
+ * \brief Declare an empty RBRInstrumentGen4ChannelPool named \a name over a
+ * buffer of \a size_ entries declared alongside it as `name##Buffer`.
+ */
+#define RBRINSTRUMENTGEN4_CHANNEL_POOL_DECL(name, size_) \
+    RBRInstrumentGen4Channel name##Buffer[size_]; \
+    RBRInstrumentGen4ChannelPool name = (RBRInstrumentGen4ChannelPool) { \
+        .size = (size_), \
+        .count = 0, \
+        .pool = name##Buffer \
+    }
+
+/**
+ * \brief Declare an empty RBRInstrumentGen4GroupPool named \a name over a
+ * buffer of \a size_ entries declared alongside it as `name##Buffer`.
+ */
+#define RBRINSTRUMENTGEN4_GROUP_POOL_DECL(name, size_) \
+    RBRInstrumentGen4Group name##Buffer[size_]; \
+    RBRInstrumentGen4GroupPool name = (RBRInstrumentGen4GroupPool) { \
+        .size = (size_), \
+        .count = 0, \
+        .pool = name##Buffer \
+    }
+
+/**
+ * \brief Declare an empty RBRInstrumentGen4SchedulePool named \a name over a
+ * buffer of \a size_ entries declared alongside it as `name##Buffer`.
+ */
+#define RBRINSTRUMENTGEN4_SCHEDULE_POOL_DECL(name, size_) \
+    RBRInstrumentGen4Schedule name##Buffer[size_]; \
+    RBRInstrumentGen4SchedulePool name = (RBRInstrumentGen4SchedulePool) { \
+        .size = (size_), \
+        .count = 0, \
+        .pool = name##Buffer \
+    }
+
+/**
+ * \brief Declare an empty RBRInstrumentGen4ConfigPool named \a name over a
+ * buffer of \a size_ entries declared alongside it as `name##Buffer`.
+ */
+#define RBRINSTRUMENTGEN4_CONFIG_POOL_DECL(name, size_) \
+    RBRInstrumentGen4Config name##Buffer[size_]; \
+    RBRInstrumentGen4ConfigPool name = (RBRInstrumentGen4ConfigPool) { \
+        .size = (size_), \
+        .count = 0, \
+        .pool = name##Buffer \
+    }
+
+/**
+ * \brief Declare an empty RBRInstrumentGen4DatasetPool named \a name over a
+ * buffer of \a size_ entries declared alongside it as `name##Buffer`.
+ */
+#define RBRINSTRUMENTGEN4_DATASET_POOL_DECL(name, size_) \
+    RBRInstrumentGen4Dataset name##Buffer[size_]; \
+    RBRInstrumentGen4DatasetPool name = (RBRInstrumentGen4DatasetPool) { \
+        .size = (size_), \
+        .count = 0, \
+        .pool = name##Buffer \
+    }
+
+/**
  * \brief Escape control characters in a string.
  *
  * Control characters (as defined by iscntrl(3)) are replaced in the

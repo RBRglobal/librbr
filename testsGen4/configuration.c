@@ -996,12 +996,6 @@ static bool test_channel(RBRInstrumentGen4Channel *expected,
     TEST_ASSERT_EQ(expected->measuringTime, actual->measuringTime, "%" PRIi32);
     TEST_ASSERT_EQ(expected->readOutTime, actual->readOutTime, "%" PRIi32);
     TEST_ASSERT_STR_EQ(expected->userUnits, actual->userUnits);
-    TEST_ASSERT_EQ(expected->groupCount, actual->groupCount, "%" PRIi32);
-    for (int32_t group = 0; group < expected->groupCount; ++group)
-    {
-        TEST_ASSERT_STR_EQ(expected->groupList[group],
-                           actual->groupList[group]);
-    }
     TEST_ASSERT_ENUM_EQ(expected->nature,
                         actual->nature,
                         RBRInstrumentGen4ChannelNature);
@@ -1018,7 +1012,7 @@ TEST_LOGGER4(channellist)
     const char *expected[] = {
         "temperature_00", "pressure_00", "seapressure_00", "depth_00"
     };
-    RBRInstrumentGen4ChannelPool actual;
+    RBRINSTRUMENTGEN4_CHANNEL_POOL_DECL(actual, RBRINSTRUMENTGEN4_CHANNEL_MAX);
 
     TestIOBuffers_init(
         buffers,
@@ -1040,9 +1034,32 @@ TEST_LOGGER4(channellist)
     return true;
 }
 
+TEST_LOGGER4(channellistTooSmall)
+{
+    RBRINSTRUMENTGEN4_CHANNEL_POOL_DECL(actual, 2);
+
+    TestIOBuffers_init(
+        buffers,
+        "channel count=4 "
+        "list=temperature_00|pressure_00|seapressure_00|depth_00"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getChannelPool(instrument,
+                                                                  &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_TRUNCATED,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(4, actual.count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("temperature_00", actual.pool[0].label);
+    TEST_ASSERT_STR_EQ("pressure_00", actual.pool[1].label);
+
+    return true;
+}
+
 TEST_LOGGER4(channellistScientific)
 {
-    RBRInstrumentGen4ChannelPool actual;
+    RBRINSTRUMENTGEN4_CHANNEL_POOL_DECL(actual, RBRINSTRUMENTGEN4_CHANNEL_MAX);
 
     TestIOBuffers_init(
         buffers,
@@ -1066,7 +1083,7 @@ TEST_LOGGER4(channellistScientific)
 
 TEST_LOGGER4(channellistWithoutChannels)
 {
-    RBRInstrumentGen4ChannelPool actual;
+    RBRINSTRUMENTGEN4_CHANNEL_POOL_DECL(actual, RBRINSTRUMENTGEN4_CHANNEL_MAX);
 
     TestIOBuffers_init(buffers,
                        "channel system count=0 list=none" RESPONSE_TERMINATOR,
@@ -1086,7 +1103,7 @@ TEST_LOGGER4(channellistWithoutChannels)
 
 TEST_LOGGER4(channellistUnknownNature)
 {
-    RBRInstrumentGen4ChannelPool actual;
+    RBRINSTRUMENTGEN4_CHANNEL_POOL_DECL(actual, RBRINSTRUMENTGEN4_CHANNEL_MAX);
 
     TestIOBuffers_init(buffers, "", 0);
 
@@ -1110,7 +1127,6 @@ TEST_LOGGER4(channel)
         .measuringTime = 13,
         .readOutTime = 1,
         .userUnits = "C",
-        .groupCount = 0,
         .nature = RBRINSTRUMENTGEN4_CHANNEL_NATURE_SCIENTIFIC,
         .derived = false,
         .node = "self",
@@ -1148,7 +1164,6 @@ TEST_LOGGER4(channelDerived)
         .measuringTime = 0,
         .readOutTime = 0,
         .userUnits = "m",
-        .groupCount = 0,
         .nature = RBRINSTRUMENTGEN4_CHANNEL_NATURE_SCIENTIFIC,
         .derived = true,
         .node = "",
@@ -1175,6 +1190,8 @@ TEST_LOGGER4(channelDerived)
     return test_channel(&expected, &actual);
 }
 
+/* Group membership is reported by the instrument but not modelled here: the
+ * parameter is skipped. */
 TEST_LOGGER4(channelWithGroups)
 {
     RBRInstrumentGen4Channel actual = {
@@ -1193,9 +1210,26 @@ TEST_LOGGER4(channelWithGroups)
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getChannel(instrument,
                                                               &actual);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(2, actual.groupCount, "%" PRIi32);
-    TEST_ASSERT_STR_EQ("surface", actual.groupList[0]);
-    TEST_ASSERT_STR_EQ("profile", actual.groupList[1]);
+    TEST_ASSERT_STR_EQ("temp006", actual.type);
+    TEST_ASSERT_STR_EQ("thermistor_00", actual.device);
+
+    return true;
+}
+
+
+TEST_LOGGER4(channelEmptyLabel)
+{
+    /* An empty label is refused before the command. */
+    RBRInstrumentGen4Channel channel = { .label = "" };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getChannel(instrument,
+                                                            &channel);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
 }
@@ -1242,7 +1276,9 @@ TEST_LOGGER4(channelSetEmptyUserUnits)
 
 TEST_LOGGER4(grouplist)
 {
-    RBRInstrumentGen4GroupPool actual;
+    RBRINSTRUMENTGEN4_GROUP_POOL_DECL(
+        actual,
+        RBRINSTRUMENTGEN4_GROUP_COUNT_MAX);
 
     TestIOBuffers_init(buffers,
                        "group count=2 maxcount=16 list=g_a|g_b"
@@ -1261,9 +1297,31 @@ TEST_LOGGER4(grouplist)
     return true;
 }
 
+TEST_LOGGER4(grouplistTooSmall)
+{
+    RBRINSTRUMENTGEN4_GROUP_POOL_DECL(actual, 1);
+
+    TestIOBuffers_init(buffers,
+                       "group count=2 maxcount=16 list=g_a|g_b"
+                       RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getGroupPool(instrument,
+                                                               &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_TRUNCATED,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(2, actual.count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("g_a", actual.pool[0].label);
+
+    return true;
+}
+
 TEST_LOGGER4(grouplistWithoutGroups)
 {
-    RBRInstrumentGen4GroupPool actual;
+    RBRINSTRUMENTGEN4_GROUP_POOL_DECL(
+        actual,
+        RBRINSTRUMENTGEN4_GROUP_COUNT_MAX);
 
     TestIOBuffers_init(buffers,
                        "group count=0 maxcount=16 list=none"
@@ -1280,11 +1338,12 @@ TEST_LOGGER4(grouplistWithoutGroups)
     return true;
 }
 
+/* The group's schedules are reported by the instrument but not modelled:
+ * the parameter is skipped. */
 TEST_LOGGER4(group)
 {
-    RBRInstrumentGen4Group actual = {
-        .label = "g_a"
-    };
+    RBRInstrumentGen4Group group = { .label = "g_a" };
+    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(channelList, 4);
 
     TestIOBuffers_init(
         buffers,
@@ -1293,24 +1352,21 @@ TEST_LOGGER4(group)
         0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getGroup(instrument,
-                                                           &actual);
+                                                           &group,
+                                                           &channelList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
     TEST_ASSERT_STR_EQ("group g_a" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_STR_EQ("g_a", actual.label);
-    TEST_ASSERT_EQ(2, actual.channelCount, "%" PRIi32);
-    TEST_ASSERT_STR_EQ("temperature_00", actual.channelList[0]);
-    TEST_ASSERT_STR_EQ("pressure_00", actual.channelList[1]);
-    TEST_ASSERT_EQ(1, actual.scheduleCount, "%" PRIi32);
-    TEST_ASSERT_STR_EQ("s_a", actual.scheduleList[0]);
+    TEST_ASSERT_EQ(2, channelList.count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("temperature_00", channelList.labels[0]);
+    TEST_ASSERT_STR_EQ("pressure_00", channelList.labels[1]);
 
     return true;
 }
 
 TEST_LOGGER4(groupWithoutChannels)
 {
-    RBRInstrumentGen4Group actual = {
-        .label = "g_b"
-    };
+    RBRInstrumentGen4Group group = { .label = "g_b" };
+    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(channelList, 4);
 
     TestIOBuffers_init(buffers,
                        "group g_b channellist=none schedulelist=s_a"
@@ -1318,42 +1374,83 @@ TEST_LOGGER4(groupWithoutChannels)
                        0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getGroup(instrument,
-                                                           &actual);
+                                                           &group,
+                                                           &channelList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(0, actual.channelCount, "%" PRIi32);
-    TEST_ASSERT_EQ(1, actual.scheduleCount, "%" PRIi32);
-    TEST_ASSERT_STR_EQ("s_a", actual.scheduleList[0]);
+    TEST_ASSERT_EQ(0, channelList.count, "%" PRIi32);
 
     return true;
 }
 
-TEST_LOGGER4(groupWithoutSchedules)
+TEST_LOGGER4(groupWithoutChannelList)
 {
-    RBRInstrumentGen4Group actual = {
-        .label = "g_test"
-    };
+    RBRInstrumentGen4Group group = { .label = "g_a" };
 
     TestIOBuffers_init(
         buffers,
-        "group g_test channellist=temperature_00|pressure_00 schedulelist=none"
+        "group g_a channellist=temperature_00|pressure_00 schedulelist=s_a"
         RESPONSE_TERMINATOR,
         0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getGroup(instrument,
-                                                           &actual);
+                                                           &group,
+                                                           NULL);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(2, actual.channelCount, "%" PRIi32);
-    TEST_ASSERT_EQ(0, actual.scheduleCount, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("group g_a" COMMAND_TERMINATOR, buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(groupChannelListTooSmall)
+{
+    RBRInstrumentGen4Group group = { .label = "g_a" };
+    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(channelList, 1);
+
+    TestIOBuffers_init(
+        buffers,
+        "group g_a channellist=temperature_00|pressure_00 schedulelist=s_a"
+        RESPONSE_TERMINATOR,
+        0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getGroup(instrument,
+                                                           &group,
+                                                           &channelList);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_TRUNCATED,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(2, channelList.count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("temperature_00", channelList.labels[0]);
+
+    return true;
+}
+
+
+TEST_LOGGER4(groupEmptyLabel)
+{
+    /* An empty label is refused before the command. */
+    RBRInstrumentGen4Group group = { .label = "" };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getGroup(instrument,
+                                                            &group,
+                                                            NULL);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
 }
 
 TEST_LOGGER4(groupSet)
 {
-    RBRInstrumentGen4Group group = {
-        .label = "g_a",
-        .channelCount = 2,
-        .channelList = { "temperature_00", "pressure_00" }
+    RBRInstrumentGen4Group group = { .label = "g_a" };
+    RBRInstrumentGen4Label labelBuf[] = { "temperature_00", "pressure_00" };
+    RBRInstrumentGen4LabelList channelList = {
+        .size = 2,
+        .count = 2,
+        .labels = labelBuf
     };
 
     TestIOBuffers_init(
@@ -1362,7 +1459,9 @@ TEST_LOGGER4(groupSet)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument, &group);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument,
+                                                           &group,
+                                                           &channelList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
     TEST_ASSERT_STR_EQ("group g_a channellist=temperature_00|pressure_00"
                        COMMAND_TERMINATOR,
@@ -1371,18 +1470,41 @@ TEST_LOGGER4(groupSet)
     return true;
 }
 
+TEST_LOGGER4(groupSetWithoutChannelList)
+{
+    /* The setter has nothing to send without a list. */
+    RBRInstrumentGen4Group group = { .label = "g_a" };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument,
+                                                           &group,
+                                                           NULL);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
 TEST_LOGGER4(groupSetClearingChannels)
 {
-    RBRInstrumentGen4Group group = {
-        .label = "g_a",
-        .channelCount = 0
+    RBRInstrumentGen4Group group = { .label = "g_a" };
+    RBRInstrumentGen4Label labelBuf[1];
+    RBRInstrumentGen4LabelList channelList = {
+        .size = 1,
+        .count = 0,
+        .labels = labelBuf
     };
 
     TestIOBuffers_init(buffers,
                        "group g_a channellist=none" RESPONSE_TERMINATOR,
                        0);
 
-    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument, &group);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument,
+                                                           &group,
+                                                           &channelList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
     TEST_ASSERT_STR_EQ("group g_a channellist=none" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -1392,15 +1514,19 @@ TEST_LOGGER4(groupSetClearingChannels)
 
 TEST_LOGGER4(groupSetEmptyLabel)
 {
-    RBRInstrumentGen4Group group = {
-        .label = "",
-        .channelCount = 1,
-        .channelList = { "temperature_00" }
+    RBRInstrumentGen4Group group = { .label = "" };
+    RBRInstrumentGen4Label labelBuf[] = { "temperature_00" };
+    RBRInstrumentGen4LabelList channelList = {
+        .size = 1,
+        .count = 1,
+        .labels = labelBuf
     };
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument, &group);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument,
+                                                           &group,
+                                                           &channelList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
                         err,
                         RBRInstrumentGen4Error);
@@ -1410,14 +1536,20 @@ TEST_LOGGER4(groupSetEmptyLabel)
 
 TEST_LOGGER4(groupSetInvalidChannelCount)
 {
-    RBRInstrumentGen4Group group = {
-        .label = "g_a",
-        .channelCount = RBRINSTRUMENTGEN4_CHANNEL_MAX + 1
+    /* The count exceeds the array. */
+    RBRInstrumentGen4Group group = { .label = "g_a" };
+    RBRInstrumentGen4Label labelBuf[] = { "temperature_00", "pressure_00" };
+    RBRInstrumentGen4LabelList channelList = {
+        .size = 2,
+        .count = 3,
+        .labels = labelBuf
     };
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument, &group);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument,
+                                                           &group,
+                                                           &channelList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
                         err,
                         RBRInstrumentGen4Error);
@@ -1428,15 +1560,19 @@ TEST_LOGGER4(groupSetInvalidChannelCount)
 TEST_LOGGER4(groupSetEmptyChannelLabel)
 {
     /* An empty label would produce a malformed list. */
-    RBRInstrumentGen4Group group = {
-        .label = "g_a",
-        .channelCount = 2,
-        .channelList = { "temperature_00", "" }
+    RBRInstrumentGen4Group group = { .label = "g_a" };
+    RBRInstrumentGen4Label labelBuf[] = { "temperature_00", "" };
+    RBRInstrumentGen4LabelList channelList = {
+        .size = 2,
+        .count = 2,
+        .labels = labelBuf
     };
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument, &group);
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setGroup(instrument,
+                                                           &group,
+                                                           &channelList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
                         err,
                         RBRInstrumentGen4Error);
@@ -1502,7 +1638,9 @@ TEST_LOGGER4(groupDeleteAll)
 
 TEST_LOGGER4(configlist)
 {
-    RBRInstrumentGen4ConfigPool actual;
+    RBRINSTRUMENTGEN4_CONFIG_POOL_DECL(
+        actual,
+        RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX);
 
     TestIOBuffers_init(buffers,
                        "config count=1 maxcount=2 list=c_a"
@@ -1520,9 +1658,31 @@ TEST_LOGGER4(configlist)
     return true;
 }
 
+TEST_LOGGER4(configlistTooSmall)
+{
+    RBRINSTRUMENTGEN4_CONFIG_POOL_DECL(actual, 1);
+
+    TestIOBuffers_init(buffers,
+                       "config count=2 maxcount=2 list=c_a|c_b"
+                       RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getConfigPool(instrument,
+                                                                &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_TRUNCATED,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(2, actual.count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("c_a", actual.pool[0].label);
+
+    return true;
+}
+
 TEST_LOGGER4(configlistWithoutConfigs)
 {
-    RBRInstrumentGen4ConfigPool actual;
+    RBRINSTRUMENTGEN4_CONFIG_POOL_DECL(
+        actual,
+        RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX);
 
     TestIOBuffers_init(buffers,
                        "config count=0 maxcount=2 list=none"
@@ -1541,49 +1701,109 @@ TEST_LOGGER4(configlistWithoutConfigs)
 
 TEST_LOGGER4(config)
 {
-    RBRInstrumentGen4Config actual = {
-        .label = "c_a"
-    };
+    RBRInstrumentGen4Config config = { .label = "c_a" };
+    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(scheduleList, 4);
 
     TestIOBuffers_init(buffers,
                        "config c_a schedulelist=s_a" RESPONSE_TERMINATOR,
                        0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getConfig(instrument,
-                                                            &actual);
+                                                            &config,
+                                                            &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
     TEST_ASSERT_STR_EQ("config c_a" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_STR_EQ("c_a", actual.label);
-    TEST_ASSERT_EQ(1, actual.scheduleCount, "%" PRIi32);
-    TEST_ASSERT_STR_EQ("s_a", actual.scheduleList[0]);
+    TEST_ASSERT_EQ(1, scheduleList.count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("s_a", scheduleList.labels[0]);
 
     return true;
 }
 
 TEST_LOGGER4(configWithoutSchedules)
 {
-    RBRInstrumentGen4Config actual = {
-        .label = "c_a"
-    };
+    RBRInstrumentGen4Config config = { .label = "c_a" };
+    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(scheduleList, 4);
 
     TestIOBuffers_init(buffers,
                        "config c_a schedulelist=none" RESPONSE_TERMINATOR,
                        0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getConfig(instrument,
-                                                            &actual);
+                                                            &config,
+                                                            &scheduleList);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(0, scheduleList.count, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(configWithoutScheduleList)
+{
+    RBRInstrumentGen4Config config = { .label = "c_a" };
+
+    TestIOBuffers_init(buffers,
+                       "config c_a schedulelist=s_a" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getConfig(instrument,
+                                                            &config,
+                                                            NULL);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(0, actual.scheduleCount, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("config c_a" COMMAND_TERMINATOR, buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(configScheduleListTooSmall)
+{
+    RBRInstrumentGen4Config config = { .label = "c_a" };
+    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(scheduleList, 1);
+
+    TestIOBuffers_init(buffers,
+                       "config c_a schedulelist=s_a|s_b" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getConfig(instrument,
+                                                            &config,
+                                                            &scheduleList);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_TRUNCATED,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(2, scheduleList.count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("s_a", scheduleList.labels[0]);
+
+    return true;
+}
+
+
+TEST_LOGGER4(configEmptyLabel)
+{
+    /* An empty label is refused before the command. */
+    RBRInstrumentGen4Config config = { .label = "" };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getConfig(instrument,
+                                                            &config,
+                                                            NULL);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
 }
 
 TEST_LOGGER4(configSet)
 {
-    RBRInstrumentGen4Config config = {
-        .label = "cfgPrimary",
-        .scheduleCount = 2,
-        .scheduleList = { "schedule_fast", "schedule_burst" }
+    RBRInstrumentGen4Config config = { .label = "cfgPrimary" };
+    RBRInstrumentGen4Label labelBuf[] = { "schedule_fast", "schedule_burst" };
+    RBRInstrumentGen4LabelList scheduleList = {
+        .size = 2,
+        .count = 2,
+        .labels = labelBuf
     };
 
     TestIOBuffers_init(
@@ -1593,7 +1813,8 @@ TEST_LOGGER4(configSet)
         0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_setConfig(instrument,
-                                                            &config);
+                                                            &config,
+                                                            &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
     TEST_ASSERT_STR_EQ("config cfgPrimary "
                        "schedulelist=schedule_fast|schedule_burst"
@@ -1605,9 +1826,12 @@ TEST_LOGGER4(configSet)
 
 TEST_LOGGER4(configSetClearingSchedules)
 {
-    RBRInstrumentGen4Config config = {
-        .label = "c_a",
-        .scheduleCount = 0
+    RBRInstrumentGen4Config config = { .label = "c_a" };
+    RBRInstrumentGen4Label labelBuf[1];
+    RBRInstrumentGen4LabelList scheduleList = {
+        .size = 1,
+        .count = 0,
+        .labels = labelBuf
     };
 
     TestIOBuffers_init(buffers,
@@ -1615,7 +1839,8 @@ TEST_LOGGER4(configSetClearingSchedules)
                        0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_setConfig(instrument,
-                                                            &config);
+                                                            &config,
+                                                            &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
     TEST_ASSERT_STR_EQ("config c_a schedulelist=none" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -1625,16 +1850,19 @@ TEST_LOGGER4(configSetClearingSchedules)
 
 TEST_LOGGER4(configSetEmptyLabel)
 {
-    RBRInstrumentGen4Config config = {
-        .label = "",
-        .scheduleCount = 1,
-        .scheduleList = { "s_a" }
+    RBRInstrumentGen4Config config = { .label = "" };
+    RBRInstrumentGen4Label labelBuf[] = { "s_a" };
+    RBRInstrumentGen4LabelList scheduleList = {
+        .size = 1,
+        .count = 1,
+        .labels = labelBuf
     };
 
     TestIOBuffers_init(buffers, "", 0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_setConfig(instrument,
-                                                            &config);
+                                                            &config,
+                                                            &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
                         err,
                         RBRInstrumentGen4Error);
@@ -1644,16 +1872,19 @@ TEST_LOGGER4(configSetEmptyLabel)
 
 TEST_LOGGER4(configSetEmptyScheduleLabel)
 {
-    RBRInstrumentGen4Config config = {
-        .label = "c_a",
-        .scheduleCount = 2,
-        .scheduleList = { "s_a", "" }
+    RBRInstrumentGen4Config config = { .label = "c_a" };
+    RBRInstrumentGen4Label labelBuf[] = { "s_a", "" };
+    RBRInstrumentGen4LabelList scheduleList = {
+        .size = 2,
+        .count = 2,
+        .labels = labelBuf
     };
 
     TestIOBuffers_init(buffers, "", 0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_setConfig(instrument,
-                                                            &config);
+                                                            &config,
+                                                            &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
                         err,
                         RBRInstrumentGen4Error);
@@ -1719,7 +1950,9 @@ TEST_LOGGER4(configDeleteEmptyLabel)
 
 TEST_LOGGER4(schedulelist)
 {
-    RBRInstrumentGen4SchedulePool actual;
+    RBRINSTRUMENTGEN4_SCHEDULE_POOL_DECL(
+        actual,
+        RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX);
 
     TestIOBuffers_init(buffers,
                        "schedule count=1 maxcount=8 list=s "
@@ -1744,9 +1977,34 @@ TEST_LOGGER4(schedulelist)
     return true;
 }
 
+TEST_LOGGER4(schedulelistTooSmall)
+{
+    RBRINSTRUMENTGEN4_SCHEDULE_POOL_DECL(actual, 1);
+
+    TestIOBuffers_init(buffers,
+                       "schedule count=2 maxcount=8 list=s_a|s_b "
+                       "availablemodes=continuous "
+                       "availablefastperiods=none maxregimes=3"
+                       RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getSchedulePool(instrument,
+                                                                  &actual);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_TRUNCATED,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(2, actual.count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("s_a", actual.pool[0].label);
+    TEST_ASSERT_EQ(3, actual.maxRegimes, "%" PRIi32);
+
+    return true;
+}
+
 TEST_LOGGER4(schedulelistEveryMode)
 {
-    RBRInstrumentGen4SchedulePool actual;
+    RBRINSTRUMENTGEN4_SCHEDULE_POOL_DECL(
+        actual,
+        RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX);
 
     TestIOBuffers_init(
         buffers,
@@ -1778,7 +2036,9 @@ TEST_LOGGER4(schedulelistEveryMode)
 TEST_LOGGER4(schedulelistUnknownMode)
 {
     /* An unrecognized mode drops out of the set. */
-    RBRInstrumentGen4SchedulePool actual;
+    RBRINSTRUMENTGEN4_SCHEDULE_POOL_DECL(
+        actual,
+        RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX);
 
     TestIOBuffers_init(buffers,
                        "schedule count=0 maxcount=8 list=none "
@@ -1810,11 +2070,10 @@ TEST_LOGGER4(schedule)
                        0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getSchedule(instrument,
-                                                              &actual);
+                                                              &actual,
+                                                              NULL);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
     TEST_ASSERT_STR_EQ("schedule s" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_EQ(0, actual.groupCount, "%" PRIi32);
-    TEST_ASSERT_EQ(0, actual.configCount, "%" PRIi32);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SCHEDULE_STREAM_OFF,
                         actual.stream,
                         RBRInstrumentGen4ScheduleStream);
@@ -1830,11 +2089,14 @@ TEST_LOGGER4(schedule)
     return true;
 }
 
+/* The schedule's configurations are reported by the instrument but not
+ * modelled: the parameter is skipped. */
 TEST_LOGGER4(scheduleWithGroupsAndConfigs)
 {
     RBRInstrumentGen4Schedule actual = {
         .label = "s_a"
     };
+    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(groupList, 4);
 
     TestIOBuffers_init(buffers,
                        "schedule s_a grouplist=g_a|g_b configlist=c_a "
@@ -1844,13 +2106,39 @@ TEST_LOGGER4(scheduleWithGroupsAndConfigs)
                        0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getSchedule(instrument,
-                                                              &actual);
+                                                              &actual,
+                                                              &groupList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
-    TEST_ASSERT_EQ(2, actual.groupCount, "%" PRIi32);
-    TEST_ASSERT_STR_EQ("g_a", actual.groupList[0]);
-    TEST_ASSERT_STR_EQ("g_b", actual.groupList[1]);
-    TEST_ASSERT_EQ(1, actual.configCount, "%" PRIi32);
-    TEST_ASSERT_STR_EQ("c_a", actual.configList[0]);
+    TEST_ASSERT_EQ(2, groupList.count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("g_a", groupList.labels[0]);
+    TEST_ASSERT_STR_EQ("g_b", groupList.labels[1]);
+
+    return true;
+}
+
+TEST_LOGGER4(scheduleGroupListTooSmall)
+{
+    RBRInstrumentGen4Schedule actual = {
+        .label = "s_a"
+    };
+    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(groupList, 1);
+
+    TestIOBuffers_init(buffers,
+                       "schedule s_a grouplist=g_a|g_b configlist=c_a "
+                       "stream=off castdetection=off mode=continuous "
+                       "period=1000"
+                       RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getSchedule(instrument,
+                                                              &actual,
+                                                              &groupList);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_TRUNCATED,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_EQ(2, groupList.count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("g_a", groupList.labels[0]);
+    TEST_ASSERT_EQ(1000, actual.parameters.continuous.period, "%" PRIi32);
 
     return true;
 }
@@ -1869,7 +2157,8 @@ TEST_LOGGER4(scheduleWithStorage)
                        0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getSchedule(instrument,
-                                                              &actual);
+                                                              &actual,
+                                                              NULL);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_OFF,
                         actual.storage,
@@ -1893,7 +2182,8 @@ TEST_LOGGER4(scheduleBursting)
                        0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getSchedule(instrument,
-                                                              &actual);
+                                                              &actual,
+                                                              NULL);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SCHEDULE_STREAM_USB,
                         actual.stream,
@@ -1930,7 +2220,8 @@ TEST_LOGGER4(scheduleDeferredMode)
                        0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_getSchedule(instrument,
-                                                              &actual);
+                                                              &actual,
+                                                              NULL);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES,
                         actual.mode,
@@ -1940,17 +2231,41 @@ TEST_LOGGER4(scheduleDeferredMode)
     return true;
 }
 
+
+TEST_LOGGER4(scheduleEmptyLabel)
+{
+    /* An empty label is refused before the command. */
+    RBRInstrumentGen4Schedule schedule = { .label = "" };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_getSchedule(instrument,
+                                                            &schedule,
+                                                            NULL);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+                        err,
+                        RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
 TEST_LOGGER4(scheduleSet)
 {
     RBRInstrumentGen4Schedule schedule = {
         .label = "s_cap",
-        .groupCount = 1,
-        .groupList = { "g_test" },
         .stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_OFF,
         .storage = RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE,
         .castDetection = true,
         .mode = RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS,
         .parameters = { .continuous = { .period = 2000 } }
+    };
+
+    RBRInstrumentGen4Label labelBuf[] = { "g_test" };
+    RBRInstrumentGen4LabelList groupList = {
+        .size = sizeof(labelBuf) / sizeof(labelBuf[0]),
+        .count = 1,
+        .labels = labelBuf
     };
 
     TestIOBuffers_init(buffers,
@@ -1960,10 +2275,40 @@ TEST_LOGGER4(scheduleSet)
                        0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_setSchedule(instrument,
-                                                              &schedule);
+                                                              &schedule,
+                                                              &groupList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
     TEST_ASSERT_STR_EQ("schedule s_cap grouplist=g_test stream=off "
                        "castdetection=on mode=continuous period=2000"
+                       COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(scheduleSetWithoutGroupList)
+{
+    RBRInstrumentGen4Schedule schedule = {
+        .label = "s_cap",
+        .stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_OFF,
+        .storage = RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE,
+        .castDetection = true,
+        .mode = RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS,
+        .parameters = { .continuous = { .period = 2000 } }
+    };
+
+    TestIOBuffers_init(buffers,
+                       "schedule s_cap stream=off castdetection=on "
+                       "mode=continuous period=2000"
+                       RESPONSE_TERMINATOR,
+                       0);
+
+    RBRInstrumentGen4Error err = RBRInstrumentGen4_setSchedule(instrument,
+                                                              &schedule,
+                                                              NULL);
+    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_STR_EQ("schedule s_cap stream=off castdetection=on "
+                       "mode=continuous period=2000"
                        COMMAND_TERMINATOR,
                        buffers->writeBuffer);
 
@@ -1974,7 +2319,6 @@ TEST_LOGGER4(scheduleSetWithStorage)
 {
     RBRInstrumentGen4Schedule schedule = {
         .label = "s_cap",
-        .groupCount = 0,
         .stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_USB,
         .storage = RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_ON,
         .castDetection = true,
@@ -1988,6 +2332,13 @@ TEST_LOGGER4(scheduleSetWithStorage)
         }
     };
 
+    RBRInstrumentGen4Label labelBuf[1];
+    RBRInstrumentGen4LabelList groupList = {
+        .size = 1,
+        .count = 0,
+        .labels = labelBuf
+    };
+
     TestIOBuffers_init(buffers,
                        "schedule s_cap grouplist=none stream=usb storage=on "
                        "castdetection=on mode=average period=10000 "
@@ -1996,7 +2347,8 @@ TEST_LOGGER4(scheduleSetWithStorage)
                        0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_setSchedule(instrument,
-                                                              &schedule);
+                                                              &schedule,
+                                                              &groupList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
     TEST_ASSERT_STR_EQ("schedule s_cap grouplist=none stream=usb storage=on "
                        "castdetection=on mode=average period=10000 "
@@ -2017,10 +2369,18 @@ TEST_LOGGER4(scheduleSetMultipleModes)
                 | RBRINSTRUMENTGEN4_SCHEDULE_MODE_AVERAGE
     };
 
+    RBRInstrumentGen4Label labelBuf[1];
+    RBRInstrumentGen4LabelList groupList = {
+        .size = 1,
+        .count = 0,
+        .labels = labelBuf
+    };
+
     TestIOBuffers_init(buffers, "", 0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_setSchedule(instrument,
-                                                              &schedule);
+                                                              &schedule,
+                                                              &groupList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
                         err,
                         RBRInstrumentGen4Error);
@@ -2036,10 +2396,18 @@ TEST_LOGGER4(scheduleSetNoMode)
         .mode = RBRINSTRUMENTGEN4_SCHEDULE_MODE_NONE
     };
 
+    RBRInstrumentGen4Label labelBuf[1];
+    RBRInstrumentGen4LabelList groupList = {
+        .size = 1,
+        .count = 0,
+        .labels = labelBuf
+    };
+
     TestIOBuffers_init(buffers, "", 0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_setSchedule(instrument,
-                                                              &schedule);
+                                                              &schedule,
+                                                              &groupList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
                         err,
                         RBRInstrumentGen4Error);
@@ -2055,10 +2423,18 @@ TEST_LOGGER4(scheduleSetDeferredMode)
         .mode = RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES
     };
 
+    RBRInstrumentGen4Label labelBuf[1];
+    RBRInstrumentGen4LabelList groupList = {
+        .size = 1,
+        .count = 0,
+        .labels = labelBuf
+    };
+
     TestIOBuffers_init(buffers, "", 0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_setSchedule(instrument,
-                                                              &schedule);
+                                                              &schedule,
+                                                              &groupList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_UNSUPPORTED,
                         err,
                         RBRInstrumentGen4Error);
@@ -2070,16 +2446,22 @@ TEST_LOGGER4(scheduleSetEmptyGroupLabel)
 {
     RBRInstrumentGen4Schedule schedule = {
         .label = "s_cap",
-        .groupCount = 2,
-        .groupList = { "g_test", "" },
         .storage = RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE,
         .mode = RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS
+    };
+
+    RBRInstrumentGen4Label labelBuf[] = { "g_test", "" };
+    RBRInstrumentGen4LabelList groupList = {
+        .size = sizeof(labelBuf) / sizeof(labelBuf[0]),
+        .count = 2,
+        .labels = labelBuf
     };
 
     TestIOBuffers_init(buffers, "", 0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_setSchedule(instrument,
-                                                              &schedule);
+                                                              &schedule,
+                                                              &groupList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
                         err,
                         RBRInstrumentGen4Error);
@@ -2161,7 +2543,8 @@ TEST_LOGGER4(scheduleEveryBurstingMode)
         TestIOBuffers_init(buffers, response, 0);
 
         RBRInstrumentGen4Error err = RBRInstrumentGen4_getSchedule(instrument,
-                                                                  &actual);
+                                                              &actual,
+                                                              NULL);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
                             err,
                             RBRInstrumentGen4Error);
@@ -2203,6 +2586,13 @@ TEST_LOGGER4(scheduleSetEveryBurstingMode)
         RBRINSTRUMENTGEN4_SCHEDULE_MODE_WAVE
     };
 
+    RBRInstrumentGen4Label labelBuf[1];
+    RBRInstrumentGen4LabelList groupList = {
+        .size = 1,
+        .count = 0,
+        .labels = labelBuf
+    };
+
     for (size_t i = 0; i < sizeof(modes) / sizeof(modes[0]); ++i)
     {
         schedule.mode = modes[i];
@@ -2227,7 +2617,8 @@ TEST_LOGGER4(scheduleSetEveryBurstingMode)
         TestIOBuffers_init(buffers, response, 0);
 
         RBRInstrumentGen4Error err = RBRInstrumentGen4_setSchedule(instrument,
-                                                                  &schedule);
+                                                                  &schedule,
+                                                                  &groupList);
         TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
                             err,
                             RBRInstrumentGen4Error);
@@ -2252,6 +2643,13 @@ TEST_LOGGER4(scheduleSetLongParameters)
         }
     };
 
+    RBRInstrumentGen4Label labelBuf[1];
+    RBRInstrumentGen4LabelList groupList = {
+        .size = 1,
+        .count = 0,
+        .labels = labelBuf
+    };
+
     TestIOBuffers_init(buffers,
                        "schedule s grouplist=none stream=off castdetection=off "
                        "mode=average period=86400000 measurementcount=65535 "
@@ -2259,7 +2657,8 @@ TEST_LOGGER4(scheduleSetLongParameters)
                        0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_setSchedule(instrument,
-                                                              &schedule);
+                                                              &schedule,
+                                                              &groupList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
     TEST_ASSERT_STR_EQ("schedule s grouplist=none stream=off castdetection=off "
                        "mode=average period=86400000 measurementcount=65535 "
@@ -2275,24 +2674,28 @@ TEST_LOGGER4(scheduleSetCommandTooLong)
     /* A command which cannot fit has to be reported, not truncated. */
     RBRInstrumentGen4Schedule schedule = {
         .label = "s",
-        .groupCount = RBRINSTRUMENTGEN4_GROUP_COUNT_MAX,
         .storage = RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE,
         .mode = RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS,
         .parameters = { .continuous = { .period = 1000 } }
     };
 
-    for (int32_t group = 0; group < schedule.groupCount; ++group)
+    RBRInstrumentGen4Label labelBuf[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX];
+    RBRInstrumentGen4LabelList groupList = {
+        .size = RBRINSTRUMENTGEN4_GROUP_COUNT_MAX,
+        .count = RBRINSTRUMENTGEN4_GROUP_COUNT_MAX,
+        .labels = labelBuf
+    };
+    for (int32_t i = 0; i < groupList.count; ++i)
     {
-        memset(schedule.groupList[group],
-               'g',
-               RBRINSTRUMENTGEN4_LABEL_NAME_MAX);
-        schedule.groupList[group][RBRINSTRUMENTGEN4_LABEL_NAME_MAX] = '\0';
+        memset(labelBuf[i], 'g', RBRINSTRUMENTGEN4_LABEL_NAME_MAX);
+        labelBuf[i][RBRINSTRUMENTGEN4_LABEL_NAME_MAX] = '\0';
     }
 
     TestIOBuffers_init(buffers, "", 0);
 
     RBRInstrumentGen4Error err = RBRInstrumentGen4_setSchedule(instrument,
-                                                              &schedule);
+                                                              &schedule,
+                                                              &groupList);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL,
                         err,
                         RBRInstrumentGen4Error);

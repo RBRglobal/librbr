@@ -34,7 +34,7 @@
 
 #define GROUP_PTS_LABEL "gr_pts"
 #define GROUP_PTS_CHANNELS                              \
-    (const char[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             TEMPERATURE,                                \
@@ -48,7 +48,7 @@
 #define SCHEDULE_PTS_CASTDETECTION false
 
 #define SCHEDULE_PTS_GROUPS                          \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         GROUP_PTS_LABEL                              \
     }
@@ -56,7 +56,7 @@
 
 #define CONFIG_ASCENT_LABEL "cf_ascent"
 #define CONFIG_ASCENT_SCHEDULES                      \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         SCHEDULE_PTS_LABEL                           \
     }
@@ -156,40 +156,44 @@ int main(int argc, char *argv[])
 
     RBRInstrumentGen4_deleteConfigAll(instrument);
 
-    RBRInstrumentGen4SchedulePool schedulePool;
     RBRInstrumentGen4_deleteScheduleAll(instrument);
-
-    RBRInstrumentGen4GroupPool groupPool;
     RBRInstrumentGen4_deleteGroupAll(instrument);
 
     /************ group definition ************/
-    /* populate all channelPool and calibrations */
-    RBRInstrumentGen4ChannelPool channelPool;
+    /* read the channel pool, then each channel and its calibration */
+    RBRInstrumentGen4Channel channelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4ChannelPool channelPool = {
+        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+        .pool = channelBuf
+    };
     RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
 
-    for (int32_t i = 0; i < channelPool.count; i++)
+    /* Only min(count, size) channels are stored when the instrument reports
+     * more than the buffer holds. */
+    int32_t channelCount = channelPool.count < channelPool.size
+        ? channelPool.count : channelPool.size;
+    for (int32_t i = 0; i < channelCount; i++)
     {
-        RBRInstrumentGen4_getChannel(instrument, &channelPool.pool[i]);
+        RBRInstrumentGen4Channel *channel = &channelPool.pool[i];
+        RBRInstrumentGen4_getChannel(instrument, channel);
         printf(
             "%s,%s,%d,%d,%d,%s,%s,%s,%u",
-            channelPool.pool[i].label,
-            channelPool.pool[i].type,
-            channelPool.pool[i].settlingTime,
-            channelPool.pool[i].measuringTime,
-            channelPool.pool[i].readOutTime,
-            channelPool.pool[i].userUnits,
-            RBRInstrumentGen4ChannelNature_name(channelPool.pool[i].nature),
-            channelPool.pool[i].device,
-            channelPool.pool[i].derived
+            channel->label,
+            channel->type,
+            channel->settlingTime,
+            channel->measuringTime,
+            channel->readOutTime,
+            channel->userUnits,
+            RBRInstrumentGen4ChannelNature_name(channel->nature),
+            channel->device,
+            channel->derived
         );
-    }
-    for (int32_t i = 0; i < channelPool.count; i++)
-    {
+
         RBRInstrumentGen4Calibration calibration;
         snprintf(calibration.label,
                  sizeof(calibration.label),
                  "%s",
-                 channelPool.pool[i].label);
+                 channel->label);
         RBRInstrumentGen4_getCalibration(instrument, &calibration);
     }
 
@@ -205,6 +209,11 @@ int main(int argc, char *argv[])
 
     /************ schedule definition ************/
     RBRInstrumentGen4Schedule schedule;
+    RBRInstrumentGen4Label groupLabelBuf[SCHEDULE_PTS_GROUP_COUNT];
+    RBRInstrumentGen4LabelList groupList = {
+        .size = SCHEDULE_PTS_GROUP_COUNT,
+        .labels = groupLabelBuf
+    };
     RBRInstrumentGen4_initNewScheduleContinuous(instrument,
                          SCHEDULE_PTS_LABEL,
                          SCHEDULE_PTS_GROUPS,
@@ -212,16 +221,21 @@ int main(int argc, char *argv[])
                          SCHEDULE_PTS_MODE,
                          SCHEDULE_PTS_PERIOD,
                          SCHEDULE_PTS_CASTDETECTION,
-                         &groupPool,
+                         &groupList,
                          &schedule);
 
     /************ configuration definition ************/
     RBRInstrumentGen4Config config;
+    RBRInstrumentGen4Label scheduleLabelBuf[CONFIG_ASCENT_SCHEDULE_COUNT];
+    RBRInstrumentGen4LabelList scheduleList = {
+        .size = CONFIG_ASCENT_SCHEDULE_COUNT,
+        .labels = scheduleLabelBuf
+    };
     RBRInstrumentGen4_initNewConfig(instrument,
                         CONFIG_ASCENT_LABEL,
                         CONFIG_ASCENT_SCHEDULES,
                         CONFIG_ASCENT_SCHEDULE_COUNT,
-                        &schedulePool,
+                        &scheduleList,
                         &config);
 
     /************ deployment parameters ************/

@@ -139,7 +139,11 @@ int main(int argc, char *argv[])
 
     //*******************download data from instrument. Support only bytecount. *******************//
     // quit if there's no dataset available.
-    RBRInstrumentGen4DatasetPool datasetPool;
+    RBRInstrumentGen4Dataset datasetBuf[RBRINSTRUMENTGEN4_DATASET_COUNT_MAX];
+    RBRInstrumentGen4DatasetPool datasetPool = {
+        .size = RBRINSTRUMENTGEN4_DATASET_COUNT_MAX,
+        .pool = datasetBuf
+    };
     err = RBRInstrumentGen4_getDatasetPool(instrument, &datasetPool);
     if (err != RBRINSTRUMENTGEN4_SUCCESS || datasetPool.count <= 0)
     {
@@ -161,7 +165,15 @@ int main(int argc, char *argv[])
     }
 
     // Read the dataset's parameters, including the schedules it ran.
-    err = RBRInstrumentGen4_getDataset(instrument, targetDataset);
+    RBRInstrumentGen4Label
+        scheduleLabelBuf[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
+    RBRInstrumentGen4LabelList scheduleList = {
+        .size = RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX,
+        .labels = scheduleLabelBuf
+    };
+    err = RBRInstrumentGen4_getDataset(instrument,
+                                       targetDataset,
+                                       &scheduleList);
     if (err != RBRINSTRUMENTGEN4_SUCCESS)
     {
         printf("Error: Failed to read dataset %s: %s. Quit.\n",
@@ -172,11 +184,9 @@ int main(int argc, char *argv[])
     }
 
     printf("Dataset %s contains data from following schedules: ", targetDataset->label);
-    for (int32_t schedule_idx = 0;
-         schedule_idx < targetDataset->scheduleCount;
-         schedule_idx++)
+    for (int32_t i = 0; i < scheduleList.count && i < scheduleList.size; i++)
     {
-        printf("%s ", targetDataset->scheduleList[schedule_idx]);
+        printf("%s ", scheduleList.labels[i]);
     }
     printf("\n");
 

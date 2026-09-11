@@ -631,7 +631,7 @@ typedef struct RBRInstrumentGen4Calibration
      * RBRInstrumentGen4_getCalibration(). Calibrations are one to one with
      * channels and cannot be created or deleted.
      */
-    char label[RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX + 1];
+    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
     /**
      * \brief The formula used to convert raw readings to physical units.
@@ -733,7 +733,6 @@ const char *RBRInstrumentGen4ChannelNature_name(
 /**
  * \brief Instrument `channel <channel_label>` command parameters.
  *
- * \see RBRInstrumentGen4ChannelPool
  * \see RBRInstrumentGen4_getChannel()
  * \see RBRInstrumentGen4_setChannel()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
@@ -746,7 +745,7 @@ typedef struct RBRInstrumentGen4Channel
      * Set by the caller to select the channel to read; see
      * RBRInstrumentGen4_getChannel().
      */
-    char label[RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX + 1];
+    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
     /**
      * \brief A short, pre-defined generic name for the installed channel.
@@ -770,18 +769,6 @@ typedef struct RBRInstrumentGen4Channel
      * The only parameter of the command a caller may change.
      */
     char userUnits[RBRINSTRUMENTGEN4_CHANNEL_UNIT_MAX + 1];
-
-    /** \brief The number of groups this channel belongs to. */
-    const int32_t groupCount;
-
-    /**
-     * \brief The labels of the groups this channel belongs to.
-     *
-     * Membership is changed through the `group` command, not here.
-     * \see RBRInstrumentGen4_setGroup()
-     */
-    const char groupList[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX]
-                        [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief Whether the channel measures or reports housekeeping. */
     const RBRInstrumentGen4ChannelNature nature;
@@ -816,7 +803,8 @@ typedef struct RBRInstrumentGen4Channel
 } RBRInstrumentGen4Channel;
 
 /**
- * \brief Instrument `channel` command parameters.
+ * \brief `channel` command parameters. The `list` is stored in a user provided
+ * buffer (#pool).
  *
  * \see RBRInstrumentGen4_getChannelPool()
  * \see RBRInstrumentGen4_getChannelPoolByNature()
@@ -824,22 +812,25 @@ typedef struct RBRInstrumentGen4Channel
  */
 typedef struct RBRInstrumentGen4ChannelPool
 {
+    /** \brief The number of channels #pool can hold. */
+    int32_t size;
+
     /**
      * \brief The number of channels reported.
      *
-     * \warning Use `min(count, RBRINSTRUMENTGEN4_CHANNEL_MAX)` to avoid an
-     * out-of-bounds error when accessing #pool if 
-     * #count > #RBRINSTRUMENTGEN4_CHANNEL_MAX.
+     * \warning This field will be larger than #size when
+     * #RBRINSTRUMENTGEN4_TRUNCATED is returned by the getter. Care should be
+     * taken to avoid out-of-bounds access when iterating over #pool.
      */
     int32_t count;
 
     /**
-     * \brief The channels reported.
+     * \brief User provided buffer of the channels reported.
      *
      * Discovery reports nothing but the labels; read a channel's parameters
      * with RBRInstrumentGen4_getChannel().
      */
-    RBRInstrumentGen4Channel pool[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4Channel *pool;
 } RBRInstrumentGen4ChannelPool;
 
 /**
@@ -855,6 +846,7 @@ typedef struct RBRInstrumentGen4ChannelPool
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the channel is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the channel does not exist
  * \see RBRInstrumentGen4_getChannelPool()
  * \see RBRInstrumentGen4_setChannel()
@@ -889,7 +881,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setChannel(
     const RBRInstrumentGen4Channel *channel);
 
 /**
- * \brief Populate the pool of channels configured on the instrument.
+ * \brief Read the labels of the channels configured on the instrument.
  *
  * Reports nothing but the labels; read a channel's parameters with
  * RBRInstrumentGen4_getChannel().
@@ -897,10 +889,15 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setChannel(
  * \note Issues the `channel` command.
  *
  * \param [in] instrument the instrument connection
- * \param [out] channelPool the labels of the channels present
+ * \param [in,out] channelPool the channels present, labels only
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the pool is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a channelPool cannot hold every
+ *                                      reported channel; the first `size` are
+ *                                      stored, and `count` is set to the value
+ *                                      reported by the instrument which WILL
+ *                                      exceed `size`
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the channel pool cannot be read
  * \see RBRInstrumentGen4_getChannelPoolByNature()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
@@ -910,7 +907,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(
     RBRInstrumentGen4ChannelPool *channelPool);
 
 /**
- * \brief Populate the pool of channels of one nature.
+ * \brief Read the labels of the channels of one nature.
  *
  * Reports nothing but the labels; read a channel's parameters with
  * RBRInstrumentGen4_getChannel().
@@ -919,10 +916,15 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(
  *
  * \param [in] instrument the instrument connection
  * \param [in] nature the nature of the channels to report
- * \param [out] channelPool the labels of the channels present
+ * \param [in,out] channelPool the channels present, labels only
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the pool is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a channelPool cannot hold every
+ *                                      reported channel; the first `size` are
+ *                                      stored, and `count` is set to the value
+ *                                      reported by the instrument which WILL
+ *                                      exceed `size`
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the channel pool cannot be read
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the nature is not
  *                                                    one the command accepts
@@ -1146,43 +1148,29 @@ typedef struct RBRInstrumentGen4Group
      * Set by the caller to select the group to read.
      */
     char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
-
-    /** \brief The number of channels in the group. */
-    int32_t channelCount;
-
-    /** \brief The labels of the channels in the group. */
-    char channelList[RBRINSTRUMENTGEN4_CHANNEL_MAX]
-                    [RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX + 1];
-
-    /**
-     * \brief The number of schedules using the group.
-     *
-     * \readonly
-     */
-    const int32_t scheduleCount;
-
-    /**
-     * \brief The labels of the schedules using the group.
-     *
-     * \readonly
-     * \see RBRInstrumentGen4_setSchedule()
-     */
-    const char scheduleList[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX]
-                           [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 } RBRInstrumentGen4Group;
 
 /**
- * \brief Populate the parameters of a group.
+ * \brief Read the channels in a group.
  *
  * The caller sets RBRInstrumentGen4Group.label to select the group to read.
+ * The labels of the group's channels are written to \a channelList when it
+ * is given.
  *
  * \note Issues the `group <group_label>` command.
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] group the group to read, selected by its label
+ * \param [out] channelList the channels in the group, or `NULL` to skip them
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a channelList cannot hold every
+ *                                      reported channel; the first `size` are
+ *                                      stored, and `count` is set to the value
+ *                                      reported by the instrument which WILL
+ *                                      exceed `size`
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the group does not exist
  * \see RBRInstrumentGen4_getGroupPool()
  * \see RBRInstrumentGen4_setGroup()
@@ -1190,56 +1178,65 @@ typedef struct RBRInstrumentGen4Group
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getGroup(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Group *group);
+    RBRInstrumentGen4Group *group,
+    RBRInstrumentGen4LabelList *channelList);
 
 /**
  * \brief Set the channels in a group.
  *
- * Sends `channellist`, the only writable parameter. A zero
- * RBRInstrumentGen4Group.channelCount sends `none`.
+ * Sends `channellist`, the only writable parameter. An empty \a channelList
+ * sends `none`.
  *
  * \note Issues the `group <group_label>` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] group the group to write
+ * \param [in] group the group to write, selected by its label
+ * \param [in] channelList the channels to put in the group
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully written
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the group cannot be written
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty,
- *                                                    the channel count is out
- *                                                    of range, or a channel
+ *                                                    \a channelList is `NULL`,
+ *                                                    its count does not fit
+ *                                                    its array, or a channel
  *                                                    label is empty
- * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit the
+ *                                            command
  * \see RBRInstrumentGen4_getGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_setGroup(
     RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Group *group);
+    const RBRInstrumentGen4Group *group,
+    const RBRInstrumentGen4LabelList *channelList);
 
 /**
- * \brief `group` command parameters.
+ * \brief `group` command parameters. The `list` is stored in a user provided
+ * buffer (#pool).
  *
  * \see RBRInstrumentGen4_getGroupPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
 typedef struct RBRInstrumentGen4GroupPool
 {
+    /** \brief The number of groups #pool can hold. */
+    int32_t size;
+
     /**
      * \brief The number of groups defined on the instrument.
      *
-     * \warning Use `min(count, RBRINSTRUMENTGEN4_GROUP_COUNT_MAX)` to avoid an 
-     * out-of-bounds error when accessing #pool if 
-     * #maxCount > RBRINSTRUMENTGEN4_GROUP_COUNT_MAX.
+     * \warning This field will be larger than #size when
+     * #RBRINSTRUMENTGEN4_TRUNCATED is returned by the getter. Care should be
+     * taken to avoid out-of-bounds access when iterating over #pool.
      */
     int32_t count;
 
     /** \brief The maximum number of groups that can exist on the instrument. */
     int32_t maxCount;
 
-    /** \brief The pool of groups. */
-    RBRInstrumentGen4Group pool[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX];
+    /** \brief User provided buffer of the groups defined. */
+    RBRInstrumentGen4Group *pool;
 } RBRInstrumentGen4GroupPool;
 
 /**
@@ -1251,10 +1248,15 @@ typedef struct RBRInstrumentGen4GroupPool
  * \note Issues the `group` command.
  *
  * \param [in] instrument the instrument connection
- * \param [out] groupPool the populated pool of groups
+ * \param [in,out] groupPool the groups defined, labels only
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the groups are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a groupPool cannot hold every
+ *                                      reported group; the first `size` are
+ *                                      stored, and `count` is set to the value
+ *                                      reported by the instrument which WILL
+ *                                      exceed `size`
  * \see RBRInstrumentGen4_getGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
@@ -1465,29 +1467,6 @@ typedef struct RBRInstrumentGen4Schedule
      */
     char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
-    /** \brief The number of groups the schedule samples. */
-    int32_t groupCount;
-
-    /** \brief The labels of the groups the schedule samples. */
-    char groupList[RBRINSTRUMENTGEN4_GROUP_COUNT_MAX]
-                  [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
-
-    /**
-     * \brief The number of configurations using the schedule.
-     *
-     * \readonly
-     */
-    const int32_t configCount;
-
-    /**
-     * \brief The labels of the configurations using the schedule.
-     *
-     * \readonly
-     * \see RBRInstrumentGen4_setConfig()
-     */
-    const char configList[RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX]
-                         [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
-
     /** \brief Where the schedule's data is streamed in real time. */
     RBRInstrumentGen4ScheduleStream stream;
 
@@ -1536,6 +1515,8 @@ typedef struct RBRInstrumentGen4Schedule
  * \brief Populate the parameters of a schedule.
  *
  * The caller sets RBRInstrumentGen4Schedule.label to select the schedule.
+ * The labels of the groups the schedule samples are written to \a groupList
+ * when it is given.
  * 
  * \p schedule.storage is set to #RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE for 
  * instruments that do not report the `storage` parameter
@@ -1544,9 +1525,17 @@ typedef struct RBRInstrumentGen4Schedule
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] schedule the schedule to read, selected by its label
+ * \param [out] groupList the groups the schedule samples, or `NULL` to skip
+ *                        them
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a groupList cannot hold every
+ *                                      reported group; the first `size` are
+ *                                      stored, and `count` is set to the value
+ *                                      reported by the instrument which WILL
+ *                                      exceed `size`
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the schedule does not exist
  * \see RBRInstrumentGen4_getSchedulePool()
  * \see RBRInstrumentGen4_setSchedule()
@@ -1554,17 +1543,22 @@ typedef struct RBRInstrumentGen4Schedule
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedule *schedule);
+    RBRInstrumentGen4Schedule *schedule,
+    RBRInstrumentGen4LabelList *groupList);
 
 /**
  * \brief Set the parameters of a schedule.
  *
- * `storage` is only available on some instrument configurations.
+ * `storage` is only available on some instrument configurations. An empty
+ * \a groupList sends `none`; a `NULL` \a groupList leaves the instrument's
+ * group list unchanged.
  *
  * \note Issues the `schedule <schedule_label>` command.
  *
  * \param [in] instrument the instrument connection
  * \param [in] schedule the schedule to write
+ * \param [in] groupList the groups the schedule samples, or `NULL` to leave
+ *                       them as they are
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully written
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
@@ -1572,8 +1566,9 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
  *                                           written, or when `storage` is set
  *                                           where it is unavailable
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty,
- *                                                    a count is out of range,
- *                                                    a group label is empty,
+ *                                                    the list's count does
+ *                                                    not fit its array, a
+ *                                                    group label is empty,
  *                                                    or the mode is not a
  *                                                    single known flag
  * \return #RBRINSTRUMENTGEN4_UNSUPPORTED when the mode is `ddsampling` or
@@ -1584,22 +1579,27 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
     RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Schedule *schedule);
+    const RBRInstrumentGen4Schedule *schedule,
+    const RBRInstrumentGen4LabelList *groupList);
 
 /**
- * \brief `schedule` command parameters.
+ * \brief `schedule` command parameters. The `list` is stored in a user
+ * provided buffer (#pool).
  *
  * \see RBRInstrumentGen4_getSchedulePool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 typedef struct RBRInstrumentGen4SchedulePool
 {
+    /** \brief The number of schedules #pool can hold. */
+    int32_t size;
+
     /**
      * \brief The number of schedules defined on the instrument.
      *
-     * \warning Use `min(count, RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX)` to
-     * avoid an out-of-bounds error when accessing #pool if 
-     * #maxCount > #RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX.
+     * \warning This field will be larger than #size when
+     * #RBRINSTRUMENTGEN4_TRUNCATED is returned by the getter. Care should be
+     * taken to avoid out-of-bounds access when iterating over #pool.
      */
     int32_t count;
 
@@ -1609,8 +1609,8 @@ typedef struct RBRInstrumentGen4SchedulePool
      */
     int32_t maxCount;
 
-    /** \brief The pool of schedules. */
-    RBRInstrumentGen4Schedule pool[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
+    /** \brief User provided buffer of the schedules defined. */
+    RBRInstrumentGen4Schedule *pool;
 
     /** \brief The modes the instrument offers. */
     RBRInstrumentGen4ScheduleMode availableModes;
@@ -1658,10 +1658,15 @@ const char *RBRInstrumentGen4ScheduleMode_name(
  * \note Issues the `schedule` command.
  *
  * \param [in] instrument the instrument connection
- * \param [out] schedulePool the populated pool of schedules
+ * \param [in,out] schedulePool the schedules defined, labels only
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedules are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a schedulePool cannot hold every
+ *                                      reported schedule; the first `size` are
+ *                                      stored, and `count` is set to the value
+ *                                      reported by the instrument which WILL
+ *                                      exceed `size`
  * \see RBRInstrumentGen4_getSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
@@ -1741,27 +1746,30 @@ typedef struct RBRInstrumentGen4Config
      * Set by the caller to select the configuration to read.
      */
     char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
-
-    /** \brief The number of schedules in the configuration. */
-    int32_t scheduleCount;
-
-    /** \brief The labels of the schedules in the configuration. */
-    char scheduleList[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX]
-                     [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 } RBRInstrumentGen4Config;
 
 /**
- * \brief Populate the parameters of a configuration.
+ * \brief Read the schedules in a configuration.
  *
  * The caller sets RBRInstrumentGen4Config.label to select the configuration.
+ * The labels of the configuration's schedules are written to
+ * \a scheduleList when it is given.
  *
  * \note Issues the `config <config_label>` command.
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] config the configuration to read, selected by its label
+ * \param [out] scheduleList the schedules in the configuration, or `NULL` to
+ *                           skip them
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the configuration is read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a scheduleList cannot hold every
+ *                                      reported schedule; the first `size` are
+ *                                      stored, and `count` is set to the value
+ *                                      reported by the instrument which WILL
+ *                                      exceed `size`
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the configuration does not
  *                                           exist
  * \see RBRInstrumentGen4_getConfigPool()
@@ -1770,49 +1778,58 @@ typedef struct RBRInstrumentGen4Config
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getConfig(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Config *config);
+    RBRInstrumentGen4Config *config,
+    RBRInstrumentGen4LabelList *scheduleList);
 
 /**
  * \brief Set the schedules in a configuration.
  *
- * Sends `schedulelist`, the command's only parameter. A zero
- * RBRInstrumentGen4Config.scheduleCount sends `none`.
+ * Sends `schedulelist`, the command's only parameter. An empty
+ * \a scheduleList sends `none`.
  *
  * \note Issues the `config <config_label>` command.
  *
  * \param [in] instrument the instrument connection
- * \param [in] config the configuration to write
+ * \param [in] config the configuration to write, selected by its label
+ * \param [in] scheduleList the schedules to put in the configuration
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the configuration is written
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the configuration cannot be
  *                                           written
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty,
- *                                                    the schedule count is out
- *                                                    of range, or a schedule
- *                                                    label is empty
- * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit
+ *                                                    \a scheduleList is
+ *                                                    `NULL`, its count does
+ *                                                    not fit its array, or a
+ *                                                    schedule label is empty
+ * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit the
+ *                                            command
  * \see RBRInstrumentGen4_getConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_setConfig(
     RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Config *config);
+    const RBRInstrumentGen4Config *config,
+    const RBRInstrumentGen4LabelList *scheduleList);
 
 /**
- * \brief `config` command parameters.
+ * \brief `config` command parameters. The `list` is stored in a user provided
+ * buffer (#pool).
  *
  * \see RBRInstrumentGen4_getConfigPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
 typedef struct RBRInstrumentGen4ConfigPool
 {
+    /** \brief The number of configurations #pool can hold. */
+    int32_t size;
+
     /**
      * \brief The number of configurations defined on the instrument.
      *
-     * \warning Use `min(count, RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX)` to avoid
-     * an out-of-bounds error when accessing #pool if 
-     * #maxCount > #RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX.
+     * \warning This field will be larger than #size when
+     * #RBRINSTRUMENTGEN4_TRUNCATED is returned by the getter. Care should be
+     * taken to avoid out-of-bounds access when iterating over #pool.
      */
     int32_t count;
 
@@ -1822,8 +1839,8 @@ typedef struct RBRInstrumentGen4ConfigPool
      */
     int32_t maxCount;
 
-    /** \brief The pool of configurations. */
-    RBRInstrumentGen4Config pool[RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX];
+    /** \brief User provided buffer of the configurations defined. */
+    RBRInstrumentGen4Config *pool;
 } RBRInstrumentGen4ConfigPool;
 
 /**
@@ -1835,10 +1852,15 @@ typedef struct RBRInstrumentGen4ConfigPool
  * \note Issues the `config` command.
  *
  * \param [in] instrument the instrument connection
- * \param [out] configPool the populated pool of configurations
+ * \param [in,out] configPool the configurations defined, labels only
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the configurations are read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a configPool cannot hold every
+ *                                      reported configuration; the first
+ *                                      `size` are stored, and `count` is set
+ *                                      to the value reported by the instrument
+ *                                      which WILL exceed `size`
  * \see RBRInstrumentGen4_getConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */

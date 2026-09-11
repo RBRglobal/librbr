@@ -165,19 +165,6 @@ typedef struct RBRInstrumentGen4Dataset
     /** \brief Whether the dataset's deployment is still in progress. */
     RBRInstrumentGen4DatasetStatus status;
 
-    /** \brief The number of schedules run by the dataset's deployment. */
-    int32_t scheduleCount;
-
-    /**
-     * \brief The labels of the schedules run by the dataset's deployment.
-     *
-     * The instrument reports the schedules as they were when the dataset
-     * was started, not as they are presently defined: a label listed here
-     * can name a schedule which no longer exists in the schedule pool.
-     */
-    char scheduleList[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX]
-                     [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
-
     /** \brief The total memory usage of the dataset in bytes. */
     int64_t byteCount;
 
@@ -186,19 +173,23 @@ typedef struct RBRInstrumentGen4Dataset
 } RBRInstrumentGen4Dataset;
 
 /**
- * \brief `dataset` command parameters.
+ * \brief `dataset` command parameters. The `list` is stored in a user provided
+ * buffer (#pool).
  *
  * \see RBRInstrumentGen4_getDatasetPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 typedef struct RBRInstrumentGen4DatasetPool
 {
+    /** \brief The number of datasets #pool can hold. */
+    int32_t size;
+
     /**
      * \brief The number of datasets stored in the instrument's memory.
      *
-     * \warning Use `min(count, RBRINSTRUMENTGEN4_DATASET_COUNT_MAX)` to
-     * avoid an out-of-bounds error when accessing #pool if
-     * #maxCount > #RBRINSTRUMENTGEN4_DATASET_COUNT_MAX.
+     * \warning This field will be larger than #size when
+     * #RBRINSTRUMENTGEN4_TRUNCATED is returned by the getter. Care should be
+     * taken to avoid out-of-bounds access when iterating over #pool.
      */
     int32_t count;
 
@@ -208,8 +199,8 @@ typedef struct RBRInstrumentGen4DatasetPool
      */
     int32_t maxCount;
 
-    /** \brief The pool of datasets. */
-    RBRInstrumentGen4Dataset pool[RBRINSTRUMENTGEN4_DATASET_COUNT_MAX];
+    /** \brief User provided buffer of the datasets stored. */
+    RBRInstrumentGen4Dataset *pool;
 } RBRInstrumentGen4DatasetPool;
 
 /**
@@ -222,10 +213,15 @@ typedef struct RBRInstrumentGen4DatasetPool
  * \note Issues the `dataset` command.
  *
  * \param [in] instrument the instrument connection
- * \param [out] datasetPool the pool of datasets in storage
+ * \param [in,out] datasetPool the datasets in storage, labels only
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a datasetPool cannot hold every
+ *                                      reported dataset; the first `size` are
+ *                                      stored, and `count` is set to the value
+ *                                      reported by the instrument which WILL
+ *                                      exceed `size`
  * \see RBRInstrumentGen4_getDataset()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
@@ -242,17 +238,25 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetPool(
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] dataset the dataset to read, selected by its label
+ * \param [out] scheduleList the schedules run by the dataset, or `NULL` to
+ *                           skip them
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a scheduleList cannot hold every
+ *                                      reported schedule; the first `size` are
+ *                                      stored, and `count` is set to the value
+ *                                      reported by the instrument which WILL
+ *                                      exceed `size`
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the dataset does not exist
  * \see RBRInstrumentGen4_getDatasetPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_getDataset(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Dataset *dataset);
+    RBRInstrumentGen4Dataset *dataset,
+    RBRInstrumentGen4LabelList *scheduleList);
 
 /**
  * \brief `dataset <dataset_label>/[<schedule_label>/]events` command
@@ -358,7 +362,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getMetaBlock(
  * \param [in] instrument the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in] scheduleLabel the schedule, as listed by
- *                           RBRInstrumentGen4Dataset.scheduleList
+ *                           RBRInstrumentGen4_getDataset()
  * \param [out] block the memory usage of the schedule's blocks
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
@@ -384,7 +388,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleBlock(
  * \param [in] instrument the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in] scheduleLabel the schedule, as listed by
- *                           RBRInstrumentGen4Dataset.scheduleList
+ *                           RBRInstrumentGen4_getDataset()
  * \param [out] block the memory usage of the schedule's events block
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
@@ -410,7 +414,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleEventsBlock(
  * \param [in] instrument the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in] scheduleLabel the schedule, as listed by
- *                           RBRInstrumentGen4Dataset.scheduleList
+ *                           RBRInstrumentGen4_getDataset()
  * \param [out] block the memory usage of the schedule's sample data block
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
@@ -654,7 +658,7 @@ typedef struct RBRInstrumentGen4DownloadMeta
  * \param [in] instrument the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in] scheduleLabel the schedule, as listed by
- *                           RBRInstrumentGen4Dataset.scheduleList
+ *                           RBRInstrumentGen4_getDataset()
  * \param [in,out] download the download request: the caller populates the
  *                         unit, count, offset, and buffer fields to say what
  *                         to transfer and where to put it; the counts are
@@ -721,7 +725,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadEvents(
  * \param [in] instrument the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in] scheduleLabel the schedule, as listed by
- *                           RBRInstrumentGen4Dataset.scheduleList
+ *                           RBRInstrumentGen4_getDataset()
  * \param [in,out] download the download request: the caller populates the
  *                         unit, count, offset, and buffer fields to say what
  *                         to transfer and where to put it; the counts are

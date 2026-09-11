@@ -66,6 +66,8 @@
 #define COMMAND_PROMPT_LEN 7
 
 #define ARRAY_SEPARATOR_L4 '|'
+/** \brief The value an empty list is reported and sent as. */
+#define EMPTY_LIST_L4 "none"
 #define PARAMETER_SEPARATOR_L4 ' '
 #define PARAMETER_VALUE_SEPARATOR_L4 '='
 
@@ -1295,22 +1297,28 @@ char *RBRInstrumentGen4_splitListValue(char *value)
 RBRInstrumentGen4Error RBRInstrumentGen4_formatLabelList(
     char *value,
     int32_t size,
-    const RBRInstrumentGen4Label *labels,
-    int32_t count)
+    const RBRInstrumentGen4LabelList *labelList)
 {
+    if (labelList == NULL
+        || labelList->count < 0
+        || labelList->count > labelList->size)
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
+
     int32_t length = 0;
 
-    if (count == 0)
+    if (labelList->count == 0)
     {
-        length = snprintf(value, size, "none");
+        length = snprintf(value, size, EMPTY_LIST_L4);
         return length > 0 && length < size
                ? RBRINSTRUMENTGEN4_SUCCESS
                : RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
     }
 
-    for (int32_t label = 0; label < count; ++label)
+    for (int32_t i = 0; i < labelList->count; ++i)
     {
-        if (labels[label][0] == '\0')
+        if (labelList->labels[i][0] == '\0')
         {
             return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
         }
@@ -1318,8 +1326,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_formatLabelList(
         int32_t written = snprintf(value + length,
                                    size - length,
                                    "%s%s",
-                                   label == 0 ? "" : "|",
-                                   labels[label]);
+                                   i == 0 ? "" : "|",
+                                   labelList->labels[i]);
 
         if (written < 0 || length + written >= size)
         {
@@ -1332,26 +1340,44 @@ RBRInstrumentGen4Error RBRInstrumentGen4_formatLabelList(
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
-void RBRInstrumentGen4_parseLabelList(
-    RBRInstrumentGen4Label *labels,
-    int32_t max,
-    int32_t *count,
+RBRInstrumentGen4Error RBRInstrumentGen4_copyLabelList(
+    RBRInstrumentGen4LabelList *labelList,
     char *value)
 {
-    *count = 0;
+    labelList->count = 0;
 
-    if (strcmp(value, "none") == 0)
+    if (strcmp(value, EMPTY_LIST_L4) == 0)
     {
-        return;
+        return RBRINSTRUMENTGEN4_SUCCESS;
     }
 
-    while (value != NULL && *count < max)
+    while (value != NULL)
     {
+        if (labelList->count >= labelList->size)
+        {
+            /* Count the rest of the labels without storing them. */
+            labelList->count++;
+            for (; *value != '\0'; value++)
+            {
+                if (*value == ARRAY_SEPARATOR_L4)
+                {
+                    labelList->count++;
+                }
+            }
+            return RBRINSTRUMENTGEN4_TRUNCATED;
+        }
+
         char *nextValue = RBRInstrumentGen4_splitListValue(value);
 
-        snprintf(labels[*count], sizeof(labels[*count]), "%s", value);
-        (*count)++;
+        snprintf(labelList->labels[labelList->count],
+                 sizeof(labelList->labels[labelList->count]),
+                 "%s",
+                 value);
+        labelList->count++;
 
         value = nextValue;
     }
+
+    return RBRINSTRUMENTGEN4_SUCCESS;
 }
+

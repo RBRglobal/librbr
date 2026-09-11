@@ -41,7 +41,7 @@
 
 #define GROUP_PTS_LABEL "gr_pts"
 #define GROUP_PTS_CHANNELS                              \
-    (const char[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             TEMPERATURE,                                \
@@ -50,7 +50,7 @@
 
 #define GROUP_ODO_LABEL "gr_odo"
 #define GROUP_ODO_CHANNELS                              \
-    (const char[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             ODO_CONCENTRATION,                          \
@@ -59,7 +59,7 @@
 
 #define GROUP_PH_LABEL "gr_ph"
 #define GROUP_PH_CHANNELS                               \
-    (const char[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             PH                                          \
@@ -67,7 +67,7 @@
 
 #define GROUP_BBPFL_LABEL "gr_bbpfl"
 #define GROUP_BBPFL_CHANNELS                            \
-    (const char[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             BACKSCATTER,                                \
@@ -77,7 +77,7 @@
 
 #define GROUP_RADIOMETRY_LABEL "gr_radiometry"
 #define GROUP_RADIOMETRY_CHANNELS                       \
-    (const char[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             PAR,                                        \
@@ -88,7 +88,7 @@
 
 #define SCHEDULE_PTS_LABEL "sch_asc_pts"
 #define SCHEDULE_PTS_GROUPS                          \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         GROUP_PTS_LABEL                              \
     }
@@ -115,7 +115,7 @@
 
 #define SCHEDULE_ODO_LABEL "sch_asc_odo"
 #define SCHEDULE_ODO_GROUPS                          \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         GROUP_ODO_LABEL                              \
     }
@@ -139,7 +139,7 @@
 
 #define SCHEDULE_PH_LABEL "sch_asc_ph"
 #define SCHEDULE_PH_GROUPS                           \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         GROUP_PH_LABEL                               \
     }
@@ -163,7 +163,7 @@
 
 #define SCHEDULE_BBPFL_LABEL "sch_asc_bbpfl"
 #define SCHEDULE_BBPFL_GROUPS                        \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         GROUP_BBPFL_LABEL                            \
     }
@@ -187,7 +187,7 @@
 
 #define SCHEDULE_RADIOMETRY_LABEL "sch_asc_radiometry"
 #define SCHEDULE_RADIOMETRY_GROUPS                   \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         GROUP_RADIOMETRY_LABEL                       \
     }
@@ -208,7 +208,7 @@
 
 #define SCHEDULE_PARK_PTS_LABEL "sch_park_pts"
 #define SCHEDULE_PARK_PTS_GROUPS                     \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         GROUP_PTS_LABEL                              \
     }
@@ -218,7 +218,7 @@
 
 #define SCHEDULE_PARK_ODO_LABEL "sch_park_odo"
 #define SCHEDULE_PARK_ODO_GROUPS                     \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         GROUP_ODO_LABEL                              \
     }
@@ -228,7 +228,7 @@
 
 #define CONFIG_ASCENT_LABEL "cf_ascent"
 #define CONFIG_ASCENT_SCHEDULES                      \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         SCHEDULE_PTS_LABEL,                          \
             SCHEDULE_ODO_LABEL,                      \
@@ -239,7 +239,7 @@
 
 #define CONFIG_PARK_LABEL "cf_park"
 #define CONFIG_PARK_SCHEDULES                        \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         SCHEDULE_PARK_PTS_LABEL,                     \
             SCHEDULE_PARK_ODO_LABEL,                 \

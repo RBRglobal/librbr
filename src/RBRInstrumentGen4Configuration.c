@@ -956,6 +956,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_parseChannelPool(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4ChannelPool *channelPool)
 {
+    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
@@ -981,15 +982,20 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_parseChannelPool(
                 continue;
             }
 
+            /* Channels past the pool's capacity are discarded. */
             char *value = parameter.value;
-            for (int32_t channel = 0;
-                 value != NULL && channel < RBRINSTRUMENTGEN4_CHANNEL_MAX;
-                 channel++)
+            for (int32_t i = 0; value != NULL; i++)
             {
+                if (i >= channelPool->size)
+                {
+                    err = RBRINSTRUMENTGEN4_TRUNCATED;
+                    break;
+                }
+
                 char *nextValue = RBRInstrumentGen4_splitListValue(value);
 
-                snprintf(channelPool->pool[channel].label,
-                         sizeof(channelPool->pool[channel].label),
+                snprintf(channelPool->pool[i].label,
+                         sizeof(channelPool->pool[i].label),
                          "%s",
                          value);
 
@@ -998,23 +1004,24 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_parseChannelPool(
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return err;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4Channel *channel)
 {
-    /* The label selects the channel to read, so it has to outlive the reset of
-     * the rest of the structure. */
-    char label[sizeof(channel->label)];
-    snprintf(label, sizeof(label), "%s", channel->label);
+    if (channel->label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
 
-    memset(channel, 0, sizeof(RBRInstrumentGen4Channel));
+    RBR_RESET_EXCEPT(channel, label);
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "channel %s", label));
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "channel %s",
+                                       channel->label));
 
-    snprintf(channel->label, sizeof(channel->label), "%s", label);
     *(RBRInstrumentGen4ChannelNature *) &channel->nature =
         RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE;
 
@@ -1058,29 +1065,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
                      sizeof(channel->userUnits),
                      "%s",
                      parameter.value);
-        }
-        else if (strcmp(parameter.key, "grouplist") == 0)
-        {
-            /* A channel in no groups reports `none`, not an empty list. */
-            if (strcmp(parameter.value, "none") == 0)
-            {
-                continue;
-            }
-
-            char *value = parameter.value;
-            while (value != NULL
-                   && channel->groupCount < RBRINSTRUMENTGEN4_GROUP_COUNT_MAX)
-            {
-                char *nextValue = RBRInstrumentGen4_splitListValue(value);
-
-                snprintf((char *) channel->groupList[channel->groupCount],
-                         sizeof(channel->groupList[channel->groupCount]),
-                         "%s",
-                         value);
-                (*(int32_t *) &channel->groupCount)++;
-
-                value = nextValue;
-            }
         }
         else if (strcmp(parameter.key, "nature") == 0)
         {
@@ -1134,7 +1118,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4ChannelPool *channelPool)
 {
-    memset(channelPool, 0, sizeof(RBRInstrumentGen4ChannelPool));
+    channelPool->count = 0;
+    memset(channelPool->pool,
+           0,
+           channelPool->size * sizeof(RBRInstrumentGen4Channel));
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "channel"));
 
@@ -1151,7 +1138,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPoolByNature(
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    memset(channelPool, 0, sizeof(RBRInstrumentGen4ChannelPool));
+    channelPool->count = 0;
+    memset(channelPool->pool,
+           0,
+           channelPool->size * sizeof(RBRInstrumentGen4Channel));
 
     RBR_TRY(RBRInstrumentGen4_converse(
                 instrument,
@@ -1304,18 +1294,23 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setParameters(
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getGroup(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Group *group)
+    RBRInstrumentGen4Group *group,
+    RBRInstrumentGen4LabelList *channelList)
 {
-    /* The label selects the group, so it outlives the reset. */
-    char label[sizeof(group->label)];
-    snprintf(label, sizeof(label), "%s", group->label);
+    if (group->label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
 
-    memset(group, 0, sizeof(RBRInstrumentGen4Group));
+    RBR_RESET_EXCEPT(group, label);
+    if (channelList != NULL)
+    {
+        channelList->count = 0;
+    }
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "group %s", label));
+    RBR_TRY(RBRInstrumentGen4_converse(instrument, "group %s", group->label));
 
-    snprintf(group->label, sizeof(group->label), "%s", label);
-
+    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
@@ -1328,57 +1323,51 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getGroup(
         {
             break;
         }
-        else if (strcmp(parameter.key, "channellist") == 0)
+        else if (strcmp(parameter.key, "channellist") == 0
+                 && channelList != NULL)
         {
-            RBRInstrumentGen4_parseLabelList(group->channelList,
-                                             RBRINSTRUMENTGEN4_CHANNEL_MAX,
-                                             &group->channelCount,
-                                             parameter.value);
-        }
-        else if (strcmp(parameter.key, "schedulelist") == 0)
-        {
-            RBRInstrumentGen4_parseLabelList(
-                (RBRInstrumentGen4Label *) group->scheduleList,
-                RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX,
-                (int32_t *) &group->scheduleCount,
-                parameter.value);
+            err = RBRInstrumentGen4_copyLabelList(channelList,
+                                                  parameter.value);
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return err;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_setGroup(
     RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Group *group)
+    const RBRInstrumentGen4Group *group,
+    const RBRInstrumentGen4LabelList *channelList)
 {
-    if (group->label[0] == '\0'
-        || group->channelCount < 0
-        || group->channelCount > RBRINSTRUMENTGEN4_CHANNEL_MAX)
+    if (group->label[0] == '\0')
     {
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    char channelList[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX];
-    RBR_TRY(RBRInstrumentGen4_formatLabelList(channelList,
-                                              (int32_t) sizeof(channelList),
-                                              group->channelList,
-                                              group->channelCount));
+    char value[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX];
+    RBR_TRY(RBRInstrumentGen4_formatLabelList(value,
+                                              (int32_t) sizeof(value),
+                                              channelList));
 
     return RBRInstrumentGen4_converse(instrument,
                                       "group %s channellist=%s",
                                       group->label,
-                                      channelList);
+                                      value);
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getGroupPool(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4GroupPool *groupPool)
 {
-    memset(groupPool, 0, sizeof(RBRInstrumentGen4GroupPool));
+    groupPool->count = 0;
+    groupPool->maxCount = 0;
+    memset(groupPool->pool,
+           0,
+           groupPool->size * sizeof(RBRInstrumentGen4Group));
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "group"));
 
+    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
@@ -1407,15 +1396,20 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getGroupPool(
                 continue;
             }
 
+            /* Groups past the pool's capacity are discarded. */
             char *value = parameter.value;
-            for (int32_t group = 0;
-                 value != NULL && group < RBRINSTRUMENTGEN4_GROUP_COUNT_MAX;
-                 group++)
+            for (int32_t i = 0; value != NULL; i++)
             {
+                if (i >= groupPool->size)
+                {
+                    err = RBRINSTRUMENTGEN4_TRUNCATED;
+                    break;
+                }
+
                 char *nextValue = RBRInstrumentGen4_splitListValue(value);
 
-                snprintf(groupPool->pool[group].label,
-                         sizeof(groupPool->pool[group].label),
+                snprintf(groupPool->pool[i].label,
+                         sizeof(groupPool->pool[i].label),
                          "%s",
                          value);
 
@@ -1424,7 +1418,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getGroupPool(
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return err;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_createGroup(
@@ -1459,18 +1453,25 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteGroupAll(
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getConfig(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Config *config)
+    RBRInstrumentGen4Config *config,
+    RBRInstrumentGen4LabelList *scheduleList)
 {
-    /* The label selects the configuration, so it outlives the reset. */
-    char label[sizeof(config->label)];
-    snprintf(label, sizeof(label), "%s", config->label);
+    if (config->label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
 
-    memset(config, 0, sizeof(RBRInstrumentGen4Config));
+    RBR_RESET_EXCEPT(config, label);
+    if (scheduleList != NULL)
+    {
+        scheduleList->count = 0;
+    }
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "config %s", label));
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "config %s",
+                                       config->label));
 
-    snprintf(config->label, sizeof(config->label), "%s", label);
-
+    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
@@ -1483,50 +1484,51 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getConfig(
         {
             break;
         }
-        else if (strcmp(parameter.key, "schedulelist") == 0)
+        else if (strcmp(parameter.key, "schedulelist") == 0
+                 && scheduleList != NULL)
         {
-            RBRInstrumentGen4_parseLabelList(
-                config->scheduleList,
-                RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX,
-                &config->scheduleCount,
-                parameter.value);
+            err = RBRInstrumentGen4_copyLabelList(scheduleList,
+                                                  parameter.value);
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return err;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_setConfig(
     RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Config *config)
+    const RBRInstrumentGen4Config *config,
+    const RBRInstrumentGen4LabelList *scheduleList)
 {
-    if (config->label[0] == '\0'
-        || config->scheduleCount < 0
-        || config->scheduleCount > RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX)
+    if (config->label[0] == '\0')
     {
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    char scheduleList[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX];
-    RBR_TRY(RBRInstrumentGen4_formatLabelList(scheduleList,
-                                              (int32_t) sizeof(scheduleList),
-                                              config->scheduleList,
-                                              config->scheduleCount));
+    char value[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX];
+    RBR_TRY(RBRInstrumentGen4_formatLabelList(value,
+                                              (int32_t) sizeof(value),
+                                              scheduleList));
 
     return RBRInstrumentGen4_converse(instrument,
                                       "config %s schedulelist=%s",
                                       config->label,
-                                      scheduleList);
+                                      value);
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getConfigPool(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4ConfigPool *configPool)
 {
-    memset(configPool, 0, sizeof(RBRInstrumentGen4ConfigPool));
+    configPool->count = 0;
+    configPool->maxCount = 0;
+    memset(configPool->pool,
+           0,
+           configPool->size * sizeof(RBRInstrumentGen4Config));
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "config"));
 
+    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
@@ -1555,15 +1557,20 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getConfigPool(
                 continue;
             }
 
+            /* Configurations past the pool's capacity are discarded. */
             char *value = parameter.value;
-            for (int32_t config = 0;
-                 value != NULL && config < RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX;
-                 config++)
+            for (int32_t i = 0; value != NULL; i++)
             {
+                if (i >= configPool->size)
+                {
+                    err = RBRINSTRUMENTGEN4_TRUNCATED;
+                    break;
+                }
+
                 char *nextValue = RBRInstrumentGen4_splitListValue(value);
 
-                snprintf(configPool->pool[config].label,
-                         sizeof(configPool->pool[config].label),
+                snprintf(configPool->pool[i].label,
+                         sizeof(configPool->pool[i].label),
                          "%s",
                          value);
 
@@ -1572,7 +1579,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getConfigPool(
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return err;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_createConfig(
@@ -1691,17 +1698,24 @@ static RBRInstrumentGen4ScheduleMode RBRInstrumentGen4ScheduleMode_parse(
 
 RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
     RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4Schedule *schedule)
+    RBRInstrumentGen4Schedule *schedule,
+    RBRInstrumentGen4LabelList *groupList)
 {
-    /* The label selects the schedule, so it outlives the reset. */
-    char label[sizeof(schedule->label)];
-    snprintf(label, sizeof(label), "%s", schedule->label);
+    if (schedule->label[0] == '\0')
+    {
+        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    }
 
-    memset(schedule, 0, sizeof(RBRInstrumentGen4Schedule));
+    RBR_RESET_EXCEPT(schedule, label);
+    if (groupList != NULL)
+    {
+        groupList->count = 0;
+    }
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "schedule %s", label));
+    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+                                       "schedule %s",
+                                       schedule->label));
 
-    snprintf(schedule->label, sizeof(schedule->label), "%s", label);
     schedule->stream = RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STREAM;
     schedule->storage = RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE;
     schedule->mode = RBRINSTRUMENTGEN4_SCHEDULE_MODE_NONE;
@@ -1710,6 +1724,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
     RBRInstrumentGen4Period measurementPeriod = 0;
     int32_t measurementCount = 0;
 
+    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
@@ -1722,20 +1737,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
         {
             break;
         }
-        else if (strcmp(parameter.key, "grouplist") == 0)
+        else if (strcmp(parameter.key, "grouplist") == 0
+                 && groupList != NULL)
         {
-            RBRInstrumentGen4_parseLabelList(schedule->groupList,
-                                             RBRINSTRUMENTGEN4_GROUP_COUNT_MAX,
-                                             &schedule->groupCount,
-                                             parameter.value);
-        }
-        else if (strcmp(parameter.key, "configlist") == 0)
-        {
-            RBRInstrumentGen4_parseLabelList(
-                (RBRInstrumentGen4Label *) schedule->configList,
-                RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX,
-                (int32_t *) &schedule->configCount,
-                parameter.value);
+            err = RBRInstrumentGen4_copyLabelList(groupList, parameter.value);
         }
         else if (strcmp(parameter.key, "stream") == 0)
         {
@@ -1788,17 +1793,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
         break;
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return err;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
     RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4Schedule *schedule)
+    const RBRInstrumentGen4Schedule *schedule,
+    const RBRInstrumentGen4LabelList *groupList)
 {
     /* A schedule runs in exactly one mode. */
     if (schedule->label[0] == '\0'
-        || schedule->groupCount < 0
-        || schedule->groupCount > RBRINSTRUMENTGEN4_GROUP_COUNT_MAX
         || schedule->stream >= RBRINSTRUMENTGEN4_SCHEDULE_STREAM_COUNT
         || schedule->storage > RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE
         || schedule->storage == RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_COUNT
@@ -1832,11 +1836,20 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
         return RBRINSTRUMENTGEN4_UNSUPPORTED;
     }
 
-    char groupList[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX];
-    RBR_TRY(RBRInstrumentGen4_formatLabelList(groupList,
-                                              (int32_t) sizeof(groupList),
-                                              schedule->groupList,
-                                              schedule->groupCount));
+    /* A NULL list leaves the instrument's group list unchanged. */
+    char groups[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX] = "";
+    if (groupList != NULL)
+    {
+        const char prefix[] = "grouplist=";
+        memcpy(groups, prefix, sizeof(prefix));
+        int32_t length = (int32_t) sizeof(prefix) - 1;
+        /* Leave room for the separating space. */
+        RBR_TRY(RBRInstrumentGen4_formatLabelList(
+                    groups + length,
+                    (int32_t) sizeof(groups) - length - 1,
+                    groupList));
+        strcat(groups, " ");
+    }
 
     /* Sending a `storage` the getter never read would be an error. */
     const char *storage = "";
@@ -1850,7 +1863,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
 /* The parameters every mode sends, shared by the two forms below so the
  * spelling cannot drift between them. */
 #define SCHEDULE_COMMON \
-    "schedule %s grouplist=%s stream=%s %scastdetection=%s mode=%s"
+    "schedule %s %sstream=%s %scastdetection=%s mode=%s"
 
     if (schedule->mode == RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS)
     {
@@ -1858,7 +1871,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
             instrument,
             SCHEDULE_COMMON " period=%" PRId32,
             schedule->label,
-            groupList,
+            groups,
             RBRInstrumentGen4ScheduleStream_name(schedule->stream),
             storage,
             schedule->castDetection ? "on" : "off",
@@ -1873,7 +1886,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
         " measurementcount=%" PRId32
         " measurementperiod=%" PRId32,
         schedule->label,
-        groupList,
+        groups,
         RBRInstrumentGen4ScheduleStream_name(schedule->stream),
         storage,
         schedule->castDetection ? "on" : "off",
@@ -1889,10 +1902,21 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4SchedulePool *schedulePool)
 {
-    memset(schedulePool, 0, sizeof(RBRInstrumentGen4SchedulePool));
+    schedulePool->count = 0;
+    schedulePool->maxCount = 0;
+    memset(schedulePool->pool,
+           0,
+           schedulePool->size * sizeof(RBRInstrumentGen4Schedule));
+    schedulePool->availableModes = RBRINSTRUMENTGEN4_SCHEDULE_MODE_NONE;
+    schedulePool->availableFastPeriodCount = 0;
+    memset(schedulePool->availableFastPeriods,
+           0,
+           sizeof(schedulePool->availableFastPeriods));
+    schedulePool->maxRegimes = 0;
 
     RBR_TRY(RBRInstrumentGen4_converse(instrument, "schedule"));
 
+    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
     char *command = NULL;
     RBRInstrumentGen4ResponseParameter parameter;
     while (true)
@@ -1925,16 +1949,20 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
                 continue;
             }
 
+            /* Schedules past the pool's capacity are discarded. */
             char *value = parameter.value;
-            for (int32_t schedule = 0;
-                 value != NULL
-                 && schedule < RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX;
-                 schedule++)
+            for (int32_t i = 0; value != NULL; i++)
             {
+                if (i >= schedulePool->size)
+                {
+                    err = RBRINSTRUMENTGEN4_TRUNCATED;
+                    break;
+                }
+
                 char *nextValue = RBRInstrumentGen4_splitListValue(value);
 
-                snprintf(schedulePool->pool[schedule].label,
-                         sizeof(schedulePool->pool[schedule].label),
+                snprintf(schedulePool->pool[i].label,
+                         sizeof(schedulePool->pool[i].label),
                          "%s",
                          value);
 
@@ -1980,7 +2008,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return err;
 }
 
 RBRInstrumentGen4Error RBRInstrumentGen4_createSchedule(

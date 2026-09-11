@@ -84,8 +84,7 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
  * The default maximum of 32 channels is reflective of the maximum number of
  * channels supported by RBR instruments, but most instruments have far fewer.
  * Adjusting this value will dramatically affect the size of some structures;
- * notably RBRInstrumentGen4Sample, but also RBRInstrumentGen4ChannelPool (used by
- * RBRInstrumentGen4_getChannelPool()) and RBRInstrumentGen4Calibration.n
+ * notably RBRInstrumentGen4Sample, but also RBRInstrumentGen4Calibration.n
  */
 #ifndef RBRINSTRUMENTGEN4_CHANNEL_MAX
 #define RBRINSTRUMENTGEN4_CHANNEL_MAX 32
@@ -97,14 +96,6 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
 #define str(s) #s
 /** \brief The string length of the maximum number of instrument channels. */
 #define RBRINSTRUMENTGEN4_CHANNEL_MAX_LEN sizeof(xstr(RBRINSTRUMENTGEN4_CHANNEL_MAX))
-
-/**
- * \brief The maximum number of characters in a channel label (e.g.,
- * “temperature_00”).
- *
- * Does not include any null terminator.
- */
-#define RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX 31
 
 /**
  * \brief The maximum number of characters in a channel type (e.g., “temp09”).
@@ -185,6 +176,32 @@ extern const char *RBRINSTRUMENTGEN4_LIB_BUILD_DATE;
  */
 typedef char RBRInstrumentGen4Label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
 
+/**
+ * \brief A list of labels stored in a user provided buffer (#labels).
+ *
+ * Library functions which read or send a list of labels (a group's channels,
+ * a schedule's groups, ...) take one of these instead of storing the list in
+ * the object structure. The user sizes #labels for the lists it needs, and
+ * may reuse one array across objects and commands.
+ */
+typedef struct RBRInstrumentGen4LabelList
+{
+    /** \brief The number of labels #labels can hold. */
+    int32_t size;
+
+    /**
+     * \brief The number of labels in the list.
+     *
+     * \warning This field will be larger than #size when
+     * #RBRINSTRUMENTGEN4_TRUNCATED is returned by the getter. Care should be
+     * taken to avoid out-of-bounds access when iterating over #labels.
+     */
+    int32_t count;
+
+    /** \brief User provided array of labels. */
+    RBRInstrumentGen4Label *labels;
+} RBRInstrumentGen4LabelList;
+
 /** \brief The maximum length of characters within a dataset block name.*/
 #define RBRINSTRUMENTGEN4_DATABLOCK_NAME_MAX 6
 
@@ -244,6 +261,11 @@ typedef enum RBRInstrumentGen4Error
     RBRINSTRUMENTGEN4_CHECKSUM_ERROR,
     /** The given value is out of bounds or otherwise unsuitable. */
     RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+    /**
+     * The command succeeded but the user provided buffer could not hold
+     * everything the instrument reported; only what fits was stored.
+     */
+    RBRINSTRUMENTGEN4_TRUNCATED,
     /**
      * Used internally when the parser encounters a sample.
      *

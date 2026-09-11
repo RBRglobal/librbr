@@ -36,7 +36,7 @@
 
 #define GROUP_PTS_LABEL "gr_pts"
 #define GROUP_PTS_CHANNELS                              \
-    (const char[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             TEMPERATURE,                                \
@@ -50,7 +50,7 @@
 #define SCHEDULE_PTS_CASTDETECTION false
 
 #define SCHEDULE_PTS_GROUPS                          \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         GROUP_PTS_LABEL                              \
     }
@@ -58,7 +58,7 @@
 
 #define CONFIG_ASCENT_LABEL "cf_ascent"
 #define CONFIG_ASCENT_SCHEDULES                      \
-    (const char[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX]) \
+    (const RBRInstrumentGen4Label[]) \
     {                                                \
         SCHEDULE_PTS_LABEL                           \
     }
@@ -223,21 +223,17 @@ int main(int argc, char *argv[])
 
     RBRInstrumentGen4_deleteDatasetAll(instrument);
 
-    RBRInstrumentGen4ConfigPool configPool;
-    RBRInstrumentGen4_getConfigPool(instrument, &configPool);
     RBRInstrumentGen4_deleteConfigAll(instrument);
-
-    RBRInstrumentGen4SchedulePool schedulePool;
-    RBRInstrumentGen4_getSchedulePool(instrument, &schedulePool);
     RBRInstrumentGen4_deleteScheduleAll(instrument);
-
-    RBRInstrumentGen4GroupPool groupPool;
-    RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
     RBRInstrumentGen4_deleteGroupAll(instrument);
 
     /************ group definition ************/
-    // populate all channelPool and calibrations
-    RBRInstrumentGen4ChannelPool channelPool;
+    // read the channel pool
+    RBRInstrumentGen4Channel channelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4ChannelPool channelPool = {
+        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+        .pool = channelBuf
+    };
     RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
 
     // specify groupLabel, channel labels, and create group instance
@@ -251,6 +247,11 @@ int main(int argc, char *argv[])
 
     /************ schedule definition ************/
     RBRInstrumentGen4Schedule schedule_pts;
+    RBRInstrumentGen4Label groupLabelBuf[SCHEDULE_PTS_GROUP_COUNT];
+    RBRInstrumentGen4LabelList groupList = {
+        .size = SCHEDULE_PTS_GROUP_COUNT,
+        .labels = groupLabelBuf
+    };
     RBRInstrumentGen4_initNewScheduleContinuous(instrument,
                           SCHEDULE_PTS_LABEL,
                           SCHEDULE_PTS_GROUPS,
@@ -258,7 +259,7 @@ int main(int argc, char *argv[])
                           SCHEDULE_PTS_MODE,
                           SCHEDULE_PTS_PERIOD,
                           SCHEDULE_PTS_CASTDETECTION,
-                          &groupPool,
+                          &groupList,
                           &schedule_pts);
 
     /* The link we are connected over is where this schedule should stream. */
@@ -285,15 +286,20 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
     // warning: read error for RBRInstrumentGen4_initNewSchedule!!!
-    RBRInstrumentGen4_setSchedule(instrument, &schedule_pts);
+    RBRInstrumentGen4_setSchedule(instrument, &schedule_pts, &groupList);
 
     /************ configuration definition ************/
     RBRInstrumentGen4Config config_ascent;
+    RBRInstrumentGen4Label scheduleLabelBuf[CONFIG_ASCENT_SCHEDULE_COUNT];
+    RBRInstrumentGen4LabelList scheduleList = {
+        .size = CONFIG_ASCENT_SCHEDULE_COUNT,
+        .labels = scheduleLabelBuf
+    };
     RBRInstrumentGen4_initNewConfig(instrument,
                          CONFIG_ASCENT_LABEL,
                          CONFIG_ASCENT_SCHEDULES,
-                        CONFIG_ASCENT_SCHEDULE_COUNT,
-                         &schedulePool,
+                         CONFIG_ASCENT_SCHEDULE_COUNT,
+                         &scheduleList,
                          &config_ascent);
 
     // specify outputformat. The setter sends every parameter of the command,

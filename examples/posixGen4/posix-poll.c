@@ -31,7 +31,7 @@
 
 #define GROUP_PTS_LABEL "gr_pts"
 #define GROUP_PTS_CHANNELS \
-(const char[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX]) \
+(const RBRInstrumentGen4Label[]) \
 {   \
     PRESSURE, \
         TEMPERATURE, \
@@ -119,13 +119,32 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    // populate all channels and calibrations.
-    RBRInstrumentGen4ChannelPool channelPool;
+    // read the channel pool
+    RBRInstrumentGen4Channel channelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4ChannelPool channelPool = {
+        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+        .pool = channelBuf
+    };
     RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
 
-    // create group
-    RBRInstrumentGen4GroupPool groupPool;
-    RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
+    // Only the first group is polled, so only one label is kept; the pool
+    // reports that the rest were discarded, which is expected here.
+    RBRInstrumentGen4Group groupBuf[1];
+    RBRInstrumentGen4GroupPool groupPool = {
+        .size = 1,
+        .pool = groupBuf
+    };
+    err = RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
+    if (err != RBRINSTRUMENTGEN4_SUCCESS
+        && err != RBRINSTRUMENTGEN4_TRUNCATED)
+    {
+        fprintf(stderr,
+                "%s: Failed to read the group pool: %s!\n",
+                programName,
+                RBRInstrumentGen4Error_name(err));
+        status = EXIT_FAILURE;
+        goto instrumentCleanup;
+    }
 
     // specify outputformat. The setter sends every parameter of the command,
     // so read the current format and change only the sample fields.

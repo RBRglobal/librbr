@@ -65,6 +65,22 @@ extern "C" {
 } while (0)
 
 /**
+ * \brief Zero every member of a structure except one.
+ *
+ * \param [in,out] object a pointer to the structure
+ * \param [in] member the name of the member to keep
+ */
+#define RBR_RESET_EXCEPT(object, member) do { \
+        char *_begin = (char *) (object); \
+        char *_keepBegin = (char *) &(object)->member; \
+        char *_keepEnd = _keepBegin + sizeof((object)->member); \
+        memset(_begin, 0, (size_t) (_keepBegin - _begin)); \
+        memset(_keepEnd, \
+               0, \
+               sizeof(*(object)) - (size_t) (_keepEnd - _begin)); \
+} while (0)
+
+/**
  * Send the first RBRInstrumentGen4.commandBufferLength bytes of
  * RBRInstrumentGen4.commandBuffer to the instrument. No formatting or validation
  * of the contents of the buffer will be performed.
@@ -387,38 +403,38 @@ void RBRInstrumentGen4DateTime_toScheduleTime(RBRInstrumentGen4DateTime timestam
 char *RBRInstrumentGen4_splitListValue(char *value);
 
 /**
- * \brief Format an array of labels as a pipe-separated parameter value.
+ * \brief Format a label list as a pipe-separated parameter value.
  *
  * An empty list is written as `none`.
  *
  * \param [out] value the buffer to write the list into
  * \param [in] size the size of \a value
- * \param [in] labels the labels to write
- * \param [in] count the number of labels
+ * \param [in] labelList the labels to write
  * \return #RBRINSTRUMENTGEN4_SUCCESS when the list is formatted
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when a label is empty
+ * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when \a labelList is
+ *                                                    `NULL`, its count does
+ *                                                    not fit its array, or a
+ *                                                    label is empty
  * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_formatLabelList(
     char *value,
     int32_t size,
-    const RBRInstrumentGen4Label *labels,
-    int32_t count);
+    const RBRInstrumentGen4LabelList *labelList);
 
 /**
- * \brief Parse a pipe-separated parameter value into an array of labels.
+ * \brief Copy a pipe-separated parameter value into a label list.
  *
- * `none` yields a zero count. Labels past \a max are discarded.
+ * `none` yields a zero count. The count is the number of labels reported;
+ * labels past the list's capacity are discarded.
  *
- * \param [out] labels the labels read
- * \param [in] max the number of labels \a labels holds
- * \param [out] count the number of labels read
+ * \param [out] labelList the caller-provided label list
  * \param [in,out] value the response value, consumed in place
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when every label is stored
+ * \return #RBRINSTRUMENTGEN4_TRUNCATED when labels were discarded
  */
-void RBRInstrumentGen4_parseLabelList(
-    RBRInstrumentGen4Label *labels,
-    int32_t max,
-    int32_t *count,
+RBRInstrumentGen4Error RBRInstrumentGen4_copyLabelList(
+    RBRInstrumentGen4LabelList *labelList,
     char *value);
 
 #ifdef __cplusplus

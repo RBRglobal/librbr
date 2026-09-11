@@ -98,54 +98,50 @@ extern "C"
                                   int count);
 
     /**
-     * \brief Set \a group pointers to \a channelPool channels with labels
-     *        that match \a specifiedChannelLabels.
-     * \param group destination group
+     * \brief Fill \a channelList with the \a channelPool channels whose labels
+     *        match \a specifiedChannelLabels.
+     * \param channelList destination list
      * \param channelPool pool of channels to match to \a specifiedChannelLabels
      * \param specifiedChannelLabels array of labels to match to \a channelPool
      * \param specifiedChannelLabelCnt number of labels in \a specifiedChannelLabels
      * \return RBRINSTRUMENTGEN4_SUCCESS when all labels are found and the target is set
      * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if any label is not found
      * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the target is too small for the requested number of children
+     * \return RBRINSTRUMENTGEN4_TRUNCATED if \a channelPool was too small to
+     *         hold every channel
      */
     RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
-        RBRInstrumentGen4Group *group,
+        RBRInstrumentGen4LabelList *channelList,
         RBRInstrumentGen4ChannelPool *channelPool,
-        const char specifiedChannelLabels[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX],
+        const RBRInstrumentGen4Label specifiedChannelLabels[],
         int32_t specifiedChannelLabelCnt);
 
     /**
-     * \brief Set \a schedule pointers to \a groupPool groups with labels
-     *        that match \a specifiedGroupLabels.
-     * \param schedule destination schedule
-     * \param groupPool pool of groups to match to \a specifiedGroupLabels
-     * \param specifiedGroupLabels array of labels to match to \a groupPool
+     * \brief Fill \a groupList with \a specifiedGroupLabels.
+     * \param groupList destination list
+     * \param specifiedGroupLabels array of labels to copy
      * \param specifiedGroupLabelCnt number of labels in \a specifiedGroupLabels
-     * \return RBRINSTRUMENTGEN4_SUCCESS when all labels are found and the target is set
-     * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if any label is not found
-     * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the target is too small for the requested number of children
+     * \return RBRINSTRUMENTGEN4_SUCCESS when the labels are copied
+     * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the list cannot hold the
+     *         labels
      */
     RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleGroups(
-        RBRInstrumentGen4Schedule *schedule,
-        RBRInstrumentGen4GroupPool *groupPool,
-        const char specifiedGroupLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
+        RBRInstrumentGen4LabelList *groupList,
+        const RBRInstrumentGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt);
 
     /**
-     * \brief Set \a config pointers to \a schedulePool schedules with labels
-     *        that match \a specifiedScheduleLabels.
-     * \param config destination config
-     * \param schedulePool pool of schedules to match to \a specifiedScheduleLabels
-     * \param specifiedScheduleLabels array of labels to match to \a schedulePool
+     * \brief Fill \a scheduleList with \a specifiedScheduleLabels.
+     * \param scheduleList destination list
+     * \param specifiedScheduleLabels array of labels to copy
      * \param specifiedScheduleLabelCnt number of labels in \a specifiedScheduleLabels
-     * \return RBRINSTRUMENTGEN4_SUCCESS when all labels are found and the target is set
-     * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if any label is not found
-     * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the target is too small for the requested number of children
+     * \return RBRINSTRUMENTGEN4_SUCCESS when the labels are copied
+     * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the list cannot hold the
+     *         labels
      */
     RBRInstrumentGen4Error RBRInstrumentGen4_populateConfigSchedules(
-        RBRInstrumentGen4Config *config,
-        RBRInstrumentGen4SchedulePool *schedulePool,
-        const char specifiedScheduleLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
+        RBRInstrumentGen4LabelList *scheduleList,
+        const RBRInstrumentGen4Label specifiedScheduleLabels[],
         int32_t specifiedScheduleLabelCnt);
 
     /**
@@ -155,6 +151,8 @@ extern "C"
      * \param datasetLabel label to search for
      * \return RBRINSTRUMENTGEN4_SUCCESS when the label is found and the target is set
      * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if the label is not found
+     * \return RBRINSTRUMENTGEN4_TRUNCATED if \a datasetPool was too small
+     *         to hold every dataset
      */
     RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetFromPool(
         RBRInstrumentGen4Dataset **targetDataset,
@@ -224,7 +222,7 @@ extern "C"
     RBRInstrumentGen4Error RBRInstrumentGen4_initNewGroup(
         RBRInstrumentGen4 *instrument,
         const char newGroupLabel[],
-        const char specifiedChannelLabels[][RBRINSTRUMENTGEN4_CHANNEL_LABEL_MAX],
+        const RBRInstrumentGen4Label specifiedChannelLabels[],
         int32_t specifiedChannelLabelCnt,
         RBRInstrumentGen4ChannelPool *channelPool,
         RBRInstrumentGen4Group *newGroup);
@@ -249,10 +247,10 @@ extern "C"
     RBRInstrumentGen4Error RBRInstrumentGen4_initNewSchedule(
         RBRInstrumentGen4 *instrument,
         const char newScheduleLabel[],
-        const char specifiedGroupLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
+        const RBRInstrumentGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt,
         RBRInstrumentGen4ScheduleMode mode,
-        RBRInstrumentGen4GroupPool *groupPool,
+        RBRInstrumentGen4LabelList *groupList,
         RBRInstrumentGen4Schedule *newSchedule);
 
     /**
@@ -278,10 +276,9 @@ extern "C"
      * \param [in] newScheduleLabel the label to give the parent
      * \param [in] specifiedGroupLabels the labels of the children to give the parent
      * \param [in] specifiedGroupLabelCnt the number of children to give the parent
-     * \param [in] groupPool the pool to search for children in
      * \param [in] period the sample period in milliseconds
      * \param [in] castDetection enable cast detection when true
-     * \param [inout] groupPool the pool to add the parent to
+     * \param [out] groupList the groups given to the parent
      * \param [out] newSchedule the new parent
      * \return #RBRINSTRUMENTGEN4_SUCCESS when the parent is successfully created and populated
      * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
@@ -293,12 +290,12 @@ extern "C"
     RBRInstrumentGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
         RBRInstrumentGen4 *instrument,
         const char newScheduleLabel[],
-        const char specifiedGroupLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
+        const RBRInstrumentGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt,
         RBRInstrumentGen4ScheduleMode mode,
         RBRInstrumentGen4Period period,
         bool castDetection,
-        RBRInstrumentGen4GroupPool *groupPool,
+        RBRInstrumentGen4LabelList *groupList,
         RBRInstrumentGen4Schedule *newSchedule);
 
     /**
@@ -308,8 +305,7 @@ extern "C"
      * \param [in] newConfigLabel the label to give the config
      * \param [in] specifiedScheduleLabels the labels of the schedules to give the parent
      * \param [in] specifiedScheduleLabelCnt the number of children to give the parent
-     * \param [in] schedulePool the pool to search for children in
-     * \param [inout] configPool the pool to add the parent to
+     * \param [out] scheduleList the schedules given to the parent
      * \param [out] newConfig the new parent
      * \return #RBRINSTRUMENTGEN4_SUCCESS when the parent is successfully created and populated
      * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
@@ -321,9 +317,9 @@ extern "C"
     RBRInstrumentGen4Error RBRInstrumentGen4_initNewConfig(
         RBRInstrumentGen4 *instrument,
         const char newConfigLabel[],
-        const char specifiedScheduleLabels[][RBRINSTRUMENTGEN4_LABEL_NAME_MAX],
+        const RBRInstrumentGen4Label specifiedScheduleLabels[],
         int32_t specifiedScheduleLabelCnt,
-        RBRInstrumentGen4SchedulePool *schedulePool,
+        RBRInstrumentGen4LabelList *scheduleList,
         RBRInstrumentGen4Config *newConfig);
 
 #ifdef __cplusplus
