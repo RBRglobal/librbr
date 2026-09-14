@@ -3,9 +3,13 @@
 
 # Generated artifacts.
 bin/
+docs/_build/
 testsGen3/tests.c
 testsGen4/tests.c
 *.o
+
+# Documentation toolchain virtual environment.
+.venv/
 
 # Temporary/output files.
 compile_commands.json

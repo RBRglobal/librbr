@@ -5,11 +5,12 @@
 ## This makefile provides three different targets of interest to the end user:
 ##
 ## - `lib` will build the library (`bin/libRBR.a`)
+## - `docs` will generate the documentation via Sphinx (in `docs/_build/html/`)
 ## - `tests` will run library tests (from `testsGen3/` and `testsGen4/`)
 ##
 ## Additional targets may be useful to developers:
 ##
-## - `clean` will remove any compiled binaries
+## - `clean` will remove any compiled binaries and documentation
 ##
 ## \copyright
 ## Copyright (c) 2018 RBR Ltd.
@@ -99,7 +100,7 @@ ifneq ($(LIB_BUILD_DATE),)
 CFLAGS += -DRBR_LIB_BUILD_DATE=\"$(LIB_BUILD_DATE)\"
 endif
 
-all: lib libdynamiccorrection tests
+all: lib libdynamiccorrection docs tests
 
 libdynamiccorrection: bin/libRBRDynamicCorrection.a
 
@@ -162,6 +163,10 @@ bin/libRBR.a: $(LIB_OBJECTS) | bin
 
 bin/libRBRDynamicCorrection.a: $(DYNAMICCORRECTION_OBJECTS) | bin
 
+.PHONY: docs
+docs:
+	$(MAKE) -C docs html
+
 TEST_BINARIES :=
 ifeq ($(GEN3),1)
 TEST_BINARIES += bin/testsGen3
@@ -178,7 +183,7 @@ tests: bin $(TEST_BINARIES)
 	$(foreach test,$(TEST_BINARIES),./$(test) &&) true
 
 nomalloc: CFLAGS += -DRBR_LIB_NODYNAMICMEMORYALLOCATION
-nomalloc: lib libdynamiccorrection tests
+nomalloc: lib libdynamiccorrection docs tests
 
 ## \brief Gen3 test modules.
 ##
@@ -279,4 +284,4 @@ bin:
 
 .PHONY: clean
 clean:
-	rm -Rf src/*.o bin/ testsGen3/tests.c testsGen3/*.o testsGen4/tests.c testsGen4/*.o
+	rm -Rf src/*.o bin/ testsGen3/tests.c testsGen3/*.o testsGen4/tests.c testsGen4/*.o docs/_build/

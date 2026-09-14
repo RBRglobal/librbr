@@ -1,0 +1,17 @@
+Gen4 API
+========
+
+.. toctree::
+   :maxdepth: 1
+
+   RBRGen4Commands
+   RBRGen4Communication
+   RBRGen4Configuration
+   RBRGen4Deployment
+   RBRGen4DynamicCorrection
+   RBRGen4HardwareErrors
+   RBRGen4Instrument
+   RBRGen4Memory
+   RBRGen4Parser
+   RBRGen4Realtime
+   RBRGen4
