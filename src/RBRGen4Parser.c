@@ -1,5 +1,5 @@
 /**
- * \file RBRParserGen4.c
+ * \file RBRGen4Parser.c
  *
  * \brief Library implementation.
  *
@@ -16,111 +16,111 @@
 #include <stdio.h>
 #include <stddef.h>
 
-#include "../include/RBRParserGen4.h"
+#include "../include/RBRGen4Parser.h"
 /* Required for RBR_TRY. */
 #include "RBRGen4Internal.h"
 
-const char *RBRInstrumentGen4EventType_name(RBRInstrumentGen4EventType type)
+const char *RBRGen4EventType_name(RBRGen4EventType type)
 {
     switch (type)
     {
-    case RBRINSTRUMENTGEN4_EVENT_UNKNOWN_OR_UNRECOGNIZED_EVENT:
+    case RBRGEN4_EVENT_UNKNOWN_OR_UNRECOGNIZED_EVENT:
     default:
         return "unknown or unrecognized event";
-    case RBRINSTRUMENTGEN4_EVENT_TIME_SYNCHRONIZATION_MARKER:
+    case RBRGEN4_EVENT_TIME_SYNCHRONIZATION_MARKER:
         return "time synchronization marker";
-    case RBRINSTRUMENTGEN4_EVENT_DISABLE_COMMAND_RECEIVED:
+    case RBRGEN4_EVENT_DISABLE_COMMAND_RECEIVED:
         return "disable command received";
-    case RBRINSTRUMENTGEN4_EVENT_RUN_TIME_ERROR_ENCOUNTERED:
+    case RBRGEN4_EVENT_RUN_TIME_ERROR_ENCOUNTERED:
         return "run-time error encountered";
-    case RBRINSTRUMENTGEN4_EVENT_CPU_RESET_DETECTED:
+    case RBRGEN4_EVENT_CPU_RESET_DETECTED:
         return "CPU reset detected";
-    case RBRINSTRUMENTGEN4_EVENT_ONE_OR_MORE_PARAMETERS_RECOVERED_AFTER_RESET:
+    case RBRGEN4_EVENT_ONE_OR_MORE_PARAMETERS_RECOVERED_AFTER_RESET:
         return "one or more parameters recovered after reset";
-    case RBRINSTRUMENTGEN4_EVENT_RESTART_FAILED_RTC_CALENDAR_CONTENTS_NOT_VALID:
+    case RBRGEN4_EVENT_RESTART_FAILED_RTC_CALENDAR_CONTENTS_NOT_VALID:
         return "restart failed: RTC/calendar contents not valid";
-    case RBRINSTRUMENTGEN4_EVENT_RESTART_FAILED_LOGGER_STATUS_NOT_VALID:
+    case RBRGEN4_EVENT_RESTART_FAILED_LOGGER_STATUS_NOT_VALID:
         return "restart failed: logger status not valid";
-    case RBRINSTRUMENTGEN4_EVENT_RESTART_FAILED_PRIMARY_SCHEDULE_PARAMETERS_COULD_NOT_BE_RECOVERED:
+    case RBRGEN4_EVENT_RESTART_FAILED_PRIMARY_SCHEDULE_PARAMETERS_COULD_NOT_BE_RECOVERED:
         return "restart failed: primary schedule parameters could not be recovered";
-    case RBRINSTRUMENTGEN4_EVENT_UNABLE_TO_LOAD_ALARM_TIME_FOR_NEXT_SAMPLE:
+    case RBRGEN4_EVENT_UNABLE_TO_LOAD_ALARM_TIME_FOR_NEXT_SAMPLE:
         return "unable to load alarm time for next sample";
-    case RBRINSTRUMENTGEN4_EVENT_SAMPLING_RESTARTED_AFTER_RESETTING_RTC:
+    case RBRGEN4_EVENT_SAMPLING_RESTARTED_AFTER_RESETTING_RTC:
         return "sampling restarted after resetting RTC";
-    case RBRINSTRUMENTGEN4_EVENT_PARAMETERS_RECOVERED_SAMPLING_RESTARTED_AFTER_RESETTING_RTC:
+    case RBRGEN4_EVENT_PARAMETERS_RECOVERED_SAMPLING_RESTARTED_AFTER_RESETTING_RTC:
         return "parameters recovered sampling restarted after resetting RTC";
-    case RBRINSTRUMENTGEN4_EVENT_SAMPLING_STOPPED_END_TIME_REACHED:
+    case RBRGEN4_EVENT_SAMPLING_STOPPED_END_TIME_REACHED:
         return "sampling stopped, end time reached";
-    case RBRINSTRUMENTGEN4_EVENT_START_OF_A_RECORDED_BURST:
+    case RBRGEN4_EVENT_START_OF_A_RECORDED_BURST:
         return "start of a_recorded burst";
-    case RBRINSTRUMENTGEN4_EVENT_START_OF_A_WAVE_BURST:
+    case RBRGEN4_EVENT_START_OF_A_WAVE_BURST:
         return "start of a_wave burst";
-    case RBRINSTRUMENTGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_USB:
+    case RBRGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_USB:
         return "power source switched to USB";
-    case RBRINSTRUMENTGEN4_EVENT_STREAMING_NOW_OFF_FOR_BOTH_PORTS:
+    case RBRGEN4_EVENT_STREAMING_NOW_OFF_FOR_BOTH_PORTS:
         return "streaming now OFF for both ports";
-    case RBRINSTRUMENTGEN4_EVENT_STREAMING_ON_FOR_USB_OFF_FOR_SERIAL:
+    case RBRGEN4_EVENT_STREAMING_ON_FOR_USB_OFF_FOR_SERIAL:
         return "streaming ON for USB, OFF for serial";
-    case RBRINSTRUMENTGEN4_EVENT_STREAMING_OFF_FOR_USB_ON_FOR_SERIAL:
+    case RBRGEN4_EVENT_STREAMING_OFF_FOR_USB_ON_FOR_SERIAL:
         return "streaming OFF for usb, ON for serial";
-    case RBRINSTRUMENTGEN4_EVENT_STREAMING_NOW_ON_FOR_BOTH_PORTS:
+    case RBRGEN4_EVENT_STREAMING_NOW_ON_FOR_BOTH_PORTS:
         return "streaming now ON for both ports";
-    case RBRINSTRUMENTGEN4_EVENT_SAMPLING_STARTED_THRESHOLD_CONDITION_SATISFIED:
+    case RBRGEN4_EVENT_SAMPLING_STARTED_THRESHOLD_CONDITION_SATISFIED:
         return "sampling started, threshold condition satisfied";
-    case RBRINSTRUMENTGEN4_EVENT_SAMPLING_PAUSED_THRESHOLD_CONDITION_NOT_MET:
+    case RBRGEN4_EVENT_SAMPLING_PAUSED_THRESHOLD_CONDITION_NOT_MET:
         return "sampling paused, threshold condition not met";
-    case RBRINSTRUMENTGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_INTERNAL_BATTERY:
+    case RBRGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_INTERNAL_BATTERY:
         return "power source switched to internal battery";
-    case RBRINSTRUMENTGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_EXTERNAL_BATTERY:
+    case RBRGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_EXTERNAL_BATTERY:
         return "power source switched to external battery";
-    case RBRINSTRUMENTGEN4_EVENT_TWIST_ACTIVATION_STARTED_SAMPLING:
+    case RBRGEN4_EVENT_TWIST_ACTIVATION_STARTED_SAMPLING:
         return "twist activation started sampling";
-    case RBRINSTRUMENTGEN4_EVENT_TWIST_ACTIVATION_PAUSED_SAMPLING:
+    case RBRGEN4_EVENT_TWIST_ACTIVATION_PAUSED_SAMPLING:
         return "twist activation paused sampling";
-    case RBRINSTRUMENTGEN4_EVENT_WIFI_MODULE_DETECTED_AND_ACTIVATED:
+    case RBRGEN4_EVENT_WIFI_MODULE_DETECTED_AND_ACTIVATED:
         return "Wi-Fi module detected and activated";
-    case RBRINSTRUMENTGEN4_EVENT_WIFI_MODULE_DEACTIVATED_REMOVED_OR_ACTIVITY_TIMEOUT:
+    case RBRGEN4_EVENT_WIFI_MODULE_DEACTIVATED_REMOVED_OR_ACTIVITY_TIMEOUT:
         return "Wi-Fi module deactivated; removed or activity timeout";
-    case RBRINSTRUMENTGEN4_EVENT_REGIMES_ENABLED_BUT_NOT_YET_IN_A_REGIME:
+    case RBRGEN4_EVENT_REGIMES_ENABLED_BUT_NOT_YET_IN_A_REGIME:
         return "regimes enabled, but not yet in a_regime";
-    case RBRINSTRUMENTGEN4_EVENT_ENTERED_REGIME_1:
+    case RBRGEN4_EVENT_ENTERED_REGIME_1:
         return "entered regime 1";
-    case RBRINSTRUMENTGEN4_EVENT_ENTERED_REGIME_2:
+    case RBRGEN4_EVENT_ENTERED_REGIME_2:
         return "entered regime 2";
-    case RBRINSTRUMENTGEN4_EVENT_ENTERED_REGIME_3:
+    case RBRGEN4_EVENT_ENTERED_REGIME_3:
         return "entered regime 3";
-    case RBRINSTRUMENTGEN4_EVENT_START_OF_REGIME_BIN:
+    case RBRGEN4_EVENT_START_OF_REGIME_BIN:
         return "start of regime bin";
-    case RBRINSTRUMENTGEN4_EVENT_BEGIN_PROFILING_UP_CAST:
+    case RBRGEN4_EVENT_BEGIN_PROFILING_UP_CAST:
         return "begin profiling 'up' cast";
-    case RBRINSTRUMENTGEN4_EVENT_BEGIN_PROFILING_DOWN_CAST:
+    case RBRGEN4_EVENT_BEGIN_PROFILING_DOWN_CAST:
         return "begin profiling 'down' cast";
-    case RBRINSTRUMENTGEN4_EVENT_END_OF_PROFILING_CAST:
+    case RBRGEN4_EVENT_END_OF_PROFILING_CAST:
         return "end of profiling cast";
-    case RBRINSTRUMENTGEN4_EVENT_BATTERY_FAILED_SCHEDULE_FINISHED:
+    case RBRGEN4_EVENT_BATTERY_FAILED_SCHEDULE_FINISHED:
         return "battery failed, schedule finished";
-    case RBRINSTRUMENTGEN4_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_FAST_SAMPLING_MODE:
+    case RBRGEN4_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_FAST_SAMPLING_MODE:
         return "directional dependent sampling: beginning of fast sampling mode";
-    case RBRINSTRUMENTGEN4_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_SLOW_SAMPLING_MODE:
+    case RBRGEN4_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_SLOW_SAMPLING_MODE:
         return "directional dependent sampling: beginning of slow sampling mode";
-    case RBRINSTRUMENTGEN4_EVENT_ENERGY_USED_MARKER_INTERNAL_BATTERY:
+    case RBRGEN4_EVENT_ENERGY_USED_MARKER_INTERNAL_BATTERY:
         return "energy used marker, internal battery";
-    case RBRINSTRUMENTGEN4_EVENT_ENERGY_USED_MARKER_EXTERNAL_POWER_SOURCE:
+    case RBRGEN4_EVENT_ENERGY_USED_MARKER_EXTERNAL_POWER_SOURCE:
         return "energy used marker, external power source";
-    case RBRINSTRUMENTGEN4_EVENT_DEVICE_CONTROL_ACTION_RESULT:
+    case RBRGEN4_EVENT_DEVICE_CONTROL_ACTION_RESULT:
         return "device control action result";
-    case RBRINSTRUMENTGEN4_EVENT_DEPLOYMENT_RESUMED:
+    case RBRGEN4_EVENT_DEPLOYMENT_RESUMED:
         return "Paused deployment resumed by the resume command";
-    case RBRINSTRUMENTGEN4_EVENT_DEPLOYMENT_PAUSED:
+    case RBRGEN4_EVENT_DEPLOYMENT_PAUSED:
         return "Deployment paused using the pause command";
-    case RBRINSTRUMENTGEN4_EVENT_REGIMES_PASSED_FINAL_BOUNDARY:
+    case RBRGEN4_EVENT_REGIMES_PASSED_FINAL_BOUNDARY:
         return "Regimes; passed final boundary";
     }
 }
 
-RBRGen4Error RBRParserGen4_init(RBRParserGen4 **parser,
-                                  const RBRParserGen4Callbacks *callbacks,
-                                  const RBRParserGen4Config *config,
+RBRGen4Error RBRGen4Parser_init(RBRGen4Parser **parser,
+                                  const RBRGen4ParserCallbacks *callbacks,
+                                  const RBRGen4ParserConfig *config,
                                   void *userData)
 {
     if (callbacks == NULL
@@ -136,25 +136,25 @@ RBRGen4Error RBRParserGen4_init(RBRParserGen4 **parser,
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    memset(*parser, 0, sizeof(RBRParserGen4));
-    memcpy(&(*parser)->config, config, sizeof(RBRParserGen4Config));
-    memcpy(&(*parser)->callbacks, callbacks, sizeof(RBRParserGen4Callbacks));
+    memset(*parser, 0, sizeof(RBRGen4Parser));
+    memcpy(&(*parser)->config, config, sizeof(RBRGen4ParserConfig));
+    memcpy(&(*parser)->callbacks, callbacks, sizeof(RBRGen4ParserCallbacks));
     (*parser)->userData          = userData;
 
     return RBRGEN4_SUCCESS;
 }
 
-void RBRParserGen4_getConfig(const RBRParserGen4 *parser, RBRParserGen4Config *config)
+void RBRGen4Parser_getConfig(const RBRGen4Parser *parser, RBRGen4ParserConfig *config)
 {
-    memcpy(config, &parser->config, sizeof(RBRParserGen4Config));
+    memcpy(config, &parser->config, sizeof(RBRGen4ParserConfig));
 }
 
-void *RBRParserGen4_getUserData(const RBRParserGen4 *parser)
+void *RBRGen4Parser_getUserData(const RBRGen4Parser *parser)
 {
     return parser->userData;
 }
 
-void RBRParserGen4_setUserData(RBRParserGen4 *parser, void *userData)
+void RBRGen4Parser_setUserData(RBRGen4Parser *parser, void *userData)
 {
     parser->userData = userData;
 }
@@ -166,15 +166,15 @@ void RBRParserGen4_setUserData(RBRParserGen4 *parser, void *userData)
 #define EP_EVENT_TIMESTAMP_OFFSET 4
 #define EP_EVENT_PAYLOAD_OFFSET   12
 
-static RBRGen4Error RBRParserGen4_parseEPEvents(
-    RBRParserGen4 *parser,
+static RBRGen4Error RBRGen4Parser_parseEPEvents(
+    RBRGen4Parser *parser,
     const uint8_t *const data,
     int32_t *size)
 {
     int32_t maxSize = *size;
     *size = 0;
 
-    RBRInstrumentGen4Event *event = parser->callbacks.eventBuffer;
+    RBRGen4Event *event = parser->callbacks.eventBuffer;
     if (event == NULL)
     {
         return RBRGEN4_SUCCESS;
@@ -182,7 +182,7 @@ static RBRGen4Error RBRParserGen4_parseEPEvents(
 
     for (; *size + EP_EVENT_SIZE <= maxSize; *size += EP_EVENT_SIZE)
     {
-        memset(event, 0, sizeof(RBRInstrumentGen4Event));
+        memset(event, 0, sizeof(RBRGen4Event));
 
         event->type = *(uint8_t *) (data + *size + EP_EVENT_TYPE_OFFSET);
         event->timestamp =
@@ -191,10 +191,10 @@ static RBRGen4Error RBRParserGen4_parseEPEvents(
                                         + EP_EVENT_TIMESTAMP_OFFSET);
         switch (event->type)
         {
-        case RBRINSTRUMENTGEN4_EVENT_START_OF_REGIME_BIN:
-        case RBRINSTRUMENTGEN4_EVENT_BEGIN_PROFILING_UP_CAST:
-        case RBRINSTRUMENTGEN4_EVENT_BEGIN_PROFILING_DOWN_CAST:
-        case RBRINSTRUMENTGEN4_EVENT_END_OF_PROFILING_CAST:
+        case RBRGEN4_EVENT_START_OF_REGIME_BIN:
+        case RBRGEN4_EVENT_BEGIN_PROFILING_UP_CAST:
+        case RBRGEN4_EVENT_BEGIN_PROFILING_DOWN_CAST:
+        case RBRGEN4_EVENT_END_OF_PROFILING_CAST:
             event->auxiliaryDataLength = 1;
             event->auxiliaryData[0] =
                 *(uint32_t *) (data + *size + EP_EVENT_PAYLOAD_OFFSET);
@@ -216,7 +216,7 @@ static RBRGen4Error RBRParserGen4_parseEPEvents(
 #define EP_SAMPLE_READING_SIZE ((int32_t) sizeof(float))
 
 // static RBRGen4Error RBRParserGen4_parseEPSamples(
-//     RBRParserGen4 *parser,
+//     RBRGen4Parser *parser,
 //     const uint8_t *const data,
 //     int32_t *size)
 // {
@@ -234,7 +234,7 @@ static RBRGen4Error RBRParserGen4_parseEPEvents(
 //                          + EP_SAMPLE_READING_SIZE * channels;
 //     for (; *size + sampleSize <= maxSize; *size += sampleSize)
 //     {
-//         memset(sample, 0, sizeof(RBRInstrumentGen4Event));
+//         memset(sample, 0, sizeof(RBRGen4Event));
 
 //         sample->timestamp = *(RBRGen4DateTime *) (data + *size);
 //         sample->channels = channels;
@@ -256,7 +256,7 @@ static RBRGen4Error RBRParserGen4_parseEPEvents(
 //     return RBRGEN4_SUCCESS;
 // }
 
-RBRGen4Error RBRParserGen4_parse(RBRParserGen4 *parser,
+RBRGen4Error RBRGen4Parser_parse(RBRGen4Parser *parser,
                                    RBRGen4Block block,
                                    const void *const data,
                                    int32_t *size)
@@ -266,7 +266,7 @@ RBRGen4Error RBRParserGen4_parse(RBRParserGen4 *parser,
     // switch (dataset)
     // {
     // case RBRINSTRUMENTGEN4_DATASET_EASYPARSE_EVENTS:
-    //     return RBRParserGen4_parseEPEvents(parser, d, size);
+    //     return RBRGen4Parser_parseEPEvents(parser, d, size);
     // case RBRINSTRUMENTGEN4_DATASET_EASYPARSE_SAMPLE_DATA:
     //     return RBRParserGen4_parseEPSamples(parser, d, size);
     // case RBRINSTRUMENTGEN4_DATASET_EASYPARSE_DEPLOYMENT_HEADER:
@@ -275,5 +275,5 @@ RBRGen4Error RBRParserGen4_parse(RBRParserGen4 *parser,
     // }
     //GEN4 todo: edit this parser.
     (void)block;
-    return RBRParserGen4_parseEPEvents(parser, d, size);
+    return RBRGen4Parser_parseEPEvents(parser, d, size);
 }

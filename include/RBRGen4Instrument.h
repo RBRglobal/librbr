@@ -577,7 +577,7 @@ RBRGen4Error RBRGen4_getOutputFormat(
  * populated: read the current format with RBRGen4_getOutputFormat()
  * and modify it if only some parameters are of interest.
  *
- * \warning RBRParserGen4 reads only #RBRGEN4_ENCODING_ASCII.
+ * \warning RBRGen4Parser reads only #RBRGEN4_ENCODING_ASCII.
  *          Selecting #RBRGEN4_ENCODING_BINARY will stop this library
  *          from being able to interpret samples or command responses.
  *

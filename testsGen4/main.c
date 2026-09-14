@@ -177,11 +177,11 @@ RBRGen4Error TestIOBuffers_sample(
 }
 
 RBRGen4Error TestParserBuffers_sample(
-    const struct RBRParserGen4 *parser,
+    const struct RBRGen4Parser *parser,
     const struct RBRGen4Sample *const sample)
 {
     TestParserBuffers *buffers;
-    buffers = (TestParserBuffers *) RBRParserGen4_getUserData(parser);
+    buffers = (TestParserBuffers *) RBRGen4Parser_getUserData(parser);
     if (buffers->samplesLength >= TESTPARSERBUFFERS_SAMPLES_MAX)
     {
         return RBRGEN4_CALLBACK_ERROR;
@@ -193,18 +193,18 @@ RBRGen4Error TestParserBuffers_sample(
 }
 
 RBRGen4Error TestParserBuffers_event(
-    const struct RBRParserGen4 *parser,
-    const struct RBRInstrumentGen4Event *const event)
+    const struct RBRGen4Parser *parser,
+    const struct RBRGen4Event *const event)
 {
     TestParserBuffers *buffers;
-    buffers = (TestParserBuffers *) RBRParserGen4_getUserData(parser);
+    buffers = (TestParserBuffers *) RBRGen4Parser_getUserData(parser);
     if (buffers->eventsLength >= TESTPARSERBUFFERS_EVENTS_MAX)
     {
         return RBRGEN4_CALLBACK_ERROR;
     }
     memcpy(&buffers->events[buffers->eventsLength++],
            event,
-           sizeof(RBRInstrumentGen4Event));
+           sizeof(RBRGen4Event));
     return RBRGEN4_SUCCESS;
 }
 
@@ -262,16 +262,16 @@ int main(void)
 
     TestParserBuffers parserBuffers;
     RBRGen4Sample parserSample;
-    RBRInstrumentGen4Event parserEvent;
-    RBRParserGen4Callbacks parserCallbacks = {
+    RBRGen4Event parserEvent;
+    RBRGen4ParserCallbacks parserCallbacks = {
         .sample = TestParserBuffers_sample,
         .sampleBuffer = &parserSample,
         .event = TestParserBuffers_event,
         .eventBuffer = &parserEvent
     };
 
-    RBRParserGen4 parserBuffer;
-    RBRParserGen4 *parser = &parserBuffer;
+    RBRGen4Parser parserBuffer;
+    RBRGen4Parser *parser = &parserBuffer;
 
     printf("Running tests...\n");
     int success = EXIT_SUCCESS;
@@ -319,7 +319,7 @@ int main(void)
 
         memset(&parserBuffers, 0, sizeof(TestParserBuffers));
 
-        err = RBRParserGen4_init(&parser,
+        err = RBRGen4Parser_init(&parser,
                              &parserCallbacks,
                              parserTests[i].config,
                              &parserBuffers);

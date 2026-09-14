@@ -30,10 +30,10 @@
 #include <unistd.h>
 
 #include "posix-shared.h"
-#include "RBRParserGen4.h"
+#include "RBRGen4Parser.h"
 
 RBRGen4Error parserSample(
-    const struct RBRParserGen4 *parser,
+    const struct RBRGen4Parser *parser,
     const struct RBRGen4Sample *const sample)
 {
     /* Unused. */
@@ -88,25 +88,25 @@ int main(int argc, char *argv[])
             RBRGEN4_LIB_VERSION,
             RBRGEN4_LIB_BUILD_DATE);
 
-    RBRParserGen4 *parser = NULL;
+    RBRGen4Parser *parser = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRParserGen4 parserSpace;
+    RBRGen4Parser parserSpace;
     parser = &parserSpace;
     #endif
 
     RBRGen4Sample sampleBuffer;
-    RBRParserGen4Callbacks parserCallbacks = {
+    RBRGen4ParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
 
-    RBRParserGen4Config parserConfig = {
+    RBRGen4ParserConfig parserConfig = {
         .channelCount = channels,
         .datatype = RBRGEN4_DATATYPE_FLOAT32
     };
 
     RBRGen4Error err;
-    if ((err = RBRParserGen4_init(
+    if ((err = RBRGen4Parser_init(
              &parser,
              &parserCallbacks,
              &parserConfig,
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 
         bufSize += readSize;
         parsedSize = bufSize;
-        RBRParserGen4_parse(parser,
+        RBRGen4Parser_parse(parser,
                         RBRGEN4_BLOCK_DATA,
                         buf,
                         &parsedSize);
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
         memmove(buf, buf + parsedSize, bufSize);
     }
 
-    RBRParserGen4_destroy(parser);
+    RBRGen4Parser_destroy(parser);
 fileCleanup:
     close(datasetFd);
 

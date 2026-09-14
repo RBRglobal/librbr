@@ -27,7 +27,7 @@ extern "C" {
 
 #include "RBRGen4.h"
 #include "RBRDynamicCorrectionGen4.h"
-#include "RBRParserGen4.h"
+#include "RBRGen4Parser.h"
 
 /**
  * \brief Assert that a condition is true.
@@ -398,7 +398,7 @@ extern InstrumentTest instrumentTests[];
  *
  * \param [in] cfg the name of the configuration
  */
-#define TEST_PARSER_CONFIG(cfg) const RBRParserGen4Config test_##cfg##_parser_config
+#define TEST_PARSER_CONFIG(cfg) const RBRGen4ParserConfig test_##cfg##_parser_config
 
 /**
  * \brief Declare a parser test function.
@@ -408,7 +408,7 @@ extern InstrumentTest instrumentTests[];
  */
 /* *INDENT-OFF* */
 #define TEST_PARSER(fn, cfg) bool test_##fn##_parser( \
-    RBRParserGen4 *parser, \
+    RBRGen4Parser *parser, \
     TestParserBuffers *buffers)
 /* *INDENT-ON* */
 
@@ -424,7 +424,7 @@ typedef struct TestParserBuffers
     /** \brief The length of TestParserBuffers.events. */
     int32_t eventsLength;
     /** \brief Parsed events. */
-    RBRInstrumentGen4Event events[TESTPARSERBUFFERS_EVENTS_MAX];
+    RBRGen4Event events[TESTPARSERBUFFERS_EVENTS_MAX];
 } TestParserBuffers;
 
 /**
@@ -434,7 +434,7 @@ typedef struct TestParserBuffers
  * \param buffers the parser result buffers
  * \return whether the test passed
  */
-typedef bool (ParserTestFunction)(RBRParserGen4 *parser,
+typedef bool (ParserTestFunction)(RBRGen4Parser *parser,
                                   TestParserBuffers *buffers);
 
 /**
@@ -447,7 +447,7 @@ typedef struct ParserTest
     /** \brief The name of the test. */
     const char *name;
     /** \brief The parser configuration. */
-    const RBRParserGen4Config *config;
+    const RBRGen4ParserConfig *config;
     /** \brief The test to be run. */
     ParserTestFunction *function;
 } ParserTest;

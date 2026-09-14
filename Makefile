@@ -136,7 +136,7 @@ GEN4_OBJECTS := src/RBRGen4.o \
                 src/RBRGen4Internal.o \
                 src/RBRGen4Memory.o \
                 src/RBRGen4Realtime.o \
-                src/RBRParserGen4.o
+                src/RBRGen4Parser.o
 
 LIB_OBJECTS :=
 DYNAMICCORRECTION_OBJECTS :=
@@ -275,7 +275,7 @@ testsGen4/tests.c: $(foreach module,$(GEN4_TEST_MODULES),testsGen4/$(module).c)
 	@echo "};" >>$@
 
 	@grep -ho 'TEST_PARSER_CONFIG([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_PARSER_CONFIG(\([^,]*\))/extern const RBRParserGen4Config test_\1_parser_config;/' \
+		| sed -e 's/^TEST_PARSER_CONFIG(\([^,]*\))/extern const RBRGen4ParserConfig test_\1_parser_config;/' \
 		>>$@
 
 	@echo "ParserTest parserTests[] = {" >>$@

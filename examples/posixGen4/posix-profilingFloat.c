@@ -31,7 +31,7 @@
 #include "RBRGen4Deployment.h"
 #include "RBRGen4Instrument.h"
 #include "RBRGen4Memory.h"
-#include "RBRParserGen4.h"
+#include "RBRGen4Parser.h"
 #include "posix-shared.h"
 
 //************************************* customer defined parameters *************************************//
@@ -92,7 +92,7 @@
 #define CHUNK_LEN_BYTES 1000
 
 RBRGen4Error parserSample(
-    const struct RBRParserGen4 *parser,
+    const struct RBRGen4Parser *parser,
     const struct RBRGen4Sample *const sample)
 {
     /* Unused. */
@@ -311,18 +311,18 @@ int main(int argc, char *argv[])
     RBRGen4Instrument info;
     RBRGen4_getInstrument(instrument, &info);
     /* Prepare the parser */
-    RBRParserGen4 parserSpace;
-    RBRParserGen4* parser = &parserSpace;
-    RBRParserGen4Config config = {
+    RBRGen4Parser parserSpace;
+    RBRGen4Parser* parser = &parserSpace;
+    RBRGen4ParserConfig config = {
         .channelCount = group_pts.channelCount,
         .datatype = info.dataType
     };
     RBRGen4Sample sampleBuffer;
-    RBRParserGen4Callbacks parserCallbacks = {
+    RBRGen4ParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
-    RBRParserGen4_init(&parser,
+    RBRGen4Parser_init(&parser,
                        &parserCallbacks,
                        &config,
                        NULL);
@@ -342,7 +342,7 @@ int main(int argc, char *argv[])
     {
         RBRInstrumentGen4_download(instrument,
                                    &download_data_pts);
-        RBRParserGen4_parse(parser,
+        RBRGen4Parser_parse(parser,
                             download_data_pts.block,
                             download_data_pts.data,
                             &download_data_pts.countValue);
