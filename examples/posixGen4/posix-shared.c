@@ -33,7 +33,7 @@
 #include <inttypes.h>
 
 #include "RBRGen4.h"
-#include "RBRInstrumentGen4Commands.h"
+#include "RBRGen4Commands.h"
 #include "posix-shared.h"
 
 int openSerialFd(char *devicePath)

@@ -17,7 +17,7 @@ extern "C"
 #endif
 
 #include "../../include/RBRGen4.h"
-#include "../../include/RBRInstrumentGen4Commands.h"
+#include "../../include/RBRGen4Commands.h"
 
 #define INSTRUMENT_CHARACTER_TIMEOUT_MSEC 4000
 #define INSTRUMENT_COMMAND_TIMEOUT_MSEC 10000
