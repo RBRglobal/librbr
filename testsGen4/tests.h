@@ -26,7 +26,7 @@ extern "C" {
 #include <string.h>
 
 #include "RBRGen4.h"
-#include "RBRDynamicCorrectionGen4.h"
+#include "RBRGen4DynamicCorrection.h"
 #include "RBRGen4Parser.h"
 
 /**

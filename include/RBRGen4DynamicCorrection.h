@@ -1,5 +1,5 @@
 /**
- * \file RBRDynamicCorrectionGen4.h
+ * \file RBRGen4DynamicCorrection.h
  *
  * \brief Library for salinity dynamic correction
  *
@@ -8,8 +8,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_DYNAMICCORRECTIONGEN4_H
-#define LIBRBR_DYNAMICCORRECTIONGEN4_H
+#ifndef LIBRBR_RBRGEN4DYNAMICCORRECTION_H
+#define LIBRBR_RBRGEN4DYNAMICCORRECTION_H
 
 #include <stdint.h>
 
@@ -92,26 +92,26 @@
  * data values; data will be passed back to the caller via out pointers. This
  * allows for predictable and consistent error checking by the caller.
  */
-typedef enum RBRDynamicCorrectionGen4Error
+typedef enum RBRGen4DynamicCorrectionError
 {
     /** No error. */
-    RBRDYNAMICCORRECTIONGEN4_SUCCESS = 0,
+    RBRGEN4DYNAMICCORRECTION_SUCCESS = 0,
     /** Invalid sampling rate for given parameters */
-    RBRDYNAMICCORRECTIONGEN4_INVALID_SAMPLING_RATE,
+    RBRGEN4DYNAMICCORRECTION_INVALID_SAMPLING_RATE,
     /** Insufficient data injected in function to provide a result */
-    RBRDYNAMICCORRECTIONGEN4_NOT_VALID_YET,
+    RBRGEN4DYNAMICCORRECTION_NOT_VALID_YET,
     /** Invalid correction (could be related to previous input) */
-    RBRDYNAMICCORRECTIONGEN4_CORRUPTED,
+    RBRGEN4DYNAMICCORRECTION_CORRUPTED,
     /** Invalid parameters (initialization failure) */
-    RBRDYNAMICCORRECTIONGEN4_BAD_PARAMS,
+    RBRGEN4DYNAMICCORRECTION_BAD_PARAMS,
     /** Other error */
-    RBRDYNAMICCORRECTIONGEN4_UNKNOWN_ERROR
-} RBRDynamicCorrectionGen4Error;
+    RBRGEN4DYNAMICCORRECTION_UNKNOWN_ERROR
+} RBRGen4DynamicCorrectionError;
 
-/** \brief RBRDynamicCorrectionGen4Params
+/** \brief RBRGen4DynamicCorrectionParams
    *  This is a struct 
    */
-typedef struct RBRDynamicCorrectionGen4Params
+typedef struct RBRGen4DynamicCorrectionParams
 {
     /** \brief time delay (sec), or C-T lag*/
     float t_delay;
@@ -178,12 +178,12 @@ typedef struct RBRDynamicCorrectionGen4Params
     float _P_meas_lagArray[DCORR_MAX_LAG_ARRAY];
     float _T_cond_lagArray[DCORR_MAX_LAG_ARRAY];    
     /// @endcond
-} RBRDynamicCorrectionGen4Params;
+} RBRGen4DynamicCorrectionParams;
 
-/** \brief RBRDynamicCorrectionGen4Measurement
+/** \brief RBRGen4DynamicCorrectionMeasurement
    *  This is a struct
    */
-typedef struct RBRDynamicCorrectionGen4Measurement{
+typedef struct RBRGen4DynamicCorrectionMeasurement{
     /** \brief Time in seconds*/
     float timestamp;
 
@@ -198,12 +198,12 @@ typedef struct RBRDynamicCorrectionGen4Measurement{
 
     /** \brief Pressure measurement (dbar)*/
     float pressure;
-} RBRDynamicCorrectionGen4Measurement;
+} RBRGen4DynamicCorrectionMeasurement;
 
-/** \brief RBRDynamicCorrectionGen4Result
+/** \brief RBRGen4DynamicCorrectionResult
    *  This is a struct
    */
-typedef struct RBRDynamicCorrectionGen4Result{
+typedef struct RBRGen4DynamicCorrectionResult{
     /** \brief Time in seconds*/
     float timestamp;
 
@@ -218,7 +218,7 @@ typedef struct RBRDynamicCorrectionGen4Result{
 
     /** \brief Practical salinity after all corrections (corrected, unitless)*/
     float corrSalinity;
-} RBRDynamicCorrectionGen4Result;
+} RBRGen4DynamicCorrectionResult;
 
 /**
  * @brief Initialize the dynamic correction algorithm.
@@ -239,11 +239,11 @@ typedef struct RBRDynamicCorrectionGen4Result{
  * @param [inout] params Parameters for dynamic correction algorithm
  * @return error code (0 = no error)
  */
-RBRDynamicCorrectionGen4Error RBRDynamicCorrectionGen4_init(const float Fs,
+RBRGen4DynamicCorrectionError RBRGen4DynamicCorrection_init(const float Fs,
                                             const float t_delay, const float alpha_a, const float alpha_e, 
                                             const float tau_a, const float tau_e, const float ctcoeff_a, const float ctcoeff_e, 
                                             const float Vp_min, const float Vp_max, const float Vp_fc,
-                                            RBRDynamicCorrectionGen4Params *params);
+                                            RBRGen4DynamicCorrectionParams *params);
 
 /**
  * @brief Change the sampling rate for the algorithm.
@@ -252,7 +252,7 @@ RBRDynamicCorrectionGen4Error RBRDynamicCorrectionGen4_init(const float Fs,
  * @param [inout] params Parameters for dynamic correction algorithm
  * @return error code (0 = no error)
  */
-RBRDynamicCorrectionGen4Error RBRDynamicCorrectionGen4_update_Fs(const float Fs, RBRDynamicCorrectionGen4Params *params);
+RBRGen4DynamicCorrectionError RBRGen4DynamicCorrection_update_Fs(const float Fs, RBRGen4DynamicCorrectionParams *params);
 
 /**
  * @brief Feed a new measurement in the algorithm.  
@@ -264,7 +264,7 @@ RBRDynamicCorrectionGen4Error RBRDynamicCorrectionGen4_update_Fs(const float Fs,
  * @param [out] corrMeasOut Output corrected measurements (time aligned)
  * @return error code (0 = no error)
  */
-RBRDynamicCorrectionGen4Error RBRDynamicCorrectionGen4_addMeasurement(const RBRDynamicCorrectionGen4Measurement * measIn, RBRDynamicCorrectionGen4Params *params, RBRDynamicCorrectionGen4Result * corrMeasOut);
+RBRGen4DynamicCorrectionError RBRGen4DynamicCorrection_addMeasurement(const RBRGen4DynamicCorrectionMeasurement * measIn, RBRGen4DynamicCorrectionParams *params, RBRGen4DynamicCorrectionResult * corrMeasOut);
 
 
-#endif // LIBRBR_DYNAMICCORRECTIONGEN4_H
+#endif // LIBRBR_RBRGEN4DYNAMICCORRECTION_H

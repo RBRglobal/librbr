@@ -146,7 +146,7 @@ DYNAMICCORRECTION_OBJECTS += src/RBRDynamicCorrectionGen3.o
 endif
 ifeq ($(GEN4),1)
 LIB_OBJECTS += $(GEN4_OBJECTS)
-DYNAMICCORRECTION_OBJECTS += src/RBRDynamicCorrectionGen4.o
+DYNAMICCORRECTION_OBJECTS += src/RBRGen4DynamicCorrection.o
 endif
 
 # Due to incompatibility between parallel builds (-j, --jobs) and Make's
