@@ -132,7 +132,7 @@ GEN4_OBJECTS := src/RBRGen4.o \
                 src/RBRGen4Configuration.o \
                 src/RBRGen4Deployment.o \
                 src/RBRGen4HardwareErrors.o \
-                src/RBRInstrumentGen4Instrument.o \
+                src/RBRGen4Instrument.o \
                 src/RBRGen4Internal.o \
                 src/RBRInstrumentGen4Memory.o \
                 src/RBRInstrumentGen4Realtime.o \

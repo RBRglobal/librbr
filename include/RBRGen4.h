@@ -340,7 +340,7 @@ const char *RBRGen4DataType_name(RBRGen4DataType dataType);
 /**
  * \brief Sample encodings reported by `instrument outputformat`.
  *
- * \see RBRInstrumentGen4_getOutputFormat()
+ * \see RBRGen4_getOutputFormat()
  */
 typedef enum RBRGen4Encoding
 {
@@ -366,8 +366,8 @@ const char *RBRGen4Encoding_name(RBRGen4Encoding encoding);
 /**
  * \brief Instrument `instrument outputformat` command parameters.
  *
- * \see RBRInstrumentGen4_getOutputFormat()
- * \see RBRInstrumentGen4_setOutputFormat()
+ * \see RBRGen4_getOutputFormat()
+ * \see RBRGen4_setOutputFormat()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828467/outputformat
  */
 typedef struct RBRGen4OutputFormat
@@ -425,7 +425,7 @@ typedef struct RBRGen4OutputFormat
 /**
  * \brief Instrument `id` command parameters.
  *
- * \see RBRInstrumentGen4_getId()
+ * \see RBRGen4_getId()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
  */
 typedef struct RBRGen4Id
@@ -451,7 +451,7 @@ typedef struct RBRGen4Id
 /**
  * \brief Instrument `id4` command parameters.
  *
- * \see RBRInstrumentGen4_getId4()
+ * \see RBRGen4_getId4()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
  */
 typedef struct RBRGen4Id4
@@ -789,8 +789,8 @@ typedef struct RBRGen4
     /**
      * \brief The instrument identifier.
      *
-     * \note Cached every time RBRInstrumentGen4_getId4() is called.
-     * \see RBRInstrumentGen4_getId4()
+     * \note Cached every time RBRGen4_getId4() is called.
+     * \see RBRGen4_getId4()
      */
     RBRGen4Id4 id;
 
@@ -939,7 +939,7 @@ typedef struct RBRGen4
  * in any other format while the connection is being opened are not
  * recognised as samples: they are discarded rather than passed to
  * RBRGen4Callbacks.sample.
- * \see RBRInstrumentGen4_setOutputFormat()
+ * \see RBRGen4_setOutputFormat()
  *
  * In the event of any return value other than #RBRGEN4_SUCCESS, any
  * memory allocated by this constructor is freed. That is, in the event of

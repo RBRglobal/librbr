@@ -178,8 +178,8 @@ int main(int argc, char *argv[])
            RBRGen4Encoding_name(instrument->outputFormat.encoding),
            RBRGen4DataType_name(instrument->outputFormat.dataType));
 
-    RBRInstrumentGen4Instrument info;
-    if ((err = RBRInstrumentGen4_getInstrument(instrument, &info)) != RBRGEN4_SUCCESS)
+    RBRGen4Instrument info;
+    if ((err = RBRGen4_getInstrument(instrument, &info)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to get instrument info: %s!\n",
                 programName,
@@ -194,9 +194,9 @@ int main(int argc, char *argv[])
 
     /* Power source */
 
-    RBRInstrumentGen4PowerSource powerSource;
+    RBRGen4PowerSource powerSource;
     if ((err = 
-    RBRInstrumentGen4_getPowerSource(instrument, &powerSource)
+    RBRGen4_getPowerSource(instrument, &powerSource)
     ) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to get power source: %s!\n",
@@ -205,11 +205,11 @@ int main(int argc, char *argv[])
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
-    printf("powerSource: %s\n", RBRInstrumentGen4PowerSource_name(powerSource));
+    printf("powerSource: %s\n", RBRGen4PowerSource_name(powerSource));
 
     /* Internal battery */
 
-    if ((err = RBRInstrumentGen4_setPowerInternalBatteryType(instrument, RBRINSTRUMENTGEN4_INTERNAL_BATTERY_LIFES2)) != RBRGEN4_SUCCESS)
+    if ((err = RBRGen4_setPowerInternalBatteryType(instrument, RBRGEN4_INTERNAL_BATTERY_LIFES2)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to set internal battery type: %s!\n",
                 programName,
@@ -218,7 +218,7 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    if ((err = RBRInstrumentGen4_resetPowerInternalUsed(instrument)) != RBRGEN4_SUCCESS)
+    if ((err = RBRGen4_resetPowerInternalUsed(instrument)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to reset internal battery usage: %s!\n",
                 programName,
@@ -227,8 +227,8 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    RBRInstrumentGen4PowerInternal powerInternal;
-    if ((err = RBRInstrumentGen4_getPowerInternal(instrument, &powerInternal)) != RBRGEN4_SUCCESS)
+    RBRGen4PowerInternal powerInternal;
+    if ((err = RBRGen4_getPowerInternal(instrument, &powerInternal)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to get internal power info: %s!\n",
                 programName,
@@ -238,13 +238,13 @@ int main(int argc, char *argv[])
     }
     printf("powerInternal: voltage=%f, batteryType=%s (%s), used=%f\n",
            powerInternal.voltage,
-           RBRInstrumentGen4InternalBatteryType_name(powerInternal.batteryType),
-           RBRInstrumentGen4InternalBatteryType_displayName(powerInternal.batteryType),
+           RBRGen4InternalBatteryType_name(powerInternal.batteryType),
+           RBRGen4InternalBatteryType_displayName(powerInternal.batteryType),
            powerInternal.used);
 
     /* External battery */
 
-    if ((err = RBRInstrumentGen4_setPowerExternalBatteryType(instrument, RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMATA_NIMH)) != RBRGEN4_SUCCESS)
+    if ((err = RBRGen4_setPowerExternalBatteryType(instrument, RBRGEN4_EXTERNAL_BATTERY_FERMATA_NIMH)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to set external battery type: %s!\n",
                 programName,
@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    if ((err = RBRInstrumentGen4_resetPowerExternalUsed(instrument)) != RBRGEN4_SUCCESS)
+    if ((err = RBRGen4_resetPowerExternalUsed(instrument)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to reset external battery usage: %s!\n",
                 programName,
@@ -262,9 +262,9 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    RBRInstrumentGen4PowerExternal powerExternal;
+    RBRGen4PowerExternal powerExternal;
     if ((err = 
-    RBRInstrumentGen4_getPowerExternal(instrument, &powerExternal)
+    RBRGen4_getPowerExternal(instrument, &powerExternal)
     ) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to get external power info: %s!\n",
@@ -275,8 +275,8 @@ int main(int argc, char *argv[])
     }
     printf("powerExternal: voltage=%f, batteryType=%s (%s), used=%f",
            powerExternal.voltage,
-           RBRInstrumentGen4ExternalBatteryType_name(powerExternal.batteryType),
-           RBRInstrumentGen4ExternalBatteryType_displayName(powerExternal.batteryType),
+           RBRGen4ExternalBatteryType_name(powerExternal.batteryType),
+           RBRGen4ExternalBatteryType_displayName(powerExternal.batteryType),
            powerExternal.used);
 
 instrumentCleanup:

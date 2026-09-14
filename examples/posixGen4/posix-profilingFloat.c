@@ -29,7 +29,7 @@
 #include "RBRGen4.h"
 #include "RBRGen4Configuration.h"
 #include "RBRGen4Deployment.h"
-#include "RBRInstrumentGen4Instrument.h"
+#include "RBRGen4Instrument.h"
 #include "RBRInstrumentGen4Memory.h"
 #include "RBRParserGen4.h"
 #include "posix-shared.h"
@@ -195,8 +195,8 @@ int main(int argc, char *argv[])
     }
 
     /************ ensure default state ************/
-    RBRInstrumentGen4InstrumentState loggingState
-        = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
+    RBRGen4InstrumentState loggingState
+        = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
     RBRGen4_disable(instrument, &loggingState);
 
     RBRInstrumentGen4DatasetPool datasetPool;
@@ -308,8 +308,8 @@ int main(int argc, char *argv[])
         dataset_ascent,
         &dataset_asc_info);
     /* Get the data type */
-    RBRInstrumentGen4Instrument info;
-    RBRInstrumentGen4_getInstrument(instrument, &info);
+    RBRGen4Instrument info;
+    RBRGen4_getInstrument(instrument, &info);
     /* Prepare the parser */
     RBRParserGen4 parserSpace;
     RBRParserGen4* parser = &parserSpace;

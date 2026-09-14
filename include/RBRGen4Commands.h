@@ -22,7 +22,7 @@ extern "C" {
 #include "RBRGen4Configuration.h"
 #include "RBRInstrumentGen4Memory.h"
 #include "RBRGen4Deployment.h"
-#include "RBRInstrumentGen4Instrument.h"
+#include "RBRGen4Instrument.h"
 #include "RBRInstrumentGen4Realtime.h"
 
 #ifdef __cplusplus

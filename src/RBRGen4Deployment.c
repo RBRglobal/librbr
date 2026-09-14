@@ -309,9 +309,9 @@ RBRGen4Error RBRGen4_resume(
  */
 static void RBRGen4_parseInstrumentState(
     RBRGen4 *instrument,
-    RBRInstrumentGen4InstrumentState *state)
+    RBRGen4InstrumentState *state)
 {
-    *state = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
+    *state = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
@@ -330,9 +330,9 @@ static void RBRGen4_parseInstrumentState(
             continue;
         }
 
-        for (int i = 0; i < RBRINSTRUMENTGEN4_INSTRUMENT_STATE_COUNT; i++)
+        for (int i = 0; i < RBRGEN4_INSTRUMENT_STATE_COUNT; i++)
         {
-            if (strcmp(RBRInstrumentGen4InstrumentState_name(i),
+            if (strcmp(RBRGen4InstrumentState_name(i),
                        parameter.value) == 0)
             {
                 *state = i;
@@ -377,7 +377,7 @@ RBRGen4Error RBRGen4_verify(
     const RBRGen4Config *config,
     const char *datasetLabel,
     RBRGen4DeploymentStoragemode storageMode,
-    RBRInstrumentGen4InstrumentState *state)
+    RBRGen4InstrumentState *state)
 {
     RBR_TRY(RBRGen4_checkDeploymentParameters(config,
                                                         datasetLabel,
@@ -416,7 +416,7 @@ RBRGen4Error RBRGen4_enable(
     const RBRGen4Config *config,
     const char *datasetLabel,
     RBRGen4DeploymentStoragemode storageMode,
-    RBRInstrumentGen4InstrumentState *state)
+    RBRGen4InstrumentState *state)
 {
     RBR_TRY(RBRGen4_checkDeploymentParameters(config,
                                                         datasetLabel,
@@ -436,7 +436,7 @@ RBRGen4Error RBRGen4_enable(
 
 RBRGen4Error RBRGen4_disable(
     RBRGen4 *instrument,
-    RBRInstrumentGen4InstrumentState *state)
+    RBRGen4InstrumentState *state)
 {
     RBR_TRY(RBRGen4_converse(instrument, "disable"));
 

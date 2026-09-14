@@ -404,7 +404,7 @@ typedef struct VerifyTest
     const char *command;
     const char *response;
     RBRGen4Error expectedError;
-    RBRInstrumentGen4InstrumentState expectedState;
+    RBRGen4InstrumentState expectedState;
 } VerifyTest;
 
 TEST_LOGGER4(verify)
@@ -419,7 +419,7 @@ TEST_LOGGER4(verify)
           "verify config=c_test dataset=d1 storagemode=normal state=enabled"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED },
+          RBRGEN4_INSTRUMENT_STATE_ENABLED },
         { { .label = "pH_cal" },
           "d_pHcal_20260824",
           RBRGEN4_STORAGEMODE_CALIBRATION,
@@ -428,7 +428,7 @@ TEST_LOGGER4(verify)
           "verify config=pH_cal dataset=d_pHcal_20260824 "
           "storagemode=calibration state=enabled" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED },
+          RBRGEN4_INSTRUMENT_STATE_ENABLED },
         /*
          * The response echoes the parameters in whatever order they were
          * sent, and `state` need not come last.
@@ -441,7 +441,7 @@ TEST_LOGGER4(verify)
           "verify state=disabled dataset=d1 config=c_test storagemode=normal"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED },
+          RBRGEN4_INSTRUMENT_STATE_DISABLED },
         /* A state the library does not model reads as unknown. */
         { { .label = "c_test" },
           "d1",
@@ -450,7 +450,7 @@ TEST_LOGGER4(verify)
           COMMAND_TERMINATOR,
           "verify config=c_test dataset=d1 state=bogus" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         /* A response with no state at all leaves it unknown. */
         { { .label = "c_test" },
           "d1",
@@ -459,7 +459,7 @@ TEST_LOGGER4(verify)
           COMMAND_TERMINATOR,
           "verify config=c_test dataset=d1" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         /* Out-of-range parameters never reach the instrument. */
         { { .label = "" },
           "d1",
@@ -467,35 +467,35 @@ TEST_LOGGER4(verify)
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "",
           RBRGEN4_STORAGEMODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "0123456789012345678901234567890123",
           RBRGEN4_STORAGEMODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
           RBRGEN4_UNKNOWN_STORAGEMODE,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
           RBRGEN4_STORAGEMODE_COUNT,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         /* Every failing check the instrument makes. */
         { { .label = "nope" },
           "d1",
@@ -504,7 +504,7 @@ TEST_LOGGER4(verify)
           COMMAND_TERMINATOR,
           "ERR-108 invalid argument to command: 'nope'" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d.1",
           RBRGEN4_STORAGEMODE_NORMAL,
@@ -512,7 +512,7 @@ TEST_LOGGER4(verify)
           COMMAND_TERMINATOR,
           "ERR-131 illegal character in label 'd.1'" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
           RBRGEN4_STORAGEMODE_NORMAL,
@@ -520,7 +520,7 @@ TEST_LOGGER4(verify)
           COMMAND_TERMINATOR,
           "ERR-120 'd1' is already in use" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d5",
           RBRGEN4_STORAGEMODE_NORMAL,
@@ -529,7 +529,7 @@ TEST_LOGGER4(verify)
           "ERR-431 dataset limit of '4' reached, delete dataset(s) to make "
           "space" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d2",
           RBRGEN4_STORAGEMODE_NORMAL,
@@ -538,16 +538,16 @@ TEST_LOGGER4(verify)
           "ERR-436 instrument was already enabled with different settings"
           RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "" }, NULL, 0, NULL, NULL, 0, 0 }
     };
 
     RBRGen4Error err;
-    RBRInstrumentGen4InstrumentState actual;
+    RBRGen4InstrumentState actual;
 
     for (int i = 0; tests[i].command != NULL; i++)
     {
-        actual = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
+        actual = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen4_verify(instrument,
                                        &tests[i].config,
@@ -560,7 +560,7 @@ TEST_LOGGER4(verify)
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedState,
                             actual,
-                            RBRInstrumentGen4InstrumentState);
+                            RBRGen4InstrumentState);
     }
 
     return true;
@@ -574,7 +574,7 @@ typedef struct EnableTest
     const char *command;
     const char *response;
     RBRGen4Error expectedError;
-    RBRInstrumentGen4InstrumentState expectedState;
+    RBRGen4InstrumentState expectedState;
 } EnableTest;
 
 TEST_LOGGER4(enable)
@@ -588,7 +588,7 @@ TEST_LOGGER4(enable)
           "enable config=c_test dataset=d1 storagemode=normal state=enabled"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED },
+          RBRGEN4_INSTRUMENT_STATE_ENABLED },
         { { .label = "pH_cal" },
           "d_pHcal_20260824",
           RBRGEN4_STORAGEMODE_CALIBRATION,
@@ -597,7 +597,7 @@ TEST_LOGGER4(enable)
           "enable config=pH_cal dataset=d_pHcal_20260824 "
           "storagemode=calibration state=enabled" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED },
+          RBRGEN4_INSTRUMENT_STATE_ENABLED },
         /* Out-of-range parameters never reach the instrument. */
         { { .label = "" },
           "d1",
@@ -605,14 +605,14 @@ TEST_LOGGER4(enable)
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "",
           RBRGEN4_STORAGEMODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         /*
          * A label one character past the field is refused rather than
          * truncated into the instrument's 32-byte field.
@@ -623,14 +623,14 @@ TEST_LOGGER4(enable)
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
           RBRGEN4_UNKNOWN_STORAGEMODE,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         /* Every failing check the instrument makes. */
         { { .label = "c_test" },
           "d1",
@@ -639,7 +639,7 @@ TEST_LOGGER4(enable)
           COMMAND_TERMINATOR,
           "ERR-408 instrument was already enabled" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d2",
           RBRGEN4_STORAGEMODE_NORMAL,
@@ -648,7 +648,7 @@ TEST_LOGGER4(enable)
           "ERR-436 instrument was already enabled with different settings"
           RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
           RBRGEN4_STORAGEMODE_NORMAL,
@@ -656,7 +656,7 @@ TEST_LOGGER4(enable)
           COMMAND_TERMINATOR,
           "ERR-120 'd1' is already in use" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d5",
           RBRGEN4_STORAGEMODE_NORMAL,
@@ -665,7 +665,7 @@ TEST_LOGGER4(enable)
           "ERR-431 dataset limit of '4' reached, delete dataset(s) to make "
           "space" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_empty" },
           "d1",
           RBRGEN4_STORAGEMODE_NORMAL,
@@ -674,16 +674,16 @@ TEST_LOGGER4(enable)
           "ERR-430 empty schedule list in configuration 'c_empty'"
           RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "" }, NULL, 0, NULL, NULL, 0, 0 }
     };
 
     RBRGen4Error err;
-    RBRInstrumentGen4InstrumentState actual;
+    RBRGen4InstrumentState actual;
 
     for (int i = 0; tests[i].command != NULL; i++)
     {
-        actual = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
+        actual = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen4_enable(instrument,
                                        &tests[i].config,
@@ -696,7 +696,7 @@ TEST_LOGGER4(enable)
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedState,
                             actual,
-                            RBRInstrumentGen4InstrumentState);
+                            RBRGen4InstrumentState);
     }
 
     return true;
@@ -708,7 +708,7 @@ typedef struct DisableTest
     RBRGen4Error expectedError;
     RBRGen4ResponseType expectedType;
     RBRGen4HardwareError expectedHardwareError;
-    RBRInstrumentGen4InstrumentState expectedState;
+    RBRGen4InstrumentState expectedState;
 } DisableTest;
 
 TEST_LOGGER4(disable)
@@ -719,7 +719,7 @@ TEST_LOGGER4(disable)
           RBRGEN4_SUCCESS,
           RBRGEN4_RESPONSE_INFO,
           RBRGEN4_HARDWARE_ERROR_NONE,
-          RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED },
+          RBRGEN4_INSTRUMENT_STATE_DISABLED },
         /*
          * Disabling an instrument that is already disabled is a warning, which
          * the library surfaces as a hardware error with the response type
@@ -729,27 +729,27 @@ TEST_LOGGER4(disable)
           RBRGEN4_HARDWARE_ERROR,
           RBRGEN4_RESPONSE_WARNING,
           RBRGEN4_HARDWARE_ERROR_INSTRUMENT_STATE_IS_ALREADY_DISABLED,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         /* A state the library does not model reads as unknown. */
         { "disable state=bogus" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           RBRGEN4_RESPONSE_INFO,
           RBRGEN4_HARDWARE_ERROR_NONE,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { "disable" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           RBRGEN4_RESPONSE_INFO,
           RBRGEN4_HARDWARE_ERROR_NONE,
-          RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { 0 }
     };
 
     RBRGen4Error err;
-    RBRInstrumentGen4InstrumentState actual;
+    RBRGen4InstrumentState actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
-        actual = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
+        actual = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen4_disable(instrument, &actual);
         TEST_ASSERT_STR_EQ("disable" COMMAND_TERMINATOR,
@@ -765,7 +765,7 @@ TEST_LOGGER4(disable)
                             RBRGen4HardwareError);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedState,
                             actual,
-                            RBRInstrumentGen4InstrumentState);
+                            RBRGen4InstrumentState);
     }
 
     return true;

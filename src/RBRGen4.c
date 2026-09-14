@@ -11,7 +11,7 @@
 /* Required for memcpy, memcmp, memset, strlen. */
 #include <string.h>
 #include "RBRGen4.h"
-#include "RBRInstrumentGen4Instrument.h"
+#include "RBRGen4Instrument.h"
 #include "RBRGen4Internal.h"
 
 const char *RBRGEN4_LIB_NAME =
@@ -150,7 +150,7 @@ static RBRGen4Error RBRGen4_populateGeneration(
 
     /* If this isn't an RBR instrument, it'll just time out or the response
      * won't match. */
-    RBRGen4Error err = RBRInstrumentGen4_getId4(instrument,
+    RBRGen4Error err = RBRGen4_getId4(instrument,
                                                           &instrument->id);
 
     if (err != RBRGEN4_SUCCESS)
@@ -232,7 +232,7 @@ RBRGen4Error RBRGen4_open(RBRGen4 **instrument,
     }
 
     /* Caches the sample field flags into the instrument for the parser. */
-    err = RBRInstrumentGen4_getOutputFormat(*instrument,
+    err = RBRGen4_getOutputFormat(*instrument,
                                             &(*instrument)->outputFormat);
 
     if (err != RBRGEN4_SUCCESS)

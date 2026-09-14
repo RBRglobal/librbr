@@ -149,12 +149,12 @@ int main(int argc, char *argv[])
     // specify outputformat. The setter sends every parameter of the command,
     // so read the current format and change only the sample fields.
     RBRGen4OutputFormat outputformat;
-    RBRInstrumentGen4_getOutputFormat(instrument, &outputformat);
+    RBRGen4_getOutputFormat(instrument, &outputformat);
     outputformat.sn = true;
     outputformat.scheduleLabel = true;
     outputformat.dateTime = true;
     outputformat.crc = true;
-    RBRInstrumentGen4_setOutputFormat(instrument, &outputformat);
+    RBRGen4_setOutputFormat(instrument, &outputformat);
 
     // poll data and print in console
     RBRGen4Sample sample;

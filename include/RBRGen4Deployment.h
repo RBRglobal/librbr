@@ -20,8 +20,8 @@ extern "C"
 
 #include "RBRGen4.h"
 #include "RBRGen4Configuration.h"
-/* Required for RBRInstrumentGen4InstrumentState. */
-#include "RBRInstrumentGen4Instrument.h"
+/* Required for RBRGen4InstrumentState. */
+#include "RBRGen4Instrument.h"
 
 /**
  * \brief Instrument `clock` command parameters.
@@ -81,7 +81,7 @@ RBRGen4Error RBRGen4_setClock(
 /**
  * \brief Possible deployment statuses.
  *
- * \see RBRInstrumentGen4InstrumentState
+ * \see RBRGen4InstrumentState
  * \see RBRGen4Deployment
  * \see RBRGen4_getDeployment()
  * \see RBRGen4_pause()
@@ -320,7 +320,7 @@ RBRGen4Error RBRGen4_verify(
     const RBRGen4Config *config,
     const char *datasetLabel,
     RBRGen4DeploymentStoragemode storageMode,
-    RBRInstrumentGen4InstrumentState *state);
+    RBRGen4InstrumentState *state);
 
 /**
  * \brief Enable the instrument to sample for a new deployment.
@@ -353,7 +353,7 @@ RBRGen4Error RBRGen4_enable(
     const RBRGen4Config *config,
     const char *datasetLabel,
     RBRGen4DeploymentStoragemode storageMode,
-    RBRInstrumentGen4InstrumentState *state);
+    RBRGen4InstrumentState *state);
 
 /**
  * \brief Terminate the current deployment.
@@ -375,7 +375,7 @@ RBRGen4Error RBRGen4_enable(
  */
 RBRGen4Error RBRGen4_disable(
     RBRGen4 *instrument,
-    RBRInstrumentGen4InstrumentState *state);
+    RBRGen4InstrumentState *state);
 
 #ifdef __cplusplus
 }

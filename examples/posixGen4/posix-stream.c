@@ -217,8 +217,8 @@ int main(int argc, char *argv[])
     // need to change all list to a struct (array of strings, and count)
 
     /************ ensure default state ************/
-    RBRInstrumentGen4InstrumentState loggingState
-        = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
+    RBRGen4InstrumentState loggingState
+        = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
     RBRGen4_disable(instrument, &loggingState);
 
     RBRInstrumentGen4_deleteDatasetAll(instrument);
@@ -305,12 +305,12 @@ int main(int argc, char *argv[])
     // specify outputformat. The setter sends every parameter of the command,
     // so read the current format and change only the sample fields.
     RBRGen4OutputFormat outputformat;
-    RBRInstrumentGen4_getOutputFormat(instrument, &outputformat);
+    RBRGen4_getOutputFormat(instrument, &outputformat);
     outputformat.sn = true;
     outputformat.scheduleLabel = true;
     outputformat.dateTime = false;
     outputformat.crc = true;
-    RBRInstrumentGen4_setOutputFormat(instrument, &outputformat);
+    RBRGen4_setOutputFormat(instrument, &outputformat);
 
     /************ deployment parameters ************/
     // need to stop if it's logging.

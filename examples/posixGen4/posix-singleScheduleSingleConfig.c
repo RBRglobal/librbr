@@ -148,8 +148,8 @@ int main(int argc, char *argv[])
     }
 
     /************ ensure default state ************/
-    RBRInstrumentGen4InstrumentState loggingState
-        = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
+    RBRGen4InstrumentState loggingState
+        = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
     RBRGen4_disable(instrument, &loggingState);
 
     RBRInstrumentGen4_deleteDatasetAll(instrument);
