@@ -23,7 +23,7 @@
 #include <unistd.h>
 
 #include "RBRGen4.h"
-#include "RBRInstrumentGen4Configuration.h"
+#include "RBRGen4Configuration.h"
 #include "RBRInstrumentGen4Memory.h"
 #include "posix-shared.h"
 
@@ -43,7 +43,7 @@
 #define GROUP_PTS_CHANNEL_COUNT 3
 
 #define SCHEDULE_PTS_LABEL "sch_asc_pts"
-#define SCHEDULE_PTS_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS
+#define SCHEDULE_PTS_MODE RBRGEN4_SCHEDULE_MODE_CONTINUOUS
 #define SCHEDULE_PTS_PERIOD 1000
 #define SCHEDULE_PTS_CASTDETECTION false
 
@@ -154,19 +154,19 @@ int main(int argc, char *argv[])
 
     RBRInstrumentGen4_deleteDatasetAll(instrument);
 
-    RBRInstrumentGen4_deleteConfigAll(instrument);
+    RBRGen4_deleteConfigAll(instrument);
 
-    RBRInstrumentGen4_deleteScheduleAll(instrument);
-    RBRInstrumentGen4_deleteGroupAll(instrument);
+    RBRGen4_deleteScheduleAll(instrument);
+    RBRGen4_deleteGroupAll(instrument);
 
     /************ group definition ************/
     /* read the channel pool, then each channel and its calibration */
-    RBRInstrumentGen4Channel channelBuf[RBRGEN4_CHANNEL_MAX];
-    RBRInstrumentGen4ChannelPool channelPool = {
+    RBRGen4Channel channelBuf[RBRGEN4_CHANNEL_MAX];
+    RBRGen4ChannelPool channelPool = {
         .size = RBRGEN4_CHANNEL_MAX,
         .pool = channelBuf
     };
-    RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
+    RBRGen4_getChannelPool(instrument, &channelPool);
 
     /* Only min(count, size) channels are stored when the instrument reports
      * more than the buffer holds. */
@@ -174,8 +174,8 @@ int main(int argc, char *argv[])
         ? channelPool.count : channelPool.size;
     for (int32_t i = 0; i < channelCount; i++)
     {
-        RBRInstrumentGen4Channel *channel = &channelPool.pool[i];
-        RBRInstrumentGen4_getChannel(instrument, channel);
+        RBRGen4Channel *channel = &channelPool.pool[i];
+        RBRGen4_getChannel(instrument, channel);
         printf(
             "%s,%s,%d,%d,%d,%s,%s,%s,%u",
             channel->label,
@@ -184,21 +184,21 @@ int main(int argc, char *argv[])
             channel->measuringTime,
             channel->readOutTime,
             channel->userUnits,
-            RBRInstrumentGen4ChannelNature_name(channel->nature),
+            RBRGen4ChannelNature_name(channel->nature),
             channel->device,
             channel->derived
         );
 
-        RBRInstrumentGen4Calibration calibration;
+        RBRGen4Calibration calibration;
         snprintf(calibration.label,
                  sizeof(calibration.label),
                  "%s",
                  channel->label);
-        RBRInstrumentGen4_getCalibration(instrument, &calibration);
+        RBRGen4_getCalibration(instrument, &calibration);
     }
 
     /* specify groupLabel, channel labels, and create group instance */
-    RBRInstrumentGen4Group group_pts;
+    RBRGen4Group group_pts;
 
     RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_PTS_LABEL,
@@ -208,7 +208,7 @@ int main(int argc, char *argv[])
                         &group_pts);
 
     /************ schedule definition ************/
-    RBRInstrumentGen4Schedule schedule;
+    RBRGen4Schedule schedule;
     RBRGen4Label groupLabelBuf[SCHEDULE_PTS_GROUP_COUNT];
     RBRGen4LabelList groupList = {
         .size = SCHEDULE_PTS_GROUP_COUNT,
@@ -225,7 +225,7 @@ int main(int argc, char *argv[])
                          &schedule);
 
     /************ configuration definition ************/
-    RBRInstrumentGen4Config config;
+    RBRGen4Config config;
     RBRGen4Label scheduleLabelBuf[CONFIG_ASCENT_SCHEDULE_COUNT];
     RBRGen4LabelList scheduleList = {
         .size = CONFIG_ASCENT_SCHEDULE_COUNT,

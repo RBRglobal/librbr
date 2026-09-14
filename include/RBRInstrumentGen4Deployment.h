@@ -19,7 +19,7 @@ extern "C"
 #endif
 
 #include "RBRGen4.h"
-#include "RBRInstrumentGen4Configuration.h"
+#include "RBRGen4Configuration.h"
 /* Required for RBRInstrumentGen4InstrumentState. */
 #include "RBRInstrumentGen4Instrument.h"
 
@@ -317,7 +317,7 @@ const char *RBRInstrumentGen4DeploymentStoragemode_name(
  */
 RBRGen4Error RBRInstrumentGen4_verify(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Config *config,
+    const RBRGen4Config *config,
     const char *datasetLabel,
     RBRInstrumentGen4DeploymentStoragemode storageMode,
     RBRInstrumentGen4InstrumentState *state);
@@ -350,7 +350,7 @@ RBRGen4Error RBRInstrumentGen4_verify(
  */
 RBRGen4Error RBRInstrumentGen4_enable(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Config *config,
+    const RBRGen4Config *config,
     const char *datasetLabel,
     RBRInstrumentGen4DeploymentStoragemode storageMode,
     RBRInstrumentGen4InstrumentState *state);

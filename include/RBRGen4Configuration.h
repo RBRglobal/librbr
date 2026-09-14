@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen4Configuration.h
+ * \file RBRGen4Configuration.h
  *
  * \brief Instrument commands and structures pertaining to instrument
  * configuration information and calibration.
@@ -11,8 +11,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTGEN4CONFIGURATION_H
-#define LIBRBR_RBRINSTRUMENTGEN4CONFIGURATION_H
+#ifndef LIBRBR_RBRGEN4CONFIGURATION_H
+#define LIBRBR_RBRGEN4CONFIGURATION_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,22 +21,22 @@ extern "C" {
 #include "RBRGen4.h"
 
 /** \brief The maximum number of schedules count. */
-#define RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX 16
+#define RBRGEN4_SCHEDULE_COUNT_MAX 16
 
 /** \brief The maximum number of permissionlist count. */
-#define RBRINSTRUMENTGEN4_PERMISSION_COUNT_MAX 14
+#define RBRGEN4_PERMISSION_COUNT_MAX 14
 
 /** \brief The maximum schedule period in milliseconds. */
-#define RBRINSTRUMENTGEN4_SAMPLING_PERIOD_MAX 86400000
+#define RBRGEN4_SAMPLING_PERIOD_MAX 86400000
 
 /** \brief The maximum regime boundary in dbar. */
-#define RBRINSTRUMENTGEN4_REGIME_BOUNDARY_MAX 65535
+#define RBRGEN4_REGIME_BOUNDARY_MAX 65535
 
 /** \brief The maximum regime bin size in dbar. */
-#define RBRINSTRUMENTGEN4_REGIME_BINSIZE_MAX 6553.5
+#define RBRGEN4_REGIME_BINSIZE_MAX 6553.5
 
 /** \brief The maximum sampling period within a regime. */
-#define RBRINSTRUMENTGEN4_REGIME_SAMPLING_PERIOD_MAX 65000
+#define RBRGEN4_REGIME_SAMPLING_PERIOD_MAX 65000
 
 /**
  * \brief The maximum number of coefficients in a calibration group.
@@ -44,63 +44,63 @@ extern "C" {
  * All three groups share one pool of this size on the instrument, so the
  * three counts sum to no more than this.
  *
- * \see RBRInstrumentGen4Calibration.a
- * \see RBRInstrumentGen4Calibration.b
- * \see RBRInstrumentGen4Calibration.m
+ * \see RBRGen4Calibration.a
+ * \see RBRGen4Calibration.b
+ * \see RBRGen4Calibration.m
  */
-#define RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX 14
+#define RBRGEN4_CALIBRATION_COEFFICIENT_MAX 14
 
 /**
  * \brief The maximum number of characters in a calibration equation name.
  *
  * Does not include any null terminator.
- * \see RBRInstrumentGen4Calibration.equation
+ * \see RBRGen4Calibration.equation
  */
-#define RBRINSTRUMENTGEN4_CALIBRATION_EQUATION_MAX 32
+#define RBRGEN4_CALIBRATION_EQUATION_MAX 32
 
 /** \brief The minimum input timeout. */
-#define RBRINSTRUMENTGEN4_INPUT_TIMEOUT_MIN 10000
+#define RBRGEN4_INPUT_TIMEOUT_MIN 10000
 
 /** \brief The maximum input timeout. */
-#define RBRINSTRUMENTGEN4_INPUT_TIMEOUT_MAX 240000
+#define RBRGEN4_INPUT_TIMEOUT_MAX 240000
 
 /** 
  * \brief The maximum number of configs count.
- * \see RBRInstrumentGen4ConfigPool.pool
+ * \see RBRGen4ConfigPool.pool
  */
-#define RBRINSTRUMENTGEN4_CONFIG_COUNT_MAX 16
+#define RBRGEN4_CONFIG_COUNT_MAX 16
 
 /**
  * \brief The maximum number of groups count.
- * \see RBRInstrumentGen4GroupPool.pool
+ * \see RBRGen4GroupPool.pool
  */
-#define RBRINSTRUMENTGEN4_GROUP_COUNT_MAX 16
+#define RBRGEN4_GROUP_COUNT_MAX 16
 
 /** \brief The maximum number of characters in a bus address.
  * The bus address is from 0 to 255, with some reserved addresses.
  */
-#define RBRINSTRUMENTGEN4_BUS_ADDRESS_MAX 3
+#define RBRGEN4_BUS_ADDRESS_MAX 3
 
 /** \brief The maximum number of fast periods. */
-#define RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX 4
+#define RBRGEN4_AVAILABLE_FAST_PERIODS_MAX 4
 
 /**
  * \brief The maximum number of nodes.
- * \see RBRInstrumentGen4NodePool.pool
+ * \see RBRGen4NodePool.pool
  */
-#define RBRINSTRUMENTGEN4_NODE_COUNT_MAX 12
+#define RBRGEN4_NODE_COUNT_MAX 12
 
 /**
  * \brief The maximum number of ports.
- * \see RBRInstrumentGen4Node.portList
+ * \see RBRGen4Node.portList
  */
-#define RBRINSTRUMENTGEN4_PORT_COUNT_MAX 16
+#define RBRGEN4_PORT_COUNT_MAX 16
 
 /**
  * \brief The maximum number of devices.
- * \see RBRInstrumentGen4Port.deviceList
+ * \see RBRGen4Port.deviceList
  */
-#define RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX 16
+#define RBRGEN4_DEVICE_COUNT_MAX 16
 
 /**
  * \brief `node <node_label>` command parameters.
@@ -109,17 +109,17 @@ extern "C" {
  * board. Nodes are the top of the instrument's configuration hierarchy: a node
  * carries ports, a port carries devices, and a device exposes channels.
  *
- * \see RBRInstrumentGen4NodePool
- * \see RBRInstrumentGen4_getNode()
+ * \see RBRGen4NodePool
+ * \see RBRGen4_getNode()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-typedef struct RBRInstrumentGen4Node
+typedef struct RBRGen4Node
 {
     /**
      * \brief Node label.
      *
      * Set by the caller to select the node to read; see
-     * RBRInstrumentGen4_getNode().
+     * RBRGen4_getNode().
      */
     char label[RBRGEN4_LABEL_NAME_MAX + 1];
 
@@ -130,7 +130,7 @@ typedef struct RBRInstrumentGen4Node
     int32_t portCount;
 
     /** \brief The labels of the ports on the node. */
-    char portList[RBRINSTRUMENTGEN4_PORT_COUNT_MAX]
+    char portList[RBRGEN4_PORT_COUNT_MAX]
                  [RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief The firmware version running on the node. */
@@ -155,12 +155,12 @@ typedef struct RBRInstrumentGen4Node
      * before powering anything beneath it.
      */
     int32_t inrushOffsetTime;
-} RBRInstrumentGen4Node;
+} RBRGen4Node;
 
 /**
  * \brief Populate the parameters of a node.
  *
- * The caller sets RBRInstrumentGen4Node.label to select the node to read.
+ * The caller sets RBRGen4Node.label to select the node to read.
  *
  * \note Issues the `node <node_label>` command.
  *
@@ -169,39 +169,39 @@ typedef struct RBRInstrumentGen4Node
  * \return #RBRGEN4_SUCCESS when the node is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_getNodePool()
+ * \see RBRGen4_getNodePool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-RBRGen4Error RBRInstrumentGen4_getNode(
+RBRGen4Error RBRGen4_getNode(
     RBRGen4 *instrument,
-    RBRInstrumentGen4Node *node);
+    RBRGen4Node *node);
 
 /**
  * \brief `node` command parameters.
  *
- * \see RBRInstrumentGen4_getNodePool()
+ * \see RBRGen4_getNodePool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-typedef struct RBRInstrumentGen4NodePool
+typedef struct RBRGen4NodePool
 {
     /**
      * \brief The number of nodes on the instrument.
      *
-     * \warning Use `min(count, RBRINSTRUMENTGEN4_NODE_COUNT_MAX)` to avoid an
+     * \warning Use `min(count, RBRGEN4_NODE_COUNT_MAX)` to avoid an
      * out-of-bounds error when accessing #pool if 
-     * #count > #RBRINSTRUMENTGEN4_NODE_COUNT_MAX.
+     * #count > #RBRGEN4_NODE_COUNT_MAX.
      */
     int32_t count;
 
     /** \brief The pool of nodes. */
-    RBRInstrumentGen4Node pool[RBRINSTRUMENTGEN4_NODE_COUNT_MAX];
-} RBRInstrumentGen4NodePool;
+    RBRGen4Node pool[RBRGEN4_NODE_COUNT_MAX];
+} RBRGen4NodePool;
 
 /**
  * \brief Populate the pool of the instrument's nodes.
  *
  * Only the labels are reported; read the rest of a node's parameters with
- * RBRInstrumentGen4_getNode().
+ * RBRGen4_getNode().
  *
  * \note Issues the `node` command.
  *
@@ -210,31 +210,31 @@ typedef struct RBRInstrumentGen4NodePool
  * \return #RBRGEN4_SUCCESS when the nodes are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_getNode()
+ * \see RBRGen4_getNode()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-RBRGen4Error RBRInstrumentGen4_getNodePool(
+RBRGen4Error RBRGen4_getNodePool(
     RBRGen4 *instrument,
-    RBRInstrumentGen4NodePool *nodePool);
+    RBRGen4NodePool *nodePool);
 
 /**
  * \brief The classes of port.
  *
- * \see RBRInstrumentGen4Port.portClass
+ * \see RBRGen4Port.portClass
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-typedef enum RBRInstrumentGen4PortClass
+typedef enum RBRGen4PortClass
 {
     /** A direct ADC connection with no bus; typical of on-board sensors. */
-    RBRINSTRUMENTGEN4_PORT_CLASS_VIRTUAL,
+    RBRGEN4_PORT_CLASS_VIRTUAL,
     /** A bus-attached port, which speaks one of the port protocols. */
-    RBRINSTRUMENTGEN4_PORT_CLASS_SERIAL,
+    RBRGEN4_PORT_CLASS_SERIAL,
 
     /** The number of specific port classes. */
-    RBRINSTRUMENTGEN4_PORT_CLASS_COUNT,
+    RBRGEN4_PORT_CLASS_COUNT,
     /** An unknown or unrecognized port class. */
-    RBRINSTRUMENTGEN4_UNKNOWN_PORT_CLASS
-} RBRInstrumentGen4PortClass;
+    RBRGEN4_UNKNOWN_PORT_CLASS
+} RBRGen4PortClass;
 
 /**
  * \brief Get a human-readable string name for a port class.
@@ -243,35 +243,35 @@ typedef enum RBRInstrumentGen4PortClass
  * \return a string name for the port class
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4PortClass_name(
-    RBRInstrumentGen4PortClass portClass);
+const char *RBRGen4PortClass_name(
+    RBRGen4PortClass portClass);
 
 /**
  * \brief The protocols a port can speak.
  *
  * A `virtual` port speaks none of these. Consult
- * RBRInstrumentGen4Port.availableProtocols for the protocols a given port is
+ * RBRGen4Port.availableProtocols for the protocols a given port is
  * capable of.
  *
- * \see RBRInstrumentGen4Port
+ * \see RBRGen4Port
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-typedef enum RBRInstrumentGen4PortProtocol
+typedef enum RBRGen4PortProtocol
 {
     /** An unrecognized protocol, or none being spoken. */
-    RBRINSTRUMENTGEN4_PORT_PROTOCOL_NONE         =      0,
+    RBRGEN4_PORT_PROTOCOL_NONE         =      0,
     /** Pressure. */
-    RBRINSTRUMENTGEN4_PORT_PROTOCOL_PRESSURE = 1 << 0,
+    RBRGEN4_PORT_PROTOCOL_PRESSURE = 1 << 0,
     /** RBR serial. */
-    RBRINSTRUMENTGEN4_PORT_PROTOCOL_RBRSERIAL    = 1 << 1,
+    RBRGEN4_PORT_PROTOCOL_RBRSERIAL    = 1 << 1,
     /** RBR modem. */
-    RBRINSTRUMENTGEN4_PORT_PROTOCOL_RBRMODEM     = 1 << 2,
+    RBRGEN4_PORT_PROTOCOL_RBRMODEM     = 1 << 2,
     /** RBR multidrop. */
-    RBRINSTRUMENTGEN4_PORT_PROTOCOL_RBRMULTIDROP = 1 << 3,
+    RBRGEN4_PORT_PROTOCOL_RBRMULTIDROP = 1 << 3,
     /** Corresponds to the largest port protocol enum value. */
-    RBRINSTRUMENTGEN4_PORT_PROTOCOL_MAX
-        = RBRINSTRUMENTGEN4_PORT_PROTOCOL_RBRMULTIDROP
-} RBRInstrumentGen4PortProtocol;
+    RBRGEN4_PORT_PROTOCOL_MAX
+        = RBRGEN4_PORT_PROTOCOL_RBRMULTIDROP
+} RBRGen4PortProtocol;
 
 /**
  * \brief Get a human-readable string name for a port protocol.
@@ -280,25 +280,25 @@ typedef enum RBRInstrumentGen4PortProtocol
  * \return a string name for the port protocol
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4PortProtocol_name(
-    RBRInstrumentGen4PortProtocol protocol);
+const char *RBRGen4PortProtocol_name(
+    RBRGen4PortProtocol protocol);
 
 /**
  * \brief `port <port_label>` command parameters.
  *
  * A port is an attachment point on a node to which devices attach.
  *
- * \see RBRInstrumentGen4PortPool
- * \see RBRInstrumentGen4_getPort()
+ * \see RBRGen4PortPool
+ * \see RBRGen4_getPort()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-typedef struct RBRInstrumentGen4Port
+typedef struct RBRGen4Port
 {
     /**
      * \brief Port label.
      *
      * Set by the caller to select the port to read; see
-     * RBRInstrumentGen4_getPort().
+     * RBRGen4_getPort().
      */
     char label[RBRGEN4_LABEL_NAME_MAX + 1];
 
@@ -306,19 +306,19 @@ typedef struct RBRInstrumentGen4Port
     char node[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief The class of the port. */
-    RBRInstrumentGen4PortClass portClass;
+    RBRGen4PortClass portClass;
 
     /** \brief The protocol currently selected on the port. */
-    RBRInstrumentGen4PortProtocol protocol;
+    RBRGen4PortProtocol protocol;
 
     /**
      * \brief Protocols the port is capable of speaking.
      *
      * Treated as a bit field representation of available protocols as defined
-     * by RBRInstrumentGen4PortProtocol. For details, consult
+     * by RBRGen4PortProtocol. For details, consult
      * [Working with Bit Fields](bitfields.md).
      */
-    RBRInstrumentGen4PortProtocol availableProtocols;
+    RBRGen4PortProtocol availableProtocols;
 
     /**
      * \brief The baud rate of the port.
@@ -331,17 +331,17 @@ typedef struct RBRInstrumentGen4Port
     int32_t deviceCount;
 
     /** \brief The labels of the devices attached to the port. */
-    char deviceList[RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX]
+    char deviceList[RBRGEN4_DEVICE_COUNT_MAX]
                    [RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief The time in milliseconds to bring power to the port. */
     int32_t powerUpTime;
-} RBRInstrumentGen4Port;
+} RBRGen4Port;
 
 /**
  * \brief Populate the parameters of a port.
  *
- * The caller sets RBRInstrumentGen4Port.label to select the port to read.
+ * The caller sets RBRGen4Port.label to select the port to read.
  *
  * \note Issues the `port <port_label>` command.
  *
@@ -350,39 +350,39 @@ typedef struct RBRInstrumentGen4Port
  * \return #RBRGEN4_SUCCESS when the port is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_getPortPool()
+ * \see RBRGen4_getPortPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-RBRGen4Error RBRInstrumentGen4_getPort(
+RBRGen4Error RBRGen4_getPort(
     RBRGen4 *instrument,
-    RBRInstrumentGen4Port *port);
+    RBRGen4Port *port);
 
 /**
  * \brief `port` command parameters.
  *
- * \see RBRInstrumentGen4_getPortPool()
+ * \see RBRGen4_getPortPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-typedef struct RBRInstrumentGen4PortPool
+typedef struct RBRGen4PortPool
 {
     /**
      * \brief The number of ports across all nodes.
      *
-     * \warning Use `min(count, RBRINSTRUMENTGEN4_PORT_COUNT_MAX)` to avoid an
+     * \warning Use `min(count, RBRGEN4_PORT_COUNT_MAX)` to avoid an
      * out-of-bounds error when accessing #pool if 
-     * #count > #RBRINSTRUMENTGEN4_PORT_COUNT_MAX.
+     * #count > #RBRGEN4_PORT_COUNT_MAX.
      */
     int32_t count;
 
     /** \brief The pool of ports. */
-    RBRInstrumentGen4Port pool[RBRINSTRUMENTGEN4_PORT_COUNT_MAX];
-} RBRInstrumentGen4PortPool;
+    RBRGen4Port pool[RBRGEN4_PORT_COUNT_MAX];
+} RBRGen4PortPool;
 
 /**
  * \brief Populate the pool of the instrument's ports.
  *
  * Only the labels are reported; read the rest of a port's parameters with
- * RBRInstrumentGen4_getPort().
+ * RBRGen4_getPort().
  *
  * \note Issues the `port` command.
  *
@@ -391,35 +391,35 @@ typedef struct RBRInstrumentGen4PortPool
  * \return #RBRGEN4_SUCCESS when the ports are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_getPort()
+ * \see RBRGen4_getPort()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-RBRGen4Error RBRInstrumentGen4_getPortPool(
+RBRGen4Error RBRGen4_getPortPool(
     RBRGen4 *instrument,
-    RBRInstrumentGen4PortPool *portPool);
+    RBRGen4PortPool *portPool);
 
 /**
  * \brief The classes of device.
  *
- * \see RBRInstrumentGen4Device.deviceClass
+ * \see RBRGen4Device.deviceClass
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-typedef enum RBRInstrumentGen4DeviceClass
+typedef enum RBRGen4DeviceClass
 {
     /** A device which measures. */
-    RBRINSTRUMENTGEN4_DEVICE_CLASS_SENSOR,
+    RBRGEN4_DEVICE_CLASS_SENSOR,
     /** A device which acts, such as a valve or a UV LED. */
-    RBRINSTRUMENTGEN4_DEVICE_CLASS_ACTUATOR,
+    RBRGEN4_DEVICE_CLASS_ACTUATOR,
     /** A device which raises asynchronous events. */
-    RBRINSTRUMENTGEN4_DEVICE_CLASS_EVENTGEN,
+    RBRGEN4_DEVICE_CLASS_EVENTGEN,
     /** A device which carries other devices on a multidrop bus. */
-    RBRINSTRUMENTGEN4_DEVICE_CLASS_MODEM,
+    RBRGEN4_DEVICE_CLASS_MODEM,
 
     /** The number of specific device classes. */
-    RBRINSTRUMENTGEN4_DEVICE_CLASS_COUNT,
+    RBRGEN4_DEVICE_CLASS_COUNT,
     /** An unknown or unrecognized device class. */
-    RBRINSTRUMENTGEN4_UNKNOWN_DEVICE_CLASS
-} RBRInstrumentGen4DeviceClass;
+    RBRGEN4_UNKNOWN_DEVICE_CLASS
+} RBRGen4DeviceClass;
 
 /**
  * \brief Get a human-readable string name for a device class.
@@ -428,8 +428,8 @@ typedef enum RBRInstrumentGen4DeviceClass
  * \return a string name for the device class
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4DeviceClass_name(
-    RBRInstrumentGen4DeviceClass deviceClass);
+const char *RBRGen4DeviceClass_name(
+    RBRGen4DeviceClass deviceClass);
 
 /**
  * \brief `device <device_label>` command parameters.
@@ -437,17 +437,17 @@ const char *RBRInstrumentGen4DeviceClass_name(
  * A device is a logical sensor, actuator, event source, or modem attached to a
  * port. Devices are produced by discovery: there is no command to create one.
  *
- * \see RBRInstrumentGen4DevicePool
- * \see RBRInstrumentGen4_getDevice()
+ * \see RBRGen4DevicePool
+ * \see RBRGen4_getDevice()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-typedef struct RBRInstrumentGen4Device
+typedef struct RBRGen4Device
 {
     /**
      * \brief Device label.
      *
      * Set by the caller to select the device to read; see
-     * RBRInstrumentGen4_getDevice().
+     * RBRGen4_getDevice().
      */
     char label[RBRGEN4_LABEL_NAME_MAX + 1];
 
@@ -455,7 +455,7 @@ typedef struct RBRInstrumentGen4Device
     char port[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief The class of the device. */
-    RBRInstrumentGen4DeviceClass deviceClass;
+    RBRGen4DeviceClass deviceClass;
 
     /**
      * \brief Device serial number.
@@ -494,7 +494,7 @@ typedef struct RBRInstrumentGen4Device
      *
      * A device can name a channel which the `channel` command does not
      * enumerate and will not accept, so a label found here is not
-     * necessarily readable with RBRInstrumentGen4_getChannel().
+     * necessarily readable with RBRGen4_getChannel().
      */
     char channelList[RBRGEN4_CHANNEL_MAX]
                     [RBRGEN4_LABEL_NAME_MAX + 1];
@@ -519,12 +519,12 @@ typedef struct RBRInstrumentGen4Device
      * before drawing on it.
      */
     int32_t inrushOffsetTime;
-} RBRInstrumentGen4Device;
+} RBRGen4Device;
 
 /**
  * \brief Populate the parameters of a device.
  *
- * The caller sets RBRInstrumentGen4Device.label to select the device to read.
+ * The caller sets RBRGen4Device.label to select the device to read.
  *
  * \note Issues the `device <device_label> <param1> <param2> ...` command
  * \note This getter is special: the `device <device_label>` command has a
@@ -538,39 +538,39 @@ typedef struct RBRInstrumentGen4Device
  * \return #RBRGEN4_SUCCESS when the device is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_getDevicePool()
+ * \see RBRGen4_getDevicePool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-RBRGen4Error RBRInstrumentGen4_getDevice(
+RBRGen4Error RBRGen4_getDevice(
     RBRGen4 *instrument,
-    RBRInstrumentGen4Device *device);
+    RBRGen4Device *device);
 
 /**
  * \brief `device` command parameters.
  *
- * \see RBRInstrumentGen4_getDevicePool()
+ * \see RBRGen4_getDevicePool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-typedef struct RBRInstrumentGen4DevicePool
+typedef struct RBRGen4DevicePool
 {
     /**
      * \brief The number of devices across all ports.
      *
-     * \warning Use `min(count, RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX)` to avoid
+     * \warning Use `min(count, RBRGEN4_DEVICE_COUNT_MAX)` to avoid
      * an out-of-bounds error when accessing #pool if 
-     * #count > #RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX.
+     * #count > #RBRGEN4_DEVICE_COUNT_MAX.
      */
     int32_t count;
 
     /** \brief The pool of devices. */
-    RBRInstrumentGen4Device pool[RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX];
-} RBRInstrumentGen4DevicePool;
+    RBRGen4Device pool[RBRGEN4_DEVICE_COUNT_MAX];
+} RBRGen4DevicePool;
 
 /**
  * \brief Populate the pool of the instrument's devices.
  *
  * Only the labels are reported; read the rest of a device's parameters with
- * RBRInstrumentGen4_getDevice().
+ * RBRGen4_getDevice().
  *
  * \note Issues the `device` command.
  *
@@ -579,20 +579,20 @@ typedef struct RBRInstrumentGen4DevicePool
  * \return #RBRGEN4_SUCCESS when the devices are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_getDevice()
+ * \see RBRGen4_getDevice()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-RBRGen4Error RBRInstrumentGen4_getDevicePool(
+RBRGen4Error RBRGen4_getDevicePool(
     RBRGen4 *instrument,
-    RBRInstrumentGen4DevicePool *devicePool);
+    RBRGen4DevicePool *devicePool);
 
 /**
  * \brief Sweep every port and repopulate the devices attached to them.
  *
  * Discovery reports every device present after the sweep, not only the ones it
- * has just added, so it fills the same pool RBRInstrumentGen4_getDevicePool()
+ * has just added, so it fills the same pool RBRGen4_getDevicePool()
  * does. Both report nothing but the labels; read a device's parameters with
- * RBRInstrumentGen4_getDevice().
+ * RBRGen4_getDevice().
  *
  * \note Issues the `device discover` command.
  *
@@ -602,13 +602,13 @@ RBRGen4Error RBRInstrumentGen4_getDevicePool(
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR if the instrument refuses
- * \see RBRInstrumentGen4_getDevice()
- * \see RBRInstrumentGen4_getDevicePool()
+ * \see RBRGen4_getDevice()
+ * \see RBRGen4_getDevicePool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-RBRGen4Error RBRInstrumentGen4_discoverDevices(
+RBRGen4Error RBRGen4_discoverDevices(
     RBRGen4 *instrument,
-    RBRInstrumentGen4DevicePool *devicePool);
+    RBRGen4DevicePool *devicePool);
 
 /**
  * \brief `calibration <channel_label>` command parameters.
@@ -617,18 +617,18 @@ RBRGen4Error RBRInstrumentGen4_discoverDevices(
  * Coefficients the equation does not use are absent from the response and the
  * instrument rejects them, so a group's count bounds what is present.
  *
- * \see RBRInstrumentGen4Channel
- * \see RBRInstrumentGen4_getCalibration()
- * \see RBRInstrumentGen4_setCalibration()
+ * \see RBRGen4Channel
+ * \see RBRGen4_getCalibration()
+ * \see RBRGen4_setCalibration()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828510/calibration
  */
-typedef struct RBRInstrumentGen4Calibration
+typedef struct RBRGen4Calibration
 {
     /**
      * \brief The label of the channel the calibration belongs to.
      *
      * Set by the caller to select the calibration to read; see
-     * RBRInstrumentGen4_getCalibration(). Calibrations are one to one with
+     * RBRGen4_getCalibration(). Calibrations are one to one with
      * channels and cannot be created or deleted.
      */
     char label[RBRGEN4_LABEL_NAME_MAX + 1];
@@ -640,7 +640,7 @@ typedef struct RBRInstrumentGen4Calibration
      *
      * \readonly
      */
-    char equation[RBRINSTRUMENTGEN4_CALIBRATION_EQUATION_MAX + 1];
+    char equation[RBRGEN4_CALIBRATION_EQUATION_MAX + 1];
 
     /**
      * \brief The date and time of the calibration.
@@ -671,7 +671,7 @@ typedef struct RBRInstrumentGen4Calibration
     int32_t aCount;
 
     /** \brief The a coefficients, which any user may change. */
-    float a[RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX];
+    float a[RBRGEN4_CALIBRATION_COEFFICIENT_MAX];
 
     /** \brief The number of b coefficients the equation uses. */
     int32_t bCount;
@@ -681,7 +681,7 @@ typedef struct RBRInstrumentGen4Calibration
      *
      * \warning Intended to be changed by RBR or an expert user only.
      */
-    float b[RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX];
+    float b[RBRGEN4_CALIBRATION_COEFFICIENT_MAX];
 
     /** \brief The number of m references the equation uses. */
     int32_t mCount;
@@ -694,33 +694,33 @@ typedef struct RBRInstrumentGen4Calibration
      * is empty, and is sent as `none`. Whether a label names something the
      * equation can use is for the instrument to decide.
      *
-     * \see RBRInstrumentGen4_getParameters()
+     * \see RBRGen4_getParameters()
      */
-    char m[RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX]
+    char m[RBRGEN4_CALIBRATION_COEFFICIENT_MAX]
           [RBRGEN4_LABEL_NAME_MAX + 1];
-} RBRInstrumentGen4Calibration;
+} RBRGen4Calibration;
 
 /** \brief An internal module identifier. */
-typedef uint8_t RBRInstrumentGen4ModuleAddress;
+typedef uint8_t RBRGen4ModuleAddress;
 
 /**
  * \brief Whether a channel carries a measurement or an instrument housekeeping
  * value.
  *
- * \see RBRInstrumentGen4Channel
+ * \see RBRGen4Channel
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
-typedef enum RBRInstrumentGen4ChannelNature
+typedef enum RBRGen4ChannelNature
 {
     /** The channel measures a physical parameter. */
-    RBRINSTRUMENTGEN4_CHANNEL_NATURE_SCIENTIFIC,
+    RBRGEN4_CHANNEL_NATURE_SCIENTIFIC,
     /** The channel reports an instrument housekeeping value. */
-    RBRINSTRUMENTGEN4_CHANNEL_NATURE_SYSTEM,
+    RBRGEN4_CHANNEL_NATURE_SYSTEM,
     /** The number of specific channel natures. */
-    RBRINSTRUMENTGEN4_CHANNEL_NATURE_COUNT,
+    RBRGEN4_CHANNEL_NATURE_COUNT,
     /** An unknown or unrecognized channel nature. */
-    RBRINSTRUMENTGEN4_UNKNOWN_CHANNEL_NATURE
-} RBRInstrumentGen4ChannelNature;
+    RBRGEN4_UNKNOWN_CHANNEL_NATURE
+} RBRGen4ChannelNature;
 
 /**
  * \brief Get a human-readable string name for a channel nature.
@@ -729,23 +729,23 @@ typedef enum RBRInstrumentGen4ChannelNature
  * \return a string name for the channel nature
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4ChannelNature_name(
-    RBRInstrumentGen4ChannelNature nature);
+const char *RBRGen4ChannelNature_name(
+    RBRGen4ChannelNature nature);
 
 /**
  * \brief Instrument `channel <channel_label>` command parameters.
  *
- * \see RBRInstrumentGen4_getChannel()
- * \see RBRInstrumentGen4_setChannel()
+ * \see RBRGen4_getChannel()
+ * \see RBRGen4_setChannel()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
-typedef struct RBRInstrumentGen4Channel
+typedef struct RBRGen4Channel
 {
     /**
      * \brief The channel's label.
      *
      * Set by the caller to select the channel to read; see
-     * RBRInstrumentGen4_getChannel().
+     * RBRGen4_getChannel().
      */
     char label[RBRGEN4_LABEL_NAME_MAX + 1];
 
@@ -791,7 +791,7 @@ typedef struct RBRInstrumentGen4Channel
      *
      * \readonly
      */
-    RBRInstrumentGen4ChannelNature nature;
+    RBRGen4ChannelNature nature;
 
     /**
      * \brief Whether the channel is computed from other channels rather than
@@ -828,17 +828,17 @@ typedef struct RBRInstrumentGen4Channel
      * \readonly
      */
     char device[RBRGEN4_LABEL_NAME_MAX + 1];
-} RBRInstrumentGen4Channel;
+} RBRGen4Channel;
 
 /**
  * \brief `channel` command parameters. The `list` is stored in a user provided
  * buffer (#pool).
  *
- * \see RBRInstrumentGen4_getChannelPool()
- * \see RBRInstrumentGen4_getChannelPoolByNature()
+ * \see RBRGen4_getChannelPool()
+ * \see RBRGen4_getChannelPoolByNature()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
-typedef struct RBRInstrumentGen4ChannelPool
+typedef struct RBRGen4ChannelPool
 {
     /** \brief The number of channels #pool can hold. */
     int32_t size;
@@ -856,15 +856,15 @@ typedef struct RBRInstrumentGen4ChannelPool
      * \brief User provided buffer of the channels reported.
      *
      * Discovery reports nothing but the labels; read a channel's parameters
-     * with RBRInstrumentGen4_getChannel().
+     * with RBRGen4_getChannel().
      */
-    RBRInstrumentGen4Channel *pool;
-} RBRInstrumentGen4ChannelPool;
+    RBRGen4Channel *pool;
+} RBRGen4ChannelPool;
 
 /**
  * \brief Populate the parameters of a channel.
  *
- * The caller sets RBRInstrumentGen4Channel.label to select the channel to
+ * The caller sets RBRGen4Channel.label to select the channel to
  * read.
  *
  * \note Issues the `channel <channel_label>` command.
@@ -876,20 +876,20 @@ typedef struct RBRInstrumentGen4ChannelPool
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist
- * \see RBRInstrumentGen4_getChannelPool()
- * \see RBRInstrumentGen4_setChannel()
+ * \see RBRGen4_getChannelPool()
+ * \see RBRGen4_setChannel()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
-RBRGen4Error RBRInstrumentGen4_getChannel(
+RBRGen4Error RBRGen4_getChannel(
     RBRGen4 *instrument,
-    RBRInstrumentGen4Channel *channel);
+    RBRGen4Channel *channel);
 
 /**
  * \brief Update a channel's user units.
  *
- * RBRInstrumentGen4Channel.userUnits is the only parameter of the command a
+ * RBRGen4Channel.userUnits is the only parameter of the command a
  * caller may change; every other field of the structure is read-only. Read
- * the channel with RBRInstrumentGen4_getChannel(), change the units, and write
+ * the channel with RBRGen4_getChannel(), change the units, and write
  * the structure back.
  *
  * \note Issues the `channel <channel_label>` command.
@@ -901,18 +901,18 @@ RBRGen4Error RBRInstrumentGen4_getChannel(
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the channel cannot be changed
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the units are empty
- * \see RBRInstrumentGen4_getChannel()
+ * \see RBRGen4_getChannel()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
-RBRGen4Error RBRInstrumentGen4_setChannel(
+RBRGen4Error RBRGen4_setChannel(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Channel *channel);
+    const RBRGen4Channel *channel);
 
 /**
  * \brief Read the labels of the channels configured on the instrument.
  *
  * Reports nothing but the labels; read a channel's parameters with
- * RBRInstrumentGen4_getChannel().
+ * RBRGen4_getChannel().
  *
  * \note Issues the `channel` command.
  *
@@ -927,18 +927,18 @@ RBRGen4Error RBRInstrumentGen4_setChannel(
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
  * \return #RBRGEN4_HARDWARE_ERROR if the channel pool cannot be read
- * \see RBRInstrumentGen4_getChannelPoolByNature()
+ * \see RBRGen4_getChannelPoolByNature()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
-RBRGen4Error RBRInstrumentGen4_getChannelPool(
+RBRGen4Error RBRGen4_getChannelPool(
     RBRGen4 *instrument,
-    RBRInstrumentGen4ChannelPool *channelPool);
+    RBRGen4ChannelPool *channelPool);
 
 /**
  * \brief Read the labels of the channels of one nature.
  *
  * Reports nothing but the labels; read a channel's parameters with
- * RBRInstrumentGen4_getChannel().
+ * RBRGen4_getChannel().
  *
  * \note Issues the `channel scientific` or `channel system` command.
  *
@@ -956,18 +956,18 @@ RBRGen4Error RBRInstrumentGen4_getChannelPool(
  * \return #RBRGEN4_HARDWARE_ERROR if the channel pool cannot be read
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the nature is not
  *                                                    one the command accepts
- * \see RBRInstrumentGen4_getChannelPool()
+ * \see RBRGen4_getChannelPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
-RBRGen4Error RBRInstrumentGen4_getChannelPoolByNature(
+RBRGen4Error RBRGen4_getChannelPoolByNature(
     RBRGen4 *instrument,
-    RBRInstrumentGen4ChannelNature nature,
-    RBRInstrumentGen4ChannelPool *channelPool);
+    RBRGen4ChannelNature nature,
+    RBRGen4ChannelPool *channelPool);
 
 /**
  * \brief Read a channel's calibration.
  *
- * The caller sets RBRInstrumentGen4Calibration.label to select the channel.
+ * The caller sets RBRGen4Calibration.label to select the channel.
  *
  * \note Issues the `calibration <channel_label>` command.
  *
@@ -977,18 +977,18 @@ RBRGen4Error RBRInstrumentGen4_getChannelPoolByNature(
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist
- * \see RBRInstrumentGen4_setCalibration()
+ * \see RBRGen4_setCalibration()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828510/calibration
  */
-RBRGen4Error RBRInstrumentGen4_getCalibration(
+RBRGen4Error RBRGen4_getCalibration(
     RBRGen4 *instrument,
-    RBRInstrumentGen4Calibration *calibration);
+    RBRGen4Calibration *calibration);
 
 /**
  * \brief Update a channel's calibration.
  *
  * Sends the date, the offset and slope, and every a, b, and m coefficient the
- * equation uses. Read the calibration with RBRInstrumentGen4_getCalibration(),
+ * equation uses. Read the calibration with RBRGen4_getCalibration(),
  * change what you need, and write the structure back: the counts read there
  * are what bounds the coefficients sent.
  *
@@ -1009,21 +1009,21 @@ RBRGen4Error RBRInstrumentGen4_getCalibration(
  *                                           changed
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a coefficient count
  *                                                    is out of range
- * \see RBRInstrumentGen4_getCalibration()
+ * \see RBRGen4_getCalibration()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828510/calibration
  */
-RBRGen4Error RBRInstrumentGen4_setCalibration(
+RBRGen4Error RBRGen4_setCalibration(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Calibration *calibration);
+    const RBRGen4Calibration *calibration);
 
 
 /** 
  * \brief Instrument `settings` command parameters.
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828508/settings
- * \see RBRInstrumentGen4_getSettings()
- * \see RBRInstrumentGen4_setSettings()
+ * \see RBRGen4_getSettings()
+ * \see RBRGen4_setSettings()
  */
-typedef struct RBRInstrumentGen4Settings
+typedef struct RBRGen4Settings
 {
     /**
      * \brief Whether the instrument returns the “Ready:” prompt following a
@@ -1045,7 +1045,7 @@ typedef struct RBRInstrumentGen4Settings
      * the removal of sensor power. The as-shipped default value is 8000.
      */
     RBRGen4Period pollPowerOffDelay;
-} RBRInstrumentGen4Settings;
+} RBRGen4Settings;
 
 /**
  * \brief Get miscellaneous logger settings
@@ -1057,11 +1057,11 @@ typedef struct RBRInstrumentGen4Settings
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828508/settings
- * \see RBRInstrumentGen4_setSettings()
+ * \see RBRGen4_setSettings()
  */
-RBRGen4Error RBRInstrumentGen4_getSettings(
+RBRGen4Error RBRGen4_getSettings(
     RBRGen4 *instrument,
-    RBRInstrumentGen4Settings *settings);
+    RBRGen4Settings *settings);
 
 /**
  * \brief Set the miscellaneous logger settings.
@@ -1079,19 +1079,19 @@ RBRGen4Error RBRInstrumentGen4_getSettings(
  *          With \a confirmation off the instrument answers a set with nothing
  *          at all, and every later setter blocks until the command timeout.
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828508/settings
- * \see RBRInstrumentGen4_getSettings()
+ * \see RBRGen4_getSettings()
  */
-RBRGen4Error RBRInstrumentGen4_setSettings(
+RBRGen4Error RBRGen4_setSettings(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Settings *settings);
+    const RBRGen4Settings *settings);
 
 /** 
  * \brief `parameters` command parameters.
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/42729486/parameters
- * \see RBRInstrumentGen4_getParameters()
- * \see RBRInstrumentGen4_setParameters()
+ * \see RBRGen4_getParameters()
+ * \see RBRGen4_setParameters()
  */
-typedef struct RBRInstrumentGen4Parameters
+typedef struct RBRGen4Parameters
 {
     /**
      * \brief the temperature coefficient used to correct the derived channel 
@@ -1122,7 +1122,7 @@ typedef struct RBRInstrumentGen4Parameters
     float salinity;
     /** \brief avgSoundSpeed in m/s, default value 1506.8*/
     float avgSoundSpeed;
-} RBRInstrumentGen4Parameters;
+} RBRGen4Parameters;
 
 /**
  * \brief Get parameters which may be required when computing calibrated output.
@@ -1134,11 +1134,11 @@ typedef struct RBRInstrumentGen4Parameters
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/42729486/parameters
- * \see RBRInstrumentGen4_setParameters
+ * \see RBRGen4_setParameters
  */
-RBRGen4Error RBRInstrumentGen4_getParameters(
+RBRGen4Error RBRGen4_getParameters(
     RBRGen4 *instrument,
-    RBRInstrumentGen4Parameters *parameters);
+    RBRGen4Parameters *parameters);
 
 /**
  * \brief Set parameters which may be required when computing calibrated output.
@@ -1155,21 +1155,21 @@ RBRGen4Error RBRInstrumentGen4_getParameters(
  * \return #RBRGEN4_HARDWARE_ERROR when the parameters cannot be
  *                                           changed
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/42729486/parameters
- * \see RBRInstrumentGen4_getParameters
+ * \see RBRGen4_getParameters
  */
-RBRGen4Error RBRInstrumentGen4_setParameters(
+RBRGen4Error RBRGen4_setParameters(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Parameters *parameters);
+    const RBRGen4Parameters *parameters);
 
 /**
  * \brief `group <group_label>` command parameters.
  *
- * \see RBRInstrumentGen4GroupPool
- * \see RBRInstrumentGen4_getGroup()
- * \see RBRInstrumentGen4_setGroup()
+ * \see RBRGen4GroupPool
+ * \see RBRGen4_getGroup()
+ * \see RBRGen4_setGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-typedef struct RBRInstrumentGen4Group
+typedef struct RBRGen4Group
 {
     /**
      * \brief The group's label.
@@ -1177,12 +1177,12 @@ typedef struct RBRInstrumentGen4Group
      * Set by the caller to select the group to read.
      */
     char label[RBRGEN4_LABEL_NAME_MAX + 1];
-} RBRInstrumentGen4Group;
+} RBRGen4Group;
 
 /**
  * \brief Read the channels in a group.
  *
- * The caller sets RBRInstrumentGen4Group.label to select the group to read.
+ * The caller sets RBRGen4Group.label to select the group to read.
  * The labels of the group's channels are written to \a channelList when it
  * is given.
  *
@@ -1201,13 +1201,13 @@ typedef struct RBRInstrumentGen4Group
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
  * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist
- * \see RBRInstrumentGen4_getGroupPool()
- * \see RBRInstrumentGen4_setGroup()
+ * \see RBRGen4_getGroupPool()
+ * \see RBRGen4_setGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-RBRGen4Error RBRInstrumentGen4_getGroup(
+RBRGen4Error RBRGen4_getGroup(
     RBRGen4 *instrument,
-    RBRInstrumentGen4Group *group,
+    RBRGen4Group *group,
     RBRGen4LabelList *channelList);
 
 /**
@@ -1232,22 +1232,22 @@ RBRGen4Error RBRInstrumentGen4_getGroup(
  *                                                    label is empty
  * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
  *                                            command
- * \see RBRInstrumentGen4_getGroup()
+ * \see RBRGen4_getGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-RBRGen4Error RBRInstrumentGen4_setGroup(
+RBRGen4Error RBRGen4_setGroup(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Group *group,
+    const RBRGen4Group *group,
     const RBRGen4LabelList *channelList);
 
 /**
  * \brief `group` command parameters. The `list` is stored in a user provided
  * buffer (#pool).
  *
- * \see RBRInstrumentGen4_getGroupPool()
+ * \see RBRGen4_getGroupPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-typedef struct RBRInstrumentGen4GroupPool
+typedef struct RBRGen4GroupPool
 {
     /** \brief The number of groups #pool can hold. */
     int32_t size;
@@ -1265,14 +1265,14 @@ typedef struct RBRInstrumentGen4GroupPool
     int32_t maxCount;
 
     /** \brief User provided buffer of the groups defined. */
-    RBRInstrumentGen4Group *pool;
-} RBRInstrumentGen4GroupPool;
+    RBRGen4Group *pool;
+} RBRGen4GroupPool;
 
 /**
  * \brief Populate the pool of the instrument's groups.
  *
  * Only the labels are reported; read a group's parameters with
- * RBRInstrumentGen4_getGroup().
+ * RBRGen4_getGroup().
  *
  * \note Issues the `group` command.
  *
@@ -1286,17 +1286,17 @@ typedef struct RBRInstrumentGen4GroupPool
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
- * \see RBRInstrumentGen4_getGroup()
+ * \see RBRGen4_getGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-RBRGen4Error RBRInstrumentGen4_getGroupPool(
+RBRGen4Error RBRGen4_getGroupPool(
     RBRGen4 *instrument,
-    RBRInstrumentGen4GroupPool *groupPool);
+    RBRGen4GroupPool *groupPool);
 
 /**
  * \brief Create an empty group.
  *
- * Add channels with RBRInstrumentGen4_setGroup().
+ * Add channels with RBRGen4_setGroup().
  *
  * \note Issues the `group create <group_label>` command.
  *
@@ -1307,11 +1307,11 @@ RBRGen4Error RBRInstrumentGen4_getGroupPool(
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be created
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \see RBRInstrumentGen4_deleteGroup()
+ * \see RBRGen4_deleteGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-RBRGen4Error RBRInstrumentGen4_createGroup(
+RBRGen4Error RBRGen4_createGroup(
     RBRGen4 *instrument,
     const char *label);
 
@@ -1327,10 +1327,10 @@ RBRGen4Error RBRInstrumentGen4_createGroup(
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \see RBRInstrumentGen4_deleteGroupAll()
+ * \see RBRGen4_deleteGroupAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-RBRGen4Error RBRInstrumentGen4_deleteGroup(
+RBRGen4Error RBRGen4_deleteGroup(
     RBRGen4 *instrument,
     const char *label);
 
@@ -1343,10 +1343,10 @@ RBRGen4Error RBRInstrumentGen4_deleteGroup(
  * \return #RBRGEN4_SUCCESS when the groups are successfully deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_deleteGroup()
+ * \see RBRGen4_deleteGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-RBRGen4Error RBRInstrumentGen4_deleteGroupAll(
+RBRGen4Error RBRGen4_deleteGroupAll(
     RBRGen4 *instrument);
 
 /**
@@ -1354,53 +1354,53 @@ RBRGen4Error RBRInstrumentGen4_deleteGroupAll(
  *
  * Flags, so one type serves both a schedule's mode and the set of modes the
  * instrument offers. A schedule's mode must be a single flag;
- * RBRInstrumentGen4_setSchedule() rejects any other value.
+ * RBRGen4_setSchedule() rejects any other value.
  *
- * \see RBRInstrumentGen4Schedule.mode
- * \see RBRInstrumentGen4SchedulePool.availableModes
+ * \see RBRGen4Schedule.mode
+ * \see RBRGen4SchedulePool.availableModes
  * \see bitfields.md
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-typedef enum RBRInstrumentGen4ScheduleMode
+typedef enum RBRGen4ScheduleMode
 {
     /** \brief No mode, and any mode the library does not recognize. */
-    RBRINSTRUMENTGEN4_SCHEDULE_MODE_NONE = 0,
+    RBRGEN4_SCHEDULE_MODE_NONE = 0,
     /** \brief Continuous mode. */
-    RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS = 1 << 0,
+    RBRGEN4_SCHEDULE_MODE_CONTINUOUS = 1 << 0,
     /** \brief Average mode. */
-    RBRINSTRUMENTGEN4_SCHEDULE_MODE_AVERAGE = 1 << 1,
+    RBRGEN4_SCHEDULE_MODE_AVERAGE = 1 << 1,
     /** \brief Burst mode. */
-    RBRINSTRUMENTGEN4_SCHEDULE_MODE_BURST = 1 << 2,
+    RBRGEN4_SCHEDULE_MODE_BURST = 1 << 2,
     /** \brief Tide mode. */
-    RBRINSTRUMENTGEN4_SCHEDULE_MODE_TIDE = 1 << 3,
+    RBRGEN4_SCHEDULE_MODE_TIDE = 1 << 3,
     /** \brief Wave mode. */
-    RBRINSTRUMENTGEN4_SCHEDULE_MODE_WAVE = 1 << 4,
+    RBRGEN4_SCHEDULE_MODE_WAVE = 1 << 4,
     /** \brief Direction-dependent mode. */
-    RBRINSTRUMENTGEN4_SCHEDULE_MODE_DDSAMPLING = 1 << 5,
+    RBRGEN4_SCHEDULE_MODE_DDSAMPLING = 1 << 5,
     /** \brief Regimes mode. */
-    RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES = 1 << 6,
+    RBRGEN4_SCHEDULE_MODE_REGIMES = 1 << 6,
     /** \brief The greatest mode flag. */
-    RBRINSTRUMENTGEN4_SCHEDULE_MODE_MAX =
-        RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES
-} RBRInstrumentGen4ScheduleMode;
+    RBRGEN4_SCHEDULE_MODE_MAX =
+        RBRGEN4_SCHEDULE_MODE_REGIMES
+} RBRGen4ScheduleMode;
 
 /**
  * \brief Whether a schedule's data is stored in memory.
  *
- * \see RBRInstrumentGen4Schedule.storage
+ * \see RBRGen4Schedule.storage
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-typedef enum RBRInstrumentGen4ScheduleStorage
+typedef enum RBRGen4ScheduleStorage
 {
     /** Data for this schedule is not stored in memory. */
-    RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_OFF,
+    RBRGEN4_SCHEDULE_STORAGE_OFF,
     /** Data for this schedule is stored in memory. */
-    RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_ON,
+    RBRGEN4_SCHEDULE_STORAGE_ON,
     /** The number of specific storage states. */
-    RBRINSTRUMENTGEN4_SCHEDULE_STORAGE_COUNT,
+    RBRGEN4_SCHEDULE_STORAGE_COUNT,
     /** The parameter was not reported. */
-    RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE
-} RBRInstrumentGen4ScheduleStorage;
+    RBRGEN4_UNKNOWN_SCHEDULE_STORAGE
+} RBRGen4ScheduleStorage;
 
 /**
  * \brief Get a human-readable string name for a storage state.
@@ -1409,35 +1409,35 @@ typedef enum RBRInstrumentGen4ScheduleStorage
  * \return a string name for the storage state
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4ScheduleStorage_name(
-    RBRInstrumentGen4ScheduleStorage storage);
+const char *RBRGen4ScheduleStorage_name(
+    RBRGen4ScheduleStorage storage);
 
 /**
  * \brief A schedule's parameters in
- *        #RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS.
+ *        #RBRGEN4_SCHEDULE_MODE_CONTINUOUS.
  *
- * \see RBRInstrumentGen4Schedule.parameters
+ * \see RBRGen4Schedule.parameters
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-typedef struct RBRInstrumentGen4ScheduleModeContinuous
+typedef struct RBRGen4ScheduleModeContinuous
 {
     /** \brief `period`, in milliseconds. */
     RBRGen4Period period;
-} RBRInstrumentGen4ScheduleModeContinuous;
+} RBRGen4ScheduleModeContinuous;
 
 /**
  * \brief A schedule's parameters in the bursting modes.
  *
- * #RBRINSTRUMENTGEN4_SCHEDULE_MODE_AVERAGE,
- * #RBRINSTRUMENTGEN4_SCHEDULE_MODE_BURST,
- * #RBRINSTRUMENTGEN4_SCHEDULE_MODE_TIDE and
- * #RBRINSTRUMENTGEN4_SCHEDULE_MODE_WAVE take the same parameters and so share
+ * #RBRGEN4_SCHEDULE_MODE_AVERAGE,
+ * #RBRGEN4_SCHEDULE_MODE_BURST,
+ * #RBRGEN4_SCHEDULE_MODE_TIDE and
+ * #RBRGEN4_SCHEDULE_MODE_WAVE take the same parameters and so share
  * one structure.
  *
- * \see RBRInstrumentGen4Schedule.parameters
+ * \see RBRGen4Schedule.parameters
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-typedef struct RBRInstrumentGen4ScheduleModeBursting
+typedef struct RBRGen4ScheduleModeBursting
 {
     /** \brief `period`, in milliseconds. */
     RBRGen4Period period;
@@ -1447,27 +1447,27 @@ typedef struct RBRInstrumentGen4ScheduleModeBursting
 
     /** \brief `measurementcount`. */
     int32_t measurementCount;
-} RBRInstrumentGen4ScheduleModeBursting;
+} RBRGen4ScheduleModeBursting;
 
 /**
  * \brief Destinations for a schedule's real-time data.
  *
- * \see RBRInstrumentGen4Schedule.stream
+ * \see RBRGen4Schedule.stream
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-typedef enum RBRInstrumentGen4ScheduleStream
+typedef enum RBRGen4ScheduleStream
 {
     /** Data for this schedule is not streamed in real time. */
-    RBRINSTRUMENTGEN4_SCHEDULE_STREAM_OFF,
+    RBRGEN4_SCHEDULE_STREAM_OFF,
     /** Data for this schedule is streamed over the USB CDC link. */
-    RBRINSTRUMENTGEN4_SCHEDULE_STREAM_USB,
+    RBRGEN4_SCHEDULE_STREAM_USB,
     /** Data for this schedule is streamed over the serial link. */
-    RBRINSTRUMENTGEN4_SCHEDULE_STREAM_SERIAL,
+    RBRGEN4_SCHEDULE_STREAM_SERIAL,
     /** The number of specific stream destinations. */
-    RBRINSTRUMENTGEN4_SCHEDULE_STREAM_COUNT,
+    RBRGEN4_SCHEDULE_STREAM_COUNT,
     /** An unknown or unrecognized stream destination. */
-    RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STREAM
-} RBRInstrumentGen4ScheduleStream;
+    RBRGEN4_UNKNOWN_SCHEDULE_STREAM
+} RBRGen4ScheduleStream;
 
 /**
  * \brief Get a human-readable string name for a stream destination.
@@ -1476,18 +1476,18 @@ typedef enum RBRInstrumentGen4ScheduleStream
  * \return a string name for the stream destination
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4ScheduleStream_name(
-    RBRInstrumentGen4ScheduleStream stream);
+const char *RBRGen4ScheduleStream_name(
+    RBRGen4ScheduleStream stream);
 
 /**
  * \brief `schedule <schedule_label>` command parameters.
  *
- * \see RBRInstrumentGen4SchedulePool
- * \see RBRInstrumentGen4_getSchedule()
- * \see RBRInstrumentGen4_setSchedule()
+ * \see RBRGen4SchedulePool
+ * \see RBRGen4_getSchedule()
+ * \see RBRGen4_setSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-typedef struct RBRInstrumentGen4Schedule
+typedef struct RBRGen4Schedule
 {
     /**
      * \brief The schedule's label.
@@ -1497,17 +1497,17 @@ typedef struct RBRInstrumentGen4Schedule
     char label[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief Where the schedule's data is streamed in real time. */
-    RBRInstrumentGen4ScheduleStream stream;
+    RBRGen4ScheduleStream stream;
 
     /**
      * \brief Whether the schedule's data is stored in memory.
      *
      * Some instrument configurations do not support data storage, in which case
-     * this field should be left as #RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE.
+     * this field should be left as #RBRGEN4_UNKNOWN_SCHEDULE_STORAGE.
      * 
-     * \see RBRInstrumentGen4ScheduleStorage
+     * \see RBRGen4ScheduleStorage
      */
-    RBRInstrumentGen4ScheduleStorage storage;
+    RBRGen4ScheduleStorage storage;
 
     /** \brief `castdetection`, which applies in every mode. */
     bool castDetection;
@@ -1517,37 +1517,37 @@ typedef struct RBRInstrumentGen4Schedule
      *
      * Exactly one mode flag.
      */
-    RBRInstrumentGen4ScheduleMode mode;
+    RBRGen4ScheduleMode mode;
 
     /**
      * \brief The parameters belonging to #mode.
      *
      * Only the member matching #mode is populated; a getter zeroes the rest.
-     * #RBRINSTRUMENTGEN4_SCHEDULE_MODE_DDSAMPLING and
-     * #RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES have no member: a getter
+     * #RBRGEN4_SCHEDULE_MODE_DDSAMPLING and
+     * #RBRGEN4_SCHEDULE_MODE_REGIMES have no member: a getter
      * leaves this zeroed and a setter gives #RBRGEN4_UNSUPPORTED.
      */
     union
     {
         /**
          * \brief Parameters for
-         *        #RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS.
+         *        #RBRGEN4_SCHEDULE_MODE_CONTINUOUS.
          */
-        RBRInstrumentGen4ScheduleModeContinuous continuous;
+        RBRGen4ScheduleModeContinuous continuous;
 
         /** \brief Parameters for the bursting modes. */
-        RBRInstrumentGen4ScheduleModeBursting bursting;
+        RBRGen4ScheduleModeBursting bursting;
     } parameters;
-} RBRInstrumentGen4Schedule;
+} RBRGen4Schedule;
 
 /**
  * \brief Populate the parameters of a schedule.
  *
- * The caller sets RBRInstrumentGen4Schedule.label to select the schedule.
+ * The caller sets RBRGen4Schedule.label to select the schedule.
  * The labels of the groups the schedule samples are written to \a groupList
  * when it is given.
  * 
- * \p schedule.storage is set to #RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE for 
+ * \p schedule.storage is set to #RBRGEN4_UNKNOWN_SCHEDULE_STORAGE for 
  * instruments that do not report the `storage` parameter
  *
  * \note Issues the `schedule <schedule_label>` command.
@@ -1566,13 +1566,13 @@ typedef struct RBRInstrumentGen4Schedule
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
  * \return #RBRGEN4_HARDWARE_ERROR when the schedule does not exist
- * \see RBRInstrumentGen4_getSchedulePool()
- * \see RBRInstrumentGen4_setSchedule()
+ * \see RBRGen4_getSchedulePool()
+ * \see RBRGen4_setSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-RBRGen4Error RBRInstrumentGen4_getSchedule(
+RBRGen4Error RBRGen4_getSchedule(
     RBRGen4 *instrument,
-    RBRInstrumentGen4Schedule *schedule,
+    RBRGen4Schedule *schedule,
     RBRGen4LabelList *groupList);
 
 /**
@@ -1603,22 +1603,22 @@ RBRGen4Error RBRInstrumentGen4_getSchedule(
  * \return #RBRGEN4_UNSUPPORTED when the mode is `ddsampling` or
  *                                        `regimes`
  * \return #RBRGEN4_BUFFER_TOO_SMALL when the command does not fit
- * \see RBRInstrumentGen4_getSchedule()
+ * \see RBRGen4_getSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-RBRGen4Error RBRInstrumentGen4_setSchedule(
+RBRGen4Error RBRGen4_setSchedule(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Schedule *schedule,
+    const RBRGen4Schedule *schedule,
     const RBRGen4LabelList *groupList);
 
 /**
  * \brief `schedule` command parameters. The `list` is stored in a user
  * provided buffer (#pool).
  *
- * \see RBRInstrumentGen4_getSchedulePool()
+ * \see RBRGen4_getSchedulePool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-typedef struct RBRInstrumentGen4SchedulePool
+typedef struct RBRGen4SchedulePool
 {
     /** \brief The number of schedules #pool can hold. */
     int32_t size;
@@ -1639,34 +1639,34 @@ typedef struct RBRInstrumentGen4SchedulePool
     int32_t maxCount;
 
     /** \brief User provided buffer of the schedules defined. */
-    RBRInstrumentGen4Schedule *pool;
+    RBRGen4Schedule *pool;
 
     /** \brief The modes the instrument offers. */
-    RBRInstrumentGen4ScheduleMode availableModes;
+    RBRGen4ScheduleMode availableModes;
 
     /**
      * \brief The number of entries in #availableFastPeriods.
      *
      * \warning Use `min(availableFastPeriodCount,
-     * RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX)` to avoid an
+     * RBRGEN4_AVAILABLE_FAST_PERIODS_MAX)` to avoid an
      * out-of-bounds error when accessing #availableFastPeriods if
      * #availableFastPeriodCount >
-     * RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX.
+     * RBRGEN4_AVAILABLE_FAST_PERIODS_MAX.
      */
     int32_t availableFastPeriodCount;
 
     /**
      * \brief `availablefastperiods`, in the order reported.
      *
-     * Entries past #RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX are
+     * Entries past #RBRGEN4_AVAILABLE_FAST_PERIODS_MAX are
      * discarded.
      */
     RBRGen4Period
-        availableFastPeriods[RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX];
+        availableFastPeriods[RBRGEN4_AVAILABLE_FAST_PERIODS_MAX];
 
     /** \brief `maxregimes`. */
     int32_t maxRegimes;
-} RBRInstrumentGen4SchedulePool;
+} RBRGen4SchedulePool;
 
 /**
  * \brief Get a human-readable string name for a schedule mode.
@@ -1675,14 +1675,14 @@ typedef struct RBRInstrumentGen4SchedulePool
  * \return a string name for the schedule mode
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4ScheduleMode_name(
-    RBRInstrumentGen4ScheduleMode mode);
+const char *RBRGen4ScheduleMode_name(
+    RBRGen4ScheduleMode mode);
 
 /**
  * \brief Populate the pool of the instrument's schedules.
  *
  * Only the labels are reported; read a schedule's parameters with
- * RBRInstrumentGen4_getSchedule().
+ * RBRGen4_getSchedule().
  *
  * \note Issues the `schedule` command.
  *
@@ -1696,17 +1696,17 @@ const char *RBRInstrumentGen4ScheduleMode_name(
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
- * \see RBRInstrumentGen4_getSchedule()
+ * \see RBRGen4_getSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-RBRGen4Error RBRInstrumentGen4_getSchedulePool(
+RBRGen4Error RBRGen4_getSchedulePool(
     RBRGen4 *instrument,
-    RBRInstrumentGen4SchedulePool *schedulePool);
+    RBRGen4SchedulePool *schedulePool);
 
 /**
  * \brief Create a schedule with default parameters.
  *
- * Configure it with RBRInstrumentGen4_setSchedule().
+ * Configure it with RBRGen4_setSchedule().
  *
  * \note Issues the `schedule create <schedule_label>` command.
  *
@@ -1717,11 +1717,11 @@ RBRGen4Error RBRInstrumentGen4_getSchedulePool(
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when it cannot be created
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \see RBRInstrumentGen4_deleteSchedule()
+ * \see RBRGen4_deleteSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-RBRGen4Error RBRInstrumentGen4_createSchedule(
+RBRGen4Error RBRGen4_createSchedule(
     RBRGen4 *instrument,
     const char *label);
 
@@ -1737,10 +1737,10 @@ RBRGen4Error RBRInstrumentGen4_createSchedule(
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when it does not exist
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \see RBRInstrumentGen4_deleteScheduleAll()
+ * \see RBRGen4_deleteScheduleAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-RBRGen4Error RBRInstrumentGen4_deleteSchedule(
+RBRGen4Error RBRGen4_deleteSchedule(
     RBRGen4 *instrument,
     const char *label);
 
@@ -1753,21 +1753,21 @@ RBRGen4Error RBRInstrumentGen4_deleteSchedule(
  * \return #RBRGEN4_SUCCESS when the schedules are deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_deleteSchedule()
+ * \see RBRGen4_deleteSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-RBRGen4Error RBRInstrumentGen4_deleteScheduleAll(
+RBRGen4Error RBRGen4_deleteScheduleAll(
     RBRGen4 *instrument);
 
 /**
  * \brief `config <config_label>` command parameters.
  *
- * \see RBRInstrumentGen4ConfigPool
- * \see RBRInstrumentGen4_getConfig()
- * \see RBRInstrumentGen4_setConfig()
+ * \see RBRGen4ConfigPool
+ * \see RBRGen4_getConfig()
+ * \see RBRGen4_setConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-typedef struct RBRInstrumentGen4Config
+typedef struct RBRGen4Config
 {
     /**
      * \brief The configuration's label.
@@ -1775,12 +1775,12 @@ typedef struct RBRInstrumentGen4Config
      * Set by the caller to select the configuration to read.
      */
     char label[RBRGEN4_LABEL_NAME_MAX + 1];
-} RBRInstrumentGen4Config;
+} RBRGen4Config;
 
 /**
  * \brief Read the schedules in a configuration.
  *
- * The caller sets RBRInstrumentGen4Config.label to select the configuration.
+ * The caller sets RBRGen4Config.label to select the configuration.
  * The labels of the configuration's schedules are written to
  * \a scheduleList when it is given.
  *
@@ -1801,13 +1801,13 @@ typedef struct RBRInstrumentGen4Config
  *                                      exceed `size`
  * \return #RBRGEN4_HARDWARE_ERROR when the configuration does not
  *                                           exist
- * \see RBRInstrumentGen4_getConfigPool()
- * \see RBRInstrumentGen4_setConfig()
+ * \see RBRGen4_getConfigPool()
+ * \see RBRGen4_setConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-RBRGen4Error RBRInstrumentGen4_getConfig(
+RBRGen4Error RBRGen4_getConfig(
     RBRGen4 *instrument,
-    RBRInstrumentGen4Config *config,
+    RBRGen4Config *config,
     RBRGen4LabelList *scheduleList);
 
 /**
@@ -1833,22 +1833,22 @@ RBRGen4Error RBRInstrumentGen4_getConfig(
  *                                                    schedule label is empty
  * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
  *                                            command
- * \see RBRInstrumentGen4_getConfig()
+ * \see RBRGen4_getConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-RBRGen4Error RBRInstrumentGen4_setConfig(
+RBRGen4Error RBRGen4_setConfig(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Config *config,
+    const RBRGen4Config *config,
     const RBRGen4LabelList *scheduleList);
 
 /**
  * \brief `config` command parameters. The `list` is stored in a user provided
  * buffer (#pool).
  *
- * \see RBRInstrumentGen4_getConfigPool()
+ * \see RBRGen4_getConfigPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-typedef struct RBRInstrumentGen4ConfigPool
+typedef struct RBRGen4ConfigPool
 {
     /** \brief The number of configurations #pool can hold. */
     int32_t size;
@@ -1869,14 +1869,14 @@ typedef struct RBRInstrumentGen4ConfigPool
     int32_t maxCount;
 
     /** \brief User provided buffer of the configurations defined. */
-    RBRInstrumentGen4Config *pool;
-} RBRInstrumentGen4ConfigPool;
+    RBRGen4Config *pool;
+} RBRGen4ConfigPool;
 
 /**
  * \brief Populate the pool of the instrument's configurations.
  *
  * Only the labels are reported; read a configuration's parameters with
- * RBRInstrumentGen4_getConfig().
+ * RBRGen4_getConfig().
  *
  * \note Issues the `config` command.
  *
@@ -1890,17 +1890,17 @@ typedef struct RBRInstrumentGen4ConfigPool
  *                                      `size` are stored, and `count` is set
  *                                      to the value reported by the instrument
  *                                      which WILL exceed `size`
- * \see RBRInstrumentGen4_getConfig()
+ * \see RBRGen4_getConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-RBRGen4Error RBRInstrumentGen4_getConfigPool(
+RBRGen4Error RBRGen4_getConfigPool(
     RBRGen4 *instrument,
-    RBRInstrumentGen4ConfigPool *configPool);
+    RBRGen4ConfigPool *configPool);
 
 /**
  * \brief Create an empty configuration.
  *
- * Add schedules with RBRInstrumentGen4_setConfig().
+ * Add schedules with RBRGen4_setConfig().
  *
  * \note Issues the `config create <config_label>` command.
  *
@@ -1911,11 +1911,11 @@ RBRGen4Error RBRInstrumentGen4_getConfigPool(
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when it cannot be created
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \see RBRInstrumentGen4_deleteConfig()
+ * \see RBRGen4_deleteConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-RBRGen4Error RBRInstrumentGen4_createConfig(
+RBRGen4Error RBRGen4_createConfig(
     RBRGen4 *instrument,
     const char *label);
 
@@ -1931,10 +1931,10 @@ RBRGen4Error RBRInstrumentGen4_createConfig(
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when it does not exist
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \see RBRInstrumentGen4_deleteConfigAll()
+ * \see RBRGen4_deleteConfigAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-RBRGen4Error RBRInstrumentGen4_deleteConfig(
+RBRGen4Error RBRGen4_deleteConfig(
     RBRGen4 *instrument,
     const char *label);
 
@@ -1947,14 +1947,14 @@ RBRGen4Error RBRInstrumentGen4_deleteConfig(
  * \return #RBRGEN4_SUCCESS when the configurations are deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_deleteConfig()
+ * \see RBRGen4_deleteConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-RBRGen4Error RBRInstrumentGen4_deleteConfigAll(
+RBRGen4Error RBRGen4_deleteConfigAll(
     RBRGen4 *instrument);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTGEN4CONFIGURATION_H */
+#endif /* LIBRBR_RBRGEN4CONFIGURATION_H */

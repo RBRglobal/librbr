@@ -82,8 +82,8 @@ extern "C"
      * \param source source array
      * \param count the number of elements to copy
      */
-    void cpy_ptrArray_forGroup(RBRInstrumentGen4Group *target[],
-                               RBRInstrumentGen4Group *source[],
+    void cpy_ptrArray_forGroup(RBRGen4Group *target[],
+                               RBRGen4Group *source[],
                                int count);
 
     /**
@@ -93,8 +93,8 @@ extern "C"
      * \param source source array
      * \param count the number of elements to copy
      */
-    void cpy_ptrArray_forSchedule(RBRInstrumentGen4Schedule *target[],
-                                  RBRInstrumentGen4Schedule *source[],
+    void cpy_ptrArray_forSchedule(RBRGen4Schedule *target[],
+                                  RBRGen4Schedule *source[],
                                   int count);
 
     /**
@@ -112,7 +112,7 @@ extern "C"
      */
     RBRGen4Error RBRInstrumentGen4_populateGroupChannels(
         RBRGen4LabelList *channelList,
-        RBRInstrumentGen4ChannelPool *channelPool,
+        RBRGen4ChannelPool *channelPool,
         const RBRGen4Label specifiedChannelLabels[],
         int32_t specifiedChannelLabelCnt);
 
@@ -168,8 +168,8 @@ extern "C"
      * \return RBRGEN4_INVALID_PARAMETER_VALUE if the label is not found
      */
     RBRGen4Error RBRInstrumentGen4_getChannelFromPool(
-        RBRInstrumentGen4Channel **targetChannel,
-        RBRInstrumentGen4ChannelPool *channelPool,
+        RBRGen4Channel **targetChannel,
+        RBRGen4ChannelPool *channelPool,
         const char channelLabel[]);
 
     /**
@@ -181,8 +181,8 @@ extern "C"
      * \return RBRGEN4_INVALID_PARAMETER_VALUE if the label is not found
      */
     RBRGen4Error RBRInstrumentGen4_getGroupFromPool(
-        RBRInstrumentGen4Group **targetGroup,
-        RBRInstrumentGen4GroupPool *groupPool,
+        RBRGen4Group **targetGroup,
+        RBRGen4GroupPool *groupPool,
         const char groupLabel[]);
 
     /**
@@ -194,8 +194,8 @@ extern "C"
      * \return RBRGEN4_INVALID_PARAMETER_VALUE if the label is not found
      */
     RBRGen4Error RBRInstrumentGen4_getScheduleFromPool(
-        RBRInstrumentGen4Schedule **targetSchedule,
-        RBRInstrumentGen4SchedulePool *schedulePool,
+        RBRGen4Schedule **targetSchedule,
+        RBRGen4SchedulePool *schedulePool,
         const char scheduleLabel[]);
 
     /**
@@ -205,8 +205,8 @@ extern "C"
      * \param configLabel label to search for
      */
     RBRGen4Error RBRInstrumentGen4_getConfigFromPool(
-        RBRInstrumentGen4Config **targetConfig,
-        RBRInstrumentGen4ConfigPool *configPool,
+        RBRGen4Config **targetConfig,
+        RBRGen4ConfigPool *configPool,
         const char configLabel[]);
 
     /**
@@ -224,8 +224,8 @@ extern "C"
         const char newGroupLabel[],
         const RBRGen4Label specifiedChannelLabels[],
         int32_t specifiedChannelLabelCnt,
-        RBRInstrumentGen4ChannelPool *channelPool,
-        RBRInstrumentGen4Group *newGroup);
+        RBRGen4ChannelPool *channelPool,
+        RBRGen4Group *newGroup);
 
     /**
      * \brief Create and populate a new parent.
@@ -249,9 +249,9 @@ extern "C"
         const char newScheduleLabel[],
         const RBRGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt,
-        RBRInstrumentGen4ScheduleMode mode,
+        RBRGen4ScheduleMode mode,
         RBRGen4LabelList *groupList,
-        RBRInstrumentGen4Schedule *newSchedule);
+        RBRGen4Schedule *newSchedule);
 
     /**
      * \brief Configure \a targetSchedule to sample continuously.
@@ -262,10 +262,10 @@ extern "C"
      * \return #RBRGEN4_TIMEOUT when a timeout occurs
      * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
      * \return #RBRGEN4_HARDWARE_ERROR if the schedule cannot be configured
-     * \see RBRInstrumentGen4_setSchedule()
+     * \see RBRGen4_setSchedule()
      */
     RBRGen4Error RBRInstrumentGen4_populateScheduleContinuous(
-        RBRInstrumentGen4Schedule *targetSchedule,
+        RBRGen4Schedule *targetSchedule,
         RBRGen4Period period,
         bool castDetection);
 
@@ -284,19 +284,19 @@ extern "C"
      * \return #RBRGEN4_TIMEOUT when a timeout occurs
      * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
      * \return #RBRGEN4_HARDWARE_ERROR if the parent cannot be created or populated
-     * \see RBRInstrumentGen4_createSchedule()
-     * \see RBRInstrumentGen4_setSchedule()
+     * \see RBRGen4_createSchedule()
+     * \see RBRGen4_setSchedule()
      */
     RBRGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
         RBRGen4 *instrument,
         const char newScheduleLabel[],
         const RBRGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt,
-        RBRInstrumentGen4ScheduleMode mode,
+        RBRGen4ScheduleMode mode,
         RBRGen4Period period,
         bool castDetection,
         RBRGen4LabelList *groupList,
-        RBRInstrumentGen4Schedule *newSchedule);
+        RBRGen4Schedule *newSchedule);
 
     /**
      * \brief Create and populate a new parent.
@@ -311,8 +311,8 @@ extern "C"
      * \return #RBRGEN4_TIMEOUT when a timeout occurs
      * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
      * \return #RBRGEN4_HARDWARE_ERROR if the parent cannot be created or populated
-     * \see RBRInstrumentGen4_createConfig()
-     * \see RBRInstrumentGen4_setConfig()
+     * \see RBRGen4_createConfig()
+     * \see RBRGen4_setConfig()
      */
     RBRGen4Error RBRInstrumentGen4_initNewConfig(
         RBRGen4 *instrument,
@@ -320,7 +320,7 @@ extern "C"
         const RBRGen4Label specifiedScheduleLabels[],
         int32_t specifiedScheduleLabelCnt,
         RBRGen4LabelList *scheduleList,
-        RBRInstrumentGen4Config *newConfig);
+        RBRGen4Config *newConfig);
 
 #ifdef __cplusplus
 }

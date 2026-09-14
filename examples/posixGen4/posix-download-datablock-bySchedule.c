@@ -166,9 +166,9 @@ int main(int argc, char *argv[])
 
     // Read the dataset's parameters, including the schedules it ran.
     RBRGen4Label
-        scheduleLabelBuf[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
+        scheduleLabelBuf[RBRGEN4_SCHEDULE_COUNT_MAX];
     RBRGen4LabelList scheduleList = {
-        .size = RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX,
+        .size = RBRGEN4_SCHEDULE_COUNT_MAX,
         .labels = scheduleLabelBuf
     };
     err = RBRInstrumentGen4_getDataset(instrument,

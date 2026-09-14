@@ -27,7 +27,7 @@
 #include <unistd.h>
 
 #include "RBRGen4.h"
-#include "RBRInstrumentGen4Configuration.h"
+#include "RBRGen4Configuration.h"
 #include "RBRInstrumentGen4Deployment.h"
 #include "RBRInstrumentGen4Instrument.h"
 #include "RBRInstrumentGen4Memory.h"
@@ -50,7 +50,7 @@
 #define GROUP_PTS_CHANNEL_COUNT 3
 
 #define SCHEDULE_PTS_LABEL "sch_asc_pts"
-#define SCHEDULE_PTS_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES
+#define SCHEDULE_PTS_MODE RBRGEN4_SCHEDULE_MODE_REGIMES
 #define SCHEDULE_PTS_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
 #define SCHEDULE_PTS_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
 #define SCHEDULE_PTS_COUNT 3
@@ -202,23 +202,23 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4DatasetPool datasetPool;
     RBRInstrumentGen4_deleteDatasetAll(instrument, &datasetPool);
 
-    RBRInstrumentGen4ConfigPool configPool;
-    RBRInstrumentGen4_deleteConfigAll(instrument);
+    RBRGen4ConfigPool configPool;
+    RBRGen4_deleteConfigAll(instrument);
 
-    RBRInstrumentGen4SchedulePool schedulePool;
-    RBRInstrumentGen4_deleteScheduleAll(instrument, &schedulePool);
+    RBRGen4SchedulePool schedulePool;
+    RBRGen4_deleteScheduleAll(instrument, &schedulePool);
 
-    RBRInstrumentGen4GroupPool groupPool;
-    RBRInstrumentGen4_deleteGroupAll(instrument);
+    RBRGen4GroupPool groupPool;
+    RBRGen4_deleteGroupAll(instrument);
 
     /************ group definition ************/
     /* populate all channels and calibrations */
-    RBRInstrumentGen4ChannelPool channelPool;
-    RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
+    RBRGen4ChannelPool channelPool;
+    RBRGen4_getChannelPool(instrument, &channelPool);
 
     for (int32_t i = 0; i < channelPool.count; i++)
     {
-        RBRInstrumentGen4_getChannel(instrument, &channelPool.pool[i]);
+        RBRGen4_getChannel(instrument, &channelPool.pool[i]);
         printf(
             "%s,%s,%d,%d,%d,%s,%s,%s,%u",
             channelPool.pool[i].label,
@@ -227,23 +227,23 @@ int main(int argc, char *argv[])
             channelPool.pool[i].measuringTime,
             channelPool.pool[i].readOutTime,
             channelPool.pool[i].userUnits,
-            RBRInstrumentGen4ChannelNature_name(channelPool.pool[i].nature),
+            RBRGen4ChannelNature_name(channelPool.pool[i].nature),
             channelPool.pool[i].device,
             channelPool.pool[i].derived
         );
     }
     for (int32_t i = 0; i < channelPool.count; i++)
     {
-        RBRInstrumentGen4Calibration calibration;
+        RBRGen4Calibration calibration;
         snprintf(calibration.label,
                  sizeof(calibration.label),
                  "%s",
                  channelPool.pool[i].label);
-        RBRInstrumentGen4_getCalibration(instrument, &calibration);
+        RBRGen4_getCalibration(instrument, &calibration);
     }
 
     /* specify groupLabel, channel labels, and create group instance */
-    RBRInstrumentGen4Group group_pts;
+    RBRGen4Group group_pts;
 
     RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_PTS_LABEL,
@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
                         &group_pts);
 
     /************ schedule definition ************/
-    RBRInstrumentGen4Schedule* schedule_asc_pts;
+    RBRGen4Schedule* schedule_asc_pts;
     RBRInstrumentGen4_initNewScheduleRegimes(instrument,
                          SCHEDULE_PTS_LABEL,
                          SCHEDULE_PTS_GROUPS,
@@ -265,7 +265,7 @@ int main(int argc, char *argv[])
                          &schedule_asc_pts);
 
     /************ configuration definition ************/
-    RBRInstrumentGen4Config config_ascent;
+    RBRGen4Config config_ascent;
     RBRInstrumentGen4_initNewConfig(instrument,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,

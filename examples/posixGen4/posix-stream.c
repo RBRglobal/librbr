@@ -45,7 +45,7 @@
 #define GROUP_PTS_CHANNEL_COUNT 3
 
 #define SCHEDULE_PTS_LABEL "sch_asc_pts"
-#define SCHEDULE_PTS_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS
+#define SCHEDULE_PTS_MODE RBRGEN4_SCHEDULE_MODE_CONTINUOUS
 #define SCHEDULE_PTS_PERIOD 1000
 #define SCHEDULE_PTS_CASTDETECTION false
 
@@ -223,21 +223,21 @@ int main(int argc, char *argv[])
 
     RBRInstrumentGen4_deleteDatasetAll(instrument);
 
-    RBRInstrumentGen4_deleteConfigAll(instrument);
-    RBRInstrumentGen4_deleteScheduleAll(instrument);
-    RBRInstrumentGen4_deleteGroupAll(instrument);
+    RBRGen4_deleteConfigAll(instrument);
+    RBRGen4_deleteScheduleAll(instrument);
+    RBRGen4_deleteGroupAll(instrument);
 
     /************ group definition ************/
     // read the channel pool
-    RBRInstrumentGen4Channel channelBuf[RBRGEN4_CHANNEL_MAX];
-    RBRInstrumentGen4ChannelPool channelPool = {
+    RBRGen4Channel channelBuf[RBRGEN4_CHANNEL_MAX];
+    RBRGen4ChannelPool channelPool = {
         .size = RBRGEN4_CHANNEL_MAX,
         .pool = channelBuf
     };
-    RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
+    RBRGen4_getChannelPool(instrument, &channelPool);
 
     // specify groupLabel, channel labels, and create group instance
-    RBRInstrumentGen4Group group_pts;
+    RBRGen4Group group_pts;
     RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
@@ -246,7 +246,7 @@ int main(int argc, char *argv[])
                         &group_pts); // warning: need to read error!!!
 
     /************ schedule definition ************/
-    RBRInstrumentGen4Schedule schedule_pts;
+    RBRGen4Schedule schedule_pts;
     RBRGen4Label groupLabelBuf[SCHEDULE_PTS_GROUP_COUNT];
     RBRGen4LabelList groupList = {
         .size = SCHEDULE_PTS_GROUP_COUNT,
@@ -266,10 +266,10 @@ int main(int argc, char *argv[])
     switch (link.type)
     {
     case RBRGEN4_LINK_TYPE_USB:
-        schedule_pts.stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_USB;
+        schedule_pts.stream = RBRGEN4_SCHEDULE_STREAM_USB;
         break;
     case RBRGEN4_LINK_TYPE_SERIAL:
-        schedule_pts.stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_SERIAL;
+        schedule_pts.stream = RBRGEN4_SCHEDULE_STREAM_SERIAL;
         break;
     default:
         /*
@@ -286,10 +286,10 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
     // warning: read error for RBRInstrumentGen4_initNewSchedule!!!
-    RBRInstrumentGen4_setSchedule(instrument, &schedule_pts, &groupList);
+    RBRGen4_setSchedule(instrument, &schedule_pts, &groupList);
 
     /************ configuration definition ************/
-    RBRInstrumentGen4Config config_ascent;
+    RBRGen4Config config_ascent;
     RBRGen4Label scheduleLabelBuf[CONFIG_ASCENT_SCHEDULE_COUNT];
     RBRGen4LabelList scheduleList = {
         .size = CONFIG_ASCENT_SCHEDULE_COUNT,

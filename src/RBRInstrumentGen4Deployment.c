@@ -354,7 +354,7 @@ static void RBRInstrumentGen4_parseInstrumentState(
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE otherwise
  */
 static RBRGen4Error RBRInstrumentGen4_checkDeploymentParameters(
-    const RBRInstrumentGen4Config *config,
+    const RBRGen4Config *config,
     const char *datasetLabel,
     RBRInstrumentGen4DeploymentStoragemode storageMode)
 {
@@ -374,7 +374,7 @@ static RBRGen4Error RBRInstrumentGen4_checkDeploymentParameters(
 
 RBRGen4Error RBRInstrumentGen4_verify(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Config *config,
+    const RBRGen4Config *config,
     const char *datasetLabel,
     RBRInstrumentGen4DeploymentStoragemode storageMode,
     RBRInstrumentGen4InstrumentState *state)
@@ -413,7 +413,7 @@ const char *RBRInstrumentGen4DeploymentStoragemode_name(RBRInstrumentGen4Deploym
 
 RBRGen4Error RBRInstrumentGen4_enable(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Config *config,
+    const RBRGen4Config *config,
     const char *datasetLabel,
     RBRInstrumentGen4DeploymentStoragemode storageMode,
     RBRInstrumentGen4InstrumentState *state)

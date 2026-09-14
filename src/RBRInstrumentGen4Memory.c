@@ -18,7 +18,7 @@
 #include <inttypes.h>
 
 #include "RBRGen4.h"
-#include "RBRInstrumentGen4Configuration.h"
+#include "RBRGen4Configuration.h"
 #include "RBRGen4Internal.h"
 #include "RBRInstrumentGen4Memory.h"
 

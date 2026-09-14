@@ -208,7 +208,7 @@ int main(void)
             "storageMode = normal, status = pending, warning = none" RESPONSE_TERMINATOR,
         0);
 
-        RBRInstrumentGen4Config config = {
+        RBRGen4Config config = {
             .label = "profiling"
         };
         char datasetLabel[] = "test";

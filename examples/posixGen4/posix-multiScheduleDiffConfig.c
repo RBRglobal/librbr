@@ -92,7 +92,7 @@
     {                                                \
         GROUP_PTS_LABEL                              \
     }
-#define SCHEDULE_PTS_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES
+#define SCHEDULE_PTS_MODE RBRGEN4_SCHEDULE_MODE_REGIMES
 #define SCHEDULE_PTS_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
 #define SCHEDULE_PTS_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
 #define SCHEDULE_PTS_COUNT 3
@@ -119,7 +119,7 @@
     {                                                \
         GROUP_ODO_LABEL                              \
     }
-#define SCHEDULE_ODO_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES
+#define SCHEDULE_ODO_MODE RBRGEN4_SCHEDULE_MODE_REGIMES
 #define SCHEDULE_ODO_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
 #define SCHEDULE_ODO_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
 #define SCHEDULE_ODO_COUNT 2
@@ -143,7 +143,7 @@
     {                                                \
         GROUP_PH_LABEL                               \
     }
-#define SCHEDULE_PH_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES
+#define SCHEDULE_PH_MODE RBRGEN4_SCHEDULE_MODE_REGIMES
 #define SCHEDULE_PH_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
 #define SCHEDULE_PH_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
 #define SCHEDULE_PH_COUNT 2
@@ -167,7 +167,7 @@
     {                                                \
         GROUP_BBPFL_LABEL                            \
     }
-#define SCHEDULE_BBPFL_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES
+#define SCHEDULE_BBPFL_MODE RBRGEN4_SCHEDULE_MODE_REGIMES
 #define SCHEDULE_BBPFL_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
 #define SCHEDULE_BBPFL_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
 #define SCHEDULE_BBPFL_COUNT 2
@@ -191,7 +191,7 @@
     {                                                \
         GROUP_RADIOMETRY_LABEL                       \
     }
-#define SCHEDULE_RADIOMETRY_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES
+#define SCHEDULE_RADIOMETRY_MODE RBRGEN4_SCHEDULE_MODE_REGIMES
 #define SCHEDULE_RADIOMETRY_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
 #define SCHEDULE_RADIOMETRY_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
 #define SCHEDULE_RADIOMETRY_COUNT 1
@@ -212,7 +212,7 @@
     {                                                \
         GROUP_PTS_LABEL                              \
     }
-#define SCHEDULE_PARK_PTS_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS
+#define SCHEDULE_PARK_PTS_MODE RBRGEN4_SCHEDULE_MODE_CONTINUOUS
 #define SCHEDULE_PARK_PTS_PERIOD 21600000
 #define SCHEDULE_PARK_PTS_CASTDETECTION false
 
@@ -222,7 +222,7 @@
     {                                                \
         GROUP_ODO_LABEL                              \
     }
-#define SCHEDULE_PARK_ODO_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS
+#define SCHEDULE_PARK_ODO_MODE RBRGEN4_SCHEDULE_MODE_CONTINUOUS
 #define SCHEDULE_PARK_ODO_PERIOD 43200000
 #define SCHEDULE_PARK_ODO_CASTDETECTION false
 
@@ -348,23 +348,23 @@ int main(int argc, char *argv[])
 
     RBRInstrumentGen4Configs configPool;
     RBRInstrumentGen4_getConfigs(instrument, &configPool);
-    RBRInstrumentGen4_deleteConfigAll(instrument, &configPool);
+    RBRGen4_deleteConfigAll(instrument, &configPool);
 
-    RBRInstrumentGen4SchedulePool schedulePool;
-    RBRInstrumentGen4_getSchedulePool(instrument, &schedulePool);
-    RBRInstrumentGen4_deleteScheduleAll(instrument, &schedulePool);
+    RBRGen4SchedulePool schedulePool;
+    RBRGen4_getSchedulePool(instrument, &schedulePool);
+    RBRGen4_deleteScheduleAll(instrument, &schedulePool);
 
-    RBRInstrumentGen4GroupPool groupPool;
-    RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
-    RBRInstrumentGen4_deleteGroupAll(instrument, &groupPool);
+    RBRGen4GroupPool groupPool;
+    RBRGen4_getGroupPool(instrument, &groupPool);
+    RBRGen4_deleteGroupAll(instrument, &groupPool);
 
     /************ group definition ************/
     // populate all channelPool and calibrations
-    RBRInstrumentGen4ChannelPool channelPool;
-    RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
+    RBRGen4ChannelPool channelPool;
+    RBRGen4_getChannelPool(instrument, &channelPool);
 
     // specify groupLabel, channel labels, and create group instance
-    RBRInstrumentGen4Group group_pts;
+    RBRGen4Group group_pts;
     RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
@@ -372,7 +372,7 @@ int main(int argc, char *argv[])
                         &group_pts,
                         &groupPool); // warning: need to read error!!!
 
-    RBRInstrumentGen4Group group_odo;
+    RBRGen4Group group_odo;
     RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_ODO_LABEL,
                         GROUP_ODO_CHANNELS,
@@ -380,7 +380,7 @@ int main(int argc, char *argv[])
                         &group_odo,
                         &groupPool); // warning: need to read error!!!
 
-    RBRInstrumentGen4Group group_ph;
+    RBRGen4Group group_ph;
     RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_PH_LABEL,
                         GROUP_PH_CHANNELS,
@@ -388,7 +388,7 @@ int main(int argc, char *argv[])
                         &group_ph,
                         &groupPool); // warning: need to read error!!!
 
-    RBRInstrumentGen4Group group_bbpfl;
+    RBRGen4Group group_bbpfl;
     RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_BBPFL_LABEL,
                         GROUP_BBPFL_CHANNELS,
@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
                         &group_bbpfl,
                         &groupPool); // warning: need to read error!!!
 
-    RBRInstrumentGen4Group group_radiometry;
+    RBRGen4Group group_radiometry;
     RBRInstrumentGen4_initNewGroup(instrument,
                         GROUP_RADIOMETRY_LABEL,
                         GROUP_RADIOMETRY_CHANNELS,
@@ -405,7 +405,7 @@ int main(int argc, char *argv[])
                         &groupPool); // warning: need to read error!!!
 
     /************ schedule definition ************/
-    RBRInstrumentGen4Schedule schedule_pts;
+    RBRGen4Schedule schedule_pts;
     RBRInstrumentGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_PTS_LABEL,
                           SCHEDULE_PTS_GROUPS,
@@ -414,9 +414,9 @@ int main(int argc, char *argv[])
                           SCHEDULE_PTS_REGIME,
                           &schedule_pts,
                           &schedulePool);
-    RBRInstrumentGen4_setSchedule(instrument, &schedule_pts);
+    RBRGen4_setSchedule(instrument, &schedule_pts);
 
-    RBRInstrumentGen4Schedule schedule_odo;
+    RBRGen4Schedule schedule_odo;
     RBRInstrumentGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_ODO_LABEL,
                           SCHEDULE_ODO_GROUPS,
@@ -425,9 +425,9 @@ int main(int argc, char *argv[])
                           SCHEDULE_ODO_REGIME,
                           &schedule_odo,
                           &schedulePool);
-    RBRInstrumentGen4_setSchedule(instrument, &schedule_odo);
+    RBRGen4_setSchedule(instrument, &schedule_odo);
 
-    RBRInstrumentGen4Schedule schedule_ph;
+    RBRGen4Schedule schedule_ph;
     RBRInstrumentGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_PH_LABEL,
                           SCHEDULE_PH_GROUPS,
@@ -436,9 +436,9 @@ int main(int argc, char *argv[])
                           SCHEDULE_PH_REGIME,
                           &schedule_ph,
                           &schedulePool);
-    RBRInstrumentGen4_setSchedule(instrument, &schedule_ph);
+    RBRGen4_setSchedule(instrument, &schedule_ph);
 
-    RBRInstrumentGen4Schedule schedule_BBPFL;
+    RBRGen4Schedule schedule_BBPFL;
     RBRInstrumentGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_BBPFL_LABEL,
                           SCHEDULE_BBPFL_GROUPS,
@@ -447,9 +447,9 @@ int main(int argc, char *argv[])
                           SCHEDULE_BBPFL_REGIME,
                           &schedule_BBPFL,
                           &schedulePool);
-    RBRInstrumentGen4_setSchedule(instrument, &schedule_BBPFL);
+    RBRGen4_setSchedule(instrument, &schedule_BBPFL);
 
-    RBRInstrumentGen4Schedule schedule_radiometry;
+    RBRGen4Schedule schedule_radiometry;
     RBRInstrumentGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_RADIOMETRY_LABEL,
                           SCHEDULE_RADIOMETRY_GROUPS,
@@ -458,9 +458,9 @@ int main(int argc, char *argv[])
                           SCHEDULE_RADIOMETRY_REGIME,
                           &schedule_radiometry,
                           &schedulePool);
-    RBRInstrumentGen4_setSchedule(instrument, &schedule_radiometry);
+    RBRGen4_setSchedule(instrument, &schedule_radiometry);
 
-    RBRInstrumentGen4Schedule schedule_pts_park;
+    RBRGen4Schedule schedule_pts_park;
     RBRInstrumentGen4_initNewScheduleContinuous(instrument,
                              SCHEDULE_PARK_PTS_LABEL,
                              SCHEDULE_PTS_GROUPS,
@@ -470,9 +470,9 @@ int main(int argc, char *argv[])
                              SCHEDULE_PARK_PTS_CASTDETECTION,
                              &schedule_pts_park,
                              &schedulePool);
-    RBRInstrumentGen4_setSchedule(instrument, &schedule_pts_park);
+    RBRGen4_setSchedule(instrument, &schedule_pts_park);
 
-    RBRInstrumentGen4Schedule schedule_park_odo;
+    RBRGen4Schedule schedule_park_odo;
     RBRInstrumentGen4_initNewScheduleContinuous(instrument,
                              SCHEDULE_PARK_ODO_LABEL,
                              SCHEDULE_PARK_ODO_GROUPS,
@@ -482,10 +482,10 @@ int main(int argc, char *argv[])
                              SCHEDULE_PARK_ODO_CASTDETECTION,
                              &schedule_park_odo,
                              &schedulePool);
-    RBRInstrumentGen4_setSchedule(instrument, &schedule_park_odo);
+    RBRGen4_setSchedule(instrument, &schedule_park_odo);
 
     /************ configuration definition ************/
-    RBRInstrumentGen4Config config_ascent;
+    RBRGen4Config config_ascent;
     RBRInstrumentGen4_initNewConfig(instrument,
                          CONFIG_ASCENT_LABEL,
                          CONFIG_ASCENT_SCHEDULES,
@@ -493,7 +493,7 @@ int main(int argc, char *argv[])
                          &config_ascent,
                          &configPool);
 
-    RBRInstrumentGen4Config config_park;
+    RBRGen4Config config_park;
     RBRInstrumentGen4_initNewConfig(instrument,
                          CONFIG_PARK_LABEL,
                          CONFIG_PARK_SCHEDULES,

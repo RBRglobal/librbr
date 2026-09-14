@@ -398,7 +398,7 @@ TEST_LOGGER4(setDeployment)
 
 typedef struct VerifyTest
 {
-    const RBRInstrumentGen4Config config;
+    const RBRGen4Config config;
     const char *datasetLabel;
     RBRInstrumentGen4DeploymentStoragemode storageMode;
     const char *command;
@@ -568,7 +568,7 @@ TEST_LOGGER4(verify)
 
 typedef struct EnableTest
 {
-    const RBRInstrumentGen4Config config;
+    const RBRGen4Config config;
     const char *datasetLabel;
     RBRInstrumentGen4DeploymentStoragemode storageMode;
     const char *command;

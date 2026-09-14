@@ -117,7 +117,7 @@ typedef struct RBRInstrumentGen4Event
     RBRInstrumentGen4EventType type;
     
     /** \brief The schedule(s) that this event belongs to. */
-    RBRInstrumentGen4Schedule *schedules[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
+    RBRGen4Schedule *schedules[RBRGEN4_SCHEDULE_COUNT_MAX];
 
     /** \brief The timestamp of the event. */
     RBRGen4DateTime timestamp;

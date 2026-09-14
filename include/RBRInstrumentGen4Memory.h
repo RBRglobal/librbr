@@ -15,7 +15,7 @@
 #define LIBRBR_RBRINSTRUMENTGEN4MEMORY_H
 
 #include "RBRGen4.h"
-#include "RBRInstrumentGen4Configuration.h"
+#include "RBRGen4Configuration.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

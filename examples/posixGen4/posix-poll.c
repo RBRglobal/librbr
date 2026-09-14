@@ -120,21 +120,21 @@ int main(int argc, char *argv[])
     }
 
     // read the channel pool
-    RBRInstrumentGen4Channel channelBuf[RBRGEN4_CHANNEL_MAX];
-    RBRInstrumentGen4ChannelPool channelPool = {
+    RBRGen4Channel channelBuf[RBRGEN4_CHANNEL_MAX];
+    RBRGen4ChannelPool channelPool = {
         .size = RBRGEN4_CHANNEL_MAX,
         .pool = channelBuf
     };
-    RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
+    RBRGen4_getChannelPool(instrument, &channelPool);
 
     // Only the first group is polled, so only one label is kept; the pool
     // reports that the rest were discarded, which is expected here.
-    RBRInstrumentGen4Group groupBuf[1];
-    RBRInstrumentGen4GroupPool groupPool = {
+    RBRGen4Group groupBuf[1];
+    RBRGen4GroupPool groupPool = {
         .size = 1,
         .pool = groupBuf
     };
-    err = RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
+    err = RBRGen4_getGroupPool(instrument, &groupPool);
     if (err != RBRGEN4_SUCCESS
         && err != RBRGEN4_TRUNCATED)
     {
