@@ -659,7 +659,7 @@ RBRGen4Error RBRGen4_errorCheckResponse(
     }
 
     instrument->response.type = RBRGEN4_RESPONSE_INFO;
-    instrument->response.error = RBRINSTRUMENTGEN4_HARDWARE_ERROR_NONE;
+    instrument->response.error = RBRGEN4_HARDWARE_ERROR_NONE;
     instrument->response.response = beginning;
 
     return RBRGEN4_SUCCESS;
@@ -691,7 +691,7 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *instrument,
 {
     /* Reset the response state. */
     instrument->response.type = RBRGEN4_RESPONSE_UNKNOWN_TYPE;
-    instrument->response.error = RBRINSTRUMENTGEN4_HARDWARE_ERROR_NONE;
+    instrument->response.error = RBRGEN4_HARDWARE_ERROR_NONE;
     instrument->response.response = NULL;
 
     RBRGen4Sample *sampleTarget;
@@ -970,7 +970,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
              *   all and should be ignored.
              */
             if (err == RBRGEN4_HARDWARE_ERROR && (instrument->response.error ==
-                                                            RBRINSTRUMENTGEN4_HARDWARE_ERROR_INVALID_COMMAND))
+                                                            RBRGEN4_HARDWARE_ERROR_INVALID_COMMAND))
             {
                 /* We have no message to inspect, so we can only assume the
                  * error is legitimate and pass it along to the user. */

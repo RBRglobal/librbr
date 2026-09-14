@@ -707,7 +707,7 @@ typedef struct DisableTest
     const char *response;
     RBRGen4Error expectedError;
     RBRGen4ResponseType expectedType;
-    RBRInstrumentGen4HardwareError expectedHardwareError;
+    RBRGen4HardwareError expectedHardwareError;
     RBRInstrumentGen4InstrumentState expectedState;
 } DisableTest;
 
@@ -718,7 +718,7 @@ TEST_LOGGER4(disable)
         { "disable state=disabled" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           RBRGEN4_RESPONSE_INFO,
-          RBRINSTRUMENTGEN4_HARDWARE_ERROR_NONE,
+          RBRGEN4_HARDWARE_ERROR_NONE,
           RBRINSTRUMENTGEN4_INSTRUMENT_STATE_DISABLED },
         /*
          * Disabling an instrument that is already disabled is a warning, which
@@ -728,18 +728,18 @@ TEST_LOGGER4(disable)
         { "WRN-435 instrument state is already disabled" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
           RBRGEN4_RESPONSE_WARNING,
-          RBRINSTRUMENTGEN4_HARDWARE_ERROR_INSTRUMENT_STATE_IS_ALREADY_DISABLED,
+          RBRGEN4_HARDWARE_ERROR_INSTRUMENT_STATE_IS_ALREADY_DISABLED,
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         /* A state the library does not model reads as unknown. */
         { "disable state=bogus" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           RBRGEN4_RESPONSE_INFO,
-          RBRINSTRUMENTGEN4_HARDWARE_ERROR_NONE,
+          RBRGEN4_HARDWARE_ERROR_NONE,
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { "disable" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           RBRGEN4_RESPONSE_INFO,
-          RBRINSTRUMENTGEN4_HARDWARE_ERROR_NONE,
+          RBRGEN4_HARDWARE_ERROR_NONE,
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { 0 }
     };
@@ -762,7 +762,7 @@ TEST_LOGGER4(disable)
                             RBRGen4ResponseType);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedHardwareError,
                             instrument->response.error,
-                            RBRInstrumentGen4HardwareError);
+                            RBRGen4HardwareError);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedState,
                             actual,
                             RBRInstrumentGen4InstrumentState);

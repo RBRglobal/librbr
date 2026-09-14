@@ -131,7 +131,7 @@ GEN4_OBJECTS := src/RBRGen4.o \
                 src/RBRInstrumentGen4Communication.o \
                 src/RBRInstrumentGen4Configuration.o \
                 src/RBRInstrumentGen4Deployment.o \
-                src/RBRInstrumentGen4HardwareErrors.o \
+                src/RBRGen4HardwareErrors.o \
                 src/RBRInstrumentGen4Instrument.o \
                 src/RBRGen4Internal.o \
                 src/RBRInstrumentGen4Memory.o \

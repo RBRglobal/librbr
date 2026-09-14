@@ -23,7 +23,7 @@ extern "C" {
 #include <inttypes.h>
 #include <stdbool.h>
 
-#include "RBRInstrumentGen4HardwareErrors.h"
+#include "RBRGen4HardwareErrors.h"
 
 /**
  * \brief The library name.
@@ -761,9 +761,9 @@ typedef struct RBRGen4Response
      * Will be `0` for informational responses. Otherwise, will include the
      * error number indicated by the instrument; e.g., for “E0109: feature not
      * available”, this field will contain `109`, aka
-     * RBRINSTRUMENTGEN4_HARDWARE_ERROR_FEATURE_NOT_AVAILABLE.
+     * RBRGEN4_HARDWARE_ERROR_FEATURE_NOT_AVAILABLE.
      */
-    RBRInstrumentGen4HardwareError error;
+    RBRGen4HardwareError error;
     /**
      * \brief The response, if available.
      *
@@ -1052,7 +1052,7 @@ void RBRGen4_setUserData(RBRGen4 *instrument, void *userData);
  *
  * If the instrument responded with an error or a warning to the last command,
  * this function returns that error. Otherwise, and before any commands have
- * been issued to the instrument, it returns RBRINSTRUMENTGEN4_HARDWARE_ERROR_NONE.
+ * been issued to the instrument, it returns RBRGEN4_HARDWARE_ERROR_NONE.
  *
  * Note that this information is _not_ recorded by the instrument: it is
  * recorded by the library as responses are parsed. Accordingly, the value will
@@ -1067,7 +1067,7 @@ void RBRGen4_setUserData(RBRGen4 *instrument, void *userData);
  * \return the last error
  * \see RBRGen4_getLastHardwareErrorMessage() for the error message
  */
-RBRInstrumentGen4HardwareError RBRGen4_getLastHardwareError(
+RBRGen4HardwareError RBRGen4_getLastHardwareError(
     const RBRGen4 *instrument);
 
 /**
@@ -1079,7 +1079,7 @@ RBRInstrumentGen4HardwareError RBRGen4_getLastHardwareError(
  * message. Otherwise, and before any commands have been issued to the
  * instrument, it returns `NULL`.
  *
- * This function differs from RBRInstrumentGen4HardwareError_name() in that it
+ * This function differs from RBRGen4HardwareError_name() in that it
  * returns the literal message produced by the instrument. This may include
  * instance-specific error details (e.g., in the case of an invalid parameter,
  * exactly which parameter was invalid). However, the enum name is a good
