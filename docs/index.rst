@@ -1,10 +1,31 @@
-libRBR
-======
+.. include:: ../README.rst
+   :end-before: .. Links below are repository-relative
 
-libRBR provides an interface for simplified communication with RBR
-instruments.
+.. _the documentation on porting: porting.html
+.. _Windows: windows.html
+.. _the introduction: introduction.html
+.. _contributions: contributing.html
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Guides
+
+   introduction
+   porting
+   timeouts
+   bitfields
+   windows
 
 .. toctree::
    :maxdepth: 2
+   :caption: Reference
 
    api/index
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Project
+
+   tests
+   contributing
+   changes

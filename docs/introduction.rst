@@ -1,8 +1,11 @@
-# Introduction
+Introduction
+============
 
-## API Concepts
+API Concepts
+------------
 
-### Object-Oriented Design
+Object-Oriented Design
+~~~~~~~~~~~~~~~~~~~~~~
 
 The library adheres
 to object-oriented design principles.
@@ -18,7 +21,7 @@ This extends to many types
 beyond just the core context objects;
 for example,
 all enum types have a corresponding “name” method
-(e.g., #RBRGen3Error and RBRGen3Error_name()).
+(e.g., :c:type:`RBRGen3Error` and :c:func:`RBRGen3Error_name`).
 
 RBRGen3 and RBRGen3Parser
 are the only struct types which leverage
@@ -38,36 +41,49 @@ we're open to exposing more
 of these internal structures
 as the need presents.
 
-### Error Propagation
+Error Propagation
+~~~~~~~~~~~~~~~~~
 
 All but the most simple,
-[functionally-pure][pure] functions
+`functionally-pure <https://en.wikipedia.org/wiki/Purely_functional_programming>`__ functions
 return an error indicator
-of type #RBRGen3Error.
+of type :c:type:`RBRGen3Error`.
 Data is returned to the caller via out pointers.
 This means that a common pattern
 can be used for calling library functions
 and either handling any error
 or passing it further up the call stack:
 
-~~~{.c}
-RBRGen3Error err;
-RBRGen3Foo foo;
-if ((err = RBRGen3_foo(conn, &foo)) != RBRGEN3_SUCCESS)
-{
-    return err;
-}
-/* Operate on foo. */
-~~~
+.. code-block:: c
 
-[pure]: https://en.wikipedia.org/wiki/Purely_functional_programming
+   RBRGen3Error err;
+   RBRGen3Foo foo;
+   if ((err = RBRGen3_foo(conn, &foo)) != RBRGEN3_SUCCESS)
+   {
+       return err;
+   }
+   /* Operate on foo. */
 
-### Memory Ownership
+Read-Only and Write-Only Members
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some members of parameter structs
+are marked **Read-only** or **Write-only**.
+A read-only member corresponds to a read-only instrument parameter:
+it is populated
+when reading parameters from the instrument,
+and its value is ignored
+when sending parameters to the instrument.
+A write-only member is used only
+when writing parameters to the instrument.
+
+Memory Ownership
+~~~~~~~~~~~~~~~~
 
 The only dynamic memory allocations
 performed by the library
-occur within RBRGen3_open()
-and RBRGen3Parser_init(),
+occur within :c:func:`RBRGen3_open`
+and :c:func:`RBRGen3Parser_init`,
 as described in the documentation
 for those functions.
 In all other cases,
@@ -81,7 +97,8 @@ the important part is that
 it is managed by the caller,
 never by the library.
 
-### Callbacks
+Callbacks
+~~~~~~~~~
 
 The library isolates itself
 from platform-specific tasks
@@ -90,16 +107,18 @@ by delegating these tasks
 to callback functions
 implemented by the library user.
 
-### Streaming
+Streaming
+~~~~~~~~~
 
 Similarly, streaming data received from the instrument
 while parsing other command responses
 is forwarded to the user via a callback.
 This lets the user receive streaming samples
 without interrupting other instrument communication.
-See the `posixGen3/posix-stream.c` example.
+See the ``posixGen3/posix-stream.c`` example.
 
-### Parsing
+Parsing
+~~~~~~~
 
 For consistency with
 the streaming data model,
@@ -108,4 +127,4 @@ This enables convenient interleaving
 of downloading and parsing,
 and similar implementation of handling
 for streamed and downloaded data.
-See the `posixGen3/posix-parse-download.c` example.
+See the ``posixGen3/posix-parse-download.c`` example.

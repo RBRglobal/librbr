@@ -12,7 +12,7 @@
 
 * Environment: GNU Make and a C99-compliant C compiler; this can be [Cygwin]
 
-[Cygwin]: ../../cygwin.md
+[Cygwin]: ../../docs/windows.rst
 
 ## Building
 
