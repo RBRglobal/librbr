@@ -57,21 +57,21 @@ if(CONFIG_LIBRBR)
 
     if(CONFIG_LIBRBR_GEN4)
         zephyr_compile_definitions(
-            RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX=CONFIG_RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX
-            RBRINSTRUMENTGEN4_RESPONSE_BUFFER_MAX=CONFIG_RBRINSTRUMENTGEN4_RESPONSE_BUFFER_MAX
-            RBRINSTRUMENTGEN4_CHANNEL_MAX=CONFIG_RBRINSTRUMENTGEN4_CHANNEL_MAX
+            RBRGEN4_COMMAND_BUFFER_MAX=CONFIG_RBRGEN4_COMMAND_BUFFER_MAX
+            RBRGEN4_RESPONSE_BUFFER_MAX=CONFIG_RBRGEN4_RESPONSE_BUFFER_MAX
+            RBRGEN4_CHANNEL_MAX=CONFIG_RBRGEN4_CHANNEL_MAX
         )
 
         zephyr_library_sources(
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRDynamicCorrectionGen4.c
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4.c
+            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Communication.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Configuration.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Deployment.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4HardwareErrors.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Instrument.c
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Internal.c
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Internal.h
+            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Internal.c
+            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Internal.h
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Memory.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Realtime.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRParserGen4.c

@@ -18,7 +18,7 @@ extern "C" {
 #include <inttypes.h>
 #include <stdbool.h>
 
-#include "RBRInstrumentGen4.h"
+#include "RBRGen4.h"
 #include "RBRInstrumentGen4Realtime.h"
 #include "RBRInstrumentGen4Memory.h"
 
@@ -37,12 +37,12 @@ struct RBRParserGen4;
  *
  * \param [in] parser the dataset parser which parsed the sample
  * \param [in] sample the parsed sample
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the sample data is successfully consumed
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR when an unrecoverable error occurs
+ * \return #RBRGEN4_SUCCESS when the sample data is successfully consumed
+ * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRInstrumentGen4Error (*RBRParserGen4SampleCallback)(
+typedef RBRGen4Error (*RBRParserGen4SampleCallback)(
     const struct RBRParserGen4 *parser,
-    const struct RBRInstrumentGen4Sample *const sample);
+    const struct RBRGen4Sample *const sample);
 
 /**
  * \brief Instrument event types.
@@ -102,7 +102,7 @@ typedef enum RBRInstrumentGen4EventType
  *
  * \param [in] type the event type
  * \return a string name for the event type
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4EventType_name(RBRInstrumentGen4EventType type);
 
@@ -120,7 +120,7 @@ typedef struct RBRInstrumentGen4Event
     RBRInstrumentGen4Schedule *schedules[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
 
     /** \brief The timestamp of the event. */
-    RBRInstrumentGen4DateTime timestamp;
+    RBRGen4DateTime timestamp;
 
     /**
      * \brief The size of the complete event in bytes.
@@ -143,10 +143,10 @@ typedef struct RBRInstrumentGen4Event
  *
  * \param [in] parser the dataset parser which parsed the event
  * \param [in] event the parsed event
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the event data is successfully consumed
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR when an unrecoverable error occurs
+ * \return #RBRGEN4_SUCCESS when the event data is successfully consumed
+ * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRInstrumentGen4Error (*RBRParserGen4EventCallback)(
+typedef RBRGen4Error (*RBRParserGen4EventCallback)(
     const struct RBRParserGen4 *parser,
     const struct RBRInstrumentGen4Event *const event);
 
@@ -155,7 +155,7 @@ typedef RBRInstrumentGen4Error (*RBRParserGen4EventCallback)(
  *
  * All of the callback functions are optional; however, where any callback
  * function is provided, the corresponding buffer must also be provided, or
- * else RBRParserGen4_init() will return #RBRINSTRUMENTGEN4_MISSING_CALLBACK.
+ * else RBRParserGen4_init() will return #RBRGEN4_MISSING_CALLBACK.
  */
 typedef struct RBRParserGen4Callbacks
 {
@@ -171,7 +171,7 @@ typedef struct RBRParserGen4Callbacks
      *
      * Required only when RBRParserGen4Callbacks.sample is populated.
      */
-    RBRInstrumentGen4Sample *sampleBuffer;
+    RBRGen4Sample *sampleBuffer;
 
     /**
      * \brief Called when an event has been parsed.
@@ -197,8 +197,8 @@ typedef struct RBRParserGen4Config
      * \brief The number of instrument channels in each sample.
      *
      * If the value is less than or equal to 0 or exceeds
-     * #RBRINSTRUMENTGEN4_CHANNEL_MAX, then RBRParserGen4_init() will return
-     * #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE.
+     * #RBRGEN4_CHANNEL_MAX, then RBRParserGen4_init() will return
+     * #RBRGEN4_INVALID_PARAMETER_VALUE.
      */
     int32_t channelCount;
 
@@ -212,7 +212,7 @@ typedef struct RBRParserGen4Config
      * instrument with very high precision sensors may use float64 to maintain
      * the necessary level of resolution.
      */
-    RBRInstrumentGen4DataType datatype;
+    RBRGen4DataType datatype;
 } RBRParserGen4Config;
 
 /**
@@ -243,27 +243,27 @@ typedef struct RBRParserGen4
  * \brief Initialize a dataset parser.
  *
  * The use of the \a parser argument is the same as that of the \a instrument
- * argument to RBRInstrumentGen4_open(): when given as `NULL`, instance memory will
+ * argument to RBRGen4_open(): when given as `NULL`, instance memory will
  * be allocated for you; otherwise, the pointer target will be used as instance
- * storage. See RBRInstrumentGen4_open() for “do”s and “don't”s inherent to this
+ * storage. See RBRGen4_open() for “do”s and “don't”s inherent to this
  * approach.
  *
- * Again, as with the \a callbacks argument to RBRInstrumentGen4_open(), the
+ * Again, as with the \a callbacks argument to RBRGen4_open(), the
  * \a config and \a callbacks structures will be copied into the RBRParserGen4
  * structure and no references to them are retained.
  *
  * Currently, the only supported memory format is
  * RBRINSTRUMENTGEN4_MEMFORMAT_CALBIN00 (“EasyParse”). Requesting any other format
- * via RBRParserGen4Config will cause #RBRINSTRUMENTGEN4_UNSUPPORTED to be returned.
+ * via RBRParserGen4Config will cause #RBRGEN4_UNSUPPORTED to be returned.
  *
  * Both callback functions are optional, but that probably isn't very useful:
  * after all, you won't receive any data that way. Still, the library won't
  * complain. If any buffer is not given for a callback function which _is_
  * given, or if \a callbacks itself is given as `NULL`, then
- * #RBRINSTRUMENTGEN4_MISSING_CALLBACK is returned and the parser instantiation
+ * #RBRGEN4_MISSING_CALLBACK is returned and the parser instantiation
  * will not be completed.
  *
- * In the event of any return value other than #RBRINSTRUMENTGEN4_SUCCESS, any
+ * In the event of any return value other than #RBRGEN4_SUCCESS, any
  * memory allocated by this constructor is freed. That is, in the event of
  * failure, no cleanup of library resources is required. In the event of a
  * successful result, RBRParserGen4_destroy() should be used to release allocated
@@ -273,13 +273,13 @@ typedef struct RBRParserGen4
  * \param [in] callbacks the set of callbacks to be used by the parser
  * \param [in] config the parser configuration
  * \param [in] userData arbitrary user data; useful in callbacks
- * \return #RBRINSTRUMENTGEN4_SUCCESS if the parser was instantiated successfully
- * \return #RBRINSTRUMENTGEN4_MISSING_CALLBACK if no callbacks were provided
- * \return #RBRINSTRUMENTGEN4_UNSUPPORTED if the memory format is unsupported
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if the config is invalid
+ * \return #RBRGEN4_SUCCESS if the parser was instantiated successfully
+ * \return #RBRGEN4_MISSING_CALLBACK if no callbacks were provided
+ * \return #RBRGEN4_UNSUPPORTED if the memory format is unsupported
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE if the config is invalid
  * \see RBRParserGen4_destroy()
  */
-RBRInstrumentGen4Error RBRParserGen4_init(RBRParserGen4 **parser,
+RBRGen4Error RBRParserGen4_init(RBRParserGen4 **parser,
                                   const RBRParserGen4Callbacks *callbacks,
                                   const RBRParserGen4Config *config,
                                   void *userData);
@@ -290,10 +290,10 @@ RBRInstrumentGen4Error RBRParserGen4_init(RBRParserGen4 **parser,
  * Frees the buffer allocated by RBRParserGen4_init() if necessary.
  *
  * \param [in,out] parser the dataset parser to close
- * \return #RBRINSTRUMENTGEN4_SUCCESS if the parser was closed successfully
+ * \return #RBRGEN4_SUCCESS if the parser was closed successfully
  * \see RBRParserGen4_init()
  */
-RBRInstrumentGen4Error RBRParserGen4_destroy(RBRParserGen4 *parser);
+RBRGen4Error RBRParserGen4_destroy(RBRParserGen4 *parser);
 
 /**
  * \brief Get the parser configuration.
@@ -344,13 +344,13 @@ void RBRParserGen4_setUserData(RBRParserGen4 *parser, void *userData);
  * \param [in,out] size initially, the size of the data given by \a data; set
  *                                 by the callback to the number of bytes
  *                                 actually parsed
- * \return #RBRINSTRUMENTGEN4_SUCCESS when no parsing errors occur
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when an invalid dataset is
+ * \return #RBRGEN4_SUCCESS when no parsing errors occur
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when an invalid dataset is
  *                                                given, or when the parser
  *                                                configuration is incomplete
  *                                                or invalid
  */
-RBRInstrumentGen4Error RBRParserGen4_parse(RBRParserGen4 *parser,
+RBRGen4Error RBRParserGen4_parse(RBRParserGen4 *parser,
                                    RBRInstrumentGen4Block block,
                                    const void *const data,
                                    int32_t *size);

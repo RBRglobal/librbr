@@ -8,7 +8,7 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#include "RBRInstrumentGen4.h"
+#include "RBRGen4.h"
 #include "RBRInstrumentGen4HardwareErrors.h"
 
 const char *RBRInstrumentGen4HardwareError_name(RBRInstrumentGen4HardwareError error)

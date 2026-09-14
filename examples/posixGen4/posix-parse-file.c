@@ -32,9 +32,9 @@
 #include "posix-shared.h"
 #include "RBRParserGen4.h"
 
-RBRInstrumentGen4Error parserSample(
+RBRGen4Error parserSample(
     const struct RBRParserGen4 *parser,
-    const struct RBRInstrumentGen4Sample *const sample)
+    const struct RBRGen4Sample *const sample)
 {
     /* Unused. */
     (void) parser;
@@ -52,7 +52,7 @@ RBRInstrumentGen4Error parserSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -84,9 +84,9 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s (built %s).\n",
             programName,
-            RBRINSTRUMENTGEN4_LIB_NAME,
-            RBRINSTRUMENTGEN4_LIB_VERSION,
-            RBRINSTRUMENTGEN4_LIB_BUILD_DATE);
+            RBRGEN4_LIB_NAME,
+            RBRGEN4_LIB_VERSION,
+            RBRGEN4_LIB_BUILD_DATE);
 
     RBRParserGen4 *parser = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
     parser = &parserSpace;
     #endif
 
-    RBRInstrumentGen4Sample sampleBuffer;
+    RBRGen4Sample sampleBuffer;
     RBRParserGen4Callbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
@@ -102,19 +102,19 @@ int main(int argc, char *argv[])
 
     RBRParserGen4Config parserConfig = {
         .channelCount = channels,
-        .datatype = RBRINSTRUMENTGEN4_DATATYPE_FLOAT32
+        .datatype = RBRGEN4_DATATYPE_FLOAT32
     };
 
-    RBRInstrumentGen4Error err;
+    RBRGen4Error err;
     if ((err = RBRParserGen4_init(
              &parser,
              &parserCallbacks,
              &parserConfig,
-             NULL)) != RBRINSTRUMENTGEN4_SUCCESS)
+             NULL)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to initialize parser: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }

@@ -127,13 +127,13 @@ GEN3_OBJECTS := src/RBRInstrumentGen3.o \
                 src/RBRParserGen3.o
 
 ## \brief Objects for the Gen4 (SL4/SEN4/L4) API.
-GEN4_OBJECTS := src/RBRInstrumentGen4.o \
+GEN4_OBJECTS := src/RBRGen4.o \
                 src/RBRInstrumentGen4Communication.o \
                 src/RBRInstrumentGen4Configuration.o \
                 src/RBRInstrumentGen4Deployment.o \
                 src/RBRInstrumentGen4HardwareErrors.o \
                 src/RBRInstrumentGen4Instrument.o \
-                src/RBRInstrumentGen4Internal.o \
+                src/RBRGen4Internal.o \
                 src/RBRInstrumentGen4Memory.o \
                 src/RBRInstrumentGen4Realtime.o \
                 src/RBRParserGen4.o
@@ -269,7 +269,7 @@ testsGen4/tests.c: $(foreach module,$(GEN4_TEST_MODULES),testsGen4/$(module).c)
 		| sed -e 's/$$/;/' >>$@
 	@echo "InstrumentTest instrumentTests[] = {" >>$@
 	@grep -ho 'TEST_LOGGER[4]([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRINSTRUMENTGEN4_LOGGER\1, test_\2_l\1},/' \
+		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRGEN4_LOGGER\1, test_\2_l\1},/' \
 		>>$@
 	@echo "    {0}" >>$@
 	@echo "};" >>$@

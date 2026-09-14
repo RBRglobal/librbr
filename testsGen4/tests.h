@@ -25,7 +25,7 @@ extern "C" {
 /* Required for strcmp, strlen. */
 #include <string.h>
 
-#include "RBRInstrumentGen4.h"
+#include "RBRGen4.h"
 #include "RBRDynamicCorrectionGen4.h"
 #include "RBRParserGen4.h"
 
@@ -194,12 +194,12 @@ extern "C" {
 #define COMMAND_RESPONSE_SIZE 1024
 
 /**
- * \brief Declare an empty RBRInstrumentGen4LabelList named \a name over a
+ * \brief Declare an empty RBRGen4LabelList named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
 #define RBRINSTRUMENTGEN4_LABEL_LIST_DECL(name, size_) \
-    RBRInstrumentGen4Label name##Buffer[size_]; \
-    RBRInstrumentGen4LabelList name = (RBRInstrumentGen4LabelList) { \
+    RBRGen4Label name##Buffer[size_]; \
+    RBRGen4LabelList name = (RBRGen4LabelList) { \
         .size = (size_), \
         .count = 0, \
         .labels = name##Buffer \
@@ -315,7 +315,7 @@ typedef struct TestIOBuffers
     /** \brief How far into the write buffer the instrument has written. */
     int32_t writeBufferPos;
     /** \brief The last sample received from the test instrument. */
-    RBRInstrumentGen4Sample streamSample;
+    RBRGen4Sample streamSample;
 } TestIOBuffers;
 
 /**
@@ -349,7 +349,7 @@ const char *bool_name(bool value);
  */
 /* Uncrustify thinks that asterisks in macros are multiplication operators and
  * incorrectly adds spacing, so we'll turn *INDENT-OFF* just for this. */
-#define _TEST(fn) bool test_##fn(RBRInstrumentGen4 *instrument, \
+#define _TEST(fn) bool test_##fn(RBRGen4 *instrument, \
                                  TestIOBuffers *buffers)
 /* *INDENT-ON* */
 
@@ -368,7 +368,7 @@ const char *bool_name(bool value);
  * \param buffers the test I/O buffers
  * \return whether the test passed
  */
-typedef bool (InstrumentTestFunction)(RBRInstrumentGen4 *instrument,
+typedef bool (InstrumentTestFunction)(RBRGen4 *instrument,
                                       TestIOBuffers *buffers);
 
 /**
@@ -381,7 +381,7 @@ typedef struct InstrumentTest
     /** \brief The name of the test. */
     const char *name;
     /** \brief The instrument generation to which this test applies. */
-    RBRInstrumentGen4Generation generation;
+    RBRGen4Generation generation;
     /** \brief The test to be run. */
     InstrumentTestFunction *function;
 } InstrumentTest;
@@ -420,7 +420,7 @@ typedef struct TestParserBuffers
     /** \brief The length of TestParserBuffers.samples. */
     int32_t samplesLength;
     /** \brief Parsed samples. */
-    RBRInstrumentGen4Sample samples[TESTPARSERBUFFERS_SAMPLES_MAX];
+    RBRGen4Sample samples[TESTPARSERBUFFERS_SAMPLES_MAX];
     /** \brief The length of TestParserBuffers.events. */
     int32_t eventsLength;
     /** \brief Parsed events. */

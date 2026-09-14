@@ -18,7 +18,7 @@ extern "C"
 {
 #endif
 
-#include "RBRInstrumentGen4.h"
+#include "RBRGen4.h"
 #include "RBRInstrumentGen4Configuration.h"
 /* Required for RBRInstrumentGen4InstrumentState. */
 #include "RBRInstrumentGen4Instrument.h"
@@ -33,7 +33,7 @@ extern "C"
 typedef struct RBRInstrumentGen4Clock
 {
     /** \brief The instrument's date and time. */
-    RBRInstrumentGen4DateTime dateTime;
+    RBRGen4DateTime dateTime;
 
     /**
      * \brief The offset of the instrument's date and time from UTC.
@@ -49,13 +49,13 @@ typedef struct RBRInstrumentGen4Clock
  *
  * \param [in] instrument the instrument connection
  * \param [out] clock the clock value
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the settings are successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_setClock()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getClock(RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getClock(RBRGen4 *instrument,
                                                  RBRInstrumentGen4Clock *clock);
 
 /**
@@ -64,18 +64,18 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getClock(RBRInstrumentGen4 *instrument,
  *
  * \param [in] instrument the instrument connection
  * \param [in] clock the clock value
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the settings cannot be changed
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the date and time is
- *         outside #RBRINSTRUMENTGEN4_DATETIME_MIN to
- *         #RBRINSTRUMENTGEN4_DATETIME_MAX, or the UTC offset is `NAN`
+ * \return #RBRGEN4_SUCCESS when the settings are successfully written
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the date and time is
+ *         outside #RBRGEN4_DATETIME_MIN to
+ *         #RBRGEN4_DATETIME_MAX, or the UTC offset is `NAN`
  * \see RBRInstrumentGen4_getClock()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setClock(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setClock(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Clock *clock);
 
 /**
@@ -109,7 +109,7 @@ typedef enum RBRInstrumentGen4DeploymentStatus
  *
  * \param [in] status the deployment status
  * \return a string name for the deployment status
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4DeploymentStatus_name(
     RBRInstrumentGen4DeploymentStatus status);
@@ -141,7 +141,7 @@ typedef enum RBRInstrumentGen4Gate
  *
  * \param [in] gate the gating condition
  * \return a string name for the gating condition
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4Gate_name(RBRInstrumentGen4Gate gate);
 
@@ -160,7 +160,7 @@ typedef struct RBRInstrumentGen4Deployment
      * Only available while RBRInstrumentGen4Deployment.gate is
      * #RBRINSTRUMENTGEN4_GATE_TIME.
      */
-    RBRInstrumentGen4DateTime startTime;
+    RBRGen4DateTime startTime;
 
     /**
      * \brief The deployment status.
@@ -186,14 +186,14 @@ typedef struct RBRInstrumentGen4Deployment
  *
  * \param [in] instrument the instrument connection
  * \param [out] deployment the deployment parameters
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the deployment is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the deployment is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_setDeployment()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getDeployment(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Deployment *deployment);
 
 /**
@@ -207,21 +207,21 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
  *
  * \param [in] instrument the instrument connection
  * \param [in] deployment the deployment parameters
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the deployment is successfully
+ * \return #RBRGEN4_SUCCESS when the deployment is successfully
  *         changed
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the deployment cannot be
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the deployment cannot be
  *         changed
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the gating condition
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the gating condition
  *         is set to more than one condition, or the start time is being sent 
- *         and is outside #RBRINSTRUMENTGEN4_DATETIME_MIN to 
- *         #RBRINSTRUMENTGEN4_DATETIME_MAX
+ *         and is outside #RBRGEN4_DATETIME_MIN to 
+ *         #RBRGEN4_DATETIME_MAX
  * \see RBRInstrumentGen4_getDeployment()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setDeployment(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setDeployment(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Deployment *deployment);
 
 /**
@@ -231,16 +231,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setDeployment(
  * \param [in] instrument the instrument connection
  * \param [out] status the deployment status; untouched unless the command
  *                     succeeds
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the deployment is paused
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the instrument is not
+ * \return #RBRGEN4_SUCCESS when the deployment is paused
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not
  *         enabled
  * \see RBRInstrumentGen4_resume()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828461/pause
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_pause(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_pause(
+    RBRGen4 *instrument,
     RBRInstrumentGen4DeploymentStatus *status);
 
 /**
@@ -250,16 +250,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pause(
  * \param [in] instrument the instrument connection
  * \param [out] status the deployment status; untouched unless the command
  *                     succeeds
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the deployment is resumed
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the instrument is not
+ * \return #RBRGEN4_SUCCESS when the deployment is resumed
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not
  *         enabled
  * \see RBRInstrumentGen4_pause()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828463/resume
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_resume(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_resume(
+    RBRGen4 *instrument,
     RBRInstrumentGen4DeploymentStatus *status);
 
 /**
@@ -286,7 +286,7 @@ typedef enum RBRInstrumentGen4DeploymentStoragemode
  *
  * \param [in] storageMode the deployment storage mode
  * \return a string name for the deployment storage mode
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4DeploymentStoragemode_name(
     RBRInstrumentGen4DeploymentStoragemode storageMode);
@@ -305,18 +305,18 @@ const char *RBRInstrumentGen4DeploymentStoragemode_name(
  * \param [in] storageMode the data storage mode which would be used
  * \param [out] state the state the instrument would assume; untouched unless
  *                    the command succeeds
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the checks all pass
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when a check fails
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the configuration or
+ * \return #RBRGEN4_SUCCESS when the checks all pass
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when a check fails
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the configuration or
  *         dataset label is empty or too long, or the storage mode is not a
  *         specific mode
  * \see RBRInstrumentGen4_enable()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828472/verify
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_verify(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_verify(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Config *config,
     const char *datasetLabel,
     RBRInstrumentGen4DeploymentStoragemode storageMode,
@@ -336,20 +336,20 @@ RBRInstrumentGen4Error RBRInstrumentGen4_verify(
  * \param [in] storageMode the data storage mode for this deployment
  * \param [out] state the state of the instrument; untouched unless the command
  *                    succeeds
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the instrument is enabled
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the instrument cannot be
+ * \return #RBRGEN4_SUCCESS when the instrument is enabled
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument cannot be
  *         enabled
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the configuration or
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the configuration or
  *         dataset label is empty or too long, or the storage mode is not a
  *         specific mode
  * \see RBRInstrumentGen4_verify()
  * \see RBRInstrumentGen4_disable()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828476/enable
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_enable(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_enable(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Config *config,
     const char *datasetLabel,
     RBRInstrumentGen4DeploymentStoragemode storageMode,
@@ -360,21 +360,21 @@ RBRInstrumentGen4Error RBRInstrumentGen4_enable(
  * \note Issues the `disable` instrument command.
  *
  * A warning from the instrument is reported as
- * #RBRINSTRUMENTGEN4_HARDWARE_ERROR with the response type set to
- * #RBRINSTRUMENTGEN4_RESPONSE_WARNING.
+ * #RBRGEN4_HARDWARE_ERROR with the response type set to
+ * #RBRGEN4_RESPONSE_WARNING.
  *
  * \param [in] instrument the instrument connection
  * \param [out] state the state of the instrument; untouched unless the command
  *                    succeeds
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the deployment is terminated
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the instrument was not enabled
+ * \return #RBRGEN4_SUCCESS when the deployment is terminated
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument was not enabled
  * \see RBRInstrumentGen4_enable()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828481/disable
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_disable(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_disable(
+    RBRGen4 *instrument,
     RBRInstrumentGen4InstrumentState *state);
 
 #ifdef __cplusplus

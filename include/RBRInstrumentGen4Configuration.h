@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#include "RBRInstrumentGen4.h"
+#include "RBRGen4.h"
 
 /** \brief The maximum number of schedules count. */
 #define RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX 16
@@ -121,23 +121,23 @@ typedef struct RBRInstrumentGen4Node
      * Set by the caller to select the node to read; see
      * RBRInstrumentGen4_getNode().
      */
-    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char label[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief The label of the PCBA implementing the node. */
-    char pcba[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char pcba[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief The number of ports on the node. */
     int32_t portCount;
 
     /** \brief The labels of the ports on the node. */
     char portList[RBRINSTRUMENTGEN4_PORT_COUNT_MAX]
-                 [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+                 [RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief The firmware version running on the node. */
-    char fwVersion[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
+    char fwVersion[RBRGEN4_ID_VERSION_MAX + 1];
 
     /** \brief The node firmware version in semantic-version form. */
-    char semver[RBRINSTRUMENTGEN4_ID_SEMVER_MAX + 1];
+    char semver[RBRGEN4_ID_SEMVER_MAX + 1];
 
     /**
      * \brief The firmware type running on the node.
@@ -166,14 +166,14 @@ typedef struct RBRInstrumentGen4Node
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] node the node to read
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the node is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the node is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_getNodePool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getNode(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getNode(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Node *node);
 
 /**
@@ -207,14 +207,14 @@ typedef struct RBRInstrumentGen4NodePool
  *
  * \param [in] instrument the instrument connection
  * \param [out] nodePool the populated pool of nodes
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the nodes are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the nodes are successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_getNode()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getNodePool(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getNodePool(
+    RBRGen4 *instrument,
     RBRInstrumentGen4NodePool *nodePool);
 
 /**
@@ -241,7 +241,7 @@ typedef enum RBRInstrumentGen4PortClass
  *
  * \param [in] portClass the port class
  * \return a string name for the port class
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4PortClass_name(
     RBRInstrumentGen4PortClass portClass);
@@ -278,7 +278,7 @@ typedef enum RBRInstrumentGen4PortProtocol
  *
  * \param [in] protocol the port protocol
  * \return a string name for the port protocol
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4PortProtocol_name(
     RBRInstrumentGen4PortProtocol protocol);
@@ -300,10 +300,10 @@ typedef struct RBRInstrumentGen4Port
      * Set by the caller to select the port to read; see
      * RBRInstrumentGen4_getPort().
      */
-    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char label[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief The label of the node the port belongs to. */
-    char node[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char node[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief The class of the port. */
     RBRInstrumentGen4PortClass portClass;
@@ -332,7 +332,7 @@ typedef struct RBRInstrumentGen4Port
 
     /** \brief The labels of the devices attached to the port. */
     char deviceList[RBRINSTRUMENTGEN4_DEVICE_COUNT_MAX]
-                   [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+                   [RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief The time in milliseconds to bring power to the port. */
     int32_t powerUpTime;
@@ -347,14 +347,14 @@ typedef struct RBRInstrumentGen4Port
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] port the port to read
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the port is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the port is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_getPortPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getPort(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getPort(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Port *port);
 
 /**
@@ -388,14 +388,14 @@ typedef struct RBRInstrumentGen4PortPool
  *
  * \param [in] instrument the instrument connection
  * \param [out] portPool the populated pool of ports
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the ports are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the ports are successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_getPort()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getPortPool(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getPortPool(
+    RBRGen4 *instrument,
     RBRInstrumentGen4PortPool *portPool);
 
 /**
@@ -426,7 +426,7 @@ typedef enum RBRInstrumentGen4DeviceClass
  *
  * \param [in] deviceClass the device class
  * \return a string name for the device class
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4DeviceClass_name(
     RBRInstrumentGen4DeviceClass deviceClass);
@@ -449,10 +449,10 @@ typedef struct RBRInstrumentGen4Device
      * Set by the caller to select the device to read; see
      * RBRInstrumentGen4_getDevice().
      */
-    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char label[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief The label of the port the device is attached to. */
-    char port[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char port[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief The class of the device. */
     RBRInstrumentGen4DeviceClass deviceClass;
@@ -470,10 +470,10 @@ typedef struct RBRInstrumentGen4Device
      *
      * Reported as `na` when unrecorded.
      */
-    char pn[RBRINSTRUMENTGEN4_PART_NUMBER_MAX + 1];
+    char pn[RBRGEN4_PART_NUMBER_MAX + 1];
 
     /** \brief The firmware version running on the device. */
-    char fwVersion[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
+    char fwVersion[RBRGEN4_ID_VERSION_MAX + 1];
 
     /**
      * \brief The firmware type running on the device.
@@ -484,7 +484,7 @@ typedef struct RBRInstrumentGen4Device
     int32_t fwType;
 
     /** \brief The generic name of the kind of device installed. */
-    char name[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char name[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief The number of channels the device exposes. */
     int32_t channelCount;
@@ -496,8 +496,8 @@ typedef struct RBRInstrumentGen4Device
      * enumerate and will not accept, so a label found here is not
      * necessarily readable with RBRInstrumentGen4_getChannel().
      */
-    char channelList[RBRINSTRUMENTGEN4_CHANNEL_MAX]
-                    [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char channelList[RBRGEN4_CHANNEL_MAX]
+                    [RBRGEN4_LABEL_NAME_MAX + 1];
 
     /**
      * \brief Whether the device is protected from being overridden by a
@@ -535,14 +535,14 @@ typedef struct RBRInstrumentGen4Device
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] device the device to read
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the device is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the device is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_getDevicePool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getDevice(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getDevice(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Device *device);
 
 /**
@@ -576,14 +576,14 @@ typedef struct RBRInstrumentGen4DevicePool
  *
  * \param [in] instrument the instrument connection
  * \param [out] devicePool the populated pool of devices
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the devices are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the devices are successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_getDevice()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getDevicePool(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getDevicePool(
+    RBRGen4 *instrument,
     RBRInstrumentGen4DevicePool *devicePool);
 
 /**
@@ -598,16 +598,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDevicePool(
  *
  * \param [in] instrument the instrument connection
  * \param [out] devicePool the labels of the devices present after the sweep
- * \return #RBRINSTRUMENTGEN4_SUCCESS when discovery completes
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the instrument refuses
+ * \return #RBRGEN4_SUCCESS when discovery completes
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR if the instrument refuses
  * \see RBRInstrumentGen4_getDevice()
  * \see RBRInstrumentGen4_getDevicePool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_discoverDevices(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_discoverDevices(
+    RBRGen4 *instrument,
     RBRInstrumentGen4DevicePool *devicePool);
 
 /**
@@ -631,7 +631,7 @@ typedef struct RBRInstrumentGen4Calibration
      * RBRInstrumentGen4_getCalibration(). Calibrations are one to one with
      * channels and cannot be created or deleted.
      */
-    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char label[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /**
      * \brief The formula used to convert raw readings to physical units.
@@ -649,7 +649,7 @@ typedef struct RBRInstrumentGen4Calibration
      * instrument restamps this with the current time when coefficients change
      * and no date is sent with them.
      */
-    RBRInstrumentGen4DateTime dateTime;
+    RBRGen4DateTime dateTime;
 
     /**
      * \brief A linear offset applied to the final value.
@@ -697,7 +697,7 @@ typedef struct RBRInstrumentGen4Calibration
      * \see RBRInstrumentGen4_getParameters()
      */
     char m[RBRINSTRUMENTGEN4_CALIBRATION_COEFFICIENT_MAX]
-          [RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+          [RBRGEN4_LABEL_NAME_MAX + 1];
 } RBRInstrumentGen4Calibration;
 
 /** \brief An internal module identifier. */
@@ -727,7 +727,7 @@ typedef enum RBRInstrumentGen4ChannelNature
  *
  * \param [in] nature the channel nature
  * \return a string name for the channel nature
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4ChannelNature_name(
     RBRInstrumentGen4ChannelNature nature);
@@ -747,7 +747,7 @@ typedef struct RBRInstrumentGen4Channel
      * Set by the caller to select the channel to read; see
      * RBRInstrumentGen4_getChannel().
      */
-    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char label[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /**
      * \brief A short, pre-defined generic name for the installed channel.
@@ -756,35 +756,35 @@ typedef struct RBRInstrumentGen4Channel
      *
      * \readonly
      */
-    char type[RBRINSTRUMENTGEN4_CHANNEL_TYPE_MAX + 1];
+    char type[RBRGEN4_CHANNEL_TYPE_MAX + 1];
 
     /**
      * \brief Settling time in milliseconds; zero on a derived channel.
      *
      * \readonly
      */
-    RBRInstrumentGen4Period settlingTime;
+    RBRGen4Period settlingTime;
 
     /**
      * \brief Measuring time in milliseconds; zero on a derived channel.
      *
      * \readonly
      */
-    RBRInstrumentGen4Period measuringTime;
+    RBRGen4Period measuringTime;
 
     /**
      * \brief Read-out time in milliseconds; zero on a derived channel.
      *
      * \readonly
      */
-    RBRInstrumentGen4Period readOutTime;
+    RBRGen4Period readOutTime;
 
     /**
      * \brief The unit in which processed data is reported.
      *
      * The only parameter of the command a caller may change.
      */
-    char userUnits[RBRINSTRUMENTGEN4_CHANNEL_UNIT_MAX + 1];
+    char userUnits[RBRGEN4_CHANNEL_UNIT_MAX + 1];
 
     /**
      * \brief Whether the channel measures or reports housekeeping.
@@ -809,7 +809,7 @@ typedef struct RBRInstrumentGen4Channel
      *
      * \readonly
      */
-    char node[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char node[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /**
      * \brief The label of the port the channel is reached through.
@@ -818,7 +818,7 @@ typedef struct RBRInstrumentGen4Channel
      *
      * \readonly
      */
-    char port[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char port[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /**
      * \brief The label of the device the channel belongs to.
@@ -827,7 +827,7 @@ typedef struct RBRInstrumentGen4Channel
      *
      * \readonly
      */
-    char device[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char device[RBRGEN4_LABEL_NAME_MAX + 1];
 } RBRInstrumentGen4Channel;
 
 /**
@@ -847,7 +847,7 @@ typedef struct RBRInstrumentGen4ChannelPool
      * \brief The number of channels reported.
      *
      * \warning This field will be larger than #size when
-     * #RBRINSTRUMENTGEN4_TRUNCATED is returned by the getter. Care should be
+     * #RBRGEN4_TRUNCATED is returned by the getter. Care should be
      * taken to avoid out-of-bounds access when iterating over #pool.
      */
     int32_t count;
@@ -871,17 +871,17 @@ typedef struct RBRInstrumentGen4ChannelPool
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] channel the channel to read, selected by its label
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the channel is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the channel does not exist
+ * \return #RBRGEN4_SUCCESS when the channel is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist
  * \see RBRInstrumentGen4_getChannelPool()
  * \see RBRInstrumentGen4_setChannel()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getChannel(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Channel *channel);
 
 /**
@@ -896,16 +896,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannel(
  *
  * \param [in] instrument the instrument connection
  * \param [in] channel the channel to write, selected by its label
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the channel is successfully written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the channel cannot be changed
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the units are empty
+ * \return #RBRGEN4_SUCCESS when the channel is successfully written
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the channel cannot be changed
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the units are empty
  * \see RBRInstrumentGen4_getChannel()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setChannel(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setChannel(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Channel *channel);
 
 /**
@@ -918,20 +918,20 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setChannel(
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] channelPool the channels present, labels only
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the pool is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a channelPool cannot hold every
+ * \return #RBRGEN4_SUCCESS when the pool is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_TRUNCATED when \a channelPool cannot hold every
  *                                      reported channel; the first `size` are
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the channel pool cannot be read
+ * \return #RBRGEN4_HARDWARE_ERROR if the channel pool cannot be read
  * \see RBRInstrumentGen4_getChannelPoolByNature()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getChannelPool(
+    RBRGen4 *instrument,
     RBRInstrumentGen4ChannelPool *channelPool);
 
 /**
@@ -945,22 +945,22 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPool(
  * \param [in] instrument the instrument connection
  * \param [in] nature the nature of the channels to report
  * \param [in,out] channelPool the channels present, labels only
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the pool is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a channelPool cannot hold every
+ * \return #RBRGEN4_SUCCESS when the pool is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_TRUNCATED when \a channelPool cannot hold every
  *                                      reported channel; the first `size` are
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the channel pool cannot be read
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the nature is not
+ * \return #RBRGEN4_HARDWARE_ERROR if the channel pool cannot be read
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the nature is not
  *                                                    one the command accepts
  * \see RBRInstrumentGen4_getChannelPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPoolByNature(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getChannelPoolByNature(
+    RBRGen4 *instrument,
     RBRInstrumentGen4ChannelNature nature,
     RBRInstrumentGen4ChannelPool *channelPool);
 
@@ -973,15 +973,15 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getChannelPoolByNature(
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] calibration the calibration to read, selected by its label
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the calibration is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the channel does not exist
+ * \return #RBRGEN4_SUCCESS when the calibration is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist
  * \see RBRInstrumentGen4_setCalibration()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828510/calibration
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getCalibration(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Calibration *calibration);
 
 /**
@@ -1001,19 +1001,19 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getCalibration(
  *
  * \param [in] instrument the instrument connection
  * \param [in] calibration the calibration to write, selected by its label
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the calibration is successfully
+ * \return #RBRGEN4_SUCCESS when the calibration is successfully
  *                                    written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the calibration cannot be
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the calibration cannot be
  *                                           changed
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when a coefficient count
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a coefficient count
  *                                                    is out of range
  * \see RBRInstrumentGen4_getCalibration()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828510/calibration
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setCalibration(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setCalibration(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Calibration *calibration);
 
 
@@ -1044,7 +1044,7 @@ typedef struct RBRInstrumentGen4Settings
      * \brief The delay in milliseconds between the completion of a poll and
      * the removal of sensor power. The as-shipped default value is 8000.
      */
-    RBRInstrumentGen4Period pollPowerOffDelay;
+    RBRGen4Period pollPowerOffDelay;
 } RBRInstrumentGen4Settings;
 
 /**
@@ -1053,14 +1053,14 @@ typedef struct RBRInstrumentGen4Settings
  *
  * \param [in] instrument the instrument connection
  * \param [out] settings the logger settings
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the setting is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828508/settings
  * \see RBRInstrumentGen4_setSettings()
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getSettings(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getSettings(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Settings *settings);
 
 /**
@@ -1069,11 +1069,11 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSettings(
  *
  * \param [in] instrument the instrument connection
  * \param [in] settings the values for the settings in the logger
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the settings cannot be changed
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the power-off delay
+ * \return #RBRGEN4_SUCCESS when the setting is successfully written
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the power-off delay
  *                                                    is negative
  * \warning The library expects both \a prompt and \a confirmation to be on.
  *          With \a confirmation off the instrument answers a set with nothing
@@ -1081,8 +1081,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSettings(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828508/settings
  * \see RBRInstrumentGen4_getSettings()
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setSettings(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setSettings(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Settings *settings);
 
 /** 
@@ -1130,14 +1130,14 @@ typedef struct RBRInstrumentGen4Parameters
  *
  * \param [in] instrument the instrument connection
  * \param [out] parameters the parameters in the logger
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/42729486/parameters
  * \see RBRInstrumentGen4_setParameters
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getParameters(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getParameters(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Parameters *parameters);
 
 /**
@@ -1148,17 +1148,17 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getParameters(
  *
  * \param [in] instrument the instrument connection
  * \param [in] parameters the values for the parameters in the logger
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are successfully
+ * \return #RBRGEN4_SUCCESS when the parameters are successfully
  *                                    written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the parameters cannot be
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the parameters cannot be
  *                                           changed
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/42729486/parameters
  * \see RBRInstrumentGen4_getParameters
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setParameters(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setParameters(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Parameters *parameters);
 
 /**
@@ -1176,7 +1176,7 @@ typedef struct RBRInstrumentGen4Group
      *
      * Set by the caller to select the group to read.
      */
-    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char label[RBRGEN4_LABEL_NAME_MAX + 1];
 } RBRInstrumentGen4Group;
 
 /**
@@ -1191,24 +1191,24 @@ typedef struct RBRInstrumentGen4Group
  * \param [in] instrument the instrument connection
  * \param [in,out] group the group to read, selected by its label
  * \param [out] channelList the channels in the group, or `NULL` to skip them
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a channelList cannot hold every
+ * \return #RBRGEN4_SUCCESS when the group is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRGEN4_TRUNCATED when \a channelList cannot hold every
  *                                      reported channel; the first `size` are
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the group does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist
  * \see RBRInstrumentGen4_getGroupPool()
  * \see RBRInstrumentGen4_setGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getGroup(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getGroup(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Group *group,
-    RBRInstrumentGen4LabelList *channelList);
+    RBRGen4LabelList *channelList);
 
 /**
  * \brief Set the channels in a group.
@@ -1221,24 +1221,24 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getGroup(
  * \param [in] instrument the instrument connection
  * \param [in] group the group to write, selected by its label
  * \param [in] channelList the channels to put in the group
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the group cannot be written
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty,
+ * \return #RBRGEN4_SUCCESS when the group is successfully written
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be written
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
  *                                                    \a channelList is `NULL`,
  *                                                    its count does not fit
  *                                                    its array, or a channel
  *                                                    label is empty
- * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit the
+ * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
  *                                            command
  * \see RBRInstrumentGen4_getGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setGroup(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setGroup(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Group *group,
-    const RBRInstrumentGen4LabelList *channelList);
+    const RBRGen4LabelList *channelList);
 
 /**
  * \brief `group` command parameters. The `list` is stored in a user provided
@@ -1256,7 +1256,7 @@ typedef struct RBRInstrumentGen4GroupPool
      * \brief The number of groups defined on the instrument.
      *
      * \warning This field will be larger than #size when
-     * #RBRINSTRUMENTGEN4_TRUNCATED is returned by the getter. Care should be
+     * #RBRGEN4_TRUNCATED is returned by the getter. Care should be
      * taken to avoid out-of-bounds access when iterating over #pool.
      */
     int32_t count;
@@ -1278,10 +1278,10 @@ typedef struct RBRInstrumentGen4GroupPool
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] groupPool the groups defined, labels only
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the groups are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a groupPool cannot hold every
+ * \return #RBRGEN4_SUCCESS when the groups are successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_TRUNCATED when \a groupPool cannot hold every
  *                                      reported group; the first `size` are
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
@@ -1289,8 +1289,8 @@ typedef struct RBRInstrumentGen4GroupPool
  * \see RBRInstrumentGen4_getGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getGroupPool(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getGroupPool(
+    RBRGen4 *instrument,
     RBRInstrumentGen4GroupPool *groupPool);
 
 /**
@@ -1302,17 +1302,17 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getGroupPool(
  *
  * \param [in] instrument the instrument connection
  * \param [in] label the label to give the new group
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully created
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the group cannot be created
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRGEN4_SUCCESS when the group is successfully created
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be created
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRInstrumentGen4_deleteGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_createGroup(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_createGroup(
+    RBRGen4 *instrument,
     const char *label);
 
 /**
@@ -1322,16 +1322,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_createGroup(
  *
  * \param [in] instrument the instrument connection
  * \param [in] label the label of the group to delete
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the group is successfully deleted
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the group does not exist
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRGEN4_SUCCESS when the group is successfully deleted
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRInstrumentGen4_deleteGroupAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteGroup(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_deleteGroup(
+    RBRGen4 *instrument,
     const char *label);
 
 /**
@@ -1340,14 +1340,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteGroup(
  * \note Issues the `group delete all` command.
  *
  * \param [in] instrument the instrument connection
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the groups are successfully deleted
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the groups are successfully deleted
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_deleteGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteGroupAll(
-    RBRInstrumentGen4 *instrument);
+RBRGen4Error RBRInstrumentGen4_deleteGroupAll(
+    RBRGen4 *instrument);
 
 /**
  * \brief The modes of a schedule.
@@ -1407,7 +1407,7 @@ typedef enum RBRInstrumentGen4ScheduleStorage
  *
  * \param [in] storage the storage state
  * \return a string name for the storage state
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4ScheduleStorage_name(
     RBRInstrumentGen4ScheduleStorage storage);
@@ -1422,7 +1422,7 @@ const char *RBRInstrumentGen4ScheduleStorage_name(
 typedef struct RBRInstrumentGen4ScheduleModeContinuous
 {
     /** \brief `period`, in milliseconds. */
-    RBRInstrumentGen4Period period;
+    RBRGen4Period period;
 } RBRInstrumentGen4ScheduleModeContinuous;
 
 /**
@@ -1440,10 +1440,10 @@ typedef struct RBRInstrumentGen4ScheduleModeContinuous
 typedef struct RBRInstrumentGen4ScheduleModeBursting
 {
     /** \brief `period`, in milliseconds. */
-    RBRInstrumentGen4Period period;
+    RBRGen4Period period;
 
     /** \brief `measurementperiod`, in milliseconds. */
-    RBRInstrumentGen4Period measurementPeriod;
+    RBRGen4Period measurementPeriod;
 
     /** \brief `measurementcount`. */
     int32_t measurementCount;
@@ -1474,7 +1474,7 @@ typedef enum RBRInstrumentGen4ScheduleStream
  *
  * \param [in] stream the stream destination
  * \return a string name for the stream destination
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4ScheduleStream_name(
     RBRInstrumentGen4ScheduleStream stream);
@@ -1494,7 +1494,7 @@ typedef struct RBRInstrumentGen4Schedule
      *
      * Set by the caller to select the schedule to read.
      */
-    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char label[RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief Where the schedule's data is streamed in real time. */
     RBRInstrumentGen4ScheduleStream stream;
@@ -1525,7 +1525,7 @@ typedef struct RBRInstrumentGen4Schedule
      * Only the member matching #mode is populated; a getter zeroes the rest.
      * #RBRINSTRUMENTGEN4_SCHEDULE_MODE_DDSAMPLING and
      * #RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES have no member: a getter
-     * leaves this zeroed and a setter gives #RBRINSTRUMENTGEN4_UNSUPPORTED.
+     * leaves this zeroed and a setter gives #RBRGEN4_UNSUPPORTED.
      */
     union
     {
@@ -1556,24 +1556,24 @@ typedef struct RBRInstrumentGen4Schedule
  * \param [in,out] schedule the schedule to read, selected by its label
  * \param [out] groupList the groups the schedule samples, or `NULL` to skip
  *                        them
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a groupList cannot hold every
+ * \return #RBRGEN4_SUCCESS when the schedule is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRGEN4_TRUNCATED when \a groupList cannot hold every
  *                                      reported group; the first `size` are
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the schedule does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the schedule does not exist
  * \see RBRInstrumentGen4_getSchedulePool()
  * \see RBRInstrumentGen4_setSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getSchedule(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Schedule *schedule,
-    RBRInstrumentGen4LabelList *groupList);
+    RBRGen4LabelList *groupList);
 
 /**
  * \brief Set the parameters of a schedule.
@@ -1588,28 +1588,28 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedule(
  * \param [in] schedule the schedule to write
  * \param [in] groupList the groups the schedule samples, or `NULL` to leave
  *                       them as they are
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the schedule cannot be
+ * \return #RBRGEN4_SUCCESS when the schedule is successfully written
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the schedule cannot be
  *                                           written, or when `storage` is set
  *                                           where it is unavailable
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty,
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
  *                                                    the list's count does
  *                                                    not fit its array, a
  *                                                    group label is empty,
  *                                                    or the mode is not a
  *                                                    single known flag
- * \return #RBRINSTRUMENTGEN4_UNSUPPORTED when the mode is `ddsampling` or
+ * \return #RBRGEN4_UNSUPPORTED when the mode is `ddsampling` or
  *                                        `regimes`
- * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the command does not fit
+ * \return #RBRGEN4_BUFFER_TOO_SMALL when the command does not fit
  * \see RBRInstrumentGen4_getSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setSchedule(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setSchedule(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Schedule *schedule,
-    const RBRInstrumentGen4LabelList *groupList);
+    const RBRGen4LabelList *groupList);
 
 /**
  * \brief `schedule` command parameters. The `list` is stored in a user
@@ -1627,7 +1627,7 @@ typedef struct RBRInstrumentGen4SchedulePool
      * \brief The number of schedules defined on the instrument.
      *
      * \warning This field will be larger than #size when
-     * #RBRINSTRUMENTGEN4_TRUNCATED is returned by the getter. Care should be
+     * #RBRGEN4_TRUNCATED is returned by the getter. Care should be
      * taken to avoid out-of-bounds access when iterating over #pool.
      */
     int32_t count;
@@ -1661,7 +1661,7 @@ typedef struct RBRInstrumentGen4SchedulePool
      * Entries past #RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX are
      * discarded.
      */
-    RBRInstrumentGen4Period
+    RBRGen4Period
         availableFastPeriods[RBRINSTRUMENTGEN4_AVAILABLE_FAST_PERIODS_MAX];
 
     /** \brief `maxregimes`. */
@@ -1673,7 +1673,7 @@ typedef struct RBRInstrumentGen4SchedulePool
  *
  * \param [in] mode the schedule mode
  * \return a string name for the schedule mode
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4ScheduleMode_name(
     RBRInstrumentGen4ScheduleMode mode);
@@ -1688,10 +1688,10 @@ const char *RBRInstrumentGen4ScheduleMode_name(
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] schedulePool the schedules defined, labels only
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedules are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a schedulePool cannot hold every
+ * \return #RBRGEN4_SUCCESS when the schedules are successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_TRUNCATED when \a schedulePool cannot hold every
  *                                      reported schedule; the first `size` are
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
@@ -1699,8 +1699,8 @@ const char *RBRInstrumentGen4ScheduleMode_name(
  * \see RBRInstrumentGen4_getSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getSchedulePool(
+    RBRGen4 *instrument,
     RBRInstrumentGen4SchedulePool *schedulePool);
 
 /**
@@ -1712,17 +1712,17 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getSchedulePool(
  *
  * \param [in] instrument the instrument connection
  * \param [in] label the label to give the new schedule
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully created
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when it cannot be created
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRGEN4_SUCCESS when the schedule is successfully created
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when it cannot be created
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRInstrumentGen4_deleteSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_createSchedule(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_createSchedule(
+    RBRGen4 *instrument,
     const char *label);
 
 /**
@@ -1732,16 +1732,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_createSchedule(
  *
  * \param [in] instrument the instrument connection
  * \param [in] label the label of the schedule to delete
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully deleted
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when it does not exist
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRGEN4_SUCCESS when the schedule is successfully deleted
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when it does not exist
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRInstrumentGen4_deleteScheduleAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteSchedule(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_deleteSchedule(
+    RBRGen4 *instrument,
     const char *label);
 
 /**
@@ -1750,14 +1750,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteSchedule(
  * \note Issues the `schedule delete all` command.
  *
  * \param [in] instrument the instrument connection
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedules are deleted
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the schedules are deleted
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_deleteSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteScheduleAll(
-    RBRInstrumentGen4 *instrument);
+RBRGen4Error RBRInstrumentGen4_deleteScheduleAll(
+    RBRGen4 *instrument);
 
 /**
  * \brief `config <config_label>` command parameters.
@@ -1774,7 +1774,7 @@ typedef struct RBRInstrumentGen4Config
      *
      * Set by the caller to select the configuration to read.
      */
-    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char label[RBRGEN4_LABEL_NAME_MAX + 1];
 } RBRInstrumentGen4Config;
 
 /**
@@ -1790,25 +1790,25 @@ typedef struct RBRInstrumentGen4Config
  * \param [in,out] config the configuration to read, selected by its label
  * \param [out] scheduleList the schedules in the configuration, or `NULL` to
  *                           skip them
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the configuration is read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a scheduleList cannot hold every
+ * \return #RBRGEN4_SUCCESS when the configuration is read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRGEN4_TRUNCATED when \a scheduleList cannot hold every
  *                                      reported schedule; the first `size` are
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the configuration does not
+ * \return #RBRGEN4_HARDWARE_ERROR when the configuration does not
  *                                           exist
  * \see RBRInstrumentGen4_getConfigPool()
  * \see RBRInstrumentGen4_setConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getConfig(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getConfig(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Config *config,
-    RBRInstrumentGen4LabelList *scheduleList);
+    RBRGen4LabelList *scheduleList);
 
 /**
  * \brief Set the schedules in a configuration.
@@ -1821,25 +1821,25 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getConfig(
  * \param [in] instrument the instrument connection
  * \param [in] config the configuration to write, selected by its label
  * \param [in] scheduleList the schedules to put in the configuration
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the configuration is written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the configuration cannot be
+ * \return #RBRGEN4_SUCCESS when the configuration is written
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the configuration cannot be
  *                                           written
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty,
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
  *                                                    \a scheduleList is
  *                                                    `NULL`, its count does
  *                                                    not fit its array, or a
  *                                                    schedule label is empty
- * \return #RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL when the list does not fit the
+ * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
  *                                            command
  * \see RBRInstrumentGen4_getConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setConfig(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setConfig(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Config *config,
-    const RBRInstrumentGen4LabelList *scheduleList);
+    const RBRGen4LabelList *scheduleList);
 
 /**
  * \brief `config` command parameters. The `list` is stored in a user provided
@@ -1857,7 +1857,7 @@ typedef struct RBRInstrumentGen4ConfigPool
      * \brief The number of configurations defined on the instrument.
      *
      * \warning This field will be larger than #size when
-     * #RBRINSTRUMENTGEN4_TRUNCATED is returned by the getter. Care should be
+     * #RBRGEN4_TRUNCATED is returned by the getter. Care should be
      * taken to avoid out-of-bounds access when iterating over #pool.
      */
     int32_t count;
@@ -1882,10 +1882,10 @@ typedef struct RBRInstrumentGen4ConfigPool
  *
  * \param [in] instrument the instrument connection
  * \param [in,out] configPool the configurations defined, labels only
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the configurations are read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_TRUNCATED when \a configPool cannot hold every
+ * \return #RBRGEN4_SUCCESS when the configurations are read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_TRUNCATED when \a configPool cannot hold every
  *                                      reported configuration; the first
  *                                      `size` are stored, and `count` is set
  *                                      to the value reported by the instrument
@@ -1893,8 +1893,8 @@ typedef struct RBRInstrumentGen4ConfigPool
  * \see RBRInstrumentGen4_getConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getConfigPool(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getConfigPool(
+    RBRGen4 *instrument,
     RBRInstrumentGen4ConfigPool *configPool);
 
 /**
@@ -1906,17 +1906,17 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getConfigPool(
  *
  * \param [in] instrument the instrument connection
  * \param [in] label the label to give the new configuration
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the configuration is created
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when it cannot be created
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRGEN4_SUCCESS when the configuration is created
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when it cannot be created
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRInstrumentGen4_deleteConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_createConfig(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_createConfig(
+    RBRGen4 *instrument,
     const char *label);
 
 /**
@@ -1926,16 +1926,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_createConfig(
  *
  * \param [in] instrument the instrument connection
  * \param [in] label the label of the configuration to delete
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the configuration is deleted
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when it does not exist
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRGEN4_SUCCESS when the configuration is deleted
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when it does not exist
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRInstrumentGen4_deleteConfigAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfig(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_deleteConfig(
+    RBRGen4 *instrument,
     const char *label);
 
 /**
@@ -1944,14 +1944,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfig(
  * \note Issues the `config delete all` command.
  *
  * \param [in] instrument the instrument connection
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the configurations are deleted
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the configurations are deleted
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_deleteConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteConfigAll(
-    RBRInstrumentGen4 *instrument);
+RBRGen4Error RBRInstrumentGen4_deleteConfigAll(
+    RBRGen4 *instrument);
 
 #ifdef __cplusplus
 }

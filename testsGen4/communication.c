@@ -17,11 +17,11 @@ typedef struct LinkTest
     RBRInstrumentGen4LinkType expected;
 } LinkTest;
 
-static bool test_link(RBRInstrumentGen4 *instrument,
+static bool test_link(RBRGen4 *instrument,
                       TestIOBuffers *buffers,
                       LinkTest *tests)
 {
-    RBRInstrumentGen4Error err;
+    RBRGen4Error err;
     RBRInstrumentGen4Link actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
@@ -29,7 +29,7 @@ static bool test_link(RBRInstrumentGen4 *instrument,
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrumentGen4_getLink(instrument, &actual);
         TEST_ASSERT_STR_EQ("link" COMMAND_TERMINATOR, buffers->writeBuffer);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+        TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected,
                             actual.type,
                             RBRInstrumentGen4LinkType);
@@ -57,7 +57,7 @@ typedef struct LinkSerialTest
 {
     const char *response;
     RBRInstrumentGen4LinkSerial expected;
-    RBRInstrumentGen4Error expectedError;
+    RBRGen4Error expectedError;
 } LinkSerialTest;
 
 /* The baud rates and modes an L4 reports as available. */
@@ -89,7 +89,7 @@ TEST_LOGGER4(linkSerial)
             .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232,
             .availableBaudRates = L4_AVAILABLE_BAUD_RATE_MASK,
             .availableModes = L4_AVAILABLE_MODE_MASK },
-          RBRINSTRUMENTGEN4_SUCCESS },
+          RBRGEN4_SUCCESS },
         { "link serial baudrate=115200 mode=uart_idlelow availablebaudrates="
           L4_AVAILABLE_BAUD_RATES " availablemodes="
           L4_AVAILABLE_MODES RESPONSE_TERMINATOR,
@@ -97,7 +97,7 @@ TEST_LOGGER4(linkSerial)
             .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW,
             .availableBaudRates = L4_AVAILABLE_BAUD_RATE_MASK,
             .availableModes = L4_AVAILABLE_MODE_MASK },
-          RBRINSTRUMENTGEN4_SUCCESS },
+          RBRGEN4_SUCCESS },
         /* An instrument which offers only one mode. */
         { "link serial baudrate=19200 mode=rs232 availablebaudrates="
           "9600|19200 availablemodes=rs232" RESPONSE_TERMINATOR,
@@ -107,7 +107,7 @@ TEST_LOGGER4(linkSerial)
                 RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_9600
                 | RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_19200,
             .availableModes = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232 },
-          RBRINSTRUMENTGEN4_SUCCESS },
+          RBRGEN4_SUCCESS },
         /* Values the library does not know are reported as unknown, and are
          * left out of the available lists. */
         { "link serial baudrate=921600 mode=rs485h availablebaudrates="
@@ -116,11 +116,11 @@ TEST_LOGGER4(linkSerial)
             .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_NONE,
             .availableBaudRates = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_9600,
             .availableModes = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232 },
-          RBRINSTRUMENTGEN4_SUCCESS },
+          RBRGEN4_SUCCESS },
         { 0 }
     };
 
-    RBRInstrumentGen4Error err;
+    RBRGen4Error err;
     RBRInstrumentGen4LinkSerial actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
@@ -130,7 +130,7 @@ TEST_LOGGER4(linkSerial)
         TEST_ASSERT_STR_EQ(
             "link serial baudrate mode availablebaudrates availablemodes" COMMAND_TERMINATOR,
             buffers->writeBuffer);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen4Error);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate,
                             actual.baudRate,
                             RBRInstrumentGen4LinkSerialBaudRate);
@@ -153,7 +153,7 @@ typedef struct SetLinkSerialTest
 {
     const char *command;
     const char *response;
-    RBRInstrumentGen4Error expectedError;
+    RBRGen4Error expectedError;
     RBRInstrumentGen4LinkSerial serial;
 } SetLinkSerialTest;
 
@@ -162,12 +162,12 @@ TEST_LOGGER4(setLinkSerial)
     SetLinkSerialTest tests[] = {
         { "link serial baudrate=19200 mode=rs232" COMMAND_TERMINATOR,
           "link serial baudrate=19200 mode=rs232" RESPONSE_TERMINATOR,
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_19200,
             .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232 } },
         { "link serial baudrate=9600 mode=uart" COMMAND_TERMINATOR,
           "link serial baudrate=9600 mode=uart" RESPONSE_TERMINATOR,
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_9600,
             .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_UART } },
         /* A value the getter could not read reaches the setter as `none`, a
@@ -176,34 +176,34 @@ TEST_LOGGER4(setLinkSerial)
          * three is sent. */
         { "",
           "",
-          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+          RBRGEN4_INVALID_PARAMETER_VALUE,
           { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_NONE,
             .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232 } },
         { "",
           "",
-          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+          RBRGEN4_INVALID_PARAMETER_VALUE,
           { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_115200,
             .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_NONE } },
         { "",
           "",
-          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+          RBRGEN4_INVALID_PARAMETER_VALUE,
           { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_MAX << 1,
             .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232 } },
         { "",
           "",
-          RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+          RBRGEN4_INVALID_PARAMETER_VALUE,
           { .baudRate = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_9600
                         | RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_19200,
             .mode = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232 } },
         { 0 }
     };
 
-    RBRInstrumentGen4Error err;
+    RBRGen4Error err;
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRInstrumentGen4_setLinkSerial(instrument, &(tests[i].serial));
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRInstrumentGen4Error);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].command,
                            buffers->writeBuffer);
     }
@@ -214,8 +214,8 @@ TEST_LOGGER4(setLinkSerial)
 TEST_LOGGER4(sleep)
 {
     TestIOBuffers_init(buffers, "", 0);
-    RBRInstrumentGen4Error err = RBRInstrumentGen4_sleep(instrument);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    RBRGen4Error err = RBRInstrumentGen4_sleep(instrument);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("sleep" COMMAND_TERMINATOR, buffers->writeBuffer);
     TEST_ASSERT(instrument->lastActivityTime < 0);
 
@@ -233,7 +233,7 @@ TEST_LOGGER4(sleep)
     TEST_ASSERT_STR_EQ(
         RESPONSE_TERMINATOR RESPONSE_TERMINATOR "link" COMMAND_TERMINATOR,
         buffers->writeBuffer);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS, err, RBRInstrumentGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_LINK_TYPE_USB,
                         actual.type,
                         RBRInstrumentGen4LinkType);

@@ -97,7 +97,7 @@ typedef enum RBRInstrumentGen4HardwareError
  *
  * \param [in] error the hardware error
  * \return a string name for the hardware error
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4HardwareError_name(RBRInstrumentGen4HardwareError error);
 

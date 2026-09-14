@@ -18,23 +18,23 @@
 /* Required for PRId32. */
 #include <inttypes.h>
 
-#include "RBRInstrumentGen4.h"
-#include "RBRInstrumentGen4Internal.h"
+#include "RBRGen4.h"
+#include "RBRGen4Internal.h"
 #include "RBRInstrumentGen4Deployment.h"
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getClock(RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getClock(RBRGen4 *instrument,
                                                  RBRInstrumentGen4Clock *clock)
 {
     clock->dateTime = 0;
     clock->offsetFromUtc = NAN;
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "clock"));
+    RBR_TRY(RBRGen4_converse(instrument, "clock"));
 
     char *command = NULL;
-    RBRInstrumentGen4ResponseParameter parameter;
+    RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(instrument,
                                         &command,
                                         &parameter);
 
@@ -44,7 +44,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getClock(RBRInstrumentGen4 *instrument,
         }
         else if (strcmp(parameter.key, "datetime") == 0)
         {
-            RBR_TRY(RBRInstrumentGen4DateTime_parseScheduleTime(
+            RBR_TRY(RBRGen4DateTime_parseScheduleTime(
                         parameter.value,
                         &clock->dateTime,
                         NULL));
@@ -55,28 +55,28 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getClock(RBRInstrumentGen4 *instrument,
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_setClock(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setClock(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Clock *clock)
 {
-    if (clock->dateTime < RBRINSTRUMENTGEN4_DATETIME_MIN
-        || clock->dateTime > RBRINSTRUMENTGEN4_DATETIME_MAX)
+    if (clock->dateTime < RBRGEN4_DATETIME_MIN
+        || clock->dateTime > RBRGEN4_DATETIME_MAX)
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     if (isnan(clock->offsetFromUtc))
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    char dateTime[RBRINSTRUMENTGEN4_SCHEDULE_TIME_LEN + 1];
-    RBRInstrumentGen4DateTime_toScheduleTime(clock->dateTime, dateTime);
+    char dateTime[RBRGEN4_SCHEDULE_TIME_LEN + 1];
+    RBRGen4DateTime_toScheduleTime(clock->dateTime, dateTime);
 
-    return RBRInstrumentGen4_converse(instrument,
+    return RBRGen4_converse(instrument,
                                       "clock datetime=%s offsetfromutc=%.2f",
                                       dateTime,
                                       (double) clock->offsetFromUtc);
@@ -162,8 +162,8 @@ static RBRInstrumentGen4Gate RBRInstrumentGen4Gate_parse(const char *value)
     return RBRINSTRUMENTGEN4_UNKNOWN_GATE;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getDeployment(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Deployment *deployment)
 {
     memset(deployment, 0, sizeof(RBRInstrumentGen4Deployment));
@@ -171,13 +171,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
     deployment->status = RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS;
     deployment->gate = RBRINSTRUMENTGEN4_UNKNOWN_GATE;
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "deployment"));
+    RBR_TRY(RBRGen4_converse(instrument, "deployment"));
 
     char *command = NULL;
-    RBRInstrumentGen4ResponseParameter parameter;
+    RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(instrument,
                                         &command,
                                         &parameter);
 
@@ -187,7 +187,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
         }
         else if (strcmp(parameter.key, "starttime") == 0)
         {
-            RBR_TRY(RBRInstrumentGen4DateTime_parseScheduleTime(
+            RBR_TRY(RBRGen4DateTime_parseScheduleTime(
                         parameter.value,
                         &deployment->startTime,
                         NULL));
@@ -207,38 +207,38 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDeployment(
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_setDeployment(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setDeployment(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Deployment *deployment)
 {
     if (deployment->gate < 0
         || deployment->gate >= RBRINSTRUMENTGEN4_GATE_COUNT)
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     /* `starttime` is only available under time gating. */
     if (deployment->gate != RBRINSTRUMENTGEN4_GATE_TIME)
     {
-        return RBRInstrumentGen4_converse(
+        return RBRGen4_converse(
             instrument,
             "deployment gate=%s",
             RBRInstrumentGen4Gate_name(deployment->gate));
     }
 
-    if (deployment->startTime < RBRINSTRUMENTGEN4_DATETIME_MIN
-        || deployment->startTime > RBRINSTRUMENTGEN4_DATETIME_MAX)
+    if (deployment->startTime < RBRGEN4_DATETIME_MIN
+        || deployment->startTime > RBRGEN4_DATETIME_MAX)
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    char startTime[RBRINSTRUMENTGEN4_SCHEDULE_TIME_LEN + 1];
-    RBRInstrumentGen4DateTime_toScheduleTime(deployment->startTime, startTime);
+    char startTime[RBRGEN4_SCHEDULE_TIME_LEN + 1];
+    RBRGen4DateTime_toScheduleTime(deployment->startTime, startTime);
 
-    return RBRInstrumentGen4_converse(
+    return RBRGen4_converse(
         instrument,
         "deployment gate=%s starttime=%s",
         RBRInstrumentGen4Gate_name(deployment->gate),
@@ -252,16 +252,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setDeployment(
  * \param [out] status the reported status
  */
 static void RBRInstrumentGen4_parseDeploymentStatus(
-    RBRInstrumentGen4 *instrument,
+    RBRGen4 *instrument,
     RBRInstrumentGen4DeploymentStatus *status)
 {
     *status = RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS;
 
     char *command = NULL;
-    RBRInstrumentGen4ResponseParameter parameter;
+    RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(instrument,
                                         &command,
                                         &parameter);
 
@@ -277,26 +277,26 @@ static void RBRInstrumentGen4_parseDeploymentStatus(
     }
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_pause(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_pause(
+    RBRGen4 *instrument,
     RBRInstrumentGen4DeploymentStatus *status)
 {
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "pause"));
+    RBR_TRY(RBRGen4_converse(instrument, "pause"));
 
     RBRInstrumentGen4_parseDeploymentStatus(instrument, status);
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_resume(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_resume(
+    RBRGen4 *instrument,
     RBRInstrumentGen4DeploymentStatus *status)
 {
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "resume"));
+    RBR_TRY(RBRGen4_converse(instrument, "resume"));
 
     RBRInstrumentGen4_parseDeploymentStatus(instrument, status);
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 /**
@@ -308,16 +308,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_resume(
  * \param [out] state the reported state
  */
 static void RBRInstrumentGen4_parseInstrumentState(
-    RBRInstrumentGen4 *instrument,
+    RBRGen4 *instrument,
     RBRInstrumentGen4InstrumentState *state)
 {
     *state = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
 
     char *command = NULL;
-    RBRInstrumentGen4ResponseParameter parameter;
+    RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(instrument,
                                         &command,
                                         &parameter);
 
@@ -350,10 +350,10 @@ static void RBRInstrumentGen4_parseInstrumentState(
  * \param [in] config the configuration to deploy
  * \param [in] datasetLabel the label for the deployment's dataset
  * \param [in] storageMode the data storage mode
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the parameters are all in range
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE otherwise
+ * \return #RBRGEN4_SUCCESS when the parameters are all in range
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE otherwise
  */
-static RBRInstrumentGen4Error RBRInstrumentGen4_checkDeploymentParameters(
+static RBRGen4Error RBRInstrumentGen4_checkDeploymentParameters(
     const RBRInstrumentGen4Config *config,
     const char *datasetLabel,
     RBRInstrumentGen4DeploymentStoragemode storageMode)
@@ -362,18 +362,18 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_checkDeploymentParameters(
         || config->label[0] == '\0'
         || datasetLabel == NULL
         || datasetLabel[0] == '\0'
-        || strlen(datasetLabel) > RBRINSTRUMENTGEN4_LABEL_NAME_MAX
+        || strlen(datasetLabel) > RBRGEN4_LABEL_NAME_MAX
         || (storageMode != RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL
             && storageMode != RBRINSTRUMENTGEN4_STORAGEMODE_CALIBRATION))
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_verify(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_verify(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Config *config,
     const char *datasetLabel,
     RBRInstrumentGen4DeploymentStoragemode storageMode,
@@ -383,7 +383,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_verify(
                                                         datasetLabel,
                                                         storageMode));
 
-    RBR_TRY(RBRInstrumentGen4_converse(
+    RBR_TRY(RBRGen4_converse(
                 instrument,
                 "verify config=%s dataset=%s storagemode=%s",
                 config->label,
@@ -392,7 +392,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_verify(
 
     RBRInstrumentGen4_parseInstrumentState(instrument, state);
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 const char *RBRInstrumentGen4DeploymentStoragemode_name(RBRInstrumentGen4DeploymentStoragemode storageMode)
@@ -411,8 +411,8 @@ const char *RBRInstrumentGen4DeploymentStoragemode_name(RBRInstrumentGen4Deploym
     }
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_enable(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_enable(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Config *config,
     const char *datasetLabel,
     RBRInstrumentGen4DeploymentStoragemode storageMode,
@@ -422,7 +422,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_enable(
                                                         datasetLabel,
                                                         storageMode));
 
-    RBR_TRY(RBRInstrumentGen4_converse(
+    RBR_TRY(RBRGen4_converse(
                 instrument,
                 "enable config=%s dataset=%s storagemode=%s",
                 config->label,
@@ -431,16 +431,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_enable(
 
     RBRInstrumentGen4_parseInstrumentState(instrument, state);
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_disable(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_disable(
+    RBRGen4 *instrument,
     RBRInstrumentGen4InstrumentState *state)
 {
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "disable"));
+    RBR_TRY(RBRGen4_converse(instrument, "disable"));
 
     RBRInstrumentGen4_parseInstrumentState(instrument, state);
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }

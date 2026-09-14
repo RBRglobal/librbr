@@ -22,7 +22,7 @@
 /* Required for close. */
 #include <unistd.h>
 
-#include "RBRInstrumentGen4.h"
+#include "RBRGen4.h"
 #include "RBRInstrumentGen4Configuration.h"
 #include "RBRInstrumentGen4Memory.h"
 #include "posix-shared.h"
@@ -34,7 +34,7 @@
 
 #define GROUP_PTS_LABEL "gr_pts"
 #define GROUP_PTS_CHANNELS                              \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             TEMPERATURE,                                \
@@ -48,7 +48,7 @@
 #define SCHEDULE_PTS_CASTDETECTION false
 
 #define SCHEDULE_PTS_GROUPS                          \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         GROUP_PTS_LABEL                              \
     }
@@ -56,7 +56,7 @@
 
 #define CONFIG_ASCENT_LABEL "cf_ascent"
 #define CONFIG_ASCENT_SCHEDULES                      \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         SCHEDULE_PTS_LABEL                           \
     }
@@ -76,9 +76,9 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen4Error err;
-    RBRInstrumentGen4 instrumentSpace;
-    RBRInstrumentGen4 *instrument = &instrumentSpace;
+    RBRGen4Error err;
+    RBRGen4 instrumentSpace;
+    RBRGen4 *instrument = &instrumentSpace;
 
     if (argc < 2)
     {
@@ -97,25 +97,25 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s (built %s).\n",
             programName,
-            RBRINSTRUMENTGEN4_LIB_NAME,
-            RBRINSTRUMENTGEN4_LIB_VERSION,
-            RBRINSTRUMENTGEN4_LIB_BUILD_DATE);
+            RBRGEN4_LIB_NAME,
+            RBRGEN4_LIB_VERSION,
+            RBRGEN4_LIB_BUILD_DATE);
 
     // check instrument communication is fine.
-    RBRInstrumentGen4Callbacks callbacks = {
+    RBRGen4Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrumentGen4_open(
+    if ((err = RBRGen4_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN4_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
     {
-        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRInstrumentGen4Error_name(err));
+        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup; // Failure case, memory allocated by this constructor is freed.
     }
@@ -161,9 +161,9 @@ int main(int argc, char *argv[])
 
     /************ group definition ************/
     /* read the channel pool, then each channel and its calibration */
-    RBRInstrumentGen4Channel channelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4Channel channelBuf[RBRGEN4_CHANNEL_MAX];
     RBRInstrumentGen4ChannelPool channelPool = {
-        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+        .size = RBRGEN4_CHANNEL_MAX,
         .pool = channelBuf
     };
     RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
@@ -209,8 +209,8 @@ int main(int argc, char *argv[])
 
     /************ schedule definition ************/
     RBRInstrumentGen4Schedule schedule;
-    RBRInstrumentGen4Label groupLabelBuf[SCHEDULE_PTS_GROUP_COUNT];
-    RBRInstrumentGen4LabelList groupList = {
+    RBRGen4Label groupLabelBuf[SCHEDULE_PTS_GROUP_COUNT];
+    RBRGen4LabelList groupList = {
         .size = SCHEDULE_PTS_GROUP_COUNT,
         .labels = groupLabelBuf
     };
@@ -226,8 +226,8 @@ int main(int argc, char *argv[])
 
     /************ configuration definition ************/
     RBRInstrumentGen4Config config;
-    RBRInstrumentGen4Label scheduleLabelBuf[CONFIG_ASCENT_SCHEDULE_COUNT];
-    RBRInstrumentGen4LabelList scheduleList = {
+    RBRGen4Label scheduleLabelBuf[CONFIG_ASCENT_SCHEDULE_COUNT];
+    RBRGen4LabelList scheduleList = {
         .size = CONFIG_ASCENT_SCHEDULE_COUNT,
         .labels = scheduleLabelBuf
     };
@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
                              &loggingState);
 
 instrumentCleanup:
-    RBRInstrumentGen4_close(instrument);
+    RBRGen4_close(instrument);
 
 fileCleanup:
     close(instrumentFd);

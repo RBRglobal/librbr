@@ -31,7 +31,7 @@
 
 #define GROUP_PTS_LABEL "gr_pts"
 #define GROUP_PTS_CHANNELS \
-(const RBRInstrumentGen4Label[]) \
+(const RBRGen4Label[]) \
 {   \
     PRESSURE, \
         TEMPERATURE, \
@@ -48,9 +48,9 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen4Error err;
-    RBRInstrumentGen4 instrumentSpace;
-    RBRInstrumentGen4 *instrument = &instrumentSpace;
+    RBRGen4Error err;
+    RBRGen4 instrumentSpace;
+    RBRGen4 *instrument = &instrumentSpace;
 
     if (argc < 2)
     {
@@ -69,25 +69,25 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s (built %s).\n",
             programName,
-            RBRINSTRUMENTGEN4_LIB_NAME,
-            RBRINSTRUMENTGEN4_LIB_VERSION,
-            RBRINSTRUMENTGEN4_LIB_BUILD_DATE);
+            RBRGEN4_LIB_NAME,
+            RBRGEN4_LIB_VERSION,
+            RBRGEN4_LIB_BUILD_DATE);
 
     // check instrument communication is fine.
-    RBRInstrumentGen4Callbacks callbacks = {
+    RBRGen4Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrumentGen4_open(
+    if ((err = RBRGen4_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN4_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
     {
-        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRInstrumentGen4Error_name(err));
+        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup; // Failure case, memory allocated by this constructor is freed.
     }
@@ -120,9 +120,9 @@ int main(int argc, char *argv[])
     }
 
     // read the channel pool
-    RBRInstrumentGen4Channel channelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
+    RBRInstrumentGen4Channel channelBuf[RBRGEN4_CHANNEL_MAX];
     RBRInstrumentGen4ChannelPool channelPool = {
-        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+        .size = RBRGEN4_CHANNEL_MAX,
         .pool = channelBuf
     };
     RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
@@ -135,20 +135,20 @@ int main(int argc, char *argv[])
         .pool = groupBuf
     };
     err = RBRInstrumentGen4_getGroupPool(instrument, &groupPool);
-    if (err != RBRINSTRUMENTGEN4_SUCCESS
-        && err != RBRINSTRUMENTGEN4_TRUNCATED)
+    if (err != RBRGEN4_SUCCESS
+        && err != RBRGEN4_TRUNCATED)
     {
         fprintf(stderr,
                 "%s: Failed to read the group pool: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
 
     // specify outputformat. The setter sends every parameter of the command,
     // so read the current format and change only the sample fields.
-    RBRInstrumentGen4OutputFormat outputformat;
+    RBRGen4OutputFormat outputformat;
     RBRInstrumentGen4_getOutputFormat(instrument, &outputformat);
     outputformat.sn = true;
     outputformat.scheduleLabel = true;
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_setOutputFormat(instrument, &outputformat);
 
     // poll data and print in console
-    RBRInstrumentGen4Sample sample;
+    RBRGen4Sample sample;
     while (true)
     {
         // poll one group
@@ -165,9 +165,9 @@ int main(int argc, char *argv[])
                                            true,
                                            groupPool.pool[0].label,
                                            &sample);
-        if (err != RBRINSTRUMENTGEN4_SUCCESS)
+        if (err != RBRGEN4_SUCCESS)
         {
-            fprintf(stderr, "Error: %s\n", RBRInstrumentGen4Error_name(err));
+            fprintf(stderr, "Error: %s\n", RBRGen4Error_name(err));
         }
         else
         {
@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
     goto instrumentCleanup;
 
 instrumentCleanup:
-    RBRInstrumentGen4_close(instrument);
+    RBRGen4_close(instrument);
 
 fileCleanup:
     close(instrumentFd);

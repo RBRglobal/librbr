@@ -26,7 +26,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "RBRInstrumentGen4.h"
+#include "RBRGen4.h"
 #include "RBRInstrumentGen4Configuration.h"
 #include "RBRInstrumentGen4Deployment.h"
 #include "RBRInstrumentGen4Instrument.h"
@@ -41,7 +41,7 @@
 
 #define GROUP_PTS_LABEL "gr_pts"
 #define GROUP_PTS_CHANNELS                              \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
         SALINITY_DYNCORR,                               \
@@ -56,7 +56,7 @@
 #define SCHEDULE_PTS_COUNT 3
 
 #define SCHEDULE_PTS_GROUPS                          \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         GROUP_PTS_LABEL                              \
     }
@@ -80,7 +80,7 @@
 
 #define CONFIG_ASCENT_LABEL "cf_ascent"
 #define CONFIG_ASCENT_SCHEDULES                      \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         SCHEDULE_PTS_LABEL                           \
     }
@@ -91,9 +91,9 @@
 
 #define CHUNK_LEN_BYTES 1000
 
-RBRInstrumentGen4Error parserSample(
+RBRGen4Error parserSample(
     const struct RBRParserGen4 *parser,
-    const struct RBRInstrumentGen4Sample *const sample)
+    const struct RBRGen4Sample *const sample)
 {
     /* Unused. */
     (void) parser;
@@ -111,7 +111,7 @@ RBRInstrumentGen4Error parserSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -123,9 +123,9 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen4Error err;
-    RBRInstrumentGen4 instrumentSpace;
-    RBRInstrumentGen4 *instrument = &instrumentSpace;
+    RBRGen4Error err;
+    RBRGen4 instrumentSpace;
+    RBRGen4 *instrument = &instrumentSpace;
 
     if (argc < 2)
     {
@@ -144,25 +144,25 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s (built %s).\n",
             programName,
-            RBRINSTRUMENTGEN4_LIB_NAME,
-            RBRINSTRUMENTGEN4_LIB_VERSION,
-            RBRINSTRUMENTGEN4_LIB_BUILD_DATE);
+            RBRGEN4_LIB_NAME,
+            RBRGEN4_LIB_VERSION,
+            RBRGEN4_LIB_BUILD_DATE);
 
     // check instrument communication is fine.
-    RBRInstrumentGen4Callbacks callbacks = {
+    RBRGen4Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrumentGen4_open(
+    if ((err = RBRGen4_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN4_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
     {
-        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRInstrumentGen4Error_name(err));
+        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup; // Failure case, memory allocated by this constructor is freed.
     }
@@ -317,7 +317,7 @@ int main(int argc, char *argv[])
         .channelCount = group_pts.channelCount,
         .datatype = info.dataType
     };
-    RBRInstrumentGen4Sample sampleBuffer;
+    RBRGen4Sample sampleBuffer;
     RBRParserGen4Callbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
@@ -349,7 +349,7 @@ int main(int argc, char *argv[])
     }
 
 instrumentCleanup:
-    RBRInstrumentGen4_close(instrument);
+    RBRGen4_close(instrument);
 
 fileCleanup:
     close(instrumentFd);

@@ -13,7 +13,7 @@
 #ifndef LIBRBR_RBRINSTRUMENTGEN4INSTRUMENT_H
 #define LIBRBR_RBRINSTRUMENTGEN4INSTRUMENT_H
 
-#include "RBRInstrumentGen4.h"
+#include "RBRGen4.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,7 +49,7 @@ typedef enum RBRInstrumentGen4InstrumentState
  *
  * \param [in] state the instrument state
  * \return a string name for the instrument state
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4InstrumentState_name(
     RBRInstrumentGen4InstrumentState status);
@@ -78,14 +78,14 @@ const char *RBRInstrumentGen4InstrumentState_name(
  *
  * \param [in] instrument the instrument connection
  * \param [out] id the instrument information
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the information is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the information is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_getId4()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
-                                       RBRInstrumentGen4Id *id);
+RBRGen4Error RBRInstrumentGen4_getId(RBRGen4 *instrument,
+                                       RBRGen4Id *id);
 
 /**
  * \brief Get identification information from the instrument.
@@ -93,14 +93,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getId(RBRInstrumentGen4 *instrument,
  *
  * \param [in] instrument the instrument connection
  * \param [out] id the instrument information
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the information is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the information is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_getInstrument();
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getId4(RBRInstrumentGen4 *instrument,
-                                       RBRInstrumentGen4Id4 *id);
+RBRGen4Error RBRInstrumentGen4_getId4(RBRGen4 *instrument,
+                                       RBRGen4Id4 *id);
 
 /**
  * \brief Instrument `pcba <pcba_label>` command parameters.
@@ -116,7 +116,7 @@ typedef struct RBRInstrumentGen4Pcba
      * Set by the caller to select the PCBA to read; see
      * RBRInstrumentGen4_getPcba().
      */
-    char label[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char label[RBRGEN4_LABEL_NAME_MAX + 1];
     /**
      * \brief PCBA serial number.
      *
@@ -129,9 +129,9 @@ typedef struct RBRInstrumentGen4Pcba
      *
      * Reported as `na` when unrecorded.
      */
-    char pn[RBRINSTRUMENTGEN4_PART_NUMBER_MAX + 1];
+    char pn[RBRGEN4_PART_NUMBER_MAX + 1];
     /** \brief The label of the node this PCBA belongs to. */
-    char node[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char node[RBRGEN4_LABEL_NAME_MAX + 1];
 } RBRInstrumentGen4Pcba;
 
 /**
@@ -153,15 +153,15 @@ typedef struct RBRInstrumentGen4PcbaPool {
  *
  * \param [in] instrument the instrument connection
  * \param [inout] pcbaPool the PCBAs of this instrument.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when all PCBAs are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if a PCBA cannot be read
+ * \return #RBRGEN4_SUCCESS when all PCBAs are successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR if a PCBA cannot be read
  * \see RBRInstrumentGen4_getPcba()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/44761149/pcba
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getPcbaPool(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getPcbaPool(
+    RBRGen4 *instrument,
     RBRInstrumentGen4PcbaPool *pcbaPool);
 
 /**
@@ -174,15 +174,15 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPcbaPool(
  *
  * \param [in] instrument the instrument connection
  * \param [inout] pcba the label of the PCBA to read, and its information
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the information is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the information cannot be read
+ * \return #RBRGEN4_SUCCESS when the information is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR if the information cannot be read
  * \see RBRInstrumentGen4_getPcbaPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/44761149/pcba
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getPcba(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getPcba(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Pcba *pcba);
 
 /**
@@ -209,7 +209,7 @@ typedef enum RBRInstrumentGen4PowerSource
  *
  * \param [in] source the power source
  * \return a string name for the power source
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4PowerSource_name(RBRInstrumentGen4PowerSource source);
 
@@ -219,13 +219,13 @@ const char *RBRInstrumentGen4PowerSource_name(RBRInstrumentGen4PowerSource sourc
  *
  * \param [in] instrument the instrument connection
  * \param [out] powerSource the power source from which the instrument is running
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the information is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the information cannot be read
+ * \return #RBRGEN4_SUCCESS when the information is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR if the information cannot be read
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830328/power
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getPowerSource(RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getPowerSource(RBRGen4 *instrument,
                                           RBRInstrumentGen4PowerSource *powerSource);
 
 /**
@@ -258,7 +258,7 @@ typedef enum RBRInstrumentGen4InternalBatteryType
  *
  * \param [in] type the battery type
  * \return a string name for the battery type
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  * \see RBRInstrumentGen4InternalBatteryType_displayName() for display names
  */
 const char *RBRInstrumentGen4InternalBatteryType_name(
@@ -307,16 +307,16 @@ typedef struct RBRInstrumentGen4PowerInternal
  *
  * \param [in] instrument the instrument connection
  * \param [out] power the power information
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the information is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if an error occurs reading voltages
+ * \return #RBRGEN4_SUCCESS when the information is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR if an error occurs reading voltages
  * \see RBRInstrumentGen4_setPowerInternalBatteryType()
  * \see RBRInstrumentGen4_resetPowerInternalUsed()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828548/internal
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getPowerInternal(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getPowerInternal(
+    RBRGen4 *instrument,
     RBRInstrumentGen4PowerInternal *power);
 
 /**
@@ -325,16 +325,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPowerInternal(
  *
  * \param [in] instrument the instrument connection
  * \param [in] type the battery type
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN4_SUCCESS when the setting is successfully written
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging
  * \see RBRInstrumentGen4_getPowerInternal()
  * \see RBRInstrumentGen4_resetPowerInternalUsed()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828548/internal
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setPowerInternalBatteryType(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setPowerInternalBatteryType(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4InternalBatteryType type);
 
 /**
@@ -342,16 +342,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPowerInternalBatteryType(
  * \note Issues the `instrument power internal` instrument command.
  *
  * \param [in] instrument the instrument connection
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN4_SUCCESS when the setting is successfully written
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging
  * \see RBRInstrumentGen4_getPowerInternal()
  * \see RBRInstrumentGen4_setPowerInternalBatteryType()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828548/internal
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_resetPowerInternalUsed(
-    RBRInstrumentGen4 *instrument);
+RBRGen4Error RBRInstrumentGen4_resetPowerInternalUsed(
+    RBRGen4 *instrument);
 
 /**
  * \brief External battery types.
@@ -393,7 +393,7 @@ typedef enum RBRInstrumentGen4ExternalBatteryType
  *
  * \param [in] type the battery type
  * \return a string name for the battery type
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  * \see RBRInstrumentGen4ExternalBatteryType_displayName() for display names
  */
 const char *RBRInstrumentGen4ExternalBatteryType_name(
@@ -444,15 +444,15 @@ typedef struct RBRInstrumentGen4PowerExternal
  *
  * \param [in] instrument the instrument connection
  * \param [out] power the power information
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the information is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the information is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_setPowerExternalBatteryType()
  * \see RBRInstrumentGen4_resetPowerExternalUsed()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getPowerExternal(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getPowerExternal(
+    RBRGen4 *instrument,
     RBRInstrumentGen4PowerExternal *power);
 
 /**
@@ -461,16 +461,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getPowerExternal(
  *
  * \param [in] instrument the instrument connection
  * \param [in] type the battery type
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN4_SUCCESS when the setting is successfully written
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging
  * \see RBRInstrumentGen4_getPowerExternal()
  * \see RBRInstrumentGen4_resetPowerExternalUsed()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828551/external
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setPowerExternalBatteryType(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setPowerExternalBatteryType(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4ExternalBatteryType type);
 
 /**
@@ -478,21 +478,21 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setPowerExternalBatteryType(
  * \note Issues the `instrument power external` instrument command.
  *
  * \param [in] instrument the instrument connection
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN4_SUCCESS when the setting is successfully written
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging
  * \see RBRInstrumentGen4_getPowerExternal()
  * \see RBRInstrumentGen4_setPowerExternalBatteryType()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828551/external
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_resetPowerExternalUsed(
-    RBRInstrumentGen4 *instrument);
+RBRGen4Error RBRInstrumentGen4_resetPowerExternalUsed(
+    RBRGen4 *instrument);
 
 /**
  * \brief Instrument `instrument` command parameters.
  *
- * Distinct from #RBRInstrumentGen4, which is the connection to an instrument.
+ * Distinct from #RBRGen4, which is the connection to an instrument.
  *
  * Fields are declared in the order the instrument reports them.
  *
@@ -506,23 +506,23 @@ typedef struct RBRInstrumentGen4Instrument
     /** \brief The serial number of the instrument. */
     int32_t sn;
     /** \brief The instrument model. */
-    char model[RBRINSTRUMENTGEN4_ID_MODEL_MAX + 1];
+    char model[RBRGEN4_ID_MODEL_MAX + 1];
     /** \brief The RBR part number of the instrument. */
-    char pn[RBRINSTRUMENTGEN4_PART_NUMBER_MAX + 1];
+    char pn[RBRGEN4_PART_NUMBER_MAX + 1];
     /** \brief The instrument firmware version. */
-    char fwversion[RBRINSTRUMENTGEN4_ID_VERSION_MAX + 1];
+    char fwversion[RBRGEN4_ID_VERSION_MAX + 1];
     /**
      * \brief The instrument firmware version in Semantic Version form.
      *
      * For example, `2.0.0-rc1-10-g148bc5eb1`.
      */
-    char semver[RBRINSTRUMENTGEN4_ID_SEMVER_MAX + 1];
+    char semver[RBRGEN4_ID_SEMVER_MAX + 1];
     /** \brief The firmware type of the instrument. */
     int32_t fwtype;
     /** \brief Whether firmware upgrades are locked. */
     bool fwLock;
     /** \brief The data type used by the instrument's samples. */
-    RBRInstrumentGen4DataType dataType;
+    RBRGen4DataType dataType;
     /**
      * \brief The extended model name of the instrument.
      *
@@ -540,14 +540,14 @@ typedef struct RBRInstrumentGen4Instrument
  *
  * \param [in] instrument the instrument connection
  * \param [out] instrumentInfo the instrument information
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the information is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the information is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_getId4()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/41582593/instrument
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getInstrument(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getInstrument(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Instrument *instrumentInfo);
 
 /**
@@ -559,15 +559,15 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getInstrument(
  *
  * \param [in] instrument the instrument connection
  * \param [out] outputformat the current output format
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the settings are successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_setOutputFormat()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getOutputFormat(
-    RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4OutputFormat *outputformat);
+RBRGen4Error RBRInstrumentGen4_getOutputFormat(
+    RBRGen4 *instrument,
+    RBRGen4OutputFormat *outputformat);
 
 /**
  * \brief Set the current output format.
@@ -577,8 +577,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getOutputFormat(
  * populated: read the current format with RBRInstrumentGen4_getOutputFormat()
  * and modify it if only some parameters are of interest.
  *
- * \warning RBRParserGen4 reads only #RBRINSTRUMENTGEN4_ENCODING_ASCII.
- *          Selecting #RBRINSTRUMENTGEN4_ENCODING_BINARY will stop this library
+ * \warning RBRParserGen4 reads only #RBRGEN4_ENCODING_ASCII.
+ *          Selecting #RBRGEN4_ENCODING_BINARY will stop this library
  *          from being able to interpret samples or command responses.
  *
  * On success, the library caches the output format and uses it to parse
@@ -590,33 +590,33 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getOutputFormat(
  *
  * \param [in] instrument the instrument connection
  * \param [in] outputformat the desired output format
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the settings are successfully written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the encoding or
+ * \return #RBRGEN4_SUCCESS when the settings are successfully written
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the encoding or
  *                                                   datatype is not a real
  *                                                   value
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the instrument refuses a value
+ * \return #RBRGEN4_HARDWARE_ERROR if the instrument refuses a value
  * \see RBRInstrumentGen4_getOutputFormat()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setOutputFormat(
-    RBRInstrumentGen4 *instrument,
-    const RBRInstrumentGen4OutputFormat *outputformat);
+RBRGen4Error RBRInstrumentGen4_setOutputFormat(
+    RBRGen4 *instrument,
+    const RBRGen4OutputFormat *outputformat);
 
 /**
  * \brief Return the instrument's configuration to its factory state.
  * \note Issues the `instrument factory reset` command.
  *
  * \param [in] instrument the instrument connection
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the instrument has been reset
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the instrument refuses
+ * \return #RBRGEN4_SUCCESS when the instrument has been reset
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR if the instrument refuses
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/factory
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_factoryReset(
-    RBRInstrumentGen4 *instrument);
+RBRGen4Error RBRInstrumentGen4_factoryReset(
+    RBRGen4 *instrument);
 
 /**
  * \brief Reset the instrument CPU.
@@ -626,12 +626,12 @@ RBRInstrumentGen4Error RBRInstrumentGen4_factoryReset(
  * \param [in] delay time in milliseconds to wait before rebooting; zero omits
  *                   the parameter, rebooting without a delay. The command
  *                   has no default delay of its own.
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the reboot has been requested
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the reboot has been requested
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/reboot
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_reboot(RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_reboot(RBRGen4 *instrument,
                                         const int32_t delay);
 
 #ifdef __cplusplus

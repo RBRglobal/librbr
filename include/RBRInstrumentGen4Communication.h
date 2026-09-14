@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#include "RBRInstrumentGen4.h"
+#include "RBRGen4.h"
 
 /**
  * \brief Instrument link types.
@@ -47,7 +47,7 @@ typedef enum RBRInstrumentGen4LinkType
  *
  * \param [in] linkType the type of communication link
  * \return a string name for the communication link
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4LinkType_name(RBRInstrumentGen4LinkType linkType);
 
@@ -69,12 +69,12 @@ typedef struct RBRInstrumentGen4Link
  *
  * \param [in] instrument the instrument connection
  * \param [out] link the link parameters
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the setting is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830279/link
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getLink(RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getLink(RBRGen4 *instrument,
                                                 RBRInstrumentGen4Link *link);
 
 /**
@@ -117,7 +117,7 @@ typedef enum RBRInstrumentGen4LinkSerialBaudRate
  *
  * \param [in] baud the baud rate
  * \return a string name for the baud rate
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4LinkSerialBaudRate_name(
     RBRInstrumentGen4LinkSerialBaudRate baud);
@@ -155,7 +155,7 @@ typedef enum RBRInstrumentGen4LinkSerialMode
  *
  * \param [in] mode the serial mode
  * \return a string name for the serial mode
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4LinkSerialMode_name(
     RBRInstrumentGen4LinkSerialMode mode);
@@ -204,14 +204,14 @@ typedef struct RBRInstrumentGen4LinkSerial
  *
  * \param [in] instrument the instrument connection
  * \param [out] serial the current and available serial parameters
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the setting is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRInstrumentGen4_setLinkSerial()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getLinkSerial(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getLinkSerial(
+    RBRGen4 *instrument,
     RBRInstrumentGen4LinkSerial *serial);
 
 /**
@@ -234,17 +234,17 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getLinkSerial(
  *
  * \param [in] instrument the instrument connection
  * \param [in] serial the new serial parameters
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when a value is not supported
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the baud rate or
+ * \return #RBRGEN4_SUCCESS when the setting is successfully written
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when a value is not supported
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the baud rate or
  *                                                   mode is not a real value
  * \see RBRInstrumentGen4_getLinkSerial()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setLinkSerial(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setLinkSerial(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4LinkSerial *serial);
 
 /**
@@ -258,12 +258,12 @@ RBRInstrumentGen4Error RBRInstrumentGen4_setLinkSerial(
  * sensor channels used for a `poll` command will still be shut down.
  *
  * \param [in] instrument the instrument connection
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the instrument has been put to sleep
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_SUCCESS when the instrument has been put to sleep
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828543/sleep
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828337/Timeouts+output+blanking+and+power+saving
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_sleep(RBRInstrumentGen4 *instrument);
+RBRGen4Error RBRInstrumentGen4_sleep(RBRGen4 *instrument);
 
 /**
  * L3.5/L4 WiFi interface is To Be Defined as of October 2024
@@ -295,7 +295,7 @@ typedef enum RBRInstrumentGen4WiFiState
  *
  * \param [in] state the Wi-Fi connection state
  * \return a string name for the Wi-Fi connection state
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
+ * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRInstrumentGen4WiFiState_name(RBRInstrumentGen4WiFiState state);
 
@@ -355,14 +355,14 @@ typedef struct RBRInstrumentGen4WiFi
  *
  * \param [in] instrument the instrument connection
  * \param [out] wifi the current Wi-Fi parameters
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRGEN4_SUCCESS when the setting is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the feature is unavailable
  * \see RBRInstrumentGen4_setWiFi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_getWiFi(RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getWiFi(RBRGen4 *instrument,
                                          RBRInstrumentGen4WiFi *wifi);
 
 /**
@@ -378,16 +378,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getWiFi(RBRInstrumentGen4 *instrument,
  *
  * \param [in] instrument the instrument connection
  * \param [out] wifi the new Wi-Fi parameters
- * \return #RBRINSTRUMENTGEN4_SUCCESS when the setting is successfully written
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when the feature is unavailable
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when parameter values are out
+ * \return #RBRGEN4_SUCCESS when the setting is successfully written
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see RBRInstrumentGen4_getWifi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_setWiFi(RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setWiFi(RBRGen4 *instrument,
                                          const RBRInstrumentGen4WiFi *wifi);
 
 #endif

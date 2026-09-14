@@ -15,8 +15,8 @@
 /* Required for strcmp. */
 #include <string.h>
 
-#include "RBRInstrumentGen4.h"
-#include "RBRInstrumentGen4Internal.h"
+#include "RBRGen4.h"
+#include "RBRGen4Internal.h"
 #include "RBRInstrumentGen4Realtime.h"
 
 #define READING_FLAG_MASK 0x00FF0000
@@ -81,33 +81,33 @@ inline double RBRInstrumentGen4Reading_setError(RBRInstrumentGen4ReadingError er
     return alias.reading;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_readSample(RBRInstrumentGen4 *instrument)
+RBRGen4Error RBRInstrumentGen4_readSample(RBRGen4 *instrument)
 {
     if (instrument->callbacks.sample == NULL)
     {
-        return RBRINSTRUMENTGEN4_MISSING_CALLBACK;
+        return RBRGEN4_MISSING_CALLBACK;
     }
 
-    RBRInstrumentGen4Error err;
-    RBRInstrumentGen4DateTime now;
-    /* RBRInstrumentGen4_readResponse() returns #RBRINSTRUMENTGEN4_SAMPLE when a sample
-     * is read to the given sample pointer; a return of #RBRINSTRUMENTGEN4_SUCCESS
+    RBRGen4Error err;
+    RBRGen4DateTime now;
+    /* RBRGen4_readResponse() returns #RBRGEN4_SAMPLE when a sample
+     * is read to the given sample pointer; a return of #RBRGEN4_SUCCESS
      * means that it found some other command response instead, so we'll loop
      * until we get a “failure” value (which we hope is SAMPLE). */
     do
     {
         RBR_TRY(instrument->callbacks.time(instrument, &now));
-        err = RBRInstrumentGen4_readResponse(instrument,
+        err = RBRGen4_readResponse(instrument,
                                              true,
                                              NULL,
                                              now,
                                              instrument->commandTimeout);
-    } while (err == RBRINSTRUMENTGEN4_SUCCESS);
+    } while (err == RBRGEN4_SUCCESS);
     /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any
      * other errors can really be errors. */
-    if (err == RBRINSTRUMENTGEN4_SAMPLE)
+    if (err == RBRGEN4_SAMPLE)
     {
-        err = RBRINSTRUMENTGEN4_SUCCESS;
+        err = RBRGEN4_SUCCESS;
     }
 
     return err;
@@ -124,16 +124,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_readSample(RBRInstrumentGen4 *instrumen
  * \param [in] list the value of \a parameter
  * \param [out] sample the polled sample
  */
-static RBRInstrumentGen4Error RBRInstrumentGen4_sendPoll(
-    RBRInstrumentGen4 *instrument,
+static RBRGen4Error RBRInstrumentGen4_sendPoll(
+    RBRGen4 *instrument,
     bool requireLabel,
     const char *parameter,
     const char *list,
-    RBRInstrumentGen4Sample *sample)
+    RBRGen4Sample *sample)
 {
     if (requireLabel && !instrument->outputFormat.scheduleLabel)
     {
-        return RBRINSTRUMENTGEN4_UNSUPPORTED;
+        return RBRGEN4_UNSUPPORTED;
     }
 
     char *commandBuffer = (char *) instrument->commandBuffer;
@@ -146,31 +146,31 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_sendPoll(
         parameter != NULL ? " " : "",
         parameter != NULL ? parameter : "",
         parameter != NULL ? list : "",
-        RBRINSTRUMENTGEN4_SEND_COMMAND_TERMINATOR);
+        RBRGEN4_SEND_COMMAND_TERMINATOR);
     if ((size_t) *commandBufferLength >= sizeof(instrument->commandBuffer))
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    RBRInstrumentGen4DateTime start;
+    RBRGen4DateTime start;
     RBR_TRY(instrument->callbacks.time(instrument, &start));
 
-    RBR_TRY(RBRInstrumentGen4_sendBuffer(instrument));
+    RBR_TRY(RBRGen4_sendBuffer(instrument));
 
-    RBRInstrumentGen4Error err;
-    /* RBRInstrumentGen4_readResponse() returns #RBRINSTRUMENTGEN4_SAMPLE when
+    RBRGen4Error err;
+    /* RBRGen4_readResponse() returns #RBRGEN4_SAMPLE when
      * a sample is read to the given sample pointer; a return of
-     * #RBRINSTRUMENTGEN4_SUCCESS means that it found some other command
+     * #RBRGEN4_SUCCESS means that it found some other command
      * response instead, so we'll loop until we get a “failure” value (which
      * we hope is SAMPLE). */
     do
     {
-        err = RBRInstrumentGen4_readResponse(instrument,
+        err = RBRGen4_readResponse(instrument,
                                              true,
                                              sample,
                                              start,
                                              instrument->pollTimeout);
-        if (err == RBRINSTRUMENTGEN4_SAMPLE
+        if (err == RBRGEN4_SAMPLE
             && requireLabel
             && 0 != strcmp(sample->scheduleLabel,
                            RBRINSTRUMENTGEN4_POLL_SCHEDULE_LABEL))
@@ -178,24 +178,24 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_sendPoll(
             /* This is a streamed sample, not the polled one we're waiting
              * for. Forward it to the sample callback, if any, and keep
              * looking. */
-            RBR_TRY(RBRInstrumentGen4_deliverSample(instrument, sample));
-            err = RBRINSTRUMENTGEN4_SUCCESS;
+            RBR_TRY(RBRGen4_deliverSample(instrument, sample));
+            err = RBRGEN4_SUCCESS;
         }
-    } while (err == RBRINSTRUMENTGEN4_SUCCESS);
+    } while (err == RBRGEN4_SUCCESS);
     /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any
      * other errors can really be errors. */
-    if (err == RBRINSTRUMENTGEN4_SAMPLE)
+    if (err == RBRGEN4_SAMPLE)
     {
-        err = RBRINSTRUMENTGEN4_SUCCESS;
+        err = RBRGEN4_SUCCESS;
     }
 
     return err;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_poll(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_poll(
+    RBRGen4 *instrument,
     bool requireLabel,
-    RBRInstrumentGen4Sample *sample)
+    RBRGen4Sample *sample)
 {
     return RBRInstrumentGen4_sendPoll(instrument,
                                       requireLabel,
@@ -204,11 +204,11 @@ RBRInstrumentGen4Error RBRInstrumentGen4_poll(
                                       sample);
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_pollChannels(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_pollChannels(
+    RBRGen4 *instrument,
     bool requireLabel,
     const char *channelList,
-    RBRInstrumentGen4Sample *sample)
+    RBRGen4Sample *sample)
 {
     return RBRInstrumentGen4_sendPoll(instrument,
                                       requireLabel,
@@ -217,11 +217,11 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollChannels(
                                       sample);
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_pollGroups(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_pollGroups(
+    RBRGen4 *instrument,
     bool requireLabel,
     const char *groupList,
-    RBRInstrumentGen4Sample *sample)
+    RBRGen4Sample *sample)
 {
     return RBRInstrumentGen4_sendPoll(instrument,
                                       requireLabel,

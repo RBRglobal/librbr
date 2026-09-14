@@ -17,9 +17,9 @@
 /* Required for PRId32. */
 #include <inttypes.h>
 
-#include "RBRInstrumentGen4.h"
+#include "RBRGen4.h"
 #include "RBRInstrumentGen4Configuration.h"
-#include "RBRInstrumentGen4Internal.h"
+#include "RBRGen4Internal.h"
 #include "RBRInstrumentGen4Memory.h"
 
 const char *RBRInstrumentGen4StorageAccess_name(
@@ -39,20 +39,20 @@ const char *RBRInstrumentGen4StorageAccess_name(
     }
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getStorage(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getStorage(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Storage *storage)
 {
     memset(storage, 0, sizeof(RBRInstrumentGen4Storage));
     storage->access = RBRINSTRUMENTGEN4_UNKNOWN_STORAGE_ACCESS;
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "storage"));
+    RBR_TRY(RBRGen4_converse(instrument, "storage"));
 
     char *command = NULL;
-    RBRInstrumentGen4ResponseParameter parameter;
+    RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(instrument,
                                         &command,
                                         &parameter);
 
@@ -88,20 +88,20 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getStorage(
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_setStorage(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_setStorage(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Storage *storage)
 {
     if (storage->access < 0
         || storage->access >= RBRINSTRUMENTGEN4_STORAGE_ACCESS_COUNT)
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrumentGen4_converse(
+    return RBRGen4_converse(
         instrument,
         "storage access=%s",
         RBRInstrumentGen4StorageAccess_name(storage->access));
@@ -124,8 +124,8 @@ const char *RBRInstrumentGen4DatasetStatus_name(
     }
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetPool(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getDatasetPool(
+    RBRGen4 *instrument,
     RBRInstrumentGen4DatasetPool *datasetPool)
 {
     datasetPool->count = 0;
@@ -134,14 +134,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetPool(
            0,
            datasetPool->size * sizeof(RBRInstrumentGen4Dataset));
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument, "dataset"));
+    RBR_TRY(RBRGen4_converse(instrument, "dataset"));
 
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
+    RBRGen4Error err = RBRGEN4_SUCCESS;
     char *command = NULL;
-    RBRInstrumentGen4ResponseParameter parameter;
+    RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(instrument,
                                         &command,
                                         &parameter);
 
@@ -160,7 +160,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetPool(
         else if (strcmp(parameter.key, "list") == 0)
         {
             /* An empty pool reports `none`. */
-            if (strcmp(parameter.value, RBRINSTRUMENTGEN4_EMPTY_LIST) == 0)
+            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0)
             {
                 continue;
             }
@@ -171,11 +171,11 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetPool(
             {
                 if (i >= datasetPool->size)
                 {
-                    err = RBRINSTRUMENTGEN4_TRUNCATED;
+                    err = RBRGEN4_TRUNCATED;
                     break;
                 }
 
-                char *nextValue = RBRInstrumentGen4_splitListValue(value);
+                char *nextValue = RBRGen4_splitListValue(value);
 
                 snprintf(datasetPool->pool[i].label,
                          sizeof(datasetPool->pool[i].label),
@@ -190,34 +190,34 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetPool(
     return err;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_getDataset(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_getDataset(
+    RBRGen4 *instrument,
     RBRInstrumentGen4Dataset *dataset,
-    RBRInstrumentGen4LabelList *scheduleList)
+    RBRGen4LabelList *scheduleList)
 {
     if (dataset->label[0] == '\0')
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     RBR_RESET_EXCEPT(dataset, label);
     dataset->status = RBRINSTRUMENTGEN4_UNKNOWN_DATASET_STATUS;
-    dataset->dataType = RBRINSTRUMENTGEN4_UNKNOWN_DATATYPE;
+    dataset->dataType = RBRGEN4_UNKNOWN_DATATYPE;
     if (scheduleList != NULL)
     {
         scheduleList->count = 0;
     }
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(instrument,
                                        "dataset %s",
                                        dataset->label));
 
-    RBRInstrumentGen4Error err = RBRINSTRUMENTGEN4_SUCCESS;
+    RBRGen4Error err = RBRGEN4_SUCCESS;
     char *command = NULL;
-    RBRInstrumentGen4ResponseParameter parameter;
+    RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(instrument,
                                         &command,
                                         &parameter);
 
@@ -240,7 +240,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDataset(
         else if (strcmp(parameter.key, "schedulelist") == 0
                  && scheduleList != NULL)
         {
-            err = RBRInstrumentGen4_copyLabelList(scheduleList,
+            err = RBRGen4_copyLabelList(scheduleList,
                                                   parameter.value);
         }
         else if (strcmp(parameter.key, "bytecount") == 0)
@@ -249,10 +249,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDataset(
         }
         else if (strcmp(parameter.key, "datatype") == 0)
         {
-            for (int i = 0; i < RBRINSTRUMENTGEN4_DATATYPE_COUNT; i++)
+            for (int i = 0; i < RBRGEN4_DATATYPE_COUNT; i++)
             {
                 if (strcmp(parameter.value,
-                           RBRInstrumentGen4DataType_name(i)) == 0)
+                           RBRGen4DataType_name(i)) == 0)
                 {
                     dataset->dataType = i;
                     break;
@@ -288,16 +288,16 @@ const char *RBRInstrumentGen4Block_name(RBRInstrumentGen4Block block){
  * and left unparsed.
  */
 static void RBRInstrumentGen4Dataset_parseBlockResponse(
-    RBRInstrumentGen4 *instrument,
+    RBRGen4 *instrument,
     int64_t *byteCount,
     int64_t *sampleCount,
     int64_t *eventCount)
 {
     char *command = NULL;
-    RBRInstrumentGen4ResponseParameter parameter;
+    RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(instrument,
                                         &command,
                                         &parameter);
 
@@ -323,19 +323,19 @@ static void RBRInstrumentGen4Dataset_parseBlockResponse(
     }
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getEventsBlock(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4Dataset_getEventsBlock(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Dataset *dataset,
     RBRInstrumentGen4DatasetEventsBlock *block)
 {
     if (dataset->label[0] == '\0')
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     memset(block, 0, sizeof(RBRInstrumentGen4DatasetEventsBlock));
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(instrument,
                                        "dataset %s/events",
                                        dataset->label));
 
@@ -344,22 +344,22 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getEventsBlock(
                                                 NULL,
                                                 &block->eventCount);
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getMetaBlock(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4Dataset_getMetaBlock(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Dataset *dataset,
     RBRInstrumentGen4DatasetMetaBlock *block)
 {
     if (dataset->label[0] == '\0')
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     memset(block, 0, sizeof(RBRInstrumentGen4DatasetMetaBlock));
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(instrument,
                                        "dataset %s/meta",
                                        dataset->label));
 
@@ -368,23 +368,23 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getMetaBlock(
                                                 NULL,
                                                 NULL);
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleBlock(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4Dataset_getScheduleBlock(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRInstrumentGen4DatasetScheduleBlock *block)
 {
     if (dataset->label[0] == '\0' || scheduleLabel[0] == '\0')
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     memset(block, 0, sizeof(RBRInstrumentGen4DatasetScheduleBlock));
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(instrument,
                                        "dataset %s/%s",
                                        dataset->label,
                                        scheduleLabel));
@@ -394,23 +394,23 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleBlock(
                                                 NULL,
                                                 NULL);
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleEventsBlock(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4Dataset_getScheduleEventsBlock(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRInstrumentGen4DatasetEventsBlock *block)
 {
     if (dataset->label[0] == '\0' || scheduleLabel[0] == '\0')
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     memset(block, 0, sizeof(RBRInstrumentGen4DatasetEventsBlock));
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(instrument,
                                        "dataset %s/%s/events",
                                        dataset->label,
                                        scheduleLabel));
@@ -420,23 +420,23 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleEventsBlock(
                                                 NULL,
                                                 &block->eventCount);
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleDataBlock(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4Dataset_getScheduleDataBlock(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRInstrumentGen4DatasetDataBlock *block)
 {
     if (dataset->label[0] == '\0' || scheduleLabel[0] == '\0')
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     memset(block, 0, sizeof(RBRInstrumentGen4DatasetDataBlock));
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(instrument,
                                        "dataset %s/%s/data",
                                        dataset->label,
                                        scheduleLabel));
@@ -446,27 +446,27 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_getScheduleDataBlock(
                                                 &block->sampleCount,
                                                 NULL);
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteDataset(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_deleteDataset(
+    RBRGen4 *instrument,
     const char *label)
 {
     if (label[0] == '\0')
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrumentGen4_converse(instrument,
+    return RBRGen4_converse(instrument,
                                       "dataset delete %s",
                                       label);
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_deleteDatasetAll(
-    RBRInstrumentGen4 *instrument)
+RBRGen4Error RBRInstrumentGen4_deleteDatasetAll(
+    RBRGen4 *instrument)
 {
-    return RBRInstrumentGen4_converse(instrument, "dataset delete all");
+    return RBRGen4_converse(instrument, "dataset delete all");
 }
 
 const char *RBRInstrumentGen4DownloadDataUnit_name(
@@ -506,16 +506,16 @@ const char *RBRInstrumentGen4DownloadEventsUnit_name(
 /**
  * \brief Keep retrying reads until we retrieve a fixed amount of data.
  *
- * This function first drains data out of RBRInstrumentGen4.responseBuffer,
+ * This function first drains data out of RBRGen4.responseBuffer,
  * then begins to read from the instrument. As a result, \a data must not be
- * RBRInstrumentGen4.responseBuffer!
+ * RBRGen4.responseBuffer!
  *
  * \param [in] instrument the instrument connection
  * \param [out] data the buffer to write into
  * \param [in] size the amount of data to write into the buffer
  */
-static RBRInstrumentGen4Error RBRInstrumentGen4_fixedRead(
-    struct RBRInstrumentGen4 *instrument,
+static RBRGen4Error RBRInstrumentGen4_fixedRead(
+    struct RBRGen4 *instrument,
     void *data,
     int64_t size)
 {
@@ -556,7 +556,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_fixedRead(
         bufferLength += readLength;
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 /**
@@ -573,8 +573,8 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_fixedRead(
  * \param [out] data the buffer receiving the transfer
  * \param [in] dataSize the capacity of \a data in bytes
  */
-static RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadCommon(
-    RBRInstrumentGen4 *instrument,
+static RBRGen4Error RBRInstrumentGen4Dataset_downloadCommon(
+    RBRGen4 *instrument,
     const char *countKey,
     int64_t *count,
     int64_t *byteCount,
@@ -582,10 +582,10 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadCommon(
     int64_t dataSize)
 {
     char *command = NULL;
-    RBRInstrumentGen4ResponseParameter parameter;
+    RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRInstrumentGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(instrument,
                                         &command,
                                         &parameter);
 
@@ -624,7 +624,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadCommon(
                                                 chunk));
             rest -= chunk;
         }
-        return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+        return RBRGEN4_BUFFER_TOO_SMALL;
     }
 
     RBR_TRY(RBRInstrumentGen4_fixedRead(instrument, data, *byteCount));
@@ -636,14 +636,14 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadCommon(
     uint16_t reportedCrc = (uint16_t) ((crc[0] << 8) | crc[1]);
     if (RBRInstrumentGen4_calculateCrc(data, *byteCount) != reportedCrc)
     {
-        return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;
+        return RBRGEN4_CHECKSUM_ERROR;
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadScheduleData(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4Dataset_downloadScheduleData(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRInstrumentGen4DownloadData *download)
@@ -656,7 +656,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadScheduleData(
         || download->start < 0
         || download->data == NULL)
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     bool bytes = download->unit == RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES;
@@ -664,7 +664,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadScheduleData(
 
     download->byteCount = 0;
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(instrument,
                                        "download %s/%s/data"
                                        " %s=%" PRId64 " %s=%" PRId64,
                                        dataset->label,
@@ -682,7 +682,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadScheduleData(
                 download->data,
                 download->dataSize));
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 /**
@@ -694,8 +694,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadScheduleData(
  * \param [in] scheduleLabel the schedule, or NULL for the whole dataset
  * \param [in,out] download the download request and its result
  */
-static RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadEventsCommon(
-    RBRInstrumentGen4 *instrument,
+static RBRGen4Error RBRInstrumentGen4Dataset_downloadEventsCommon(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRInstrumentGen4DownloadEvents *download)
@@ -708,7 +708,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadEventsCommon(
         || download->start < 0
         || download->data == NULL)
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     bool bytes
@@ -719,7 +719,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadEventsCommon(
 
     if (scheduleLabel == NULL)
     {
-        RBR_TRY(RBRInstrumentGen4_converse(instrument,
+        RBR_TRY(RBRGen4_converse(instrument,
                                            "download %s/events"
                                            " %s=%" PRId64 " %s=%" PRId64,
                                            dataset->label,
@@ -730,7 +730,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadEventsCommon(
     }
     else
     {
-        RBR_TRY(RBRInstrumentGen4_converse(instrument,
+        RBR_TRY(RBRGen4_converse(instrument,
                                            "download %s/%s/events"
                                            " %s=%" PRId64 " %s=%" PRId64,
                                            dataset->label,
@@ -749,11 +749,11 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadEventsCommon(
                 download->data,
                 download->dataSize));
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadEvents(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4Dataset_downloadEvents(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Dataset *dataset,
     RBRInstrumentGen4DownloadEvents *download)
 {
@@ -763,15 +763,15 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadEvents(
                                                        download);
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadScheduleEvents(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4Dataset_downloadScheduleEvents(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRInstrumentGen4DownloadEvents *download)
 {
     if (scheduleLabel[0] == '\0')
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     return RBRInstrumentGen4Dataset_downloadEventsCommon(instrument,
@@ -780,8 +780,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadScheduleEvents(
                                                        download);
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadMeta(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4Dataset_downloadMeta(
+    RBRGen4 *instrument,
     const RBRInstrumentGen4Dataset *dataset,
     RBRInstrumentGen4DownloadMeta *download)
 {
@@ -790,10 +790,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadMeta(
         || download->byteStart < 0
         || download->data == NULL)
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    RBR_TRY(RBRInstrumentGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(instrument,
                                        "download %s/meta"
                                        " bytecount=%" PRId64
                                        " bytestart=%" PRId64,
@@ -809,7 +809,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4Dataset_downloadMeta(
                                                     download->data,
                                                     download->dataSize));
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 /* CRC-CCITT */

@@ -32,7 +32,7 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
-#include "RBRInstrumentGen4.h"
+#include "RBRGen4.h"
 #include "RBRInstrumentGen4Commands.h"
 #include "posix-shared.h"
 
@@ -85,19 +85,19 @@ int openSerialFd(char *devicePath)
     return instrumentFd;
 }
 
-RBRInstrumentGen4Error instrumentTime(const struct RBRInstrumentGen4 *instrument,
-                                      RBRInstrumentGen4DateTime *time)
+RBRGen4Error instrumentTime(const struct RBRGen4 *instrument,
+                                      RBRGen4DateTime *time)
 {
     /* Unused. */
     (void) instrument;
     struct timespec result;
     clock_gettime(CLOCK_MONOTONIC, &result);
     *time = (result.tv_sec * 1000) + (result.tv_nsec / 1000000);
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error instrumentSleep(const struct RBRInstrumentGen4 *instrument,
-                                       RBRInstrumentGen4DateTime time)
+RBRGen4Error instrumentSleep(const struct RBRGen4 *instrument,
+                                       RBRGen4DateTime time)
 {
     /* Unused. */
     (void) instrument;
@@ -107,14 +107,14 @@ RBRInstrumentGen4Error instrumentSleep(const struct RBRInstrumentGen4 *instrumen
         .tv_nsec = (time % 1000) * 1000000
     };
     nanosleep(&sleep, NULL);
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error instrumentRead(const struct RBRInstrumentGen4 *instrument,
+RBRGen4Error instrumentRead(const struct RBRGen4 *instrument,
                                       void *data,
                                       int32_t *size)
 {
-    int *instrumentFd = (int *) RBRInstrumentGen4_getUserData(instrument);
+    int *instrumentFd = (int *) RBRGen4_getUserData(instrument);
 
     /* A select() call to enforce a read timeout is unnecessary because we
      * configured the serial port in noncanonical mode and specified a read
@@ -127,23 +127,23 @@ RBRInstrumentGen4Error instrumentRead(const struct RBRInstrumentGen4 *instrument
                  *size);
     if (*size == 0)
     {
-        return RBRINSTRUMENTGEN4_TIMEOUT;
+        return RBRGEN4_TIMEOUT;
     }
     else if (*size < 0)
     {
-        return RBRINSTRUMENTGEN4_CALLBACK_ERROR;
+        return RBRGEN4_CALLBACK_ERROR;
     }
     else
     {
-        return RBRINSTRUMENTGEN4_SUCCESS;
+        return RBRGEN4_SUCCESS;
     }
 }
 
-RBRInstrumentGen4Error instrumentWrite(const struct RBRInstrumentGen4 *instrument,
+RBRGen4Error instrumentWrite(const struct RBRGen4 *instrument,
                                        const void *const data,
                                        int32_t size)
 {
-    int *instrumentFd = (int *) RBRInstrumentGen4_getUserData(instrument);
+    int *instrumentFd = (int *) RBRGen4_getUserData(instrument);
     const uint8_t *const byteData = (const uint8_t *const) data;
     int32_t written = 0;
 
@@ -176,11 +176,11 @@ RBRInstrumentGen4Error instrumentWrite(const struct RBRInstrumentGen4 *instrumen
                                      &writeTimeout);
         if (instrumentReady < 0)
         {
-            return RBRINSTRUMENTGEN4_CALLBACK_ERROR;
+            return RBRGEN4_CALLBACK_ERROR;
         }
         else if (instrumentReady == 0)
         {
-            return RBRINSTRUMENTGEN4_TIMEOUT;
+            return RBRGEN4_TIMEOUT;
         }
 
         int32_t chunkWritten = write(*instrumentFd,
@@ -190,22 +190,22 @@ RBRInstrumentGen4Error instrumentWrite(const struct RBRInstrumentGen4 *instrumen
          * an error, not just an unready device. */
         if (chunkWritten <= 0)
         {
-            return RBRINSTRUMENTGEN4_CALLBACK_ERROR;
+            return RBRGEN4_CALLBACK_ERROR;
         }
 
         written += chunkWritten;
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 /******************* posix helper functions ***********************/
 //---------------- define helper functions --------------------------------------------------
 // Parses a schedule-format time string ("YYYYMMDDhhmmss", UTC) into a
 // millisecond Unix timestamp. The library's own parser,
-// RBRInstrumentGen4DateTime_parseScheduleTime(), lives in
-// RBRInstrumentGen4Internal.c and is not part of the public API.
-void str_to_deploymentDatetime(RBRInstrumentGen4DateTime *targetDatetime,
+// RBRGen4DateTime_parseScheduleTime(), lives in
+// RBRGen4Internal.c and is not part of the public API.
+void str_to_deploymentDatetime(RBRGen4DateTime *targetDatetime,
                                const char *sourceDatetime)
 {
     // Days from the start of the year to the start of each month (non-leap).
@@ -236,8 +236,8 @@ void str_to_deploymentDatetime(RBRInstrumentGen4DateTime *targetDatetime,
 
     // Whole days since the Unix epoch, counting leap days: every fourth
     // year, except century years not divisible by 400.
-    RBRInstrumentGen4DateTime days =
-        (RBRInstrumentGen4DateTime) (year - 1970) * 365
+    RBRGen4DateTime days =
+        (RBRGen4DateTime) (year - 1970) * 365
         + (year - 1969) / 4
         - (year - 1901) / 100
         + (year - 1601) / 400
@@ -277,24 +277,24 @@ void cpy_ptrArray_forSchedule(RBRInstrumentGen4Schedule *target[],
 
 /* Channel, group, and schedule configurations are TBD. */
 // can be static.
-RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
-    RBRInstrumentGen4LabelList *channelList,
+RBRGen4Error RBRInstrumentGen4_populateGroupChannels(
+    RBRGen4LabelList *channelList,
     RBRInstrumentGen4ChannelPool *channelPool,
-    const RBRInstrumentGen4Label specifiedChannelLabels[],
+    const RBRGen4Label specifiedChannelLabels[],
     int32_t specifiedChannelLabelCnt)
 {
     if (specifiedChannelLabelCnt < 1
-        || specifiedChannelLabelCnt > RBRINSTRUMENTGEN4_CHANNEL_MAX)
+        || specifiedChannelLabelCnt > RBRGEN4_CHANNEL_MAX)
     {
         fprintf(stderr, "Error: invalid channel label count!\n");
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     if (channelPool->count > channelPool->size)
     {
         fprintf(stderr, "Error: channel pool holds only %" PRIi32 " of %" PRIi32 " channels!\n",
                 channelPool->size, channelPool->count);
-        return RBRINSTRUMENTGEN4_TRUNCATED;
+        return RBRGEN4_TRUNCATED;
     }
 
     // find out each label specified, and compare with all sourceObjList.
@@ -313,7 +313,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
                 if (_currentIndex >= channelList->size)
                 {
                     fprintf(stderr, "Error: channel list buffer too small!\n");
-                    return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+                    return RBRGEN4_BUFFER_TOO_SMALL;
                 }
                 snprintf(channelList->labels[_currentIndex],
                          sizeof(channelList->labels[_currentIndex]),
@@ -333,24 +333,24 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
     if (_currentIndex == 0) // none of the label specified is valid.
     {
         fprintf(stderr, "Error: none of the specified labels exist!\n");
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     // Only the channels which were actually found are in the list.
     channelList->count = _currentIndex;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 // can be static.
-RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleGroups(
-    RBRInstrumentGen4LabelList *groupList,
-    const RBRInstrumentGen4Label specifiedGroupLabels[],
+RBRGen4Error RBRInstrumentGen4_populateScheduleGroups(
+    RBRGen4LabelList *groupList,
+    const RBRGen4Label specifiedGroupLabels[],
     int32_t specifiedGroupLabelCnt)
 {
     if (specifiedGroupLabelCnt > groupList->size)
     {
         fprintf(stderr, "Error: group list buffer too small!\n");
-        return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+        return RBRGEN4_BUFFER_TOO_SMALL;
     }
 
     for (int32_t i = 0; i < specifiedGroupLabelCnt; i++)
@@ -361,19 +361,19 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleGroups(
                  specifiedGroupLabels[i]);
     }
     groupList->count = specifiedGroupLabelCnt;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 // can be static.
-RBRInstrumentGen4Error RBRInstrumentGen4_populateConfigSchedules(
-    RBRInstrumentGen4LabelList *scheduleList,
-    const RBRInstrumentGen4Label specifiedScheduleLabels[],
+RBRGen4Error RBRInstrumentGen4_populateConfigSchedules(
+    RBRGen4LabelList *scheduleList,
+    const RBRGen4Label specifiedScheduleLabels[],
     int32_t specifiedScheduleLabelCnt)
 {
     if (specifiedScheduleLabelCnt > scheduleList->size)
     {
         fprintf(stderr, "Error: schedule list buffer too small!\n");
-        return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL;
+        return RBRGEN4_BUFFER_TOO_SMALL;
     }
 
     for (int32_t i = 0; i < specifiedScheduleLabelCnt; i++)
@@ -384,11 +384,11 @@ RBRInstrumentGen4Error RBRInstrumentGen4_populateConfigSchedules(
                  specifiedScheduleLabels[i]);
     }
     scheduleList->count = specifiedScheduleLabelCnt;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 // can be static.
-RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetFromPool(
+RBRGen4Error RBRInstrumentGen4_getDatasetFromPool(
     RBRInstrumentGen4Dataset **targetDataset,
     RBRInstrumentGen4DatasetPool *datasetPool,
     const char datasetLabel[])
@@ -396,13 +396,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetFromPool(
     int _totalSourceObjCnt = datasetPool->count;
     if (_totalSourceObjCnt <= 0)
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
     else if (_totalSourceObjCnt > datasetPool->size)
     {
         fprintf(stderr, "Error: dataset pool holds only %" PRIi32 " of %" PRIi32 " datasets!\n",
                 datasetPool->size, datasetPool->count);
-        return RBRINSTRUMENTGEN4_TRUNCATED;
+        return RBRGEN4_TRUNCATED;
     }
     else
     {
@@ -419,14 +419,14 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetFromPool(
         if (_flag == false) // label not found
         {
             fprintf(stderr, "Warning: label '%s' specified does not exist!\n", datasetLabel);
-            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+            return RBRGEN4_INVALID_PARAMETER_VALUE;
         }
     }
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 // can be static.
-RBRInstrumentGen4Error RBRInstrumentGen4_getChannelFromPool(
+RBRGen4Error RBRInstrumentGen4_getChannelFromPool(
 RBRInstrumentGen4Channel **targetChannel,
     RBRInstrumentGen4ChannelPool *channelPool,
     const char channelLabel[])
@@ -434,10 +434,10 @@ RBRInstrumentGen4Channel **targetChannel,
     (void)targetChannel;
     (void)channelPool;
     (void)channelLabel;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 // can be static.
-RBRInstrumentGen4Error RBRInstrumentGen4_getGroupFromPool(
+RBRGen4Error RBRInstrumentGen4_getGroupFromPool(
     RBRInstrumentGen4Group **targetGroup,
     RBRInstrumentGen4GroupPool *groupPool,
     const char groupLabel[])
@@ -445,10 +445,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getGroupFromPool(
     (void)targetGroup;
     (void)groupPool;
     (void)groupLabel;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 // can be static.
-RBRInstrumentGen4Error RBRInstrumentGen4_getScheduleFromPool(
+RBRGen4Error RBRInstrumentGen4_getScheduleFromPool(
     RBRInstrumentGen4Schedule **targetSchedule,
     RBRInstrumentGen4SchedulePool *schedulePool,
     const char scheduleLabel[])
@@ -456,10 +456,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getScheduleFromPool(
     (void)targetSchedule;
     (void)schedulePool;
     (void)scheduleLabel;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 // can be static.
-RBRInstrumentGen4Error RBRInstrumentGen4_getConfigFromPool(
+RBRGen4Error RBRInstrumentGen4_getConfigFromPool(
     RBRInstrumentGen4Config **targetConfig,
     RBRInstrumentGen4ConfigPool *configPool,
     const char configLabel[])
@@ -467,13 +467,13 @@ RBRInstrumentGen4Error RBRInstrumentGen4_getConfigFromPool(
     (void)targetConfig;
     (void)configPool;
     (void)configLabel;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_initNewGroup(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_initNewGroup(
+    RBRGen4 *instrument,
     const char newGroupLabel[],
-    const RBRInstrumentGen4Label specifiedChannelLabels[],
+    const RBRGen4Label specifiedChannelLabels[],
     int32_t specifiedChannelLabelCnt,
     RBRInstrumentGen4ChannelPool *channelPool,
     RBRInstrumentGen4Group *newGroup)
@@ -481,9 +481,9 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewGroup(
     memset(newGroup, 0, sizeof(RBRInstrumentGen4Group));
     snprintf(newGroup->label, sizeof(newGroup->label), "%s", newGroupLabel);
 
-    RBRInstrumentGen4Label labelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
-    RBRInstrumentGen4LabelList channelList = {
-        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+    RBRGen4Label labelBuf[RBRGEN4_CHANNEL_MAX];
+    RBRGen4LabelList channelList = {
+        .size = RBRGEN4_CHANNEL_MAX,
         .labels = labelBuf
     };
 
@@ -493,16 +493,16 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewGroup(
                                     specifiedChannelLabels,
                                     specifiedChannelLabelCnt);
     RBRInstrumentGen4_setGroup(instrument, newGroup, &channelList);
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 // can be static
-RBRInstrumentGen4Error RBRInstrumentGen4_initNewSchedule(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_initNewSchedule(
+    RBRGen4 *instrument,
     const char newScheduleLabel[],
-    const RBRInstrumentGen4Label specifiedGroupLabels[],
+    const RBRGen4Label specifiedGroupLabels[],
     int32_t specifiedGroupLabelCnt,
     RBRInstrumentGen4ScheduleMode mode,
-    RBRInstrumentGen4LabelList *groupList,
+    RBRGen4LabelList *groupList,
     RBRInstrumentGen4Schedule *newSchedule)
 {
     memset(newSchedule, 0, sizeof(RBRInstrumentGen4Schedule));
@@ -520,27 +520,27 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewSchedule(
     newSchedule->stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_OFF; // default value.
     newSchedule->storage = RBRINSTRUMENTGEN4_UNKNOWN_SCHEDULE_STORAGE;
     // The caller fills in the mode's parameters before writing the schedule.
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 // can be static
-RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleContinuous(
+RBRGen4Error RBRInstrumentGen4_populateScheduleContinuous(
     RBRInstrumentGen4Schedule *targetSchedule,
-    RBRInstrumentGen4Period period,
+    RBRGen4Period period,
     bool castDetection)
 {
     targetSchedule->parameters.continuous.period = period;
     targetSchedule->castDetection = castDetection;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
-RBRInstrumentGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
+    RBRGen4 *instrument,
     const char newScheduleLabel[],
-    const RBRInstrumentGen4Label specifiedGroupLabels[],
+    const RBRGen4Label specifiedGroupLabels[],
     int32_t specifiedGroupLabelCnt,
     RBRInstrumentGen4ScheduleMode mode,
-    RBRInstrumentGen4Period period,
+    RBRGen4Period period,
     bool castDetection,
-    RBRInstrumentGen4LabelList *groupList,
+    RBRGen4LabelList *groupList,
     RBRInstrumentGen4Schedule *newSchedule)
 {
     RBRInstrumentGen4_initNewSchedule(instrument,
@@ -553,15 +553,15 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
     RBRInstrumentGen4_populateScheduleContinuous(newSchedule, period, castDetection);
     // warning: read err!!!
     RBRInstrumentGen4_setSchedule(instrument, newSchedule, groupList);
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error RBRInstrumentGen4_initNewConfig(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_initNewConfig(
+    RBRGen4 *instrument,
     const char newConfigLabel[],
-    const RBRInstrumentGen4Label specifiedScheduleLabels[],
+    const RBRGen4Label specifiedScheduleLabels[],
     int32_t specifiedScheduleLabelCnt,
-    RBRInstrumentGen4LabelList *scheduleList,
+    RBRGen4LabelList *scheduleList,
     RBRInstrumentGen4Config *newConfig)
 {
     memset(newConfig, 0, sizeof(RBRInstrumentGen4Config));
@@ -574,6 +574,6 @@ RBRInstrumentGen4Error RBRInstrumentGen4_initNewConfig(
                                               specifiedScheduleLabelCnt);
     // warning: read err!!!
     RBRInstrumentGen4_setConfig(instrument, newConfig, scheduleList);
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 //-------------------------------------------------------------------------------

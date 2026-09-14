@@ -23,7 +23,7 @@
 
 int main(void)
 {
-    RBRInstrumentGen4 instrument;
+    RBRGen4 instrument;
     printf("%zu\n", sizeof(instrument)); //in bytes
 
     RBRInstrumentGen4ConfigPool configPool;

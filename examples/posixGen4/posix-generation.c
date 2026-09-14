@@ -31,10 +31,10 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen4Error err;
-    RBRInstrumentGen4 *instrument = NULL;
+    RBRGen4Error err;
+    RBRGen4 *instrument = NULL;
     //no dynamic allocation case:
-    RBRInstrumentGen4 instrumentSpace;
+    RBRGen4 instrumentSpace;
     instrument = &instrumentSpace;
 
     if (argc < 2)
@@ -56,43 +56,43 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s (built %s).\n",
             programName,
-            RBRINSTRUMENTGEN4_LIB_NAME,
-            RBRINSTRUMENTGEN4_LIB_VERSION,
-            RBRINSTRUMENTGEN4_LIB_BUILD_DATE);
+            RBRGEN4_LIB_NAME,
+            RBRGEN4_LIB_VERSION,
+            RBRGEN4_LIB_BUILD_DATE);
 
-    RBRInstrumentGen4Callbacks callbacks = {
+    RBRGen4Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrumentGen4_open(
+    if ((err = RBRGen4_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN4_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup; //Failure case, memory allocated by this constructor is freed.
     }
 
- RBRInstrumentGen4Generation generation;
- generation =  RBRInstrumentGen4_getGeneration(instrument);
- if (generation != RBRINSTRUMENTGEN4_LOGGER4)
+ RBRGen4Generation generation;
+ generation =  RBRGen4_getGeneration(instrument);
+ if (generation != RBRGEN4_LOGGER4)
  {
     fprintf(stderr, "%s: Instrument generation %s not supported. Please check libRBR version.\n",
             programName,
-            RBRInstrumentGen4Generation_name(generation));
+            RBRGen4Generation_name(generation));
             status = EXIT_FAILURE;
             goto instrumentCleanup;
  }
 
 instrumentCleanup:
-    RBRInstrumentGen4_close(instrument);
+    RBRGen4_close(instrument);
 fileCleanup:
     close(instrumentFd);
     return status;

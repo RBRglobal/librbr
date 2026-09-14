@@ -16,7 +16,7 @@ extern "C"
 {
 #endif
 
-#include "../../include/RBRInstrumentGen4.h"
+#include "../../include/RBRGen4.h"
 #include "../../include/RBRInstrumentGen4Commands.h"
 
 #define INSTRUMENT_CHARACTER_TIMEOUT_MSEC 4000
@@ -26,35 +26,35 @@ extern "C"
 
     /**
      * \brief Callback to get the current time.
-     * \see RBRInstrumentGen4Callbacks
-     * \see RBRInstrumentGen4TimeCallback
+     * \see RBRGen4Callbacks
+     * \see RBRGen4TimeCallback
      */
-    RBRInstrumentGen4Error instrumentTime(const struct RBRInstrumentGen4 *instrument,
-                                          RBRInstrumentGen4DateTime *time);
+    RBRGen4Error instrumentTime(const struct RBRGen4 *instrument,
+                                          RBRGen4DateTime *time);
 
     /**
      * \brief Callback to run when the instrument goes to sleep.
-     * \see RBRInstrumentGen4Callbacks
-     * \see RBRInstrumentGen4TimeCallback
+     * \see RBRGen4Callbacks
+     * \see RBRGen4TimeCallback
      */
-    RBRInstrumentGen4Error instrumentSleep(const struct RBRInstrumentGen4 *instrument,
-                                           RBRInstrumentGen4DateTime time);
+    RBRGen4Error instrumentSleep(const struct RBRGen4 *instrument,
+                                           RBRGen4DateTime time);
 
     /**
      * \brief Callback to read from the instrument.
-     * \see RBRInstrumentGen4Callbacks
-     * \see RBRInstrumentGen4ReadCallback
+     * \see RBRGen4Callbacks
+     * \see RBRGen4ReadCallback
      */
-    RBRInstrumentGen4Error instrumentRead(const struct RBRInstrumentGen4 *instrument,
+    RBRGen4Error instrumentRead(const struct RBRGen4 *instrument,
                                           void *data,
                                           int32_t *size);
 
     /**
      * \brief Callback to write to the instrument.
-     * \see RBRInstrumentGen4Callbacks
-     * \see RBRInstrumentGen4WriteCallback
+     * \see RBRGen4Callbacks
+     * \see RBRGen4WriteCallback
      */
-    RBRInstrumentGen4Error instrumentWrite(const struct RBRInstrumentGen4 *instrument,
+    RBRGen4Error instrumentWrite(const struct RBRGen4 *instrument,
                                            const void *const data,
                                            int32_t size);
 
@@ -64,7 +64,7 @@ extern "C"
      *
      * On invalid input, prints an error and sets \a targetDatetime to 0.
      */
-    void str_to_deploymentDatetime(RBRInstrumentGen4DateTime *targetDatetime,
+    void str_to_deploymentDatetime(RBRGen4DateTime *targetDatetime,
                                    const char *sourceDatetime);
 
     /**
@@ -104,16 +104,16 @@ extern "C"
      * \param channelPool pool of channels to match to \a specifiedChannelLabels
      * \param specifiedChannelLabels array of labels to match to \a channelPool
      * \param specifiedChannelLabelCnt number of labels in \a specifiedChannelLabels
-     * \return RBRINSTRUMENTGEN4_SUCCESS when all labels are found and the target is set
-     * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if any label is not found
-     * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the target is too small for the requested number of children
-     * \return RBRINSTRUMENTGEN4_TRUNCATED if \a channelPool was too small to
+     * \return RBRGEN4_SUCCESS when all labels are found and the target is set
+     * \return RBRGEN4_INVALID_PARAMETER_VALUE if any label is not found
+     * \return RBRGEN4_BUFFER_TOO_SMALL if the target is too small for the requested number of children
+     * \return RBRGEN4_TRUNCATED if \a channelPool was too small to
      *         hold every channel
      */
-    RBRInstrumentGen4Error RBRInstrumentGen4_populateGroupChannels(
-        RBRInstrumentGen4LabelList *channelList,
+    RBRGen4Error RBRInstrumentGen4_populateGroupChannels(
+        RBRGen4LabelList *channelList,
         RBRInstrumentGen4ChannelPool *channelPool,
-        const RBRInstrumentGen4Label specifiedChannelLabels[],
+        const RBRGen4Label specifiedChannelLabels[],
         int32_t specifiedChannelLabelCnt);
 
     /**
@@ -121,13 +121,13 @@ extern "C"
      * \param groupList destination list
      * \param specifiedGroupLabels array of labels to copy
      * \param specifiedGroupLabelCnt number of labels in \a specifiedGroupLabels
-     * \return RBRINSTRUMENTGEN4_SUCCESS when the labels are copied
-     * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the list cannot hold the
+     * \return RBRGEN4_SUCCESS when the labels are copied
+     * \return RBRGEN4_BUFFER_TOO_SMALL if the list cannot hold the
      *         labels
      */
-    RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleGroups(
-        RBRInstrumentGen4LabelList *groupList,
-        const RBRInstrumentGen4Label specifiedGroupLabels[],
+    RBRGen4Error RBRInstrumentGen4_populateScheduleGroups(
+        RBRGen4LabelList *groupList,
+        const RBRGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt);
 
     /**
@@ -135,13 +135,13 @@ extern "C"
      * \param scheduleList destination list
      * \param specifiedScheduleLabels array of labels to copy
      * \param specifiedScheduleLabelCnt number of labels in \a specifiedScheduleLabels
-     * \return RBRINSTRUMENTGEN4_SUCCESS when the labels are copied
-     * \return RBRINSTRUMENTGEN4_BUFFER_TOO_SMALL if the list cannot hold the
+     * \return RBRGEN4_SUCCESS when the labels are copied
+     * \return RBRGEN4_BUFFER_TOO_SMALL if the list cannot hold the
      *         labels
      */
-    RBRInstrumentGen4Error RBRInstrumentGen4_populateConfigSchedules(
-        RBRInstrumentGen4LabelList *scheduleList,
-        const RBRInstrumentGen4Label specifiedScheduleLabels[],
+    RBRGen4Error RBRInstrumentGen4_populateConfigSchedules(
+        RBRGen4LabelList *scheduleList,
+        const RBRGen4Label specifiedScheduleLabels[],
         int32_t specifiedScheduleLabelCnt);
 
     /**
@@ -149,12 +149,12 @@ extern "C"
      * \param targetDataset target
      * \param datasetPool pool to search in
      * \param datasetLabel label to search for
-     * \return RBRINSTRUMENTGEN4_SUCCESS when the label is found and the target is set
-     * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if the label is not found
-     * \return RBRINSTRUMENTGEN4_TRUNCATED if \a datasetPool was too small
+     * \return RBRGEN4_SUCCESS when the label is found and the target is set
+     * \return RBRGEN4_INVALID_PARAMETER_VALUE if the label is not found
+     * \return RBRGEN4_TRUNCATED if \a datasetPool was too small
      *         to hold every dataset
      */
-    RBRInstrumentGen4Error RBRInstrumentGen4_getDatasetFromPool(
+    RBRGen4Error RBRInstrumentGen4_getDatasetFromPool(
         RBRInstrumentGen4Dataset **targetDataset,
         RBRInstrumentGen4DatasetPool *datasetPool,
         const char datasetLabel[]);
@@ -164,10 +164,10 @@ extern "C"
      * \param targetDataset target
      * \param datasetPool pool to search in
      * \param datasetLabel label to search for
-     * \return RBRINSTRUMENTGEN4_SUCCESS when the label is found and the target is set
-     * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if the label is not found
+     * \return RBRGEN4_SUCCESS when the label is found and the target is set
+     * \return RBRGEN4_INVALID_PARAMETER_VALUE if the label is not found
      */
-    RBRInstrumentGen4Error RBRInstrumentGen4_getChannelFromPool(
+    RBRGen4Error RBRInstrumentGen4_getChannelFromPool(
         RBRInstrumentGen4Channel **targetChannel,
         RBRInstrumentGen4ChannelPool *channelPool,
         const char channelLabel[]);
@@ -177,10 +177,10 @@ extern "C"
      * \param targetGroup target
      * \param groupPool pool to search in
      * \param groupLabel label to search for
-     * \return RBRINSTRUMENTGEN4_SUCCESS when the label is found and the target is set
-     * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if the label is not found
+     * \return RBRGEN4_SUCCESS when the label is found and the target is set
+     * \return RBRGEN4_INVALID_PARAMETER_VALUE if the label is not found
      */
-    RBRInstrumentGen4Error RBRInstrumentGen4_getGroupFromPool(
+    RBRGen4Error RBRInstrumentGen4_getGroupFromPool(
         RBRInstrumentGen4Group **targetGroup,
         RBRInstrumentGen4GroupPool *groupPool,
         const char groupLabel[]);
@@ -190,10 +190,10 @@ extern "C"
      * \param targetSchedule target
      * \param schedulePool pool to search in
      * \param scheduleLabel label to search for
-     * \return RBRINSTRUMENTGEN4_SUCCESS when the label is found and the target is set
-     * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if the label is not found
+     * \return RBRGEN4_SUCCESS when the label is found and the target is set
+     * \return RBRGEN4_INVALID_PARAMETER_VALUE if the label is not found
      */
-    RBRInstrumentGen4Error RBRInstrumentGen4_getScheduleFromPool(
+    RBRGen4Error RBRInstrumentGen4_getScheduleFromPool(
         RBRInstrumentGen4Schedule **targetSchedule,
         RBRInstrumentGen4SchedulePool *schedulePool,
         const char scheduleLabel[]);
@@ -204,7 +204,7 @@ extern "C"
      * \param configPool pool to search in
      * \param configLabel label to search for
      */
-    RBRInstrumentGen4Error RBRInstrumentGen4_getConfigFromPool(
+    RBRGen4Error RBRInstrumentGen4_getConfigFromPool(
         RBRInstrumentGen4Config **targetConfig,
         RBRInstrumentGen4ConfigPool *configPool,
         const char configLabel[]);
@@ -219,10 +219,10 @@ extern "C"
      * \param [in] channelPool the pool to search in
      * \param [out] newGroup the new group
      */
-    RBRInstrumentGen4Error RBRInstrumentGen4_initNewGroup(
-        RBRInstrumentGen4 *instrument,
+    RBRGen4Error RBRInstrumentGen4_initNewGroup(
+        RBRGen4 *instrument,
         const char newGroupLabel[],
-        const RBRInstrumentGen4Label specifiedChannelLabels[],
+        const RBRGen4Label specifiedChannelLabels[],
         int32_t specifiedChannelLabelCnt,
         RBRInstrumentGen4ChannelPool *channelPool,
         RBRInstrumentGen4Group *newGroup);
@@ -237,20 +237,20 @@ extern "C"
      * \param [in] channelPool the pool to search for children in
      * \param [inout] groupPool the pool to add the parent to
      * \param [out] newGroup the new parent
-     * \return #RBRINSTRUMENTGEN4_SUCCESS when the parent is successfully created and populated
-     * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
-     * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
-     * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the parent cannot be created or populated
+     * \return #RBRGEN4_SUCCESS when the parent is successfully created and populated
+     * \return #RBRGEN4_TIMEOUT when a timeout occurs
+     * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+     * \return #RBRGEN4_HARDWARE_ERROR if the parent cannot be created or populated
      * \see RBRInstrumentGen4_create<Parent>()
      * \see RBRInstrumentGen4_set<Parent>()
      */
-    RBRInstrumentGen4Error RBRInstrumentGen4_initNewSchedule(
-        RBRInstrumentGen4 *instrument,
+    RBRGen4Error RBRInstrumentGen4_initNewSchedule(
+        RBRGen4 *instrument,
         const char newScheduleLabel[],
-        const RBRInstrumentGen4Label specifiedGroupLabels[],
+        const RBRGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt,
         RBRInstrumentGen4ScheduleMode mode,
-        RBRInstrumentGen4LabelList *groupList,
+        RBRGen4LabelList *groupList,
         RBRInstrumentGen4Schedule *newSchedule);
 
     /**
@@ -258,15 +258,15 @@ extern "C"
      * \param [inout] targetSchedule the target schedule
      * \param [in] period the sample period in milliseconds
      * \param [in] castDetection enable cast detection when true
-     * \return #RBRINSTRUMENTGEN4_SUCCESS when the schedule is successfully configured
-     * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
-     * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
-     * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the schedule cannot be configured
+     * \return #RBRGEN4_SUCCESS when the schedule is successfully configured
+     * \return #RBRGEN4_TIMEOUT when a timeout occurs
+     * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+     * \return #RBRGEN4_HARDWARE_ERROR if the schedule cannot be configured
      * \see RBRInstrumentGen4_setSchedule()
      */
-    RBRInstrumentGen4Error RBRInstrumentGen4_populateScheduleContinuous(
+    RBRGen4Error RBRInstrumentGen4_populateScheduleContinuous(
         RBRInstrumentGen4Schedule *targetSchedule,
-        RBRInstrumentGen4Period period,
+        RBRGen4Period period,
         bool castDetection);
 
     /**
@@ -280,22 +280,22 @@ extern "C"
      * \param [in] castDetection enable cast detection when true
      * \param [out] groupList the groups given to the parent
      * \param [out] newSchedule the new parent
-     * \return #RBRINSTRUMENTGEN4_SUCCESS when the parent is successfully created and populated
-     * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
-     * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
-     * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the parent cannot be created or populated
+     * \return #RBRGEN4_SUCCESS when the parent is successfully created and populated
+     * \return #RBRGEN4_TIMEOUT when a timeout occurs
+     * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+     * \return #RBRGEN4_HARDWARE_ERROR if the parent cannot be created or populated
      * \see RBRInstrumentGen4_createSchedule()
      * \see RBRInstrumentGen4_setSchedule()
      */
-    RBRInstrumentGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
-        RBRInstrumentGen4 *instrument,
+    RBRGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
+        RBRGen4 *instrument,
         const char newScheduleLabel[],
-        const RBRInstrumentGen4Label specifiedGroupLabels[],
+        const RBRGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt,
         RBRInstrumentGen4ScheduleMode mode,
-        RBRInstrumentGen4Period period,
+        RBRGen4Period period,
         bool castDetection,
-        RBRInstrumentGen4LabelList *groupList,
+        RBRGen4LabelList *groupList,
         RBRInstrumentGen4Schedule *newSchedule);
 
     /**
@@ -307,19 +307,19 @@ extern "C"
      * \param [in] specifiedScheduleLabelCnt the number of children to give the parent
      * \param [out] scheduleList the schedules given to the parent
      * \param [out] newConfig the new parent
-     * \return #RBRINSTRUMENTGEN4_SUCCESS when the parent is successfully created and populated
-     * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
-     * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
-     * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR if the parent cannot be created or populated
+     * \return #RBRGEN4_SUCCESS when the parent is successfully created and populated
+     * \return #RBRGEN4_TIMEOUT when a timeout occurs
+     * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+     * \return #RBRGEN4_HARDWARE_ERROR if the parent cannot be created or populated
      * \see RBRInstrumentGen4_createConfig()
      * \see RBRInstrumentGen4_setConfig()
      */
-    RBRInstrumentGen4Error RBRInstrumentGen4_initNewConfig(
-        RBRInstrumentGen4 *instrument,
+    RBRGen4Error RBRInstrumentGen4_initNewConfig(
+        RBRGen4 *instrument,
         const char newConfigLabel[],
-        const RBRInstrumentGen4Label specifiedScheduleLabels[],
+        const RBRGen4Label specifiedScheduleLabels[],
         int32_t specifiedScheduleLabelCnt,
-        RBRInstrumentGen4LabelList *scheduleList,
+        RBRGen4LabelList *scheduleList,
         RBRInstrumentGen4Config *newConfig);
 
 #ifdef __cplusplus

@@ -58,9 +58,9 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen4Error err;
-    RBRInstrumentGen4 instrumentSpace;
-    RBRInstrumentGen4 *instrument = &instrumentSpace;
+    RBRGen4Error err;
+    RBRGen4 instrumentSpace;
+    RBRGen4 *instrument = &instrumentSpace;
 
     if (argc < 2)
     {
@@ -80,31 +80,31 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s (built %s).\n",
             programName,
-            RBRINSTRUMENTGEN4_LIB_NAME,
-            RBRINSTRUMENTGEN4_LIB_VERSION,
-            RBRINSTRUMENTGEN4_LIB_BUILD_DATE);
+            RBRGEN4_LIB_NAME,
+            RBRGEN4_LIB_VERSION,
+            RBRGEN4_LIB_BUILD_DATE);
 
     // check instrument communication is fine.
-    RBRInstrumentGen4Callbacks callbacks = {
+    RBRGen4Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrumentGen4_open(
+    if ((err = RBRGen4_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN4_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
     {
-        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRInstrumentGen4Error_name(err));
+        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup; // Failure case, memory allocated by this constructor is freed.
     }
 
     //******************seems unnecessary********************//
-    RBRInstrumentGen4Id4 id;
+    RBRGen4Id4 id;
     RBRInstrumentGen4_getId4(instrument, &id);
     printf("The instrument is an %s (fwtype %d), serial number %06d, with "
            "firmware v%s.\n",
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
         .pool = datasetBuf
     };
     err = RBRInstrumentGen4_getDatasetPool(instrument, &datasetPool);
-    if (err != RBRINSTRUMENTGEN4_SUCCESS || datasetPool.count <= 0)
+    if (err != RBRGEN4_SUCCESS || datasetPool.count <= 0)
     {
         printf("Error: There's no dataset available in this instrument. Quit.\n");
         status = EXIT_FAILURE;
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
     if (RBRInstrumentGen4_getDatasetFromPool(&targetDataset,
                                              &datasetPool,
                                              DATASET_LABEL)
-        != RBRINSTRUMENTGEN4_SUCCESS)
+        != RBRGEN4_SUCCESS)
     {
         printf("Error: Dataset %s not found. Quit.\n", DATASET_LABEL);
         status = EXIT_FAILURE;
@@ -165,20 +165,20 @@ int main(int argc, char *argv[])
     }
 
     // Read the dataset's parameters, including the schedules it ran.
-    RBRInstrumentGen4Label
+    RBRGen4Label
         scheduleLabelBuf[RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX];
-    RBRInstrumentGen4LabelList scheduleList = {
+    RBRGen4LabelList scheduleList = {
         .size = RBRINSTRUMENTGEN4_SCHEDULE_COUNT_MAX,
         .labels = scheduleLabelBuf
     };
     err = RBRInstrumentGen4_getDataset(instrument,
                                        targetDataset,
                                        &scheduleList);
-    if (err != RBRINSTRUMENTGEN4_SUCCESS)
+    if (err != RBRGEN4_SUCCESS)
     {
         printf("Error: Failed to read dataset %s: %s. Quit.\n",
                DATASET_LABEL,
-               RBRInstrumentGen4Error_name(err));
+               RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
@@ -197,11 +197,11 @@ int main(int argc, char *argv[])
                                                         targetDataset,
                                                         SCHEDULE_LABEL,
                                                         &dataBlock);
-    if (err != RBRINSTRUMENTGEN4_SUCCESS)
+    if (err != RBRGEN4_SUCCESS)
     {
         printf("Error: Failed to read schedule %s data block: %s. Quit.\n",
                SCHEDULE_LABEL,
-               RBRInstrumentGen4Error_name(err));
+               RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
            SCHEDULE_LABEL,
            dataBlock.byteCount,
            dataBlock.sampleCount,
-           RBRInstrumentGen4DataType_name(targetDataset->dataType));
+           RBRGen4DataType_name(targetDataset->dataType));
 
     uint8_t buf[CHUNK_SIZE];
     RBRInstrumentGen4DownloadData download = {
@@ -237,18 +237,18 @@ int main(int argc, char *argv[])
                                                             targetDataset,
                                                             SCHEDULE_LABEL,
                                                             &download);
-        if (err == RBRINSTRUMENTGEN4_SUCCESS)
+        if (err == RBRGEN4_SUCCESS)
         {
             write(downloadFd, download.data, download.count);
             download.start += download.count;
         }
-        else if (err == RBRINSTRUMENTGEN4_TIMEOUT)
+        else if (err == RBRGEN4_TIMEOUT)
         {
             printf("\nWarning: timeout. Retrying...\n");
         }
         else
         {
-            printf("\nError: %s", RBRInstrumentGen4Error_name(err));
+            printf("\nError: %s", RBRGen4Error_name(err));
             break;
         }
 
@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
 fileCleanup:
     close(downloadFd);
 instrumentCleanup:
-    RBRInstrumentGen4_close(instrument);
+    RBRGen4_close(instrument);
 
     return status;
 }

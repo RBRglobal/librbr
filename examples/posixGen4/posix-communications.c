@@ -36,9 +36,9 @@ void sig_handler(int signo){
     }
 }
 
-RBRInstrumentGen4Error instrumentSample(
-    const struct RBRInstrumentGen4 *instrument,
-    const struct RBRInstrumentGen4Sample *const sample)
+RBRGen4Error instrumentSample(
+    const struct RBRGen4 *instrument,
+    const struct RBRGen4Sample *const sample)
 {
     /* Unused. */
     (void) instrument;
@@ -56,7 +56,7 @@ RBRInstrumentGen4Error instrumentSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -67,10 +67,10 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen4Error err;
-    RBRInstrumentGen4 *instrument = NULL;
+    RBRGen4Error err;
+    RBRGen4 *instrument = NULL;
     
-    RBRInstrumentGen4 instrumentSpace;
+    RBRGen4 instrumentSpace;
     instrument = &instrumentSpace;
 
     if (argc < 2)
@@ -94,12 +94,12 @@ int main(int argc, char *argv[])
         fprintf(stderr,
             "%s: Using %s v%s (built %s).\n",
             programName,
-            RBRINSTRUMENTGEN4_LIB_NAME,
-            RBRINSTRUMENTGEN4_LIB_VERSION,
-            RBRINSTRUMENTGEN4_LIB_BUILD_DATE);
+            RBRGEN4_LIB_NAME,
+            RBRGEN4_LIB_VERSION,
+            RBRGEN4_LIB_BUILD_DATE);
 
-    RBRInstrumentGen4Sample sampleBuffer;
-    RBRInstrumentGen4Callbacks callbacks = {
+    RBRGen4Sample sampleBuffer;
+    RBRGen4Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
@@ -108,35 +108,35 @@ int main(int argc, char *argv[])
         .sampleBuffer = &sampleBuffer
     };
 
-    if ((err = RBRInstrumentGen4_open(
+    if ((err = RBRGen4_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN4_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
 
-    if ((err = RBRInstrumentGen4_sleep(instrument)) != RBRINSTRUMENTGEN4_SUCCESS)
+    if ((err = RBRInstrumentGen4_sleep(instrument)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to put instrument to sleep: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
 
     RBRInstrumentGen4Link link;
     if ((err = RBRInstrumentGen4_getLink(instrument, &link))
-        != RBRINSTRUMENTGEN4_SUCCESS)
+        != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to get instrument link: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
     printf("generation: %s, id: model=%s version=%s serial=%u fwtype=%u,"
            " outputformat: sn=%s schedulelabel=%s datetime=%s crc=%s"
            " encoding=%s datatype=%s\n",
-           RBRInstrumentGen4Generation_name(instrument->generation),
+           RBRGen4Generation_name(instrument->generation),
            instrument->id.model,
            instrument->id.fwversion,
            instrument->id.sn,
@@ -175,20 +175,20 @@ int main(int argc, char *argv[])
            instrument->outputFormat.scheduleLabel ? "on" : "off",
            instrument->outputFormat.dateTime ? "on" : "off",
            instrument->outputFormat.crc ? "on" : "off",
-           RBRInstrumentGen4Encoding_name(instrument->outputFormat.encoding),
-           RBRInstrumentGen4DataType_name(instrument->outputFormat.dataType));
+           RBRGen4Encoding_name(instrument->outputFormat.encoding),
+           RBRGen4DataType_name(instrument->outputFormat.dataType));
 
     RBRInstrumentGen4Instrument info;
-    if ((err = RBRInstrumentGen4_getInstrument(instrument, &info)) != RBRINSTRUMENTGEN4_SUCCESS)
+    if ((err = RBRInstrumentGen4_getInstrument(instrument, &info)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to get instrument info: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
     printf("info: dataType=%s, fwlock=%s, pn=%s\n",
-           RBRInstrumentGen4DataType_name(info.dataType),
+           RBRGen4DataType_name(info.dataType),
            info.fwLock ? "true" : "false",
            info.pn);
 
@@ -197,11 +197,11 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4PowerSource powerSource;
     if ((err = 
     RBRInstrumentGen4_getPowerSource(instrument, &powerSource)
-    ) != RBRINSTRUMENTGEN4_SUCCESS)
+    ) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to get power source: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
@@ -209,30 +209,30 @@ int main(int argc, char *argv[])
 
     /* Internal battery */
 
-    if ((err = RBRInstrumentGen4_setPowerInternalBatteryType(instrument, RBRINSTRUMENTGEN4_INTERNAL_BATTERY_LIFES2)) != RBRINSTRUMENTGEN4_SUCCESS)
+    if ((err = RBRInstrumentGen4_setPowerInternalBatteryType(instrument, RBRINSTRUMENTGEN4_INTERNAL_BATTERY_LIFES2)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to set internal battery type: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
 
-    if ((err = RBRInstrumentGen4_resetPowerInternalUsed(instrument)) != RBRINSTRUMENTGEN4_SUCCESS)
+    if ((err = RBRInstrumentGen4_resetPowerInternalUsed(instrument)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to reset internal battery usage: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
 
     RBRInstrumentGen4PowerInternal powerInternal;
-    if ((err = RBRInstrumentGen4_getPowerInternal(instrument, &powerInternal)) != RBRINSTRUMENTGEN4_SUCCESS)
+    if ((err = RBRInstrumentGen4_getPowerInternal(instrument, &powerInternal)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to get internal power info: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
@@ -244,20 +244,20 @@ int main(int argc, char *argv[])
 
     /* External battery */
 
-    if ((err = RBRInstrumentGen4_setPowerExternalBatteryType(instrument, RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMATA_NIMH)) != RBRINSTRUMENTGEN4_SUCCESS)
+    if ((err = RBRInstrumentGen4_setPowerExternalBatteryType(instrument, RBRINSTRUMENTGEN4_EXTERNAL_BATTERY_FERMATA_NIMH)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to set external battery type: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
 
-    if ((err = RBRInstrumentGen4_resetPowerExternalUsed(instrument)) != RBRINSTRUMENTGEN4_SUCCESS)
+    if ((err = RBRInstrumentGen4_resetPowerExternalUsed(instrument)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to reset external battery usage: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
@@ -265,11 +265,11 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4PowerExternal powerExternal;
     if ((err = 
     RBRInstrumentGen4_getPowerExternal(instrument, &powerExternal)
-    ) != RBRINSTRUMENTGEN4_SUCCESS)
+    ) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to get external power info: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
@@ -280,7 +280,7 @@ int main(int argc, char *argv[])
            powerExternal.used);
 
 instrumentCleanup:
-    RBRInstrumentGen4_close(instrument);
+    RBRGen4_close(instrument);
 
 fileCleanup:
     close(instrumentFd);

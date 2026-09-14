@@ -41,7 +41,7 @@
 
 #define GROUP_PTS_LABEL "gr_pts"
 #define GROUP_PTS_CHANNELS                              \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             TEMPERATURE,                                \
@@ -50,7 +50,7 @@
 
 #define GROUP_ODO_LABEL "gr_odo"
 #define GROUP_ODO_CHANNELS                              \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             ODO_CONCENTRATION,                          \
@@ -59,7 +59,7 @@
 
 #define GROUP_PH_LABEL "gr_ph"
 #define GROUP_PH_CHANNELS                               \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             PH                                          \
@@ -67,7 +67,7 @@
 
 #define GROUP_BBPFL_LABEL "gr_bbpfl"
 #define GROUP_BBPFL_CHANNELS                            \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             BACKSCATTER,                                \
@@ -77,7 +77,7 @@
 
 #define GROUP_RADIOMETRY_LABEL "gr_radiometry"
 #define GROUP_RADIOMETRY_CHANNELS                       \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             PAR,                                        \
@@ -88,7 +88,7 @@
 
 #define SCHEDULE_PTS_LABEL "sch_asc_pts"
 #define SCHEDULE_PTS_GROUPS                          \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         GROUP_PTS_LABEL                              \
     }
@@ -115,7 +115,7 @@
 
 #define SCHEDULE_ODO_LABEL "sch_asc_odo"
 #define SCHEDULE_ODO_GROUPS                          \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         GROUP_ODO_LABEL                              \
     }
@@ -139,7 +139,7 @@
 
 #define SCHEDULE_PH_LABEL "sch_asc_ph"
 #define SCHEDULE_PH_GROUPS                           \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         GROUP_PH_LABEL                               \
     }
@@ -163,7 +163,7 @@
 
 #define SCHEDULE_BBPFL_LABEL "sch_asc_bbpfl"
 #define SCHEDULE_BBPFL_GROUPS                        \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         GROUP_BBPFL_LABEL                            \
     }
@@ -187,7 +187,7 @@
 
 #define SCHEDULE_RADIOMETRY_LABEL "sch_asc_radiometry"
 #define SCHEDULE_RADIOMETRY_GROUPS                   \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         GROUP_RADIOMETRY_LABEL                       \
     }
@@ -208,7 +208,7 @@
 
 #define SCHEDULE_PARK_PTS_LABEL "sch_park_pts"
 #define SCHEDULE_PARK_PTS_GROUPS                     \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         GROUP_PTS_LABEL                              \
     }
@@ -218,7 +218,7 @@
 
 #define SCHEDULE_PARK_ODO_LABEL "sch_park_odo"
 #define SCHEDULE_PARK_ODO_GROUPS                     \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         GROUP_ODO_LABEL                              \
     }
@@ -228,7 +228,7 @@
 
 #define CONFIG_ASCENT_LABEL "cf_ascent"
 #define CONFIG_ASCENT_SCHEDULES                      \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         SCHEDULE_PTS_LABEL,                          \
             SCHEDULE_ODO_LABEL,                      \
@@ -239,7 +239,7 @@
 
 #define CONFIG_PARK_LABEL "cf_park"
 #define CONFIG_PARK_SCHEDULES                        \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         SCHEDULE_PARK_PTS_LABEL,                     \
             SCHEDULE_PARK_ODO_LABEL,                 \
@@ -258,9 +258,9 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen4Error err;
-    RBRInstrumentGen4 instrumentSpace;
-    RBRInstrumentGen4 *instrument = &instrumentSpace;
+    RBRGen4Error err;
+    RBRGen4 instrumentSpace;
+    RBRGen4 *instrument = &instrumentSpace;
 
     if (argc < 2)
     {
@@ -279,25 +279,25 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s (built %s).\n",
             programName,
-            RBRINSTRUMENTGEN4_LIB_NAME,
-            RBRINSTRUMENTGEN4_LIB_VERSION,
-            RBRINSTRUMENTGEN4_LIB_BUILD_DATE);
+            RBRGEN4_LIB_NAME,
+            RBRGEN4_LIB_VERSION,
+            RBRGEN4_LIB_BUILD_DATE);
 
     // check instrument communication is fine.
-    RBRInstrumentGen4Callbacks callbacks = {
+    RBRGen4Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrumentGen4_open(
+    if ((err = RBRGen4_open(
              &instrument,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN4_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
     {
-        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRInstrumentGen4Error_name(err));
+        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup; // Failure case, memory allocated by this constructor is freed.
     }
@@ -535,7 +535,7 @@ int main(int argc, char *argv[])
                              deploymentStatus);
 
 instrumentCleanup:
-    RBRInstrumentGen4_close(instrument);
+    RBRGen4_close(instrument);
 fileCleanup:
     close(instrumentFd);
     return status;

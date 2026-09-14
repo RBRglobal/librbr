@@ -18,7 +18,7 @@
 
 #include "../include/RBRParserGen4.h"
 /* Required for RBR_TRY. */
-#include "RBRInstrumentGen4Internal.h"
+#include "RBRGen4Internal.h"
 
 const char *RBRInstrumentGen4EventType_name(RBRInstrumentGen4EventType type)
 {
@@ -118,7 +118,7 @@ const char *RBRInstrumentGen4EventType_name(RBRInstrumentGen4EventType type)
     }
 }
 
-RBRInstrumentGen4Error RBRParserGen4_init(RBRParserGen4 **parser,
+RBRGen4Error RBRParserGen4_init(RBRParserGen4 **parser,
                                   const RBRParserGen4Callbacks *callbacks,
                                   const RBRParserGen4Config *config,
                                   void *userData)
@@ -127,13 +127,13 @@ RBRInstrumentGen4Error RBRParserGen4_init(RBRParserGen4 **parser,
         || (callbacks->sample != NULL && callbacks->sampleBuffer == NULL)
         || (callbacks->event != NULL && callbacks->eventBuffer == NULL))
     {
-        return RBRINSTRUMENTGEN4_MISSING_CALLBACK;
+        return RBRGEN4_MISSING_CALLBACK;
     }
 
     if (config->channelCount <= 0
-        || config->channelCount > RBRINSTRUMENTGEN4_CHANNEL_MAX)
+        || config->channelCount > RBRGEN4_CHANNEL_MAX)
     {
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     memset(*parser, 0, sizeof(RBRParserGen4));
@@ -141,7 +141,7 @@ RBRInstrumentGen4Error RBRParserGen4_init(RBRParserGen4 **parser,
     memcpy(&(*parser)->callbacks, callbacks, sizeof(RBRParserGen4Callbacks));
     (*parser)->userData          = userData;
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 void RBRParserGen4_getConfig(const RBRParserGen4 *parser, RBRParserGen4Config *config)
@@ -166,7 +166,7 @@ void RBRParserGen4_setUserData(RBRParserGen4 *parser, void *userData)
 #define EP_EVENT_TIMESTAMP_OFFSET 4
 #define EP_EVENT_PAYLOAD_OFFSET   12
 
-static RBRInstrumentGen4Error RBRParserGen4_parseEPEvents(
+static RBRGen4Error RBRParserGen4_parseEPEvents(
     RBRParserGen4 *parser,
     const uint8_t *const data,
     int32_t *size)
@@ -177,7 +177,7 @@ static RBRInstrumentGen4Error RBRParserGen4_parseEPEvents(
     RBRInstrumentGen4Event *event = parser->callbacks.eventBuffer;
     if (event == NULL)
     {
-        return RBRINSTRUMENTGEN4_SUCCESS;
+        return RBRGEN4_SUCCESS;
     }
 
     for (; *size + EP_EVENT_SIZE <= maxSize; *size += EP_EVENT_SIZE)
@@ -186,7 +186,7 @@ static RBRInstrumentGen4Error RBRParserGen4_parseEPEvents(
 
         event->type = *(uint8_t *) (data + *size + EP_EVENT_TYPE_OFFSET);
         event->timestamp =
-            *(RBRInstrumentGen4DateTime *) (data
+            *(RBRGen4DateTime *) (data
                                         + *size
                                         + EP_EVENT_TIMESTAMP_OFFSET);
         switch (event->type)
@@ -209,13 +209,13 @@ static RBRInstrumentGen4Error RBRParserGen4_parseEPEvents(
         }
     }
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-#define EP_SAMPLE_TIMESTAMP_SIZE ((int32_t) sizeof(RBRInstrumentGen4DateTime))
+#define EP_SAMPLE_TIMESTAMP_SIZE ((int32_t) sizeof(RBRGen4DateTime))
 #define EP_SAMPLE_READING_SIZE ((int32_t) sizeof(float))
 
-// static RBRInstrumentGen4Error RBRParserGen4_parseEPSamples(
+// static RBRGen4Error RBRParserGen4_parseEPSamples(
 //     RBRParserGen4 *parser,
 //     const uint8_t *const data,
 //     int32_t *size)
@@ -223,10 +223,10 @@ static RBRInstrumentGen4Error RBRParserGen4_parseEPEvents(
 //     int32_t maxSize = *size;
 //     *size = 0;
 
-//     RBRInstrumentGen4Sample *sample = parser->callbacks.sampleBuffer;
+//     RBRGen4Sample *sample = parser->callbacks.sampleBuffer;
 //     if (sample == NULL)
 //     {
-//         return RBRINSTRUMENTGEN4_SUCCESS;
+//         return RBRGEN4_SUCCESS;
 //     }
 
 //     int32_t channels = parser->config.formatConfig.easyParse.channels;
@@ -236,7 +236,7 @@ static RBRInstrumentGen4Error RBRParserGen4_parseEPEvents(
 //     {
 //         memset(sample, 0, sizeof(RBRInstrumentGen4Event));
 
-//         sample->timestamp = *(RBRInstrumentGen4DateTime *) (data + *size);
+//         sample->timestamp = *(RBRGen4DateTime *) (data + *size);
 //         sample->channels = channels;
 //         for (int32_t channel = 0; channel < channels; ++channel)
 //         {
@@ -253,10 +253,10 @@ static RBRInstrumentGen4Error RBRParserGen4_parseEPEvents(
 //         }
 //     }
 
-//     return RBRINSTRUMENTGEN4_SUCCESS;
+//     return RBRGEN4_SUCCESS;
 // }
 
-RBRInstrumentGen4Error RBRParserGen4_parse(RBRParserGen4 *parser,
+RBRGen4Error RBRParserGen4_parse(RBRParserGen4 *parser,
                                    RBRInstrumentGen4Block block,
                                    const void *const data,
                                    int32_t *size)
@@ -271,7 +271,7 @@ RBRInstrumentGen4Error RBRParserGen4_parse(RBRParserGen4 *parser,
     //     return RBRParserGen4_parseEPSamples(parser, d, size);
     // case RBRINSTRUMENTGEN4_DATASET_EASYPARSE_DEPLOYMENT_HEADER:
     // default:
-    //     return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+    //     return RBRGEN4_INVALID_PARAMETER_VALUE;
     // }
     //GEN4 todo: edit this parser.
     (void)block;

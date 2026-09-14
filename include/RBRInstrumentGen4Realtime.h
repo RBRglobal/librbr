@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-#include "RBRInstrumentGen4.h"
+#include "RBRGen4.h"
 
 /*************************************************************************************************/
 typedef enum RBRInstrumentGen4ReadingError
@@ -116,22 +116,22 @@ double RBRInstrumentGen4Reading_setError(RBRInstrumentGen4ReadingError error);
 /**
  * \brief An instrument sample.
  */
-typedef struct RBRInstrumentGen4Sample
+typedef struct RBRGen4Sample
 {
     /** \brief The timestamp of the sample. */
-    RBRInstrumentGen4DateTime timestamp;
+    RBRGen4DateTime timestamp;
     /**
      * \brief The schedule label reported with the sample.
      *
      * An empty string when the output format omits the schedule label.
      */
-    char scheduleLabel[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
+    char scheduleLabel[RBRGEN4_LABEL_NAME_MAX + 1];
     /** \brief The number of populated sample readings. */
     int32_t channelCount;
     /**
      * \brief The sample readings.
      *
-     * Only the first RBRInstrumentGen4Sample.channels readings will be populated.
+     * Only the first RBRGen4Sample.channels readings will be populated.
      * Other readings will be set to 0.
      *
      * Readings are represented as double-precision floating point. If they
@@ -141,28 +141,28 @@ typedef struct RBRInstrumentGen4Sample
      * \see RBRInstrumentGen4Reading_getError() to get the error code
      * \see RBRInstrumentGen4Reading_setError() to synthesize an error reading
      */
-    double readings[RBRINSTRUMENTGEN4_CHANNEL_MAX];
-} RBRInstrumentGen4Sample;
+    double readings[RBRGEN4_CHANNEL_MAX];
+} RBRGen4Sample;
 
 /**
  * \brief Retrieve and parse data streamed from the instrument.
  *
  * This function waits for a streamed sample to arrive, parses it, then calls
- * the RBRInstrumentGen4SampleCallback provided to the instrument via
- * RBRInstrumentGen4Callbacks.sample, delivering the sample into
- * RBRInstrumentGen4Callbacks.sampleBuffer.
+ * the RBRGen4SampleCallback provided to the instrument via
+ * RBRGen4Callbacks.sample, delivering the sample into
+ * RBRGen4Callbacks.sampleBuffer.
  *
- * This requires RBRInstrumentGen4Callbacks.sample and
- * RBRInstrumentGen4Callbacks.sampleBuffer to be populated.
+ * This requires RBRGen4Callbacks.sample and
+ * RBRGen4Callbacks.sampleBuffer to be populated.
  *
  * \param [in] instrument the instrument connection
- * \return #RBRINSTRUMENTGEN4_SUCCESS when a streaming sample has been read
- * \return #RBRINSTRUMENTGEN4_MISSING_CALLBACK when the connection was opened
+ * \return #RBRGEN4_SUCCESS when a streaming sample has been read
+ * \return #RBRGEN4_MISSING_CALLBACK when the connection was opened
  *         without a sample callback
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_readSample(RBRInstrumentGen4 *instrument);
+RBRGen4Error RBRInstrumentGen4_readSample(RBRGen4 *instrument);
 
 /**
  * \brief Requests an “on-demand” sample of every channel from the
@@ -172,12 +172,12 @@ RBRInstrumentGen4Error RBRInstrumentGen4_readSample(RBRInstrumentGen4 *instrumen
  *
  * Unlike streaming data/RBRInstrumentGen4_readSample(), polled data is
  * returned directly to the caller (independent of any
- * RBRInstrumentGen4SampleCallback defined in
- * RBRInstrumentGen4Callbacks.sample).
+ * RBRGen4SampleCallback defined in
+ * RBRGen4Callbacks.sample).
  *
  * With \a requireLabel set, only a sample labelled `polling` is returned;
  * any streamed samples read while waiting for it are passed to
- * RBRInstrumentGen4Callbacks.sample instead. With \a requireLabel unset, the
+ * RBRGen4Callbacks.sample instead. With \a requireLabel unset, the
  * first sample read is returned, which may be a streamed sample, not a
  * polled sample, if the instrument is streaming over this link.
  *
@@ -185,18 +185,18 @@ RBRInstrumentGen4Error RBRInstrumentGen4_readSample(RBRInstrumentGen4 *instrumen
  * \param [in] requireLabel whether to require and wait for a sample
  *                          labelled `polling`
  * \param [out] sample the polled sample
- * \return #RBRINSTRUMENTGEN4_SUCCESS when a sample is successfully read
- * \return #RBRINSTRUMENTGEN4_UNSUPPORTED when \a requireLabel is set but
+ * \return #RBRGEN4_SUCCESS when a sample is successfully read
+ * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but
  *         instrument.outputformat.scheduleLabel is false
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs, or when no
- *         polled sample arrives within RBRInstrumentGen4.pollTimeout
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
+ *         polled sample arrives within RBRGen4.pollTimeout
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_poll(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_poll(
+    RBRGen4 *instrument,
     bool requireLabel,
-    RBRInstrumentGen4Sample *sample);
+    RBRGen4Sample *sample);
 
 /**
  * \brief Requests an “on-demand” sample of the given channels from the
@@ -207,12 +207,12 @@ RBRInstrumentGen4Error RBRInstrumentGen4_poll(
  *
  * Unlike streaming data/RBRInstrumentGen4_readSample(), polled data is
  * returned directly to the caller (independent of any
- * RBRInstrumentGen4SampleCallback defined in
- * RBRInstrumentGen4Callbacks.sample).
+ * RBRGen4SampleCallback defined in
+ * RBRGen4Callbacks.sample).
  *
  * With \a requireLabel set, only a sample labelled `polling` is returned;
  * any streamed samples read while waiting for it are passed to
- * RBRInstrumentGen4Callbacks.sample instead. With \a requireLabel unset, the
+ * RBRGen4Callbacks.sample instead. With \a requireLabel unset, the
  * first sample read is returned, which may be a streamed sample, not a
  * polled sample, if the instrument is streaming over this link.
  *
@@ -221,23 +221,23 @@ RBRInstrumentGen4Error RBRInstrumentGen4_poll(
  *                          labelled `polling`
  * \param [in] channelList the channels to sample
  * \param [out] sample the polled sample
- * \return #RBRINSTRUMENTGEN4_SUCCESS when a sample is successfully read
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the channel list
+ * \return #RBRGEN4_SUCCESS when a sample is successfully read
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the channel list
  *         is too long to send
- * \return #RBRINSTRUMENTGEN4_UNSUPPORTED when \a requireLabel is set but
+ * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but
  *         instrument.outputformat.scheduleLabel is false
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs, or when no
- *         polled sample arrives within RBRInstrumentGen4.pollTimeout
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when an invalid channel is
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
+ *         polled sample arrives within RBRGen4.pollTimeout
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when an invalid channel is
  *         requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_pollChannels(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_pollChannels(
+    RBRGen4 *instrument,
     bool requireLabel,
     const char *channelList,
-    RBRInstrumentGen4Sample *sample);
+    RBRGen4Sample *sample);
 
 /**
  * \brief Requests an “on-demand” sample of the given groups of channels from
@@ -248,12 +248,12 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollChannels(
  *
  * Unlike streaming data/RBRInstrumentGen4_readSample(), polled data is
  * returned directly to the caller (independent of any
- * RBRInstrumentGen4SampleCallback defined in
- * RBRInstrumentGen4Callbacks.sample).
+ * RBRGen4SampleCallback defined in
+ * RBRGen4Callbacks.sample).
  *
  * With \a requireLabel set, only a sample labelled `polling` is returned;
  * any streamed samples read while waiting for it are passed to
- * RBRInstrumentGen4Callbacks.sample instead. With \a requireLabel unset, the
+ * RBRGen4Callbacks.sample instead. With \a requireLabel unset, the
  * first sample read is returned, which may be a streamed sample, not a
  * polled sample, if the instrument is streaming over this link.
  *
@@ -262,23 +262,23 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollChannels(
  *                          labelled `polling`
  * \param [in] groupList the groups of channels to sample
  * \param [out] sample the polled sample
- * \return #RBRINSTRUMENTGEN4_SUCCESS when a sample is successfully read
- * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the group list is
+ * \return #RBRGEN4_SUCCESS when a sample is successfully read
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the group list is
  *         too long to send
- * \return #RBRINSTRUMENTGEN4_UNSUPPORTED when \a requireLabel is set but
+ * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but
  *         instrument.outputformat.scheduleLabel is false
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs, or when no
- *         polled sample arrives within RBRInstrumentGen4.pollTimeout
- * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when an invalid group is
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
+ *         polled sample arrives within RBRGen4.pollTimeout
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when an invalid group is
  *         requested
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
-RBRInstrumentGen4Error RBRInstrumentGen4_pollGroups(
-    RBRInstrumentGen4 *instrument,
+RBRGen4Error RBRInstrumentGen4_pollGroups(
+    RBRGen4 *instrument,
     bool requireLabel,
     const char *groupList,
-    RBRInstrumentGen4Sample *sample);
+    RBRGen4Sample *sample);
 
 #ifdef __cplusplus
 }

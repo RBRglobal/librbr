@@ -88,19 +88,19 @@ endif # LIBRBR_GEN3
 
 if LIBRBR_GEN4
 
-# The following settings are reproduced from RBRInstrumentGen4.h. See
+# The following settings are reproduced from RBRGen4.h. See
 # CMakeLists.txt for the Kconfig-to-precompiler-macro bindings.
 
-config RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX
+config RBRGEN4_COMMAND_BUFFER_MAX
     int "The size of the buffer storing commands destined for the instrument."
     default 120
     help
         Must be large enough to hold the largest command you will want to send
         to the instrument plus the trailing line termination (`\r\n\0`).
 
-        A buffer of this size is included in RBRInstrumentGen4.
+        A buffer of this size is included in RBRGen4.
 
-config RBRINSTRUMENTGEN4_RESPONSE_BUFFER_MAX
+config RBRGEN4_RESPONSE_BUFFER_MAX
     int "The size of the buffer storing instrument responses."
     default 1024
     help
@@ -108,16 +108,16 @@ config RBRINSTRUMENTGEN4_RESPONSE_BUFFER_MAX
         to receive. This does not include download data, which is read directly
         into a user-managed buffer.
 
-        A buffer of this size is included in RBRInstrumentGen4.
+        A buffer of this size is included in RBRGen4.
 
-config RBRINSTRUMENTGEN4_CHANNEL_MAX
+config RBRGEN4_CHANNEL_MAX
     int "The maximum number of channels present on an instrument."
     default 32
     help
         The default maximum of 32 channels is reflective of the maximum number
         of channels supported by RBR instruments, but most instruments have far
         fewer. Adjusting this value will affect the size of some structures,
-        notably RBRInstrumentGen4Sample.
+        notably RBRGen4Sample.
 
 endif # LIBRBR_GEN4
 
