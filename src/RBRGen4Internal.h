@@ -21,7 +21,7 @@ extern "C" {
 #endif
 
 #include "RBRGen4.h"
-#include "RBRInstrumentGen4Realtime.h"
+#include "RBRGen4Realtime.h"
 
 /** \brief Timestamp indicating that no instrument activity has occurred. */
 #define RBRGEN4_NO_ACTIVITY ((RBRGen4DateTime) - 1)

@@ -135,7 +135,7 @@ GEN4_OBJECTS := src/RBRGen4.o \
                 src/RBRGen4Instrument.o \
                 src/RBRGen4Internal.o \
                 src/RBRGen4Memory.o \
-                src/RBRInstrumentGen4Realtime.o \
+                src/RBRGen4Realtime.o \
                 src/RBRParserGen4.o
 
 LIB_OBJECTS :=

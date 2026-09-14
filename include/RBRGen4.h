@@ -259,8 +259,8 @@ typedef enum RBRGen4Error
     /**
      * Used internally when the parser encounters a sample.
      *
-     * \see RBRInstrumentGen4_poll()
-     * \see RBRInstrumentGen4_readSample()
+     * \see RBRGen4_poll()
+     * \see RBRGen4_readSample()
      */
     RBRGEN4_SAMPLE,
     /** Communication error. */

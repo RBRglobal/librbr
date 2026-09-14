@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
     while (true)
     {
         // poll one group
-        err = RBRInstrumentGen4_pollGroups(instrument,
+        err = RBRGen4_pollGroups(instrument,
                                            true,
                                            groupPool.pool[0].label,
                                            &sample);
@@ -174,10 +174,10 @@ int main(int argc, char *argv[])
             printf("%" PRIi64, sample.timestamp);
             for (int32_t i = 0; i < sample.channelCount; i++)
             {
-                if (RBRInstrumentGen4Reading_isError(sample.readings[i]))
+                if (RBRGen4Reading_isError(sample.readings[i]))
                 {
                     printf(", Error-%2d",
-                           RBRInstrumentGen4Reading_getError(sample.readings[i]));
+                           RBRGen4Reading_getError(sample.readings[i]));
                 }
                 else
                 {

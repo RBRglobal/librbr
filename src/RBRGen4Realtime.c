@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen4Realtime.c
+ * \file RBRGen4Realtime.c
  *
  * \brief Library implementation.
  *
@@ -17,7 +17,7 @@
 
 #include "RBRGen4.h"
 #include "RBRGen4Internal.h"
-#include "RBRInstrumentGen4Realtime.h"
+#include "RBRGen4Realtime.h"
 
 #define READING_FLAG_MASK 0x00FF0000
 /** \brief Marks a NaN as an error reading rather than a plain NaN. */
@@ -27,9 +27,9 @@
 
 /** \brief The schedule label reported with a polled (as opposed to
  * streamed) sample. */
-#define RBRINSTRUMENTGEN4_POLL_SCHEDULE_LABEL "polling"
+#define RBRGEN4_POLL_SCHEDULE_LABEL "polling"
 
-inline bool RBRInstrumentGen4Reading_isError(double reading)
+inline bool RBRGen4Reading_isError(double reading)
 {
     if (!isnan(reading))
     {
@@ -46,7 +46,7 @@ inline bool RBRInstrumentGen4Reading_isError(double reading)
     return (alias.raw & READING_FLAG_MASK) != 0;
 }
 
-inline RBRInstrumentGen4ReadingError RBRInstrumentGen4Reading_getError(double reading)
+inline RBRGen4ReadingError RBRGen4Reading_getError(double reading)
 {
 
     if (!isnan(reading))
@@ -62,10 +62,10 @@ inline RBRInstrumentGen4ReadingError RBRInstrumentGen4Reading_getError(double re
     alias.reading = reading;
 
     uint8_t index = (alias.raw & READING_ERROR_MASK) >> READING_ERROR_OFFSET;
-    return (RBRInstrumentGen4ReadingError)(index);
+    return (RBRGen4ReadingError)(index);
 }
 
-inline double RBRInstrumentGen4Reading_setError(RBRInstrumentGen4ReadingError error)
+inline double RBRGen4Reading_setError(RBRGen4ReadingError error)
 {
     union
     {
@@ -81,7 +81,7 @@ inline double RBRInstrumentGen4Reading_setError(RBRInstrumentGen4ReadingError er
     return alias.reading;
 }
 
-RBRGen4Error RBRInstrumentGen4_readSample(RBRGen4 *instrument)
+RBRGen4Error RBRGen4_readSample(RBRGen4 *instrument)
 {
     if (instrument->callbacks.sample == NULL)
     {
@@ -118,13 +118,13 @@ RBRGen4Error RBRInstrumentGen4_readSample(RBRGen4 *instrument)
  *
  * \param [in] instrument the instrument connection
  * \param [in] requireLabel whether to require and wait for a sample
- *                          labelled #RBRINSTRUMENTGEN4_POLL_SCHEDULE_LABEL
+ *                          labelled #RBRGEN4_POLL_SCHEDULE_LABEL
  * \param [in] parameter the list parameter to send, or `NULL` for a bare
  *                       `poll`
  * \param [in] list the value of \a parameter
  * \param [out] sample the polled sample
  */
-static RBRGen4Error RBRInstrumentGen4_sendPoll(
+static RBRGen4Error RBRGen4_sendPoll(
     RBRGen4 *instrument,
     bool requireLabel,
     const char *parameter,
@@ -173,7 +173,7 @@ static RBRGen4Error RBRInstrumentGen4_sendPoll(
         if (err == RBRGEN4_SAMPLE
             && requireLabel
             && 0 != strcmp(sample->scheduleLabel,
-                           RBRINSTRUMENTGEN4_POLL_SCHEDULE_LABEL))
+                           RBRGEN4_POLL_SCHEDULE_LABEL))
         {
             /* This is a streamed sample, not the polled one we're waiting
              * for. Forward it to the sample callback, if any, and keep
@@ -192,38 +192,38 @@ static RBRGen4Error RBRInstrumentGen4_sendPoll(
     return err;
 }
 
-RBRGen4Error RBRInstrumentGen4_poll(
+RBRGen4Error RBRGen4_poll(
     RBRGen4 *instrument,
     bool requireLabel,
     RBRGen4Sample *sample)
 {
-    return RBRInstrumentGen4_sendPoll(instrument,
+    return RBRGen4_sendPoll(instrument,
                                       requireLabel,
                                       NULL,
                                       NULL,
                                       sample);
 }
 
-RBRGen4Error RBRInstrumentGen4_pollChannels(
+RBRGen4Error RBRGen4_pollChannels(
     RBRGen4 *instrument,
     bool requireLabel,
     const char *channelList,
     RBRGen4Sample *sample)
 {
-    return RBRInstrumentGen4_sendPoll(instrument,
+    return RBRGen4_sendPoll(instrument,
                                       requireLabel,
                                       "channellist=",
                                       channelList,
                                       sample);
 }
 
-RBRGen4Error RBRInstrumentGen4_pollGroups(
+RBRGen4Error RBRGen4_pollGroups(
     RBRGen4 *instrument,
     bool requireLabel,
     const char *groupList,
     RBRGen4Sample *sample)
 {
-    return RBRInstrumentGen4_sendPoll(instrument,
+    return RBRGen4_sendPoll(instrument,
                                       requireLabel,
                                       "grouplist=",
                                       groupList,

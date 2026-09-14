@@ -347,7 +347,7 @@ int main(int argc, char *argv[])
     {
         signal(SIGINT, sig_handler);
         signal(SIGTERM, sig_handler);
-        if ((err = RBRInstrumentGen4_readSample(instrument)) != RBRGEN4_SUCCESS)
+        if ((err = RBRGen4_readSample(instrument)) != RBRGEN4_SUCCESS)
         {
             fprintf(stderr, "Error: %s\n", RBRGen4Error_name(err));
         }

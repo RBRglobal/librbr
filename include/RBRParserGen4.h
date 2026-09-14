@@ -19,7 +19,7 @@ extern "C" {
 #include <stdbool.h>
 
 #include "RBRGen4.h"
-#include "RBRInstrumentGen4Realtime.h"
+#include "RBRGen4Realtime.h"
 #include "RBRGen4Memory.h"
 
 /** \brief The maximum number of pieces of auxiliary data in an event. */

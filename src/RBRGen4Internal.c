@@ -26,7 +26,7 @@
 #include "RBRGen4.h"
 #include "RBRGen4Internal.h"
 #include "RBRGen4Memory.h"
-#include "RBRInstrumentGen4Realtime.h"
+#include "RBRGen4Realtime.h"
 
 /** \brief 10-second command timeout. */
 #define COMMAND_TIMEOUT (10 * 1000)
@@ -552,7 +552,7 @@ static RBRGen4Error RBRGen4Sample_parse(
             /* Uh-oh. We'll encode the error in a NaN. Filtering, etc. will
              * ignore the value and the sample formatter will output it just as
              * we received it. */
-            reading = RBRInstrumentGen4Reading_setError(
+            reading = RBRGen4Reading_setError(
                 strtol(token + SAMPLE_ERROR_PREFIX_LEN, NULL, 10));
         }
         else if (memcmp(token, "0x", 2) == 0)
