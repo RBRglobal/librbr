@@ -134,7 +134,7 @@ GEN4_OBJECTS := src/RBRGen4.o \
                 src/RBRGen4HardwareErrors.o \
                 src/RBRGen4Instrument.o \
                 src/RBRGen4Internal.o \
-                src/RBRInstrumentGen4Memory.o \
+                src/RBRGen4Memory.o \
                 src/RBRInstrumentGen4Realtime.o \
                 src/RBRParserGen4.o
 

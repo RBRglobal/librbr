@@ -25,7 +25,7 @@
 
 #include "RBRGen4.h"
 #include "RBRGen4Internal.h"
-#include "RBRInstrumentGen4Memory.h"
+#include "RBRGen4Memory.h"
 #include "RBRInstrumentGen4Realtime.h"
 
 /** \brief 10-second command timeout. */
@@ -569,7 +569,7 @@ static RBRGen4Error RBRGen4Sample_parse(
                     return RBRGEN4_INVALID_PARAMETER_VALUE;
                 }
                 uint16_t calCrc;
-                calCrc = RBRInstrumentGen4_calculateCrc(response,
+                calCrc = RBRGen4_calculateCrc(response,
                                                         token - response);
                 if (calCrc != realCrc)
                 {

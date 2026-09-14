@@ -41,7 +41,7 @@ int main(void)
     RBRGen4Calibration calibration;
     printf("%zu\n", sizeof(calibration));
 
-    RBRInstrumentGen4DatasetPool datasetPool;
+    RBRGen4DatasetPool datasetPool;
     printf("%zu, %zu\n", sizeof(datasetPool), sizeof(datasetPool.pool[0]));
 
 }

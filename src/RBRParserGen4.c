@@ -257,7 +257,7 @@ static RBRGen4Error RBRParserGen4_parseEPEvents(
 // }
 
 RBRGen4Error RBRParserGen4_parse(RBRParserGen4 *parser,
-                                   RBRInstrumentGen4Block block,
+                                   RBRGen4Block block,
                                    const void *const data,
                                    int32_t *size)
 {

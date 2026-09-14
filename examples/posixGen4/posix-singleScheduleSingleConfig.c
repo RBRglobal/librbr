@@ -24,7 +24,7 @@
 
 #include "RBRGen4.h"
 #include "RBRGen4Configuration.h"
-#include "RBRInstrumentGen4Memory.h"
+#include "RBRGen4Memory.h"
 #include "posix-shared.h"
 
 //************************************* customer defined parameters *************************************//
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
         = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
     RBRGen4_disable(instrument, &loggingState);
 
-    RBRInstrumentGen4_deleteDatasetAll(instrument);
+    RBRGen4_deleteDatasetAll(instrument);
 
     RBRGen4_deleteConfigAll(instrument);
 

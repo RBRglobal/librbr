@@ -139,12 +139,12 @@ int main(int argc, char *argv[])
 
     //*******************download data from instrument. Support only bytecount. *******************//
     // quit if there's no dataset available.
-    RBRInstrumentGen4Dataset datasetBuf[RBRINSTRUMENTGEN4_DATASET_COUNT_MAX];
-    RBRInstrumentGen4DatasetPool datasetPool = {
-        .size = RBRINSTRUMENTGEN4_DATASET_COUNT_MAX,
+    RBRGen4Dataset datasetBuf[RBRGEN4_DATASET_COUNT_MAX];
+    RBRGen4DatasetPool datasetPool = {
+        .size = RBRGEN4_DATASET_COUNT_MAX,
         .pool = datasetBuf
     };
-    err = RBRInstrumentGen4_getDatasetPool(instrument, &datasetPool);
+    err = RBRGen4_getDatasetPool(instrument, &datasetPool);
     if (err != RBRGEN4_SUCCESS || datasetPool.count <= 0)
     {
         printf("Error: There's no dataset available in this instrument. Quit.\n");
@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
     }
 
     // Need dataset struct instance to find out the bytecount.
-    RBRInstrumentGen4Dataset *targetDataset;
+    RBRGen4Dataset *targetDataset;
     if (RBRInstrumentGen4_getDatasetFromPool(&targetDataset,
                                              &datasetPool,
                                              DATASET_LABEL)
@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
         .size = RBRGEN4_SCHEDULE_COUNT_MAX,
         .labels = scheduleLabelBuf
     };
-    err = RBRInstrumentGen4_getDataset(instrument,
+    err = RBRGen4_getDataset(instrument,
                                        targetDataset,
                                        &scheduleList);
     if (err != RBRGEN4_SUCCESS)
@@ -192,8 +192,8 @@ int main(int argc, char *argv[])
 
     // Get the data block info of specified dataset and schedule.
     // This will fail if the target schedule is not in the target dataset.
-    RBRInstrumentGen4DatasetDataBlock dataBlock;
-    err = RBRInstrumentGen4Dataset_getScheduleDataBlock(instrument,
+    RBRGen4DatasetDataBlock dataBlock;
+    err = RBRGen4Dataset_getScheduleDataBlock(instrument,
                                                         targetDataset,
                                                         SCHEDULE_LABEL,
                                                         &dataBlock);
@@ -216,8 +216,8 @@ int main(int argc, char *argv[])
            RBRGen4DataType_name(targetDataset->dataType));
 
     uint8_t buf[CHUNK_SIZE];
-    RBRInstrumentGen4DownloadData download = {
-        .unit = RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES,
+    RBRGen4DownloadData download = {
+        .unit = RBRGEN4_DOWNLOAD_DATA_UNIT_BYTES,
         .start = 0,
         .data = buf,
         .dataSize = sizeof(buf)
@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
     while (download.start < dataBlock.byteCount) // if not downloaded all data from targetDataset/schedule/datablock
     {
         download.count = sizeof(buf); // specify download bytes
-        err = RBRInstrumentGen4Dataset_downloadScheduleData(instrument,
+        err = RBRGen4Dataset_downloadScheduleData(instrument,
                                                             targetDataset,
                                                             SCHEDULE_LABEL,
                                                             &download);

@@ -254,12 +254,12 @@ extern "C" {
     }
 
 /**
- * \brief Declare an empty RBRInstrumentGen4DatasetPool named \a name over a
+ * \brief Declare an empty RBRGen4DatasetPool named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
 #define RBRINSTRUMENTGEN4_DATASET_POOL_DECL(name, size_) \
-    RBRInstrumentGen4Dataset name##Buffer[size_]; \
-    RBRInstrumentGen4DatasetPool name = (RBRInstrumentGen4DatasetPool) { \
+    RBRGen4Dataset name##Buffer[size_]; \
+    RBRGen4DatasetPool name = (RBRGen4DatasetPool) { \
         .size = (size_), \
         .count = 0, \
         .pool = name##Buffer \

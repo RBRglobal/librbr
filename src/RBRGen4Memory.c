@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen4Memory.c
+ * \file RBRGen4Memory.c
  *
  * \brief Library implementation.
  *
@@ -20,31 +20,31 @@
 #include "RBRGen4.h"
 #include "RBRGen4Configuration.h"
 #include "RBRGen4Internal.h"
-#include "RBRInstrumentGen4Memory.h"
+#include "RBRGen4Memory.h"
 
-const char *RBRInstrumentGen4StorageAccess_name(
-    RBRInstrumentGen4StorageAccess access)
+const char *RBRGen4StorageAccess_name(
+    RBRGen4StorageAccess access)
 {
     switch (access)
     {
-    case RBRINSTRUMENTGEN4_STORAGE_ACCESS_INSTRUMENT:
+    case RBRGEN4_STORAGE_ACCESS_INSTRUMENT:
         return "instrument";
-    case RBRINSTRUMENTGEN4_STORAGE_ACCESS_USBHOST:
+    case RBRGEN4_STORAGE_ACCESS_USBHOST:
         return "usbhost";
-    case RBRINSTRUMENTGEN4_STORAGE_ACCESS_COUNT:
+    case RBRGEN4_STORAGE_ACCESS_COUNT:
         return "storage access count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_STORAGE_ACCESS:
+    case RBRGEN4_UNKNOWN_STORAGE_ACCESS:
     default:
         return "unknown storage access";
     }
 }
 
-RBRGen4Error RBRInstrumentGen4_getStorage(
+RBRGen4Error RBRGen4_getStorage(
     RBRGen4 *instrument,
-    RBRInstrumentGen4Storage *storage)
+    RBRGen4Storage *storage)
 {
-    memset(storage, 0, sizeof(RBRInstrumentGen4Storage));
-    storage->access = RBRINSTRUMENTGEN4_UNKNOWN_STORAGE_ACCESS;
+    memset(storage, 0, sizeof(RBRGen4Storage));
+    storage->access = RBRGEN4_UNKNOWN_STORAGE_ACCESS;
 
     RBR_TRY(RBRGen4_converse(instrument, "storage"));
 
@@ -75,11 +75,11 @@ RBRGen4Error RBRInstrumentGen4_getStorage(
         else if (strcmp(parameter.key, "access") == 0)
         {
             for (int i = 0;
-                 i < RBRINSTRUMENTGEN4_STORAGE_ACCESS_COUNT;
+                 i < RBRGEN4_STORAGE_ACCESS_COUNT;
                  i++)
             {
                 if (strcmp(parameter.value,
-                           RBRInstrumentGen4StorageAccess_name(i)) == 0)
+                           RBRGen4StorageAccess_name(i)) == 0)
                 {
                     storage->access = i;
                     break;
@@ -91,12 +91,12 @@ RBRGen4Error RBRInstrumentGen4_getStorage(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4_setStorage(
+RBRGen4Error RBRGen4_setStorage(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Storage *storage)
+    const RBRGen4Storage *storage)
 {
     if (storage->access < 0
-        || storage->access >= RBRINSTRUMENTGEN4_STORAGE_ACCESS_COUNT)
+        || storage->access >= RBRGEN4_STORAGE_ACCESS_COUNT)
     {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
@@ -104,35 +104,35 @@ RBRGen4Error RBRInstrumentGen4_setStorage(
     return RBRGen4_converse(
         instrument,
         "storage access=%s",
-        RBRInstrumentGen4StorageAccess_name(storage->access));
+        RBRGen4StorageAccess_name(storage->access));
 }
 
-const char *RBRInstrumentGen4DatasetStatus_name(
-    RBRInstrumentGen4DatasetStatus status)
+const char *RBRGen4DatasetStatus_name(
+    RBRGen4DatasetStatus status)
 {
     switch (status)
     {
-    case RBRINSTRUMENTGEN4_DATASET_STATUS_OPEN:
+    case RBRGEN4_DATASET_STATUS_OPEN:
         return "open";
-    case RBRINSTRUMENTGEN4_DATASET_STATUS_CLOSED:
+    case RBRGEN4_DATASET_STATUS_CLOSED:
         return "closed";
-    case RBRINSTRUMENTGEN4_DATASET_STATUS_COUNT:
+    case RBRGEN4_DATASET_STATUS_COUNT:
         return "dataset status count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_DATASET_STATUS:
+    case RBRGEN4_UNKNOWN_DATASET_STATUS:
     default:
         return "unknown dataset status";
     }
 }
 
-RBRGen4Error RBRInstrumentGen4_getDatasetPool(
+RBRGen4Error RBRGen4_getDatasetPool(
     RBRGen4 *instrument,
-    RBRInstrumentGen4DatasetPool *datasetPool)
+    RBRGen4DatasetPool *datasetPool)
 {
     datasetPool->count = 0;
     datasetPool->maxCount = 0;
     memset(datasetPool->pool,
            0,
-           datasetPool->size * sizeof(RBRInstrumentGen4Dataset));
+           datasetPool->size * sizeof(RBRGen4Dataset));
 
     RBR_TRY(RBRGen4_converse(instrument, "dataset"));
 
@@ -190,9 +190,9 @@ RBRGen4Error RBRInstrumentGen4_getDatasetPool(
     return err;
 }
 
-RBRGen4Error RBRInstrumentGen4_getDataset(
+RBRGen4Error RBRGen4_getDataset(
     RBRGen4 *instrument,
-    RBRInstrumentGen4Dataset *dataset,
+    RBRGen4Dataset *dataset,
     RBRGen4LabelList *scheduleList)
 {
     if (dataset->label[0] == '\0')
@@ -201,7 +201,7 @@ RBRGen4Error RBRInstrumentGen4_getDataset(
     }
 
     RBR_RESET_EXCEPT(dataset, label);
-    dataset->status = RBRINSTRUMENTGEN4_UNKNOWN_DATASET_STATUS;
+    dataset->status = RBRGEN4_UNKNOWN_DATASET_STATUS;
     dataset->dataType = RBRGEN4_UNKNOWN_DATATYPE;
     if (scheduleList != NULL)
     {
@@ -227,10 +227,10 @@ RBRGen4Error RBRInstrumentGen4_getDataset(
         }
         else if (strcmp(parameter.key, "status") == 0)
         {
-            for (int i = 0; i < RBRINSTRUMENTGEN4_DATASET_STATUS_COUNT; i++)
+            for (int i = 0; i < RBRGEN4_DATASET_STATUS_COUNT; i++)
             {
                 if (strcmp(parameter.value,
-                           RBRInstrumentGen4DatasetStatus_name(i)) == 0)
+                           RBRGen4DatasetStatus_name(i)) == 0)
                 {
                     dataset->status = i;
                     break;
@@ -264,18 +264,18 @@ RBRGen4Error RBRInstrumentGen4_getDataset(
     return err;
 }
 
-const char *RBRInstrumentGen4Block_name(RBRInstrumentGen4Block block){
+const char *RBRGen4Block_name(RBRGen4Block block){
     switch(block)
     {
-        case RBRINSTRUMENTGEN4_BLOCK_DATA:
+        case RBRGEN4_BLOCK_DATA:
             return "data";
-        case RBRINSTRUMENTGEN4_BLOCK_EVENTS:
+        case RBRGEN4_BLOCK_EVENTS:
             return "events";
-        case RBRINSTRUMENTGEN4_BLOCK_META:
+        case RBRGEN4_BLOCK_META:
             return "meta";
-        case RBRINSTRUMENTGEN4_BLOCK_COUNT:
+        case RBRGEN4_BLOCK_COUNT:
             return "block count";
-        case RBRINSTRUMENTGEN4_BLOCK_UNKNOWN:
+        case RBRGEN4_BLOCK_UNKNOWN:
         default:
             return "unknown block";
     }
@@ -287,7 +287,7 @@ const char *RBRInstrumentGen4Block_name(RBRInstrumentGen4Block block){
  * A count the caller does not expect for the block type is passed as NULL
  * and left unparsed.
  */
-static void RBRInstrumentGen4Dataset_parseBlockResponse(
+static void RBRGen4Dataset_parseBlockResponse(
     RBRGen4 *instrument,
     int64_t *byteCount,
     int64_t *sampleCount,
@@ -323,23 +323,23 @@ static void RBRInstrumentGen4Dataset_parseBlockResponse(
     }
 }
 
-RBRGen4Error RBRInstrumentGen4Dataset_getEventsBlock(
+RBRGen4Error RBRGen4Dataset_getEventsBlock(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Dataset *dataset,
-    RBRInstrumentGen4DatasetEventsBlock *block)
+    const RBRGen4Dataset *dataset,
+    RBRGen4DatasetEventsBlock *block)
 {
     if (dataset->label[0] == '\0')
     {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    memset(block, 0, sizeof(RBRInstrumentGen4DatasetEventsBlock));
+    memset(block, 0, sizeof(RBRGen4DatasetEventsBlock));
 
     RBR_TRY(RBRGen4_converse(instrument,
                                        "dataset %s/events",
                                        dataset->label));
 
-    RBRInstrumentGen4Dataset_parseBlockResponse(instrument,
+    RBRGen4Dataset_parseBlockResponse(instrument,
                                                 &block->byteCount,
                                                 NULL,
                                                 &block->eventCount);
@@ -347,23 +347,23 @@ RBRGen4Error RBRInstrumentGen4Dataset_getEventsBlock(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4Dataset_getMetaBlock(
+RBRGen4Error RBRGen4Dataset_getMetaBlock(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Dataset *dataset,
-    RBRInstrumentGen4DatasetMetaBlock *block)
+    const RBRGen4Dataset *dataset,
+    RBRGen4DatasetMetaBlock *block)
 {
     if (dataset->label[0] == '\0')
     {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    memset(block, 0, sizeof(RBRInstrumentGen4DatasetMetaBlock));
+    memset(block, 0, sizeof(RBRGen4DatasetMetaBlock));
 
     RBR_TRY(RBRGen4_converse(instrument,
                                        "dataset %s/meta",
                                        dataset->label));
 
-    RBRInstrumentGen4Dataset_parseBlockResponse(instrument,
+    RBRGen4Dataset_parseBlockResponse(instrument,
                                                 &block->byteCount,
                                                 NULL,
                                                 NULL);
@@ -371,25 +371,25 @@ RBRGen4Error RBRInstrumentGen4Dataset_getMetaBlock(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4Dataset_getScheduleBlock(
+RBRGen4Error RBRGen4Dataset_getScheduleBlock(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Dataset *dataset,
+    const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
-    RBRInstrumentGen4DatasetScheduleBlock *block)
+    RBRGen4DatasetScheduleBlock *block)
 {
     if (dataset->label[0] == '\0' || scheduleLabel[0] == '\0')
     {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    memset(block, 0, sizeof(RBRInstrumentGen4DatasetScheduleBlock));
+    memset(block, 0, sizeof(RBRGen4DatasetScheduleBlock));
 
     RBR_TRY(RBRGen4_converse(instrument,
                                        "dataset %s/%s",
                                        dataset->label,
                                        scheduleLabel));
 
-    RBRInstrumentGen4Dataset_parseBlockResponse(instrument,
+    RBRGen4Dataset_parseBlockResponse(instrument,
                                                 &block->byteCount,
                                                 NULL,
                                                 NULL);
@@ -397,25 +397,25 @@ RBRGen4Error RBRInstrumentGen4Dataset_getScheduleBlock(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4Dataset_getScheduleEventsBlock(
+RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Dataset *dataset,
+    const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
-    RBRInstrumentGen4DatasetEventsBlock *block)
+    RBRGen4DatasetEventsBlock *block)
 {
     if (dataset->label[0] == '\0' || scheduleLabel[0] == '\0')
     {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    memset(block, 0, sizeof(RBRInstrumentGen4DatasetEventsBlock));
+    memset(block, 0, sizeof(RBRGen4DatasetEventsBlock));
 
     RBR_TRY(RBRGen4_converse(instrument,
                                        "dataset %s/%s/events",
                                        dataset->label,
                                        scheduleLabel));
 
-    RBRInstrumentGen4Dataset_parseBlockResponse(instrument,
+    RBRGen4Dataset_parseBlockResponse(instrument,
                                                 &block->byteCount,
                                                 NULL,
                                                 &block->eventCount);
@@ -423,25 +423,25 @@ RBRGen4Error RBRInstrumentGen4Dataset_getScheduleEventsBlock(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4Dataset_getScheduleDataBlock(
+RBRGen4Error RBRGen4Dataset_getScheduleDataBlock(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Dataset *dataset,
+    const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
-    RBRInstrumentGen4DatasetDataBlock *block)
+    RBRGen4DatasetDataBlock *block)
 {
     if (dataset->label[0] == '\0' || scheduleLabel[0] == '\0')
     {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    memset(block, 0, sizeof(RBRInstrumentGen4DatasetDataBlock));
+    memset(block, 0, sizeof(RBRGen4DatasetDataBlock));
 
     RBR_TRY(RBRGen4_converse(instrument,
                                        "dataset %s/%s/data",
                                        dataset->label,
                                        scheduleLabel));
 
-    RBRInstrumentGen4Dataset_parseBlockResponse(instrument,
+    RBRGen4Dataset_parseBlockResponse(instrument,
                                                 &block->byteCount,
                                                 &block->sampleCount,
                                                 NULL);
@@ -449,7 +449,7 @@ RBRGen4Error RBRInstrumentGen4Dataset_getScheduleDataBlock(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4_deleteDataset(
+RBRGen4Error RBRGen4_deleteDataset(
     RBRGen4 *instrument,
     const char *label)
 {
@@ -463,41 +463,41 @@ RBRGen4Error RBRInstrumentGen4_deleteDataset(
                                       label);
 }
 
-RBRGen4Error RBRInstrumentGen4_deleteDatasetAll(
+RBRGen4Error RBRGen4_deleteDatasetAll(
     RBRGen4 *instrument)
 {
     return RBRGen4_converse(instrument, "dataset delete all");
 }
 
-const char *RBRInstrumentGen4DownloadDataUnit_name(
-    RBRInstrumentGen4DownloadDataUnit unit)
+const char *RBRGen4DownloadDataUnit_name(
+    RBRGen4DownloadDataUnit unit)
 {
     switch (unit)
     {
-    case RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES:
+    case RBRGEN4_DOWNLOAD_DATA_UNIT_BYTES:
         return "bytes";
-    case RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_SAMPLES:
+    case RBRGEN4_DOWNLOAD_DATA_UNIT_SAMPLES:
         return "samples";
-    case RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_COUNT:
+    case RBRGEN4_DOWNLOAD_DATA_UNIT_COUNT:
         return "download data unit count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_DOWNLOAD_DATA_UNIT:
+    case RBRGEN4_UNKNOWN_DOWNLOAD_DATA_UNIT:
     default:
         return "unknown download data unit";
     }
 }
 
-const char *RBRInstrumentGen4DownloadEventsUnit_name(
-    RBRInstrumentGen4DownloadEventsUnit unit)
+const char *RBRGen4DownloadEventsUnit_name(
+    RBRGen4DownloadEventsUnit unit)
 {
     switch (unit)
     {
-    case RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_BYTES:
+    case RBRGEN4_DOWNLOAD_EVENTS_UNIT_BYTES:
         return "bytes";
-    case RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_EVENTS:
+    case RBRGEN4_DOWNLOAD_EVENTS_UNIT_EVENTS:
         return "events";
-    case RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_COUNT:
+    case RBRGEN4_DOWNLOAD_EVENTS_UNIT_COUNT:
         return "download events unit count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_DOWNLOAD_EVENTS_UNIT:
+    case RBRGEN4_UNKNOWN_DOWNLOAD_EVENTS_UNIT:
     default:
         return "unknown download events unit";
     }
@@ -514,7 +514,7 @@ const char *RBRInstrumentGen4DownloadEventsUnit_name(
  * \param [out] data the buffer to write into
  * \param [in] size the amount of data to write into the buffer
  */
-static RBRGen4Error RBRInstrumentGen4_fixedRead(
+static RBRGen4Error RBRGen4_fixedRead(
     struct RBRGen4 *instrument,
     void *data,
     int64_t size)
@@ -573,7 +573,7 @@ static RBRGen4Error RBRInstrumentGen4_fixedRead(
  * \param [out] data the buffer receiving the transfer
  * \param [in] dataSize the capacity of \a data in bytes
  */
-static RBRGen4Error RBRInstrumentGen4Dataset_downloadCommon(
+static RBRGen4Error RBRGen4Dataset_downloadCommon(
     RBRGen4 *instrument,
     const char *countKey,
     int64_t *count,
@@ -619,7 +619,7 @@ static RBRGen4Error RBRInstrumentGen4Dataset_downloadCommon(
                 rest > (int64_t) sizeof(instrument->commandBuffer)
                 ? (int64_t) sizeof(instrument->commandBuffer)
                 : rest;
-            RBR_TRY(RBRInstrumentGen4_fixedRead(instrument,
+            RBR_TRY(RBRGen4_fixedRead(instrument,
                                                 instrument->commandBuffer,
                                                 chunk));
             rest -= chunk;
@@ -627,14 +627,14 @@ static RBRGen4Error RBRInstrumentGen4Dataset_downloadCommon(
         return RBRGEN4_BUFFER_TOO_SMALL;
     }
 
-    RBR_TRY(RBRInstrumentGen4_fixedRead(instrument, data, *byteCount));
+    RBR_TRY(RBRGen4_fixedRead(instrument, data, *byteCount));
 
     /* The instrument transmits the 16-bit CRC most significant byte first. */
     uint8_t crc[2];
-    RBR_TRY(RBRInstrumentGen4_fixedRead(instrument, crc, 2));
+    RBR_TRY(RBRGen4_fixedRead(instrument, crc, 2));
 
     uint16_t reportedCrc = (uint16_t) ((crc[0] << 8) | crc[1]);
-    if (RBRInstrumentGen4_calculateCrc(data, *byteCount) != reportedCrc)
+    if (RBRGen4_calculateCrc(data, *byteCount) != reportedCrc)
     {
         return RBRGEN4_CHECKSUM_ERROR;
     }
@@ -642,16 +642,16 @@ static RBRGen4Error RBRInstrumentGen4Dataset_downloadCommon(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4Dataset_downloadScheduleData(
+RBRGen4Error RBRGen4Dataset_downloadScheduleData(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Dataset *dataset,
+    const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
-    RBRInstrumentGen4DownloadData *download)
+    RBRGen4DownloadData *download)
 {
     if (dataset->label[0] == '\0'
         || scheduleLabel[0] == '\0'
-        || (download->unit != RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES
-            && download->unit != RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_SAMPLES)
+        || (download->unit != RBRGEN4_DOWNLOAD_DATA_UNIT_BYTES
+            && download->unit != RBRGEN4_DOWNLOAD_DATA_UNIT_SAMPLES)
         || download->count < 0
         || download->start < 0
         || download->data == NULL)
@@ -659,7 +659,7 @@ RBRGen4Error RBRInstrumentGen4Dataset_downloadScheduleData(
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    bool bytes = download->unit == RBRINSTRUMENTGEN4_DOWNLOAD_DATA_UNIT_BYTES;
+    bool bytes = download->unit == RBRGEN4_DOWNLOAD_DATA_UNIT_BYTES;
     const char *countKey = bytes ? "bytecount" : "samplecount";
 
     download->byteCount = 0;
@@ -674,7 +674,7 @@ RBRGen4Error RBRInstrumentGen4Dataset_downloadScheduleData(
                                        bytes ? "bytestart" : "samplestart",
                                        download->start));
 
-    RBR_TRY(RBRInstrumentGen4Dataset_downloadCommon(
+    RBR_TRY(RBRGen4Dataset_downloadCommon(
                 instrument,
                 countKey,
                 &download->count,
@@ -694,16 +694,16 @@ RBRGen4Error RBRInstrumentGen4Dataset_downloadScheduleData(
  * \param [in] scheduleLabel the schedule, or NULL for the whole dataset
  * \param [in,out] download the download request and its result
  */
-static RBRGen4Error RBRInstrumentGen4Dataset_downloadEventsCommon(
+static RBRGen4Error RBRGen4Dataset_downloadEventsCommon(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Dataset *dataset,
+    const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
-    RBRInstrumentGen4DownloadEvents *download)
+    RBRGen4DownloadEvents *download)
 {
     if (dataset->label[0] == '\0'
-        || (download->unit != RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_BYTES
+        || (download->unit != RBRGEN4_DOWNLOAD_EVENTS_UNIT_BYTES
             && download->unit
-               != RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_EVENTS)
+               != RBRGEN4_DOWNLOAD_EVENTS_UNIT_EVENTS)
         || download->count < 0
         || download->start < 0
         || download->data == NULL)
@@ -712,7 +712,7 @@ static RBRGen4Error RBRInstrumentGen4Dataset_downloadEventsCommon(
     }
 
     bool bytes
-        = download->unit == RBRINSTRUMENTGEN4_DOWNLOAD_EVENTS_UNIT_BYTES;
+        = download->unit == RBRGEN4_DOWNLOAD_EVENTS_UNIT_BYTES;
     const char *countKey = bytes ? "bytecount" : "eventcount";
 
     download->byteCount = 0;
@@ -741,7 +741,7 @@ static RBRGen4Error RBRInstrumentGen4Dataset_downloadEventsCommon(
                                            download->start));
     }
 
-    RBR_TRY(RBRInstrumentGen4Dataset_downloadCommon(
+    RBR_TRY(RBRGen4Dataset_downloadCommon(
                 instrument,
                 countKey,
                 &download->count,
@@ -752,38 +752,38 @@ static RBRGen4Error RBRInstrumentGen4Dataset_downloadEventsCommon(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4Dataset_downloadEvents(
+RBRGen4Error RBRGen4Dataset_downloadEvents(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Dataset *dataset,
-    RBRInstrumentGen4DownloadEvents *download)
+    const RBRGen4Dataset *dataset,
+    RBRGen4DownloadEvents *download)
 {
-    return RBRInstrumentGen4Dataset_downloadEventsCommon(instrument,
+    return RBRGen4Dataset_downloadEventsCommon(instrument,
                                                        dataset,
                                                        NULL,
                                                        download);
 }
 
-RBRGen4Error RBRInstrumentGen4Dataset_downloadScheduleEvents(
+RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Dataset *dataset,
+    const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
-    RBRInstrumentGen4DownloadEvents *download)
+    RBRGen4DownloadEvents *download)
 {
     if (scheduleLabel[0] == '\0')
     {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRInstrumentGen4Dataset_downloadEventsCommon(instrument,
+    return RBRGen4Dataset_downloadEventsCommon(instrument,
                                                        dataset,
                                                        scheduleLabel,
                                                        download);
 }
 
-RBRGen4Error RBRInstrumentGen4Dataset_downloadMeta(
+RBRGen4Error RBRGen4Dataset_downloadMeta(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Dataset *dataset,
-    RBRInstrumentGen4DownloadMeta *download)
+    const RBRGen4Dataset *dataset,
+    RBRGen4DownloadMeta *download)
 {
     if (dataset->label[0] == '\0'
         || download->byteCount < 0
@@ -802,7 +802,7 @@ RBRGen4Error RBRInstrumentGen4Dataset_downloadMeta(
                                        download->byteStart));
 
     int64_t byteCount = 0;
-    RBR_TRY(RBRInstrumentGen4Dataset_downloadCommon(instrument,
+    RBR_TRY(RBRGen4Dataset_downloadCommon(instrument,
                                                     "bytecount",
                                                     &download->byteCount,
                                                     &byteCount,
@@ -813,7 +813,7 @@ RBRGen4Error RBRInstrumentGen4Dataset_downloadMeta(
 }
 
 /* CRC-CCITT */
-uint16_t RBRInstrumentGen4_calculateCrc(const void *data, int64_t size)
+uint16_t RBRGen4_calculateCrc(const void *data, int64_t size)
 {
 #define CRC_POLYNOMIAL 0x1021
 

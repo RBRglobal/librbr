@@ -389,8 +389,8 @@ RBRGen4Error RBRInstrumentGen4_populateConfigSchedules(
 
 // can be static.
 RBRGen4Error RBRInstrumentGen4_getDatasetFromPool(
-    RBRInstrumentGen4Dataset **targetDataset,
-    RBRInstrumentGen4DatasetPool *datasetPool,
+    RBRGen4Dataset **targetDataset,
+    RBRGen4DatasetPool *datasetPool,
     const char datasetLabel[])
 {
     int _totalSourceObjCnt = datasetPool->count;

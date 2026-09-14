@@ -155,8 +155,8 @@ extern "C"
      *         to hold every dataset
      */
     RBRGen4Error RBRInstrumentGen4_getDatasetFromPool(
-        RBRInstrumentGen4Dataset **targetDataset,
-        RBRInstrumentGen4DatasetPool *datasetPool,
+        RBRGen4Dataset **targetDataset,
+        RBRGen4DatasetPool *datasetPool,
         const char datasetLabel[]);
 
     /**

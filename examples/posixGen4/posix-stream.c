@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
         = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
     RBRGen4_disable(instrument, &loggingState);
 
-    RBRInstrumentGen4_deleteDatasetAll(instrument);
+    RBRGen4_deleteDatasetAll(instrument);
 
     RBRGen4_deleteConfigAll(instrument);
     RBRGen4_deleteScheduleAll(instrument);

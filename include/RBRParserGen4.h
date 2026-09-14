@@ -20,7 +20,7 @@ extern "C" {
 
 #include "RBRGen4.h"
 #include "RBRInstrumentGen4Realtime.h"
-#include "RBRInstrumentGen4Memory.h"
+#include "RBRGen4Memory.h"
 
 /** \brief The maximum number of pieces of auxiliary data in an event. */
 #define RBRINSTRUMENTGEN4_EVENT_AUXILIARY_DATA_MAX 8
@@ -351,7 +351,7 @@ void RBRParserGen4_setUserData(RBRParserGen4 *parser, void *userData);
  *                                                or invalid
  */
 RBRGen4Error RBRParserGen4_parse(RBRParserGen4 *parser,
-                                   RBRInstrumentGen4Block block,
+                                   RBRGen4Block block,
                                    const void *const data,
                                    int32_t *size);
 

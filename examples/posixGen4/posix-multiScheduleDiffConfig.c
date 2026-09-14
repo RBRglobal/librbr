@@ -342,9 +342,9 @@ int main(int argc, char *argv[])
     RBRGen4DeploymentStatus deploymentStatus = RBRINSTRUMENTGEN4_STATUS_UNKNOWN;
     RBRGen4_disable(instrument, deploymentStatus);
 
-    RBRInstrumentGen4DatasetPool datasetPool;
-    RBRInstrumentGen4_getDatasetPool(instrument, &datasetPool);
-    RBRInstrumentGen4_deleteDatasetAll(instrument, &datasetPool);
+    RBRGen4DatasetPool datasetPool;
+    RBRGen4_getDatasetPool(instrument, &datasetPool);
+    RBRGen4_deleteDatasetAll(instrument, &datasetPool);
 
     RBRInstrumentGen4Configs configPool;
     RBRInstrumentGen4_getConfigs(instrument, &configPool);
@@ -518,7 +518,7 @@ int main(int argc, char *argv[])
 
     /************ start of ascent ************/
     // ensures the memory is cleared first
-    RBRInstrumentGen4_deleteDatasetAll(instrument, &datasetPool);
+    RBRGen4_deleteDatasetAll(instrument, &datasetPool);
 
     // verify the configurations for enable
     RBRGen4_verify(instrument,

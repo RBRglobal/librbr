@@ -328,7 +328,7 @@ RBRGen4Error RBRGen4_verify(
  *
  * All three parameters of the command are sent. The command reports no
  * dataset, so read the deployment's dataset back with
- * RBRInstrumentGen4_getDatasetPool().
+ * RBRGen4_getDatasetPool().
  *
  * \param [in] instrument the instrument connection
  * \param [in] config the configuration which defines this deployment

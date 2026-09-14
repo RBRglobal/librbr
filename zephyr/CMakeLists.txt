@@ -72,7 +72,7 @@ if(CONFIG_LIBRBR)
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Instrument.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Internal.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Internal.h
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Memory.c
+            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Memory.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Realtime.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRParserGen4.c
         )

@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
         bufSize += readSize;
         parsedSize = bufSize;
         RBRParserGen4_parse(parser,
-                        RBRINSTRUMENTGEN4_BLOCK_DATA,
+                        RBRGEN4_BLOCK_DATA,
                         buf,
                         &parsedSize);
         bufSize -= parsedSize;

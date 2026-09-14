@@ -30,7 +30,7 @@
 #include "RBRGen4Configuration.h"
 #include "RBRGen4Deployment.h"
 #include "RBRGen4Instrument.h"
-#include "RBRInstrumentGen4Memory.h"
+#include "RBRGen4Memory.h"
 #include "RBRParserGen4.h"
 #include "posix-shared.h"
 
@@ -199,8 +199,8 @@ int main(int argc, char *argv[])
         = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
     RBRGen4_disable(instrument, &loggingState);
 
-    RBRInstrumentGen4DatasetPool datasetPool;
-    RBRInstrumentGen4_deleteDatasetAll(instrument, &datasetPool);
+    RBRGen4DatasetPool datasetPool;
+    RBRGen4_deleteDatasetAll(instrument, &datasetPool);
 
     RBRGen4ConfigPool configPool;
     RBRGen4_deleteConfigAll(instrument);
@@ -283,10 +283,10 @@ int main(int argc, char *argv[])
 
     /************ start of ascent ************/
     /* enable the instrument */
-    RBRInstrumentGen4Dataset dataset_ascent_value = {
+    RBRGen4Dataset dataset_ascent_value = {
         .label = NEW_DATASET_LABEL
     };
-    RBRInstrumentGen4Dataset *dataset_ascent = &dataset_ascent_value;
+    RBRGen4Dataset *dataset_ascent = &dataset_ascent_value;
     RBRGen4_enable(instrument,
                              &config_ascent,
                              NEW_DATASET_LABEL,
@@ -297,14 +297,14 @@ int main(int argc, char *argv[])
     /* Stop the current deployment */
     RBRGen4_disable(instrument, &loggingState);
     /* Determine how much memory has been used */
-    RBRInstrumentGen4_getDataset(instrument,
+    RBRGen4_getDataset(instrument,
                                  &configPool,
                                  dataset_ascent);
     RBRInstrumentGen4DatasetInfo dataset_asc_info;
     RBRInstrumentGen4_getDatasetByScheduleBlock(
         instrument,
         schedule_asc_pts,
-        RBRINSTRUMENTGEN4_BLOCK_DATA,
+        RBRGEN4_BLOCK_DATA,
         dataset_ascent,
         &dataset_asc_info);
     /* Get the data type */
@@ -331,7 +331,7 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4Download download_data_pts = {
         .dataset = dataset_ascent,
         .schedule = schedule_asc_pts,
-        .block = RBRINSTRUMENTGEN4_BLOCK_DATA,
+        .block = RBRGEN4_BLOCK_DATA,
         .countKey = RBRINSTRUMENTGEN4_COUNTKEY_BYTECOUNT,
         .countValue = CHUNK_LEN_BYTES,
         .startKey = RBRINSTRUMENTGEN4_COUNTKEY_BYTECOUNT,
