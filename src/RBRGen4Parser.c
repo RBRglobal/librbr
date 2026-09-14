@@ -215,7 +215,7 @@ static RBRGen4Error RBRGen4Parser_parseEPEvents(
 #define EP_SAMPLE_TIMESTAMP_SIZE ((int32_t) sizeof(RBRGen4DateTime))
 #define EP_SAMPLE_READING_SIZE ((int32_t) sizeof(float))
 
-// static RBRGen4Error RBRParserGen4_parseEPSamples(
+// static RBRGen4Error RBRGen4Parser_parseEPSamples(
 //     RBRGen4Parser *parser,
 //     const uint8_t *const data,
 //     int32_t *size)
@@ -265,11 +265,11 @@ RBRGen4Error RBRGen4Parser_parse(RBRGen4Parser *parser,
 
     // switch (dataset)
     // {
-    // case RBRINSTRUMENTGEN4_DATASET_EASYPARSE_EVENTS:
+    // case RBRGEN4_DATASET_EASYPARSE_EVENTS:
     //     return RBRGen4Parser_parseEPEvents(parser, d, size);
-    // case RBRINSTRUMENTGEN4_DATASET_EASYPARSE_SAMPLE_DATA:
-    //     return RBRParserGen4_parseEPSamples(parser, d, size);
-    // case RBRINSTRUMENTGEN4_DATASET_EASYPARSE_DEPLOYMENT_HEADER:
+    // case RBRGEN4_DATASET_EASYPARSE_SAMPLE_DATA:
+    //     return RBRGen4Parser_parseEPSamples(parser, d, size);
+    // case RBRGEN4_DATASET_EASYPARSE_DEPLOYMENT_HEADER:
     // default:
     //     return RBRGEN4_INVALID_PARAMETER_VALUE;
     // }

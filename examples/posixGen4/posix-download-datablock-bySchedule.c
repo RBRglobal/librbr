@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
 
     // Need dataset struct instance to find out the bytecount.
     RBRGen4Dataset *targetDataset;
-    if (RBRInstrumentGen4_getDatasetFromPool(&targetDataset,
+    if (RBRGen4_getDatasetFromPool(&targetDataset,
                                              &datasetPool,
                                              DATASET_LABEL)
         != RBRGEN4_SUCCESS)

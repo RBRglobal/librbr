@@ -93,11 +93,11 @@
         GROUP_PTS_LABEL                              \
     }
 #define SCHEDULE_PTS_MODE RBRGEN4_SCHEDULE_MODE_REGIMES
-#define SCHEDULE_PTS_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
-#define SCHEDULE_PTS_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
+#define SCHEDULE_PTS_REF RBRGEN4_REFERENCE_SEAPRESSURE
+#define SCHEDULE_PTS_DIR RBRGEN4_DIRECTION_ASCENDING
 #define SCHEDULE_PTS_COUNT 3
 #define SCHEDULE_PTS_REGIME            \
-    (RBRInstrumentGen4Regimes)         \
+    (RBRGen4Regimes)         \
     {                                  \
         .direction = SCHEDULE_PTS_DIR, \
         .count = SCHEDULE_PTS_COUNT,   \
@@ -120,11 +120,11 @@
         GROUP_ODO_LABEL                              \
     }
 #define SCHEDULE_ODO_MODE RBRGEN4_SCHEDULE_MODE_REGIMES
-#define SCHEDULE_ODO_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
-#define SCHEDULE_ODO_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
+#define SCHEDULE_ODO_REF RBRGEN4_REFERENCE_SEAPRESSURE
+#define SCHEDULE_ODO_DIR RBRGEN4_DIRECTION_ASCENDING
 #define SCHEDULE_ODO_COUNT 2
 #define SCHEDULE_ODO_REGIME            \
-    (RBRInstrumentGen4Regimes)         \
+    (RBRGen4Regimes)         \
     {                                  \
         .direction = SCHEDULE_ODO_DIR, \
         .count = SCHEDULE_ODO_COUNT,   \
@@ -144,11 +144,11 @@
         GROUP_PH_LABEL                               \
     }
 #define SCHEDULE_PH_MODE RBRGEN4_SCHEDULE_MODE_REGIMES
-#define SCHEDULE_PH_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
-#define SCHEDULE_PH_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
+#define SCHEDULE_PH_REF RBRGEN4_REFERENCE_SEAPRESSURE
+#define SCHEDULE_PH_DIR RBRGEN4_DIRECTION_ASCENDING
 #define SCHEDULE_PH_COUNT 2
 #define SCHEDULE_PH_REGIME            \
-    (RBRInstrumentGen4Regimes)        \
+    (RBRGen4Regimes)        \
     {                                 \
         .direction = SCHEDULE_PH_DIR, \
         .count = SCHEDULE_PH_COUNT,   \
@@ -168,11 +168,11 @@
         GROUP_BBPFL_LABEL                            \
     }
 #define SCHEDULE_BBPFL_MODE RBRGEN4_SCHEDULE_MODE_REGIMES
-#define SCHEDULE_BBPFL_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
-#define SCHEDULE_BBPFL_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
+#define SCHEDULE_BBPFL_REF RBRGEN4_REFERENCE_SEAPRESSURE
+#define SCHEDULE_BBPFL_DIR RBRGEN4_DIRECTION_ASCENDING
 #define SCHEDULE_BBPFL_COUNT 2
 #define SCHEDULE_BBPFL_REGIME            \
-    (RBRInstrumentGen4Regimes)           \
+    (RBRGen4Regimes)           \
     {                                    \
         .direction = SCHEDULE_BBPFL_DIR, \
         .count = SCHEDULE_BBPFL_COUNT,   \
@@ -192,11 +192,11 @@
         GROUP_RADIOMETRY_LABEL                       \
     }
 #define SCHEDULE_RADIOMETRY_MODE RBRGEN4_SCHEDULE_MODE_REGIMES
-#define SCHEDULE_RADIOMETRY_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
-#define SCHEDULE_RADIOMETRY_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
+#define SCHEDULE_RADIOMETRY_REF RBRGEN4_REFERENCE_SEAPRESSURE
+#define SCHEDULE_RADIOMETRY_DIR RBRGEN4_DIRECTION_ASCENDING
 #define SCHEDULE_RADIOMETRY_COUNT 1
 #define SCHEDULE_RADIOMETRY_REGIME            \
-    (RBRInstrumentGen4Regimes)                \
+    (RBRGen4Regimes)                \
     {                                         \
         .direction = SCHEDULE_RADIOMETRY_DIR, \
         .count = SCHEDULE_RADIOMETRY_COUNT,   \
@@ -323,7 +323,7 @@ int main(int argc, char *argv[])
                RBRGen4LinkSerialBaudRate_name(serial.baudRate));
         break;
     }
-    case RBRINSTRUMENTGEN4_LINK_TYPE_WIFI:
+    case RBRGEN4_LINK_TYPE_WIFI:
     {
         RBRGen4_getWiFi(instrument, &wifi);
         printf("Connected in WiFi mode at %s baud. Timeout is %d\n",
@@ -339,15 +339,15 @@ int main(int argc, char *argv[])
     }
 
     /************ ensure default state ************/
-    RBRGen4DeploymentStatus deploymentStatus = RBRINSTRUMENTGEN4_STATUS_UNKNOWN;
+    RBRGen4DeploymentStatus deploymentStatus = RBRGEN4_STATUS_UNKNOWN;
     RBRGen4_disable(instrument, deploymentStatus);
 
     RBRGen4DatasetPool datasetPool;
     RBRGen4_getDatasetPool(instrument, &datasetPool);
     RBRGen4_deleteDatasetAll(instrument, &datasetPool);
 
-    RBRInstrumentGen4Configs configPool;
-    RBRInstrumentGen4_getConfigs(instrument, &configPool);
+    RBRGen4Configs configPool;
+    RBRGen4_getConfigs(instrument, &configPool);
     RBRGen4_deleteConfigAll(instrument, &configPool);
 
     RBRGen4SchedulePool schedulePool;
@@ -365,7 +365,7 @@ int main(int argc, char *argv[])
 
     // specify groupLabel, channel labels, and create group instance
     RBRGen4Group group_pts;
-    RBRInstrumentGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(instrument,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         &channelPool,
@@ -373,7 +373,7 @@ int main(int argc, char *argv[])
                         &groupPool); // warning: need to read error!!!
 
     RBRGen4Group group_odo;
-    RBRInstrumentGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(instrument,
                         GROUP_ODO_LABEL,
                         GROUP_ODO_CHANNELS,
                         &channelPool,
@@ -381,7 +381,7 @@ int main(int argc, char *argv[])
                         &groupPool); // warning: need to read error!!!
 
     RBRGen4Group group_ph;
-    RBRInstrumentGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(instrument,
                         GROUP_PH_LABEL,
                         GROUP_PH_CHANNELS,
                         &channelPool,
@@ -389,7 +389,7 @@ int main(int argc, char *argv[])
                         &groupPool); // warning: need to read error!!!
 
     RBRGen4Group group_bbpfl;
-    RBRInstrumentGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(instrument,
                         GROUP_BBPFL_LABEL,
                         GROUP_BBPFL_CHANNELS,
                         &channelPool,
@@ -397,7 +397,7 @@ int main(int argc, char *argv[])
                         &groupPool); // warning: need to read error!!!
 
     RBRGen4Group group_radiometry;
-    RBRInstrumentGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(instrument,
                         GROUP_RADIOMETRY_LABEL,
                         GROUP_RADIOMETRY_CHANNELS,
                         &channelPool,
@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
 
     /************ schedule definition ************/
     RBRGen4Schedule schedule_pts;
-    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
+    RBRGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_PTS_LABEL,
                           SCHEDULE_PTS_GROUPS,
                           SCHEDULE_PTS_MODE,
@@ -417,7 +417,7 @@ int main(int argc, char *argv[])
     RBRGen4_setSchedule(instrument, &schedule_pts);
 
     RBRGen4Schedule schedule_odo;
-    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
+    RBRGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_ODO_LABEL,
                           SCHEDULE_ODO_GROUPS,
                           SCHEDULE_ODO_MODE,
@@ -428,7 +428,7 @@ int main(int argc, char *argv[])
     RBRGen4_setSchedule(instrument, &schedule_odo);
 
     RBRGen4Schedule schedule_ph;
-    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
+    RBRGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_PH_LABEL,
                           SCHEDULE_PH_GROUPS,
                           SCHEDULE_PH_MODE,
@@ -439,7 +439,7 @@ int main(int argc, char *argv[])
     RBRGen4_setSchedule(instrument, &schedule_ph);
 
     RBRGen4Schedule schedule_BBPFL;
-    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
+    RBRGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_BBPFL_LABEL,
                           SCHEDULE_BBPFL_GROUPS,
                           SCHEDULE_BBPFL_MODE,
@@ -450,7 +450,7 @@ int main(int argc, char *argv[])
     RBRGen4_setSchedule(instrument, &schedule_BBPFL);
 
     RBRGen4Schedule schedule_radiometry;
-    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
+    RBRGen4_initNewScheduleRegimes(instrument,
                           SCHEDULE_RADIOMETRY_LABEL,
                           SCHEDULE_RADIOMETRY_GROUPS,
                           SCHEDULE_RADIOMETRY_MODE,
@@ -461,7 +461,7 @@ int main(int argc, char *argv[])
     RBRGen4_setSchedule(instrument, &schedule_radiometry);
 
     RBRGen4Schedule schedule_pts_park;
-    RBRInstrumentGen4_initNewScheduleContinuous(instrument,
+    RBRGen4_initNewScheduleContinuous(instrument,
                              SCHEDULE_PARK_PTS_LABEL,
                              SCHEDULE_PTS_GROUPS,
                              SCHEDULE_PARK_PTS_MODE,
@@ -473,7 +473,7 @@ int main(int argc, char *argv[])
     RBRGen4_setSchedule(instrument, &schedule_pts_park);
 
     RBRGen4Schedule schedule_park_odo;
-    RBRInstrumentGen4_initNewScheduleContinuous(instrument,
+    RBRGen4_initNewScheduleContinuous(instrument,
                              SCHEDULE_PARK_ODO_LABEL,
                              SCHEDULE_PARK_ODO_GROUPS,
                              SCHEDULE_PARK_ODO_MODE,
@@ -486,7 +486,7 @@ int main(int argc, char *argv[])
 
     /************ configuration definition ************/
     RBRGen4Config config_ascent;
-    RBRInstrumentGen4_initNewConfig(instrument,
+    RBRGen4_initNewConfig(instrument,
                          CONFIG_ASCENT_LABEL,
                          CONFIG_ASCENT_SCHEDULES,
                          &schedulePool,
@@ -494,7 +494,7 @@ int main(int argc, char *argv[])
                          &configPool);
 
     RBRGen4Config config_park;
-    RBRInstrumentGen4_initNewConfig(instrument,
+    RBRGen4_initNewConfig(instrument,
                          CONFIG_PARK_LABEL,
                          CONFIG_PARK_SCHEDULES,
                          &schedulePool,
@@ -505,7 +505,7 @@ int main(int argc, char *argv[])
     RBRGen4Deployment deployment;
     RBRGen4_getDeployment(instrument, &deployment);
     // GEN4 TODO: if it's pending, could we modify parameters???
-    if (deployment.status == RBRINSTRUMENTGEN4_STATUS_LOGGING || deployment.status == RBRINSTRUMENTGEN4_STATUS_PENDING)
+    if (deployment.status == RBRGEN4_STATUS_LOGGING || deployment.status == RBRGEN4_STATUS_PENDING)
     {
         printf("%s: Instrument is logging/pending. I'm going to disable it first.\n",
                programName);

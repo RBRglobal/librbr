@@ -176,7 +176,7 @@ TEST_LOGGER4(getDatasetPool)
     };
 
     RBRGen4Error err;
-    RBRINSTRUMENTGEN4_DATASET_POOL_DECL(actual, 3);
+    RBRGEN4_DATASET_POOL_DECL(actual, 3);
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
@@ -277,7 +277,7 @@ TEST_LOGGER4(getDataset)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         RBRGen4Dataset actual = { .label = "d1" };
-        RBRINSTRUMENTGEN4_LABEL_LIST_DECL(scheduleList, 2);
+        RBRGEN4_LABEL_LIST_DECL(scheduleList, 2);
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen4_getDataset(instrument,
                                            &actual,
@@ -331,7 +331,7 @@ TEST_LOGGER4(getDataset)
 
     /* A schedule list which does not fit is truncated and reported. */
     RBRGen4Dataset overfull = { .label = "d1" };
-    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(shortList, 1);
+    RBRGEN4_LABEL_LIST_DECL(shortList, 1);
     TestIOBuffers_init(buffers,
                        "dataset d1 status=closed"
                        " schedulelist=tides_schedule|DO_schedule"

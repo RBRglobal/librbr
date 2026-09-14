@@ -1012,7 +1012,7 @@ TEST_LOGGER4(channellist)
     const char *expected[] = {
         "temperature_00", "pressure_00", "seapressure_00", "depth_00"
     };
-    RBRINSTRUMENTGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
 
     TestIOBuffers_init(
         buffers,
@@ -1036,7 +1036,7 @@ TEST_LOGGER4(channellist)
 
 TEST_LOGGER4(channellistTooSmall)
 {
-    RBRINSTRUMENTGEN4_CHANNEL_POOL_DECL(actual, 2);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, 2);
 
     TestIOBuffers_init(
         buffers,
@@ -1059,7 +1059,7 @@ TEST_LOGGER4(channellistTooSmall)
 
 TEST_LOGGER4(channellistScientific)
 {
-    RBRINSTRUMENTGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
 
     TestIOBuffers_init(
         buffers,
@@ -1083,7 +1083,7 @@ TEST_LOGGER4(channellistScientific)
 
 TEST_LOGGER4(channellistWithoutChannels)
 {
-    RBRINSTRUMENTGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
 
     TestIOBuffers_init(buffers,
                        "channel system count=0 list=none" RESPONSE_TERMINATOR,
@@ -1103,7 +1103,7 @@ TEST_LOGGER4(channellistWithoutChannels)
 
 TEST_LOGGER4(channellistUnknownNature)
 {
-    RBRINSTRUMENTGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
 
     TestIOBuffers_init(buffers, "", 0);
 
@@ -1276,7 +1276,7 @@ TEST_LOGGER4(channelSetEmptyUserUnits)
 
 TEST_LOGGER4(grouplist)
 {
-    RBRINSTRUMENTGEN4_GROUP_POOL_DECL(
+    RBRGEN4_GROUP_POOL_DECL(
         actual,
         RBRGEN4_GROUP_COUNT_MAX);
 
@@ -1299,7 +1299,7 @@ TEST_LOGGER4(grouplist)
 
 TEST_LOGGER4(grouplistTooSmall)
 {
-    RBRINSTRUMENTGEN4_GROUP_POOL_DECL(actual, 1);
+    RBRGEN4_GROUP_POOL_DECL(actual, 1);
 
     TestIOBuffers_init(buffers,
                        "group count=2 maxcount=16 list=g_a|g_b"
@@ -1319,7 +1319,7 @@ TEST_LOGGER4(grouplistTooSmall)
 
 TEST_LOGGER4(grouplistWithoutGroups)
 {
-    RBRINSTRUMENTGEN4_GROUP_POOL_DECL(
+    RBRGEN4_GROUP_POOL_DECL(
         actual,
         RBRGEN4_GROUP_COUNT_MAX);
 
@@ -1343,7 +1343,7 @@ TEST_LOGGER4(grouplistWithoutGroups)
 TEST_LOGGER4(group)
 {
     RBRGen4Group group = { .label = "g_a" };
-    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(channelList, 4);
+    RBRGEN4_LABEL_LIST_DECL(channelList, 4);
 
     TestIOBuffers_init(
         buffers,
@@ -1366,7 +1366,7 @@ TEST_LOGGER4(group)
 TEST_LOGGER4(groupWithoutChannels)
 {
     RBRGen4Group group = { .label = "g_b" };
-    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(channelList, 4);
+    RBRGEN4_LABEL_LIST_DECL(channelList, 4);
 
     TestIOBuffers_init(buffers,
                        "group g_b channellist=none schedulelist=s_a"
@@ -1404,7 +1404,7 @@ TEST_LOGGER4(groupWithoutChannelList)
 TEST_LOGGER4(groupChannelListTooSmall)
 {
     RBRGen4Group group = { .label = "g_a" };
-    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(channelList, 1);
+    RBRGEN4_LABEL_LIST_DECL(channelList, 1);
 
     TestIOBuffers_init(
         buffers,
@@ -1638,7 +1638,7 @@ TEST_LOGGER4(groupDeleteAll)
 
 TEST_LOGGER4(configlist)
 {
-    RBRINSTRUMENTGEN4_CONFIG_POOL_DECL(
+    RBRGEN4_CONFIG_POOL_DECL(
         actual,
         RBRGEN4_CONFIG_COUNT_MAX);
 
@@ -1660,7 +1660,7 @@ TEST_LOGGER4(configlist)
 
 TEST_LOGGER4(configlistTooSmall)
 {
-    RBRINSTRUMENTGEN4_CONFIG_POOL_DECL(actual, 1);
+    RBRGEN4_CONFIG_POOL_DECL(actual, 1);
 
     TestIOBuffers_init(buffers,
                        "config count=2 maxcount=2 list=c_a|c_b"
@@ -1680,7 +1680,7 @@ TEST_LOGGER4(configlistTooSmall)
 
 TEST_LOGGER4(configlistWithoutConfigs)
 {
-    RBRINSTRUMENTGEN4_CONFIG_POOL_DECL(
+    RBRGEN4_CONFIG_POOL_DECL(
         actual,
         RBRGEN4_CONFIG_COUNT_MAX);
 
@@ -1702,7 +1702,7 @@ TEST_LOGGER4(configlistWithoutConfigs)
 TEST_LOGGER4(config)
 {
     RBRGen4Config config = { .label = "c_a" };
-    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(scheduleList, 4);
+    RBRGEN4_LABEL_LIST_DECL(scheduleList, 4);
 
     TestIOBuffers_init(buffers,
                        "config c_a schedulelist=s_a" RESPONSE_TERMINATOR,
@@ -1722,7 +1722,7 @@ TEST_LOGGER4(config)
 TEST_LOGGER4(configWithoutSchedules)
 {
     RBRGen4Config config = { .label = "c_a" };
-    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(scheduleList, 4);
+    RBRGEN4_LABEL_LIST_DECL(scheduleList, 4);
 
     TestIOBuffers_init(buffers,
                        "config c_a schedulelist=none" RESPONSE_TERMINATOR,
@@ -1759,7 +1759,7 @@ TEST_LOGGER4(configWithoutScheduleList)
 TEST_LOGGER4(configScheduleListTooSmall)
 {
     RBRGen4Config config = { .label = "c_a" };
-    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(scheduleList, 1);
+    RBRGEN4_LABEL_LIST_DECL(scheduleList, 1);
 
     TestIOBuffers_init(buffers,
                        "config c_a schedulelist=s_a|s_b" RESPONSE_TERMINATOR,
@@ -1950,7 +1950,7 @@ TEST_LOGGER4(configDeleteEmptyLabel)
 
 TEST_LOGGER4(schedulelist)
 {
-    RBRINSTRUMENTGEN4_SCHEDULE_POOL_DECL(
+    RBRGEN4_SCHEDULE_POOL_DECL(
         actual,
         RBRGEN4_SCHEDULE_COUNT_MAX);
 
@@ -1979,7 +1979,7 @@ TEST_LOGGER4(schedulelist)
 
 TEST_LOGGER4(schedulelistTooSmall)
 {
-    RBRINSTRUMENTGEN4_SCHEDULE_POOL_DECL(actual, 1);
+    RBRGEN4_SCHEDULE_POOL_DECL(actual, 1);
 
     TestIOBuffers_init(buffers,
                        "schedule count=2 maxcount=8 list=s_a|s_b "
@@ -2002,7 +2002,7 @@ TEST_LOGGER4(schedulelistTooSmall)
 
 TEST_LOGGER4(schedulelistEveryMode)
 {
-    RBRINSTRUMENTGEN4_SCHEDULE_POOL_DECL(
+    RBRGEN4_SCHEDULE_POOL_DECL(
         actual,
         RBRGEN4_SCHEDULE_COUNT_MAX);
 
@@ -2036,7 +2036,7 @@ TEST_LOGGER4(schedulelistEveryMode)
 TEST_LOGGER4(schedulelistUnknownMode)
 {
     /* An unrecognized mode drops out of the set. */
-    RBRINSTRUMENTGEN4_SCHEDULE_POOL_DECL(
+    RBRGEN4_SCHEDULE_POOL_DECL(
         actual,
         RBRGEN4_SCHEDULE_COUNT_MAX);
 
@@ -2096,7 +2096,7 @@ TEST_LOGGER4(scheduleWithGroupsAndConfigs)
     RBRGen4Schedule actual = {
         .label = "s_a"
     };
-    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(groupList, 4);
+    RBRGEN4_LABEL_LIST_DECL(groupList, 4);
 
     TestIOBuffers_init(buffers,
                        "schedule s_a grouplist=g_a|g_b configlist=c_a "
@@ -2121,7 +2121,7 @@ TEST_LOGGER4(scheduleGroupListTooSmall)
     RBRGen4Schedule actual = {
         .label = "s_a"
     };
-    RBRINSTRUMENTGEN4_LABEL_LIST_DECL(groupList, 1);
+    RBRGEN4_LABEL_LIST_DECL(groupList, 1);
 
     TestIOBuffers_init(buffers,
                        "schedule s_a grouplist=g_a|g_b configlist=c_a "

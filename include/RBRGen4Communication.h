@@ -34,7 +34,7 @@ typedef enum RBRGen4LinkType
     /** Serial connectivity. */
     RBRGEN4_LINK_TYPE_SERIAL,
     /** Wi-Fi connectivity. */
-    /* RBRINSTRUMENTGEN4_LINK_TYPE_WIFI, */
+    /* RBRGEN4_LINK_TYPE_WIFI, */
     
     /** The number of specific link types. */
     RBRGEN4_LINK_TYPE_COUNT,
@@ -384,7 +384,7 @@ RBRGen4Error RBRGen4_getWiFi(RBRGen4 *instrument,
  * \return #RBRGEN4_HARDWARE_ERROR when the feature is unavailable
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
- * \see RBRInstrumentGen4_getWifi()
+ * \see RBRGen4_getWifi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
 RBRGen4Error RBRGen4_setWiFi(RBRGen4 *instrument,

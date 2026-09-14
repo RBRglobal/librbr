@@ -23,7 +23,7 @@ const char *RBRGen4LinkType_name(RBRGen4LinkType linkType)
         return "usb";
     case RBRGEN4_LINK_TYPE_SERIAL:
         return "serial";
-    /* case RBRINSTRUMENTGEN4_LINK_TYPE_WIFI:
+    /* case RBRGEN4_LINK_TYPE_WIFI:
         return "wifi"; */
     case RBRGEN4_LINK_TYPE_COUNT:
         return "link type count";

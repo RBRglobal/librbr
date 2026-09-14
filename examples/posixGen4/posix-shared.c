@@ -277,7 +277,7 @@ void cpy_ptrArray_forSchedule(RBRGen4Schedule *target[],
 
 /* Channel, group, and schedule configurations are TBD. */
 // can be static.
-RBRGen4Error RBRInstrumentGen4_populateGroupChannels(
+RBRGen4Error RBRGen4_populateGroupChannels(
     RBRGen4LabelList *channelList,
     RBRGen4ChannelPool *channelPool,
     const RBRGen4Label specifiedChannelLabels[],
@@ -342,7 +342,7 @@ RBRGen4Error RBRInstrumentGen4_populateGroupChannels(
 }
 
 // can be static.
-RBRGen4Error RBRInstrumentGen4_populateScheduleGroups(
+RBRGen4Error RBRGen4_populateScheduleGroups(
     RBRGen4LabelList *groupList,
     const RBRGen4Label specifiedGroupLabels[],
     int32_t specifiedGroupLabelCnt)
@@ -365,7 +365,7 @@ RBRGen4Error RBRInstrumentGen4_populateScheduleGroups(
 }
 
 // can be static.
-RBRGen4Error RBRInstrumentGen4_populateConfigSchedules(
+RBRGen4Error RBRGen4_populateConfigSchedules(
     RBRGen4LabelList *scheduleList,
     const RBRGen4Label specifiedScheduleLabels[],
     int32_t specifiedScheduleLabelCnt)
@@ -388,7 +388,7 @@ RBRGen4Error RBRInstrumentGen4_populateConfigSchedules(
 }
 
 // can be static.
-RBRGen4Error RBRInstrumentGen4_getDatasetFromPool(
+RBRGen4Error RBRGen4_getDatasetFromPool(
     RBRGen4Dataset **targetDataset,
     RBRGen4DatasetPool *datasetPool,
     const char datasetLabel[])
@@ -426,7 +426,7 @@ RBRGen4Error RBRInstrumentGen4_getDatasetFromPool(
 }
 
 // can be static.
-RBRGen4Error RBRInstrumentGen4_getChannelFromPool(
+RBRGen4Error RBRGen4_getChannelFromPool(
 RBRGen4Channel **targetChannel,
     RBRGen4ChannelPool *channelPool,
     const char channelLabel[])
@@ -437,7 +437,7 @@ RBRGen4Channel **targetChannel,
     return RBRGEN4_SUCCESS;
 }
 // can be static.
-RBRGen4Error RBRInstrumentGen4_getGroupFromPool(
+RBRGen4Error RBRGen4_getGroupFromPool(
     RBRGen4Group **targetGroup,
     RBRGen4GroupPool *groupPool,
     const char groupLabel[])
@@ -448,7 +448,7 @@ RBRGen4Error RBRInstrumentGen4_getGroupFromPool(
     return RBRGEN4_SUCCESS;
 }
 // can be static.
-RBRGen4Error RBRInstrumentGen4_getScheduleFromPool(
+RBRGen4Error RBRGen4_getScheduleFromPool(
     RBRGen4Schedule **targetSchedule,
     RBRGen4SchedulePool *schedulePool,
     const char scheduleLabel[])
@@ -459,7 +459,7 @@ RBRGen4Error RBRInstrumentGen4_getScheduleFromPool(
     return RBRGEN4_SUCCESS;
 }
 // can be static.
-RBRGen4Error RBRInstrumentGen4_getConfigFromPool(
+RBRGen4Error RBRGen4_getConfigFromPool(
     RBRGen4Config **targetConfig,
     RBRGen4ConfigPool *configPool,
     const char configLabel[])
@@ -470,7 +470,7 @@ RBRGen4Error RBRInstrumentGen4_getConfigFromPool(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4_initNewGroup(
+RBRGen4Error RBRGen4_initNewGroup(
     RBRGen4 *instrument,
     const char newGroupLabel[],
     const RBRGen4Label specifiedChannelLabels[],
@@ -488,7 +488,7 @@ RBRGen4Error RBRInstrumentGen4_initNewGroup(
     };
 
     RBRGen4_createGroup(instrument, newGroupLabel);
-    RBRInstrumentGen4_populateGroupChannels(&channelList,
+    RBRGen4_populateGroupChannels(&channelList,
                                     channelPool,
                                     specifiedChannelLabels,
                                     specifiedChannelLabelCnt);
@@ -496,7 +496,7 @@ RBRGen4Error RBRInstrumentGen4_initNewGroup(
     return RBRGEN4_SUCCESS;
 }
 // can be static
-RBRGen4Error RBRInstrumentGen4_initNewSchedule(
+RBRGen4Error RBRGen4_initNewSchedule(
     RBRGen4 *instrument,
     const char newScheduleLabel[],
     const RBRGen4Label specifiedGroupLabels[],
@@ -513,7 +513,7 @@ RBRGen4Error RBRInstrumentGen4_initNewSchedule(
 
     RBRGen4_createSchedule(instrument, newScheduleLabel);
     // warning: read err!!!
-    RBRInstrumentGen4_populateScheduleGroups(groupList,
+    RBRGen4_populateScheduleGroups(groupList,
                                              specifiedGroupLabels,
                                              specifiedGroupLabelCnt);
     newSchedule->mode = mode;
@@ -523,7 +523,7 @@ RBRGen4Error RBRInstrumentGen4_initNewSchedule(
     return RBRGEN4_SUCCESS;
 }
 // can be static
-RBRGen4Error RBRInstrumentGen4_populateScheduleContinuous(
+RBRGen4Error RBRGen4_populateScheduleContinuous(
     RBRGen4Schedule *targetSchedule,
     RBRGen4Period period,
     bool castDetection)
@@ -532,7 +532,7 @@ RBRGen4Error RBRInstrumentGen4_populateScheduleContinuous(
     targetSchedule->castDetection = castDetection;
     return RBRGEN4_SUCCESS;
 }
-RBRGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
+RBRGen4Error RBRGen4_initNewScheduleContinuous(
     RBRGen4 *instrument,
     const char newScheduleLabel[],
     const RBRGen4Label specifiedGroupLabels[],
@@ -543,20 +543,20 @@ RBRGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
     RBRGen4LabelList *groupList,
     RBRGen4Schedule *newSchedule)
 {
-    RBRInstrumentGen4_initNewSchedule(instrument,
+    RBRGen4_initNewSchedule(instrument,
                            newScheduleLabel,
                            specifiedGroupLabels,
                            specifiedGroupLabelCnt,
                            mode,
                            groupList,
                            newSchedule);
-    RBRInstrumentGen4_populateScheduleContinuous(newSchedule, period, castDetection);
+    RBRGen4_populateScheduleContinuous(newSchedule, period, castDetection);
     // warning: read err!!!
     RBRGen4_setSchedule(instrument, newSchedule, groupList);
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4_initNewConfig(
+RBRGen4Error RBRGen4_initNewConfig(
     RBRGen4 *instrument,
     const char newConfigLabel[],
     const RBRGen4Label specifiedScheduleLabels[],
@@ -569,7 +569,7 @@ RBRGen4Error RBRInstrumentGen4_initNewConfig(
 
     RBRGen4_createConfig(instrument, newConfigLabel); // warning: read err!!!
     // warning: read err!!!
-    RBRInstrumentGen4_populateConfigSchedules(scheduleList,
+    RBRGen4_populateConfigSchedules(scheduleList,
                                               specifiedScheduleLabels,
                                               specifiedScheduleLabelCnt);
     // warning: read err!!!

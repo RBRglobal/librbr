@@ -197,7 +197,7 @@ extern "C" {
  * \brief Declare an empty RBRGen4LabelList named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
-#define RBRINSTRUMENTGEN4_LABEL_LIST_DECL(name, size_) \
+#define RBRGEN4_LABEL_LIST_DECL(name, size_) \
     RBRGen4Label name##Buffer[size_]; \
     RBRGen4LabelList name = (RBRGen4LabelList) { \
         .size = (size_), \
@@ -209,7 +209,7 @@ extern "C" {
  * \brief Declare an empty RBRGen4ChannelPool named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
-#define RBRINSTRUMENTGEN4_CHANNEL_POOL_DECL(name, size_) \
+#define RBRGEN4_CHANNEL_POOL_DECL(name, size_) \
     RBRGen4Channel name##Buffer[size_]; \
     RBRGen4ChannelPool name = (RBRGen4ChannelPool) { \
         .size = (size_), \
@@ -221,7 +221,7 @@ extern "C" {
  * \brief Declare an empty RBRGen4GroupPool named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
-#define RBRINSTRUMENTGEN4_GROUP_POOL_DECL(name, size_) \
+#define RBRGEN4_GROUP_POOL_DECL(name, size_) \
     RBRGen4Group name##Buffer[size_]; \
     RBRGen4GroupPool name = (RBRGen4GroupPool) { \
         .size = (size_), \
@@ -233,7 +233,7 @@ extern "C" {
  * \brief Declare an empty RBRGen4SchedulePool named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
-#define RBRINSTRUMENTGEN4_SCHEDULE_POOL_DECL(name, size_) \
+#define RBRGEN4_SCHEDULE_POOL_DECL(name, size_) \
     RBRGen4Schedule name##Buffer[size_]; \
     RBRGen4SchedulePool name = (RBRGen4SchedulePool) { \
         .size = (size_), \
@@ -245,7 +245,7 @@ extern "C" {
  * \brief Declare an empty RBRGen4ConfigPool named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
-#define RBRINSTRUMENTGEN4_CONFIG_POOL_DECL(name, size_) \
+#define RBRGEN4_CONFIG_POOL_DECL(name, size_) \
     RBRGen4Config name##Buffer[size_]; \
     RBRGen4ConfigPool name = (RBRGen4ConfigPool) { \
         .size = (size_), \
@@ -257,7 +257,7 @@ extern "C" {
  * \brief Declare an empty RBRGen4DatasetPool named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
-#define RBRINSTRUMENTGEN4_DATASET_POOL_DECL(name, size_) \
+#define RBRGEN4_DATASET_POOL_DECL(name, size_) \
     RBRGen4Dataset name##Buffer[size_]; \
     RBRGen4DatasetPool name = (RBRGen4DatasetPool) { \
         .size = (size_), \

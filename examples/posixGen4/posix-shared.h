@@ -110,7 +110,7 @@ extern "C"
      * \return RBRGEN4_TRUNCATED if \a channelPool was too small to
      *         hold every channel
      */
-    RBRGen4Error RBRInstrumentGen4_populateGroupChannels(
+    RBRGen4Error RBRGen4_populateGroupChannels(
         RBRGen4LabelList *channelList,
         RBRGen4ChannelPool *channelPool,
         const RBRGen4Label specifiedChannelLabels[],
@@ -125,7 +125,7 @@ extern "C"
      * \return RBRGEN4_BUFFER_TOO_SMALL if the list cannot hold the
      *         labels
      */
-    RBRGen4Error RBRInstrumentGen4_populateScheduleGroups(
+    RBRGen4Error RBRGen4_populateScheduleGroups(
         RBRGen4LabelList *groupList,
         const RBRGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt);
@@ -139,7 +139,7 @@ extern "C"
      * \return RBRGEN4_BUFFER_TOO_SMALL if the list cannot hold the
      *         labels
      */
-    RBRGen4Error RBRInstrumentGen4_populateConfigSchedules(
+    RBRGen4Error RBRGen4_populateConfigSchedules(
         RBRGen4LabelList *scheduleList,
         const RBRGen4Label specifiedScheduleLabels[],
         int32_t specifiedScheduleLabelCnt);
@@ -154,7 +154,7 @@ extern "C"
      * \return RBRGEN4_TRUNCATED if \a datasetPool was too small
      *         to hold every dataset
      */
-    RBRGen4Error RBRInstrumentGen4_getDatasetFromPool(
+    RBRGen4Error RBRGen4_getDatasetFromPool(
         RBRGen4Dataset **targetDataset,
         RBRGen4DatasetPool *datasetPool,
         const char datasetLabel[]);
@@ -167,7 +167,7 @@ extern "C"
      * \return RBRGEN4_SUCCESS when the label is found and the target is set
      * \return RBRGEN4_INVALID_PARAMETER_VALUE if the label is not found
      */
-    RBRGen4Error RBRInstrumentGen4_getChannelFromPool(
+    RBRGen4Error RBRGen4_getChannelFromPool(
         RBRGen4Channel **targetChannel,
         RBRGen4ChannelPool *channelPool,
         const char channelLabel[]);
@@ -180,7 +180,7 @@ extern "C"
      * \return RBRGEN4_SUCCESS when the label is found and the target is set
      * \return RBRGEN4_INVALID_PARAMETER_VALUE if the label is not found
      */
-    RBRGen4Error RBRInstrumentGen4_getGroupFromPool(
+    RBRGen4Error RBRGen4_getGroupFromPool(
         RBRGen4Group **targetGroup,
         RBRGen4GroupPool *groupPool,
         const char groupLabel[]);
@@ -193,7 +193,7 @@ extern "C"
      * \return RBRGEN4_SUCCESS when the label is found and the target is set
      * \return RBRGEN4_INVALID_PARAMETER_VALUE if the label is not found
      */
-    RBRGen4Error RBRInstrumentGen4_getScheduleFromPool(
+    RBRGen4Error RBRGen4_getScheduleFromPool(
         RBRGen4Schedule **targetSchedule,
         RBRGen4SchedulePool *schedulePool,
         const char scheduleLabel[]);
@@ -204,7 +204,7 @@ extern "C"
      * \param configPool pool to search in
      * \param configLabel label to search for
      */
-    RBRGen4Error RBRInstrumentGen4_getConfigFromPool(
+    RBRGen4Error RBRGen4_getConfigFromPool(
         RBRGen4Config **targetConfig,
         RBRGen4ConfigPool *configPool,
         const char configLabel[]);
@@ -219,7 +219,7 @@ extern "C"
      * \param [in] channelPool the pool to search in
      * \param [out] newGroup the new group
      */
-    RBRGen4Error RBRInstrumentGen4_initNewGroup(
+    RBRGen4Error RBRGen4_initNewGroup(
         RBRGen4 *instrument,
         const char newGroupLabel[],
         const RBRGen4Label specifiedChannelLabels[],
@@ -241,10 +241,10 @@ extern "C"
      * \return #RBRGEN4_TIMEOUT when a timeout occurs
      * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
      * \return #RBRGEN4_HARDWARE_ERROR if the parent cannot be created or populated
-     * \see RBRInstrumentGen4_create<Parent>()
-     * \see RBRInstrumentGen4_set<Parent>()
+     * \see RBRGen4_create<Parent>()
+     * \see RBRGen4_set<Parent>()
      */
-    RBRGen4Error RBRInstrumentGen4_initNewSchedule(
+    RBRGen4Error RBRGen4_initNewSchedule(
         RBRGen4 *instrument,
         const char newScheduleLabel[],
         const RBRGen4Label specifiedGroupLabels[],
@@ -264,7 +264,7 @@ extern "C"
      * \return #RBRGEN4_HARDWARE_ERROR if the schedule cannot be configured
      * \see RBRGen4_setSchedule()
      */
-    RBRGen4Error RBRInstrumentGen4_populateScheduleContinuous(
+    RBRGen4Error RBRGen4_populateScheduleContinuous(
         RBRGen4Schedule *targetSchedule,
         RBRGen4Period period,
         bool castDetection);
@@ -287,7 +287,7 @@ extern "C"
      * \see RBRGen4_createSchedule()
      * \see RBRGen4_setSchedule()
      */
-    RBRGen4Error RBRInstrumentGen4_initNewScheduleContinuous(
+    RBRGen4Error RBRGen4_initNewScheduleContinuous(
         RBRGen4 *instrument,
         const char newScheduleLabel[],
         const RBRGen4Label specifiedGroupLabels[],
@@ -314,7 +314,7 @@ extern "C"
      * \see RBRGen4_createConfig()
      * \see RBRGen4_setConfig()
      */
-    RBRGen4Error RBRInstrumentGen4_initNewConfig(
+    RBRGen4Error RBRGen4_initNewConfig(
         RBRGen4 *instrument,
         const char newConfigLabel[],
         const RBRGen4Label specifiedScheduleLabels[],

@@ -51,8 +51,8 @@
 
 #define SCHEDULE_PTS_LABEL "sch_asc_pts"
 #define SCHEDULE_PTS_MODE RBRGEN4_SCHEDULE_MODE_REGIMES
-#define SCHEDULE_PTS_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
-#define SCHEDULE_PTS_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
+#define SCHEDULE_PTS_DIR RBRGEN4_DIRECTION_ASCENDING
+#define SCHEDULE_PTS_REF RBRGEN4_REFERENCE_SEAPRESSURE
 #define SCHEDULE_PTS_COUNT 3
 
 #define SCHEDULE_PTS_GROUPS                          \
@@ -62,7 +62,7 @@
     }
 #define SCHEDULE_PTS_GROUP_COUNT 1
 #define SCHEDULE_PTS_REGIMES           \
-    (RBRInstrumentGen4Regimes)         \
+    (RBRGen4Regimes)         \
     {                                  \
         .direction = SCHEDULE_PTS_DIR, \
         .count = SCHEDULE_PTS_COUNT,   \
@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
     /* specify groupLabel, channel labels, and create group instance */
     RBRGen4Group group_pts;
 
-    RBRInstrumentGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(instrument,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         GROUP_PTS_CHANNEL_COUNT,
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
 
     /************ schedule definition ************/
     RBRGen4Schedule* schedule_asc_pts;
-    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
+    RBRGen4_initNewScheduleRegimes(instrument,
                          SCHEDULE_PTS_LABEL,
                          SCHEDULE_PTS_GROUPS,
                          SCHEDULE_PTS_GROUP_COUNT,
@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
 
     /************ configuration definition ************/
     RBRGen4Config config_ascent;
-    RBRInstrumentGen4_initNewConfig(instrument,
+    RBRGen4_initNewConfig(instrument,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         GROUP_PTS_CHANNEL_COUNT,
@@ -300,8 +300,8 @@ int main(int argc, char *argv[])
     RBRGen4_getDataset(instrument,
                                  &configPool,
                                  dataset_ascent);
-    RBRInstrumentGen4DatasetInfo dataset_asc_info;
-    RBRInstrumentGen4_getDatasetByScheduleBlock(
+    RBRGen4DatasetInfo dataset_asc_info;
+    RBRGen4_getDatasetByScheduleBlock(
         instrument,
         schedule_asc_pts,
         RBRGEN4_BLOCK_DATA,
@@ -328,19 +328,19 @@ int main(int argc, char *argv[])
                        NULL);
     /* Now loop over the data to download it in chunks */
     uint8_t buf[CHUNK_LEN_BYTES];
-    RBRInstrumentGen4Download download_data_pts = {
+    RBRGen4Download download_data_pts = {
         .dataset = dataset_ascent,
         .schedule = schedule_asc_pts,
         .block = RBRGEN4_BLOCK_DATA,
-        .countKey = RBRINSTRUMENTGEN4_COUNTKEY_BYTECOUNT,
+        .countKey = RBRGEN4_COUNTKEY_BYTECOUNT,
         .countValue = CHUNK_LEN_BYTES,
-        .startKey = RBRINSTRUMENTGEN4_COUNTKEY_BYTECOUNT,
+        .startKey = RBRGEN4_COUNTKEY_BYTECOUNT,
         .startOffset = 1,
         .data = buf
     };
     while (download_data_pts.startOffset < dataset_ascent->byteCount) // if not downloaded all data from targetDataset/schedule/datablock
     {
-        RBRInstrumentGen4_download(instrument,
+        RBRGen4_download(instrument,
                                    &download_data_pts);
         RBRGen4Parser_parse(parser,
                             download_data_pts.block,

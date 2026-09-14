@@ -137,7 +137,7 @@ typedef struct RBRGen4Event
  * The \a event pointer will be the same as given via
  * RBRGen4ParserCallbacks.eventBuffer. The event value will be overwritten every
  * time event parsing is attempted, which will be at least once per invocation
- * of RBRGen4Parser_parse() for dataset RBRINSTRUMENTGEN4_DATASET_EASYPARSE_EVENTS
+ * of RBRGen4Parser_parse() for dataset RBRGEN4_DATASET_EASYPARSE_EVENTS
  * where the buffer is large enough. If you want to use the event after your
  * callback has returned, make a copy of it.
  *
@@ -253,7 +253,7 @@ typedef struct RBRGen4Parser
  * structure and no references to them are retained.
  *
  * Currently, the only supported memory format is
- * RBRINSTRUMENTGEN4_MEMFORMAT_CALBIN00 (“EasyParse”). Requesting any other format
+ * RBRGEN4_MEMFORMAT_CALBIN00 (“EasyParse”). Requesting any other format
  * via RBRGen4ParserConfig will cause #RBRGEN4_UNSUPPORTED to be returned.
  *
  * Both callback functions are optional, but that probably isn't very useful:

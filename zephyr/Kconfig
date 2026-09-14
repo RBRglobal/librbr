@@ -24,7 +24,7 @@ config LIBRBR_GEN4
     bool "Gen4 (SL4/SEN4/L4) API"
     default y
     help
-        Compile the RBRInstrumentGen4_-prefixed API for Generation 4
+        Compile the RBRGen4_-prefixed API for Generation 4
         (SL4/SEN4/L4) instruments.
 
 if LIBRBR_GEN3

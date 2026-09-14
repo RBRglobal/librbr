@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
     }
     /* WiFi is not yet implemented */
     #if 0
-    case RBRINSTRUMENTGEN4_LINK_TYPE_WIFI:
+    case RBRGEN4_LINK_TYPE_WIFI:
     {
         RBRGen4WiFi wifi;
         RBRGen4_getWiFi(instrument, &wifi);
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
 
     // specify groupLabel, channel labels, and create group instance
     RBRGen4Group group_pts;
-    RBRInstrumentGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(instrument,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         GROUP_PTS_CHANNEL_COUNT,
@@ -252,7 +252,7 @@ int main(int argc, char *argv[])
         .size = SCHEDULE_PTS_GROUP_COUNT,
         .labels = groupLabelBuf
     };
-    RBRInstrumentGen4_initNewScheduleContinuous(instrument,
+    RBRGen4_initNewScheduleContinuous(instrument,
                           SCHEDULE_PTS_LABEL,
                           SCHEDULE_PTS_GROUPS,
                           SCHEDULE_PTS_GROUP_COUNT,
@@ -285,7 +285,7 @@ int main(int argc, char *argv[])
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
-    // warning: read error for RBRInstrumentGen4_initNewSchedule!!!
+    // warning: read error for RBRGen4_initNewSchedule!!!
     RBRGen4_setSchedule(instrument, &schedule_pts, &groupList);
 
     /************ configuration definition ************/
@@ -295,7 +295,7 @@ int main(int argc, char *argv[])
         .size = CONFIG_ASCENT_SCHEDULE_COUNT,
         .labels = scheduleLabelBuf
     };
-    RBRInstrumentGen4_initNewConfig(instrument,
+    RBRGen4_initNewConfig(instrument,
                          CONFIG_ASCENT_LABEL,
                          CONFIG_ASCENT_SCHEDULES,
                          CONFIG_ASCENT_SCHEDULE_COUNT,
