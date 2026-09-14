@@ -25,12 +25,12 @@ extern "C" {
  *
  * Returned by:
  * \see RBRInstrumentGen4_getInstrument()
- * \see RBRInstrumentGen4_enable()
- * \see RBRInstrumentGen4_verify()
+ * \see RBRGen4_enable()
+ * \see RBRGen4_verify()
  *
  * For the deployment state:
- * \see RBRInstrumentGen4DeploymentStatus
- * \see RBRInstrumentGen4Deployment
+ * \see RBRGen4DeploymentStatus
+ * \see RBRGen4Deployment
  */
 typedef enum RBRInstrumentGen4InstrumentState
 {

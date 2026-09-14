@@ -21,7 +21,7 @@ extern "C" {
 #include "RBRGen4Communication.h"
 #include "RBRGen4Configuration.h"
 #include "RBRInstrumentGen4Memory.h"
-#include "RBRInstrumentGen4Deployment.h"
+#include "RBRGen4Deployment.h"
 #include "RBRInstrumentGen4Instrument.h"
 #include "RBRInstrumentGen4Realtime.h"
 

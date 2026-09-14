@@ -215,11 +215,11 @@ int main(void)
         RBRInstrumentGen4InstrumentState verifyStatus
             = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
 
-   if ((err = RBRInstrumentGen4_verify(
+   if ((err = RBRGen4_verify(
                   instrument,
                   &config,
                   datasetLabel,
-                  RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+                  RBRGEN4_STORAGEMODE_NORMAL,
                   &verifyStatus)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "./posix-test.c: %s!\n",

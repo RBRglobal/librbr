@@ -9,7 +9,7 @@
  */
 
 #include "tests.h"
-#include "RBRInstrumentGen4Deployment.h"
+#include "RBRGen4Deployment.h"
 
 /* Required for isnan, NAN. */
 #include <math.h>
@@ -18,7 +18,7 @@ typedef struct GetClockTest
 {
     const char *response;
     RBRGen4Error expectedError;
-    RBRInstrumentGen4Clock expected;
+    RBRGen4Clock expected;
 } GetClockTest;
 
 TEST_LOGGER4(getClock)
@@ -65,12 +65,12 @@ TEST_LOGGER4(getClock)
     };
 
     RBRGen4Error err;
-    RBRInstrumentGen4Clock actual;
+    RBRGen4Clock actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen4_getClock(instrument, &actual);
+        err = RBRGen4_getClock(instrument, &actual);
         TEST_ASSERT_STR_EQ("clock" COMMAND_TERMINATOR, buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
                             err,
@@ -99,7 +99,7 @@ TEST_LOGGER4(getClock)
 
 typedef struct SetClockTest
 {
-    RBRInstrumentGen4Clock clock;
+    RBRGen4Clock clock;
     const char *command;
     const char *response;
     RBRGen4Error expectedError;
@@ -162,7 +162,7 @@ TEST_LOGGER4(setClock)
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen4_setClock(instrument, &tests[i].clock);
+        err = RBRGen4_setClock(instrument, &tests[i].clock);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
                             err,
                             RBRGen4Error);
@@ -176,7 +176,7 @@ typedef struct GetDeploymentTest
 {
     const char *response;
     RBRGen4Error expectedError;
-    RBRInstrumentGen4Deployment expected;
+    RBRGen4Deployment expected;
 } GetDeploymentTest;
 
 TEST_LOGGER4(getDeployment)
@@ -187,51 +187,51 @@ TEST_LOGGER4(getDeployment)
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { 0,
-            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_GATE_NONE,
+            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_GATE_NONE,
             false } },
         /* Time gating adds the start time, ahead of the other parameters. */
         { "deployment starttime=20270101000000 status=inactive gate=time "
           "simulation=off" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { 1798761600000LL,
-            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_GATE_TIME,
+            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_GATE_TIME,
             false } },
         { "deployment status=sampling gate=none simulation=off"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { 0,
-            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_SAMPLING,
-            RBRINSTRUMENTGEN4_GATE_NONE,
+            RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
+            RBRGEN4_GATE_NONE,
             false } },
         { "deployment status=paused gate=none simulation=off"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { 0,
-            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_PAUSED,
-            RBRINSTRUMENTGEN4_GATE_NONE,
+            RBRGEN4_DEPLOYMENT_STATUS_PAUSED,
+            RBRGEN4_GATE_NONE,
             false } },
         { "deployment starttime=20270101000000 status=gated gate=time "
           "simulation=off" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { 1798761600000LL,
-            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_GATED,
-            RBRINSTRUMENTGEN4_GATE_TIME,
+            RBRGEN4_DEPLOYMENT_STATUS_GATED,
+            RBRGEN4_GATE_TIME,
             false } },
         { "deployment status=inactive gate=twistactivation simulation=on"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { 0,
-            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_GATE_TWISTACTIVATION,
+            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_GATE_TWISTACTIVATION,
             true } },
         { "deployment status=inactive gate=wetswitch simulation=off"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { 0,
-            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_GATE_WETSWITCH,
+            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_GATE_WETSWITCH,
             false } },
         /*
          * A value the library does not model reads as unknown rather than as
@@ -241,34 +241,34 @@ TEST_LOGGER4(getDeployment)
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { 0,
-            RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS,
-            RBRINSTRUMENTGEN4_UNKNOWN_GATE,
+            RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+            RBRGEN4_UNKNOWN_GATE,
             false } },
         /* An unreported parameter is left unknown, not zero. */
         { "deployment" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { 0,
-            RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS,
-            RBRINSTRUMENTGEN4_UNKNOWN_GATE,
+            RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+            RBRGEN4_UNKNOWN_GATE,
             false } },
         /* Keys the library does not model are ignored. */
         { "deployment status=inactive gate=none simulation=off bogus=1"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { 0,
-            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_GATE_NONE,
+            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_GATE_NONE,
             false } },
         { 0 }
     };
 
     RBRGen4Error err;
-    RBRInstrumentGen4Deployment actual;
+    RBRGen4Deployment actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen4_getDeployment(instrument, &actual);
+        err = RBRGen4_getDeployment(instrument, &actual);
         TEST_ASSERT_STR_EQ("deployment" COMMAND_TERMINATOR,
                            buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
@@ -279,10 +279,10 @@ TEST_LOGGER4(getDeployment)
                        "%" PRIi64);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.status,
                             actual.status,
-                            RBRInstrumentGen4DeploymentStatus);
+                            RBRGen4DeploymentStatus);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.gate,
                             actual.gate,
-                            RBRInstrumentGen4Gate);
+                            RBRGen4Gate);
         TEST_ASSERT_EQ(tests[i].expected.simulation,
                        actual.simulation,
                        "%d");
@@ -293,7 +293,7 @@ TEST_LOGGER4(getDeployment)
 
 typedef struct SetDeploymentTest
 {
-    RBRInstrumentGen4Deployment deployment;
+    RBRGen4Deployment deployment;
     const char *command;
     const char *response;
     RBRGen4Error expectedError;
@@ -306,25 +306,25 @@ TEST_LOGGER4(setDeployment)
          * Without time gating only `gate` is sent: the instrument answers
          * `ERR-108` for `starttime` under any other condition.
          */
-        { { 0, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_GATE_NONE, false },
+        { { 0, RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_GATE_NONE, false },
           "deployment gate=none" COMMAND_TERMINATOR,
           "deployment gate=none" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS },
         /* A start time left over from a previous read is not sent either. */
-        { { 1798761600000LL, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_GATE_WETSWITCH, false },
+        { { 1798761600000LL, RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_GATE_WETSWITCH, false },
           "deployment gate=wetswitch" COMMAND_TERMINATOR,
           "deployment gate=wetswitch" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS },
-        { { 0, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_GATE_TWISTACTIVATION, false },
+        { { 0, RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_GATE_TWISTACTIVATION, false },
           "deployment gate=twistactivation" COMMAND_TERMINATOR,
           "deployment gate=twistactivation" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS },
         /* Time gating takes both parameters in one command. */
-        { { 1798761600000LL, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_GATE_TIME, false },
+        { { 1798761600000LL, RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_GATE_TIME, false },
           "deployment gate=time starttime=20270101000000"
           COMMAND_TERMINATOR,
           "deployment gate=time starttime=20270101000000"
@@ -336,43 +336,43 @@ TEST_LOGGER4(setDeployment)
          * under any other condition does not.
          */
         { { RBRGEN4_DATETIME_MIN - 1,
-            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_GATE_TIME, false },
+            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_GATE_TIME, false },
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE },
         { { RBRGEN4_DATETIME_MAX + 1,
-            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_GATE_TIME, false },
+            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_GATE_TIME, false },
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE },
         { { RBRGEN4_DATETIME_MAX + 1,
-            RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_GATE_NONE, false },
+            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_GATE_NONE, false },
           "deployment gate=none" COMMAND_TERMINATOR,
           "deployment gate=none" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS },
         /* The sentinels a getter can leave behind never reach the command. */
-        { { 0, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_UNKNOWN_GATE, false },
+        { { 0, RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_UNKNOWN_GATE, false },
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE },
-        { { 0, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_GATE_COUNT, false },
+        { { 0, RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_GATE_COUNT, false },
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE },
         /* Both writable parameters are unavailable while logging. */
-        { { 0, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_SAMPLING,
-            RBRINSTRUMENTGEN4_GATE_NONE, false },
+        { { 0, RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
+            RBRGEN4_GATE_NONE, false },
           "deployment gate=none" COMMAND_TERMINATOR,
           "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR },
         /* A gating condition the instrument does not offer is refused. */
-        { { 0, RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRINSTRUMENTGEN4_GATE_WETSWITCH, false },
+        { { 0, RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            RBRGEN4_GATE_WETSWITCH, false },
           "deployment gate=wetswitch" COMMAND_TERMINATOR,
           "ERR-108 invalid argument to command: 'wetswitch'"
           RESPONSE_TERMINATOR,
@@ -385,7 +385,7 @@ TEST_LOGGER4(setDeployment)
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen4_setDeployment(instrument,
+        err = RBRGen4_setDeployment(instrument,
                                               &tests[i].deployment);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
                             err,
@@ -400,7 +400,7 @@ typedef struct VerifyTest
 {
     const RBRGen4Config config;
     const char *datasetLabel;
-    RBRInstrumentGen4DeploymentStoragemode storageMode;
+    RBRGen4DeploymentStoragemode storageMode;
     const char *command;
     const char *response;
     RBRGen4Error expectedError;
@@ -413,7 +413,7 @@ TEST_LOGGER4(verify)
         /* All three parameters are always sent. */
         { { .label = "c_test" },
           "d1",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "verify config=c_test dataset=d1 storagemode=normal state=enabled"
@@ -422,7 +422,7 @@ TEST_LOGGER4(verify)
           RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED },
         { { .label = "pH_cal" },
           "d_pHcal_20260824",
-          RBRINSTRUMENTGEN4_STORAGEMODE_CALIBRATION,
+          RBRGEN4_STORAGEMODE_CALIBRATION,
           "verify config=pH_cal dataset=d_pHcal_20260824 "
           "storagemode=calibration" COMMAND_TERMINATOR,
           "verify config=pH_cal dataset=d_pHcal_20260824 "
@@ -435,7 +435,7 @@ TEST_LOGGER4(verify)
          */
         { { .label = "c_test" },
           "d1",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "verify state=disabled dataset=d1 config=c_test storagemode=normal"
@@ -445,7 +445,7 @@ TEST_LOGGER4(verify)
         /* A state the library does not model reads as unknown. */
         { { .label = "c_test" },
           "d1",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "verify config=c_test dataset=d1 state=bogus" RESPONSE_TERMINATOR,
@@ -454,7 +454,7 @@ TEST_LOGGER4(verify)
         /* A response with no state at all leaves it unknown. */
         { { .label = "c_test" },
           "d1",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "verify config=c_test dataset=d1" RESPONSE_TERMINATOR,
@@ -463,35 +463,35 @@ TEST_LOGGER4(verify)
         /* Out-of-range parameters never reach the instrument. */
         { { .label = "" },
           "d1",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "0123456789012345678901234567890123",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
-          RBRINSTRUMENTGEN4_UNKNOWN_STORAGEMODE,
+          RBRGEN4_UNKNOWN_STORAGEMODE,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
-          RBRINSTRUMENTGEN4_STORAGEMODE_COUNT,
+          RBRGEN4_STORAGEMODE_COUNT,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -499,7 +499,7 @@ TEST_LOGGER4(verify)
         /* Every failing check the instrument makes. */
         { { .label = "nope" },
           "d1",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "verify config=nope dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-108 invalid argument to command: 'nope'" RESPONSE_TERMINATOR,
@@ -507,7 +507,7 @@ TEST_LOGGER4(verify)
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d.1",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "verify config=c_test dataset=d.1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-131 illegal character in label 'd.1'" RESPONSE_TERMINATOR,
@@ -515,7 +515,7 @@ TEST_LOGGER4(verify)
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-120 'd1' is already in use" RESPONSE_TERMINATOR,
@@ -523,7 +523,7 @@ TEST_LOGGER4(verify)
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d5",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "verify config=c_test dataset=d5 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-431 dataset limit of '4' reached, delete dataset(s) to make "
@@ -532,7 +532,7 @@ TEST_LOGGER4(verify)
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d2",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "verify config=c_test dataset=d2 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-436 instrument was already enabled with different settings"
@@ -549,7 +549,7 @@ TEST_LOGGER4(verify)
     {
         actual = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen4_verify(instrument,
+        err = RBRGen4_verify(instrument,
                                        &tests[i].config,
                                        tests[i].datasetLabel,
                                        tests[i].storageMode,
@@ -570,7 +570,7 @@ typedef struct EnableTest
 {
     const RBRGen4Config config;
     const char *datasetLabel;
-    RBRInstrumentGen4DeploymentStoragemode storageMode;
+    RBRGen4DeploymentStoragemode storageMode;
     const char *command;
     const char *response;
     RBRGen4Error expectedError;
@@ -582,7 +582,7 @@ TEST_LOGGER4(enable)
     EnableTest tests[] = {
         { { .label = "c_test" },
           "d1",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "enable config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "enable config=c_test dataset=d1 storagemode=normal state=enabled"
@@ -591,7 +591,7 @@ TEST_LOGGER4(enable)
           RBRINSTRUMENTGEN4_INSTRUMENT_STATE_ENABLED },
         { { .label = "pH_cal" },
           "d_pHcal_20260824",
-          RBRINSTRUMENTGEN4_STORAGEMODE_CALIBRATION,
+          RBRGEN4_STORAGEMODE_CALIBRATION,
           "enable config=pH_cal dataset=d_pHcal_20260824 "
           "storagemode=calibration" COMMAND_TERMINATOR,
           "enable config=pH_cal dataset=d_pHcal_20260824 "
@@ -601,14 +601,14 @@ TEST_LOGGER4(enable)
         /* Out-of-range parameters never reach the instrument. */
         { { .label = "" },
           "d1",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -619,14 +619,14 @@ TEST_LOGGER4(enable)
          */
         { { .label = "c_test" },
           "0123456789012345678901234567890123",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
-          RBRINSTRUMENTGEN4_UNKNOWN_STORAGEMODE,
+          RBRGEN4_UNKNOWN_STORAGEMODE,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -634,7 +634,7 @@ TEST_LOGGER4(enable)
         /* Every failing check the instrument makes. */
         { { .label = "c_test" },
           "d1",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "enable config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-408 instrument was already enabled" RESPONSE_TERMINATOR,
@@ -642,7 +642,7 @@ TEST_LOGGER4(enable)
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d2",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "enable config=c_test dataset=d2 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-436 instrument was already enabled with different settings"
@@ -651,7 +651,7 @@ TEST_LOGGER4(enable)
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "enable config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-120 'd1' is already in use" RESPONSE_TERMINATOR,
@@ -659,7 +659,7 @@ TEST_LOGGER4(enable)
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d5",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "enable config=c_test dataset=d5 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-431 dataset limit of '4' reached, delete dataset(s) to make "
@@ -668,7 +668,7 @@ TEST_LOGGER4(enable)
           RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_empty" },
           "d1",
-          RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGEMODE_NORMAL,
           "enable config=c_empty dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-430 empty schedule list in configuration 'c_empty'"
@@ -685,7 +685,7 @@ TEST_LOGGER4(enable)
     {
         actual = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen4_enable(instrument,
+        err = RBRGen4_enable(instrument,
                                        &tests[i].config,
                                        tests[i].datasetLabel,
                                        tests[i].storageMode,
@@ -751,7 +751,7 @@ TEST_LOGGER4(disable)
     {
         actual = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRInstrumentGen4_disable(instrument, &actual);
+        err = RBRGen4_disable(instrument, &actual);
         TEST_ASSERT_STR_EQ("disable" COMMAND_TERMINATOR,
                            buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
@@ -775,7 +775,7 @@ typedef struct PauseResumeTest
 {
     const char *response;
     RBRGen4Error expectedError;
-    RBRInstrumentGen4DeploymentStatus expectedStatus;
+    RBRGen4DeploymentStatus expectedStatus;
 } PauseResumeTest;
 
 static bool test_pauseResume(
@@ -783,15 +783,15 @@ static bool test_pauseResume(
     TestIOBuffers *buffers,
     const char *command,
     RBRGen4Error (*call)(RBRGen4 *,
-                                   RBRInstrumentGen4DeploymentStatus *),
+                                   RBRGen4DeploymentStatus *),
     PauseResumeTest *tests)
 {
     RBRGen4Error err;
-    RBRInstrumentGen4DeploymentStatus actual;
+    RBRGen4DeploymentStatus actual;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
-        actual = RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS;
+        actual = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS;
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = call(instrument, &actual);
         TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
@@ -800,7 +800,7 @@ static bool test_pauseResume(
                             RBRGen4Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedStatus,
                             actual,
-                            RBRInstrumentGen4DeploymentStatus);
+                            RBRGen4DeploymentStatus);
     }
 
     return true;
@@ -811,30 +811,30 @@ TEST_LOGGER4(pause)
     PauseResumeTest tests[] = {
         { "pause status=paused" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_PAUSED },
+          RBRGEN4_DEPLOYMENT_STATUS_PAUSED },
         /*
          * Pausing a deployment that is waiting on its gating condition
          * succeeds and leaves it gated, not paused.
          */
         { "pause status=gated" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_GATED },
+          RBRGEN4_DEPLOYMENT_STATUS_GATED },
         { "ERR-406 cannot pause while disabled" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS },
+          RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS },
         { "pause status=bogus" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS },
+          RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS },
         { "pause" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS },
+          RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS },
         { 0 }
     };
 
     return test_pauseResume(instrument,
                             buffers,
                             "pause" COMMAND_TERMINATOR,
-                            RBRInstrumentGen4_pause,
+                            RBRGen4_pause,
                             tests);
 }
 
@@ -843,25 +843,25 @@ TEST_LOGGER4(resume)
     PauseResumeTest tests[] = {
         { "resume status=sampling" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_SAMPLING },
+          RBRGEN4_DEPLOYMENT_STATUS_SAMPLING },
         { "resume status=gated" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_GATED },
+          RBRGEN4_DEPLOYMENT_STATUS_GATED },
         { "ERR-407 cannot resume while disabled" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS },
+          RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS },
         { "resume status=bogus" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS },
+          RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS },
         { "resume" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS },
+          RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS },
         { 0 }
     };
 
     return test_pauseResume(instrument,
                             buffers,
                             "resume" COMMAND_TERMINATOR,
-                            RBRInstrumentGen4_resume,
+                            RBRGen4_resume,
                             tests);
 }

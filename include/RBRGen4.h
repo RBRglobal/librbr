@@ -198,7 +198,7 @@ typedef struct RBRGen4LabelList
 /**
  * A date and time in milliseconds since the Unix epoch
  * (1970-01-01T00:00:00.000Z). Instrument functions operating on time (e.g.,
- * RBRInstrumentGen4_getClock(), RBRInstrumentGen4_setClock()) will automatically
+ * RBRGen4_getClock(), RBRGen4_setClock()) will automatically
  * convert to and from the instrument's string time representation.
  *
  * The valid range for any instrument date/time parameter is

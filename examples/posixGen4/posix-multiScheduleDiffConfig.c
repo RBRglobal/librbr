@@ -339,8 +339,8 @@ int main(int argc, char *argv[])
     }
 
     /************ ensure default state ************/
-    RBRInstrumentGen4DeploymentStatus deploymentStatus = RBRINSTRUMENTGEN4_STATUS_UNKNOWN;
-    RBRInstrumentGen4_disable(instrument, deploymentStatus);
+    RBRGen4DeploymentStatus deploymentStatus = RBRINSTRUMENTGEN4_STATUS_UNKNOWN;
+    RBRGen4_disable(instrument, deploymentStatus);
 
     RBRInstrumentGen4DatasetPool datasetPool;
     RBRInstrumentGen4_getDatasetPool(instrument, &datasetPool);
@@ -502,36 +502,36 @@ int main(int argc, char *argv[])
                          &configPool);
 
     /************ deployment parameters ************/
-    RBRInstrumentGen4Deployment deployment;
-    RBRInstrumentGen4_getDeployment(instrument, &deployment);
+    RBRGen4Deployment deployment;
+    RBRGen4_getDeployment(instrument, &deployment);
     // GEN4 TODO: if it's pending, could we modify parameters???
     if (deployment.status == RBRINSTRUMENTGEN4_STATUS_LOGGING || deployment.status == RBRINSTRUMENTGEN4_STATUS_PENDING)
     {
         printf("%s: Instrument is logging/pending. I'm going to disable it first.\n",
                programName);
-        RBRInstrumentGen4_disable(instrument, deploymentStatus);
+        RBRGen4_disable(instrument, deploymentStatus);
     }
     str_to_deploymentDatetime(&deployment.startTime, STARTTIME);
     str_to_deploymentDatetime(&deployment.endTime, ENDTIME);
     // printf("deployment starttime:%" PRId64 "\n", deployment.starttime);
-    RBRInstrumentGen4_setDeployment(instrument, &deployment);
+    RBRGen4_setDeployment(instrument, &deployment);
 
     /************ start of ascent ************/
     // ensures the memory is cleared first
     RBRInstrumentGen4_deleteDatasetAll(instrument, &datasetPool);
 
     // verify the configurations for enable
-    RBRInstrumentGen4_verify(instrument,
+    RBRGen4_verify(instrument,
                              &config_ascent,
                              DATASET_ASCENT_LABEL,
-                             RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+                             RBRGEN4_STORAGEMODE_NORMAL,
                              deploymentStatus);
 
     // enable the instrument
-    RBRInstrumentGen4_enable(instrument,
+    RBRGen4_enable(instrument,
                              &config_ascent,
                              DATASET_ASCENT_LABEL,
-                             RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+                             RBRGEN4_STORAGEMODE_NORMAL,
                              deploymentStatus);
 
 instrumentCleanup:

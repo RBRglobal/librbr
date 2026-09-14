@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen4Deployment.c
+ * \file RBRGen4Deployment.c
  *
  * \brief Library implementation.
  *
@@ -20,10 +20,10 @@
 
 #include "RBRGen4.h"
 #include "RBRGen4Internal.h"
-#include "RBRInstrumentGen4Deployment.h"
+#include "RBRGen4Deployment.h"
 
-RBRGen4Error RBRInstrumentGen4_getClock(RBRGen4 *instrument,
-                                                 RBRInstrumentGen4Clock *clock)
+RBRGen4Error RBRGen4_getClock(RBRGen4 *instrument,
+                                                 RBRGen4Clock *clock)
 {
     clock->dateTime = 0;
     clock->offsetFromUtc = NAN;
@@ -58,9 +58,9 @@ RBRGen4Error RBRInstrumentGen4_getClock(RBRGen4 *instrument,
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4_setClock(
+RBRGen4Error RBRGen4_setClock(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Clock *clock)
+    const RBRGen4Clock *clock)
 {
     if (clock->dateTime < RBRGEN4_DATETIME_MIN
         || clock->dateTime > RBRGEN4_DATETIME_MAX)
@@ -82,22 +82,22 @@ RBRGen4Error RBRInstrumentGen4_setClock(
                                       (double) clock->offsetFromUtc);
 }
 
-const char *RBRInstrumentGen4DeploymentStatus_name(
-    RBRInstrumentGen4DeploymentStatus status)
+const char *RBRGen4DeploymentStatus_name(
+    RBRGen4DeploymentStatus status)
 {
     switch (status)
     {
-    case RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_SAMPLING:
+    case RBRGEN4_DEPLOYMENT_STATUS_SAMPLING:
         return "sampling";
-    case RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_GATED:
+    case RBRGEN4_DEPLOYMENT_STATUS_GATED:
         return "gated";
-    case RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_PAUSED:
+    case RBRGEN4_DEPLOYMENT_STATUS_PAUSED:
         return "paused";
-    case RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE:
+    case RBRGEN4_DEPLOYMENT_STATUS_INACTIVE:
         return "inactive";
-    case RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_COUNT:
+    case RBRGEN4_DEPLOYMENT_STATUS_COUNT:
         return "deployment status count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS:
+    case RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS:
     default:
         return "unknown deployment status";
     }
@@ -107,37 +107,37 @@ const char *RBRInstrumentGen4DeploymentStatus_name(
  * \brief Find the deployment status a response value names.
  *
  * \param [in] value the response value
- * \return the status, or #RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS
+ * \return the status, or #RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS
  */
-static RBRInstrumentGen4DeploymentStatus
-RBRInstrumentGen4DeploymentStatus_parse(const char *value)
+static RBRGen4DeploymentStatus
+RBRGen4DeploymentStatus_parse(const char *value)
 {
-    for (int i = 0; i < RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_COUNT; i++)
+    for (int i = 0; i < RBRGEN4_DEPLOYMENT_STATUS_COUNT; i++)
     {
-        if (strcmp(RBRInstrumentGen4DeploymentStatus_name(i), value) == 0)
+        if (strcmp(RBRGen4DeploymentStatus_name(i), value) == 0)
         {
             return i;
         }
     }
 
-    return RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS;
+    return RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS;
 }
 
-const char *RBRInstrumentGen4Gate_name(RBRInstrumentGen4Gate gate)
+const char *RBRGen4Gate_name(RBRGen4Gate gate)
 {
     switch (gate)
     {
-    case RBRINSTRUMENTGEN4_GATE_NONE:
+    case RBRGEN4_GATE_NONE:
         return "none";
-    case RBRINSTRUMENTGEN4_GATE_TIME:
+    case RBRGEN4_GATE_TIME:
         return "time";
-    case RBRINSTRUMENTGEN4_GATE_TWISTACTIVATION:
+    case RBRGEN4_GATE_TWISTACTIVATION:
         return "twistactivation";
-    case RBRINSTRUMENTGEN4_GATE_WETSWITCH:
+    case RBRGEN4_GATE_WETSWITCH:
         return "wetswitch";
-    case RBRINSTRUMENTGEN4_GATE_COUNT:
+    case RBRGEN4_GATE_COUNT:
         return "gate count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_GATE:
+    case RBRGEN4_UNKNOWN_GATE:
     default:
         return "unknown gate";
     }
@@ -147,29 +147,29 @@ const char *RBRInstrumentGen4Gate_name(RBRInstrumentGen4Gate gate)
  * \brief Find the gating condition a response value names.
  *
  * \param [in] value the response value
- * \return the condition, or #RBRINSTRUMENTGEN4_UNKNOWN_GATE
+ * \return the condition, or #RBRGEN4_UNKNOWN_GATE
  */
-static RBRInstrumentGen4Gate RBRInstrumentGen4Gate_parse(const char *value)
+static RBRGen4Gate RBRGen4Gate_parse(const char *value)
 {
-    for (int i = 0; i < RBRINSTRUMENTGEN4_GATE_COUNT; i++)
+    for (int i = 0; i < RBRGEN4_GATE_COUNT; i++)
     {
-        if (strcmp(RBRInstrumentGen4Gate_name(i), value) == 0)
+        if (strcmp(RBRGen4Gate_name(i), value) == 0)
         {
             return i;
         }
     }
 
-    return RBRINSTRUMENTGEN4_UNKNOWN_GATE;
+    return RBRGEN4_UNKNOWN_GATE;
 }
 
-RBRGen4Error RBRInstrumentGen4_getDeployment(
+RBRGen4Error RBRGen4_getDeployment(
     RBRGen4 *instrument,
-    RBRInstrumentGen4Deployment *deployment)
+    RBRGen4Deployment *deployment)
 {
-    memset(deployment, 0, sizeof(RBRInstrumentGen4Deployment));
+    memset(deployment, 0, sizeof(RBRGen4Deployment));
 
-    deployment->status = RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS;
-    deployment->gate = RBRINSTRUMENTGEN4_UNKNOWN_GATE;
+    deployment->status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS;
+    deployment->gate = RBRGEN4_UNKNOWN_GATE;
 
     RBR_TRY(RBRGen4_converse(instrument, "deployment"));
 
@@ -195,11 +195,11 @@ RBRGen4Error RBRInstrumentGen4_getDeployment(
         else if (strcmp(parameter.key, "status") == 0)
         {
             deployment->status =
-                RBRInstrumentGen4DeploymentStatus_parse(parameter.value);
+                RBRGen4DeploymentStatus_parse(parameter.value);
         }
         else if (strcmp(parameter.key, "gate") == 0)
         {
-            deployment->gate = RBRInstrumentGen4Gate_parse(parameter.value);
+            deployment->gate = RBRGen4Gate_parse(parameter.value);
         }
         else if (strcmp(parameter.key, "simulation") == 0)
         {
@@ -210,23 +210,23 @@ RBRGen4Error RBRInstrumentGen4_getDeployment(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4_setDeployment(
+RBRGen4Error RBRGen4_setDeployment(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Deployment *deployment)
+    const RBRGen4Deployment *deployment)
 {
     if (deployment->gate < 0
-        || deployment->gate >= RBRINSTRUMENTGEN4_GATE_COUNT)
+        || deployment->gate >= RBRGEN4_GATE_COUNT)
     {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     /* `starttime` is only available under time gating. */
-    if (deployment->gate != RBRINSTRUMENTGEN4_GATE_TIME)
+    if (deployment->gate != RBRGEN4_GATE_TIME)
     {
         return RBRGen4_converse(
             instrument,
             "deployment gate=%s",
-            RBRInstrumentGen4Gate_name(deployment->gate));
+            RBRGen4Gate_name(deployment->gate));
     }
 
     if (deployment->startTime < RBRGEN4_DATETIME_MIN
@@ -241,7 +241,7 @@ RBRGen4Error RBRInstrumentGen4_setDeployment(
     return RBRGen4_converse(
         instrument,
         "deployment gate=%s starttime=%s",
-        RBRInstrumentGen4Gate_name(deployment->gate),
+        RBRGen4Gate_name(deployment->gate),
         startTime);
 }
 
@@ -251,11 +251,11 @@ RBRGen4Error RBRInstrumentGen4_setDeployment(
  * \param [in] instrument the instrument connection
  * \param [out] status the reported status
  */
-static void RBRInstrumentGen4_parseDeploymentStatus(
+static void RBRGen4_parseDeploymentStatus(
     RBRGen4 *instrument,
-    RBRInstrumentGen4DeploymentStatus *status)
+    RBRGen4DeploymentStatus *status)
 {
-    *status = RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS;
+    *status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS;
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
@@ -271,30 +271,30 @@ static void RBRInstrumentGen4_parseDeploymentStatus(
         }
         else if (strcmp(parameter.key, "status") == 0)
         {
-            *status = RBRInstrumentGen4DeploymentStatus_parse(parameter.value);
+            *status = RBRGen4DeploymentStatus_parse(parameter.value);
             break;
         }
     }
 }
 
-RBRGen4Error RBRInstrumentGen4_pause(
+RBRGen4Error RBRGen4_pause(
     RBRGen4 *instrument,
-    RBRInstrumentGen4DeploymentStatus *status)
+    RBRGen4DeploymentStatus *status)
 {
     RBR_TRY(RBRGen4_converse(instrument, "pause"));
 
-    RBRInstrumentGen4_parseDeploymentStatus(instrument, status);
+    RBRGen4_parseDeploymentStatus(instrument, status);
 
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4_resume(
+RBRGen4Error RBRGen4_resume(
     RBRGen4 *instrument,
-    RBRInstrumentGen4DeploymentStatus *status)
+    RBRGen4DeploymentStatus *status)
 {
     RBR_TRY(RBRGen4_converse(instrument, "resume"));
 
-    RBRInstrumentGen4_parseDeploymentStatus(instrument, status);
+    RBRGen4_parseDeploymentStatus(instrument, status);
 
     return RBRGEN4_SUCCESS;
 }
@@ -307,7 +307,7 @@ RBRGen4Error RBRInstrumentGen4_resume(
  * \param [in] instrument the instrument connection
  * \param [out] state the reported state
  */
-static void RBRInstrumentGen4_parseInstrumentState(
+static void RBRGen4_parseInstrumentState(
     RBRGen4 *instrument,
     RBRInstrumentGen4InstrumentState *state)
 {
@@ -353,18 +353,18 @@ static void RBRInstrumentGen4_parseInstrumentState(
  * \return #RBRGEN4_SUCCESS when the parameters are all in range
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE otherwise
  */
-static RBRGen4Error RBRInstrumentGen4_checkDeploymentParameters(
+static RBRGen4Error RBRGen4_checkDeploymentParameters(
     const RBRGen4Config *config,
     const char *datasetLabel,
-    RBRInstrumentGen4DeploymentStoragemode storageMode)
+    RBRGen4DeploymentStoragemode storageMode)
 {
     if (config == NULL
         || config->label[0] == '\0'
         || datasetLabel == NULL
         || datasetLabel[0] == '\0'
         || strlen(datasetLabel) > RBRGEN4_LABEL_NAME_MAX
-        || (storageMode != RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL
-            && storageMode != RBRINSTRUMENTGEN4_STORAGEMODE_CALIBRATION))
+        || (storageMode != RBRGEN4_STORAGEMODE_NORMAL
+            && storageMode != RBRGEN4_STORAGEMODE_CALIBRATION))
     {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
@@ -372,14 +372,14 @@ static RBRGen4Error RBRInstrumentGen4_checkDeploymentParameters(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4_verify(
+RBRGen4Error RBRGen4_verify(
     RBRGen4 *instrument,
     const RBRGen4Config *config,
     const char *datasetLabel,
-    RBRInstrumentGen4DeploymentStoragemode storageMode,
+    RBRGen4DeploymentStoragemode storageMode,
     RBRInstrumentGen4InstrumentState *state)
 {
-    RBR_TRY(RBRInstrumentGen4_checkDeploymentParameters(config,
+    RBR_TRY(RBRGen4_checkDeploymentParameters(config,
                                                         datasetLabel,
                                                         storageMode));
 
@@ -388,37 +388,37 @@ RBRGen4Error RBRInstrumentGen4_verify(
                 "verify config=%s dataset=%s storagemode=%s",
                 config->label,
                 datasetLabel,
-                RBRInstrumentGen4DeploymentStoragemode_name(storageMode)));
+                RBRGen4DeploymentStoragemode_name(storageMode)));
 
-    RBRInstrumentGen4_parseInstrumentState(instrument, state);
+    RBRGen4_parseInstrumentState(instrument, state);
 
     return RBRGEN4_SUCCESS;
 }
 
-const char *RBRInstrumentGen4DeploymentStoragemode_name(RBRInstrumentGen4DeploymentStoragemode storageMode)
+const char *RBRGen4DeploymentStoragemode_name(RBRGen4DeploymentStoragemode storageMode)
 {
     switch (storageMode)
     {
-    case RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL:
+    case RBRGEN4_STORAGEMODE_NORMAL:
         return "normal";
-    case RBRINSTRUMENTGEN4_STORAGEMODE_CALIBRATION:
+    case RBRGEN4_STORAGEMODE_CALIBRATION:
         return "calibration";
-    case RBRINSTRUMENTGEN4_STORAGEMODE_COUNT:
+    case RBRGEN4_STORAGEMODE_COUNT:
         return "storage mode count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_STORAGEMODE:
+    case RBRGEN4_UNKNOWN_STORAGEMODE:
     default:
         return "unknown storage mode";
     }
 }
 
-RBRGen4Error RBRInstrumentGen4_enable(
+RBRGen4Error RBRGen4_enable(
     RBRGen4 *instrument,
     const RBRGen4Config *config,
     const char *datasetLabel,
-    RBRInstrumentGen4DeploymentStoragemode storageMode,
+    RBRGen4DeploymentStoragemode storageMode,
     RBRInstrumentGen4InstrumentState *state)
 {
-    RBR_TRY(RBRInstrumentGen4_checkDeploymentParameters(config,
+    RBR_TRY(RBRGen4_checkDeploymentParameters(config,
                                                         datasetLabel,
                                                         storageMode));
 
@@ -427,20 +427,20 @@ RBRGen4Error RBRInstrumentGen4_enable(
                 "enable config=%s dataset=%s storagemode=%s",
                 config->label,
                 datasetLabel,
-                RBRInstrumentGen4DeploymentStoragemode_name(storageMode)));
+                RBRGen4DeploymentStoragemode_name(storageMode)));
 
-    RBRInstrumentGen4_parseInstrumentState(instrument, state);
+    RBRGen4_parseInstrumentState(instrument, state);
 
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4_disable(
+RBRGen4Error RBRGen4_disable(
     RBRGen4 *instrument,
     RBRInstrumentGen4InstrumentState *state)
 {
     RBR_TRY(RBRGen4_converse(instrument, "disable"));
 
-    RBRInstrumentGen4_parseInstrumentState(instrument, state);
+    RBRGen4_parseInstrumentState(instrument, state);
 
     return RBRGEN4_SUCCESS;
 }

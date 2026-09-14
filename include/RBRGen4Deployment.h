@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen4Deployment.h
+ * \file RBRGen4Deployment.h
  *
  * \brief Instrument commands and structures pertaining to deployments.
  *
@@ -10,8 +10,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#ifndef LIBRBR_RBRINSTRUMENTGEN4DEPLOYMENT_H
-#define LIBRBR_RBRINSTRUMENTGEN4DEPLOYMENT_H
+#ifndef LIBRBR_RBRGEN4DEPLOYMENT_H
+#define LIBRBR_RBRGEN4DEPLOYMENT_H
 
 #ifdef __cplusplus
 extern "C"
@@ -26,11 +26,11 @@ extern "C"
 /**
  * \brief Instrument `clock` command parameters.
  *
- * \see RBRInstrumentGen4_getClock()
- * \see RBRInstrumentGen4_setClock()
+ * \see RBRGen4_getClock()
+ * \see RBRGen4_setClock()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
-typedef struct RBRInstrumentGen4Clock
+typedef struct RBRGen4Clock
 {
     /** \brief The instrument's date and time. */
     RBRGen4DateTime dateTime;
@@ -41,7 +41,7 @@ typedef struct RBRInstrumentGen4Clock
      * Specified in hours. Fractional offsets are accepted.
      */
     float offsetFromUtc;
-} RBRInstrumentGen4Clock;
+} RBRGen4Clock;
 
 /**
  * \brief Get the instrument clock.
@@ -52,11 +52,11 @@ typedef struct RBRInstrumentGen4Clock
  * \return #RBRGEN4_SUCCESS when the settings are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_setClock()
+ * \see RBRGen4_setClock()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
-RBRGen4Error RBRInstrumentGen4_getClock(RBRGen4 *instrument,
-                                                 RBRInstrumentGen4Clock *clock);
+RBRGen4Error RBRGen4_getClock(RBRGen4 *instrument,
+                                                 RBRGen4Clock *clock);
 
 /**
  * \brief Set the instrument clock.
@@ -71,38 +71,38 @@ RBRGen4Error RBRInstrumentGen4_getClock(RBRGen4 *instrument,
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the date and time is
  *         outside #RBRGEN4_DATETIME_MIN to
  *         #RBRGEN4_DATETIME_MAX, or the UTC offset is `NAN`
- * \see RBRInstrumentGen4_getClock()
+ * \see RBRGen4_getClock()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
-RBRGen4Error RBRInstrumentGen4_setClock(
+RBRGen4Error RBRGen4_setClock(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Clock *clock);
+    const RBRGen4Clock *clock);
 
 /**
  * \brief Possible deployment statuses.
  *
  * \see RBRInstrumentGen4InstrumentState
- * \see RBRInstrumentGen4Deployment
- * \see RBRInstrumentGen4_getDeployment()
- * \see RBRInstrumentGen4_pause()
- * \see RBRInstrumentGen4_resume()
+ * \see RBRGen4Deployment
+ * \see RBRGen4_getDeployment()
+ * \see RBRGen4_pause()
+ * \see RBRGen4_resume()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
-typedef enum RBRInstrumentGen4DeploymentStatus
+typedef enum RBRGen4DeploymentStatus
 {
     /** The deployment is sampling. */
-    RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_SAMPLING,
+    RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
     /** The deployment is waiting on its gating condition. */
-    RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_GATED,
+    RBRGEN4_DEPLOYMENT_STATUS_GATED,
     /** The deployment is paused. */
-    RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_PAUSED,
+    RBRGEN4_DEPLOYMENT_STATUS_PAUSED,
     /** No deployment is active. */
-    RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_INACTIVE,
+    RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
     /** The number of specific deployment statuses. */
-    RBRINSTRUMENTGEN4_DEPLOYMENT_STATUS_COUNT,
+    RBRGEN4_DEPLOYMENT_STATUS_COUNT,
     /** An unknown or unrecognized deployment status. */
-    RBRINSTRUMENTGEN4_UNKNOWN_DEPLOYMENT_STATUS
-} RBRInstrumentGen4DeploymentStatus;
+    RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS
+} RBRGen4DeploymentStatus;
 
 /**
  * \brief Get a human-readable string name for a deployment status.
@@ -111,30 +111,30 @@ typedef enum RBRInstrumentGen4DeploymentStatus
  * \return a string name for the deployment status
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4DeploymentStatus_name(
-    RBRInstrumentGen4DeploymentStatus status);
+const char *RBRGen4DeploymentStatus_name(
+    RBRGen4DeploymentStatus status);
 
 /**
  * \brief Possible deployment gating conditions.
  *
- * \see RBRInstrumentGen4Deployment
+ * \see RBRGen4Deployment
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
-typedef enum RBRInstrumentGen4Gate
+typedef enum RBRGen4Gate
 {
     /** No gating condition. */
-    RBRINSTRUMENTGEN4_GATE_NONE,
+    RBRGEN4_GATE_NONE,
     /** Gated on the deployment start time. */
-    RBRINSTRUMENTGEN4_GATE_TIME,
+    RBRGEN4_GATE_TIME,
     /** Gated on the end cap position. */
-    RBRINSTRUMENTGEN4_GATE_TWISTACTIVATION,
+    RBRGEN4_GATE_TWISTACTIVATION,
     /** Gated on the instrument being in the water. */
-    RBRINSTRUMENTGEN4_GATE_WETSWITCH,
+    RBRGEN4_GATE_WETSWITCH,
     /** The number of specific gating conditions. */
-    RBRINSTRUMENTGEN4_GATE_COUNT,
+    RBRGEN4_GATE_COUNT,
     /** An unknown or unrecognized gating condition. */
-    RBRINSTRUMENTGEN4_UNKNOWN_GATE
-} RBRInstrumentGen4Gate;
+    RBRGEN4_UNKNOWN_GATE
+} RBRGen4Gate;
 
 /**
  * \brief Get a human-readable string name for a gating condition.
@@ -143,22 +143,22 @@ typedef enum RBRInstrumentGen4Gate
  * \return a string name for the gating condition
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4Gate_name(RBRInstrumentGen4Gate gate);
+const char *RBRGen4Gate_name(RBRGen4Gate gate);
 
 /**
  * \brief Instrument `deployment` command parameters.
  *
- * \see RBRInstrumentGen4_getDeployment()
- * \see RBRInstrumentGen4_setDeployment()
+ * \see RBRGen4_getDeployment()
+ * \see RBRGen4_setDeployment()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
-typedef struct RBRInstrumentGen4Deployment
+typedef struct RBRGen4Deployment
 {
     /**
      * \brief The start date and time of the next deployment.
      *
-     * Only available while RBRInstrumentGen4Deployment.gate is
-     * #RBRINSTRUMENTGEN4_GATE_TIME.
+     * Only available while RBRGen4Deployment.gate is
+     * #RBRGEN4_GATE_TIME.
      */
     RBRGen4DateTime startTime;
 
@@ -167,10 +167,10 @@ typedef struct RBRInstrumentGen4Deployment
      *
      * \readonly
      */
-    RBRInstrumentGen4DeploymentStatus status;
+    RBRGen4DeploymentStatus status;
 
     /** \brief The gating condition of the next deployment. */
-    RBRInstrumentGen4Gate gate;
+    RBRGen4Gate gate;
 
     /**
      * \brief Whether any of the instrument's channels are being simulated.
@@ -178,7 +178,7 @@ typedef struct RBRInstrumentGen4Deployment
      * \readonly
      */
     bool simulation;
-} RBRInstrumentGen4Deployment;
+} RBRGen4Deployment;
 
 /**
  * \brief Get the instrument deployment parameters.
@@ -189,21 +189,21 @@ typedef struct RBRInstrumentGen4Deployment
  * \return #RBRGEN4_SUCCESS when the deployment is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_setDeployment()
+ * \see RBRGen4_setDeployment()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
-RBRGen4Error RBRInstrumentGen4_getDeployment(
+RBRGen4Error RBRGen4_getDeployment(
     RBRGen4 *instrument,
-    RBRInstrumentGen4Deployment *deployment);
+    RBRGen4Deployment *deployment);
 
 /**
  * \brief Set the instrument deployment parameters.
  * \note Issues the `deployment` instrument command.
  *
- * RBRInstrumentGen4Deployment.startTime is sent only when
- * RBRInstrumentGen4Deployment.gate is #RBRINSTRUMENTGEN4_GATE_TIME.
- * RBRInstrumentGen4Deployment.status and
- * RBRInstrumentGen4Deployment.simulation are never sent.
+ * RBRGen4Deployment.startTime is sent only when
+ * RBRGen4Deployment.gate is #RBRGEN4_GATE_TIME.
+ * RBRGen4Deployment.status and
+ * RBRGen4Deployment.simulation are never sent.
  *
  * \param [in] instrument the instrument connection
  * \param [in] deployment the deployment parameters
@@ -217,12 +217,12 @@ RBRGen4Error RBRInstrumentGen4_getDeployment(
  *         is set to more than one condition, or the start time is being sent 
  *         and is outside #RBRGEN4_DATETIME_MIN to 
  *         #RBRGEN4_DATETIME_MAX
- * \see RBRInstrumentGen4_getDeployment()
+ * \see RBRGen4_getDeployment()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
-RBRGen4Error RBRInstrumentGen4_setDeployment(
+RBRGen4Error RBRGen4_setDeployment(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4Deployment *deployment);
+    const RBRGen4Deployment *deployment);
 
 /**
  * \brief Pause an enabled deployment.
@@ -236,12 +236,12 @@ RBRGen4Error RBRInstrumentGen4_setDeployment(
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not
  *         enabled
- * \see RBRInstrumentGen4_resume()
+ * \see RBRGen4_resume()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828461/pause
  */
-RBRGen4Error RBRInstrumentGen4_pause(
+RBRGen4Error RBRGen4_pause(
     RBRGen4 *instrument,
-    RBRInstrumentGen4DeploymentStatus *status);
+    RBRGen4DeploymentStatus *status);
 
 /**
  * \brief Resume a paused deployment.
@@ -255,31 +255,31 @@ RBRGen4Error RBRInstrumentGen4_pause(
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not
  *         enabled
- * \see RBRInstrumentGen4_pause()
+ * \see RBRGen4_pause()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828463/resume
  */
-RBRGen4Error RBRInstrumentGen4_resume(
+RBRGen4Error RBRGen4_resume(
     RBRGen4 *instrument,
-    RBRInstrumentGen4DeploymentStatus *status);
+    RBRGen4DeploymentStatus *status);
 
 /**
  * \brief Possible data storage modes for a deployment.
  *
- * \see RBRInstrumentGen4_verify()
- * \see RBRInstrumentGen4_enable()
+ * \see RBRGen4_verify()
+ * \see RBRGen4_enable()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828476/enable
  */
-typedef enum RBRInstrumentGen4DeploymentStoragemode
+typedef enum RBRGen4DeploymentStoragemode
 {
     /** Calibration equations are applied to all channel data. */
-    RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+    RBRGEN4_STORAGEMODE_NORMAL,
     /** Calibration equations are not applied. */
-    RBRINSTRUMENTGEN4_STORAGEMODE_CALIBRATION,
+    RBRGEN4_STORAGEMODE_CALIBRATION,
     /** The number of specific storage modes. */
-    RBRINSTRUMENTGEN4_STORAGEMODE_COUNT,
+    RBRGEN4_STORAGEMODE_COUNT,
     /** An unknown or unrecognized storage mode. */
-    RBRINSTRUMENTGEN4_UNKNOWN_STORAGEMODE,
-} RBRInstrumentGen4DeploymentStoragemode;
+    RBRGEN4_UNKNOWN_STORAGEMODE,
+} RBRGen4DeploymentStoragemode;
 
 /**
  * \brief Get a human-readable string name for a deployment storageMode.
@@ -288,8 +288,8 @@ typedef enum RBRInstrumentGen4DeploymentStoragemode
  * \return a string name for the deployment storage mode
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRInstrumentGen4DeploymentStoragemode_name(
-    RBRInstrumentGen4DeploymentStoragemode storageMode);
+const char *RBRGen4DeploymentStoragemode_name(
+    RBRGen4DeploymentStoragemode storageMode);
 
 /**
  * \brief Perform the deployment consistency checks of the `enable` command
@@ -312,14 +312,14 @@ const char *RBRInstrumentGen4DeploymentStoragemode_name(
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the configuration or
  *         dataset label is empty or too long, or the storage mode is not a
  *         specific mode
- * \see RBRInstrumentGen4_enable()
+ * \see RBRGen4_enable()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828472/verify
  */
-RBRGen4Error RBRInstrumentGen4_verify(
+RBRGen4Error RBRGen4_verify(
     RBRGen4 *instrument,
     const RBRGen4Config *config,
     const char *datasetLabel,
-    RBRInstrumentGen4DeploymentStoragemode storageMode,
+    RBRGen4DeploymentStoragemode storageMode,
     RBRInstrumentGen4InstrumentState *state);
 
 /**
@@ -344,15 +344,15 @@ RBRGen4Error RBRInstrumentGen4_verify(
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the configuration or
  *         dataset label is empty or too long, or the storage mode is not a
  *         specific mode
- * \see RBRInstrumentGen4_verify()
- * \see RBRInstrumentGen4_disable()
+ * \see RBRGen4_verify()
+ * \see RBRGen4_disable()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828476/enable
  */
-RBRGen4Error RBRInstrumentGen4_enable(
+RBRGen4Error RBRGen4_enable(
     RBRGen4 *instrument,
     const RBRGen4Config *config,
     const char *datasetLabel,
-    RBRInstrumentGen4DeploymentStoragemode storageMode,
+    RBRGen4DeploymentStoragemode storageMode,
     RBRInstrumentGen4InstrumentState *state);
 
 /**
@@ -370,10 +370,10 @@ RBRGen4Error RBRInstrumentGen4_enable(
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument was not enabled
- * \see RBRInstrumentGen4_enable()
+ * \see RBRGen4_enable()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828481/disable
  */
-RBRGen4Error RBRInstrumentGen4_disable(
+RBRGen4Error RBRGen4_disable(
     RBRGen4 *instrument,
     RBRInstrumentGen4InstrumentState *state);
 
@@ -381,4 +381,4 @@ RBRGen4Error RBRInstrumentGen4_disable(
 }
 #endif
 
-#endif /* LIBRBR_RBRINSTRUMENTGEN4DEPLOYMENT_H */
+#endif /* LIBRBR_RBRGEN4DEPLOYMENT_H */

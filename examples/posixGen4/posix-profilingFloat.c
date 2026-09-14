@@ -28,7 +28,7 @@
 
 #include "RBRGen4.h"
 #include "RBRGen4Configuration.h"
-#include "RBRInstrumentGen4Deployment.h"
+#include "RBRGen4Deployment.h"
 #include "RBRInstrumentGen4Instrument.h"
 #include "RBRInstrumentGen4Memory.h"
 #include "RBRParserGen4.h"
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
     /************ ensure default state ************/
     RBRInstrumentGen4InstrumentState loggingState
         = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
-    RBRInstrumentGen4_disable(instrument, &loggingState);
+    RBRGen4_disable(instrument, &loggingState);
 
     RBRInstrumentGen4DatasetPool datasetPool;
     RBRInstrumentGen4_deleteDatasetAll(instrument, &datasetPool);
@@ -274,12 +274,12 @@ int main(int argc, char *argv[])
                         &config_ascent);
 
     /************ deployment parameters ************/
-    RBRInstrumentGen4Deployment deployment;
-    deployment.gate = RBRINSTRUMENTGEN4_GATE_NONE;
-    RBRInstrumentGen4_getDeployment(instrument, &deployment);
+    RBRGen4Deployment deployment;
+    deployment.gate = RBRGEN4_GATE_NONE;
+    RBRGen4_getDeployment(instrument, &deployment);
 
     str_to_deploymentDatetime(&deployment.startTime, STARTTIME);
-    RBRInstrumentGen4_setDeployment(instrument, &deployment);
+    RBRGen4_setDeployment(instrument, &deployment);
 
     /************ start of ascent ************/
     /* enable the instrument */
@@ -287,15 +287,15 @@ int main(int argc, char *argv[])
         .label = NEW_DATASET_LABEL
     };
     RBRInstrumentGen4Dataset *dataset_ascent = &dataset_ascent_value;
-    RBRInstrumentGen4_enable(instrument,
+    RBRGen4_enable(instrument,
                              &config_ascent,
                              NEW_DATASET_LABEL,
-                             RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+                             RBRGEN4_STORAGEMODE_NORMAL,
                              &loggingState);
 
     /************ end of ascent ************/
     /* Stop the current deployment */
-    RBRInstrumentGen4_disable(instrument, &loggingState);
+    RBRGen4_disable(instrument, &loggingState);
     /* Determine how much memory has been used */
     RBRInstrumentGen4_getDataset(instrument,
                                  &configPool,

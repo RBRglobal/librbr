@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
     /************ ensure default state ************/
     RBRInstrumentGen4InstrumentState loggingState
         = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
-    RBRInstrumentGen4_disable(instrument, &loggingState);
+    RBRGen4_disable(instrument, &loggingState);
 
     RBRInstrumentGen4_deleteDatasetAll(instrument);
 
@@ -314,25 +314,25 @@ int main(int argc, char *argv[])
 
     /************ deployment parameters ************/
     // need to stop if it's logging.
-    RBRInstrumentGen4Deployment deployment;
-    RBRInstrumentGen4_getDeployment(instrument, &deployment);
+    RBRGen4Deployment deployment;
+    RBRGen4_getDeployment(instrument, &deployment);
 
     str_to_deploymentDatetime(&deployment.startTime, STARTTIME);
-    RBRInstrumentGen4_setDeployment(instrument, &deployment);
+    RBRGen4_setDeployment(instrument, &deployment);
 
     // verify the configurations for enable
-    RBRInstrumentGen4_verify(instrument,
+    RBRGen4_verify(instrument,
                              &config_ascent,
                              NEW_DATASET_LABEL,
-                             RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+                             RBRGEN4_STORAGEMODE_NORMAL,
                              &loggingState);
 
     printf("%s: Start instrument logging with default_config.\n",
            programName);
-    if ((err = RBRInstrumentGen4_enable(instrument,
+    if ((err = RBRGen4_enable(instrument,
                                         &config_ascent,
                                         NEW_DATASET_LABEL,
-                                        RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+                                        RBRGEN4_STORAGEMODE_NORMAL,
                                         &loggingState)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr,
