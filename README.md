@@ -26,7 +26,7 @@ the Gen3 API
 for Logger2/Logger3 instruments,
 the libRBR 1.x API with every identifier suffixed `Gen3`)
 and the Gen4 API
-(`RBRGen4_…`,
+(`RBRGen4…`,
 for Generation 4 instruments,
 under active development).
 Applications choose the API to use per instrument;

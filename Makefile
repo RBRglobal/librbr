@@ -46,7 +46,7 @@ export LIB_VERSION ?= $(shell ./tools/version.sh)
 ##
 ## - `GEN3`: the `RBRInstrumentGen3_`-prefixed API for Logger2/Logger3
 ##   instruments — the libRBR 1.x API, suffixed `Gen3`;
-## - `GEN4`: the `RBRGen4_`-prefixed API for Generation 4
+## - `GEN4`: the `RBRGen4`-prefixed API for Generation 4
 ##   (SL4/SEN4/L4) instruments.
 ##
 ## Both are enabled (`1`) by default and both land in the same
