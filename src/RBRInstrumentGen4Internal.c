@@ -90,6 +90,8 @@ static const char *RBRInstrumentGen4DateTime_sampleFormat = "%04d-%02d-%02d %02d
 
 static const char *RBRInstrumentGen4DateTime_sampleScanFormat = "%04d-%02d-%02d %02d:%02d:%02d.%03d%n";
 
+static const char *RBRInstrumentGen4DateTime_sampleMillisecondsScanFormat = "%" SCNi64 "%n";
+
 static const char *RBRInstrumentGen4DateTime_scheduleFormat = "%04d%02d%02d%02d%02d%02d";
 
 static const char *RBRInstrumentGen4DateTime_scheduleScanFormat = "%04d%02d%02d%02d%02d%02d%n";
@@ -502,7 +504,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
         }
     }
 
-    /* Datetime format is 'YYYY-MM-DD hh:mm:ss.zzz' */
+    /* The timestamp is either a date/time or a bare millisecond count. */
     if (outputFormat->dateTime)
     {
         char* timestamp_end;
@@ -1175,9 +1177,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4DateTime_parseSampleTime(
         *end = NULL;
     }
 
-    int32_t timestampLength;
+    int32_t timestampLength = 0;
     struct tm split = { 0 };
     int milliseconds;
+    int64_t elapsed;
 
     if (sscanf(s,
                RBRInstrumentGen4DateTime_sampleScanFormat,
@@ -1188,13 +1191,28 @@ RBRInstrumentGen4Error RBRInstrumentGen4DateTime_parseSampleTime(
                &split.tm_min,
                &split.tm_sec,
                &milliseconds,
-               &timestampLength) < 7)
+               &timestampLength) == 7)
+    {
+        *timestamp = milliseconds;
+        RBR_TRY(RBRInstrumentGen4DateTime_parse(&split, timestamp));
+    }
+    /* A bare count of milliseconds must make up the whole token so that a
+     * reading is never mistaken for one. */
+    else if (sscanf(s,
+                    RBRInstrumentGen4DateTime_sampleMillisecondsScanFormat,
+                    &elapsed,
+                    &timestampLength) == 1
+             && timestampLength > 0
+             && (s[timestampLength] == PARAMETER_SEPARATOR_L4
+                 || s[timestampLength] == '\0'))
+    {
+        *timestamp = elapsed;
+    }
+    else
     {
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    *timestamp = milliseconds;
-    RBR_TRY(RBRInstrumentGen4DateTime_parse(&split, timestamp));
     if (end != NULL)
     {
         *end = (char *) s + timestampLength;

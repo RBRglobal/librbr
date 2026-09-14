@@ -60,6 +60,26 @@ TEST_LOGGER4(poll)
             .channelCount = 1,
             .readings = { RBRInstrumentGen4Reading_setError(
                 RBRINSTRUMENTGEN4_READING_FLAG_ERROR, 1) } } },
+        /* A sample's timestamp may be a bare count of milliseconds. */
+        { NULL,
+          NULL,
+          "poll" COMMAND_TERMINATOR,
+          "12345 12.5364470e+000 9.91695000e+000" RESPONSE_TERMINATOR,
+          OUTPUTFORMAT_DEFAULT,
+          RBRINSTRUMENTGEN4_SUCCESS,
+          { .timestamp = 12345LL,
+            .channelCount = 2,
+            .readings = { 12.5364470, 9.91695000 } } },
+        /* A reading is never taken for a millisecond timestamp, so a line
+         * missing its timestamp is refused as a sample. The library then
+         * keeps waiting for one; here the read buffer runs dry first. */
+        { NULL,
+          NULL,
+          "poll" COMMAND_TERMINATOR,
+          "12.5364470e+000 9.91695000e+000" RESPONSE_TERMINATOR,
+          OUTPUTFORMAT_DEFAULT,
+          RBRINSTRUMENTGEN4_CALLBACK_ERROR,
+          { 0 } },
         /* A repeated channel is reported at every requested position. */
         { "pressure_00|temperature_00|pressure_00",
           NULL,

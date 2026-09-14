@@ -329,8 +329,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_errorCheckResponse(
     char *end);
 
 /**
- * \brief Parse a date/time string from a sample (i.e.,
- * “YYYY-mm-dd HH:MM:SS.sss” format) to a timestamp.
+ * \brief Parse a sample's timestamp: either a date/time string (i.e.,
+ * “YYYY-mm-dd HH:MM:SS.sss” format) or a bare count of milliseconds.
  *
  * If \a end is not given as `NULL`, it will be modified to point to the first
  * character after the timestamp in \a s. If the timestamp cannot be parsed, it
