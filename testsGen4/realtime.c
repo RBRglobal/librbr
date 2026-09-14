@@ -450,24 +450,24 @@ TEST_LOGGER4(poll)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         memset(&buffers->streamSample, 0, sizeof(buffers->streamSample));
-        instrument->outputFormat = tests[i].outputFormat;
+        conn->outputFormat = tests[i].outputFormat;
         if (tests[i].channelList != NULL)
         {
-            err = RBRGen4_pollChannels(instrument,
+            err = RBRGen4_pollChannels(conn,
                                                  tests[i].requireLabel,
                                                  tests[i].channelList,
                                                  &actual);
         }
         else if (tests[i].groupList != NULL)
         {
-            err = RBRGen4_pollGroups(instrument,
+            err = RBRGen4_pollGroups(conn,
                                                tests[i].requireLabel,
                                                tests[i].groupList,
                                                &actual);
         }
         else
         {
-            err = RBRGen4_poll(instrument,
+            err = RBRGen4_poll(conn,
                                          tests[i].requireLabel,
                                          &actual);
         }
@@ -537,7 +537,7 @@ TEST_LOGGER4(poll)
     memset(longList, 'a', sizeof(longList) - 1);
     longList[sizeof(longList) - 1] = '\0';
     TestIOBuffers_init(buffers, "", 0);
-    err = RBRGen4_pollChannels(instrument, false, longList, &actual);
+    err = RBRGen4_pollChannels(conn, false, longList, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
                         err,
                         RBRGen4Error);
@@ -553,10 +553,10 @@ static RBRGen4DateTime pollTimeoutClock;
  * third of RBRGen4.pollTimeout on every call, so a poll's
  * overall timeout can be exercised without waiting in real time. */
 static RBRGen4Error pollTimeoutTime(
-    const struct RBRGen4 *instrument,
+    const struct RBRGen4 *conn,
     RBRGen4DateTime *time)
 {
-    (void) instrument;
+    (void) conn;
     *time = pollTimeoutClock;
     pollTimeoutClock += 3000;
     return RBRGEN4_SUCCESS;
@@ -566,14 +566,14 @@ TEST_LOGGER4(pollTimeout)
 {
     RBRGen4Error err;
     RBRGen4Sample actual;
-    RBRGen4TimeCallback savedTime = instrument->callbacks.time;
-    RBRGen4DateTime savedPollTimeout = instrument->pollTimeout;
+    RBRGen4TimeCallback savedTime = conn->callbacks.time;
+    RBRGen4DateTime savedPollTimeout = conn->pollTimeout;
 
     pollTimeoutClock = 0;
-    instrument->callbacks.time = pollTimeoutTime;
-    instrument->pollTimeout = 10000;
+    conn->callbacks.time = pollTimeoutTime;
+    conn->pollTimeout = 10000;
 
-    instrument->outputFormat = (RBRGen4OutputFormat) {
+    conn->outputFormat = (RBRGen4OutputFormat) {
         .sn = false,
         .scheduleLabel = true,
         .dateTime = false,
@@ -593,13 +593,13 @@ TEST_LOGGER4(pollTimeout)
         0);
     memset(&buffers->streamSample, 0, sizeof(buffers->streamSample));
 
-    err = RBRGen4_pollChannels(instrument,
+    err = RBRGen4_pollChannels(conn,
                                          true,
                                          "pressure_00",
                                          &actual);
 
-    instrument->callbacks.time = savedTime;
-    instrument->pollTimeout = savedPollTimeout;
+    conn->callbacks.time = savedTime;
+    conn->pollTimeout = savedPollTimeout;
 
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TIMEOUT,
                         err,
@@ -620,10 +620,10 @@ static RBRGen4DateTime pollSlowResponseClock;
  * a small commandTimeout on every call, so that a wait spanning several
  * such ticks can be exercised without waiting in real time. */
 static RBRGen4Error pollSlowResponseTime(
-    const struct RBRGen4 *instrument,
+    const struct RBRGen4 *conn,
     RBRGen4DateTime *time)
 {
-    (void) instrument;
+    (void) conn;
     *time = pollSlowResponseClock;
     pollSlowResponseClock += 500;
     return RBRGEN4_SUCCESS;
@@ -633,19 +633,19 @@ TEST_LOGGER4(pollSlowResponse)
 {
     RBRGen4Error err;
     RBRGen4Sample actual;
-    RBRGen4TimeCallback savedTime = instrument->callbacks.time;
+    RBRGen4TimeCallback savedTime = conn->callbacks.time;
     RBRGen4DateTime savedCommandTimeout
-        = instrument->commandTimeout;
-    RBRGen4DateTime savedPollTimeout = instrument->pollTimeout;
+        = conn->commandTimeout;
+    RBRGen4DateTime savedPollTimeout = conn->pollTimeout;
 
     pollSlowResponseClock = 0;
-    instrument->callbacks.time = pollSlowResponseTime;
+    conn->callbacks.time = pollSlowResponseTime;
     /* commandTimeout is small enough that it would trip on its own between
      * clock ticks; only pollTimeout is large enough to bound the wait. */
-    instrument->commandTimeout = 100;
-    instrument->pollTimeout = 10000;
+    conn->commandTimeout = 100;
+    conn->pollTimeout = 10000;
 
-    instrument->outputFormat = (RBRGen4OutputFormat) {
+    conn->outputFormat = (RBRGen4OutputFormat) {
         .sn = false,
         .scheduleLabel = true,
         .dateTime = false,
@@ -658,11 +658,11 @@ TEST_LOGGER4(pollSlowResponse)
         "polling 12.5364470e+000 9.91695000e+000" RESPONSE_TERMINATOR,
         0);
 
-    err = RBRGen4_poll(instrument, true, &actual);
+    err = RBRGen4_poll(conn, true, &actual);
 
-    instrument->callbacks.time = savedTime;
-    instrument->commandTimeout = savedCommandTimeout;
-    instrument->pollTimeout = savedPollTimeout;
+    conn->callbacks.time = savedTime;
+    conn->commandTimeout = savedCommandTimeout;
+    conn->pollTimeout = savedPollTimeout;
 
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS,
                         err,
@@ -746,9 +746,9 @@ TEST_LOGGER4(readSample)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         memset(&buffers->streamSample, 0, sizeof(buffers->streamSample));
-        instrument->outputFormat = tests[i].outputFormat;
+        conn->outputFormat = tests[i].outputFormat;
 
-        err = RBRGen4_readSample(instrument);
+        err = RBRGen4_readSample(conn);
         TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS,
                             err,
                             RBRGen4Error);
@@ -796,7 +796,7 @@ TEST_LOGGER4(readSampleBadCrc)
 {
     RBRGen4Error err;
 
-    instrument->outputFormat = (RBRGen4OutputFormat) {
+    conn->outputFormat = (RBRGen4OutputFormat) {
         .sn = false,
         .scheduleLabel = true,
         .dateTime = false,
@@ -811,7 +811,7 @@ TEST_LOGGER4(readSampleBadCrc)
         0);
     memset(&buffers->streamSample, 0, sizeof(buffers->streamSample));
 
-    err = RBRGen4_readSample(instrument);
+    err = RBRGen4_readSample(conn);
     /* The checksum failure makes the parser reject the line as a sample;
      * with no error/warning prefix, errorCheckResponse() then treats it as
      * an ordinary command response, so readSample() loops back for another
@@ -828,11 +828,11 @@ TEST_LOGGER4(readSampleWithoutCallback)
 {
     RBRGen4Error err;
     RBRGen4SampleCallback savedCallback
-        = instrument->callbacks.sample;
+        = conn->callbacks.sample;
 
-    instrument->callbacks.sample = NULL;
+    conn->callbacks.sample = NULL;
 
-    instrument->outputFormat = (RBRGen4OutputFormat) {
+    conn->outputFormat = (RBRGen4OutputFormat) {
         .sn = false,
         .scheduleLabel = false,
         .dateTime = false,
@@ -842,13 +842,13 @@ TEST_LOGGER4(readSampleWithoutCallback)
                        "9.85054000e+000 12.5359318e+000" RESPONSE_TERMINATOR,
                        0);
 
-    err = RBRGen4_readSample(instrument);
+    err = RBRGen4_readSample(conn);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_MISSING_CALLBACK,
                         err,
                         RBRGen4Error);
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
-    instrument->callbacks.sample = savedCallback;
+    conn->callbacks.sample = savedCallback;
 
     return true;
 }

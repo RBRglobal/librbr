@@ -164,7 +164,7 @@ typedef struct RBRGen4Node
  *
  * \note Issues the `node <node_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] node the node to read
  * \return #RBRGEN4_SUCCESS when the node is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -173,7 +173,7 @@ typedef struct RBRGen4Node
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
 RBRGen4Error RBRGen4_getNode(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Node *node);
 
 /**
@@ -205,7 +205,7 @@ typedef struct RBRGen4NodePool
  *
  * \note Issues the `node` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] nodePool the populated pool of nodes
  * \return #RBRGEN4_SUCCESS when the nodes are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -214,7 +214,7 @@ typedef struct RBRGen4NodePool
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
 RBRGen4Error RBRGen4_getNodePool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4NodePool *nodePool);
 
 /**
@@ -345,7 +345,7 @@ typedef struct RBRGen4Port
  *
  * \note Issues the `port <port_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] port the port to read
  * \return #RBRGEN4_SUCCESS when the port is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -354,7 +354,7 @@ typedef struct RBRGen4Port
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
 RBRGen4Error RBRGen4_getPort(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Port *port);
 
 /**
@@ -386,7 +386,7 @@ typedef struct RBRGen4PortPool
  *
  * \note Issues the `port` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] portPool the populated pool of ports
  * \return #RBRGEN4_SUCCESS when the ports are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -395,7 +395,7 @@ typedef struct RBRGen4PortPool
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
 RBRGen4Error RBRGen4_getPortPool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4PortPool *portPool);
 
 /**
@@ -533,7 +533,7 @@ typedef struct RBRGen4Device
  * results in a larger command string than most getters, and therefore it may
  * take slightly longer to converse. 
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] device the device to read
  * \return #RBRGEN4_SUCCESS when the device is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -542,7 +542,7 @@ typedef struct RBRGen4Device
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
 RBRGen4Error RBRGen4_getDevice(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Device *device);
 
 /**
@@ -574,7 +574,7 @@ typedef struct RBRGen4DevicePool
  *
  * \note Issues the `device` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] devicePool the populated pool of devices
  * \return #RBRGEN4_SUCCESS when the devices are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -583,7 +583,7 @@ typedef struct RBRGen4DevicePool
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
 RBRGen4Error RBRGen4_getDevicePool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4DevicePool *devicePool);
 
 /**
@@ -596,7 +596,7 @@ RBRGen4Error RBRGen4_getDevicePool(
  *
  * \note Issues the `device discover` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] devicePool the labels of the devices present after the sweep
  * \return #RBRGEN4_SUCCESS when discovery completes
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -607,7 +607,7 @@ RBRGen4Error RBRGen4_getDevicePool(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
  */
 RBRGen4Error RBRGen4_discoverDevices(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4DevicePool *devicePool);
 
 /**
@@ -869,7 +869,7 @@ typedef struct RBRGen4ChannelPool
  *
  * \note Issues the `channel <channel_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] channel the channel to read, selected by its label
  * \return #RBRGEN4_SUCCESS when the channel is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -881,7 +881,7 @@ typedef struct RBRGen4ChannelPool
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
 RBRGen4Error RBRGen4_getChannel(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Channel *channel);
 
 /**
@@ -894,7 +894,7 @@ RBRGen4Error RBRGen4_getChannel(
  *
  * \note Issues the `channel <channel_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] channel the channel to write, selected by its label
  * \return #RBRGEN4_SUCCESS when the channel is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -905,7 +905,7 @@ RBRGen4Error RBRGen4_getChannel(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
 RBRGen4Error RBRGen4_setChannel(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Channel *channel);
 
 /**
@@ -916,7 +916,7 @@ RBRGen4Error RBRGen4_setChannel(
  *
  * \note Issues the `channel` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] channelPool the channels present, labels only
  * \return #RBRGEN4_SUCCESS when the pool is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -931,7 +931,7 @@ RBRGen4Error RBRGen4_setChannel(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
 RBRGen4Error RBRGen4_getChannelPool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4ChannelPool *channelPool);
 
 /**
@@ -942,7 +942,7 @@ RBRGen4Error RBRGen4_getChannelPool(
  *
  * \note Issues the `channel scientific` or `channel system` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] nature the nature of the channels to report
  * \param [in,out] channelPool the channels present, labels only
  * \return #RBRGEN4_SUCCESS when the pool is successfully read
@@ -960,7 +960,7 @@ RBRGen4Error RBRGen4_getChannelPool(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
 RBRGen4Error RBRGen4_getChannelPoolByNature(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4ChannelNature nature,
     RBRGen4ChannelPool *channelPool);
 
@@ -971,7 +971,7 @@ RBRGen4Error RBRGen4_getChannelPoolByNature(
  *
  * \note Issues the `calibration <channel_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] calibration the calibration to read, selected by its label
  * \return #RBRGEN4_SUCCESS when the calibration is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -981,7 +981,7 @@ RBRGen4Error RBRGen4_getChannelPoolByNature(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828510/calibration
  */
 RBRGen4Error RBRGen4_getCalibration(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Calibration *calibration);
 
 /**
@@ -999,7 +999,7 @@ RBRGen4Error RBRGen4_getCalibration(
  *          coefficient is out of range for the equation, or an m reference
  *          does not name something the equation can use.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] calibration the calibration to write, selected by its label
  * \return #RBRGEN4_SUCCESS when the calibration is successfully
  *                                    written
@@ -1013,7 +1013,7 @@ RBRGen4Error RBRGen4_getCalibration(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828510/calibration
  */
 RBRGen4Error RBRGen4_setCalibration(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Calibration *calibration);
 
 
@@ -1051,7 +1051,7 @@ typedef struct RBRGen4Settings
  * \brief Get miscellaneous logger settings
  * \note Issues the instrument `settings` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] settings the logger settings
  * \return #RBRGEN4_SUCCESS when the setting is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -1060,14 +1060,14 @@ typedef struct RBRGen4Settings
  * \see RBRGen4_setSettings()
  */
 RBRGen4Error RBRGen4_getSettings(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Settings *settings);
 
 /**
  * \brief Set the miscellaneous logger settings.
  * \note Issues the instrument `settings` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] settings the values for the settings in the logger
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -1082,7 +1082,7 @@ RBRGen4Error RBRGen4_getSettings(
  * \see RBRGen4_getSettings()
  */
 RBRGen4Error RBRGen4_setSettings(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Settings *settings);
 
 /** 
@@ -1128,7 +1128,7 @@ typedef struct RBRGen4Parameters
  * \brief Get parameters which may be required when computing calibrated output.
  * \note Issues the instrument `parameters` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] parameters the parameters in the logger
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -1137,7 +1137,7 @@ typedef struct RBRGen4Parameters
  * \see RBRGen4_setParameters
  */
 RBRGen4Error RBRGen4_getParameters(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Parameters *parameters);
 
 /**
@@ -1146,7 +1146,7 @@ RBRGen4Error RBRGen4_getParameters(
  *
  * \warning Hardware errors may occur if the instrument is logging.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] parameters the values for the parameters in the logger
  * \return #RBRGEN4_SUCCESS when the parameters are successfully
  *                                    written
@@ -1158,7 +1158,7 @@ RBRGen4Error RBRGen4_getParameters(
  * \see RBRGen4_getParameters
  */
 RBRGen4Error RBRGen4_setParameters(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Parameters *parameters);
 
 /**
@@ -1188,7 +1188,7 @@ typedef struct RBRGen4Group
  *
  * \note Issues the `group <group_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] group the group to read, selected by its label
  * \param [out] channelList the channels in the group, or `NULL` to skip them
  * \return #RBRGEN4_SUCCESS when the group is successfully read
@@ -1206,7 +1206,7 @@ typedef struct RBRGen4Group
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
 RBRGen4Error RBRGen4_getGroup(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Group *group,
     RBRGen4LabelList *channelList);
 
@@ -1218,7 +1218,7 @@ RBRGen4Error RBRGen4_getGroup(
  *
  * \note Issues the `group <group_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] group the group to write, selected by its label
  * \param [in] channelList the channels to put in the group
  * \return #RBRGEN4_SUCCESS when the group is successfully written
@@ -1236,7 +1236,7 @@ RBRGen4Error RBRGen4_getGroup(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
 RBRGen4Error RBRGen4_setGroup(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Group *group,
     const RBRGen4LabelList *channelList);
 
@@ -1276,7 +1276,7 @@ typedef struct RBRGen4GroupPool
  *
  * \note Issues the `group` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] groupPool the groups defined, labels only
  * \return #RBRGEN4_SUCCESS when the groups are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -1290,7 +1290,7 @@ typedef struct RBRGen4GroupPool
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
 RBRGen4Error RBRGen4_getGroupPool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4GroupPool *groupPool);
 
 /**
@@ -1300,7 +1300,7 @@ RBRGen4Error RBRGen4_getGroupPool(
  *
  * \note Issues the `group create <group_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] label the label to give the new group
  * \return #RBRGEN4_SUCCESS when the group is successfully created
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -1312,7 +1312,7 @@ RBRGen4Error RBRGen4_getGroupPool(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
 RBRGen4Error RBRGen4_createGroup(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *label);
 
 /**
@@ -1320,7 +1320,7 @@ RBRGen4Error RBRGen4_createGroup(
  *
  * \note Issues the `group delete <group_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] label the label of the group to delete
  * \return #RBRGEN4_SUCCESS when the group is successfully deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -1331,7 +1331,7 @@ RBRGen4Error RBRGen4_createGroup(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
 RBRGen4Error RBRGen4_deleteGroup(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *label);
 
 /**
@@ -1339,7 +1339,7 @@ RBRGen4Error RBRGen4_deleteGroup(
  *
  * \note Issues the `group delete all` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the groups are successfully deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1347,7 +1347,7 @@ RBRGen4Error RBRGen4_deleteGroup(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
  */
 RBRGen4Error RBRGen4_deleteGroupAll(
-    RBRGen4 *instrument);
+    RBRGen4 *conn);
 
 /**
  * \brief The modes of a schedule.
@@ -1552,7 +1552,7 @@ typedef struct RBRGen4Schedule
  *
  * \note Issues the `schedule <schedule_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] schedule the schedule to read, selected by its label
  * \param [out] groupList the groups the schedule samples, or `NULL` to skip
  *                        them
@@ -1571,7 +1571,7 @@ typedef struct RBRGen4Schedule
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRGen4Error RBRGen4_getSchedule(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Schedule *schedule,
     RBRGen4LabelList *groupList);
 
@@ -1584,7 +1584,7 @@ RBRGen4Error RBRGen4_getSchedule(
  *
  * \note Issues the `schedule <schedule_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] schedule the schedule to write
  * \param [in] groupList the groups the schedule samples, or `NULL` to leave
  *                       them as they are
@@ -1607,7 +1607,7 @@ RBRGen4Error RBRGen4_getSchedule(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRGen4Error RBRGen4_setSchedule(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Schedule *schedule,
     const RBRGen4LabelList *groupList);
 
@@ -1686,7 +1686,7 @@ const char *RBRGen4ScheduleMode_name(
  *
  * \note Issues the `schedule` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] schedulePool the schedules defined, labels only
  * \return #RBRGEN4_SUCCESS when the schedules are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -1700,7 +1700,7 @@ const char *RBRGen4ScheduleMode_name(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRGen4Error RBRGen4_getSchedulePool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4SchedulePool *schedulePool);
 
 /**
@@ -1710,7 +1710,7 @@ RBRGen4Error RBRGen4_getSchedulePool(
  *
  * \note Issues the `schedule create <schedule_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] label the label to give the new schedule
  * \return #RBRGEN4_SUCCESS when the schedule is successfully created
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -1722,7 +1722,7 @@ RBRGen4Error RBRGen4_getSchedulePool(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRGen4Error RBRGen4_createSchedule(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *label);
 
 /**
@@ -1730,7 +1730,7 @@ RBRGen4Error RBRGen4_createSchedule(
  *
  * \note Issues the `schedule delete <schedule_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] label the label of the schedule to delete
  * \return #RBRGEN4_SUCCESS when the schedule is successfully deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -1741,7 +1741,7 @@ RBRGen4Error RBRGen4_createSchedule(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRGen4Error RBRGen4_deleteSchedule(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *label);
 
 /**
@@ -1749,7 +1749,7 @@ RBRGen4Error RBRGen4_deleteSchedule(
  *
  * \note Issues the `schedule delete all` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the schedules are deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1757,7 +1757,7 @@ RBRGen4Error RBRGen4_deleteSchedule(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 RBRGen4Error RBRGen4_deleteScheduleAll(
-    RBRGen4 *instrument);
+    RBRGen4 *conn);
 
 /**
  * \brief `config <config_label>` command parameters.
@@ -1786,7 +1786,7 @@ typedef struct RBRGen4Config
  *
  * \note Issues the `config <config_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] config the configuration to read, selected by its label
  * \param [out] scheduleList the schedules in the configuration, or `NULL` to
  *                           skip them
@@ -1806,7 +1806,7 @@ typedef struct RBRGen4Config
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
 RBRGen4Error RBRGen4_getConfig(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Config *config,
     RBRGen4LabelList *scheduleList);
 
@@ -1818,7 +1818,7 @@ RBRGen4Error RBRGen4_getConfig(
  *
  * \note Issues the `config <config_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] config the configuration to write, selected by its label
  * \param [in] scheduleList the schedules to put in the configuration
  * \return #RBRGEN4_SUCCESS when the configuration is written
@@ -1837,7 +1837,7 @@ RBRGen4Error RBRGen4_getConfig(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
 RBRGen4Error RBRGen4_setConfig(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Config *config,
     const RBRGen4LabelList *scheduleList);
 
@@ -1880,7 +1880,7 @@ typedef struct RBRGen4ConfigPool
  *
  * \note Issues the `config` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] configPool the configurations defined, labels only
  * \return #RBRGEN4_SUCCESS when the configurations are read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -1894,7 +1894,7 @@ typedef struct RBRGen4ConfigPool
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
 RBRGen4Error RBRGen4_getConfigPool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4ConfigPool *configPool);
 
 /**
@@ -1904,7 +1904,7 @@ RBRGen4Error RBRGen4_getConfigPool(
  *
  * \note Issues the `config create <config_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] label the label to give the new configuration
  * \return #RBRGEN4_SUCCESS when the configuration is created
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -1916,7 +1916,7 @@ RBRGen4Error RBRGen4_getConfigPool(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
 RBRGen4Error RBRGen4_createConfig(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *label);
 
 /**
@@ -1924,7 +1924,7 @@ RBRGen4Error RBRGen4_createConfig(
  *
  * \note Issues the `config delete <config_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] label the label of the configuration to delete
  * \return #RBRGEN4_SUCCESS when the configuration is deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -1935,7 +1935,7 @@ RBRGen4Error RBRGen4_createConfig(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
 RBRGen4Error RBRGen4_deleteConfig(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *label);
 
 /**
@@ -1943,7 +1943,7 @@ RBRGen4Error RBRGen4_deleteConfig(
  *
  * \note Issues the `config delete all` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the configurations are deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1951,7 +1951,7 @@ RBRGen4Error RBRGen4_deleteConfig(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
  */
 RBRGen4Error RBRGen4_deleteConfigAll(
-    RBRGen4 *instrument);
+    RBRGen4 *conn);
 
 #ifdef __cplusplus
 }

@@ -17,7 +17,7 @@ typedef struct LinkTest
     RBRGen4LinkType expected;
 } LinkTest;
 
-static bool test_link(RBRGen4 *instrument,
+static bool test_link(RBRGen4 *conn,
                       TestIOBuffers *buffers,
                       LinkTest *tests)
 {
@@ -27,7 +27,7 @@ static bool test_link(RBRGen4 *instrument,
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4_getLink(instrument, &actual);
+        err = RBRGen4_getLink(conn, &actual);
         TEST_ASSERT_STR_EQ("link" COMMAND_TERMINATOR, buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected,
@@ -50,7 +50,7 @@ TEST_LOGGER4(link)
         { 0 }
     };
 
-    return test_link(instrument, buffers, tests);
+    return test_link(conn, buffers, tests);
 }
 
 typedef struct LinkSerialTest
@@ -126,7 +126,7 @@ TEST_LOGGER4(linkSerial)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4_getLinkSerial(instrument, &actual);
+        err = RBRGen4_getLinkSerial(conn, &actual);
         TEST_ASSERT_STR_EQ(
             "link serial baudrate mode availablebaudrates availablemodes" COMMAND_TERMINATOR,
             buffers->writeBuffer);
@@ -202,7 +202,7 @@ TEST_LOGGER4(setLinkSerial)
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4_setLinkSerial(instrument, &(tests[i].serial));
+        err = RBRGen4_setLinkSerial(conn, &(tests[i].serial));
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].command,
                            buffers->writeBuffer);
@@ -214,10 +214,10 @@ TEST_LOGGER4(setLinkSerial)
 TEST_LOGGER4(sleep)
 {
     TestIOBuffers_init(buffers, "", 0);
-    RBRGen4Error err = RBRGen4_sleep(instrument);
+    RBRGen4Error err = RBRGen4_sleep(conn);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("sleep" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT(instrument->lastActivityTime < 0);
+    TEST_ASSERT(conn->lastActivityTime < 0);
 
     /* Wake up the simulated instrument, expecting the two wakeup sequences.
      * The instrument acknowledges the sleep command when confirmation is on,
@@ -229,7 +229,7 @@ TEST_LOGGER4(sleep)
                        "sleep" RESPONSE_TERMINATOR
                        "link type=usb" RESPONSE_TERMINATOR,
                        0);
-    err = RBRGen4_getLink(instrument, &actual);
+    err = RBRGen4_getLink(conn, &actual);
     TEST_ASSERT_STR_EQ(
         RESPONSE_TERMINATOR RESPONSE_TERMINATOR "link" COMMAND_TERMINATOR,
         buffers->writeBuffer);

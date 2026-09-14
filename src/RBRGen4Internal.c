@@ -124,17 +124,17 @@ static void *rbr_memmem(void *ptr1, size_t num1, const void *ptr2, size_t num2)
 /**
  * \brief Wake the instrument from sleep, if necessary.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the instrument has been woken
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
  */
-static RBRGen4Error RBRGen4_wake(const RBRGen4 *instrument)
+static RBRGen4Error RBRGen4_wake(const RBRGen4 *conn)
 {
     RBRGen4DateTime now;
-    RBR_TRY(instrument->callbacks.time(instrument, &now));
+    RBR_TRY(conn->callbacks.time(conn, &now));
 
-    if (instrument->lastActivityTime >= 0 && now - instrument->lastActivityTime < COMMAND_TIMEOUT)
+    if (conn->lastActivityTime >= 0 && now - conn->lastActivityTime < COMMAND_TIMEOUT)
     {
         return RBRGEN4_SUCCESS;
     }
@@ -142,43 +142,43 @@ static RBRGen4Error RBRGen4_wake(const RBRGen4 *instrument)
     /* Send the wake sequence twice to make sure it gets noticed. */
     for (int pass = 0; pass < 2; ++pass)
     {
-        RBR_TRY(instrument->callbacks.write(instrument,
+        RBR_TRY(conn->callbacks.write(conn,
                                             WAKE_COMMAND,
                                             WAKE_COMMAND_LEN));
-        RBR_TRY(instrument->callbacks.sleep(instrument, WAKE_COMMAND_WAIT));
+        RBR_TRY(conn->callbacks.sleep(conn, WAKE_COMMAND_WAIT));
     }
 
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *instrument)
+RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *conn)
 {
     /* Wake the instrument if necessary. */
-    RBR_TRY(RBRGen4_wake(instrument));
+    RBR_TRY(RBRGen4_wake(conn));
 
-    if (instrument->commandBufferLength > RBRGEN4_COMMAND_BUFFER_MAX)
+    if (conn->commandBufferLength > RBRGEN4_COMMAND_BUFFER_MAX)
     {
-        instrument->commandBufferLength = RBRGEN4_COMMAND_BUFFER_MAX;
+        conn->commandBufferLength = RBRGEN4_COMMAND_BUFFER_MAX;
     }
 
     /* Send the command to the instrument. */
-    RBR_TRY(instrument->callbacks.write(instrument,
-                                        instrument->commandBuffer,
-                                        instrument->commandBufferLength));
-    RBR_TRY(instrument->callbacks.time(instrument,
-                                       &instrument->lastActivityTime));
+    RBR_TRY(conn->callbacks.write(conn,
+                                        conn->commandBuffer,
+                                        conn->commandBufferLength));
+    RBR_TRY(conn->callbacks.time(conn,
+                                       &conn->lastActivityTime));
     return RBRGEN4_SUCCESS;
 }
 
-static RBRGen4Error RBRGen4_vSendCommand(RBRGen4 *instrument,
+static RBRGen4Error RBRGen4_vSendCommand(RBRGen4 *conn,
                                                              const char *command,
                                                              va_list format)
 {
     /* Prepare the command. */
 
-    instrument->commandBufferLength = vsnprintf(
-        (char *) instrument->commandBuffer,
-        sizeof(instrument->commandBuffer),
+    conn->commandBufferLength = vsnprintf(
+        (char *) conn->commandBuffer,
+        sizeof(conn->commandBuffer),
         command,
         format);
 
@@ -190,40 +190,40 @@ static RBRGen4Error RBRGen4_vSendCommand(RBRGen4 *instrument,
      * not just a greater-than check, because vsnprintf doesn't include the
      * null terminator in its return value. The longest value vsnprintf can
      * write is RBRGEN4_COMMAND_BUFFER_MAX - 1 bytes. */
-    if (instrument->commandBufferLength >= RBRGEN4_COMMAND_BUFFER_MAX)
+    if (conn->commandBufferLength >= RBRGEN4_COMMAND_BUFFER_MAX)
     {
-        instrument->commandBufferLength = RBRGEN4_COMMAND_BUFFER_MAX;
+        conn->commandBufferLength = RBRGEN4_COMMAND_BUFFER_MAX;
         return RBRGEN4_BUFFER_TOO_SMALL;
     }
 
     /* Make sure the command is LF-terminated. */
-    if (instrument->commandBufferLength < RBRGEN4_SEND_COMMAND_TERMINATOR_LEN || memcmp(instrument->commandBuffer + instrument->commandBufferLength - RBRGEN4_SEND_COMMAND_TERMINATOR_LEN,
+    if (conn->commandBufferLength < RBRGEN4_SEND_COMMAND_TERMINATOR_LEN || memcmp(conn->commandBuffer + conn->commandBufferLength - RBRGEN4_SEND_COMMAND_TERMINATOR_LEN,
                                                                                                   RBRGEN4_SEND_COMMAND_TERMINATOR,
                                                                                                   RBRGEN4_SEND_COMMAND_TERMINATOR_LEN) != 0)
     {
         /* It isn't. Make sure there's room before adding it. */
-        if (instrument->commandBufferLength + RBRGEN4_SEND_COMMAND_TERMINATOR_LEN > RBRGEN4_COMMAND_BUFFER_MAX)
+        if (conn->commandBufferLength + RBRGEN4_SEND_COMMAND_TERMINATOR_LEN > RBRGEN4_COMMAND_BUFFER_MAX)
         {
             return RBRGEN4_BUFFER_TOO_SMALL;
         }
 
-        memcpy(instrument->commandBuffer + instrument->commandBufferLength,
+        memcpy(conn->commandBuffer + conn->commandBufferLength,
                RBRGEN4_SEND_COMMAND_TERMINATOR,
                RBRGEN4_SEND_COMMAND_TERMINATOR_LEN);
-        instrument->commandBufferLength +=
+        conn->commandBufferLength +=
             RBRGEN4_SEND_COMMAND_TERMINATOR_LEN;
     }
-    return RBRGen4_sendBuffer(instrument);
+    return RBRGen4_sendBuffer(conn);
 }
 
-RBRGen4Error RBRGen4_sendCommand(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn,
                                                      const char *command,
                                                      ...)
 {
     RBRGen4Error err;
     va_list format;
     va_start(format, command);
-    err = RBRGen4_vSendCommand(instrument, command, format);
+    err = RBRGen4_vSendCommand(conn, command, format);
     va_end(format);
     return err;
 }
@@ -231,29 +231,29 @@ RBRGen4Error RBRGen4_sendCommand(RBRGen4 *instrument,
 /**
  * \brief Remove the last response from of the response buffer.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  */
-static void RBRGen4_removeLastResponse(RBRGen4 *instrument)
+static void RBRGen4_removeLastResponse(RBRGen4 *conn)
 {
-    if (instrument->lastResponseLength <= 0 || instrument->responseBufferLength == instrument->lastResponseLength)
+    if (conn->lastResponseLength <= 0 || conn->responseBufferLength == conn->lastResponseLength)
     {
-        instrument->responseBufferLength = 0;
-        instrument->lastResponseLength = 0;
+        conn->responseBufferLength = 0;
+        conn->lastResponseLength = 0;
         return;
     }
 
-    memmove(instrument->responseBuffer,
-            instrument->responseBuffer + instrument->lastResponseLength,
-            instrument->responseBufferLength - instrument->lastResponseLength);
-    instrument->responseBufferLength -= instrument->lastResponseLength;
-    instrument->lastResponseLength = 0;
+    memmove(conn->responseBuffer,
+            conn->responseBuffer + conn->lastResponseLength,
+            conn->responseBufferLength - conn->lastResponseLength);
+    conn->responseBufferLength -= conn->lastResponseLength;
+    conn->lastResponseLength = 0;
 }
 
 /**
  * \brief Read data until we find the command termination sequence or the
  *        callback indicates a timeout.
  *
- * \param [in,out] instrument the instrument connection
+ * \param [in,out] conn the instrument connection
  * \param [in] startTime when we started trying to read the command response
  * \param [in] timeout the longest to wait, in milliseconds, from \a startTime
  * \param [out] end the end of the response within the response buffer
@@ -262,7 +262,7 @@ static void RBRGen4_removeLastResponse(RBRGen4 *instrument)
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
  */
 static RBRGen4Error RBRGen4_readSingleResponse(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4DateTime startTime,
     RBRGen4DateTime timeout,
     char **end)
@@ -273,8 +273,8 @@ static RBRGen4Error RBRGen4_readSingleResponse(
     RBRGen4DateTime now;
     int32_t readLength;
     while ((*end = (char *) rbr_memmem(
-                instrument->responseBuffer,
-                instrument->responseBufferLength,
+                conn->responseBuffer,
+                conn->responseBufferLength,
                 RBRGEN4_RESPONSE_TERMINATOR,
                 RBRGEN4_RESPONSE_TERMINATOR_LEN)) == NULL)
     {
@@ -299,7 +299,7 @@ static RBRGen4Error RBRGen4_readSingleResponse(
          * In either of these cases, we want to give up and indicate a timeout
          * to the caller.
          */
-        RBR_TRY(instrument->callbacks.time(instrument, &now));
+        RBR_TRY(conn->callbacks.time(conn, &now));
 
         /*
         fprintf(stdout,
@@ -317,22 +317,22 @@ static RBRGen4Error RBRGen4_readSingleResponse(
         /* If the buffer is full but doesn't contain a terminator, there's
          * not much we can do about it: throw out the buffer, then keep
          * trying to fill it. */
-        if (instrument->responseBufferLength == RBRGEN4_RESPONSE_BUFFER_MAX)
+        if (conn->responseBufferLength == RBRGEN4_RESPONSE_BUFFER_MAX)
         {
-            instrument->responseBufferLength = 0;
-            instrument->lastResponseLength = 0;
+            conn->responseBufferLength = 0;
+            conn->lastResponseLength = 0;
         }
 
         /* calculate the remaining space in the responseBuffer. */
-        readLength = RBRGEN4_RESPONSE_BUFFER_MAX - instrument->responseBufferLength;
+        readLength = RBRGEN4_RESPONSE_BUFFER_MAX - conn->responseBufferLength;
 
         /* read from the instrument and update responseBuffer length. */
-        RBR_TRY(instrument->callbacks.read(
-            instrument,
-            instrument->responseBuffer + instrument->responseBufferLength,
+        RBR_TRY(conn->callbacks.read(
+            conn,
+            conn->responseBuffer + conn->responseBufferLength,
             &readLength));
 
-        instrument->responseBufferLength += readLength;
+        conn->responseBufferLength += readLength;
     }
 
     /*
@@ -356,12 +356,12 @@ static RBRGen4Error RBRGen4_readSingleResponse(
 /**
  * \brief Find the beginning of a response and null-terminate the end.
  *
- * \param [in,out] instrument the instrument connection
+ * \param [in,out] conn the instrument connection
  * \param [out] beginning the beginning of the response
  * \param [in] end the end of the response
  */
 static void RBRGen4_terminateResponse(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     char **beginning,
     char *end)
 {
@@ -385,9 +385,9 @@ static void RBRGen4_terminateResponse(
      * leaving a trailing linefeed character in the buffer.
      */
 
-    *beginning = (char *) instrument->responseBuffer;
+    *beginning = (char *) conn->responseBuffer;
     *end = '\0';
-    instrument->lastResponseLength =
+    conn->lastResponseLength =
         end + RBRGEN4_RESPONSE_TERMINATOR_LEN - *beginning;
 
     /* Fast-forward leftover line termination characters. This shouldn't happen
@@ -603,14 +603,14 @@ static RBRGen4Error RBRGen4Sample_parse(
  *
  * Updates RBRGen4.response as appropriate.
  *
- * \param [in,out] instrument the instrument connection
+ * \param [in,out] conn the instrument connection
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
  * \return #RBRGEN4_SUCCESS when the response is a warning or success
  * \return #RBRGEN4_HARDWARE_ERROR when the response indicates an error
  */
 RBRGen4Error RBRGen4_errorCheckResponse(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     char *beginning,
     char *end)
 {
@@ -627,77 +627,77 @@ RBRGen4Error RBRGen4_errorCheckResponse(
     if (end - beginning >= (ERROR_PARAMETER_LEN + ERROR_NUMBER_LEN)
         && memcmp(beginning, ERROR_PARAMETER, ERROR_PARAMETER_LEN) == 0)
     {
-        instrument->response.type = RBRGEN4_RESPONSE_ERROR;
-        instrument->response.error = strtol(beginning + ERROR_PARAMETER_LEN, NULL, 10);
+        conn->response.type = RBRGEN4_RESPONSE_ERROR;
+        conn->response.error = strtol(beginning + ERROR_PARAMETER_LEN, NULL, 10);
         /* Make sure we actually have a message to go along with the error.
          * There should be one, but it's best to play safe. */
         if (end - beginning >= (ERROR_PARAMETER_LEN + ERROR_NUMBER_LEN))
         {
-            instrument->response.response = beginning + ERROR_PARAMETER_LEN + ERROR_NUMBER_LEN;
+            conn->response.response = beginning + ERROR_PARAMETER_LEN + ERROR_NUMBER_LEN;
         }
         else
         {
-            instrument->response.response = NULL;
+            conn->response.response = NULL;
         }
         return RBRGEN4_HARDWARE_ERROR;
     }
     else if (end - beginning >= (WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN)
              && memcmp(beginning, WARNING_PARAMETER, WARNING_PARAMETER_LEN) == 0)
     {
-        instrument->response.type = RBRGEN4_RESPONSE_WARNING;
-        instrument->response.error = strtol(beginning + WARNING_PARAMETER_LEN, NULL, 10);
+        conn->response.type = RBRGEN4_RESPONSE_WARNING;
+        conn->response.error = strtol(beginning + WARNING_PARAMETER_LEN, NULL, 10);
         if (end - beginning >= (WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN))
         {
-            instrument->response.response = beginning + WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN;
+            conn->response.response = beginning + WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN;
         }
         else
         {
-            instrument->response.response = NULL;
+            conn->response.response = NULL;
         }
         /* Create an additional status for warnings? */
         return RBRGEN4_HARDWARE_ERROR;
     }
 
-    instrument->response.type = RBRGEN4_RESPONSE_INFO;
-    instrument->response.error = RBRGEN4_HARDWARE_ERROR_NONE;
-    instrument->response.response = beginning;
+    conn->response.type = RBRGEN4_RESPONSE_INFO;
+    conn->response.error = RBRGEN4_HARDWARE_ERROR_NONE;
+    conn->response.response = beginning;
 
     return RBRGEN4_SUCCESS;
 }
 
 RBRGen4Error RBRGen4_deliverSample(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Sample *sample)
 {
-    if (instrument->callbacks.sample == NULL)
+    if (conn->callbacks.sample == NULL)
     {
         return RBRGEN4_SUCCESS;
     }
 
-    if (sample != instrument->callbacks.sampleBuffer)
+    if (sample != conn->callbacks.sampleBuffer)
     {
-        *instrument->callbacks.sampleBuffer = *sample;
+        *conn->callbacks.sampleBuffer = *sample;
     }
 
-    return instrument->callbacks.sample(instrument,
-                                        instrument->callbacks.sampleBuffer);
+    return conn->callbacks.sample(conn,
+                                        conn->callbacks.sampleBuffer);
 }
 
-RBRGen4Error RBRGen4_readResponse(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn,
                                                       bool breakOnSample,
                                                       RBRGen4Sample *sample,
                                                       RBRGen4DateTime startTime,
                                                       RBRGen4DateTime timeout)
 {
     /* Reset the response state. */
-    instrument->response.type = RBRGEN4_RESPONSE_UNKNOWN_TYPE;
-    instrument->response.error = RBRGEN4_HARDWARE_ERROR_NONE;
-    instrument->response.response = NULL;
+    conn->response.type = RBRGEN4_RESPONSE_UNKNOWN_TYPE;
+    conn->response.error = RBRGEN4_HARDWARE_ERROR_NONE;
+    conn->response.response = NULL;
 
     RBRGen4Sample *sampleTarget;
     if (sample == NULL)
     {
-        sampleTarget = instrument->callbacks.sampleBuffer;
+        sampleTarget = conn->callbacks.sampleBuffer;
     }
     else
     {
@@ -708,18 +708,18 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *instrument,
      * until we exceed the timeout. */
     while (true)
     {
-        RBRGen4_removeLastResponse(instrument);
+        RBRGen4_removeLastResponse(conn);
         char *beginning;
         char *end;
-        RBR_TRY(RBRGen4_readSingleResponse(instrument, startTime, timeout, &end));
+        RBR_TRY(RBRGen4_readSingleResponse(conn, startTime, timeout, &end));
 
-        RBRGen4_terminateResponse(instrument, &beginning, end);
+        RBRGen4_terminateResponse(conn, &beginning, end);
 
-        if (sampleTarget != NULL && RBRGen4Sample_parse(sampleTarget, &instrument->outputFormat, beginning) == RBRGEN4_SUCCESS)
+        if (sampleTarget != NULL && RBRGen4Sample_parse(sampleTarget, &conn->outputFormat, beginning) == RBRGEN4_SUCCESS)
         {
             if (sample == NULL)
             {
-                RBR_TRY(RBRGen4_deliverSample(instrument,
+                RBR_TRY(RBRGen4_deliverSample(conn,
                                                         sampleTarget));
             }
             if (breakOnSample)
@@ -729,14 +729,14 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *instrument,
         }
         else
         {
-            return RBRGen4_errorCheckResponse(instrument,
+            return RBRGen4_errorCheckResponse(conn,
                                                         beginning,
                                                         end);
         }
     }
 }
 
-void RBRGen4_parseResponse(RBRGen4 *instrument,
+void RBRGen4_parseResponse(RBRGen4 *conn,
                                      char **command,
                                      RBRGen4ResponseParameter *parameter)
 {
@@ -749,7 +749,7 @@ void RBRGen4_parseResponse(RBRGen4 *instrument,
     {
         memset(parameter, 0, sizeof(RBRGen4ResponseParameter));
 
-        *command = instrument->response.response;
+        *command = conn->response.response;
         // char testcommand[103] = "id model=RBRoem fwtype=120 version=1.14.5+202310150927 serial=092431";
         // *command = testcommand;
         char *commandEnd = *command;
@@ -886,7 +886,7 @@ void RBRGen4_parseResponse(RBRGen4 *instrument,
     }
 }
 
-RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_converse(RBRGen4 *conn,
                                                   const char *command,
                                                   ...)
 {
@@ -908,7 +908,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
         /* Can't use RBR_TRY anywhere within these while loops because we need
          * to be sure to call va_end() on both va_lists before returning. */
         va_copy(formatSend, format);
-        err = RBRGen4_vSendCommand(instrument, command, formatSend);
+        err = RBRGen4_vSendCommand(conn, command, formatSend);
         va_end(formatSend);
 
         if (err != RBRGEN4_SUCCESS)
@@ -920,7 +920,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
          * its command word matches what we sent. To match that, we'll find the
          * first word of the command. */
         int32_t commandLength = 0;
-        while (!isspace(instrument->commandBuffer[commandLength]) && instrument->commandBuffer[commandLength] != '\0')
+        while (!isspace(conn->commandBuffer[commandLength]) && conn->commandBuffer[commandLength] != '\0')
         {
             ++commandLength;
         }
@@ -930,8 +930,8 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
          * rather than add another parameter to the function to indicate the
          * expected response, or to specialize the command handling function
          * to include error checking/retry. */
-        uint8_t *commandResponse = instrument->commandBuffer;
-        if (commandLength == 4 && memcmp("read", instrument->commandBuffer, 4) == 0)
+        uint8_t *commandResponse = conn->commandBuffer;
+        if (commandLength == 4 && memcmp("read", conn->commandBuffer, 4) == 0)
         {
             commandResponse = (uint8_t *) "data";
         }
@@ -939,16 +939,16 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
         do
         {
             RBRGen4DateTime now;
-            err = instrument->callbacks.time(instrument, &now);
+            err = conn->callbacks.time(conn, &now);
             if (err != RBRGEN4_SUCCESS)
             {
                 break;
             }
-            err = RBRGen4_readResponse(instrument,
+            err = RBRGen4_readResponse(conn,
                                                  false,
                                                  NULL,
                                                  now,
-                                                 instrument->commandTimeout);
+                                                 conn->commandTimeout);
             /*
              * There are a few reasons the instrument might generate an “E0102
              * invalid command” error, and we can make the user's life a bit
@@ -969,12 +969,12 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
              * - Otherwise, the error message wasn't related to this command at
              *   all and should be ignored.
              */
-            if (err == RBRGEN4_HARDWARE_ERROR && (instrument->response.error ==
+            if (err == RBRGEN4_HARDWARE_ERROR && (conn->response.error ==
                                                             RBRGEN4_HARDWARE_ERROR_INVALID_COMMAND))
             {
                 /* We have no message to inspect, so we can only assume the
                  * error is legitimate and pass it along to the user. */
-                if (instrument->response.response == NULL)
+                if (conn->response.response == NULL)
                 {
                     break;
                 }
@@ -982,7 +982,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
                 /* The error message indicates what the invalid command was.
                  * It's enclosed in single quotes, so we can look for those to
                  * find its bounds. */
-                char *invalidCommand = strchr(instrument->response.response,
+                char *invalidCommand = strchr(conn->response.response,
                                               '\'');
                 if (invalidCommand == NULL)
                 {
@@ -1000,7 +1000,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
 
                 /* The command was actually invalid. Whoops. */
                 if (invalidCommandLength == commandLength && memcmp(invalidCommand,
-                                                                    instrument->commandBuffer,
+                                                                    conn->commandBuffer,
                                                                     commandLength) == 0)
                 {
                     break;
@@ -1008,7 +1008,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
                 /* We were on the right track, but there was garbage in the
                  * buffer. Retry. */
                 else if (invalidCommandLength > commandLength && memcmp(invalidCommand + invalidCommandLength - commandLength,
-                                                                        instrument->commandBuffer,
+                                                                        conn->commandBuffer,
                                                                         commandLength) == 0)
                 {
                     retry = true;
@@ -1025,7 +1025,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
             {
                 break;
             }
-        } while ((instrument->response.response == NULL || memcmp(instrument->response.response,
+        } while ((conn->response.response == NULL || memcmp(conn->response.response,
                                                                   commandResponse,
                                                                   commandLength) != 0));
     } while (retry);
@@ -1035,20 +1035,20 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
     return err;
 }
 
-RBRGen4Error RBRGen4_getBool(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_getBool(RBRGen4 *conn,
                                                  const char *command,
                                                  const char *parameter,
                                                  bool *value)
 {
     *value = false;
 
-    RBR_TRY(RBRGen4_converse(instrument, "%s %s", command, parameter));
+    RBR_TRY(RBRGen4_converse(conn, "%s %s", command, parameter));
 
     char *responseCommand = NULL;
     RBRGen4ResponseParameter responseParameter;
     do
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &responseCommand,
                                         &responseParameter);
 
@@ -1067,20 +1067,20 @@ RBRGen4Error RBRGen4_getBool(RBRGen4 *instrument,
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_getFloat(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_getFloat(RBRGen4 *conn,
                                                   const char *command,
                                                   const char *parameter,
                                                   float *value)
 {
     *value = NAN;
 
-    RBR_TRY(RBRGen4_converse(instrument, "%s %s", command, parameter));
+    RBR_TRY(RBRGen4_converse(conn, "%s %s", command, parameter));
 
     char *responseCommand = NULL;
     RBRGen4ResponseParameter responseParameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &responseCommand,
                                         &responseParameter);
 
@@ -1099,20 +1099,20 @@ RBRGen4Error RBRGen4_getFloat(RBRGen4 *instrument,
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_getInt(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_getInt(RBRGen4 *conn,
                                                 const char *command,
                                                 const char *parameter,
                                                 int32_t *value)
 {
     *value = 0;
 
-    RBR_TRY(RBRGen4_converse(instrument, "%s %s", command, parameter));
+    RBR_TRY(RBRGen4_converse(conn, "%s %s", command, parameter));
 
     char *responseCommand = NULL;
     RBRGen4ResponseParameter responseParameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &responseCommand,
                                         &responseParameter);
 

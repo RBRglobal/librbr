@@ -86,32 +86,32 @@ void TestIOBuffers_init(TestIOBuffers *buffers,
 }
 
 RBRGen4Error TestIOBuffers_time(
-    const struct RBRGen4 *instrument,
+    const struct RBRGen4 *conn,
     RBRGen4DateTime *time)
 {
     /* No-op. */
     *time = 0;
-    (void)instrument;
+    (void)conn;
     return RBRGEN4_SUCCESS;
 }
 
 RBRGen4Error TestIOBuffers_sleep(
-    const struct RBRGen4 *instrument,
+    const struct RBRGen4 *conn,
     RBRGen4DateTime time)
 {
     /* No-op. */
-    (void)instrument;
+    (void)conn;
     (void)time;
     return RBRGEN4_SUCCESS;
 }
 
 RBRGen4Error TestIOBuffers_read(
-    const struct RBRGen4 *instrument,
+    const struct RBRGen4 *conn,
     void *data,
     int32_t *size)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRGen4_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
 
     int32_t readLength = buffers->readBufferSize - buffers->readBufferPos;
     /* If we're out of data, indicate a callback error. */
@@ -135,12 +135,12 @@ RBRGen4Error TestIOBuffers_read(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error TestIOBuffers_write(const struct RBRGen4 *instrument,
+RBRGen4Error TestIOBuffers_write(const struct RBRGen4 *conn,
                                        const void *const data,
                                        int32_t size)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRGen4_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
 
     int32_t remaining
         = TESTIOBUFFERS_WRITE_BUFFER_SIZE - buffers->writeBufferPos;
@@ -164,11 +164,11 @@ RBRGen4Error TestIOBuffers_write(const struct RBRGen4 *instrument,
 }
 
 RBRGen4Error TestIOBuffers_sample(
-    const struct RBRGen4 *instrument,
+    const struct RBRGen4 *conn,
     const struct RBRGen4Sample *const sample)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRGen4_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
     if (sample != &buffers->streamSample)
     {
         return RBRGEN4_CALLBACK_ERROR;

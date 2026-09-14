@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
     RBRGen4Error err;
     RBRGen4 instrumentSpace;
-    RBRGen4 *instrument = &instrumentSpace;
+    RBRGen4 *conn = &instrumentSpace;
 
     if (argc < 2)
     {
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     };
 
     if ((err = RBRGen4_open(
-             &instrument,
+             &conn,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
              (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 
     //------(optional) get link type: USB/serial/wifi---------------------------------------------
     RBRGen4Link link;
-    RBRGen4_getLink(instrument, &link);
+    RBRGen4_getLink(conn, &link);
     printf("Connected to the instrument via %s.\n",
            RBRGen4LinkType_name(link.type));
 
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
         break;
     case RBRGEN4_LINK_TYPE_SERIAL:
     {
-        RBRGen4_getLinkSerial(instrument, &serial);
+        RBRGen4_getLinkSerial(conn, &serial);
         printf("Connected in %s mode at %s baud.\n",
                RBRGen4LinkSerialMode_name(serial.mode),
                RBRGen4LinkSerialBaudRate_name(serial.baudRate));
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
         .size = RBRGEN4_CHANNEL_MAX,
         .pool = channelBuf
     };
-    RBRGen4_getChannelPool(instrument, &channelPool);
+    RBRGen4_getChannelPool(conn, &channelPool);
 
     // Only the first group is polled, so only one label is kept; the pool
     // reports that the rest were discarded, which is expected here.
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
         .size = 1,
         .pool = groupBuf
     };
-    err = RBRGen4_getGroupPool(instrument, &groupPool);
+    err = RBRGen4_getGroupPool(conn, &groupPool);
     if (err != RBRGEN4_SUCCESS
         && err != RBRGEN4_TRUNCATED)
     {
@@ -149,19 +149,19 @@ int main(int argc, char *argv[])
     // specify outputformat. The setter sends every parameter of the command,
     // so read the current format and change only the sample fields.
     RBRGen4OutputFormat outputformat;
-    RBRGen4_getOutputFormat(instrument, &outputformat);
+    RBRGen4_getOutputFormat(conn, &outputformat);
     outputformat.sn = true;
     outputformat.scheduleLabel = true;
     outputformat.dateTime = true;
     outputformat.crc = true;
-    RBRGen4_setOutputFormat(instrument, &outputformat);
+    RBRGen4_setOutputFormat(conn, &outputformat);
 
     // poll data and print in console
     RBRGen4Sample sample;
     while (true)
     {
         // poll one group
-        err = RBRGen4_pollGroups(instrument,
+        err = RBRGen4_pollGroups(conn,
                                            true,
                                            groupPool.pool[0].label,
                                            &sample);
@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
     goto instrumentCleanup;
 
 instrumentCleanup:
-    RBRGen4_close(instrument);
+    RBRGen4_close(conn);
 
 fileCleanup:
     close(instrumentFd);

@@ -155,14 +155,14 @@ typedef struct RBRGen4Sample
  * This requires RBRGen4Callbacks.sample and
  * RBRGen4Callbacks.sampleBuffer to be populated.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when a streaming sample has been read
  * \return #RBRGEN4_MISSING_CALLBACK when the connection was opened
  *         without a sample callback
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  */
-RBRGen4Error RBRGen4_readSample(RBRGen4 *instrument);
+RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
 
 /**
  * \brief Requests an “on-demand” sample of every channel from the
@@ -181,7 +181,7 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *instrument);
  * first sample read is returned, which may be a streamed sample, not a
  * polled sample, if the instrument is streaming over this link.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] requireLabel whether to require and wait for a sample
  *                          labelled `polling`
  * \param [out] sample the polled sample
@@ -194,7 +194,7 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *instrument);
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
 RBRGen4Error RBRGen4_poll(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     bool requireLabel,
     RBRGen4Sample *sample);
 
@@ -216,7 +216,7 @@ RBRGen4Error RBRGen4_poll(
  * first sample read is returned, which may be a streamed sample, not a
  * polled sample, if the instrument is streaming over this link.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] requireLabel whether to require and wait for a sample
  *                          labelled `polling`
  * \param [in] channelList the channels to sample
@@ -234,7 +234,7 @@ RBRGen4Error RBRGen4_poll(
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
 RBRGen4Error RBRGen4_pollChannels(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     bool requireLabel,
     const char *channelList,
     RBRGen4Sample *sample);
@@ -257,7 +257,7 @@ RBRGen4Error RBRGen4_pollChannels(
  * first sample read is returned, which may be a streamed sample, not a
  * polled sample, if the instrument is streaming over this link.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] requireLabel whether to require and wait for a sample
  *                          labelled `polling`
  * \param [in] groupList the groups of channels to sample
@@ -275,7 +275,7 @@ RBRGen4Error RBRGen4_pollChannels(
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
 RBRGen4Error RBRGen4_pollGroups(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     bool requireLabel,
     const char *groupList,
     RBRGen4Sample *sample);

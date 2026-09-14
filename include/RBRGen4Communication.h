@@ -67,14 +67,14 @@ typedef struct RBRGen4Link
  * \brief Get the connectivity of the instrument connection.
  * \note Issues the `link` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] link the link parameters
  * \return #RBRGEN4_SUCCESS when the setting is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830279/link
  */
-RBRGen4Error RBRGen4_getLink(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_getLink(RBRGen4 *conn,
                                                 RBRGen4Link *link);
 
 /**
@@ -202,7 +202,7 @@ typedef struct RBRGen4LinkSerial
  * The instrument reports the available baud rates and modes only when they are
  * requested by name, so all four parameters are requested explicitly.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] serial the current and available serial parameters
  * \return #RBRGEN4_SUCCESS when the setting is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -211,7 +211,7 @@ typedef struct RBRGen4LinkSerial
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
 RBRGen4Error RBRGen4_getLinkSerial(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4LinkSerial *serial);
 
 /**
@@ -232,7 +232,7 @@ RBRGen4Error RBRGen4_getLinkSerial(
  * response to this command has been produced. Make sure you alter the
  * configuration of your connection to the instrument correspondingly.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] serial the new serial parameters
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -244,7 +244,7 @@ RBRGen4Error RBRGen4_getLinkSerial(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
 RBRGen4Error RBRGen4_setLinkSerial(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4LinkSerial *serial);
 
 /**
@@ -257,13 +257,13 @@ RBRGen4Error RBRGen4_setLinkSerial(
  * is always enough power available via USB to run the logger's basic functions;
  * sensor channels used for a `poll` command will still be shut down.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the instrument has been put to sleep
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828543/sleep
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828337/Timeouts+output+blanking+and+power+saving
  */
-RBRGen4Error RBRGen4_sleep(RBRGen4 *instrument);
+RBRGen4Error RBRGen4_sleep(RBRGen4 *conn);
 
 /**
  * L3.5/L4 WiFi interface is To Be Defined as of October 2024
@@ -353,7 +353,7 @@ typedef struct RBRGen4WiFi
  * \brief Retrieve the current instrument Wi-Fi settings. 
  * L3.5 won't support, L4 supports it.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] wifi the current Wi-Fi parameters
  * \return #RBRGEN4_SUCCESS when the setting is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -362,7 +362,7 @@ typedef struct RBRGen4WiFi
  * \see RBRGen4_setWiFi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-RBRGen4Error RBRGen4_getWiFi(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_getWiFi(RBRGen4 *conn,
                                          RBRGen4WiFi *wifi);
 
 /**
@@ -376,7 +376,7 @@ RBRGen4Error RBRGen4_getWiFi(RBRGen4 *instrument,
  * RBRGen4WiFi.enabled parameter does not exist for that generation of
  * instruments.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] wifi the new Wi-Fi parameters
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -387,7 +387,7 @@ RBRGen4Error RBRGen4_getWiFi(RBRGen4 *instrument,
  * \see RBRGen4_getWifi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-RBRGen4Error RBRGen4_setWiFi(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_setWiFi(RBRGen4 *conn,
                                          const RBRGen4WiFi *wifi);
 
 #endif

@@ -91,13 +91,13 @@ extern "C" {
  * you have a specific requirement for custom buffer management (like sending
  * a very large command in multiple pieces).
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the command is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_sendCommand() to send a string command
  */
-RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *instrument);
+RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *conn);
 
 /**
  * Send a command to the instrument. The command will be formatted into
@@ -112,7 +112,7 @@ RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *instrument);
  * response buffer. To combine command sending and response reading with basic
  * sanity-checking, use RBRGen4_converse().
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] command the command to send as a printf-style format string
  * \return #RBRGEN4_SUCCESS when the command is successfully written
  * \return #RBRGEN4_BUFFER_TOO_SMALL when the formatted command is too
@@ -123,7 +123,7 @@ RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *instrument);
  * \see RBRGen4_readResponse() to read the command response
  * \see RBRGen4_converse() for a send/receive shortcut
  */
-RBRGen4Error RBRGen4_sendCommand(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn,
                                              const char *command,
                                              ...);
 
@@ -152,7 +152,7 @@ RBRGen4Error RBRGen4_sendCommand(RBRGen4 *instrument,
  * \a breakOnSample is false then \a sample will be populated with the most
  * recent sample incidentally encountered while parsing other responses.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] breakOnSample whether to return early when a sample is parsed
  * \param [out] sample where to put a parsed sample
  * \param [in] startTime when the caller began waiting for this response
@@ -165,7 +165,7 @@ RBRGen4Error RBRGen4_sendCommand(RBRGen4 *instrument,
  * \see RBRGen4_sendCommand() to send a command
  * \see RBRGen4_converse() for a send/receive shortcut
  */
-RBRGen4Error RBRGen4_readResponse(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn,
                                               bool breakOnSample,
                                               RBRGen4Sample *sample,
                                               RBRGen4DateTime startTime,
@@ -178,14 +178,14 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *instrument,
  * RBRGen4_open() guarantees that sampleBuffer is non-`NULL`
  * whenever the callback is set.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] sample the sample to deliver
  * \return #RBRGEN4_SUCCESS when no callback is set, or the value
  *         returned by the callback otherwise
  * \see RBRGen4_open() for the sampleBuffer guarantee
  */
 RBRGen4Error RBRGen4_deliverSample(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Sample *sample);
 
 /**
@@ -199,7 +199,7 @@ RBRGen4Error RBRGen4_deliverSample(
  * from this function means that a timeout was reached waiting for the
  * _correct_ response, not just _any_ response.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] command the command to send as a printf-style format string
  * \return #RBRGEN4_SUCCESS when the command was successfully sent and a
  *                                response was read
@@ -209,7 +209,7 @@ RBRGen4Error RBRGen4_deliverSample(
  * \see RBRGen4_sendCommand() to send a command
  * \see RBRGen4_readResponse() to read the command response
  */
-RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_converse(RBRGen4 *conn,
                                           const char *command,
                                           ...);
 
@@ -221,7 +221,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
  * for retrieving a single parameter (`command parameter`), then parses the
  * response looking for the value of that single parameter.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] command the name of the command
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
@@ -235,7 +235,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *instrument,
  * \see RBRGen4_getFloat() for the float equivalent
  * \see RBRGen4_getInt() for the integer equivalent
  */
-RBRGen4Error RBRGen4_getBool(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_getBool(RBRGen4 *conn,
                                          const char *command,
                                          const char *parameter,
                                          bool *value);
@@ -248,7 +248,7 @@ RBRGen4Error RBRGen4_getBool(RBRGen4 *instrument,
  * for retrieving a single parameter (`command parameter`), then parses the
  * response looking for the value of that single parameter.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] command the name of the command
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
@@ -262,7 +262,7 @@ RBRGen4Error RBRGen4_getBool(RBRGen4 *instrument,
  * \see RBRGen4_getBool() for the boolean equivalent
  * \see RBRGen4_getInt() for the integer equivalent
  */
-RBRGen4Error RBRGen4_getFloat(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_getFloat(RBRGen4 *conn,
                                           const char *command,
                                           const char *parameter,
                                           float *value);
@@ -275,7 +275,7 @@ RBRGen4Error RBRGen4_getFloat(RBRGen4 *instrument,
  * for retrieving a single parameter (`command parameter`), then parses the
  * response looking for the value of that single parameter.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] command the name of the command
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
@@ -289,7 +289,7 @@ RBRGen4Error RBRGen4_getFloat(RBRGen4 *instrument,
  * \see RBRGen4_getBool() for the boolean equivalent
  * \see RBRGen4_getFloat() for the float equivalent
  */
-RBRGen4Error RBRGen4_getInt(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_getInt(RBRGen4 *conn,
                                         const char *command,
                                         const char *parameter,
                                         int32_t *value);
@@ -324,11 +324,11 @@ typedef struct RBRGen4ResponseParameter
  * This function mutates the instrument response buffer. As such, it can't be
  * called more than once on the same response.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] command the name of the command as indicated by the response
  * \param [in,out] parameter the most-recently-parsed response parameter
  */
-void RBRGen4_parseResponse(RBRGen4 *instrument,
+void RBRGen4_parseResponse(RBRGen4 *conn,
                                  char **command,
                                  RBRGen4ResponseParameter *parameter);
 
@@ -338,14 +338,14 @@ void RBRGen4_parseResponse(RBRGen4 *instrument,
  *
  * Updates RBRGen4.response as appropriate.
  *
- * \param [in,out] instrument the instrument connection
+ * \param [in,out] conn the instrument connection
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
  * \return #RBRGEN4_SUCCESS when the response is a warning or success
  * \return #RBRGEN4_HARDWARE_ERROR when the response indicates an error
  */
 RBRGen4Error RBRGen4_errorCheckResponse(
-    RBRGen4 *instrument, 
+    RBRGen4 *conn, 
     char *beginning, 
     char *end);
 

@@ -47,7 +47,7 @@ typedef struct RBRGen4Clock
  * \brief Get the instrument clock.
  * \note Issues the `clock` instrument command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] clock the clock value
  * \return #RBRGEN4_SUCCESS when the settings are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -55,14 +55,14 @@ typedef struct RBRGen4Clock
  * \see RBRGen4_setClock()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
-RBRGen4Error RBRGen4_getClock(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_getClock(RBRGen4 *conn,
                                                  RBRGen4Clock *clock);
 
 /**
  * \brief Set the instrument clock.
  * \note Issues the `clock` instrument command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] clock the clock value
  * \return #RBRGEN4_SUCCESS when the settings are successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -75,7 +75,7 @@ RBRGen4Error RBRGen4_getClock(RBRGen4 *instrument,
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
 RBRGen4Error RBRGen4_setClock(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Clock *clock);
 
 /**
@@ -184,7 +184,7 @@ typedef struct RBRGen4Deployment
  * \brief Get the instrument deployment parameters.
  * \note Issues the `deployment` instrument command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] deployment the deployment parameters
  * \return #RBRGEN4_SUCCESS when the deployment is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -193,7 +193,7 @@ typedef struct RBRGen4Deployment
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
 RBRGen4Error RBRGen4_getDeployment(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Deployment *deployment);
 
 /**
@@ -205,7 +205,7 @@ RBRGen4Error RBRGen4_getDeployment(
  * RBRGen4Deployment.status and
  * RBRGen4Deployment.simulation are never sent.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] deployment the deployment parameters
  * \return #RBRGEN4_SUCCESS when the deployment is successfully
  *         changed
@@ -221,14 +221,14 @@ RBRGen4Error RBRGen4_getDeployment(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
 RBRGen4Error RBRGen4_setDeployment(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Deployment *deployment);
 
 /**
  * \brief Pause an enabled deployment.
  * \note Issues the `pause` instrument command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] status the deployment status; untouched unless the command
  *                     succeeds
  * \return #RBRGEN4_SUCCESS when the deployment is paused
@@ -240,14 +240,14 @@ RBRGen4Error RBRGen4_setDeployment(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828461/pause
  */
 RBRGen4Error RBRGen4_pause(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4DeploymentStatus *status);
 
 /**
  * \brief Resume a paused deployment.
  * \note Issues the `resume` instrument command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] status the deployment status; untouched unless the command
  *                     succeeds
  * \return #RBRGEN4_SUCCESS when the deployment is resumed
@@ -259,7 +259,7 @@ RBRGen4Error RBRGen4_pause(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828463/resume
  */
 RBRGen4Error RBRGen4_resume(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4DeploymentStatus *status);
 
 /**
@@ -298,7 +298,7 @@ const char *RBRGen4DeploymentStoragemode_name(
  *
  * All three parameters of the command are sent.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] config the configuration which would define this deployment
  * \param [in] datasetLabel the label which would be given to the deployment's
  *                          dataset
@@ -316,7 +316,7 @@ const char *RBRGen4DeploymentStoragemode_name(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828472/verify
  */
 RBRGen4Error RBRGen4_verify(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Config *config,
     const char *datasetLabel,
     RBRGen4DeploymentStoragemode storageMode,
@@ -330,7 +330,7 @@ RBRGen4Error RBRGen4_verify(
  * dataset, so read the deployment's dataset back with
  * RBRGen4_getDatasetPool().
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] config the configuration which defines this deployment
  * \param [in] datasetLabel the label for the deployment's dataset
  * \param [in] storageMode the data storage mode for this deployment
@@ -349,7 +349,7 @@ RBRGen4Error RBRGen4_verify(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828476/enable
  */
 RBRGen4Error RBRGen4_enable(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Config *config,
     const char *datasetLabel,
     RBRGen4DeploymentStoragemode storageMode,
@@ -363,7 +363,7 @@ RBRGen4Error RBRGen4_enable(
  * #RBRGEN4_HARDWARE_ERROR with the response type set to
  * #RBRGEN4_RESPONSE_WARNING.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] state the state of the instrument; untouched unless the command
  *                    succeeds
  * \return #RBRGEN4_SUCCESS when the deployment is terminated
@@ -374,7 +374,7 @@ RBRGen4Error RBRGen4_enable(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828481/disable
  */
 RBRGen4Error RBRGen4_disable(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4InstrumentState *state);
 
 #ifdef __cplusplus

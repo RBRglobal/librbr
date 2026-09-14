@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 
     RBRGen4Error err;
     RBRGen4 instrumentSpace;
-    RBRGen4 *instrument = &instrumentSpace;
+    RBRGen4 *conn = &instrumentSpace;
 
     if (argc < 2)
     {
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
     };
 
     if ((err = RBRGen4_open(
-             &instrument,
+             &conn,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
              (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 
     //------(optional) get link type: USB/serial/wifi---------------------------------------------
     RBRGen4Link link;
-    RBRGen4_getLink(instrument, &link);
+    RBRGen4_getLink(conn, &link);
     printf("Connected to the instrument via %s.\n",
            RBRGen4LinkType_name(link.type));
 
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
         break;
     case RBRGEN4_LINK_TYPE_SERIAL:
     {
-        RBRGen4_getLinkSerial(instrument, &serial);
+        RBRGen4_getLinkSerial(conn, &serial);
         printf("Connected in %s mode at %s baud.\n",
                RBRGen4LinkSerialMode_name(serial.mode),
                RBRGen4LinkSerialBaudRate_name(serial.baudRate));
@@ -150,14 +150,14 @@ int main(int argc, char *argv[])
     /************ ensure default state ************/
     RBRGen4InstrumentState loggingState
         = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
-    RBRGen4_disable(instrument, &loggingState);
+    RBRGen4_disable(conn, &loggingState);
 
-    RBRGen4_deleteDatasetAll(instrument);
+    RBRGen4_deleteDatasetAll(conn);
 
-    RBRGen4_deleteConfigAll(instrument);
+    RBRGen4_deleteConfigAll(conn);
 
-    RBRGen4_deleteScheduleAll(instrument);
-    RBRGen4_deleteGroupAll(instrument);
+    RBRGen4_deleteScheduleAll(conn);
+    RBRGen4_deleteGroupAll(conn);
 
     /************ group definition ************/
     /* read the channel pool, then each channel and its calibration */
@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
         .size = RBRGEN4_CHANNEL_MAX,
         .pool = channelBuf
     };
-    RBRGen4_getChannelPool(instrument, &channelPool);
+    RBRGen4_getChannelPool(conn, &channelPool);
 
     /* Only min(count, size) channels are stored when the instrument reports
      * more than the buffer holds. */
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
     for (int32_t i = 0; i < channelCount; i++)
     {
         RBRGen4Channel *channel = &channelPool.pool[i];
-        RBRGen4_getChannel(instrument, channel);
+        RBRGen4_getChannel(conn, channel);
         printf(
             "%s,%s,%d,%d,%d,%s,%s,%s,%u",
             channel->label,
@@ -194,13 +194,13 @@ int main(int argc, char *argv[])
                  sizeof(calibration.label),
                  "%s",
                  channel->label);
-        RBRGen4_getCalibration(instrument, &calibration);
+        RBRGen4_getCalibration(conn, &calibration);
     }
 
     /* specify groupLabel, channel labels, and create group instance */
     RBRGen4Group group_pts;
 
-    RBRGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(conn,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         GROUP_PTS_CHANNEL_COUNT,
@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
         .size = SCHEDULE_PTS_GROUP_COUNT,
         .labels = groupLabelBuf
     };
-    RBRGen4_initNewScheduleContinuous(instrument,
+    RBRGen4_initNewScheduleContinuous(conn,
                          SCHEDULE_PTS_LABEL,
                          SCHEDULE_PTS_GROUPS,
                          SCHEDULE_PTS_GROUP_COUNT,
@@ -231,7 +231,7 @@ int main(int argc, char *argv[])
         .size = CONFIG_ASCENT_SCHEDULE_COUNT,
         .labels = scheduleLabelBuf
     };
-    RBRGen4_initNewConfig(instrument,
+    RBRGen4_initNewConfig(conn,
                         CONFIG_ASCENT_LABEL,
                         CONFIG_ASCENT_SCHEDULES,
                         CONFIG_ASCENT_SCHEDULE_COUNT,
@@ -240,28 +240,28 @@ int main(int argc, char *argv[])
 
     /************ deployment parameters ************/
     RBRGen4Deployment deployment;
-    RBRGen4_getDeployment(instrument, &deployment);
+    RBRGen4_getDeployment(conn, &deployment);
 
     str_to_deploymentDatetime(&deployment.startTime, STARTTIME);
-    RBRGen4_setDeployment(instrument, &deployment);
+    RBRGen4_setDeployment(conn, &deployment);
 
     /************ start of ascent ************/
     /* verify the configurations for enable */
-    RBRGen4_verify(instrument,
+    RBRGen4_verify(conn,
                              &config,
                              NEW_DATASET_LABEL,
                              RBRGEN4_STORAGEMODE_NORMAL,
                              &loggingState);
 
     /* enable the instrument */
-    RBRGen4_enable(instrument,
+    RBRGen4_enable(conn,
                              &config,
                              NEW_DATASET_LABEL,
                              RBRGEN4_STORAGEMODE_NORMAL,
                              &loggingState);
 
 instrumentCleanup:
-    RBRGen4_close(instrument);
+    RBRGen4_close(conn);
 
 fileCleanup:
     close(instrumentFd);

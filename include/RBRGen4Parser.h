@@ -242,7 +242,7 @@ typedef struct RBRGen4Parser
 /**
  * \brief Initialize a dataset parser.
  *
- * The use of the \a parser argument is the same as that of the \a instrument
+ * The use of the \a parser argument is the same as that of the \a conn
  * argument to RBRGen4_open(): when given as `NULL`, instance memory will
  * be allocated for you; otherwise, the pointer target will be used as instance
  * storage. See RBRGen4_open() for “do”s and “don't”s inherent to this

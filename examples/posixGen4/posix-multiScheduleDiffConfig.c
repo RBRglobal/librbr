@@ -260,7 +260,7 @@ int main(int argc, char *argv[])
 
     RBRGen4Error err;
     RBRGen4 instrumentSpace;
-    RBRGen4 *instrument = &instrumentSpace;
+    RBRGen4 *conn = &instrumentSpace;
 
     if (argc < 2)
     {
@@ -292,7 +292,7 @@ int main(int argc, char *argv[])
     };
 
     if ((err = RBRGen4_open(
-             &instrument,
+             &conn,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
              (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
 
     //------(optional) get link type: USB/serial/wifi---------------------------------------------
     RBRGen4Link link;
-    RBRGen4_getLink(instrument, &link);
+    RBRGen4_getLink(conn, &link);
     printf("Connected to the instrument via %s.\n",
            RBRGen4LinkType_name(link.type));
 
@@ -317,7 +317,7 @@ int main(int argc, char *argv[])
         break;
     case RBRGEN4_LINK_TYPE_SERIAL:
     {
-        RBRGen4_getLinkSerial(instrument, &serial);
+        RBRGen4_getLinkSerial(conn, &serial);
         printf("Connected in %s mode at %s baud.\n",
                RBRGen4LinkSerialMode_name(serial.mode),
                RBRGen4LinkSerialBaudRate_name(serial.baudRate));
@@ -325,7 +325,7 @@ int main(int argc, char *argv[])
     }
     case RBRGEN4_LINK_TYPE_WIFI:
     {
-        RBRGen4_getWiFi(instrument, &wifi);
+        RBRGen4_getWiFi(conn, &wifi);
         printf("Connected in WiFi mode at %s baud. Timeout is %d\n",
                RBRGen4LinkSerialBaudRate_name(wifi.baudRate),
                wifi.commandTimeout);
@@ -340,32 +340,32 @@ int main(int argc, char *argv[])
 
     /************ ensure default state ************/
     RBRGen4DeploymentStatus deploymentStatus = RBRGEN4_STATUS_UNKNOWN;
-    RBRGen4_disable(instrument, deploymentStatus);
+    RBRGen4_disable(conn, deploymentStatus);
 
     RBRGen4DatasetPool datasetPool;
-    RBRGen4_getDatasetPool(instrument, &datasetPool);
-    RBRGen4_deleteDatasetAll(instrument, &datasetPool);
+    RBRGen4_getDatasetPool(conn, &datasetPool);
+    RBRGen4_deleteDatasetAll(conn, &datasetPool);
 
     RBRGen4Configs configPool;
-    RBRGen4_getConfigs(instrument, &configPool);
-    RBRGen4_deleteConfigAll(instrument, &configPool);
+    RBRGen4_getConfigs(conn, &configPool);
+    RBRGen4_deleteConfigAll(conn, &configPool);
 
     RBRGen4SchedulePool schedulePool;
-    RBRGen4_getSchedulePool(instrument, &schedulePool);
-    RBRGen4_deleteScheduleAll(instrument, &schedulePool);
+    RBRGen4_getSchedulePool(conn, &schedulePool);
+    RBRGen4_deleteScheduleAll(conn, &schedulePool);
 
     RBRGen4GroupPool groupPool;
-    RBRGen4_getGroupPool(instrument, &groupPool);
-    RBRGen4_deleteGroupAll(instrument, &groupPool);
+    RBRGen4_getGroupPool(conn, &groupPool);
+    RBRGen4_deleteGroupAll(conn, &groupPool);
 
     /************ group definition ************/
     // populate all channelPool and calibrations
     RBRGen4ChannelPool channelPool;
-    RBRGen4_getChannelPool(instrument, &channelPool);
+    RBRGen4_getChannelPool(conn, &channelPool);
 
     // specify groupLabel, channel labels, and create group instance
     RBRGen4Group group_pts;
-    RBRGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(conn,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         &channelPool,
@@ -373,7 +373,7 @@ int main(int argc, char *argv[])
                         &groupPool); // warning: need to read error!!!
 
     RBRGen4Group group_odo;
-    RBRGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(conn,
                         GROUP_ODO_LABEL,
                         GROUP_ODO_CHANNELS,
                         &channelPool,
@@ -381,7 +381,7 @@ int main(int argc, char *argv[])
                         &groupPool); // warning: need to read error!!!
 
     RBRGen4Group group_ph;
-    RBRGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(conn,
                         GROUP_PH_LABEL,
                         GROUP_PH_CHANNELS,
                         &channelPool,
@@ -389,7 +389,7 @@ int main(int argc, char *argv[])
                         &groupPool); // warning: need to read error!!!
 
     RBRGen4Group group_bbpfl;
-    RBRGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(conn,
                         GROUP_BBPFL_LABEL,
                         GROUP_BBPFL_CHANNELS,
                         &channelPool,
@@ -397,7 +397,7 @@ int main(int argc, char *argv[])
                         &groupPool); // warning: need to read error!!!
 
     RBRGen4Group group_radiometry;
-    RBRGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(conn,
                         GROUP_RADIOMETRY_LABEL,
                         GROUP_RADIOMETRY_CHANNELS,
                         &channelPool,
@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
 
     /************ schedule definition ************/
     RBRGen4Schedule schedule_pts;
-    RBRGen4_initNewScheduleRegimes(instrument,
+    RBRGen4_initNewScheduleRegimes(conn,
                           SCHEDULE_PTS_LABEL,
                           SCHEDULE_PTS_GROUPS,
                           SCHEDULE_PTS_MODE,
@@ -414,10 +414,10 @@ int main(int argc, char *argv[])
                           SCHEDULE_PTS_REGIME,
                           &schedule_pts,
                           &schedulePool);
-    RBRGen4_setSchedule(instrument, &schedule_pts);
+    RBRGen4_setSchedule(conn, &schedule_pts);
 
     RBRGen4Schedule schedule_odo;
-    RBRGen4_initNewScheduleRegimes(instrument,
+    RBRGen4_initNewScheduleRegimes(conn,
                           SCHEDULE_ODO_LABEL,
                           SCHEDULE_ODO_GROUPS,
                           SCHEDULE_ODO_MODE,
@@ -425,10 +425,10 @@ int main(int argc, char *argv[])
                           SCHEDULE_ODO_REGIME,
                           &schedule_odo,
                           &schedulePool);
-    RBRGen4_setSchedule(instrument, &schedule_odo);
+    RBRGen4_setSchedule(conn, &schedule_odo);
 
     RBRGen4Schedule schedule_ph;
-    RBRGen4_initNewScheduleRegimes(instrument,
+    RBRGen4_initNewScheduleRegimes(conn,
                           SCHEDULE_PH_LABEL,
                           SCHEDULE_PH_GROUPS,
                           SCHEDULE_PH_MODE,
@@ -436,10 +436,10 @@ int main(int argc, char *argv[])
                           SCHEDULE_PH_REGIME,
                           &schedule_ph,
                           &schedulePool);
-    RBRGen4_setSchedule(instrument, &schedule_ph);
+    RBRGen4_setSchedule(conn, &schedule_ph);
 
     RBRGen4Schedule schedule_BBPFL;
-    RBRGen4_initNewScheduleRegimes(instrument,
+    RBRGen4_initNewScheduleRegimes(conn,
                           SCHEDULE_BBPFL_LABEL,
                           SCHEDULE_BBPFL_GROUPS,
                           SCHEDULE_BBPFL_MODE,
@@ -447,10 +447,10 @@ int main(int argc, char *argv[])
                           SCHEDULE_BBPFL_REGIME,
                           &schedule_BBPFL,
                           &schedulePool);
-    RBRGen4_setSchedule(instrument, &schedule_BBPFL);
+    RBRGen4_setSchedule(conn, &schedule_BBPFL);
 
     RBRGen4Schedule schedule_radiometry;
-    RBRGen4_initNewScheduleRegimes(instrument,
+    RBRGen4_initNewScheduleRegimes(conn,
                           SCHEDULE_RADIOMETRY_LABEL,
                           SCHEDULE_RADIOMETRY_GROUPS,
                           SCHEDULE_RADIOMETRY_MODE,
@@ -458,10 +458,10 @@ int main(int argc, char *argv[])
                           SCHEDULE_RADIOMETRY_REGIME,
                           &schedule_radiometry,
                           &schedulePool);
-    RBRGen4_setSchedule(instrument, &schedule_radiometry);
+    RBRGen4_setSchedule(conn, &schedule_radiometry);
 
     RBRGen4Schedule schedule_pts_park;
-    RBRGen4_initNewScheduleContinuous(instrument,
+    RBRGen4_initNewScheduleContinuous(conn,
                              SCHEDULE_PARK_PTS_LABEL,
                              SCHEDULE_PTS_GROUPS,
                              SCHEDULE_PARK_PTS_MODE,
@@ -470,10 +470,10 @@ int main(int argc, char *argv[])
                              SCHEDULE_PARK_PTS_CASTDETECTION,
                              &schedule_pts_park,
                              &schedulePool);
-    RBRGen4_setSchedule(instrument, &schedule_pts_park);
+    RBRGen4_setSchedule(conn, &schedule_pts_park);
 
     RBRGen4Schedule schedule_park_odo;
-    RBRGen4_initNewScheduleContinuous(instrument,
+    RBRGen4_initNewScheduleContinuous(conn,
                              SCHEDULE_PARK_ODO_LABEL,
                              SCHEDULE_PARK_ODO_GROUPS,
                              SCHEDULE_PARK_ODO_MODE,
@@ -482,11 +482,11 @@ int main(int argc, char *argv[])
                              SCHEDULE_PARK_ODO_CASTDETECTION,
                              &schedule_park_odo,
                              &schedulePool);
-    RBRGen4_setSchedule(instrument, &schedule_park_odo);
+    RBRGen4_setSchedule(conn, &schedule_park_odo);
 
     /************ configuration definition ************/
     RBRGen4Config config_ascent;
-    RBRGen4_initNewConfig(instrument,
+    RBRGen4_initNewConfig(conn,
                          CONFIG_ASCENT_LABEL,
                          CONFIG_ASCENT_SCHEDULES,
                          &schedulePool,
@@ -494,7 +494,7 @@ int main(int argc, char *argv[])
                          &configPool);
 
     RBRGen4Config config_park;
-    RBRGen4_initNewConfig(instrument,
+    RBRGen4_initNewConfig(conn,
                          CONFIG_PARK_LABEL,
                          CONFIG_PARK_SCHEDULES,
                          &schedulePool,
@@ -503,39 +503,39 @@ int main(int argc, char *argv[])
 
     /************ deployment parameters ************/
     RBRGen4Deployment deployment;
-    RBRGen4_getDeployment(instrument, &deployment);
+    RBRGen4_getDeployment(conn, &deployment);
     // GEN4 TODO: if it's pending, could we modify parameters???
     if (deployment.status == RBRGEN4_STATUS_LOGGING || deployment.status == RBRGEN4_STATUS_PENDING)
     {
         printf("%s: Instrument is logging/pending. I'm going to disable it first.\n",
                programName);
-        RBRGen4_disable(instrument, deploymentStatus);
+        RBRGen4_disable(conn, deploymentStatus);
     }
     str_to_deploymentDatetime(&deployment.startTime, STARTTIME);
     str_to_deploymentDatetime(&deployment.endTime, ENDTIME);
     // printf("deployment starttime:%" PRId64 "\n", deployment.starttime);
-    RBRGen4_setDeployment(instrument, &deployment);
+    RBRGen4_setDeployment(conn, &deployment);
 
     /************ start of ascent ************/
     // ensures the memory is cleared first
-    RBRGen4_deleteDatasetAll(instrument, &datasetPool);
+    RBRGen4_deleteDatasetAll(conn, &datasetPool);
 
     // verify the configurations for enable
-    RBRGen4_verify(instrument,
+    RBRGen4_verify(conn,
                              &config_ascent,
                              DATASET_ASCENT_LABEL,
                              RBRGEN4_STORAGEMODE_NORMAL,
                              deploymentStatus);
 
     // enable the instrument
-    RBRGen4_enable(instrument,
+    RBRGen4_enable(conn,
                              &config_ascent,
                              DATASET_ASCENT_LABEL,
                              RBRGEN4_STORAGEMODE_NORMAL,
                              deploymentStatus);
 
 instrumentCleanup:
-    RBRGen4_close(instrument);
+    RBRGen4_close(conn);
 fileCleanup:
     close(instrumentFd);
     return status;

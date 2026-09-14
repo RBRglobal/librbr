@@ -23,8 +23,8 @@
 
 int main(void)
 {
-    RBRGen4 instrument;
-    printf("%zu\n", sizeof(instrument)); //in bytes
+    RBRGen4 conn;
+    printf("%zu\n", sizeof(conn)); //in bytes
 
     RBRGen4ConfigPool configPool;
     printf("%zu, %zu\n", sizeof(configPool), sizeof(configPool.pool[0]));

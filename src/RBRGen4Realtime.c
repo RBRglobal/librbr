@@ -81,9 +81,9 @@ inline double RBRGen4Reading_setError(RBRGen4ReadingError error)
     return alias.reading;
 }
 
-RBRGen4Error RBRGen4_readSample(RBRGen4 *instrument)
+RBRGen4Error RBRGen4_readSample(RBRGen4 *conn)
 {
-    if (instrument->callbacks.sample == NULL)
+    if (conn->callbacks.sample == NULL)
     {
         return RBRGEN4_MISSING_CALLBACK;
     }
@@ -96,12 +96,12 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *instrument)
      * until we get a “failure” value (which we hope is SAMPLE). */
     do
     {
-        RBR_TRY(instrument->callbacks.time(instrument, &now));
-        err = RBRGen4_readResponse(instrument,
+        RBR_TRY(conn->callbacks.time(conn, &now));
+        err = RBRGen4_readResponse(conn,
                                              true,
                                              NULL,
                                              now,
-                                             instrument->commandTimeout);
+                                             conn->commandTimeout);
     } while (err == RBRGEN4_SUCCESS);
     /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any
      * other errors can really be errors. */
@@ -116,7 +116,7 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *instrument)
 /**
  * \brief Send a poll command and read the resulting sample.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] requireLabel whether to require and wait for a sample
  *                          labelled #RBRGEN4_POLL_SCHEDULE_LABEL
  * \param [in] parameter the list parameter to send, or `NULL` for a bare
@@ -125,37 +125,37 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *instrument)
  * \param [out] sample the polled sample
  */
 static RBRGen4Error RBRGen4_sendPoll(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     bool requireLabel,
     const char *parameter,
     const char *list,
     RBRGen4Sample *sample)
 {
-    if (requireLabel && !instrument->outputFormat.scheduleLabel)
+    if (requireLabel && !conn->outputFormat.scheduleLabel)
     {
         return RBRGEN4_UNSUPPORTED;
     }
 
-    char *commandBuffer = (char *) instrument->commandBuffer;
-    int32_t *commandBufferLength = &instrument->commandBufferLength;
+    char *commandBuffer = (char *) conn->commandBuffer;
+    int32_t *commandBufferLength = &conn->commandBufferLength;
 
     *commandBufferLength = snprintf(
         commandBuffer,
-        sizeof(instrument->commandBuffer),
+        sizeof(conn->commandBuffer),
         "poll%s%s%s%s",
         parameter != NULL ? " " : "",
         parameter != NULL ? parameter : "",
         parameter != NULL ? list : "",
         RBRGEN4_SEND_COMMAND_TERMINATOR);
-    if ((size_t) *commandBufferLength >= sizeof(instrument->commandBuffer))
+    if ((size_t) *commandBufferLength >= sizeof(conn->commandBuffer))
     {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     RBRGen4DateTime start;
-    RBR_TRY(instrument->callbacks.time(instrument, &start));
+    RBR_TRY(conn->callbacks.time(conn, &start));
 
-    RBR_TRY(RBRGen4_sendBuffer(instrument));
+    RBR_TRY(RBRGen4_sendBuffer(conn));
 
     RBRGen4Error err;
     /* RBRGen4_readResponse() returns #RBRGEN4_SAMPLE when
@@ -165,11 +165,11 @@ static RBRGen4Error RBRGen4_sendPoll(
      * we hope is SAMPLE). */
     do
     {
-        err = RBRGen4_readResponse(instrument,
+        err = RBRGen4_readResponse(conn,
                                              true,
                                              sample,
                                              start,
-                                             instrument->pollTimeout);
+                                             conn->pollTimeout);
         if (err == RBRGEN4_SAMPLE
             && requireLabel
             && 0 != strcmp(sample->scheduleLabel,
@@ -178,7 +178,7 @@ static RBRGen4Error RBRGen4_sendPoll(
             /* This is a streamed sample, not the polled one we're waiting
              * for. Forward it to the sample callback, if any, and keep
              * looking. */
-            RBR_TRY(RBRGen4_deliverSample(instrument, sample));
+            RBR_TRY(RBRGen4_deliverSample(conn, sample));
             err = RBRGEN4_SUCCESS;
         }
     } while (err == RBRGEN4_SUCCESS);
@@ -193,11 +193,11 @@ static RBRGen4Error RBRGen4_sendPoll(
 }
 
 RBRGen4Error RBRGen4_poll(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     bool requireLabel,
     RBRGen4Sample *sample)
 {
-    return RBRGen4_sendPoll(instrument,
+    return RBRGen4_sendPoll(conn,
                                       requireLabel,
                                       NULL,
                                       NULL,
@@ -205,12 +205,12 @@ RBRGen4Error RBRGen4_poll(
 }
 
 RBRGen4Error RBRGen4_pollChannels(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     bool requireLabel,
     const char *channelList,
     RBRGen4Sample *sample)
 {
-    return RBRGen4_sendPoll(instrument,
+    return RBRGen4_sendPoll(conn,
                                       requireLabel,
                                       "channellist=",
                                       channelList,
@@ -218,12 +218,12 @@ RBRGen4Error RBRGen4_pollChannels(
 }
 
 RBRGen4Error RBRGen4_pollGroups(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     bool requireLabel,
     const char *groupList,
     RBRGen4Sample *sample)
 {
-    return RBRGen4_sendPoll(instrument,
+    return RBRGen4_sendPoll(conn,
                                       requireLabel,
                                       "grouplist=",
                                       groupList,

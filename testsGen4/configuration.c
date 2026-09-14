@@ -49,7 +49,7 @@ TEST_LOGGER4(nodelist)
                        "node count=2 list=self|fe4_minimal_00"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getNodePool(instrument,
+    RBRGen4Error err = RBRGen4_getNodePool(conn,
                                                                &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("node" COMMAND_TERMINATOR, buffers->writeBuffer);
@@ -91,7 +91,7 @@ TEST_LOGGER4(node)
                        "gdc557ad33 fwtype=150 poweruptime=0 inrushoffsettime=0"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getNode(instrument, &actual);
+    RBRGen4Error err = RBRGen4_getNode(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("node self" COMMAND_TERMINATOR, buffers->writeBuffer);
 
@@ -125,7 +125,7 @@ TEST_LOGGER4(nodeWithoutPorts)
                        "poweruptime=0 inrushoffsettime=0"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getNode(instrument, &actual);
+    RBRGen4Error err = RBRGen4_getNode(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("node fe4_minimal_00" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -185,7 +185,7 @@ TEST_LOGGER4(portlist)
                        "internal_adc_00|serial_00|serial_01|serial_02"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getPortPool(instrument,
+    RBRGen4Error err = RBRGen4_getPortPool(conn,
                                                                &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("port" COMMAND_TERMINATOR, buffers->writeBuffer);
@@ -225,7 +225,7 @@ TEST_LOGGER4(port)
                        "devicelist=thermistor_00 poweruptime=0"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getPort(instrument, &actual);
+    RBRGen4Error err = RBRGen4_getPort(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("port thermistor_00" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -257,7 +257,7 @@ TEST_LOGGER4(portWithoutDevices)
                        "devicelist=none poweruptime=0"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getPort(instrument, &actual);
+    RBRGen4Error err = RBRGen4_getPort(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("port serial_00" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -300,7 +300,7 @@ TEST_LOGGER4(portSerial)
                        "devicelist=cond_cell_00|pres_sensor_01 poweruptime=50"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getPort(instrument, &actual);
+    RBRGen4Error err = RBRGen4_getPort(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("port serial_01" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -364,7 +364,7 @@ TEST_LOGGER4(devicelist)
                        "internal_adc_00"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getDevicePool(instrument,
+    RBRGen4Error err = RBRGen4_getDevicePool(conn,
                                                                  &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("device" COMMAND_TERMINATOR, buffers->writeBuffer);
@@ -395,7 +395,7 @@ TEST_LOGGER4(discoverDevices)
                        "internal_adc_00"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_discoverDevices(instrument,
+    RBRGen4Error err = RBRGen4_discoverDevices(conn,
                                                                    &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("device discover" COMMAND_TERMINATOR,
@@ -418,7 +418,7 @@ TEST_LOGGER4(discoverDevicesFindingNothing)
     TestIOBuffers_init(buffers,
                        "device discover found=none" RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_discoverDevices(instrument,
+    RBRGen4Error err = RBRGen4_discoverDevices(conn,
                                                                    &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("device discover" COMMAND_TERMINATOR,
@@ -461,7 +461,7 @@ TEST_LOGGER4(device)
                        "inrushoffsettime=10"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getDevice(instrument,
+    RBRGen4Error err = RBRGen4_getDevice(conn,
                                                              &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("device thermistor_00" DEVICE_KEYS COMMAND_TERMINATOR,
@@ -509,7 +509,7 @@ TEST_LOGGER4(deviceIdentity)
                        "cooldowntime=0 powerdowntime=0 inrushoffsettime=0"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getDevice(instrument,
+    RBRGen4Error err = RBRGen4_getDevice(conn,
                                                              &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("device internal_adc_00" DEVICE_KEYS COMMAND_TERMINATOR,
@@ -557,7 +557,7 @@ TEST_LOGGER4(deviceWithUnlistedChannels)
                        "inrushoffsettime=75"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getDevice(instrument,
+    RBRGen4Error err = RBRGen4_getDevice(conn,
                                                              &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("device pres_sensor_00" DEVICE_KEYS COMMAND_TERMINATOR,
@@ -623,7 +623,7 @@ TEST_LOGGER4(calibration)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_getCalibration(instrument,
+    RBRGen4Error err = RBRGen4_getCalibration(conn,
                                                                   &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("calibration temperature_00" COMMAND_TERMINATOR,
@@ -656,7 +656,7 @@ TEST_LOGGER4(calibrationCrossChannel)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_getCalibration(instrument,
+    RBRGen4Error err = RBRGen4_getCalibration(conn,
                                                                   &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("calibration depth_00" COMMAND_TERMINATOR,
@@ -676,7 +676,7 @@ TEST_LOGGER4(calibrationUnusedReference)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getCalibration(instrument,
+    RBRGen4Error err = RBRGen4_getCalibration(conn,
                                                                   &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_EQ(0, actual.mCount, "%" PRIi32);
@@ -694,7 +694,7 @@ TEST_LOGGER4(calibrationEmptyGroup)
                        "calibration temperature_00" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getCalibration(instrument,
+    RBRGen4Error err = RBRGen4_getCalibration(conn,
                                                                   &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_EQ(0, actual.aCount, "%" PRIi32);
@@ -729,7 +729,7 @@ TEST_LOGGER4(calibrationSet)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_setCalibration(instrument,
+    RBRGen4Error err = RBRGen4_setCalibration(conn,
                                                                   &calibration);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ(
@@ -762,7 +762,7 @@ TEST_LOGGER4(calibrationSetCrossChannel)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_setCalibration(instrument,
+    RBRGen4Error err = RBRGen4_setCalibration(conn,
                                                                   &calibration);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ(
@@ -792,7 +792,7 @@ TEST_LOGGER4(calibrationSetUnusedReference)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_setCalibration(instrument,
+    RBRGen4Error err = RBRGen4_setCalibration(conn,
                                                                   &calibration);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ(
@@ -813,7 +813,7 @@ TEST_LOGGER4(calibrationSetInvalidCount)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setCalibration(instrument,
+    RBRGen4Error err = RBRGen4_setCalibration(conn,
                                                                   &calibration);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
                         err,
@@ -837,7 +837,7 @@ TEST_LOGGER4(settings)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_getSettings(instrument,
+    RBRGen4Error err = RBRGen4_getSettings(conn,
                                                                &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("settings" COMMAND_TERMINATOR, buffers->writeBuffer);
@@ -864,7 +864,7 @@ TEST_LOGGER4(settingsSet)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_setSettings(instrument,
+    RBRGen4Error err = RBRGen4_setSettings(conn,
                                                                &settings);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ(
@@ -885,7 +885,7 @@ TEST_LOGGER4(settingsSetConfirmationOff)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setSettings(instrument,
+    RBRGen4Error err = RBRGen4_setSettings(conn,
                                                                &settings);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ(
@@ -906,7 +906,7 @@ TEST_LOGGER4(settingsSetInvalidPollPowerOffDelay)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setSettings(instrument,
+    RBRGen4Error err = RBRGen4_setSettings(conn,
                                                                &settings);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
                         err,
@@ -937,7 +937,7 @@ TEST_LOGGER4(parameters)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_getParameters(instrument,
+    RBRGen4Error err = RBRGen4_getParameters(conn,
                                                                  &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("parameters" COMMAND_TERMINATOR, buffers->writeBuffer);
@@ -974,7 +974,7 @@ TEST_LOGGER4(parametersSet)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_setParameters(instrument,
+    RBRGen4Error err = RBRGen4_setParameters(conn,
                                                                  &parameters);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ(
@@ -1021,7 +1021,7 @@ TEST_LOGGER4(channellist)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_getChannelPool(instrument,
+    RBRGen4Error err = RBRGen4_getChannelPool(conn,
                                                                   &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("channel" COMMAND_TERMINATOR, buffers->writeBuffer);
@@ -1045,7 +1045,7 @@ TEST_LOGGER4(channellistTooSmall)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_getChannelPool(instrument,
+    RBRGen4Error err = RBRGen4_getChannelPool(conn,
                                                                   &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED,
                         err,
@@ -1069,7 +1069,7 @@ TEST_LOGGER4(channellistScientific)
         0);
 
     RBRGen4Error err = RBRGen4_getChannelPoolByNature(
-        instrument,
+        conn,
         RBRGEN4_CHANNEL_NATURE_SCIENTIFIC,
         &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -1090,7 +1090,7 @@ TEST_LOGGER4(channellistWithoutChannels)
                        0);
 
     RBRGen4Error err = RBRGen4_getChannelPoolByNature(
-        instrument,
+        conn,
         RBRGEN4_CHANNEL_NATURE_SYSTEM,
         &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -1108,7 +1108,7 @@ TEST_LOGGER4(channellistUnknownNature)
     TestIOBuffers_init(buffers, "", 0);
 
     RBRGen4Error err = RBRGen4_getChannelPoolByNature(
-        instrument,
+        conn,
         RBRGEN4_UNKNOWN_CHANNEL_NATURE,
         &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -1146,7 +1146,7 @@ TEST_LOGGER4(channel)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_getChannel(instrument,
+    RBRGen4Error err = RBRGen4_getChannel(conn,
                                                               &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("channel temperature_00" COMMAND_TERMINATOR,
@@ -1181,7 +1181,7 @@ TEST_LOGGER4(channelDerived)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_getChannel(instrument,
+    RBRGen4Error err = RBRGen4_getChannel(conn,
                                                               &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("channel depth_00" COMMAND_TERMINATOR,
@@ -1207,7 +1207,7 @@ TEST_LOGGER4(channelWithGroups)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_getChannel(instrument,
+    RBRGen4Error err = RBRGen4_getChannel(conn,
                                                               &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("temp006", actual.type);
@@ -1224,7 +1224,7 @@ TEST_LOGGER4(channelEmptyLabel)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_getChannel(instrument,
+    RBRGen4Error err = RBRGen4_getChannel(conn,
                                                             &channel);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
                         err,
@@ -1246,7 +1246,7 @@ TEST_LOGGER4(channelSet)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_setChannel(instrument,
+    RBRGen4Error err = RBRGen4_setChannel(conn,
                                                               &channel);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("channel temperature_00 userunits=C"
@@ -1265,7 +1265,7 @@ TEST_LOGGER4(channelSetEmptyUserUnits)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setChannel(instrument,
+    RBRGen4Error err = RBRGen4_setChannel(conn,
                                                               &channel);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
                         err,
@@ -1285,7 +1285,7 @@ TEST_LOGGER4(grouplist)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getGroupPool(instrument,
+    RBRGen4Error err = RBRGen4_getGroupPool(conn,
                                                                &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("group" COMMAND_TERMINATOR, buffers->writeBuffer);
@@ -1306,7 +1306,7 @@ TEST_LOGGER4(grouplistTooSmall)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getGroupPool(instrument,
+    RBRGen4Error err = RBRGen4_getGroupPool(conn,
                                                                &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED,
                         err,
@@ -1328,7 +1328,7 @@ TEST_LOGGER4(grouplistWithoutGroups)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getGroupPool(instrument,
+    RBRGen4Error err = RBRGen4_getGroupPool(conn,
                                                                &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_EQ(0, actual.count, "%" PRIi32);
@@ -1351,7 +1351,7 @@ TEST_LOGGER4(group)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_getGroup(instrument,
+    RBRGen4Error err = RBRGen4_getGroup(conn,
                                                            &group,
                                                            &channelList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -1373,7 +1373,7 @@ TEST_LOGGER4(groupWithoutChannels)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getGroup(instrument,
+    RBRGen4Error err = RBRGen4_getGroup(conn,
                                                            &group,
                                                            &channelList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -1392,7 +1392,7 @@ TEST_LOGGER4(groupWithoutChannelList)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_getGroup(instrument,
+    RBRGen4Error err = RBRGen4_getGroup(conn,
                                                            &group,
                                                            NULL);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -1412,7 +1412,7 @@ TEST_LOGGER4(groupChannelListTooSmall)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_getGroup(instrument,
+    RBRGen4Error err = RBRGen4_getGroup(conn,
                                                            &group,
                                                            &channelList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED,
@@ -1432,7 +1432,7 @@ TEST_LOGGER4(groupEmptyLabel)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_getGroup(instrument,
+    RBRGen4Error err = RBRGen4_getGroup(conn,
                                                             &group,
                                                             NULL);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -1459,7 +1459,7 @@ TEST_LOGGER4(groupSet)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_setGroup(instrument,
+    RBRGen4Error err = RBRGen4_setGroup(conn,
                                                            &group,
                                                            &channelList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -1477,7 +1477,7 @@ TEST_LOGGER4(groupSetWithoutChannelList)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setGroup(instrument,
+    RBRGen4Error err = RBRGen4_setGroup(conn,
                                                            &group,
                                                            NULL);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -1502,7 +1502,7 @@ TEST_LOGGER4(groupSetClearingChannels)
                        "group g_a channellist=none" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_setGroup(instrument,
+    RBRGen4Error err = RBRGen4_setGroup(conn,
                                                            &group,
                                                            &channelList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -1524,7 +1524,7 @@ TEST_LOGGER4(groupSetEmptyLabel)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setGroup(instrument,
+    RBRGen4Error err = RBRGen4_setGroup(conn,
                                                            &group,
                                                            &channelList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -1547,7 +1547,7 @@ TEST_LOGGER4(groupSetInvalidChannelCount)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setGroup(instrument,
+    RBRGen4Error err = RBRGen4_setGroup(conn,
                                                            &group,
                                                            &channelList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -1570,7 +1570,7 @@ TEST_LOGGER4(groupSetEmptyChannelLabel)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setGroup(instrument,
+    RBRGen4Error err = RBRGen4_setGroup(conn,
                                                            &group,
                                                            &channelList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -1586,7 +1586,7 @@ TEST_LOGGER4(groupCreate)
                        "group create g_a" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_createGroup(instrument,
+    RBRGen4Error err = RBRGen4_createGroup(conn,
                                                               "g_a");
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("group create g_a" COMMAND_TERMINATOR,
@@ -1599,7 +1599,7 @@ TEST_LOGGER4(groupCreateEmptyLabel)
 {
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_createGroup(instrument, "");
+    RBRGen4Error err = RBRGen4_createGroup(conn, "");
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
                         err,
                         RBRGen4Error);
@@ -1613,7 +1613,7 @@ TEST_LOGGER4(groupDelete)
                        "group delete g_a" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_deleteGroup(instrument,
+    RBRGen4Error err = RBRGen4_deleteGroup(conn,
                                                               "g_a");
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("group delete g_a" COMMAND_TERMINATOR,
@@ -1628,7 +1628,7 @@ TEST_LOGGER4(groupDeleteAll)
                        "group delete all" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_deleteGroupAll(instrument);
+    RBRGen4Error err = RBRGen4_deleteGroupAll(conn);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("group delete all" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -1647,7 +1647,7 @@ TEST_LOGGER4(configlist)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getConfigPool(instrument,
+    RBRGen4Error err = RBRGen4_getConfigPool(conn,
                                                                 &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("config" COMMAND_TERMINATOR, buffers->writeBuffer);
@@ -1667,7 +1667,7 @@ TEST_LOGGER4(configlistTooSmall)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getConfigPool(instrument,
+    RBRGen4Error err = RBRGen4_getConfigPool(conn,
                                                                 &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED,
                         err,
@@ -1689,7 +1689,7 @@ TEST_LOGGER4(configlistWithoutConfigs)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getConfigPool(instrument,
+    RBRGen4Error err = RBRGen4_getConfigPool(conn,
                                                                 &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_EQ(0, actual.count, "%" PRIi32);
@@ -1708,7 +1708,7 @@ TEST_LOGGER4(config)
                        "config c_a schedulelist=s_a" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getConfig(instrument,
+    RBRGen4Error err = RBRGen4_getConfig(conn,
                                                             &config,
                                                             &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -1728,7 +1728,7 @@ TEST_LOGGER4(configWithoutSchedules)
                        "config c_a schedulelist=none" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getConfig(instrument,
+    RBRGen4Error err = RBRGen4_getConfig(conn,
                                                             &config,
                                                             &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS,
@@ -1747,7 +1747,7 @@ TEST_LOGGER4(configWithoutScheduleList)
                        "config c_a schedulelist=s_a" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getConfig(instrument,
+    RBRGen4Error err = RBRGen4_getConfig(conn,
                                                             &config,
                                                             NULL);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -1765,7 +1765,7 @@ TEST_LOGGER4(configScheduleListTooSmall)
                        "config c_a schedulelist=s_a|s_b" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getConfig(instrument,
+    RBRGen4Error err = RBRGen4_getConfig(conn,
                                                             &config,
                                                             &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED,
@@ -1785,7 +1785,7 @@ TEST_LOGGER4(configEmptyLabel)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_getConfig(instrument,
+    RBRGen4Error err = RBRGen4_getConfig(conn,
                                                             &config,
                                                             NULL);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -1812,7 +1812,7 @@ TEST_LOGGER4(configSet)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_setConfig(instrument,
+    RBRGen4Error err = RBRGen4_setConfig(conn,
                                                             &config,
                                                             &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -1838,7 +1838,7 @@ TEST_LOGGER4(configSetClearingSchedules)
                        "config c_a schedulelist=none" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_setConfig(instrument,
+    RBRGen4Error err = RBRGen4_setConfig(conn,
                                                             &config,
                                                             &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -1860,7 +1860,7 @@ TEST_LOGGER4(configSetEmptyLabel)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setConfig(instrument,
+    RBRGen4Error err = RBRGen4_setConfig(conn,
                                                             &config,
                                                             &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -1882,7 +1882,7 @@ TEST_LOGGER4(configSetEmptyScheduleLabel)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setConfig(instrument,
+    RBRGen4Error err = RBRGen4_setConfig(conn,
                                                             &config,
                                                             &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -1898,7 +1898,7 @@ TEST_LOGGER4(configCreate)
                        "config create c_a" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_createConfig(instrument,
+    RBRGen4Error err = RBRGen4_createConfig(conn,
                                                                "c_a");
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("config create c_a" COMMAND_TERMINATOR,
@@ -1913,7 +1913,7 @@ TEST_LOGGER4(configDelete)
                        "config delete c_a" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_deleteConfig(instrument,
+    RBRGen4Error err = RBRGen4_deleteConfig(conn,
                                                                "c_a");
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("config delete c_a" COMMAND_TERMINATOR,
@@ -1928,7 +1928,7 @@ TEST_LOGGER4(configDeleteAll)
                        "config delete all" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_deleteConfigAll(instrument);
+    RBRGen4Error err = RBRGen4_deleteConfigAll(conn);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("config delete all" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -1940,7 +1940,7 @@ TEST_LOGGER4(configDeleteEmptyLabel)
 {
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_deleteConfig(instrument, "");
+    RBRGen4Error err = RBRGen4_deleteConfig(conn, "");
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
                         err,
                         RBRGen4Error);
@@ -1961,7 +1961,7 @@ TEST_LOGGER4(schedulelist)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getSchedulePool(instrument,
+    RBRGen4Error err = RBRGen4_getSchedulePool(conn,
                                                                   &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("schedule" COMMAND_TERMINATOR, buffers->writeBuffer);
@@ -1988,7 +1988,7 @@ TEST_LOGGER4(schedulelistTooSmall)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getSchedulePool(instrument,
+    RBRGen4Error err = RBRGen4_getSchedulePool(conn,
                                                                   &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED,
                         err,
@@ -2014,7 +2014,7 @@ TEST_LOGGER4(schedulelistEveryMode)
         RESPONSE_TERMINATOR,
         0);
 
-    RBRGen4Error err = RBRGen4_getSchedulePool(instrument,
+    RBRGen4Error err = RBRGen4_getSchedulePool(conn,
                                                                   &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_EQ(RBRGEN4_SCHEDULE_MODE_CONTINUOUS
@@ -2047,7 +2047,7 @@ TEST_LOGGER4(schedulelistUnknownMode)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getSchedulePool(instrument,
+    RBRGen4Error err = RBRGen4_getSchedulePool(conn,
                                                                   &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SCHEDULE_MODE_CONTINUOUS,
@@ -2069,7 +2069,7 @@ TEST_LOGGER4(schedule)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getSchedule(instrument,
+    RBRGen4Error err = RBRGen4_getSchedule(conn,
                                                               &actual,
                                                               NULL);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -2105,7 +2105,7 @@ TEST_LOGGER4(scheduleWithGroupsAndConfigs)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getSchedule(instrument,
+    RBRGen4Error err = RBRGen4_getSchedule(conn,
                                                               &actual,
                                                               &groupList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -2130,7 +2130,7 @@ TEST_LOGGER4(scheduleGroupListTooSmall)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getSchedule(instrument,
+    RBRGen4Error err = RBRGen4_getSchedule(conn,
                                                               &actual,
                                                               &groupList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED,
@@ -2156,7 +2156,7 @@ TEST_LOGGER4(scheduleWithStorage)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getSchedule(instrument,
+    RBRGen4Error err = RBRGen4_getSchedule(conn,
                                                               &actual,
                                                               NULL);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -2181,7 +2181,7 @@ TEST_LOGGER4(scheduleBursting)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getSchedule(instrument,
+    RBRGen4Error err = RBRGen4_getSchedule(conn,
                                                               &actual,
                                                               NULL);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -2219,7 +2219,7 @@ TEST_LOGGER4(scheduleDeferredMode)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_getSchedule(instrument,
+    RBRGen4Error err = RBRGen4_getSchedule(conn,
                                                               &actual,
                                                               NULL);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -2239,7 +2239,7 @@ TEST_LOGGER4(scheduleEmptyLabel)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_getSchedule(instrument,
+    RBRGen4Error err = RBRGen4_getSchedule(conn,
                                                             &schedule,
                                                             NULL);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -2274,7 +2274,7 @@ TEST_LOGGER4(scheduleSet)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_setSchedule(instrument,
+    RBRGen4Error err = RBRGen4_setSchedule(conn,
                                                               &schedule,
                                                               &groupList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -2303,7 +2303,7 @@ TEST_LOGGER4(scheduleSetWithoutGroupList)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_setSchedule(instrument,
+    RBRGen4Error err = RBRGen4_setSchedule(conn,
                                                               &schedule,
                                                               NULL);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -2346,7 +2346,7 @@ TEST_LOGGER4(scheduleSetWithStorage)
                        RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_setSchedule(instrument,
+    RBRGen4Error err = RBRGen4_setSchedule(conn,
                                                               &schedule,
                                                               &groupList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -2378,7 +2378,7 @@ TEST_LOGGER4(scheduleSetMultipleModes)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setSchedule(instrument,
+    RBRGen4Error err = RBRGen4_setSchedule(conn,
                                                               &schedule,
                                                               &groupList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -2405,7 +2405,7 @@ TEST_LOGGER4(scheduleSetNoMode)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setSchedule(instrument,
+    RBRGen4Error err = RBRGen4_setSchedule(conn,
                                                               &schedule,
                                                               &groupList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -2432,7 +2432,7 @@ TEST_LOGGER4(scheduleSetDeferredMode)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setSchedule(instrument,
+    RBRGen4Error err = RBRGen4_setSchedule(conn,
                                                               &schedule,
                                                               &groupList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_UNSUPPORTED,
@@ -2459,7 +2459,7 @@ TEST_LOGGER4(scheduleSetEmptyGroupLabel)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setSchedule(instrument,
+    RBRGen4Error err = RBRGen4_setSchedule(conn,
                                                               &schedule,
                                                               &groupList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -2475,7 +2475,7 @@ TEST_LOGGER4(scheduleCreate)
                        "schedule create s_cap" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_createSchedule(instrument,
+    RBRGen4Error err = RBRGen4_createSchedule(conn,
                                                                  "s_cap");
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("schedule create s_cap" COMMAND_TERMINATOR,
@@ -2490,7 +2490,7 @@ TEST_LOGGER4(scheduleDelete)
                        "schedule delete s_cap" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_deleteSchedule(instrument,
+    RBRGen4Error err = RBRGen4_deleteSchedule(conn,
                                                                  "s_cap");
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("schedule delete s_cap" COMMAND_TERMINATOR,
@@ -2506,7 +2506,7 @@ TEST_LOGGER4(scheduleDeleteAll)
                        0);
 
     RBRGen4Error err = RBRGen4_deleteScheduleAll(
-        instrument);
+        conn);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("schedule delete all" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -2542,7 +2542,7 @@ TEST_LOGGER4(scheduleEveryBurstingMode)
         };
         TestIOBuffers_init(buffers, response, 0);
 
-        RBRGen4Error err = RBRGen4_getSchedule(instrument,
+        RBRGen4Error err = RBRGen4_getSchedule(conn,
                                                               &actual,
                                                               NULL);
         TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS,
@@ -2616,7 +2616,7 @@ TEST_LOGGER4(scheduleSetEveryBurstingMode)
 
         TestIOBuffers_init(buffers, response, 0);
 
-        RBRGen4Error err = RBRGen4_setSchedule(instrument,
+        RBRGen4Error err = RBRGen4_setSchedule(conn,
                                                                   &schedule,
                                                                   &groupList);
         TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS,
@@ -2656,7 +2656,7 @@ TEST_LOGGER4(scheduleSetLongParameters)
                        "measurementperiod=86400000" RESPONSE_TERMINATOR,
                        0);
 
-    RBRGen4Error err = RBRGen4_setSchedule(instrument,
+    RBRGen4Error err = RBRGen4_setSchedule(conn,
                                                               &schedule,
                                                               &groupList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -2693,7 +2693,7 @@ TEST_LOGGER4(scheduleSetCommandTooLong)
 
     TestIOBuffers_init(buffers, "", 0);
 
-    RBRGen4Error err = RBRGen4_setSchedule(instrument,
+    RBRGen4Error err = RBRGen4_setSchedule(conn,
                                                               &schedule,
                                                               &groupList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_BUFFER_TOO_SMALL,

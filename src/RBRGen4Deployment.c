@@ -22,19 +22,19 @@
 #include "RBRGen4Internal.h"
 #include "RBRGen4Deployment.h"
 
-RBRGen4Error RBRGen4_getClock(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_getClock(RBRGen4 *conn,
                                                  RBRGen4Clock *clock)
 {
     clock->dateTime = 0;
     clock->offsetFromUtc = NAN;
 
-    RBR_TRY(RBRGen4_converse(instrument, "clock"));
+    RBR_TRY(RBRGen4_converse(conn, "clock"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -59,7 +59,7 @@ RBRGen4Error RBRGen4_getClock(RBRGen4 *instrument,
 }
 
 RBRGen4Error RBRGen4_setClock(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Clock *clock)
 {
     if (clock->dateTime < RBRGEN4_DATETIME_MIN
@@ -76,7 +76,7 @@ RBRGen4Error RBRGen4_setClock(
     char dateTime[RBRGEN4_SCHEDULE_TIME_LEN + 1];
     RBRGen4DateTime_toScheduleTime(clock->dateTime, dateTime);
 
-    return RBRGen4_converse(instrument,
+    return RBRGen4_converse(conn,
                                       "clock datetime=%s offsetfromutc=%.2f",
                                       dateTime,
                                       (double) clock->offsetFromUtc);
@@ -163,7 +163,7 @@ static RBRGen4Gate RBRGen4Gate_parse(const char *value)
 }
 
 RBRGen4Error RBRGen4_getDeployment(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Deployment *deployment)
 {
     memset(deployment, 0, sizeof(RBRGen4Deployment));
@@ -171,13 +171,13 @@ RBRGen4Error RBRGen4_getDeployment(
     deployment->status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS;
     deployment->gate = RBRGEN4_UNKNOWN_GATE;
 
-    RBR_TRY(RBRGen4_converse(instrument, "deployment"));
+    RBR_TRY(RBRGen4_converse(conn, "deployment"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -211,7 +211,7 @@ RBRGen4Error RBRGen4_getDeployment(
 }
 
 RBRGen4Error RBRGen4_setDeployment(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Deployment *deployment)
 {
     if (deployment->gate < 0
@@ -224,7 +224,7 @@ RBRGen4Error RBRGen4_setDeployment(
     if (deployment->gate != RBRGEN4_GATE_TIME)
     {
         return RBRGen4_converse(
-            instrument,
+            conn,
             "deployment gate=%s",
             RBRGen4Gate_name(deployment->gate));
     }
@@ -239,7 +239,7 @@ RBRGen4Error RBRGen4_setDeployment(
     RBRGen4DateTime_toScheduleTime(deployment->startTime, startTime);
 
     return RBRGen4_converse(
-        instrument,
+        conn,
         "deployment gate=%s starttime=%s",
         RBRGen4Gate_name(deployment->gate),
         startTime);
@@ -248,11 +248,11 @@ RBRGen4Error RBRGen4_setDeployment(
 /**
  * \brief Read the deployment status a `pause` or `resume` response reports.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] status the reported status
  */
 static void RBRGen4_parseDeploymentStatus(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4DeploymentStatus *status)
 {
     *status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS;
@@ -261,7 +261,7 @@ static void RBRGen4_parseDeploymentStatus(
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -278,23 +278,23 @@ static void RBRGen4_parseDeploymentStatus(
 }
 
 RBRGen4Error RBRGen4_pause(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4DeploymentStatus *status)
 {
-    RBR_TRY(RBRGen4_converse(instrument, "pause"));
+    RBR_TRY(RBRGen4_converse(conn, "pause"));
 
-    RBRGen4_parseDeploymentStatus(instrument, status);
+    RBRGen4_parseDeploymentStatus(conn, status);
 
     return RBRGEN4_SUCCESS;
 }
 
 RBRGen4Error RBRGen4_resume(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4DeploymentStatus *status)
 {
-    RBR_TRY(RBRGen4_converse(instrument, "resume"));
+    RBR_TRY(RBRGen4_converse(conn, "resume"));
 
-    RBRGen4_parseDeploymentStatus(instrument, status);
+    RBRGen4_parseDeploymentStatus(conn, status);
 
     return RBRGEN4_SUCCESS;
 }
@@ -304,11 +304,11 @@ RBRGen4Error RBRGen4_resume(
  *
  * Every other parameter of the response is an echo of what was sent.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] state the reported state
  */
 static void RBRGen4_parseInstrumentState(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4InstrumentState *state)
 {
     *state = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
@@ -317,7 +317,7 @@ static void RBRGen4_parseInstrumentState(
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -373,7 +373,7 @@ static RBRGen4Error RBRGen4_checkDeploymentParameters(
 }
 
 RBRGen4Error RBRGen4_verify(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Config *config,
     const char *datasetLabel,
     RBRGen4DeploymentStoragemode storageMode,
@@ -384,13 +384,13 @@ RBRGen4Error RBRGen4_verify(
                                                         storageMode));
 
     RBR_TRY(RBRGen4_converse(
-                instrument,
+                conn,
                 "verify config=%s dataset=%s storagemode=%s",
                 config->label,
                 datasetLabel,
                 RBRGen4DeploymentStoragemode_name(storageMode)));
 
-    RBRGen4_parseInstrumentState(instrument, state);
+    RBRGen4_parseInstrumentState(conn, state);
 
     return RBRGEN4_SUCCESS;
 }
@@ -412,7 +412,7 @@ const char *RBRGen4DeploymentStoragemode_name(RBRGen4DeploymentStoragemode stora
 }
 
 RBRGen4Error RBRGen4_enable(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Config *config,
     const char *datasetLabel,
     RBRGen4DeploymentStoragemode storageMode,
@@ -423,24 +423,24 @@ RBRGen4Error RBRGen4_enable(
                                                         storageMode));
 
     RBR_TRY(RBRGen4_converse(
-                instrument,
+                conn,
                 "enable config=%s dataset=%s storagemode=%s",
                 config->label,
                 datasetLabel,
                 RBRGen4DeploymentStoragemode_name(storageMode)));
 
-    RBRGen4_parseInstrumentState(instrument, state);
+    RBRGen4_parseInstrumentState(conn, state);
 
     return RBRGEN4_SUCCESS;
 }
 
 RBRGen4Error RBRGen4_disable(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4InstrumentState *state)
 {
-    RBR_TRY(RBRGen4_converse(instrument, "disable"));
+    RBR_TRY(RBRGen4_converse(conn, "disable"));
 
-    RBRGen4_parseInstrumentState(instrument, state);
+    RBRGen4_parseInstrumentState(conn, state);
 
     return RBRGEN4_SUCCESS;
 }

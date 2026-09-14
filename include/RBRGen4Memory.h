@@ -86,7 +86,7 @@ typedef struct RBRGen4Storage
  *
  * \note Issues the `storage` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] storage data memory information
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -95,7 +95,7 @@ typedef struct RBRGen4Storage
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828279/storage
  */
 RBRGen4Error RBRGen4_getStorage(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Storage *storage);
 
 /**
@@ -105,7 +105,7 @@ RBRGen4Error RBRGen4_getStorage(
  *
  * \note Issues the `storage` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] storage the storage parameters to write
  * \return #RBRGEN4_SUCCESS when the parameters are successfully
  *                                    written
@@ -117,7 +117,7 @@ RBRGen4Error RBRGen4_getStorage(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828279/storage
  */
 RBRGen4Error RBRGen4_setStorage(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Storage *storage);
 
 /**
@@ -212,7 +212,7 @@ typedef struct RBRGen4DatasetPool
  *
  * \note Issues the `dataset` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] datasetPool the datasets in storage, labels only
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -226,7 +226,7 @@ typedef struct RBRGen4DatasetPool
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRGen4Error RBRGen4_getDatasetPool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4DatasetPool *datasetPool);
 
 /**
@@ -236,7 +236,7 @@ RBRGen4Error RBRGen4_getDatasetPool(
  *
  * \note Issues the `dataset <dataset_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in,out] dataset the dataset to read, selected by its label
  * \param [out] scheduleList the schedules run by the dataset, or `NULL` to
  *                           skip them
@@ -254,7 +254,7 @@ RBRGen4Error RBRGen4_getDatasetPool(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRGen4Error RBRGen4_getDataset(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Dataset *dataset,
     RBRGen4LabelList *scheduleList);
 
@@ -318,7 +318,7 @@ typedef struct RBRGen4DatasetDataBlock
  *
  * \note Issues the `dataset <dataset_label>/events` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [out] block the memory usage of the events block
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
@@ -329,7 +329,7 @@ typedef struct RBRGen4DatasetDataBlock
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRGen4Error RBRGen4Dataset_getEventsBlock(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     RBRGen4DatasetEventsBlock *block);
 
@@ -338,7 +338,7 @@ RBRGen4Error RBRGen4Dataset_getEventsBlock(
  *
  * \note Issues the `dataset <dataset_label>/meta` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [out] block the memory usage of the metadata block
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
@@ -349,7 +349,7 @@ RBRGen4Error RBRGen4Dataset_getEventsBlock(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRGen4Error RBRGen4Dataset_getMetaBlock(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     RBRGen4DatasetMetaBlock *block);
 
@@ -359,7 +359,7 @@ RBRGen4Error RBRGen4Dataset_getMetaBlock(
  *
  * \note Issues the `dataset <dataset_label>/<schedule_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in] scheduleLabel the schedule, as listed by
  *                           RBRGen4_getDataset()
@@ -374,7 +374,7 @@ RBRGen4Error RBRGen4Dataset_getMetaBlock(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRGen4Error RBRGen4Dataset_getScheduleBlock(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRGen4DatasetScheduleBlock *block);
@@ -385,7 +385,7 @@ RBRGen4Error RBRGen4Dataset_getScheduleBlock(
  * \note Issues the `dataset <dataset_label>/<schedule_label>/events`
  * command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in] scheduleLabel the schedule, as listed by
  *                           RBRGen4_getDataset()
@@ -400,7 +400,7 @@ RBRGen4Error RBRGen4Dataset_getScheduleBlock(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRGen4DatasetEventsBlock *block);
@@ -411,7 +411,7 @@ RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(
  *
  * \note Issues the `dataset <dataset_label>/<schedule_label>/data` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in] scheduleLabel the schedule, as listed by
  *                           RBRGen4_getDataset()
@@ -426,7 +426,7 @@ RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRGen4Error RBRGen4Dataset_getScheduleDataBlock(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRGen4DatasetDataBlock *block);
@@ -459,7 +459,7 @@ const char *RBRGen4Block_name(RBRGen4Block block);
  * \brief Delete one dataset from the instrument's memory.
  * \note Issues the `dataset delete <dataset_label>` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] label the label of the dataset to delete
  * \return #RBRGEN4_SUCCESS when the dataset is deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -470,7 +470,7 @@ const char *RBRGen4Block_name(RBRGen4Block block);
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRGen4Error RBRGen4_deleteDataset(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *label);
 
 /**
@@ -478,7 +478,7 @@ RBRGen4Error RBRGen4_deleteDataset(
  *
  * \note Issues the `dataset delete all` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the datasets are deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -486,7 +486,7 @@ RBRGen4Error RBRGen4_deleteDataset(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRGen4Error RBRGen4_deleteDatasetAll(
-    RBRGen4 *instrument);
+    RBRGen4 *conn);
 
 /**
  * \brief The unit in which a sample data download's count and start offset
@@ -655,7 +655,7 @@ typedef struct RBRGen4DownloadMeta
  * \note Issues the `download <dataset_label>/<schedule_label>/data`
  * command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in] scheduleLabel the schedule, as listed by
  *                           RBRGen4_getDataset()
@@ -679,7 +679,7 @@ typedef struct RBRGen4DownloadMeta
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
 RBRGen4Error RBRGen4Dataset_downloadScheduleData(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRGen4DownloadData *download);
@@ -690,7 +690,7 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleData(
  *
  * \note Issues the `download <dataset_label>/events` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in,out] download the download request: the caller populates the
  *                         unit, count, offset, and buffer fields to say what
@@ -712,7 +712,7 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleData(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
 RBRGen4Error RBRGen4Dataset_downloadEvents(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     RBRGen4DownloadEvents *download);
 
@@ -722,7 +722,7 @@ RBRGen4Error RBRGen4Dataset_downloadEvents(
  * \note Issues the `download <dataset_label>/<schedule_label>/events`
  * command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in] scheduleLabel the schedule, as listed by
  *                           RBRGen4_getDataset()
@@ -747,7 +747,7 @@ RBRGen4Error RBRGen4Dataset_downloadEvents(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
 RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRGen4DownloadEvents *download);
@@ -757,7 +757,7 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(
  *
  * \note Issues the `download <dataset_label>/meta` command.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in,out] download the download request: the caller populates the
  *                         count, offset, and buffer fields to say what to
@@ -777,7 +777,7 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
 RBRGen4Error RBRGen4Dataset_downloadMeta(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     RBRGen4DownloadMeta *download);
 

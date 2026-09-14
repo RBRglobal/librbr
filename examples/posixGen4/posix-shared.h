@@ -29,7 +29,7 @@ extern "C"
      * \see RBRGen4Callbacks
      * \see RBRGen4TimeCallback
      */
-    RBRGen4Error instrumentTime(const struct RBRGen4 *instrument,
+    RBRGen4Error instrumentTime(const struct RBRGen4 *conn,
                                           RBRGen4DateTime *time);
 
     /**
@@ -37,7 +37,7 @@ extern "C"
      * \see RBRGen4Callbacks
      * \see RBRGen4TimeCallback
      */
-    RBRGen4Error instrumentSleep(const struct RBRGen4 *instrument,
+    RBRGen4Error instrumentSleep(const struct RBRGen4 *conn,
                                            RBRGen4DateTime time);
 
     /**
@@ -45,7 +45,7 @@ extern "C"
      * \see RBRGen4Callbacks
      * \see RBRGen4ReadCallback
      */
-    RBRGen4Error instrumentRead(const struct RBRGen4 *instrument,
+    RBRGen4Error instrumentRead(const struct RBRGen4 *conn,
                                           void *data,
                                           int32_t *size);
 
@@ -54,7 +54,7 @@ extern "C"
      * \see RBRGen4Callbacks
      * \see RBRGen4WriteCallback
      */
-    RBRGen4Error instrumentWrite(const struct RBRGen4 *instrument,
+    RBRGen4Error instrumentWrite(const struct RBRGen4 *conn,
                                            const void *const data,
                                            int32_t size);
 
@@ -212,7 +212,7 @@ extern "C"
     /**
      * \brief Create and populate a new group.
      * \note Issues the `group create` and `group <group_label>` instrument commands.
-     * \param [in] instrument the instrument connection
+     * \param [in] conn the instrument connection
      * \param [in] newGroupLabel the label to give the group
      * \param [in] specifiedChannelLabels the labels of the channels to include in the group
      * \param [in] specifiedChannelLabelCnt the number of channels to include in the group
@@ -220,7 +220,7 @@ extern "C"
      * \param [out] newGroup the new group
      */
     RBRGen4Error RBRGen4_initNewGroup(
-        RBRGen4 *instrument,
+        RBRGen4 *conn,
         const char newGroupLabel[],
         const RBRGen4Label specifiedChannelLabels[],
         int32_t specifiedChannelLabelCnt,
@@ -230,7 +230,7 @@ extern "C"
     /**
      * \brief Create and populate a new parent.
      * \note Issues the `<parent> create` and `<parent> <<parent>_label>` instrument commands.
-     * \param [in] instrument the instrument connection
+     * \param [in] conn the instrument connection
      * \param [in] newGroupLabel the label to give the parent
      * \param [in] specifiedChannelLabels the labels of the children to give the parent
      * \param [in] specifiedChannelLabelCnt the number of children to give the parent
@@ -245,7 +245,7 @@ extern "C"
      * \see RBRGen4_set<Parent>()
      */
     RBRGen4Error RBRGen4_initNewSchedule(
-        RBRGen4 *instrument,
+        RBRGen4 *conn,
         const char newScheduleLabel[],
         const RBRGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt,
@@ -272,7 +272,7 @@ extern "C"
     /**
      * \brief Create and populate a new schedule configured for continous sampling.
      * \note Issues the `schedule create` and `schedule <schedule_label>` instrument commands.
-     * \param [in] instrument the instrument connection
+     * \param [in] conn the instrument connection
      * \param [in] newScheduleLabel the label to give the parent
      * \param [in] specifiedGroupLabels the labels of the children to give the parent
      * \param [in] specifiedGroupLabelCnt the number of children to give the parent
@@ -288,7 +288,7 @@ extern "C"
      * \see RBRGen4_setSchedule()
      */
     RBRGen4Error RBRGen4_initNewScheduleContinuous(
-        RBRGen4 *instrument,
+        RBRGen4 *conn,
         const char newScheduleLabel[],
         const RBRGen4Label specifiedGroupLabels[],
         int32_t specifiedGroupLabelCnt,
@@ -301,7 +301,7 @@ extern "C"
     /**
      * \brief Create and populate a new parent.
      * \note Issues the `config create` and `config <config_label>` instrument commands.
-     * \param [in] instrument the instrument connection
+     * \param [in] conn the instrument connection
      * \param [in] newConfigLabel the label to give the config
      * \param [in] specifiedScheduleLabels the labels of the schedules to give the parent
      * \param [in] specifiedScheduleLabelCnt the number of children to give the parent
@@ -315,7 +315,7 @@ extern "C"
      * \see RBRGen4_setConfig()
      */
     RBRGen4Error RBRGen4_initNewConfig(
-        RBRGen4 *instrument,
+        RBRGen4 *conn,
         const char newConfigLabel[],
         const RBRGen4Label specifiedScheduleLabels[],
         int32_t specifiedScheduleLabelCnt,

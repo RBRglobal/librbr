@@ -144,14 +144,14 @@ const char *RBRGen4ResponseType_name(RBRGen4ResponseType type)
 }
 
 static RBRGen4Error RBRGen4_populateGeneration(
-    RBRGen4 *instrument)
+    RBRGen4 *conn)
 {
-    instrument->generation = RBRGEN4_UNKNOWN_GENERATION;
+    conn->generation = RBRGEN4_UNKNOWN_GENERATION;
 
     /* If this isn't an RBR instrument, it'll just time out or the response
      * won't match. */
-    RBRGen4Error err = RBRGen4_getId4(instrument,
-                                                          &instrument->id);
+    RBRGen4Error err = RBRGen4_getId4(conn,
+                                                          &conn->id);
 
     if (err != RBRGEN4_SUCCESS)
     {
@@ -165,28 +165,28 @@ static RBRGen4Error RBRGen4_populateGeneration(
      * (the RBRcoda T.ODO). This classification mirrors the Gen3 library's
      * (see RBRInstrumentGen3.c) so the two APIs always agree on an instrument's
      * generation. */
-    if (instrument->id.fwtype == 0
-        || (instrument->id.fwtype >= 100
-            && instrument->id.fwtype <= 103)
-        || instrument->id.fwtype == 200)
+    if (conn->id.fwtype == 0
+        || (conn->id.fwtype >= 100
+            && conn->id.fwtype <= 103)
+        || conn->id.fwtype == 200)
     {
-        instrument->generation = RBRGEN4_LOGGER2;
+        conn->generation = RBRGEN4_LOGGER2;
     }
-    else if ((instrument->id.fwtype >= 104
-              && instrument->id.fwtype <= 110)
-             || (instrument->id.fwtype >= 202
-                 && instrument->id.fwtype <= 205))
+    else if ((conn->id.fwtype >= 104
+              && conn->id.fwtype <= 110)
+             || (conn->id.fwtype >= 202
+                 && conn->id.fwtype <= 205))
     {
-        instrument->generation = RBRGEN4_LOGGER3;
+        conn->generation = RBRGEN4_LOGGER3;
     }
     else
     {
-        instrument->generation = RBRGEN4_LOGGER4;
+        conn->generation = RBRGEN4_LOGGER4;
     }
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_open(RBRGen4 **instrument,
+RBRGen4Error RBRGen4_open(RBRGen4 **conn,
                                       const RBRGen4Callbacks *callbacks,
                                       const RBRGen4DateTime commandTimeout,
                                       void *userData)
@@ -201,39 +201,39 @@ RBRGen4Error RBRGen4_open(RBRGen4 **instrument,
         return RBRGEN4_MISSING_CALLBACK;
     }
 
-    memset(*instrument, 0, sizeof(RBRGen4));
-    memcpy(&(*instrument)->callbacks,
+    memset(*conn, 0, sizeof(RBRGen4));
+    memcpy(&(*conn)->callbacks,
            callbacks,
            sizeof(RBRGen4Callbacks));
     /* We don't want the streaming sample data callback to be called before the
      * constructor has finished. */
-    (*instrument)->callbacks.sample  = NULL;
-    (*instrument)->commandTimeout    = commandTimeout;
-    (*instrument)->pollTimeout       = 2 * commandTimeout;
-    (*instrument)->userData          = userData;
-    (*instrument)->lastActivityTime  = RBRGEN4_NO_ACTIVITY;
-    (*instrument)->response.type     = RBRGEN4_RESPONSE_UNKNOWN_TYPE;
-    (*instrument)->outputFormat      = RBRGEN4_DEFAULT_OUTPUTFORMAT;
+    (*conn)->callbacks.sample  = NULL;
+    (*conn)->commandTimeout    = commandTimeout;
+    (*conn)->pollTimeout       = 2 * commandTimeout;
+    (*conn)->userData          = userData;
+    (*conn)->lastActivityTime  = RBRGEN4_NO_ACTIVITY;
+    (*conn)->response.type     = RBRGEN4_RESPONSE_UNKNOWN_TYPE;
+    (*conn)->outputFormat      = RBRGEN4_DEFAULT_OUTPUTFORMAT;
 
     /* We assume a default output format until it's read below, so samples
      * streamed in any other format in the meantime are dropped as
      * unrecognised responses. See the RBRGen4_open() doc comment. */
     RBRGen4Error err;
-    err = RBRGen4_populateGeneration(*instrument);
+    err = RBRGen4_populateGeneration(*conn);
 
     if (err != RBRGEN4_SUCCESS)
     {
         return err;
     }
 
-    if ((*instrument)->generation != RBRGEN4_LOGGER4)
+    if ((*conn)->generation != RBRGEN4_LOGGER4)
     {
         return RBRGEN4_UNSUPPORTED;
     }
 
     /* Caches the sample field flags into the instrument for the parser. */
-    err = RBRGen4_getOutputFormat(*instrument,
-                                            &(*instrument)->outputFormat);
+    err = RBRGen4_getOutputFormat(*conn,
+                                            &(*conn)->outputFormat);
 
     if (err != RBRGEN4_SUCCESS)
     {
@@ -241,64 +241,64 @@ RBRGen4Error RBRGen4_open(RBRGen4 **instrument,
     }
 
     /* Enable the streaming callback, if applicable. */
-    (*instrument)->callbacks.sample = callbacks->sample;
-    (*instrument)->callbacks.sampleBuffer = callbacks->sampleBuffer;
+    (*conn)->callbacks.sample = callbacks->sample;
+    (*conn)->callbacks.sampleBuffer = callbacks->sampleBuffer;
 
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_close(RBRGen4 *instrument)
+RBRGen4Error RBRGen4_close(RBRGen4 *conn)
 {
-    memset(instrument, 0, sizeof(RBRGen4));
+    memset(conn, 0, sizeof(RBRGen4));
     return RBRGEN4_SUCCESS;
 }
 RBRGen4Generation RBRGen4_getGeneration(
-    const RBRGen4 *instrument)
+    const RBRGen4 *conn)
 {
-    return instrument->generation;
+    return conn->generation;
 }
 
 RBRGen4DateTime RBRGen4_getCommandTimeout(
-    const RBRGen4 *instrument)
+    const RBRGen4 *conn)
 {
-    return instrument->commandTimeout;
+    return conn->commandTimeout;
 }
 
-void RBRGen4_setCommandTimeout(RBRGen4 *instrument,
+void RBRGen4_setCommandTimeout(RBRGen4 *conn,
                                      const RBRGen4DateTime commandTimeout)
 {
-    instrument->commandTimeout = commandTimeout;
+    conn->commandTimeout = commandTimeout;
 }
 
 RBRGen4DateTime RBRGen4_getPollTimeout(
-    const RBRGen4 *instrument)
+    const RBRGen4 *conn)
 {
-    return instrument->pollTimeout;
+    return conn->pollTimeout;
 }
 
-void RBRGen4_setPollTimeout(RBRGen4 *instrument,
+void RBRGen4_setPollTimeout(RBRGen4 *conn,
                                      const RBRGen4DateTime pollTimeout)
 {
-    instrument->pollTimeout = pollTimeout;
+    conn->pollTimeout = pollTimeout;
 }
 
-void *RBRGen4_getUserData(const RBRGen4 *instrument)
+void *RBRGen4_getUserData(const RBRGen4 *conn)
 {
-    return instrument->userData;
+    return conn->userData;
 }
 
-void RBRGen4_setUserData(RBRGen4 *instrument, void *userData)
+void RBRGen4_setUserData(RBRGen4 *conn, void *userData)
 {
-    instrument->userData = userData;
+    conn->userData = userData;
 }
 
 RBRGen4HardwareError RBRGen4_getLastHardwareError(
-    const RBRGen4 *instrument)
+    const RBRGen4 *conn)
 {
-    if (instrument->response.type == RBRGEN4_RESPONSE_ERROR
-        || instrument->response.type == RBRGEN4_RESPONSE_WARNING)
+    if (conn->response.type == RBRGEN4_RESPONSE_ERROR
+        || conn->response.type == RBRGEN4_RESPONSE_WARNING)
     {
-        return instrument->response.error;
+        return conn->response.error;
     }
     else
     {
@@ -307,11 +307,11 @@ RBRGen4HardwareError RBRGen4_getLastHardwareError(
 }
 
 const char *RBRGen4_getLastHardwareErrorMessage(
-    const RBRGen4 *instrument)
+    const RBRGen4 *conn)
 {
-    if (instrument->response.type == RBRGEN4_RESPONSE_ERROR)
+    if (conn->response.type == RBRGEN4_RESPONSE_ERROR)
     {
-        return instrument->response.response;
+        return conn->response.response;
     }
     else
     {

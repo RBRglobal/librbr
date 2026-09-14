@@ -32,10 +32,10 @@ int main(int argc, char *argv[])
     int instrumentFd;
 
     RBRGen4Error err;
-    RBRGen4 *instrument = NULL;
+    RBRGen4 *conn = NULL;
     //no dynamic allocation case:
     RBRGen4 instrumentSpace;
-    instrument = &instrumentSpace;
+    conn = &instrumentSpace;
 
     if (argc < 2)
     {
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     };
 
     if ((err = RBRGen4_open(
-             &instrument,
+             &conn,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
              (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     }
 
  RBRGen4Generation generation;
- generation =  RBRGen4_getGeneration(instrument);
+ generation =  RBRGen4_getGeneration(conn);
  if (generation != RBRGEN4_LOGGER4)
  {
     fprintf(stderr, "%s: Instrument generation %s not supported. Please check libRBR version.\n",
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
  }
 
 instrumentCleanup:
-    RBRGen4_close(instrument);
+    RBRGen4_close(conn);
 fileCleanup:
     close(instrumentFd);
     return status;

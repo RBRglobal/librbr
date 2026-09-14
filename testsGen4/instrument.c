@@ -71,7 +71,7 @@ TEST_LOGGER4(id)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4_getId(instrument, &actual);
+        err = RBRGen4_getId(conn, &actual);
         TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].expected.model, actual.model);
@@ -114,7 +114,7 @@ TEST_LOGGER4(id4)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4_getId4(instrument, &actual);
+        err = RBRGen4_getId4(conn, &actual);
         TEST_ASSERT_STR_EQ("id4" COMMAND_TERMINATOR, buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].expected.model, actual.model);
@@ -150,7 +150,7 @@ TEST_LOGGER4(pcbalist)
     TestIOBuffers_init(buffers,
                        "pcba count=2 list=self|fe4_cond_00" RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getPcbaPool(instrument,
+    RBRGen4Error err = RBRGen4_getPcbaPool(conn,
                                                                &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_EQ(expected.count, actual.count, "%" PRIi32);
@@ -182,7 +182,7 @@ TEST_LOGGER4(pcba)
                        "pcba fe4_cond_00 sn=na pn=na node=fe4_cond_00"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getPcba(instrument,
+    RBRGen4Error err = RBRGen4_getPcba(conn,
                                                            &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("pcba fe4_cond_00" COMMAND_TERMINATOR,
@@ -210,7 +210,7 @@ TEST_LOGGER4(pcbaSerialNumber)
                        "pcba self sn=850032 pn=na node=self"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getPcba(instrument,
+    RBRGen4Error err = RBRGen4_getPcba(conn,
                                                            &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("pcba self" COMMAND_TERMINATOR, buffers->writeBuffer);
@@ -249,7 +249,7 @@ TEST_LOGGER4(power)
         TestIOBuffers_init(buffers,
                            tests[i].response,
                            0);
-        err = RBRGen4_getPowerSource(instrument, &actual);
+        err = RBRGen4_getPowerSource(conn, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected,
                             actual,
@@ -272,7 +272,7 @@ TEST_LOGGER4(powerinternal)
                        "instrument power internal voltage=14.21 batterytype=nimh "
                        "used=100.100e+003" RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getPowerInternal(instrument,
+    RBRGen4Error err = RBRGen4_getPowerInternal(conn,
                                                                     &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_FLOAT_EQ(expected.voltage, actual.voltage, 0.001f);
@@ -328,7 +328,7 @@ TEST_LOGGER4(setPowerInternalBatteryType)
         TestIOBuffers_init(buffers,
                            tests[i].response,
                            0);
-        err = RBRGen4_setPowerInternalBatteryType(instrument, tests[i].batteryType);
+        err = RBRGen4_setPowerInternalBatteryType(conn, tests[i].batteryType);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].command,
                            buffers->writeBuffer);
@@ -339,7 +339,7 @@ TEST_LOGGER4(setPowerInternalBatteryType)
 TEST_LOGGER4(resetPowerInternalUsed)
 {
     TestIOBuffers_init(buffers, "instrument power internal used=0.000e+000" RESPONSE_TERMINATOR, 0);
-    RBRGen4Error err = RBRGen4_resetPowerInternalUsed(instrument);
+    RBRGen4Error err = RBRGen4_resetPowerInternalUsed(conn);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("instrument power internal used=0" COMMAND_TERMINATOR, buffers->writeBuffer);
     return true;
@@ -359,7 +359,7 @@ TEST_LOGGER4(powerexternal)
                        "batterytype=fermata_lisocl2 used=100.100e+003"
                        RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_getPowerExternal(instrument,
+    RBRGen4Error err = RBRGen4_getPowerExternal(conn,
                                                                     &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_FLOAT_EQ(expected.voltage, actual.voltage, 0.001f);
@@ -435,7 +435,7 @@ TEST_LOGGER4(setPowerExternalBatteryType)
         TestIOBuffers_init(buffers,
                            tests[i].response,
                            0);
-        err = RBRGen4_setPowerExternalBatteryType(instrument, tests[i].batteryType);
+        err = RBRGen4_setPowerExternalBatteryType(conn, tests[i].batteryType);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].command,
                            buffers->writeBuffer);
@@ -446,7 +446,7 @@ TEST_LOGGER4(setPowerExternalBatteryType)
 TEST_LOGGER4(resetPowerExternalUsed)
 {
     TestIOBuffers_init(buffers, "instrument power external used=0.000e+000" RESPONSE_TERMINATOR, 0);
-    RBRGen4Error err = RBRGen4_resetPowerExternalUsed(instrument);
+    RBRGen4Error err = RBRGen4_resetPowerExternalUsed(conn);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("instrument power external used=0" COMMAND_TERMINATOR, buffers->writeBuffer);
     return true;
@@ -459,7 +459,7 @@ typedef struct InstrumentCommandTest
     RBRGen4Instrument expected;
 } InstrumentCommandTest;
 
-TEST_LOGGER4(instrument)
+TEST_LOGGER4(conn)
 {
     InstrumentCommandTest tests[] = {
         { "instrument state=disabled sn=999999 model=L4 pn=9999999revA "
@@ -538,7 +538,7 @@ TEST_LOGGER4(instrument)
         TestIOBuffers_init(buffers,
                            tests[i].response,
                            0);
-        err = RBRGen4_getInstrument(instrument,
+        err = RBRGen4_getInstrument(conn,
                                               &actual);
         TEST_ASSERT_STR_EQ("instrument" COMMAND_TERMINATOR,
                            buffers->writeBuffer);
@@ -562,21 +562,21 @@ TEST_LOGGER4(instrument)
 TEST_LOGGER4(reboot)
 {
     TestIOBuffers_init(buffers, "", 0);
-    RBRGen4Error err = RBRGen4_reboot(instrument, 10000);
+    RBRGen4Error err = RBRGen4_reboot(conn, 10000);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("instrument reboot delay=10000" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
-    TEST_ASSERT(instrument->lastActivityTime < 0);
+    TEST_ASSERT(conn->lastActivityTime < 0);
 
     /* A delay of zero omits the parameter entirely; the command defines no
      * default delay of its own. */
     TestIOBuffers_init(buffers, "", 0);
-    err = RBRGen4_reboot(instrument, 0);
+    err = RBRGen4_reboot(conn, 0);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ(RESPONSE_TERMINATOR RESPONSE_TERMINATOR
                        "instrument reboot" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
-    TEST_ASSERT(instrument->lastActivityTime < 0);
+    TEST_ASSERT(conn->lastActivityTime < 0);
 
     return true;
 }
@@ -586,7 +586,7 @@ TEST_LOGGER4(factoryReset)
     TestIOBuffers_init(buffers,
                        "instrument factory reset" RESPONSE_TERMINATOR,
                        0);
-    RBRGen4Error err = RBRGen4_factoryReset(instrument);
+    RBRGen4Error err = RBRGen4_factoryReset(conn);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("instrument factory reset" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -645,7 +645,7 @@ TEST_LOGGER4(outputformat)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4_getOutputFormat(instrument, &actual);
+        err = RBRGen4_getOutputFormat(conn, &actual);
         TEST_ASSERT_STR_EQ("instrument outputformat" COMMAND_TERMINATOR,
                            buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -654,7 +654,7 @@ TEST_LOGGER4(outputformat)
             return false;
         }
         /* The format is cached for the sample parser. */
-        if (!test_outputformat(&tests[i].expected, &instrument->outputFormat))
+        if (!test_outputformat(&tests[i].expected, &conn->outputFormat))
         {
             return false;
         }
@@ -680,14 +680,14 @@ TEST_LOGGER4(outputformat_set)
                        RESPONSE_TERMINATOR,
                        0);
     RBRGen4Error err = RBRGen4_setOutputFormat(
-        instrument,
+        conn,
         &outputformat);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("instrument outputformat sn=off schedulelabel=on "
                        "datetime=on crc=off encoding=ascii datatype=float32"
                        COMMAND_TERMINATOR,
                        buffers->writeBuffer);
-    if (!test_outputformat(&outputformat, &instrument->outputFormat))
+    if (!test_outputformat(&outputformat, &conn->outputFormat))
     {
         return false;
     }
@@ -700,13 +700,13 @@ TEST_LOGGER4(outputformat_set)
                        "datetime=on crc=on encoding=ascii datatype=float32"
                        RESPONSE_TERMINATOR,
                        0);
-    err = RBRGen4_setOutputFormat(instrument, &modified);
+    err = RBRGen4_setOutputFormat(conn, &modified);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("instrument outputformat sn=off schedulelabel=on "
                        "datetime=on crc=on encoding=ascii datatype=float32"
                        COMMAND_TERMINATOR,
                        buffers->writeBuffer);
-    if (!test_outputformat(&modified, &instrument->outputFormat))
+    if (!test_outputformat(&modified, &conn->outputFormat))
     {
         return false;
     }
@@ -715,7 +715,7 @@ TEST_LOGGER4(outputformat_set)
     RBRGen4OutputFormat unreported = modified;
     unreported.encoding = RBRGEN4_UNKNOWN_ENCODING;
     TestIOBuffers_init(buffers, "", 0);
-    err = RBRGen4_setOutputFormat(instrument, &unreported);
+    err = RBRGen4_setOutputFormat(conn, &unreported);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
                         err,
                         RBRGen4Error);
@@ -728,11 +728,11 @@ TEST_LOGGER4(outputformat_set)
                        "ERR-108 invalid argument to command: 'bogus'"
                        RESPONSE_TERMINATOR,
                        0);
-    err = RBRGen4_setOutputFormat(instrument, &rejected);
+    err = RBRGen4_setOutputFormat(conn, &rejected);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_HARDWARE_ERROR,
                         err,
                         RBRGen4Error);
-    if (!test_outputformat(&modified, &instrument->outputFormat))
+    if (!test_outputformat(&modified, &conn->outputFormat))
     {
         return false;
     }

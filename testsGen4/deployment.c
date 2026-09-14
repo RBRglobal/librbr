@@ -70,7 +70,7 @@ TEST_LOGGER4(getClock)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4_getClock(instrument, &actual);
+        err = RBRGen4_getClock(conn, &actual);
         TEST_ASSERT_STR_EQ("clock" COMMAND_TERMINATOR, buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
                             err,
@@ -162,7 +162,7 @@ TEST_LOGGER4(setClock)
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4_setClock(instrument, &tests[i].clock);
+        err = RBRGen4_setClock(conn, &tests[i].clock);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
                             err,
                             RBRGen4Error);
@@ -268,7 +268,7 @@ TEST_LOGGER4(getDeployment)
     for (int i = 0; tests[i].response != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4_getDeployment(instrument, &actual);
+        err = RBRGen4_getDeployment(conn, &actual);
         TEST_ASSERT_STR_EQ("deployment" COMMAND_TERMINATOR,
                            buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
@@ -385,7 +385,7 @@ TEST_LOGGER4(setDeployment)
     for (int i = 0; tests[i].command != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4_setDeployment(instrument,
+        err = RBRGen4_setDeployment(conn,
                                               &tests[i].deployment);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
                             err,
@@ -549,7 +549,7 @@ TEST_LOGGER4(verify)
     {
         actual = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4_verify(instrument,
+        err = RBRGen4_verify(conn,
                                        &tests[i].config,
                                        tests[i].datasetLabel,
                                        tests[i].storageMode,
@@ -685,7 +685,7 @@ TEST_LOGGER4(enable)
     {
         actual = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4_enable(instrument,
+        err = RBRGen4_enable(conn,
                                        &tests[i].config,
                                        tests[i].datasetLabel,
                                        tests[i].storageMode,
@@ -751,17 +751,17 @@ TEST_LOGGER4(disable)
     {
         actual = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4_disable(instrument, &actual);
+        err = RBRGen4_disable(conn, &actual);
         TEST_ASSERT_STR_EQ("disable" COMMAND_TERMINATOR,
                            buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
                             err,
                             RBRGen4Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedType,
-                            instrument->response.type,
+                            conn->response.type,
                             RBRGen4ResponseType);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedHardwareError,
-                            instrument->response.error,
+                            conn->response.error,
                             RBRGen4HardwareError);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedState,
                             actual,
@@ -779,7 +779,7 @@ typedef struct PauseResumeTest
 } PauseResumeTest;
 
 static bool test_pauseResume(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     TestIOBuffers *buffers,
     const char *command,
     RBRGen4Error (*call)(RBRGen4 *,
@@ -793,7 +793,7 @@ static bool test_pauseResume(
     {
         actual = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS;
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = call(instrument, &actual);
+        err = call(conn, &actual);
         TEST_ASSERT_STR_EQ(command, buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
                             err,
@@ -831,7 +831,7 @@ TEST_LOGGER4(pause)
         { 0 }
     };
 
-    return test_pauseResume(instrument,
+    return test_pauseResume(conn,
                             buffers,
                             "pause" COMMAND_TERMINATOR,
                             RBRGen4_pause,
@@ -859,7 +859,7 @@ TEST_LOGGER4(resume)
         { 0 }
     };
 
-    return test_pauseResume(instrument,
+    return test_pauseResume(conn,
                             buffers,
                             "resume" COMMAND_TERMINATOR,
                             RBRGen4_resume,

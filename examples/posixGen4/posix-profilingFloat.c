@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
 
     RBRGen4Error err;
     RBRGen4 instrumentSpace;
-    RBRGen4 *instrument = &instrumentSpace;
+    RBRGen4 *conn = &instrumentSpace;
 
     if (argc < 2)
     {
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
     };
 
     if ((err = RBRGen4_open(
-             &instrument,
+             &conn,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
              (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
 
     //------(optional) get link type: USB/serial/wifi---------------------------------------------
     RBRGen4Link link;
-    RBRGen4_getLink(instrument, &link);
+    RBRGen4_getLink(conn, &link);
     printf("Connected to the instrument via %s.\n",
            RBRGen4LinkType_name(link.type));
 
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
         break;
     case RBRGEN4_LINK_TYPE_SERIAL:
     {
-        RBRGen4_getLinkSerial(instrument, &serial);
+        RBRGen4_getLinkSerial(conn, &serial);
         printf("Connected in %s mode at %s baud.\n",
                RBRGen4LinkSerialMode_name(serial.mode),
                RBRGen4LinkSerialBaudRate_name(serial.baudRate));
@@ -197,28 +197,28 @@ int main(int argc, char *argv[])
     /************ ensure default state ************/
     RBRGen4InstrumentState loggingState
         = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
-    RBRGen4_disable(instrument, &loggingState);
+    RBRGen4_disable(conn, &loggingState);
 
     RBRGen4DatasetPool datasetPool;
-    RBRGen4_deleteDatasetAll(instrument, &datasetPool);
+    RBRGen4_deleteDatasetAll(conn, &datasetPool);
 
     RBRGen4ConfigPool configPool;
-    RBRGen4_deleteConfigAll(instrument);
+    RBRGen4_deleteConfigAll(conn);
 
     RBRGen4SchedulePool schedulePool;
-    RBRGen4_deleteScheduleAll(instrument, &schedulePool);
+    RBRGen4_deleteScheduleAll(conn, &schedulePool);
 
     RBRGen4GroupPool groupPool;
-    RBRGen4_deleteGroupAll(instrument);
+    RBRGen4_deleteGroupAll(conn);
 
     /************ group definition ************/
     /* populate all channels and calibrations */
     RBRGen4ChannelPool channelPool;
-    RBRGen4_getChannelPool(instrument, &channelPool);
+    RBRGen4_getChannelPool(conn, &channelPool);
 
     for (int32_t i = 0; i < channelPool.count; i++)
     {
-        RBRGen4_getChannel(instrument, &channelPool.pool[i]);
+        RBRGen4_getChannel(conn, &channelPool.pool[i]);
         printf(
             "%s,%s,%d,%d,%d,%s,%s,%s,%u",
             channelPool.pool[i].label,
@@ -239,13 +239,13 @@ int main(int argc, char *argv[])
                  sizeof(calibration.label),
                  "%s",
                  channelPool.pool[i].label);
-        RBRGen4_getCalibration(instrument, &calibration);
+        RBRGen4_getCalibration(conn, &calibration);
     }
 
     /* specify groupLabel, channel labels, and create group instance */
     RBRGen4Group group_pts;
 
-    RBRGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(conn,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         GROUP_PTS_CHANNEL_COUNT,
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
 
     /************ schedule definition ************/
     RBRGen4Schedule* schedule_asc_pts;
-    RBRGen4_initNewScheduleRegimes(instrument,
+    RBRGen4_initNewScheduleRegimes(conn,
                          SCHEDULE_PTS_LABEL,
                          SCHEDULE_PTS_GROUPS,
                          SCHEDULE_PTS_GROUP_COUNT,
@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
 
     /************ configuration definition ************/
     RBRGen4Config config_ascent;
-    RBRGen4_initNewConfig(instrument,
+    RBRGen4_initNewConfig(conn,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         GROUP_PTS_CHANNEL_COUNT,
@@ -276,10 +276,10 @@ int main(int argc, char *argv[])
     /************ deployment parameters ************/
     RBRGen4Deployment deployment;
     deployment.gate = RBRGEN4_GATE_NONE;
-    RBRGen4_getDeployment(instrument, &deployment);
+    RBRGen4_getDeployment(conn, &deployment);
 
     str_to_deploymentDatetime(&deployment.startTime, STARTTIME);
-    RBRGen4_setDeployment(instrument, &deployment);
+    RBRGen4_setDeployment(conn, &deployment);
 
     /************ start of ascent ************/
     /* enable the instrument */
@@ -287,7 +287,7 @@ int main(int argc, char *argv[])
         .label = NEW_DATASET_LABEL
     };
     RBRGen4Dataset *dataset_ascent = &dataset_ascent_value;
-    RBRGen4_enable(instrument,
+    RBRGen4_enable(conn,
                              &config_ascent,
                              NEW_DATASET_LABEL,
                              RBRGEN4_STORAGEMODE_NORMAL,
@@ -295,21 +295,21 @@ int main(int argc, char *argv[])
 
     /************ end of ascent ************/
     /* Stop the current deployment */
-    RBRGen4_disable(instrument, &loggingState);
+    RBRGen4_disable(conn, &loggingState);
     /* Determine how much memory has been used */
-    RBRGen4_getDataset(instrument,
+    RBRGen4_getDataset(conn,
                                  &configPool,
                                  dataset_ascent);
     RBRGen4DatasetInfo dataset_asc_info;
     RBRGen4_getDatasetByScheduleBlock(
-        instrument,
+        conn,
         schedule_asc_pts,
         RBRGEN4_BLOCK_DATA,
         dataset_ascent,
         &dataset_asc_info);
     /* Get the data type */
     RBRGen4Instrument info;
-    RBRGen4_getInstrument(instrument, &info);
+    RBRGen4_getInstrument(conn, &info);
     /* Prepare the parser */
     RBRGen4Parser parserSpace;
     RBRGen4Parser* parser = &parserSpace;
@@ -340,7 +340,7 @@ int main(int argc, char *argv[])
     };
     while (download_data_pts.startOffset < dataset_ascent->byteCount) // if not downloaded all data from targetDataset/schedule/datablock
     {
-        RBRGen4_download(instrument,
+        RBRGen4_download(conn,
                                    &download_data_pts);
         RBRGen4Parser_parse(parser,
                             download_data_pts.block,
@@ -349,7 +349,7 @@ int main(int argc, char *argv[])
     }
 
 instrumentCleanup:
-    RBRGen4_close(instrument);
+    RBRGen4_close(conn);
 
 fileCleanup:
     close(instrumentFd);

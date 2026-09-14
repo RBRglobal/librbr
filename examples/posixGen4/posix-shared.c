@@ -85,22 +85,22 @@ int openSerialFd(char *devicePath)
     return instrumentFd;
 }
 
-RBRGen4Error instrumentTime(const struct RBRGen4 *instrument,
+RBRGen4Error instrumentTime(const struct RBRGen4 *conn,
                                       RBRGen4DateTime *time)
 {
     /* Unused. */
-    (void) instrument;
+    (void) conn;
     struct timespec result;
     clock_gettime(CLOCK_MONOTONIC, &result);
     *time = (result.tv_sec * 1000) + (result.tv_nsec / 1000000);
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error instrumentSleep(const struct RBRGen4 *instrument,
+RBRGen4Error instrumentSleep(const struct RBRGen4 *conn,
                                        RBRGen4DateTime time)
 {
     /* Unused. */
-    (void) instrument;
+    (void) conn;
 
     struct timespec sleep = {
         .tv_sec = time / 1000,
@@ -110,11 +110,11 @@ RBRGen4Error instrumentSleep(const struct RBRGen4 *instrument,
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error instrumentRead(const struct RBRGen4 *instrument,
+RBRGen4Error instrumentRead(const struct RBRGen4 *conn,
                                       void *data,
                                       int32_t *size)
 {
-    int *instrumentFd = (int *) RBRGen4_getUserData(instrument);
+    int *instrumentFd = (int *) RBRGen4_getUserData(conn);
 
     /* A select() call to enforce a read timeout is unnecessary because we
      * configured the serial port in noncanonical mode and specified a read
@@ -139,11 +139,11 @@ RBRGen4Error instrumentRead(const struct RBRGen4 *instrument,
     }
 }
 
-RBRGen4Error instrumentWrite(const struct RBRGen4 *instrument,
+RBRGen4Error instrumentWrite(const struct RBRGen4 *conn,
                                        const void *const data,
                                        int32_t size)
 {
-    int *instrumentFd = (int *) RBRGen4_getUserData(instrument);
+    int *instrumentFd = (int *) RBRGen4_getUserData(conn);
     const uint8_t *const byteData = (const uint8_t *const) data;
     int32_t written = 0;
 
@@ -471,7 +471,7 @@ RBRGen4Error RBRGen4_getConfigFromPool(
 }
 
 RBRGen4Error RBRGen4_initNewGroup(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char newGroupLabel[],
     const RBRGen4Label specifiedChannelLabels[],
     int32_t specifiedChannelLabelCnt,
@@ -487,17 +487,17 @@ RBRGen4Error RBRGen4_initNewGroup(
         .labels = labelBuf
     };
 
-    RBRGen4_createGroup(instrument, newGroupLabel);
+    RBRGen4_createGroup(conn, newGroupLabel);
     RBRGen4_populateGroupChannels(&channelList,
                                     channelPool,
                                     specifiedChannelLabels,
                                     specifiedChannelLabelCnt);
-    RBRGen4_setGroup(instrument, newGroup, &channelList);
+    RBRGen4_setGroup(conn, newGroup, &channelList);
     return RBRGEN4_SUCCESS;
 }
 // can be static
 RBRGen4Error RBRGen4_initNewSchedule(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char newScheduleLabel[],
     const RBRGen4Label specifiedGroupLabels[],
     int32_t specifiedGroupLabelCnt,
@@ -511,7 +511,7 @@ RBRGen4Error RBRGen4_initNewSchedule(
              "%s",
              newScheduleLabel);
 
-    RBRGen4_createSchedule(instrument, newScheduleLabel);
+    RBRGen4_createSchedule(conn, newScheduleLabel);
     // warning: read err!!!
     RBRGen4_populateScheduleGroups(groupList,
                                              specifiedGroupLabels,
@@ -533,7 +533,7 @@ RBRGen4Error RBRGen4_populateScheduleContinuous(
     return RBRGEN4_SUCCESS;
 }
 RBRGen4Error RBRGen4_initNewScheduleContinuous(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char newScheduleLabel[],
     const RBRGen4Label specifiedGroupLabels[],
     int32_t specifiedGroupLabelCnt,
@@ -543,7 +543,7 @@ RBRGen4Error RBRGen4_initNewScheduleContinuous(
     RBRGen4LabelList *groupList,
     RBRGen4Schedule *newSchedule)
 {
-    RBRGen4_initNewSchedule(instrument,
+    RBRGen4_initNewSchedule(conn,
                            newScheduleLabel,
                            specifiedGroupLabels,
                            specifiedGroupLabelCnt,
@@ -552,12 +552,12 @@ RBRGen4Error RBRGen4_initNewScheduleContinuous(
                            newSchedule);
     RBRGen4_populateScheduleContinuous(newSchedule, period, castDetection);
     // warning: read err!!!
-    RBRGen4_setSchedule(instrument, newSchedule, groupList);
+    RBRGen4_setSchedule(conn, newSchedule, groupList);
     return RBRGEN4_SUCCESS;
 }
 
 RBRGen4Error RBRGen4_initNewConfig(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char newConfigLabel[],
     const RBRGen4Label specifiedScheduleLabels[],
     int32_t specifiedScheduleLabelCnt,
@@ -567,13 +567,13 @@ RBRGen4Error RBRGen4_initNewConfig(
     memset(newConfig, 0, sizeof(RBRGen4Config));
     snprintf(newConfig->label, sizeof(newConfig->label), "%s", newConfigLabel);
 
-    RBRGen4_createConfig(instrument, newConfigLabel); // warning: read err!!!
+    RBRGen4_createConfig(conn, newConfigLabel); // warning: read err!!!
     // warning: read err!!!
     RBRGen4_populateConfigSchedules(scheduleList,
                                               specifiedScheduleLabels,
                                               specifiedScheduleLabelCnt);
     // warning: read err!!!
-    RBRGen4_setConfig(instrument, newConfig, scheduleList);
+    RBRGen4_setConfig(conn, newConfig, scheduleList);
     return RBRGEN4_SUCCESS;
 }
 //-------------------------------------------------------------------------------

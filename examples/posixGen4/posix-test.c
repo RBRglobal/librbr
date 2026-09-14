@@ -61,33 +61,33 @@ void TestIOBuffers_init(TestIOBuffers *buffers,
 }
 
 RBRGen4Error TestIOBuffers_time(
-    const struct RBRGen4 *instrument,
+    const struct RBRGen4 *conn,
     RBRGen4DateTime *time)
 {
     /* No-op. */
-    (void)instrument;
+    (void)conn;
     (void)time;
     *time = 0;
     return RBRGEN4_SUCCESS;
 }
 
 RBRGen4Error TestIOBuffers_sleep(
-    const struct RBRGen4 *instrument,
+    const struct RBRGen4 *conn,
     RBRGen4DateTime time)
 {
     /* No-op. */
-    (void)instrument;
+    (void)conn;
     (void)time;
     return RBRGEN4_SUCCESS;
 }
 
 RBRGen4Error TestIOBuffers_read(
-    const struct RBRGen4 *instrument,
+    const struct RBRGen4 *conn,
     void *data,
     int32_t *size)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRGen4_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
 
     int32_t readLength = buffers->readBufferSize - buffers->readBufferPos;
     /* If we're out of data, indicate a callback error. */
@@ -113,12 +113,12 @@ RBRGen4Error TestIOBuffers_read(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error TestIOBuffers_write(const struct RBRGen4 *instrument,
+RBRGen4Error TestIOBuffers_write(const struct RBRGen4 *conn,
                                            const void *const data,
                                            int32_t size)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRGen4_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
 
     int32_t remaining = 4096 - buffers->writeBufferPos;
     /* If we're out of space, indicate a callback error. */
@@ -141,11 +141,11 @@ RBRGen4Error TestIOBuffers_write(const struct RBRGen4 *instrument,
 }
 
 RBRGen4Error TestIOBuffers_sample(
-    const struct RBRGen4 *instrument,
+    const struct RBRGen4 *conn,
     const struct RBRGen4Sample *const sample)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRGen4_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
     if (sample != &buffers->streamSample)
     {
         return RBRGEN4_CALLBACK_ERROR;
@@ -155,9 +155,9 @@ RBRGen4Error TestIOBuffers_sample(
 
 int main(void)
 {
-    RBRGen4 *instrument = NULL;
+    RBRGen4 *conn = NULL;
     RBRGen4 instrumentSpace;
-    instrument = &instrumentSpace;
+    conn = &instrumentSpace;
     TestIOBuffers ioBuffers;
     int status = EXIT_SUCCESS;
     RBRGen4Error err;
@@ -177,7 +177,7 @@ int main(void)
     RESPONSE_TERMINATOR,
     0);
 
-    err = RBRGen4_open(&instrument,
+    err = RBRGen4_open(&conn,
                              &instrumentCallbacks,
                              /* command timeout */ 0,
                              &ioBuffers);
@@ -216,7 +216,7 @@ int main(void)
             = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
 
    if ((err = RBRGen4_verify(
-                  instrument,
+                  conn,
                   &config,
                   datasetLabel,
                   RBRGEN4_STORAGEMODE_NORMAL,

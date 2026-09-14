@@ -23,7 +23,7 @@
 #include "RBRGen4Configuration.h"
 
 RBRGen4Error RBRGen4_getNode(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Node *node)
 {
     /* The label selects the node to read, so it has to outlive the reset of
@@ -33,7 +33,7 @@ RBRGen4Error RBRGen4_getNode(
 
     memset(node, 0, sizeof(RBRGen4Node));
 
-    RBR_TRY(RBRGen4_converse(instrument, "node %s", label));
+    RBR_TRY(RBRGen4_converse(conn, "node %s", label));
 
     snprintf(node->label, sizeof(node->label), "%s", label);
 
@@ -41,7 +41,7 @@ RBRGen4Error RBRGen4_getNode(
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -113,18 +113,18 @@ RBRGen4Error RBRGen4_getNode(
 }
 
 RBRGen4Error RBRGen4_getNodePool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4NodePool *nodePool)
 {
     memset(nodePool, 0, sizeof(RBRGen4NodePool));
 
-    RBR_TRY(RBRGen4_converse(instrument, "node"));
+    RBR_TRY(RBRGen4_converse(conn, "node"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -223,7 +223,7 @@ static RBRGen4PortProtocol RBRGen4PortProtocol_parse(
 }
 
 RBRGen4Error RBRGen4_getPort(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Port *port)
 {
     /* The label selects the port to read, so it has to outlive the reset of
@@ -234,7 +234,7 @@ RBRGen4Error RBRGen4_getPort(
     memset(port, 0, sizeof(RBRGen4Port));
     port->portClass = RBRGEN4_UNKNOWN_PORT_CLASS;
 
-    RBR_TRY(RBRGen4_converse(instrument, "port %s", label));
+    RBR_TRY(RBRGen4_converse(conn, "port %s", label));
 
     snprintf(port->label, sizeof(port->label), "%s", label);
 
@@ -242,7 +242,7 @@ RBRGen4Error RBRGen4_getPort(
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -323,7 +323,7 @@ RBRGen4Error RBRGen4_getPort(
 }
 
 RBRGen4Error RBRGen4_getPortPool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4PortPool *portPool)
 {
     memset(portPool, 0, sizeof(RBRGen4PortPool));
@@ -335,13 +335,13 @@ RBRGen4Error RBRGen4_getPortPool(
         portPool->pool[port].portClass = RBRGEN4_UNKNOWN_PORT_CLASS;
     }
 
-    RBR_TRY(RBRGen4_converse(instrument, "port"));
+    RBR_TRY(RBRGen4_converse(conn, "port"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -403,7 +403,7 @@ const char *RBRGen4DeviceClass_name(
 }
 
 RBRGen4Error RBRGen4_getDevice(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Device *device)
 {
     /* The label selects the device to read, so it has to outlive the reset of
@@ -418,7 +418,7 @@ RBRGen4Error RBRGen4_getDevice(
      * `device <label>`, so name every parameter rather than take the
      * defaults. */
     RBR_TRY(RBRGen4_converse(
-        instrument,
+        conn,
         "device %s port class sn pn fwversion fwtype name channellist lock"
         " poweruptime cooldowntime powerdowntime inrushoffsettime",
         label));
@@ -429,7 +429,7 @@ RBRGen4Error RBRGen4_getDevice(
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -533,7 +533,7 @@ RBRGen4Error RBRGen4_getDevice(
 }
 
 RBRGen4Error RBRGen4_getDevicePool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4DevicePool *devicePool)
 {
     memset(devicePool, 0, sizeof(RBRGen4DevicePool));
@@ -548,13 +548,13 @@ RBRGen4Error RBRGen4_getDevicePool(
             = RBRGEN4_UNKNOWN_DEVICE_CLASS;
     }
 
-    RBR_TRY(RBRGen4_converse(instrument, "device"));
+    RBR_TRY(RBRGen4_converse(conn, "device"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -596,7 +596,7 @@ RBRGen4Error RBRGen4_getDevicePool(
 }
 
 RBRGen4Error RBRGen4_discoverDevices(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4DevicePool *devicePool)
 {
     memset(devicePool, 0, sizeof(RBRGen4DevicePool));
@@ -611,13 +611,13 @@ RBRGen4Error RBRGen4_discoverDevices(
             = RBRGEN4_UNKNOWN_DEVICE_CLASS;
     }
 
-    RBR_TRY(RBRGen4_converse(instrument, "device discover"));
+    RBR_TRY(RBRGen4_converse(conn, "device discover"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -655,7 +655,7 @@ RBRGen4Error RBRGen4_discoverDevices(
 }
 
 RBRGen4Error RBRGen4_getCalibration(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Calibration *calibration)
 {
     /* The label selects the calibration to read, so it has to outlive the
@@ -665,7 +665,7 @@ RBRGen4Error RBRGen4_getCalibration(
 
     memset(calibration, 0, sizeof(RBRGen4Calibration));
 
-    RBR_TRY(RBRGen4_converse(instrument, "calibration %s", label));
+    RBR_TRY(RBRGen4_converse(conn, "calibration %s", label));
 
     snprintf(calibration->label, sizeof(calibration->label), "%s", label);
 
@@ -673,7 +673,7 @@ RBRGen4Error RBRGen4_getCalibration(
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -822,7 +822,7 @@ static RBRGen4Error RBRGen4Calibration_appendReference(
 }
 
 RBRGen4Error RBRGen4_setCalibration(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Calibration *calibration)
 {
     if (calibration->aCount < 0
@@ -869,7 +869,7 @@ RBRGen4Error RBRGen4_setCalibration(
     }
 
     return RBRGen4_converse(
-        instrument,
+        conn,
         "calibration %s datetime=%014" PRId64 " offset=%.9g slope=%.9g%s",
         calibration->label,
         calibration->dateTime,
@@ -953,7 +953,7 @@ static void RBRGen4_copyOptionalLabel(char *destination,
  * \brief Read the labels of a `channel` response into a pool.
  */
 static RBRGen4Error RBRGen4_parseChannelPool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4ChannelPool *channelPool)
 {
     RBRGen4Error err = RBRGEN4_SUCCESS;
@@ -961,7 +961,7 @@ static RBRGen4Error RBRGen4_parseChannelPool(
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -1008,7 +1008,7 @@ static RBRGen4Error RBRGen4_parseChannelPool(
 }
 
 RBRGen4Error RBRGen4_getChannel(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Channel *channel)
 {
     if (channel->label[0] == '\0')
@@ -1018,7 +1018,7 @@ RBRGen4Error RBRGen4_getChannel(
 
     RBR_RESET_EXCEPT(channel, label);
 
-    RBR_TRY(RBRGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(conn,
                                        "channel %s",
                                        channel->label));
 
@@ -1028,7 +1028,7 @@ RBRGen4Error RBRGen4_getChannel(
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -1095,7 +1095,7 @@ RBRGen4Error RBRGen4_getChannel(
 }
 
 RBRGen4Error RBRGen4_setChannel(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Channel *channel)
 {
     if (channel->userUnits[0] == '\0')
@@ -1103,14 +1103,14 @@ RBRGen4Error RBRGen4_setChannel(
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRGen4_converse(instrument,
+    return RBRGen4_converse(conn,
                                       "channel %s userunits=%s",
                                       channel->label,
                                       channel->userUnits);
 }
 
 RBRGen4Error RBRGen4_getChannelPool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4ChannelPool *channelPool)
 {
     channelPool->count = 0;
@@ -1118,13 +1118,13 @@ RBRGen4Error RBRGen4_getChannelPool(
            0,
            channelPool->size * sizeof(RBRGen4Channel));
 
-    RBR_TRY(RBRGen4_converse(instrument, "channel"));
+    RBR_TRY(RBRGen4_converse(conn, "channel"));
 
-    return RBRGen4_parseChannelPool(instrument, channelPool);
+    return RBRGen4_parseChannelPool(conn, channelPool);
 }
 
 RBRGen4Error RBRGen4_getChannelPoolByNature(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4ChannelNature nature,
     RBRGen4ChannelPool *channelPool)
 {
@@ -1139,26 +1139,26 @@ RBRGen4Error RBRGen4_getChannelPoolByNature(
            channelPool->size * sizeof(RBRGen4Channel));
 
     RBR_TRY(RBRGen4_converse(
-                instrument,
+                conn,
                 "channel %s",
                 RBRGen4ChannelNature_name(nature)));
 
-    return RBRGen4_parseChannelPool(instrument, channelPool);
+    return RBRGen4_parseChannelPool(conn, channelPool);
 }
 
 RBRGen4Error RBRGen4_getSettings(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Settings *settings)
 {
     memset(settings, 0, sizeof(RBRGen4Settings));
 
-    RBR_TRY(RBRGen4_converse(instrument, "settings"));
+    RBR_TRY(RBRGen4_converse(conn, "settings"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -1184,7 +1184,7 @@ RBRGen4Error RBRGen4_getSettings(
 }
 
 RBRGen4Error RBRGen4_setSettings(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Settings *settings)
 {
     if (settings->pollPowerOffDelay < 0)
@@ -1196,32 +1196,32 @@ RBRGen4Error RBRGen4_setSettings(
     if (!settings->confirmation)
     {
         return RBRGen4_sendCommand(
-            instrument,
+            conn,
             "settings prompt=%s confirmation=off pollpoweroffdelay=%" PRId32,
             settings->prompt ? "on" : "off",
             settings->pollPowerOffDelay);
     }
 
     return RBRGen4_converse(
-        instrument,
+        conn,
         "settings prompt=%s confirmation=on pollpoweroffdelay=%" PRId32,
         settings->prompt ? "on" : "off",
         settings->pollPowerOffDelay);
 }
 
 RBRGen4Error RBRGen4_getParameters(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Parameters *parameters)
 {
     memset(parameters, 0, sizeof(RBRGen4Parameters));
 
-    RBR_TRY(RBRGen4_converse(instrument, "parameters"));
+    RBR_TRY(RBRGen4_converse(conn, "parameters"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -1267,12 +1267,12 @@ RBRGen4Error RBRGen4_getParameters(
 }
 
 RBRGen4Error RBRGen4_setParameters(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Parameters *parameters)
 {
     /* The instrument bounds these values; %.9g round-trips a float. */
     return RBRGen4_converse(
-        instrument,
+        conn,
         "parameters altitude=%.9g atmosphere=%.9g avgsoundspeed=%.9g "
         "density=%.9g pressure=%.9g salinity=%.9g speccondtempco=%.9g "
         "temperature=%.9g",
@@ -1288,7 +1288,7 @@ RBRGen4Error RBRGen4_setParameters(
 
 
 RBRGen4Error RBRGen4_getGroup(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Group *group,
     RBRGen4LabelList *channelList)
 {
@@ -1303,14 +1303,14 @@ RBRGen4Error RBRGen4_getGroup(
         channelList->count = 0;
     }
 
-    RBR_TRY(RBRGen4_converse(instrument, "group %s", group->label));
+    RBR_TRY(RBRGen4_converse(conn, "group %s", group->label));
 
     RBRGen4Error err = RBRGEN4_SUCCESS;
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -1330,7 +1330,7 @@ RBRGen4Error RBRGen4_getGroup(
 }
 
 RBRGen4Error RBRGen4_setGroup(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Group *group,
     const RBRGen4LabelList *channelList)
 {
@@ -1344,14 +1344,14 @@ RBRGen4Error RBRGen4_setGroup(
                                               (int32_t) sizeof(value),
                                               channelList));
 
-    return RBRGen4_converse(instrument,
+    return RBRGen4_converse(conn,
                                       "group %s channellist=%s",
                                       group->label,
                                       value);
 }
 
 RBRGen4Error RBRGen4_getGroupPool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4GroupPool *groupPool)
 {
     groupPool->count = 0;
@@ -1360,14 +1360,14 @@ RBRGen4Error RBRGen4_getGroupPool(
            0,
            groupPool->size * sizeof(RBRGen4Group));
 
-    RBR_TRY(RBRGen4_converse(instrument, "group"));
+    RBR_TRY(RBRGen4_converse(conn, "group"));
 
     RBRGen4Error err = RBRGEN4_SUCCESS;
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -1417,7 +1417,7 @@ RBRGen4Error RBRGen4_getGroupPool(
 }
 
 RBRGen4Error RBRGen4_createGroup(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *label)
 {
     if (label[0] == '\0')
@@ -1425,11 +1425,11 @@ RBRGen4Error RBRGen4_createGroup(
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRGen4_converse(instrument, "group create %s", label);
+    return RBRGen4_converse(conn, "group create %s", label);
 }
 
 RBRGen4Error RBRGen4_deleteGroup(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *label)
 {
     if (label[0] == '\0')
@@ -1437,17 +1437,17 @@ RBRGen4Error RBRGen4_deleteGroup(
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRGen4_converse(instrument, "group delete %s", label);
+    return RBRGen4_converse(conn, "group delete %s", label);
 }
 
 RBRGen4Error RBRGen4_deleteGroupAll(
-    RBRGen4 *instrument)
+    RBRGen4 *conn)
 {
-    return RBRGen4_converse(instrument, "group delete all");
+    return RBRGen4_converse(conn, "group delete all");
 }
 
 RBRGen4Error RBRGen4_getConfig(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Config *config,
     RBRGen4LabelList *scheduleList)
 {
@@ -1462,7 +1462,7 @@ RBRGen4Error RBRGen4_getConfig(
         scheduleList->count = 0;
     }
 
-    RBR_TRY(RBRGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(conn,
                                        "config %s",
                                        config->label));
 
@@ -1471,7 +1471,7 @@ RBRGen4Error RBRGen4_getConfig(
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -1491,7 +1491,7 @@ RBRGen4Error RBRGen4_getConfig(
 }
 
 RBRGen4Error RBRGen4_setConfig(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Config *config,
     const RBRGen4LabelList *scheduleList)
 {
@@ -1505,14 +1505,14 @@ RBRGen4Error RBRGen4_setConfig(
                                               (int32_t) sizeof(value),
                                               scheduleList));
 
-    return RBRGen4_converse(instrument,
+    return RBRGen4_converse(conn,
                                       "config %s schedulelist=%s",
                                       config->label,
                                       value);
 }
 
 RBRGen4Error RBRGen4_getConfigPool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4ConfigPool *configPool)
 {
     configPool->count = 0;
@@ -1521,14 +1521,14 @@ RBRGen4Error RBRGen4_getConfigPool(
            0,
            configPool->size * sizeof(RBRGen4Config));
 
-    RBR_TRY(RBRGen4_converse(instrument, "config"));
+    RBR_TRY(RBRGen4_converse(conn, "config"));
 
     RBRGen4Error err = RBRGEN4_SUCCESS;
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -1578,7 +1578,7 @@ RBRGen4Error RBRGen4_getConfigPool(
 }
 
 RBRGen4Error RBRGen4_createConfig(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *label)
 {
     if (label[0] == '\0')
@@ -1586,11 +1586,11 @@ RBRGen4Error RBRGen4_createConfig(
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRGen4_converse(instrument, "config create %s", label);
+    return RBRGen4_converse(conn, "config create %s", label);
 }
 
 RBRGen4Error RBRGen4_deleteConfig(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *label)
 {
     if (label[0] == '\0')
@@ -1598,13 +1598,13 @@ RBRGen4Error RBRGen4_deleteConfig(
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRGen4_converse(instrument, "config delete %s", label);
+    return RBRGen4_converse(conn, "config delete %s", label);
 }
 
 RBRGen4Error RBRGen4_deleteConfigAll(
-    RBRGen4 *instrument)
+    RBRGen4 *conn)
 {
-    return RBRGen4_converse(instrument, "config delete all");
+    return RBRGen4_converse(conn, "config delete all");
 }
 
 const char *RBRGen4ScheduleMode_name(
@@ -1692,7 +1692,7 @@ static RBRGen4ScheduleMode RBRGen4ScheduleMode_parse(
 }
 
 RBRGen4Error RBRGen4_getSchedule(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Schedule *schedule,
     RBRGen4LabelList *groupList)
 {
@@ -1707,7 +1707,7 @@ RBRGen4Error RBRGen4_getSchedule(
         groupList->count = 0;
     }
 
-    RBR_TRY(RBRGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(conn,
                                        "schedule %s",
                                        schedule->label));
 
@@ -1724,7 +1724,7 @@ RBRGen4Error RBRGen4_getSchedule(
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -1792,7 +1792,7 @@ RBRGen4Error RBRGen4_getSchedule(
 }
 
 RBRGen4Error RBRGen4_setSchedule(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Schedule *schedule,
     const RBRGen4LabelList *groupList)
 {
@@ -1863,7 +1863,7 @@ RBRGen4Error RBRGen4_setSchedule(
     if (schedule->mode == RBRGEN4_SCHEDULE_MODE_CONTINUOUS)
     {
         return RBRGen4_converse(
-            instrument,
+            conn,
             SCHEDULE_COMMON " period=%" PRId32,
             schedule->label,
             groups,
@@ -1875,7 +1875,7 @@ RBRGen4Error RBRGen4_setSchedule(
     }
 
     return RBRGen4_converse(
-        instrument,
+        conn,
         SCHEDULE_COMMON
         " period=%" PRId32
         " measurementcount=%" PRId32
@@ -1894,7 +1894,7 @@ RBRGen4Error RBRGen4_setSchedule(
 }
 
 RBRGen4Error RBRGen4_getSchedulePool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4SchedulePool *schedulePool)
 {
     schedulePool->count = 0;
@@ -1909,14 +1909,14 @@ RBRGen4Error RBRGen4_getSchedulePool(
            sizeof(schedulePool->availableFastPeriods));
     schedulePool->maxRegimes = 0;
 
-    RBR_TRY(RBRGen4_converse(instrument, "schedule"));
+    RBR_TRY(RBRGen4_converse(conn, "schedule"));
 
     RBRGen4Error err = RBRGEN4_SUCCESS;
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -2007,7 +2007,7 @@ RBRGen4Error RBRGen4_getSchedulePool(
 }
 
 RBRGen4Error RBRGen4_createSchedule(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *label)
 {
     if (label[0] == '\0')
@@ -2015,11 +2015,11 @@ RBRGen4Error RBRGen4_createSchedule(
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRGen4_converse(instrument, "schedule create %s", label);
+    return RBRGen4_converse(conn, "schedule create %s", label);
 }
 
 RBRGen4Error RBRGen4_deleteSchedule(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *label)
 {
     if (label[0] == '\0')
@@ -2027,11 +2027,11 @@ RBRGen4Error RBRGen4_deleteSchedule(
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRGen4_converse(instrument, "schedule delete %s", label);
+    return RBRGen4_converse(conn, "schedule delete %s", label);
 }
 
 RBRGen4Error RBRGen4_deleteScheduleAll(
-    RBRGen4 *instrument)
+    RBRGen4 *conn)
 {
-    return RBRGen4_converse(instrument, "schedule delete all");
+    return RBRGen4_converse(conn, "schedule delete all");
 }

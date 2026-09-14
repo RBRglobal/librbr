@@ -40,19 +40,19 @@ const char *RBRGen4StorageAccess_name(
 }
 
 RBRGen4Error RBRGen4_getStorage(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Storage *storage)
 {
     memset(storage, 0, sizeof(RBRGen4Storage));
     storage->access = RBRGEN4_UNKNOWN_STORAGE_ACCESS;
 
-    RBR_TRY(RBRGen4_converse(instrument, "storage"));
+    RBR_TRY(RBRGen4_converse(conn, "storage"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -92,7 +92,7 @@ RBRGen4Error RBRGen4_getStorage(
 }
 
 RBRGen4Error RBRGen4_setStorage(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Storage *storage)
 {
     if (storage->access < 0
@@ -102,7 +102,7 @@ RBRGen4Error RBRGen4_setStorage(
     }
 
     return RBRGen4_converse(
-        instrument,
+        conn,
         "storage access=%s",
         RBRGen4StorageAccess_name(storage->access));
 }
@@ -125,7 +125,7 @@ const char *RBRGen4DatasetStatus_name(
 }
 
 RBRGen4Error RBRGen4_getDatasetPool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4DatasetPool *datasetPool)
 {
     datasetPool->count = 0;
@@ -134,14 +134,14 @@ RBRGen4Error RBRGen4_getDatasetPool(
            0,
            datasetPool->size * sizeof(RBRGen4Dataset));
 
-    RBR_TRY(RBRGen4_converse(instrument, "dataset"));
+    RBR_TRY(RBRGen4_converse(conn, "dataset"));
 
     RBRGen4Error err = RBRGEN4_SUCCESS;
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -191,7 +191,7 @@ RBRGen4Error RBRGen4_getDatasetPool(
 }
 
 RBRGen4Error RBRGen4_getDataset(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Dataset *dataset,
     RBRGen4LabelList *scheduleList)
 {
@@ -208,7 +208,7 @@ RBRGen4Error RBRGen4_getDataset(
         scheduleList->count = 0;
     }
 
-    RBR_TRY(RBRGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(conn,
                                        "dataset %s",
                                        dataset->label));
 
@@ -217,7 +217,7 @@ RBRGen4Error RBRGen4_getDataset(
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -288,7 +288,7 @@ const char *RBRGen4Block_name(RBRGen4Block block){
  * and left unparsed.
  */
 static void RBRGen4Dataset_parseBlockResponse(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     int64_t *byteCount,
     int64_t *sampleCount,
     int64_t *eventCount)
@@ -297,7 +297,7 @@ static void RBRGen4Dataset_parseBlockResponse(
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -324,7 +324,7 @@ static void RBRGen4Dataset_parseBlockResponse(
 }
 
 RBRGen4Error RBRGen4Dataset_getEventsBlock(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     RBRGen4DatasetEventsBlock *block)
 {
@@ -335,11 +335,11 @@ RBRGen4Error RBRGen4Dataset_getEventsBlock(
 
     memset(block, 0, sizeof(RBRGen4DatasetEventsBlock));
 
-    RBR_TRY(RBRGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(conn,
                                        "dataset %s/events",
                                        dataset->label));
 
-    RBRGen4Dataset_parseBlockResponse(instrument,
+    RBRGen4Dataset_parseBlockResponse(conn,
                                                 &block->byteCount,
                                                 NULL,
                                                 &block->eventCount);
@@ -348,7 +348,7 @@ RBRGen4Error RBRGen4Dataset_getEventsBlock(
 }
 
 RBRGen4Error RBRGen4Dataset_getMetaBlock(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     RBRGen4DatasetMetaBlock *block)
 {
@@ -359,11 +359,11 @@ RBRGen4Error RBRGen4Dataset_getMetaBlock(
 
     memset(block, 0, sizeof(RBRGen4DatasetMetaBlock));
 
-    RBR_TRY(RBRGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(conn,
                                        "dataset %s/meta",
                                        dataset->label));
 
-    RBRGen4Dataset_parseBlockResponse(instrument,
+    RBRGen4Dataset_parseBlockResponse(conn,
                                                 &block->byteCount,
                                                 NULL,
                                                 NULL);
@@ -372,7 +372,7 @@ RBRGen4Error RBRGen4Dataset_getMetaBlock(
 }
 
 RBRGen4Error RBRGen4Dataset_getScheduleBlock(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRGen4DatasetScheduleBlock *block)
@@ -384,12 +384,12 @@ RBRGen4Error RBRGen4Dataset_getScheduleBlock(
 
     memset(block, 0, sizeof(RBRGen4DatasetScheduleBlock));
 
-    RBR_TRY(RBRGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(conn,
                                        "dataset %s/%s",
                                        dataset->label,
                                        scheduleLabel));
 
-    RBRGen4Dataset_parseBlockResponse(instrument,
+    RBRGen4Dataset_parseBlockResponse(conn,
                                                 &block->byteCount,
                                                 NULL,
                                                 NULL);
@@ -398,7 +398,7 @@ RBRGen4Error RBRGen4Dataset_getScheduleBlock(
 }
 
 RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRGen4DatasetEventsBlock *block)
@@ -410,12 +410,12 @@ RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(
 
     memset(block, 0, sizeof(RBRGen4DatasetEventsBlock));
 
-    RBR_TRY(RBRGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(conn,
                                        "dataset %s/%s/events",
                                        dataset->label,
                                        scheduleLabel));
 
-    RBRGen4Dataset_parseBlockResponse(instrument,
+    RBRGen4Dataset_parseBlockResponse(conn,
                                                 &block->byteCount,
                                                 NULL,
                                                 &block->eventCount);
@@ -424,7 +424,7 @@ RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(
 }
 
 RBRGen4Error RBRGen4Dataset_getScheduleDataBlock(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRGen4DatasetDataBlock *block)
@@ -436,12 +436,12 @@ RBRGen4Error RBRGen4Dataset_getScheduleDataBlock(
 
     memset(block, 0, sizeof(RBRGen4DatasetDataBlock));
 
-    RBR_TRY(RBRGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(conn,
                                        "dataset %s/%s/data",
                                        dataset->label,
                                        scheduleLabel));
 
-    RBRGen4Dataset_parseBlockResponse(instrument,
+    RBRGen4Dataset_parseBlockResponse(conn,
                                                 &block->byteCount,
                                                 &block->sampleCount,
                                                 NULL);
@@ -450,7 +450,7 @@ RBRGen4Error RBRGen4Dataset_getScheduleDataBlock(
 }
 
 RBRGen4Error RBRGen4_deleteDataset(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *label)
 {
     if (label[0] == '\0')
@@ -458,15 +458,15 @@ RBRGen4Error RBRGen4_deleteDataset(
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRGen4_converse(instrument,
+    return RBRGen4_converse(conn,
                                       "dataset delete %s",
                                       label);
 }
 
 RBRGen4Error RBRGen4_deleteDatasetAll(
-    RBRGen4 *instrument)
+    RBRGen4 *conn)
 {
-    return RBRGen4_converse(instrument, "dataset delete all");
+    return RBRGen4_converse(conn, "dataset delete all");
 }
 
 const char *RBRGen4DownloadDataUnit_name(
@@ -510,12 +510,12 @@ const char *RBRGen4DownloadEventsUnit_name(
  * then begins to read from the instrument. As a result, \a data must not be
  * RBRGen4.responseBuffer!
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] data the buffer to write into
  * \param [in] size the amount of data to write into the buffer
  */
 static RBRGen4Error RBRGen4_fixedRead(
-    struct RBRGen4 *instrument,
+    struct RBRGen4 *conn,
     void *data,
     int64_t size)
 {
@@ -523,22 +523,22 @@ static RBRGen4Error RBRGen4_fixedRead(
     int32_t readLength;
 
     /* Can we steal from the response buffer? */
-    if (instrument->lastResponseLength < instrument->responseBufferLength)
+    if (conn->lastResponseLength < conn->responseBufferLength)
     {
-        readLength = instrument->responseBufferLength
-                     - instrument->lastResponseLength;
+        readLength = conn->responseBufferLength
+                     - conn->lastResponseLength;
         if (readLength > size)
         {
             readLength = (int32_t) size;
         }
 
         memcpy(data,
-               ((uint8_t *) instrument->responseBuffer)
-               + instrument->lastResponseLength,
+               ((uint8_t *) conn->responseBuffer)
+               + conn->lastResponseLength,
                readLength);
 
         bufferLength = readLength;
-        instrument->lastResponseLength += readLength;
+        conn->lastResponseLength += readLength;
     }
 
     /* Now poll the instrument. */
@@ -548,8 +548,8 @@ static RBRGen4Error RBRGen4_fixedRead(
                      ? INT32_MAX
                      : (int32_t) (size - bufferLength);
 
-        RBR_TRY(instrument->callbacks.read(
-                    instrument,
+        RBR_TRY(conn->callbacks.read(
+                    conn,
                     ((uint8_t *) data) + bufferLength,
                     &readLength));
 
@@ -566,7 +566,7 @@ static RBRGen4Error RBRGen4_fixedRead(
  * The echo always reports `bytecount`; when \a countKey is not `bytecount`,
  * the count in the requested unit is reported under \a countKey as well.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] countKey the count key sent with the command
  * \param [in,out] count the requested amount; updated to the amount reported
  * \param [out] byteCount the byte count reported
@@ -574,7 +574,7 @@ static RBRGen4Error RBRGen4_fixedRead(
  * \param [in] dataSize the capacity of \a data in bytes
  */
 static RBRGen4Error RBRGen4Dataset_downloadCommon(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const char *countKey,
     int64_t *count,
     int64_t *byteCount,
@@ -585,7 +585,7 @@ static RBRGen4Error RBRGen4Dataset_downloadCommon(
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -616,22 +616,22 @@ static RBRGen4Error RBRGen4Dataset_downloadCommon(
         while (rest > 0)
         {
             int64_t chunk =
-                rest > (int64_t) sizeof(instrument->commandBuffer)
-                ? (int64_t) sizeof(instrument->commandBuffer)
+                rest > (int64_t) sizeof(conn->commandBuffer)
+                ? (int64_t) sizeof(conn->commandBuffer)
                 : rest;
-            RBR_TRY(RBRGen4_fixedRead(instrument,
-                                                instrument->commandBuffer,
+            RBR_TRY(RBRGen4_fixedRead(conn,
+                                                conn->commandBuffer,
                                                 chunk));
             rest -= chunk;
         }
         return RBRGEN4_BUFFER_TOO_SMALL;
     }
 
-    RBR_TRY(RBRGen4_fixedRead(instrument, data, *byteCount));
+    RBR_TRY(RBRGen4_fixedRead(conn, data, *byteCount));
 
     /* The instrument transmits the 16-bit CRC most significant byte first. */
     uint8_t crc[2];
-    RBR_TRY(RBRGen4_fixedRead(instrument, crc, 2));
+    RBR_TRY(RBRGen4_fixedRead(conn, crc, 2));
 
     uint16_t reportedCrc = (uint16_t) ((crc[0] << 8) | crc[1]);
     if (RBRGen4_calculateCrc(data, *byteCount) != reportedCrc)
@@ -643,7 +643,7 @@ static RBRGen4Error RBRGen4Dataset_downloadCommon(
 }
 
 RBRGen4Error RBRGen4Dataset_downloadScheduleData(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRGen4DownloadData *download)
@@ -664,7 +664,7 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleData(
 
     download->byteCount = 0;
 
-    RBR_TRY(RBRGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(conn,
                                        "download %s/%s/data"
                                        " %s=%" PRId64 " %s=%" PRId64,
                                        dataset->label,
@@ -675,7 +675,7 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleData(
                                        download->start));
 
     RBR_TRY(RBRGen4Dataset_downloadCommon(
-                instrument,
+                conn,
                 countKey,
                 &download->count,
                 &download->byteCount,
@@ -689,13 +689,13 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleData(
  * \brief Perform an events download from the whole dataset (\a scheduleLabel
  * NULL) or from one schedule.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in] scheduleLabel the schedule, or NULL for the whole dataset
  * \param [in,out] download the download request and its result
  */
 static RBRGen4Error RBRGen4Dataset_downloadEventsCommon(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRGen4DownloadEvents *download)
@@ -719,7 +719,7 @@ static RBRGen4Error RBRGen4Dataset_downloadEventsCommon(
 
     if (scheduleLabel == NULL)
     {
-        RBR_TRY(RBRGen4_converse(instrument,
+        RBR_TRY(RBRGen4_converse(conn,
                                            "download %s/events"
                                            " %s=%" PRId64 " %s=%" PRId64,
                                            dataset->label,
@@ -730,7 +730,7 @@ static RBRGen4Error RBRGen4Dataset_downloadEventsCommon(
     }
     else
     {
-        RBR_TRY(RBRGen4_converse(instrument,
+        RBR_TRY(RBRGen4_converse(conn,
                                            "download %s/%s/events"
                                            " %s=%" PRId64 " %s=%" PRId64,
                                            dataset->label,
@@ -742,7 +742,7 @@ static RBRGen4Error RBRGen4Dataset_downloadEventsCommon(
     }
 
     RBR_TRY(RBRGen4Dataset_downloadCommon(
-                instrument,
+                conn,
                 countKey,
                 &download->count,
                 &download->byteCount,
@@ -753,18 +753,18 @@ static RBRGen4Error RBRGen4Dataset_downloadEventsCommon(
 }
 
 RBRGen4Error RBRGen4Dataset_downloadEvents(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     RBRGen4DownloadEvents *download)
 {
-    return RBRGen4Dataset_downloadEventsCommon(instrument,
+    return RBRGen4Dataset_downloadEventsCommon(conn,
                                                        dataset,
                                                        NULL,
                                                        download);
 }
 
 RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     const char *scheduleLabel,
     RBRGen4DownloadEvents *download)
@@ -774,14 +774,14 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRGen4Dataset_downloadEventsCommon(instrument,
+    return RBRGen4Dataset_downloadEventsCommon(conn,
                                                        dataset,
                                                        scheduleLabel,
                                                        download);
 }
 
 RBRGen4Error RBRGen4Dataset_downloadMeta(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4Dataset *dataset,
     RBRGen4DownloadMeta *download)
 {
@@ -793,7 +793,7 @@ RBRGen4Error RBRGen4Dataset_downloadMeta(
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    RBR_TRY(RBRGen4_converse(instrument,
+    RBR_TRY(RBRGen4_converse(conn,
                                        "download %s/meta"
                                        " bytecount=%" PRId64
                                        " bytestart=%" PRId64,
@@ -802,7 +802,7 @@ RBRGen4Error RBRGen4Dataset_downloadMeta(
                                        download->byteStart));
 
     int64_t byteCount = 0;
-    RBR_TRY(RBRGen4Dataset_downloadCommon(instrument,
+    RBR_TRY(RBRGen4Dataset_downloadCommon(conn,
                                                     "bytecount",
                                                     &download->byteCount,
                                                     &byteCount,

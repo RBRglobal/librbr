@@ -90,14 +90,14 @@ static void RBRGen4_copyTrimmed(char *destination,
     destination[length] = '\0';
 }
 
-RBRGen4Error RBRGen4_getId(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_getId(RBRGen4 *conn,
                                        RBRGen4Id *id)
 {
     memset(id, 0, sizeof(RBRGen4Id));
 
-    RBR_TRY(RBRGen4_converse(instrument, "id"));
+    RBR_TRY(RBRGen4_converse(conn, "id"));
 
-    const char *cursor = instrument->response.response;
+    const char *cursor = conn->response.response;
     if (cursor == NULL)
     {
         return RBRGEN4_SUCCESS;
@@ -163,17 +163,17 @@ RBRGen4Error RBRGen4_getId(RBRGen4 *instrument,
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_getId4(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_getId4(RBRGen4 *conn,
                                        RBRGen4Id4 *id)
 {
     memset(id, 0, sizeof(RBRGen4Id4));
 
-    RBR_TRY(RBRGen4_converse(instrument, "id4"));
+    RBR_TRY(RBRGen4_converse(conn, "id4"));
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     do
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
         if (parameter.key == NULL || parameter.value == NULL)
@@ -210,27 +210,27 @@ RBRGen4Error RBRGen4_getId4(RBRGen4 *instrument,
             id->fwtype = strtol(parameter.value, NULL, 10);
         }
     } while (true);
-    if (id != &instrument->id)
+    if (id != &conn->id)
     {
-        memcpy(&instrument->id, id, sizeof(RBRGen4Id4));
+        memcpy(&conn->id, id, sizeof(RBRGen4Id4));
     }
 
     return RBRGEN4_SUCCESS;
 }
 
 RBRGen4Error RBRGen4_getPcbaPool(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4PcbaPool *pcbaPool)
 {
     memset(pcbaPool, 0, sizeof(RBRGen4PcbaPool));
 
-    RBR_TRY(RBRGen4_converse(instrument, "pcba"));
+    RBR_TRY(RBRGen4_converse(conn, "pcba"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -274,7 +274,7 @@ RBRGen4Error RBRGen4_getPcbaPool(
 }
 
 RBRGen4Error RBRGen4_getPcba(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Pcba *pcba)
 {
     /* The label selects the PCBA to read, so it has to outlive the reset of
@@ -284,7 +284,7 @@ RBRGen4Error RBRGen4_getPcba(
 
     memset(pcba, 0, sizeof(RBRGen4Pcba));
 
-    RBR_TRY(RBRGen4_converse(instrument, "pcba %s", label));
+    RBR_TRY(RBRGen4_converse(conn, "pcba %s", label));
 
     snprintf(pcba->label, sizeof(pcba->label), "%s", label);
 
@@ -292,7 +292,7 @@ RBRGen4Error RBRGen4_getPcba(
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                        &command,
                                        &parameter);
 
@@ -343,18 +343,18 @@ const char *RBRGen4PowerSource_name(RBRGen4PowerSource source)
     }
 }
 
-RBRGen4Error RBRGen4_getPowerSource(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_getPowerSource(RBRGen4 *conn,
                                           RBRGen4PowerSource *powerSource)
 {
     *powerSource = RBRGEN4_POWER_SOURCE_UNKNOWN;
 
-    RBR_TRY(RBRGen4_converse(instrument, "instrument power"));
+    RBR_TRY(RBRGen4_converse(conn, "instrument power"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -430,10 +430,10 @@ const char *RBRGen4InternalBatteryType_displayName(
 }
 
 RBRGen4Error RBRGen4_getPowerInternal(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4PowerInternal *power)
 {
-    if (instrument->generation == RBRGEN4_LOGGER2)
+    if (conn->generation == RBRGEN4_LOGGER2)
     {
         return RBRGEN4_UNSUPPORTED;
     }
@@ -441,13 +441,13 @@ RBRGen4Error RBRGen4_getPowerInternal(
     memset(power, 0, sizeof(RBRGen4PowerInternal));
     power->batteryType = RBRGEN4_UNKNOWN_INTERNAL_BATTERY;
 
-    RBR_TRY(RBRGen4_converse(instrument, "instrument power internal"));
+    RBR_TRY(RBRGen4_converse(conn, "instrument power internal"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -481,7 +481,7 @@ RBRGen4Error RBRGen4_getPowerInternal(
 }
 
 RBRGen4Error RBRGen4_setPowerInternalBatteryType(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4InternalBatteryType type)
 {
     if (type < 0 || type >= RBRGEN4_INTERNAL_BATTERY_COUNT)
@@ -490,15 +490,15 @@ RBRGen4Error RBRGen4_setPowerInternalBatteryType(
     }
 
     return RBRGen4_converse(
-        instrument,
+        conn,
         "instrument power internal batterytype=%s",
         RBRGen4InternalBatteryType_name(type));
 }
 
 RBRGen4Error RBRGen4_resetPowerInternalUsed(
-    RBRGen4 *instrument)
+    RBRGen4 *conn)
 {
-    return RBRGen4_converse(instrument, "instrument power internal used=0");
+    return RBRGen4_converse(conn, "instrument power internal used=0");
 }
 
 const char *RBRGen4ExternalBatteryType_name(
@@ -572,19 +572,19 @@ const char *RBRGen4ExternalBatteryType_displayName(
 }
 
 RBRGen4Error RBRGen4_getPowerExternal(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4PowerExternal *power)
 {
     memset(power, 0, sizeof(RBRGen4PowerExternal));
     power->batteryType = RBRGEN4_UNKNOWN_EXTERNAL_BATTERY;
 
-    RBR_TRY(RBRGen4_converse(instrument, "instrument power external"));
+    RBR_TRY(RBRGen4_converse(conn, "instrument power external"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -618,7 +618,7 @@ RBRGen4Error RBRGen4_getPowerExternal(
 }
 
 RBRGen4Error RBRGen4_setPowerExternalBatteryType(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4ExternalBatteryType type)
 {
     if (type < 0 || type >= RBRGEN4_EXTERNAL_BATTERY_COUNT)
@@ -627,15 +627,15 @@ RBRGen4Error RBRGen4_setPowerExternalBatteryType(
     }
 
     return RBRGen4_converse(
-        instrument,
+        conn,
         "instrument power external batterytype=%s",
         RBRGen4ExternalBatteryType_name(type));
 }
 
 RBRGen4Error RBRGen4_resetPowerExternalUsed(
-    RBRGen4 *instrument)
+    RBRGen4 *conn)
 {
-    return RBRGen4_converse(instrument, "instrument power external used=0");
+    return RBRGen4_converse(conn, "instrument power external used=0");
 }
 
 /**
@@ -667,20 +667,20 @@ static RBRGen4DataType RBRGen4DataType_parse(
 }
 
 RBRGen4Error RBRGen4_getInstrument(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4Instrument *instrumentInfo)
 {
     memset(instrumentInfo, 0, sizeof(RBRGen4Instrument));
     instrumentInfo->state = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
     instrumentInfo->dataType = RBRGEN4_UNKNOWN_DATATYPE;
 
-    RBR_TRY(RBRGen4_converse(instrument, "instrument"));
+    RBR_TRY(RBRGen4_converse(conn, "instrument"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                     &command,
                                     &parameter);
 
@@ -783,20 +783,20 @@ static RBRGen4Encoding RBRGen4Encoding_parse(
 }
 
 RBRGen4Error RBRGen4_getOutputFormat(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     RBRGen4OutputFormat *outputformat)
 {
     memset(outputformat, 0, sizeof(RBRGen4OutputFormat));
     outputformat->encoding = RBRGEN4_UNKNOWN_ENCODING;
     outputformat->dataType = RBRGEN4_UNKNOWN_DATATYPE;
 
-    RBR_TRY(RBRGen4_converse(instrument, "instrument outputformat"));
+    RBR_TRY(RBRGen4_converse(conn, "instrument outputformat"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
     while (true)
     {
-        RBRGen4_parseResponse(instrument,
+        RBRGen4_parseResponse(conn,
                                         &command,
                                         &parameter);
 
@@ -836,16 +836,16 @@ RBRGen4Error RBRGen4_getOutputFormat(
     }
 
     /* The caller may have asked us to populate the cache itself. */
-    if (outputformat != &instrument->outputFormat)
+    if (outputformat != &conn->outputFormat)
     {
-        instrument->outputFormat = *outputformat;
+        conn->outputFormat = *outputformat;
     }
 
     return RBRGEN4_SUCCESS;
 }
 
 RBRGen4Error RBRGen4_setOutputFormat(
-    RBRGen4 *instrument,
+    RBRGen4 *conn,
     const RBRGen4OutputFormat *outputformat)
 {
     if (outputformat->encoding < 0
@@ -857,7 +857,7 @@ RBRGen4Error RBRGen4_setOutputFormat(
     }
 
     RBR_TRY(RBRGen4_converse(
-                instrument,
+                conn,
                 "instrument outputformat sn=%s schedulelabel=%s datetime=%s"
                 " crc=%s encoding=%s datatype=%s",
                 outputformat->sn ? "on" : "off",
@@ -867,32 +867,32 @@ RBRGen4Error RBRGen4_setOutputFormat(
                 RBRGen4Encoding_name(outputformat->encoding),
                 RBRGen4DataType_name(outputformat->dataType)));
 
-    instrument->outputFormat = *outputformat;
+    conn->outputFormat = *outputformat;
 
     return RBRGEN4_SUCCESS;
 }
 
 RBRGen4Error RBRGen4_factoryReset(
-    RBRGen4 *instrument)
+    RBRGen4 *conn)
 {
-    return RBRGen4_converse(instrument, "instrument factory reset");
+    return RBRGen4_converse(conn, "instrument factory reset");
 }
 
-RBRGen4Error RBRGen4_reboot(RBRGen4 *instrument,
+RBRGen4Error RBRGen4_reboot(RBRGen4 *conn,
                                         const int32_t delay)
 {
     if (delay == 0)
     {
-        RBR_TRY(RBRGen4_sendCommand(instrument, "instrument reboot"));
+        RBR_TRY(RBRGen4_sendCommand(conn, "instrument reboot"));
     }
     else
     {
-        RBR_TRY(RBRGen4_sendCommand(instrument,
+        RBR_TRY(RBRGen4_sendCommand(conn,
                                               "instrument reboot delay=%"
                                               PRId32,
                                               delay));
     }
 
-    instrument->lastActivityTime = RBRGEN4_NO_ACTIVITY;
+    conn->lastActivityTime = RBRGEN4_NO_ACTIVITY;
     return RBRGEN4_SUCCESS;
 }
