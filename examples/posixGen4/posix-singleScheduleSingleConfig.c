@@ -121,23 +121,23 @@ int main(int argc, char *argv[])
     }
 
     //------(optional) get link type: USB/serial/wifi---------------------------------------------
-    RBRInstrumentGen4Link link;
-    RBRInstrumentGen4_getLink(instrument, &link);
+    RBRGen4Link link;
+    RBRGen4_getLink(instrument, &link);
     printf("Connected to the instrument via %s.\n",
-           RBRInstrumentGen4LinkType_name(link.type));
+           RBRGen4LinkType_name(link.type));
 
-    RBRInstrumentGen4LinkSerial serial;
+    RBRGen4LinkSerial serial;
 
     switch (link.type)
     {
-    case RBRINSTRUMENTGEN4_LINK_TYPE_USB:
+    case RBRGEN4_LINK_TYPE_USB:
         break;
-    case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
+    case RBRGEN4_LINK_TYPE_SERIAL:
     {
-        RBRInstrumentGen4_getLinkSerial(instrument, &serial);
+        RBRGen4_getLinkSerial(instrument, &serial);
         printf("Connected in %s mode at %s baud.\n",
-               RBRInstrumentGen4LinkSerialMode_name(serial.mode),
-               RBRInstrumentGen4LinkSerialBaudRate_name(serial.baudRate));
+               RBRGen4LinkSerialMode_name(serial.mode),
+               RBRGen4LinkSerialBaudRate_name(serial.baudRate));
         break;
     }
     default:

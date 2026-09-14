@@ -65,7 +65,7 @@ if(CONFIG_LIBRBR)
         zephyr_library_sources(
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRDynamicCorrectionGen4.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4.c
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Communication.c
+            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Communication.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Configuration.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRInstrumentGen4Deployment.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4HardwareErrors.c

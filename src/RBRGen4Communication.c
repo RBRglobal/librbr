@@ -1,5 +1,5 @@
 /**
- * \file RBRInstrumentGen4Communication.c
+ * \file RBRGen4Communication.c
  *
  * \brief Library implementation.
  *
@@ -13,31 +13,31 @@
 
 #include "RBRGen4.h"
 #include "RBRGen4Internal.h"
-#include "RBRInstrumentGen4Communication.h"
+#include "RBRGen4Communication.h"
 
-const char *RBRInstrumentGen4LinkType_name(RBRInstrumentGen4LinkType linkType)
+const char *RBRGen4LinkType_name(RBRGen4LinkType linkType)
 {
     switch (linkType)
     {
-    case RBRINSTRUMENTGEN4_LINK_TYPE_USB:
+    case RBRGEN4_LINK_TYPE_USB:
         return "usb";
-    case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
+    case RBRGEN4_LINK_TYPE_SERIAL:
         return "serial";
     /* case RBRINSTRUMENTGEN4_LINK_TYPE_WIFI:
         return "wifi"; */
-    case RBRINSTRUMENTGEN4_LINK_TYPE_COUNT:
+    case RBRGEN4_LINK_TYPE_COUNT:
         return "link type count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_LINK_TYPE:
+    case RBRGEN4_UNKNOWN_LINK_TYPE:
     default:
         return "unknown link type";
     }
 }
 
-RBRGen4Error RBRInstrumentGen4_getLink(RBRGen4 *instrument,
-                                                RBRInstrumentGen4Link *link)
+RBRGen4Error RBRGen4_getLink(RBRGen4 *instrument,
+                                                RBRGen4Link *link)
 {
-    memset(link, 0, sizeof(RBRInstrumentGen4Link));
-    link->type = RBRINSTRUMENTGEN4_UNKNOWN_LINK_TYPE;
+    memset(link, 0, sizeof(RBRGen4Link));
+    link->type = RBRGEN4_UNKNOWN_LINK_TYPE;
 
     RBR_TRY(RBRGen4_converse(instrument, "link"));
 
@@ -55,9 +55,9 @@ RBRGen4Error RBRInstrumentGen4_getLink(RBRGen4 *instrument,
         }
         else if (strcmp(parameter.key, "type") == 0)
         {
-            for (int i = 0; i < RBRINSTRUMENTGEN4_LINK_TYPE_COUNT; i++)
+            for (int i = 0; i < RBRGEN4_LINK_TYPE_COUNT; i++)
             {
-                if (strcmp(RBRInstrumentGen4LinkType_name(i),
+                if (strcmp(RBRGen4LinkType_name(i),
                            parameter.value) == 0)
                 {
                     link->type = i;
@@ -70,26 +70,26 @@ RBRGen4Error RBRInstrumentGen4_getLink(RBRGen4 *instrument,
     return RBRGEN4_SUCCESS;
 }
 
-const char *RBRInstrumentGen4LinkSerialBaudRate_name(
-    RBRInstrumentGen4LinkSerialBaudRate baud)
+const char *RBRGen4LinkSerialBaudRate_name(
+    RBRGen4LinkSerialBaudRate baud)
 {
     switch (baud)
     {
-    case RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_4800:
+    case RBRGEN4_LINK_SERIAL_BAUD_4800:
         return "4800";
-    case RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_9600:
+    case RBRGEN4_LINK_SERIAL_BAUD_9600:
         return "9600";
-    case RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_19200:
+    case RBRGEN4_LINK_SERIAL_BAUD_19200:
         return "19200";
-    case RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_38400:
+    case RBRGEN4_LINK_SERIAL_BAUD_38400:
         return "38400";
-    case RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_57600:
+    case RBRGEN4_LINK_SERIAL_BAUD_57600:
         return "57600";
-    case RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_115200:
+    case RBRGEN4_LINK_SERIAL_BAUD_115200:
         return "115200";
-    case RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_230400:
+    case RBRGEN4_LINK_SERIAL_BAUD_230400:
         return "230400";
-    case RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_NONE:
+    case RBRGEN4_LINK_SERIAL_BAUD_NONE:
     default:
         return "none";
     }
@@ -99,39 +99,39 @@ const char *RBRInstrumentGen4LinkSerialBaudRate_name(
  * \brief Find the baud rate a response value names.
  *
  * \param [in] value the response value
- * \return the baud rate, or #RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_NONE
+ * \return the baud rate, or #RBRGEN4_LINK_SERIAL_BAUD_NONE
  */
-static RBRInstrumentGen4LinkSerialBaudRate
-RBRInstrumentGen4LinkSerialBaudRate_parse(
+static RBRGen4LinkSerialBaudRate
+RBRGen4LinkSerialBaudRate_parse(
     const char *value)
 {
-    for (int i = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_NONE + 1;
-         i <= RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_MAX;
+    for (int i = RBRGEN4_LINK_SERIAL_BAUD_NONE + 1;
+         i <= RBRGEN4_LINK_SERIAL_BAUD_MAX;
          i <<= 1)
     {
-        if (strcmp(RBRInstrumentGen4LinkSerialBaudRate_name(i), value) == 0)
+        if (strcmp(RBRGen4LinkSerialBaudRate_name(i), value) == 0)
         {
             return i;
         }
     }
 
-    return RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_NONE;
+    return RBRGEN4_LINK_SERIAL_BAUD_NONE;
 }
 
-const char *RBRInstrumentGen4LinkSerialMode_name(
-    RBRInstrumentGen4LinkSerialMode mode)
+const char *RBRGen4LinkSerialMode_name(
+    RBRGen4LinkSerialMode mode)
 {
     switch (mode)
     {
-    case RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS232:
+    case RBRGEN4_LINK_SERIAL_MODE_RS232:
         return "rs232";
-    case RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_RS485F:
+    case RBRGEN4_LINK_SERIAL_MODE_RS485F:
         return "rs485f";
-    case RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_UART:
+    case RBRGEN4_LINK_SERIAL_MODE_UART:
         return "uart";
-    case RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW:
+    case RBRGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW:
         return "uart_idlelow";
-    case RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_NONE:
+    case RBRGEN4_LINK_SERIAL_MODE_NONE:
     default:
         return "none";
     }
@@ -141,29 +141,29 @@ const char *RBRInstrumentGen4LinkSerialMode_name(
  * \brief Find the serial mode a response value names.
  *
  * \param [in] value the response value
- * \return the serial mode, or #RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_NONE
+ * \return the serial mode, or #RBRGEN4_LINK_SERIAL_MODE_NONE
  */
-static RBRInstrumentGen4LinkSerialMode RBRInstrumentGen4LinkSerialMode_parse(
+static RBRGen4LinkSerialMode RBRGen4LinkSerialMode_parse(
     const char *value)
 {
-    for (int i = RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_NONE + 1;
-         i <= RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_MAX;
+    for (int i = RBRGEN4_LINK_SERIAL_MODE_NONE + 1;
+         i <= RBRGEN4_LINK_SERIAL_MODE_MAX;
          i <<= 1)
     {
-        if (strcmp(RBRInstrumentGen4LinkSerialMode_name(i), value) == 0)
+        if (strcmp(RBRGen4LinkSerialMode_name(i), value) == 0)
         {
             return i;
         }
     }
 
-    return RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_NONE;
+    return RBRGEN4_LINK_SERIAL_MODE_NONE;
 }
 
-RBRGen4Error RBRInstrumentGen4_getLinkSerial(
+RBRGen4Error RBRGen4_getLinkSerial(
     RBRGen4 *instrument,
-    RBRInstrumentGen4LinkSerial *serial)
+    RBRGen4LinkSerial *serial)
 {
-    memset(serial, 0, sizeof(RBRInstrumentGen4LinkSerial));
+    memset(serial, 0, sizeof(RBRGen4LinkSerial));
 
     RBR_TRY(RBRGen4_converse(
         instrument,
@@ -185,12 +185,12 @@ RBRGen4Error RBRInstrumentGen4_getLinkSerial(
         else if (strcmp(parameter.key, "baudrate") == 0)
         {
             serial->baudRate
-                = RBRInstrumentGen4LinkSerialBaudRate_parse(parameter.value);
+                = RBRGen4LinkSerialBaudRate_parse(parameter.value);
         }
         else if (strcmp(parameter.key, "mode") == 0)
         {
             serial->mode
-                = RBRInstrumentGen4LinkSerialMode_parse(parameter.value);
+                = RBRGen4LinkSerialMode_parse(parameter.value);
         }
         else if (strcmp(parameter.key, "availablebaudrates") == 0)
         {
@@ -199,7 +199,7 @@ RBRGen4Error RBRInstrumentGen4_getLinkSerial(
             {
                 char *nextValue = RBRGen4_splitListValue(value);
                 serial->availableBaudRates
-                    |= RBRInstrumentGen4LinkSerialBaudRate_parse(value);
+                    |= RBRGen4LinkSerialBaudRate_parse(value);
 
                 value = nextValue;
             }
@@ -211,7 +211,7 @@ RBRGen4Error RBRInstrumentGen4_getLinkSerial(
             {
                 char *nextValue = RBRGen4_splitListValue(value);
                 serial->availableModes
-                    |= RBRInstrumentGen4LinkSerialMode_parse(value);
+                    |= RBRGen4LinkSerialMode_parse(value);
 
                 value = nextValue;
             }
@@ -220,17 +220,17 @@ RBRGen4Error RBRInstrumentGen4_getLinkSerial(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4_setLinkSerial(
+RBRGen4Error RBRGen4_setLinkSerial(
     RBRGen4 *instrument,
-    const RBRInstrumentGen4LinkSerial *serial)
+    const RBRGen4LinkSerial *serial)
 {
     /* The command takes one baud rate and one mode, so a field carrying
      * several flags is as invalid as one carrying none. */
-    if (serial->baudRate <= RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_NONE
-        || serial->baudRate > RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_MAX
+    if (serial->baudRate <= RBRGEN4_LINK_SERIAL_BAUD_NONE
+        || serial->baudRate > RBRGEN4_LINK_SERIAL_BAUD_MAX
         || (serial->baudRate & (serial->baudRate - 1)) != 0
-        || serial->mode <= RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_NONE
-        || serial->mode > RBRINSTRUMENTGEN4_LINK_SERIAL_MODE_MAX
+        || serial->mode <= RBRGEN4_LINK_SERIAL_MODE_NONE
+        || serial->mode > RBRGEN4_LINK_SERIAL_MODE_MAX
         || (serial->mode & (serial->mode - 1)) != 0)
     {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
@@ -239,11 +239,11 @@ RBRGen4Error RBRInstrumentGen4_setLinkSerial(
     return RBRGen4_converse(
         instrument,
         "link serial baudrate=%s mode=%s",
-        RBRInstrumentGen4LinkSerialBaudRate_name(serial->baudRate),
-        RBRInstrumentGen4LinkSerialMode_name(serial->mode));
+        RBRGen4LinkSerialBaudRate_name(serial->baudRate),
+        RBRGen4LinkSerialMode_name(serial->mode));
 }
 
-RBRGen4Error RBRInstrumentGen4_sleep(RBRGen4 *instrument)
+RBRGen4Error RBRGen4_sleep(RBRGen4 *instrument)
 {
     RBR_TRY(RBRGen4_sendCommand(instrument, "sleep"));
     instrument->lastActivityTime = RBRGEN4_NO_ACTIVITY;
@@ -256,30 +256,30 @@ RBRGen4Error RBRInstrumentGen4_sleep(RBRGen4 *instrument)
 
 #if 0
 
-const char *RBRInstrumentGen4WiFiState_name(RBRInstrumentGen4WiFiState state)
+const char *RBRGen4WiFiState_name(RBRGen4WiFiState state)
 {
     switch (state)
     {
-    case RBRINSTRUMENTGEN4_WIFI_NA:
+    case RBRGEN4_WIFI_NA:
         return "n/a";
-    case RBRINSTRUMENTGEN4_WIFI_ON:
+    case RBRGEN4_WIFI_ON:
         return "on";
-    case RBRINSTRUMENTGEN4_WIFI_OFF:
+    case RBRGEN4_WIFI_OFF:
         return "off";
-    case RBRINSTRUMENTGEN4_WIFI_COUNT:
+    case RBRGEN4_WIFI_COUNT:
         return "state count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_WIFI:
+    case RBRGEN4_UNKNOWN_WIFI:
     default:
         return "unknown state";
     }
 }
 
-RBRGen4Error RBRInstrumentGen4_getWiFi(RBRGen4 *instrument,
-                                         RBRInstrumentGen4WiFi *wifi)
+RBRGen4Error RBRGen4_getWiFi(RBRGen4 *instrument,
+                                         RBRGen4WiFi *wifi)
 {
-     memset(wifi, 0, sizeof(RBRInstrumentGen4WiFi));
+     memset(wifi, 0, sizeof(RBRGen4WiFi));
 
-    wifi->state = RBRINSTRUMENTGEN4_UNKNOWN_WIFI;
+    wifi->state = RBRGEN4_UNKNOWN_WIFI;
 
     RBR_TRY(RBRGen4_converse(instrument, "wifi"));
 
@@ -301,11 +301,11 @@ RBRGen4Error RBRInstrumentGen4_getWiFi(RBRGen4 *instrument,
         }
         else if (strcmp(parameter.key, "state") == 0)
         {
-            for (int i = RBRINSTRUMENTGEN4_WIFI_NA;
-                 i < RBRINSTRUMENTGEN4_WIFI_COUNT;
+            for (int i = RBRGEN4_WIFI_NA;
+                 i < RBRGEN4_WIFI_COUNT;
                  i++)
             {
-                if (strcmp(RBRInstrumentGen4WiFiState_name(i),
+                if (strcmp(RBRGen4WiFiState_name(i),
                            parameter.value) == 0)
                 {
                     wifi->state = i;
@@ -323,11 +323,11 @@ RBRGen4Error RBRInstrumentGen4_getWiFi(RBRGen4 *instrument,
         }
         else if (strcmp(parameter.key, "baudrate") == 0)
         {
-            for (int i = RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_NONE + 1;
-                 i <= RBRINSTRUMENTGEN4_LINK_SERIAL_BAUD_MAX;
+            for (int i = RBRGEN4_LINK_SERIAL_BAUD_NONE + 1;
+                 i <= RBRGEN4_LINK_SERIAL_BAUD_MAX;
                  i <<= 1)
             {
-                if (strcmp(RBRInstrumentGen4LinkSerialBaudRate_name(i),
+                if (strcmp(RBRGen4LinkSerialBaudRate_name(i),
                            parameter.value) == 0)
                 {
                     wifi->baudRate = i;
@@ -339,8 +339,8 @@ RBRGen4Error RBRInstrumentGen4_getWiFi(RBRGen4 *instrument,
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRInstrumentGen4_setWiFi(RBRGen4 *instrument,
-                                         const RBRInstrumentGen4WiFi *wifi)
+RBRGen4Error RBRGen4_setWiFi(RBRGen4 *instrument,
+                                         const RBRGen4WiFi *wifi)
 {
     if (wifi->timeout < 5000
         || wifi->timeout > 600000

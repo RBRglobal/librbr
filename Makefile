@@ -128,7 +128,7 @@ GEN3_OBJECTS := src/RBRInstrumentGen3.o \
 
 ## \brief Objects for the Gen4 (SL4/SEN4/L4) API.
 GEN4_OBJECTS := src/RBRGen4.o \
-                src/RBRInstrumentGen4Communication.o \
+                src/RBRGen4Communication.o \
                 src/RBRInstrumentGen4Configuration.o \
                 src/RBRInstrumentGen4Deployment.o \
                 src/RBRGen4HardwareErrors.o \

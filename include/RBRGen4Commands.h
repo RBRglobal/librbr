@@ -18,7 +18,7 @@ extern "C" {
 /** The order is important. 
  * Based on dependency, it has to be "communication", "configuration", "schedule";
  * And "Memory", "Deployment. "*/
-#include "RBRInstrumentGen4Communication.h"
+#include "RBRGen4Communication.h"
 #include "RBRInstrumentGen4Configuration.h"
 #include "RBRInstrumentGen4Memory.h"
 #include "RBRInstrumentGen4Deployment.h"

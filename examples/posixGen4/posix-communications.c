@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
         goto fileCleanup;
     }
 
-    if ((err = RBRInstrumentGen4_sleep(instrument)) != RBRGEN4_SUCCESS)
+    if ((err = RBRGen4_sleep(instrument)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to put instrument to sleep: %s!\n",
                 programName,
@@ -130,8 +130,8 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    RBRInstrumentGen4Link link;
-    if ((err = RBRInstrumentGen4_getLink(instrument, &link))
+    RBRGen4Link link;
+    if ((err = RBRGen4_getLink(instrument, &link))
         != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to get instrument link: %s!\n",
@@ -141,19 +141,19 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
     printf("Connected to the instrument via %s.\n",
-           RBRInstrumentGen4LinkType_name(link.type));
+           RBRGen4LinkType_name(link.type));
 
     switch (link.type)
     {
-    case RBRINSTRUMENTGEN4_LINK_TYPE_USB:
+    case RBRGEN4_LINK_TYPE_USB:
         break;
-    case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
+    case RBRGEN4_LINK_TYPE_SERIAL:
         {
-            RBRInstrumentGen4LinkSerial serial;
-            RBRInstrumentGen4_getLinkSerial(instrument, &serial);
+            RBRGen4LinkSerial serial;
+            RBRGen4_getLinkSerial(instrument, &serial);
             printf("Connected in %s mode at %s baud.\n",
-                   RBRInstrumentGen4LinkSerialMode_name(serial.mode),
-                   RBRInstrumentGen4LinkSerialBaudRate_name(serial.baudRate));
+                   RBRGen4LinkSerialMode_name(serial.mode),
+                   RBRGen4LinkSerialBaudRate_name(serial.baudRate));
             break;
         }
     default:
