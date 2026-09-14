@@ -128,12 +128,3 @@ pipelines:
                     - make clean
                     - scan-build make
 
-            - step:
-                name: Documentation compilation
-                image: docker.io/library/gcc:15
-                script:
-                    - apt-get update && apt-get -y install doxygen graphviz
-                    - make clean
-                    - make docs
-                    - make clean
-                    - make devdocs

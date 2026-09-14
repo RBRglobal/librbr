@@ -3,7 +3,6 @@
 
 # Generated artifacts.
 bin/
-docs/
 testsGen3/tests.c
 testsGen4/tests.c
 *.o

@@ -136,8 +136,6 @@ The library makes a few assumptions
 about its host platform.
 For details, see [the documentation on porting][porting].
 
-API document compilation requires [Doxygen].
-
 Platform-specific instructions and advice
 are available:
 
@@ -145,7 +143,6 @@ are available:
 
 [Makefile]: Makefile.html
 [porting]: porting.md
-[Doxygen]: http://doxygen.org/
 [Cygwin]: cygwin.md
 
 In most cases,
@@ -165,8 +162,6 @@ Then use either `make tests` or `make all` to build the libraries:
 ~~~{.sh}
 # Build and execute tests. Also builds the library if necessary:
 $ make tests
-# Build Doxygen documentation:
-$ make docs
 # Does all of the above. Build both libraries - librbr and libRBRDynamicCorrection:
 $ make all
 ~~~
@@ -254,10 +249,6 @@ $ make nomalloc
 
 See [the introduction]
 for an overview of library conventions.
-
-API documentation is built into the `docs/` subdirectory.
-Prebuilt API documentation corresponding to the latest release
-is available at **https://docs.rbr-global.com/librbr/.**
 
 For examples,
 please see the `examples/` subdirectory.
