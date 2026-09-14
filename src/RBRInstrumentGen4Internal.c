@@ -82,7 +82,6 @@
 #define SAMPLE_NAN "nan"
 #define SAMPLE_INF "inf"
 #define SAMPLE_NINF "-inf"
-#define SAMPLE_UNCAL "###"
 #define SAMPLE_ERROR_PREFIX "Error-"
 #define SAMPLE_ERROR_PREFIX_LEN ((long) (sizeof(SAMPLE_ERROR_PREFIX) - 1))
 
@@ -556,12 +555,6 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
         {
             reading = -(double) INFINITY;
         }
-        else if (memcmp(token, SAMPLE_UNCAL, 3) == 0)
-        {
-            reading = RBRInstrumentGen4Reading_setError(
-                RBRINSTRUMENTGEN4_READING_FLAG_UNCALIBRATED,
-                0);
-        }
         else if (memcmp(token,
                         SAMPLE_ERROR_PREFIX,
                         SAMPLE_ERROR_PREFIX_LEN) == 0)
@@ -570,10 +563,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
              * ignore the value and the sample formatter will output it just as
              * we received it. */
             reading = RBRInstrumentGen4Reading_setError(
-                RBRINSTRUMENTGEN4_READING_FLAG_ERROR,
-                strtol(token + SAMPLE_ERROR_PREFIX_LEN,
-                       NULL,
-                       10));
+                strtol(token + SAMPLE_ERROR_PREFIX_LEN, NULL, 10));
         }
         else if (memcmp(token, "0x", 2) == 0)
         {

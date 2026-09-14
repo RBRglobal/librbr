@@ -173,18 +173,14 @@ int main(int argc, char *argv[])
             printf("%" PRIi64, sample.timestamp);
             for (int32_t i = 0; i < sample.channelCount; i++)
             {
-                switch (RBRInstrumentGen4Reading_getFlag(sample.readings[i]))
+                if (RBRInstrumentGen4Reading_isError(sample.readings[i]))
                 {
-                case RBRINSTRUMENTGEN4_READING_FLAG_UNCALIBRATED:
-                    printf(", ###");
-                    break;
-                case RBRINSTRUMENTGEN4_READING_FLAG_ERROR:
-                    printf(", Error-%2d", RBRInstrumentGen4Reading_getError(sample.readings[i]));
-                    break;
-                case RBRINSTRUMENTGEN4_READING_FLAG_NONE:
-                default:
+                    printf(", Error-%2d",
+                           RBRInstrumentGen4Reading_getError(sample.readings[i]));
+                }
+                else
+                {
                     printf(", %lf", sample.readings[i]);
-                    break;
                 }
             }
             printf("\n");

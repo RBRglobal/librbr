@@ -20,34 +20,17 @@
 #include "RBRInstrumentGen4Streaming.h"
 
 #define READING_FLAG_MASK 0x00FF0000
-#define READING_FLAG_OFFSET (2 * 8)
+/** \brief Marks a NaN as an error reading rather than a plain NaN. */
+#define READING_ERROR_FLAG 0x00010000
 #define READING_ERROR_MASK 0x0000FFFF
 #define READING_ERROR_OFFSET (0 * 8)
 
 
-const char *RBRInstrumentGen4ReadingFlag_name(RBRInstrumentGen4ReadingFlag flag)
-{
-    switch (flag)
-    {
-    case RBRINSTRUMENTGEN4_READING_FLAG_NONE:
-        return "none";
-    case RBRINSTRUMENTGEN4_READING_FLAG_UNCALIBRATED:
-        return "uncalibrated";
-    case RBRINSTRUMENTGEN4_READING_FLAG_ERROR:
-        return "error";
-    case RBRINSTRUMENTGEN4_READING_FLAG_COUNT:
-        return "reading flag count";
-    case RBRINSTRUMENTGEN4_UNKNOWN_READING_FLAG:
-    default:
-        return "unknown reading flag";
-    }
-}
-
-inline RBRInstrumentGen4ReadingFlag RBRInstrumentGen4Reading_getFlag(double reading)
+inline bool RBRInstrumentGen4Reading_isError(double reading)
 {
     if (!isnan(reading))
     {
-        return RBRINSTRUMENTGEN4_READING_FLAG_NONE;
+        return false;
     }
 
     union
@@ -57,7 +40,7 @@ inline RBRInstrumentGen4ReadingFlag RBRInstrumentGen4Reading_getFlag(double read
     } alias;
     alias.reading = reading;
 
-    return (alias.raw & READING_FLAG_MASK) >> READING_FLAG_OFFSET;
+    return (alias.raw & READING_FLAG_MASK) != 0;
 }
 
 inline RBRInstrumentGen4ReadingError RBRInstrumentGen4Reading_getError(double reading)
@@ -79,8 +62,7 @@ inline RBRInstrumentGen4ReadingError RBRInstrumentGen4Reading_getError(double re
     return (RBRInstrumentGen4ReadingError)(index);
 }
 
-inline double RBRInstrumentGen4Reading_setError(RBRInstrumentGen4ReadingFlag flag,
-                                                uint8_t error)
+inline double RBRInstrumentGen4Reading_setError(RBRInstrumentGen4ReadingError error)
 {
     union
     {
@@ -89,7 +71,9 @@ inline double RBRInstrumentGen4Reading_setError(RBRInstrumentGen4ReadingFlag fla
     } alias;
     alias.reading = (double) NAN;
 
-    alias.raw |= ((flag << READING_FLAG_OFFSET) & READING_FLAG_MASK) | ((error << READING_ERROR_OFFSET) & READING_ERROR_MASK);
+    alias.raw |= READING_ERROR_FLAG
+                 | (((uint64_t) error << READING_ERROR_OFFSET)
+                    & READING_ERROR_MASK);
 
     return alias.reading;
 }

@@ -42,14 +42,10 @@ TEST_LOGGER4(poll)
           { .timestamp = 1710054066000LL,
             .channelCount = 4,
             .readings = {
-              RBRInstrumentGen4Reading_setError(
-                RBRINSTRUMENTGEN4_READING_FLAG_ERROR, 1),
-              RBRInstrumentGen4Reading_setError(
-                RBRINSTRUMENTGEN4_READING_FLAG_ERROR, 9),
-              RBRInstrumentGen4Reading_setError(
-                RBRINSTRUMENTGEN4_READING_FLAG_ERROR, 9),
-              RBRInstrumentGen4Reading_setError(
-                RBRINSTRUMENTGEN4_READING_FLAG_ERROR, 9) } } },
+              RBRInstrumentGen4Reading_setError(1),
+              RBRInstrumentGen4Reading_setError(9),
+              RBRInstrumentGen4Reading_setError(9),
+              RBRInstrumentGen4Reading_setError(9) } } },
         { "temperature_00",
           NULL,
           "poll channellist=temperature_00" COMMAND_TERMINATOR,
@@ -58,8 +54,7 @@ TEST_LOGGER4(poll)
           RBRINSTRUMENTGEN4_SUCCESS,
           { .timestamp = 1710054067000LL,
             .channelCount = 1,
-            .readings = { RBRInstrumentGen4Reading_setError(
-                RBRINSTRUMENTGEN4_READING_FLAG_ERROR, 1) } } },
+            .readings = { RBRInstrumentGen4Reading_setError(1) } } },
         /* A sample's timestamp may be a bare count of milliseconds. */
         { NULL,
           NULL,
@@ -92,12 +87,9 @@ TEST_LOGGER4(poll)
           { .timestamp = 1710054069000LL,
             .channelCount = 3,
             .readings = {
-              RBRInstrumentGen4Reading_setError(
-                RBRINSTRUMENTGEN4_READING_FLAG_ERROR, 9),
-              RBRInstrumentGen4Reading_setError(
-                RBRINSTRUMENTGEN4_READING_FLAG_ERROR, 1),
-              RBRInstrumentGen4Reading_setError(
-                RBRINSTRUMENTGEN4_READING_FLAG_ERROR, 9) } } },
+              RBRInstrumentGen4Reading_setError(9),
+              RBRInstrumentGen4Reading_setError(1),
+              RBRInstrumentGen4Reading_setError(9) } } },
         { NULL,
           "g",
           "poll grouplist=g" COMMAND_TERMINATOR,
@@ -106,8 +98,7 @@ TEST_LOGGER4(poll)
           RBRINSTRUMENTGEN4_SUCCESS,
           { .timestamp = 1710054070000LL,
             .channelCount = 1,
-            .readings = { RBRInstrumentGen4Reading_setError(
-                RBRINSTRUMENTGEN4_READING_FLAG_ERROR, 9) } } },
+            .readings = { RBRInstrumentGen4Reading_setError(9) } } },
         /* Successful readings parse as their values. */
         { NULL,
           NULL,
@@ -132,8 +123,7 @@ TEST_LOGGER4(poll)
           { .timestamp = 1710054091000LL,
             .scheduleLabel = "polling",
             .channelCount = 1,
-            .readings = { RBRInstrumentGen4Reading_setError(
-                RBRINSTRUMENTGEN4_READING_FLAG_ERROR, 1) } } },
+            .readings = { RBRInstrumentGen4Reading_setError(1) } } },
         { "temperature_00",
           NULL,
           "poll channellist=temperature_00" COMMAND_TERMINATOR,
@@ -145,8 +135,7 @@ TEST_LOGGER4(poll)
           RBRINSTRUMENTGEN4_SUCCESS,
           { .timestamp = 1710054093000LL,
             .channelCount = 1,
-            .readings = { RBRInstrumentGen4Reading_setError(
-                RBRINSTRUMENTGEN4_READING_FLAG_ERROR, 1) } } },
+            .readings = { RBRInstrumentGen4Reading_setError(1) } } },
         { "temperature_00",
           NULL,
           "poll channellist=temperature_00" COMMAND_TERMINATOR,
@@ -158,8 +147,7 @@ TEST_LOGGER4(poll)
           RBRINSTRUMENTGEN4_SUCCESS,
           { .timestamp = 1710054095000LL,
             .channelCount = 1,
-            .readings = { RBRInstrumentGen4Reading_setError(
-                RBRINSTRUMENTGEN4_READING_FLAG_ERROR, 1) } } },
+            .readings = { RBRInstrumentGen4Reading_setError(1) } } },
         /* A single reading with no other fields is a one-token sample. */
         { "pressure_00",
           NULL,
@@ -395,24 +383,22 @@ TEST_LOGGER4(poll)
         for (int32_t channel = 0; channel < actual.channelCount; ++channel)
         {
             TEST_ASSERT_ENUM_EQ(
-                RBRInstrumentGen4Reading_getFlag(
+                RBRInstrumentGen4Reading_isError(
                     tests[i].expected.readings[channel]),
-                RBRInstrumentGen4Reading_getFlag(actual.readings[channel]),
-                RBRInstrumentGen4ReadingFlag);
+                RBRInstrumentGen4Reading_isError(actual.readings[channel]),
+                bool);
 
-            switch (RBRInstrumentGen4Reading_getFlag(actual.readings[channel]))
+            if (RBRInstrumentGen4Reading_isError(actual.readings[channel]))
             {
-            case RBRINSTRUMENTGEN4_READING_FLAG_UNCALIBRATED:
-            case RBRINSTRUMENTGEN4_READING_FLAG_ERROR:
                 TEST_ASSERT_EQ(
                     RBRInstrumentGen4Reading_getError(
                         tests[i].expected.readings[channel]),
                     RBRInstrumentGen4Reading_getError(
                         actual.readings[channel]),
                     "%" PRIi8);
-                break;
-            case RBRINSTRUMENTGEN4_READING_FLAG_NONE:
-            default:
+            }
+            else
+            {
                 TEST_ASSERT_EQ(tests[i].expected.readings[channel],
                                actual.readings[channel],
                                "%lf");
