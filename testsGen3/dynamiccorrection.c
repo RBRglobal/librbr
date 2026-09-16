@@ -210,7 +210,6 @@ TEST_LOGGER3(verify_ascent_rate)
 
 TEST_LOGGER3(verify_coeff_alpha_tau_ctcoeff)
 {
-    // https://wiki.rbr-global.com/display/RAD/Dynamic+processing+on+floats
     DCorrCoeffTest tests[] = {
             { 0.02f, 0.120f, 12.26f, 0.046f },
             { 0.03f, 0.120f, 12.26f, 0.046f },
