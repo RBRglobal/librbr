@@ -112,6 +112,7 @@ typedef struct RBRGen3Simulation
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
  *                                 hardware error occurs
+ * \see RBRGen3_setSimulation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
 RBRGen3Error RBRGen3_getSimulation(
@@ -138,6 +139,7 @@ RBRGen3Error RBRGen3_getSimulation(
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an out-of-bounds
  *                                                simulation period is
  *                                                requested
+ * \see RBRGen3_getSimulation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
 RBRGen3Error RBRGen3_setSimulation(

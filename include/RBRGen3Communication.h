@@ -363,7 +363,7 @@ RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn,
  *                                 hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
- * \see RBRGen3_getWifi()
+ * \see RBRGen3_getWiFi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
 RBRGen3Error RBRGen3_setWiFi(RBRGen3 *conn,

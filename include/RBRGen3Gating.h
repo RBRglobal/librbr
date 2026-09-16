@@ -173,6 +173,7 @@ typedef struct RBRGen3Thresholding
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
  *                                 hardware error occurs
+ * \see RBRGen3_setThresholding()
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
 RBRGen3Error RBRGen3_getThresholding(
@@ -198,6 +199,7 @@ RBRGen3Error RBRGen3_getThresholding(
  *                                 another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
+ * \see RBRGen3_getThresholding()
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
 RBRGen3Error RBRGen3_setThresholding(
@@ -235,6 +237,7 @@ typedef struct RBRGen3TwistActivation
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
  *                                 hardware error occurs
+ * \see RBRGen3_setTwistActivation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/twistactivation
  */
 RBRGen3Error RBRGen3_getTwistActivation(
@@ -256,6 +259,7 @@ RBRGen3Error RBRGen3_getTwistActivation(
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
  *                                 another hardware error occurs
+ * \see RBRGen3_getTwistActivation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/twistactivation
  */
 RBRGen3Error RBRGen3_setTwistActivation(

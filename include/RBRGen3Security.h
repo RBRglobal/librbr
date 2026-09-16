@@ -49,6 +49,7 @@ RBRGen3Error RBRGen3_permit(RBRGen3 *conn,
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRGen3_setPrompt()
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/prompt
  */
 RBRGen3Error RBRGen3_getPrompt(RBRGen3 *conn,
@@ -62,6 +63,7 @@ RBRGen3Error RBRGen3_getPrompt(RBRGen3 *conn,
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRGen3_getPrompt()
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/prompt
  */
 RBRGen3Error RBRGen3_setPrompt(RBRGen3 *conn,
@@ -78,6 +80,7 @@ RBRGen3Error RBRGen3_setPrompt(RBRGen3 *conn,
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRGen3_setConfirmation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/confirmation
  */
 RBRGen3Error RBRGen3_getConfirmation(RBRGen3 *conn,
@@ -95,6 +98,7 @@ RBRGen3Error RBRGen3_getConfirmation(RBRGen3 *conn,
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRGen3_getConfirmation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/confirmation
  */
 RBRGen3Error RBRGen3_setConfirmation(RBRGen3 *conn,

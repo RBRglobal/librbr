@@ -74,6 +74,7 @@ typedef struct RBRGen3Clock
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRGen3_setClock()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
  */
 RBRGen3Error RBRGen3_getClock(RBRGen3 *conn,
@@ -103,6 +104,7 @@ RBRGen3Error RBRGen3_getClock(RBRGen3 *conn,
  *                                 another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the clock values are out
  *                                                of range
+ * \see RBRGen3_getClock()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
  */
 RBRGen3Error RBRGen3_setClock(RBRGen3 *conn,
@@ -270,6 +272,7 @@ typedef struct RBRGen3Sampling
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRGen3_setSampling()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  */
 RBRGen3Error RBRGen3_getSampling(
@@ -316,6 +319,7 @@ RBRGen3Error RBRGen3_getSampling(
  *                                 another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
+ * \see RBRGen3_getSampling()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  * \see RBRGen3_setBurstSampling()
  */
@@ -448,6 +452,7 @@ typedef struct RBRGen3Deployment
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRGen3_setDeployment()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
 RBRGen3Error RBRGen3_getDeployment(
@@ -474,6 +479,7 @@ RBRGen3Error RBRGen3_getDeployment(
  *                                 another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the start or end time
  *                                                values are out of range
+ * \see RBRGen3_getDeployment()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
 RBRGen3Error RBRGen3_setDeployment(
