@@ -81,8 +81,8 @@ RBRGen4Error RBRGen4_getNode(
         }
         else if (strcmp(parameter.key, "fwversion") == 0)
         {
-            snprintf(node->fwVersion,
-                     sizeof(node->fwVersion),
+            snprintf(node->fwversion,
+                     sizeof(node->fwversion),
                      "%s",
                      parameter.value);
         }
@@ -97,7 +97,7 @@ RBRGen4Error RBRGen4_getNode(
         {
             /* `na` is not a number, so it converts to the zero which stands
              * for it. */
-            node->fwType = strtol(parameter.value, NULL, 10);
+            node->fwtype = strtol(parameter.value, NULL, 10);
         }
         else if (strcmp(parameter.key, "poweruptime") == 0)
         {
@@ -468,14 +468,14 @@ RBRGen4Error RBRGen4_getDevice(
         }
         else if (strcmp(parameter.key, "fwversion") == 0)
         {
-            snprintf(device->fwVersion,
-                     sizeof(device->fwVersion),
+            snprintf(device->fwversion,
+                     sizeof(device->fwversion),
                      "%s",
                      parameter.value);
         }
         else if (strcmp(parameter.key, "fwtype") == 0)
         {
-            device->fwType = strtol(parameter.value, NULL, 10);
+            device->fwtype = strtol(parameter.value, NULL, 10);
         }
         else if (strcmp(parameter.key, "name") == 0)
         {

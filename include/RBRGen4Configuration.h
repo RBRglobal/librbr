@@ -134,7 +134,7 @@ typedef struct RBRGen4Node
                  [RBRGEN4_LABEL_NAME_MAX + 1];
 
     /** \brief The firmware version running on the node. */
-    char fwVersion[RBRGEN4_ID_VERSION_MAX + 1];
+    char fwversion[RBRGEN4_ID_VERSION_MAX + 1];
 
     /** \brief The node firmware version in semantic-version form. */
     char semver[RBRGEN4_ID_SEMVER_MAX + 1];
@@ -145,7 +145,7 @@ typedef struct RBRGen4Node
      * Zero when the node runs no firmware of its own, which it reports as
      * `na`.
      */
-    int32_t fwType;
+    int32_t fwtype;
 
     /** \brief The time in milliseconds the node takes to power up. */
     int32_t powerUpTime;
@@ -473,7 +473,7 @@ typedef struct RBRGen4Device
     char pn[RBRGEN4_PART_NUMBER_MAX + 1];
 
     /** \brief The firmware version running on the device. */
-    char fwVersion[RBRGEN4_ID_VERSION_MAX + 1];
+    char fwversion[RBRGEN4_ID_VERSION_MAX + 1];
 
     /**
      * \brief The firmware type running on the device.
@@ -481,7 +481,7 @@ typedef struct RBRGen4Device
      * Zero when the device runs no firmware of its own, which it reports as
      * `na`.
      */
-    int32_t fwType;
+    int32_t fwtype;
 
     /** \brief The generic name of the kind of device installed. */
     char name[RBRGEN4_LABEL_NAME_MAX + 1];
