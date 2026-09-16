@@ -52,7 +52,7 @@ typedef enum RBRGen4InstrumentState
  * \see RBRGen4Error_name() for a description of the format of names
  */
 const char *RBRGen4InstrumentState_name(
-    RBRGen4InstrumentState status);
+    RBRGen4InstrumentState state);
 
 /**
  * \brief The maximum number of characters in the instrument name.
@@ -565,7 +565,7 @@ RBRGen4Error RBRGen4_getInstrument(
  * subsequently received samples.
  *
  * \param [in] conn the instrument connection
- * \param [out] outputformat the current output format
+ * \param [out] outputFormat the current output format
  * \return #RBRGEN4_SUCCESS when the settings are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -574,13 +574,13 @@ RBRGen4Error RBRGen4_getInstrument(
  */
 RBRGen4Error RBRGen4_getOutputFormat(
     RBRGen4 *conn,
-    RBRGen4OutputFormat *outputformat);
+    RBRGen4OutputFormat *outputFormat);
 
 /**
  * \brief Set the current output format.
  * \note Issues the `instrument outputformat` command.
  *
- * Every parameter of the command is sent, so \a outputformat must be fully
+ * Every parameter of the command is sent, so \a outputFormat must be fully
  * populated: read the current format with RBRGen4_getOutputFormat()
  * and modify it if only some parameters are of interest.
  *
@@ -596,7 +596,7 @@ RBRGen4Error RBRGen4_getOutputFormat(
  * before relying on parsed samples again.
  *
  * \param [in] conn the instrument connection
- * \param [in] outputformat the desired output format
+ * \param [in] outputFormat the desired output format
  * \return #RBRGEN4_SUCCESS when the settings are successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -610,7 +610,7 @@ RBRGen4Error RBRGen4_getOutputFormat(
  */
 RBRGen4Error RBRGen4_setOutputFormat(
     RBRGen4 *conn,
-    const RBRGen4OutputFormat *outputformat);
+    const RBRGen4OutputFormat *outputFormat);
 
 /**
  * \brief Return the instrument's configuration to its factory state.
