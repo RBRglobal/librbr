@@ -229,7 +229,7 @@ int main(void)
         .read = TestIOBuffers_read,
         .write = TestIOBuffers_write,
         .sample = TestIOBuffers_sample,
-        .sampleBuffer = &ioBuffers.streamSample
+        .sampleBuffer = &ioBuffers.streamSample,
     };
 
     RBRGen4 instrumentL4Buffer;
@@ -266,7 +266,7 @@ int main(void)
         .sample = TestParserBuffers_sample,
         .sampleBuffer = &parserSample,
         .event = TestParserBuffers_event,
-        .eventBuffer = &parserEvent
+        .eventBuffer = &parserEvent,
     };
 
     RBRGen4Parser parserBuffer;

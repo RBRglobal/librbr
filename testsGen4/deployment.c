@@ -27,16 +27,16 @@ TEST_LOGGER4(getClock)
         { "clock datetime=20260824120000 offsetfromutc=0.00"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { .dateTime = 1787572800000LL, .offsetFromUtc = 0.0f } },
+          { .dateTime = 1787572800000LL, .offsetFromUtc = 0.0f, }, },
         /* The instrument never signs a positive offset. */
         { "clock datetime=20260824120130 offsetfromutc=5.50"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { .dateTime = 1787572890000LL, .offsetFromUtc = 5.5f } },
+          { .dateTime = 1787572890000LL, .offsetFromUtc = 5.5f, }, },
         { "clock datetime=20260824120000 offsetfromutc=-4.50"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { .dateTime = 1787572800000LL, .offsetFromUtc = -4.5f } },
+          { .dateTime = 1787572800000LL, .offsetFromUtc = -4.5f, }, },
         /*
          * The response echoes the parameters in the order they were asked
          * for, so the getter must not depend on their position.
@@ -44,23 +44,23 @@ TEST_LOGGER4(getClock)
         { "clock offsetfromutc=14.00 datetime=20260824120000"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { .dateTime = 1787572800000LL, .offsetFromUtc = 14.0f } },
+          { .dateTime = 1787572800000LL, .offsetFromUtc = 14.0f, }, },
         /* An unreported parameter keeps its unset value. */
         { "clock datetime=20260824120000" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { .dateTime = 1787572800000LL, .offsetFromUtc = NAN } },
+          { .dateTime = 1787572800000LL, .offsetFromUtc = NAN, }, },
         { "clock" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { .dateTime = 0, .offsetFromUtc = NAN } },
+          { .dateTime = 0, .offsetFromUtc = NAN, }, },
         /* Keys the library does not model are ignored. */
         { "clock datetime=20260824120000 offsetfromutc=0.00 bogus=1"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { .dateTime = 1787572800000LL, .offsetFromUtc = 0.0f } },
+          { .dateTime = 1787572800000LL, .offsetFromUtc = 0.0f, }, },
         { "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          { .dateTime = 0, .offsetFromUtc = NAN } },
-        { 0 }
+          { .dateTime = 0, .offsetFromUtc = NAN, }, },
+        { 0 },
     };
 
     RBRGen4Error err;
@@ -108,52 +108,52 @@ TEST_LOGGER4(setClock)
 {
     SetClockTest tests[] = {
         /* Both parameters are always sent. */
-        { { .dateTime = 1787572800000LL, .offsetFromUtc = 0.0f },
+        { { .dateTime = 1787572800000LL, .offsetFromUtc = 0.0f, },
           "clock datetime=20260824120000 offsetfromutc=0.00"
           COMMAND_TERMINATOR,
           "clock datetime=20260824120000 offsetfromutc=0.00"
           RESPONSE_TERMINATOR,
-          RBRGEN4_SUCCESS },
-        { { .dateTime = 1787572890000LL, .offsetFromUtc = 5.5f },
+          RBRGEN4_SUCCESS, },
+        { { .dateTime = 1787572890000LL, .offsetFromUtc = 5.5f, },
           "clock datetime=20260824120130 offsetfromutc=5.50"
           COMMAND_TERMINATOR,
           "clock datetime=20260824120130 offsetfromutc=5.50"
           RESPONSE_TERMINATOR,
-          RBRGEN4_SUCCESS },
-        { { .dateTime = 1787572800000LL, .offsetFromUtc = -12.0f },
+          RBRGEN4_SUCCESS, },
+        { { .dateTime = 1787572800000LL, .offsetFromUtc = -12.0f, },
           "clock datetime=20260824120000 offsetfromutc=-12.00"
           COMMAND_TERMINATOR,
           "clock datetime=20260824120000 offsetfromutc=-12.00"
           RESPONSE_TERMINATOR,
-          RBRGEN4_SUCCESS },
+          RBRGEN4_SUCCESS, },
         /*
          * The offset is not range-checked: an offset the instrument will not
          * accept is sent and refused there.
          */
-        { { .dateTime = 1787572800000LL, .offsetFromUtc = 99.0f },
+        { { .dateTime = 1787572800000LL, .offsetFromUtc = 99.0f, },
           "clock datetime=20260824120000 offsetfromutc=99.00"
           COMMAND_TERMINATOR,
           "ERR-108 invalid argument to command: '99.00'" RESPONSE_TERMINATOR,
-          RBRGEN4_HARDWARE_ERROR },
+          RBRGEN4_HARDWARE_ERROR, },
         /* `NAN` would emit "nan", so it is refused before the command. */
-        { { .dateTime = 1787572800000LL, .offsetFromUtc = NAN },
+        { { .dateTime = 1787572800000LL, .offsetFromUtc = NAN, },
           "",
           "",
-          RBRGEN4_INVALID_PARAMETER_VALUE },
-        { { .dateTime = RBRGEN4_DATETIME_MIN - 1, .offsetFromUtc = 0.0f },
+          RBRGEN4_INVALID_PARAMETER_VALUE, },
+        { { .dateTime = RBRGEN4_DATETIME_MIN - 1, .offsetFromUtc = 0.0f, },
           "",
           "",
-          RBRGEN4_INVALID_PARAMETER_VALUE },
-        { { .dateTime = RBRGEN4_DATETIME_MAX + 1, .offsetFromUtc = 0.0f },
+          RBRGEN4_INVALID_PARAMETER_VALUE, },
+        { { .dateTime = RBRGEN4_DATETIME_MAX + 1, .offsetFromUtc = 0.0f, },
           "",
           "",
-          RBRGEN4_INVALID_PARAMETER_VALUE },
-        { { .dateTime = 1787572800000LL, .offsetFromUtc = 0.0f },
+          RBRGEN4_INVALID_PARAMETER_VALUE, },
+        { { .dateTime = 1787572800000LL, .offsetFromUtc = 0.0f, },
           "clock datetime=20260824120000 offsetfromutc=0.00"
           COMMAND_TERMINATOR,
           "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR,
-          RBRGEN4_HARDWARE_ERROR },
-        { { 0 }, NULL, NULL, 0 }
+          RBRGEN4_HARDWARE_ERROR, },
+        { { 0 }, NULL, NULL, 0, },
     };
 
     RBRGen4Error err;
@@ -188,7 +188,7 @@ TEST_LOGGER4(getDeployment)
           { .startTime = 0,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_GATE_NONE,
-            .simulation = false } },
+            .simulation = false, }, },
         /* Time gating adds the start time, ahead of the other parameters. */
         { "deployment starttime=20270101000000 status=inactive gate=time "
           "simulation=off" RESPONSE_TERMINATOR,
@@ -196,42 +196,42 @@ TEST_LOGGER4(getDeployment)
           { .startTime = 1798761600000LL,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_GATE_TIME,
-            .simulation = false } },
+            .simulation = false, }, },
         { "deployment status=sampling gate=none simulation=off"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { .startTime = 0,
             .status = RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
             .gate = RBRGEN4_GATE_NONE,
-            .simulation = false } },
+            .simulation = false, }, },
         { "deployment status=paused gate=none simulation=off"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { .startTime = 0,
             .status = RBRGEN4_DEPLOYMENT_STATUS_PAUSED,
             .gate = RBRGEN4_GATE_NONE,
-            .simulation = false } },
+            .simulation = false, }, },
         { "deployment starttime=20270101000000 status=gated gate=time "
           "simulation=off" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { .startTime = 1798761600000LL,
             .status = RBRGEN4_DEPLOYMENT_STATUS_GATED,
             .gate = RBRGEN4_GATE_TIME,
-            .simulation = false } },
+            .simulation = false, }, },
         { "deployment status=inactive gate=twistactivation simulation=on"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { .startTime = 0,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_GATE_TWISTACTIVATION,
-            .simulation = true } },
+            .simulation = true, }, },
         { "deployment status=inactive gate=wetswitch simulation=off"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { .startTime = 0,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_GATE_WETSWITCH,
-            .simulation = false } },
+            .simulation = false, }, },
         /*
          * A value the library does not model reads as unknown rather than as
          * the first member.
@@ -242,14 +242,14 @@ TEST_LOGGER4(getDeployment)
           { .startTime = 0,
             .status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
             .gate = RBRGEN4_UNKNOWN_GATE,
-            .simulation = false } },
+            .simulation = false, }, },
         /* An unreported parameter is left unknown, not zero. */
         { "deployment" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { .startTime = 0,
             .status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
             .gate = RBRGEN4_UNKNOWN_GATE,
-            .simulation = false } },
+            .simulation = false, }, },
         /* Keys the library does not model are ignored. */
         { "deployment status=inactive gate=none simulation=off bogus=1"
           RESPONSE_TERMINATOR,
@@ -257,8 +257,8 @@ TEST_LOGGER4(getDeployment)
           { .startTime = 0,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_GATE_NONE,
-            .simulation = false } },
-        { 0 }
+            .simulation = false, }, },
+        { 0 },
     };
 
     RBRGen4Error err;
@@ -308,35 +308,35 @@ TEST_LOGGER4(setDeployment)
         { { .startTime = 0,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_GATE_NONE,
-            .simulation = false },
+            .simulation = false, },
           "deployment gate=none" COMMAND_TERMINATOR,
           "deployment gate=none" RESPONSE_TERMINATOR,
-          RBRGEN4_SUCCESS },
+          RBRGEN4_SUCCESS, },
         /* A start time left over from a previous read is not sent either. */
         { { .startTime = 1798761600000LL,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_GATE_WETSWITCH,
-            .simulation = false },
+            .simulation = false, },
           "deployment gate=wetswitch" COMMAND_TERMINATOR,
           "deployment gate=wetswitch" RESPONSE_TERMINATOR,
-          RBRGEN4_SUCCESS },
+          RBRGEN4_SUCCESS, },
         { { .startTime = 0,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_GATE_TWISTACTIVATION,
-            .simulation = false },
+            .simulation = false, },
           "deployment gate=twistactivation" COMMAND_TERMINATOR,
           "deployment gate=twistactivation" RESPONSE_TERMINATOR,
-          RBRGEN4_SUCCESS },
+          RBRGEN4_SUCCESS, },
         /* Time gating takes both parameters in one command. */
         { { .startTime = 1798761600000LL,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_GATE_TIME,
-            .simulation = false },
+            .simulation = false, },
           "deployment gate=time starttime=20270101000000"
           COMMAND_TERMINATOR,
           "deployment gate=time starttime=20270101000000"
           RESPONSE_TERMINATOR,
-          RBRGEN4_SUCCESS },
+          RBRGEN4_SUCCESS, },
         /*
          * A start time is range-checked only when it is going to be sent, so
          * an out-of-range value under time gating fails and the same value
@@ -345,57 +345,57 @@ TEST_LOGGER4(setDeployment)
         { { .startTime = RBRGEN4_DATETIME_MIN - 1,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_GATE_TIME,
-            .simulation = false },
+            .simulation = false, },
           "",
           "",
-          RBRGEN4_INVALID_PARAMETER_VALUE },
+          RBRGEN4_INVALID_PARAMETER_VALUE, },
         { { .startTime = RBRGEN4_DATETIME_MAX + 1,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_GATE_TIME,
-            .simulation = false },
+            .simulation = false, },
           "",
           "",
-          RBRGEN4_INVALID_PARAMETER_VALUE },
+          RBRGEN4_INVALID_PARAMETER_VALUE, },
         { { .startTime = RBRGEN4_DATETIME_MAX + 1,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_GATE_NONE,
-            .simulation = false },
+            .simulation = false, },
           "deployment gate=none" COMMAND_TERMINATOR,
           "deployment gate=none" RESPONSE_TERMINATOR,
-          RBRGEN4_SUCCESS },
+          RBRGEN4_SUCCESS, },
         /* The sentinels a getter can leave behind never reach the command. */
         { { .startTime = 0,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_UNKNOWN_GATE,
-            .simulation = false },
+            .simulation = false, },
           "",
           "",
-          RBRGEN4_INVALID_PARAMETER_VALUE },
+          RBRGEN4_INVALID_PARAMETER_VALUE, },
         { { .startTime = 0,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_GATE_COUNT,
-            .simulation = false },
+            .simulation = false, },
           "",
           "",
-          RBRGEN4_INVALID_PARAMETER_VALUE },
+          RBRGEN4_INVALID_PARAMETER_VALUE, },
         /* Both writable parameters are unavailable while logging. */
         { { .startTime = 0,
             .status = RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
             .gate = RBRGEN4_GATE_NONE,
-            .simulation = false },
+            .simulation = false, },
           "deployment gate=none" COMMAND_TERMINATOR,
           "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR,
-          RBRGEN4_HARDWARE_ERROR },
+          RBRGEN4_HARDWARE_ERROR, },
         /* A gating condition the instrument does not offer is refused. */
         { { .startTime = 0,
             .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
             .gate = RBRGEN4_GATE_WETSWITCH,
-            .simulation = false },
+            .simulation = false, },
           "deployment gate=wetswitch" COMMAND_TERMINATOR,
           "ERR-108 invalid argument to command: 'wetswitch'"
           RESPONSE_TERMINATOR,
-          RBRGEN4_HARDWARE_ERROR },
-        { { 0 }, NULL, NULL, 0 }
+          RBRGEN4_HARDWARE_ERROR, },
+        { { 0 }, NULL, NULL, 0, },
     };
 
     RBRGen4Error err;
@@ -429,7 +429,7 @@ TEST_LOGGER4(verify)
 {
     VerifyTest tests[] = {
         /* All three parameters are always sent. */
-        { { .label = "c_test" },
+        { { .label = "c_test", },
           "d1",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
@@ -437,8 +437,8 @@ TEST_LOGGER4(verify)
           "verify config=c_test dataset=d1 storagemode=normal state=enabled"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRGEN4_INSTRUMENT_STATE_ENABLED },
-        { { .label = "pH_cal" },
+          RBRGEN4_INSTRUMENT_STATE_ENABLED, },
+        { { .label = "pH_cal", },
           "d_pHcal_20260824",
           RBRGEN4_STORAGE_MODE_CALIBRATION,
           "verify config=pH_cal dataset=d_pHcal_20260824 "
@@ -446,12 +446,12 @@ TEST_LOGGER4(verify)
           "verify config=pH_cal dataset=d_pHcal_20260824 "
           "storagemode=calibration state=enabled" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRGEN4_INSTRUMENT_STATE_ENABLED },
+          RBRGEN4_INSTRUMENT_STATE_ENABLED, },
         /*
          * The response echoes the parameters in whatever order they were
          * sent, and `state` need not come last.
          */
-        { { .label = "c_test" },
+        { { .label = "c_test", },
           "d1",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
@@ -459,87 +459,87 @@ TEST_LOGGER4(verify)
           "verify state=disabled dataset=d1 config=c_test storagemode=normal"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRGEN4_INSTRUMENT_STATE_DISABLED },
+          RBRGEN4_INSTRUMENT_STATE_DISABLED, },
         /* A state the library does not model reads as unknown. */
-        { { .label = "c_test" },
+        { { .label = "c_test", },
           "d1",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "verify config=c_test dataset=d1 state=bogus" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
         /* A response with no state at all leaves it unknown. */
-        { { .label = "c_test" },
+        { { .label = "c_test", },
           "d1",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "verify config=c_test dataset=d1" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
         /* Out-of-range parameters never reach the instrument. */
-        { { .label = "" },
+        { { .label = "", },
           "d1",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "c_test" },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "c_test", },
           "",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "c_test" },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "c_test", },
           "0123456789012345678901234567890123",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "c_test" },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "c_test", },
           "d1",
           RBRGEN4_UNKNOWN_STORAGE_MODE,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "c_test" },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "c_test", },
           "d1",
           RBRGEN4_STORAGE_MODE_COUNT,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
         /* Every failing check the instrument makes. */
-        { { .label = "nope" },
+        { { .label = "nope", },
           "d1",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=nope dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-108 invalid argument to command: 'nope'" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "c_test" },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "c_test", },
           "d.1",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d.1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-131 illegal character in label 'd.1'" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "c_test" },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "c_test", },
           "d1",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-120 'd1' is already in use" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "c_test" },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "c_test", },
           "d5",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d5 storagemode=normal"
@@ -547,8 +547,8 @@ TEST_LOGGER4(verify)
           "ERR-431 dataset limit of '4' reached, delete dataset(s) to make "
           "space" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "c_test" },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "c_test", },
           "d2",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d2 storagemode=normal"
@@ -556,8 +556,8 @@ TEST_LOGGER4(verify)
           "ERR-436 instrument was already enabled with different settings"
           RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "" }, NULL, 0, NULL, NULL, 0, 0 }
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "", }, NULL, 0, NULL, NULL, 0, 0, },
     };
 
     RBRGen4Error err;
@@ -598,7 +598,7 @@ typedef struct EnableTest
 TEST_LOGGER4(enable)
 {
     EnableTest tests[] = {
-        { { .label = "c_test" },
+        { { .label = "c_test", },
           "d1",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "enable config=c_test dataset=d1 storagemode=normal"
@@ -606,8 +606,8 @@ TEST_LOGGER4(enable)
           "enable config=c_test dataset=d1 storagemode=normal state=enabled"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRGEN4_INSTRUMENT_STATE_ENABLED },
-        { { .label = "pH_cal" },
+          RBRGEN4_INSTRUMENT_STATE_ENABLED, },
+        { { .label = "pH_cal", },
           "d_pHcal_20260824",
           RBRGEN4_STORAGE_MODE_CALIBRATION,
           "enable config=pH_cal dataset=d_pHcal_20260824 "
@@ -615,50 +615,50 @@ TEST_LOGGER4(enable)
           "enable config=pH_cal dataset=d_pHcal_20260824 "
           "storagemode=calibration state=enabled" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          RBRGEN4_INSTRUMENT_STATE_ENABLED },
+          RBRGEN4_INSTRUMENT_STATE_ENABLED, },
         /* Out-of-range parameters never reach the instrument. */
-        { { .label = "" },
+        { { .label = "", },
           "d1",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "c_test" },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "c_test", },
           "",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
         /*
          * A label one character past the field is refused rather than
          * truncated into the instrument's 32-byte field.
          */
-        { { .label = "c_test" },
+        { { .label = "c_test", },
           "0123456789012345678901234567890123",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "c_test" },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "c_test", },
           "d1",
           RBRGEN4_UNKNOWN_STORAGE_MODE,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
         /* Every failing check the instrument makes. */
-        { { .label = "c_test" },
+        { { .label = "c_test", },
           "d1",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "enable config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-408 instrument was already enabled" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "c_test" },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "c_test", },
           "d2",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "enable config=c_test dataset=d2 storagemode=normal"
@@ -666,16 +666,16 @@ TEST_LOGGER4(enable)
           "ERR-436 instrument was already enabled with different settings"
           RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "c_test" },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "c_test", },
           "d1",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "enable config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-120 'd1' is already in use" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "c_test" },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "c_test", },
           "d5",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "enable config=c_test dataset=d5 storagemode=normal"
@@ -683,8 +683,8 @@ TEST_LOGGER4(enable)
           "ERR-431 dataset limit of '4' reached, delete dataset(s) to make "
           "space" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "c_empty" },
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "c_empty", },
           "d1",
           RBRGEN4_STORAGE_MODE_NORMAL,
           "enable config=c_empty dataset=d1 storagemode=normal"
@@ -692,8 +692,8 @@ TEST_LOGGER4(enable)
           "ERR-430 empty schedule list in configuration 'c_empty'"
           RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { { .label = "" }, NULL, 0, NULL, NULL, 0, 0 }
+          RBRGEN4_UNKNOWN_INSTRUMENT_STATE, },
+        { { .label = "", }, NULL, 0, NULL, NULL, 0, 0, },
     };
 
     RBRGen4Error err;
@@ -759,7 +759,7 @@ TEST_LOGGER4(disable)
           RBRGEN4_RESPONSE_INFO,
           RBRGEN4_HARDWARE_ERROR_NONE,
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
-        { 0 }
+        { 0 },
     };
 
     RBRGen4Error err;
@@ -846,7 +846,7 @@ TEST_LOGGER4(pause)
         { "pause" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS },
-        { 0 }
+        { 0 },
     };
 
     return test_pauseResume(conn,
@@ -874,7 +874,7 @@ TEST_LOGGER4(resume)
         { "resume" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS },
-        { 0 }
+        { 0 },
     };
 
     return test_pauseResume(conn,

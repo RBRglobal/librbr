@@ -59,8 +59,8 @@ TEST_LOGGER2(now)
             "now = 20180920214914" RESPONSE_TERMINATOR,
             {
                 .dateTime = 1537480154000LL,
-                .offsetFromUtc = NAN
-            }
+                .offsetFromUtc = NAN,
+            },
         },
         {
             "settings offsetfromutc" COMMAND_TERMINATOR
@@ -69,8 +69,8 @@ TEST_LOGGER2(now)
             "now = 20000101000000" RESPONSE_TERMINATOR,
             {
                 .dateTime = RBRGEN3_DATETIME_MIN,
-                .offsetFromUtc = NAN
-            }
+                .offsetFromUtc = NAN,
+            },
         },
         {
             "settings offsetfromutc" COMMAND_TERMINATOR
@@ -79,8 +79,8 @@ TEST_LOGGER2(now)
             "now = 20991231235959" RESPONSE_TERMINATOR,
             {
                 .dateTime = RBRGEN3_DATETIME_MAX,
-                .offsetFromUtc = NAN
-            }
+                .offsetFromUtc = NAN,
+            },
         },
         {
             "settings offsetfromutc" COMMAND_TERMINATOR
@@ -89,8 +89,8 @@ TEST_LOGGER2(now)
             "now = 20180920214914" RESPONSE_TERMINATOR,
             {
                 .dateTime = 1537480154000LL,
-                .offsetFromUtc = 7.5
-            }
+                .offsetFromUtc = 7.5,
+            },
         },
         {
             "settings offsetfromutc" COMMAND_TERMINATOR
@@ -99,10 +99,10 @@ TEST_LOGGER2(now)
             "now = 20180920214914" RESPONSE_TERMINATOR,
             {
                 .dateTime = 1537480154000LL,
-                .offsetFromUtc = -4
-            }
+                .offsetFromUtc = -4,
+            },
         },
-        {0}
+        {0},
     };
 
     return test_clock(conn, buffers, tests);
@@ -112,7 +112,7 @@ TEST_LOGGER2(now_set)
 {
     RBRGen3Clock now = {
         .dateTime = 1550264758524LL,
-        .offsetFromUtc = 0
+        .offsetFromUtc = 0,
     };
 
     const char *expectedCommand = "now = 20190215210558" COMMAND_TERMINATOR
@@ -142,8 +142,8 @@ TEST_LOGGER3(clock)
             "offsetfromutc = unknown" RESPONSE_TERMINATOR,
             {
                 .dateTime = 1537480154000LL,
-                .offsetFromUtc = NAN
-            }
+                .offsetFromUtc = NAN,
+            },
         },
         {
             "clock" COMMAND_TERMINATOR,
@@ -151,8 +151,8 @@ TEST_LOGGER3(clock)
             "offsetfromutc = unknown" RESPONSE_TERMINATOR,
             {
                 .dateTime = RBRGEN3_DATETIME_MIN,
-                .offsetFromUtc = NAN
-            }
+                .offsetFromUtc = NAN,
+            },
         },
         {
             "clock" COMMAND_TERMINATOR,
@@ -160,8 +160,8 @@ TEST_LOGGER3(clock)
             "offsetfromutc = unknown" RESPONSE_TERMINATOR,
             {
                 .dateTime = RBRGEN3_DATETIME_MAX,
-                .offsetFromUtc = NAN
-            }
+                .offsetFromUtc = NAN,
+            },
         },
         {
             "clock" COMMAND_TERMINATOR,
@@ -169,8 +169,8 @@ TEST_LOGGER3(clock)
             "offsetfromutc = +7.50" RESPONSE_TERMINATOR,
             {
                 .dateTime = 1537480154000LL,
-                .offsetFromUtc = 7.5
-            }
+                .offsetFromUtc = 7.5,
+            },
         },
         {
             "clock" COMMAND_TERMINATOR,
@@ -178,10 +178,10 @@ TEST_LOGGER3(clock)
             "offsetfromutc = -4.00" RESPONSE_TERMINATOR,
             {
                 .dateTime = 1537480154000LL,
-                .offsetFromUtc = -4
-            }
+                .offsetFromUtc = -4,
+            },
         },
-        {0}
+        {0},
     };
 
     return test_clock(conn, buffers, tests);
@@ -191,7 +191,7 @@ TEST_LOGGER3(clock_set)
 {
     RBRGen3Clock now = {
         .dateTime = 1550264758524LL,
-        .offsetFromUtc = 0
+        .offsetFromUtc = 0,
     };
 
     const char *text = "clock datetime = 20190215210558, "
@@ -277,8 +277,8 @@ TEST_LOGGER2(sampling)
                 .userPeriodLimit = 167,
                 .burstLength = 10,
                 .burstInterval = 10000,
-                .gate = RBRGEN3_GATE_NONE
-            }
+                .gate = RBRGEN3_GATE_NONE,
+            },
         },
         {
             "sampling" COMMAND_TERMINATOR,
@@ -292,10 +292,10 @@ TEST_LOGGER2(sampling)
                 .userPeriodLimit = 83,
                 .burstLength = 10,
                 .burstInterval = 10000,
-                .gate = RBRGEN3_GATE_THRESHOLDING
-            }
+                .gate = RBRGEN3_GATE_THRESHOLDING,
+            },
         },
-        {0}
+        {0},
     };
 
     return test_sampling(conn, buffers, tests);
@@ -316,8 +316,8 @@ TEST_LOGGER3(sampling)
                 .userPeriodLimit = 32,
                 .burstLength = 240,
                 .burstInterval = 300000,
-                .gate = RBRGEN3_GATE_NONE
-            }
+                .gate = RBRGEN3_GATE_NONE,
+            },
         },
         {
             "sampling all" COMMAND_TERMINATOR,
@@ -332,10 +332,10 @@ TEST_LOGGER3(sampling)
                 .userPeriodLimit = 1000,
                 .burstLength = 10,
                 .burstInterval = 10000,
-                .gate = RBRGEN3_GATE_THRESHOLDING
-            }
+                .gate = RBRGEN3_GATE_THRESHOLDING,
+            },
         },
-        {0}
+        {0},
     };
 
     return test_sampling(conn, buffers, tests);
@@ -361,12 +361,12 @@ TEST_LOGGER3(sampling_set)
                 .userPeriodLimit = 32,
                 .burstLength = 240,
                 .burstInterval = 300000,
-                .gate = RBRGEN3_GATE_NONE
+                .gate = RBRGEN3_GATE_NONE,
             },
             "sampling mode = continuous, period = 1000",
             "sampling burstlength = 240, burstinterval = 300000",
             RBRGEN3_SUCCESS,
-            RBRGEN3_SUCCESS
+            RBRGEN3_SUCCESS,
         },
         {
             {
@@ -376,13 +376,13 @@ TEST_LOGGER3(sampling_set)
                 .userPeriodLimit = 63,
                 .burstLength = 10,
                 .burstInterval = 10000,
-                .gate = RBRGEN3_GATE_THRESHOLDING
+                .gate = RBRGEN3_GATE_THRESHOLDING,
             },
             "",
             "",
             /* Failure because the period isn't in availableFastPeriods. */
             RBRGEN3_INVALID_PARAMETER_VALUE,
-            RBRGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE,
         },
         {
             {
@@ -392,13 +392,13 @@ TEST_LOGGER3(sampling_set)
                 .userPeriodLimit = 125,
                 .burstLength = 10,
                 .burstInterval = 10000,
-                .gate = RBRGEN3_GATE_THRESHOLDING
+                .gate = RBRGEN3_GATE_THRESHOLDING,
             },
             "",
             "",
             /* Failure because the period is less than userPeriodLimit. */
             RBRGEN3_INVALID_PARAMETER_VALUE,
-            RBRGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE,
         },
         {
             {
@@ -408,15 +408,15 @@ TEST_LOGGER3(sampling_set)
                 .userPeriodLimit = 32,
                 .burstLength = 240,
                 .burstInterval = 1000 * 240,
-                .gate = RBRGEN3_GATE_NONE
+                .gate = RBRGEN3_GATE_NONE,
             },
             "sampling mode = continuous, period = 1000",
             "",
             RBRGEN3_SUCCESS,
             /* Failure because the burst interval is inconsistent. */
-            RBRGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE,
         },
-        {{0}, 0, 0, 0, 0}
+        {{0}, 0, 0, 0, 0,},
     };
 
     RBRGen3Error err;
@@ -490,10 +490,10 @@ TEST_LOGGER2(deployment)
             {
                 .startTime = RBRGEN3_DATETIME_MIN,
                 .endTime = RBRGEN3_DATETIME_MAX,
-                .status = RBRGEN3_STATUS_DISABLED
-            }
+                .status = RBRGEN3_STATUS_DISABLED,
+            },
         },
-        {0}
+        {0},
     };
 
     return test_deployment(conn, buffers, tests);
@@ -509,10 +509,10 @@ TEST_LOGGER3(deployment)
             {
                 .startTime = RBRGEN3_DATETIME_MIN,
                 .endTime = RBRGEN3_DATETIME_MAX,
-                .status = RBRGEN3_STATUS_DISABLED
-            }
+                .status = RBRGEN3_STATUS_DISABLED,
+            },
         },
-        {0}
+        {0},
     };
 
     return test_deployment(conn, buffers, tests);
@@ -532,53 +532,53 @@ TEST_LOGGER3(deployment_set)
             {
                 .startTime = RBRGEN3_DATETIME_MIN,
                 .endTime = RBRGEN3_DATETIME_MAX,
-                .status = RBRGEN3_STATUS_DISABLED
+                .status = RBRGEN3_STATUS_DISABLED,
             },
             "deployment starttime = 20000101000000, "
             "endtime = 20991231235959",
-            RBRGEN3_SUCCESS
+            RBRGEN3_SUCCESS,
         },
         {
             {
                 .startTime = 1537556712000LL,
                 .endTime = 1537556699000LL,
-                .status = RBRGEN3_STATUS_DISABLED
+                .status = RBRGEN3_STATUS_DISABLED,
             },
             "",
             /* Failure because the end time is before the start time. */
-            RBRGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE,
         },
         {
             {
                 .startTime = 1537556699000LL,
                 .endTime = 1537556699000LL,
-                .status = RBRGEN3_STATUS_DISABLED
+                .status = RBRGEN3_STATUS_DISABLED,
             },
             "",
             /* Failure because the end time equals the start time. */
-            RBRGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE,
         },
         {
             {
                 .startTime = 915148800000LL,
                 .endTime = 1537556699000LL,
-                .status = RBRGEN3_STATUS_DISABLED
+                .status = RBRGEN3_STATUS_DISABLED,
             },
             "",
             /* Failure because the start time is before the epoch. */
-            RBRGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE,
         },
         {
             {
                 .startTime = 915148800000LL,
                 .endTime = 4102444800000LL,
-                .status = RBRGEN3_STATUS_DISABLED
+                .status = RBRGEN3_STATUS_DISABLED,
             },
             "",
             /* Failure because the end time is after the limit. */
-            RBRGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE,
         },
-        {{0}, 0, 0}
+        {{0}, 0, 0,},
     };
 
     RBRGen3Error err;

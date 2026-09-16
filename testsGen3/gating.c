@@ -66,10 +66,10 @@ TEST_LOGGER2(thresholding)
                 .channelLabel = "",
                 .condition = RBRGEN3_THRESHOLDING_ABOVE,
                 .value = 0.0,
-                .interval = 60000
-            }
+                .interval = 60000,
+            },
         },
-        {0}
+        {0},
     };
 
     return test_thresholding(conn, buffers, tests);
@@ -90,8 +90,8 @@ TEST_LOGGER3(thresholding)
                 .channelLabel = "temperature_00",
                 .condition = RBRGEN3_THRESHOLDING_ABOVE,
                 .value = 0.0,
-                .interval = 60000
-            }
+                .interval = 60000,
+            },
         },
         {
             "thresholding enabled = true, state = paused, channelindex = 2, "
@@ -105,8 +105,8 @@ TEST_LOGGER3(thresholding)
                 .channelLabel = "pressure_00",
                 .condition = RBRGEN3_THRESHOLDING_BELOW,
                 .value = 600.0,
-                .interval = 10000
-            }
+                .interval = 10000,
+            },
         },
         {
             "thresholding enabled = true, state = paused, channelindex = 2, "
@@ -121,10 +121,10 @@ TEST_LOGGER3(thresholding)
                 .channelLabel = "thispressurelabelislongerthanth",
                 .condition = RBRGEN3_THRESHOLDING_BELOW,
                 .value = 600.0,
-                .interval = 10000
-            }
+                .interval = 10000,
+            },
         },
-        {0}
+        {0},
     };
 
     return test_thresholding(conn, buffers, tests);
@@ -138,7 +138,7 @@ TEST_LOGGER2(thresholding_set)
         .channelIndex = 1,
         .condition = RBRGEN3_THRESHOLDING_ABOVE,
         .value = 0.0,
-        .interval = 60000
+        .interval = 60000,
     };
 
     RBRGen3Error err;
@@ -165,7 +165,7 @@ TEST_LOGGER3(thresholding_set_channel_by_index)
         .channelIndex = 1,
         .condition = RBRGEN3_THRESHOLDING_ABOVE,
         .value = 0.0,
-        .interval = 60000
+        .interval = 60000,
     };
 
     RBRGen3Error err;
@@ -193,7 +193,7 @@ TEST_LOGGER3(thresholding_set_channel_by_label)
         .channelLabel = "pressure_00",
         .condition = RBRGEN3_THRESHOLDING_BELOW,
         .value = 30.0,
-        .interval = 30000
+        .interval = 30000,
     };
 
     RBRGen3Error err;
@@ -247,17 +247,17 @@ TEST_LOGGER2(twistactivation)
             "twistactivation state = off, location = off" RESPONSE_TERMINATOR,
             {
                 .enabled = false,
-                .state = RBRGEN3_UNKNOWN_GATING
-            }
+                .state = RBRGEN3_UNKNOWN_GATING,
+            },
         },
         {
             "twistactivation state = on, location = who cares" RESPONSE_TERMINATOR,
             {
                 .enabled = true,
-                .state = RBRGEN3_UNKNOWN_GATING
-            }
+                .state = RBRGEN3_UNKNOWN_GATING,
+            },
         },
-        {0}
+        {0},
     };
 
     return test_twistactivation(conn, buffers, tests);
@@ -270,26 +270,26 @@ TEST_LOGGER3(twistactivation)
             "twistactivation enabled = false, state = n/a" RESPONSE_TERMINATOR,
             {
                 .enabled = false,
-                .state = RBRGEN3_GATING_NA
-            }
+                .state = RBRGEN3_GATING_NA,
+            },
         },
         {
             "twistactivation enabled = true, state = paused"
             RESPONSE_TERMINATOR,
             {
                 .enabled = true,
-                .state = RBRGEN3_GATING_PAUSED
-            }
+                .state = RBRGEN3_GATING_PAUSED,
+            },
         },
         {
             "twistactivation enabled = true, state = running"
             RESPONSE_TERMINATOR,
             {
                 .enabled = true,
-                .state = RBRGEN3_GATING_RUNNING
-            }
+                .state = RBRGEN3_GATING_RUNNING,
+            },
         },
-        {0}
+        {0},
     };
 
     return test_twistactivation(conn, buffers, tests);
@@ -298,7 +298,7 @@ TEST_LOGGER3(twistactivation)
 TEST_LOGGER2(twistactivation_set)
 {
     RBRGen3TwistActivation twistActivation = {
-        .enabled = true
+        .enabled = true,
     };
 
     RBRGen3Error err;
@@ -319,7 +319,7 @@ TEST_LOGGER2(twistactivation_set)
 TEST_LOGGER3(twistactivation_set)
 {
     RBRGen3TwistActivation twistActivation = {
-        .enabled = true
+        .enabled = true,
     };
 
     RBRGen3Error err;

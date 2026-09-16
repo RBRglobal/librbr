@@ -44,7 +44,7 @@ TEST_LOGGER2(id)
         .version = "1.440",
         .serial = 912345,
         .fwtype = 103,
-        .mode = ""
+        .mode = "",
     };
     RBRGen3Id actual;
 
@@ -70,7 +70,7 @@ TEST_LOGGER3(id)
         .version = "1.092",
         .serial = 923456,
         .fwtype = 104,
-        .mode = ""
+        .mode = "",
     };
     RBRGen3Id actual;
 
@@ -97,7 +97,7 @@ TEST_LOGGER3(id_simulated)
         .version = "1.092",
         .serial = 923456,
         .fwtype = 104,
-        .mode = "SIMULATED"
+        .mode = "SIMULATED",
     };
     RBRGen3Id actual;
 
@@ -125,7 +125,7 @@ TEST_LOGGER3(id_short)
         .version = "",
         .serial = 0,
         .fwtype = 0,
-        .mode = ""
+        .mode = "",
     };
     RBRGen3Id actual;
 
@@ -146,7 +146,7 @@ TEST_LOGGER2(hwrev)
     RBRGen3HardwareRevision expected = {
         .pcb = 'G',
         .cpu = "5659A",
-        .bsl = 'A'
+        .bsl = 'A',
     };
     RBRGen3HardwareRevision actual;
 
@@ -169,7 +169,7 @@ TEST_LOGGER3(hwrev)
     RBRGen3HardwareRevision expected = {
         .pcb = 'J',
         .cpu = "5659A",
-        .bsl = 'A'
+        .bsl = 'A',
     };
     RBRGen3HardwareRevision actual;
 
@@ -193,7 +193,7 @@ TEST_LOGGER2(powerstatus)
         .source = RBRGEN3_POWER_SOURCE_USB,
         .internal = 12.4,
         .external = 0,
-        .regulator = NAN
+        .regulator = NAN,
     };
     RBRGen3Power actual;
 
@@ -219,7 +219,7 @@ TEST_LOGGER3(power)
         .source = RBRGEN3_POWER_SOURCE_EXTERNAL,
         .internal = 0,
         .external = 11.59,
-        .regulator = NAN
+        .regulator = NAN,
     };
     RBRGen3Power actual;
 
@@ -254,7 +254,7 @@ TEST_LOGGER3(powerinternal)
     RBRGen3PowerInternal expected = {
         .batteryType = RBRGEN3_INTERNAL_BATTERY_NIMH,
         .capacity = 138000,
-        .used = 100100
+        .used = 100100,
     };
     RBRGen3PowerInternal actual;
 
@@ -290,7 +290,7 @@ TEST_LOGGER3(powerexternal)
     RBRGen3PowerExternal expected = {
         .batteryType = RBRGEN3_EXTERNAL_BATTERY_FERMATA_LISOCL2,
         .capacity = 22000000,
-        .used = 100100
+        .used = 100100,
     };
     RBRGen3PowerExternal actual;
 
@@ -329,7 +329,7 @@ TEST_LOGGER3(info)
 {
     RBRGen3Info expected = {
         .partNumber = "L3-M11-BEC11-SC11-ST11-SP11",
-        .fwLock = false
+        .fwLock = false,
     };
     RBRGen3Info actual;
 
@@ -351,7 +351,7 @@ TEST_LOGGER3(info_fwlock)
 {
     RBRGen3Info expected = {
         .partNumber = "L3-M11-F14-BEC11-G1-SCT12-SP11",
-        .fwLock = true
+        .fwLock = true,
     };
     RBRGen3Info actual;
 

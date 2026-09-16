@@ -30,21 +30,21 @@ TEST_LOGGER4(getStorage)
           { .used = 15372LL,
             .remaining = 61016097780LL,
             .size = 61016113152LL,
-            .access = RBRGEN4_STORAGE_ACCESS_INSTRUMENT } },
+            .access = RBRGEN4_STORAGE_ACCESS_INSTRUMENT, }, },
         { "storage used=1528 remaining=134216192 size=134217728"
           " access=usbhost" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { .used = 1528LL,
             .remaining = 134216192LL,
             .size = 134217728LL,
-            .access = RBRGEN4_STORAGE_ACCESS_USBHOST } },
+            .access = RBRGEN4_STORAGE_ACCESS_USBHOST, }, },
         /* An unreported parameter keeps its unset value. */
         { "storage used=15372" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { .used = 15372LL,
             .remaining = 0LL,
             .size = 0LL,
-            .access = RBRGEN4_UNKNOWN_STORAGE_ACCESS } },
+            .access = RBRGEN4_UNKNOWN_STORAGE_ACCESS, }, },
         /* An unrecognized access location parses to the unknown member. */
         { "storage used=15372 remaining=61016097780 size=61016113152"
           " access=cloud" RESPONSE_TERMINATOR,
@@ -52,7 +52,7 @@ TEST_LOGGER4(getStorage)
           { .used = 15372LL,
             .remaining = 61016097780LL,
             .size = 61016113152LL,
-            .access = RBRGEN4_UNKNOWN_STORAGE_ACCESS } },
+            .access = RBRGEN4_UNKNOWN_STORAGE_ACCESS, }, },
         /* Keys the library does not model are ignored. */
         { "storage used=15372 remaining=61016097780 size=61016113152"
           " access=instrument bogus=1" RESPONSE_TERMINATOR,
@@ -60,8 +60,8 @@ TEST_LOGGER4(getStorage)
           { .used = 15372LL,
             .remaining = 61016097780LL,
             .size = 61016113152LL,
-            .access = RBRGEN4_STORAGE_ACCESS_INSTRUMENT } },
-        { NULL, 0, { 0, 0, 0, 0 } }
+            .access = RBRGEN4_STORAGE_ACCESS_INSTRUMENT, }, },
+        { NULL, 0, { 0, 0, 0, 0 }, },
     };
 
     RBRGen4Error err;
@@ -127,7 +127,7 @@ TEST_LOGGER4(setStorage)
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE },
-        { 0, NULL, NULL, 0 }
+        { 0, NULL, NULL, 0 },
     };
 
     RBRGen4Error err;
@@ -135,7 +135,7 @@ TEST_LOGGER4(setStorage)
     for (int i = 0; tests[i].command != NULL; i++)
     {
         RBRGen4Storage storage = {
-            .access = tests[i].access
+            .access = tests[i].access,
         };
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen4_setStorage(conn, &storage);
@@ -162,19 +162,19 @@ TEST_LOGGER4(getDatasetPool)
     GetDatasetPoolTest tests[] = {
         { "dataset count=3 maxcount=4 list=d1|d2|d5" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          3, 4, { "d1", "d2", "d5" } },
+          3, 4, { "d1", "d2", "d5" }, },
         { "dataset count=1 maxcount=20 list=DeepCove" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          1, 20, { "DeepCove" } },
+          1, 20, { "DeepCove" }, },
         /* An empty pool reports `none`. */
         { "dataset count=0 maxcount=4 list=none" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          0, 4, { NULL } },
+          0, 4, { NULL }, },
         /* Keys the library does not model are ignored. */
         { "dataset count=1 maxcount=4 list=d1 bogus=1" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          1, 4, { "d1" } },
-        { NULL, 0, 0, 0, { NULL } }
+          1, 4, { "d1" }, },
+        { NULL, 0, 0, 0, { NULL }, },
     };
 
     RBRGen4Error err;
@@ -205,7 +205,7 @@ TEST_LOGGER4(getDatasetPool)
     /* A pool which cannot hold every dataset is truncated and reported. */
     RBRGen4DatasetPool shortPool = {
         .size = 2,
-        .pool = actualBuffer
+        .pool = actualBuffer,
     };
     TestIOBuffers_init(buffers,
                        "dataset count=3 maxcount=4 list=d1|d2|d5"
@@ -240,18 +240,18 @@ TEST_LOGGER4(getDataset)
           { .label = "d1",
             .status = RBRGEN4_DATASET_STATUS_CLOSED,
             .byteCount = 5604LL,
-            .dataType = RBRGEN4_DATA_TYPE_FLOAT64 },
+            .dataType = RBRGEN4_DATA_TYPE_FLOAT64, },
           1,
-          { "s_cont" } },
+          { "s_cont" }, },
         { "dataset d1 status=open schedulelist=tides_schedule|DO_schedule"
           " bytecount=3749498 datatype=float32" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
           { .label = "d1",
             .status = RBRGEN4_DATASET_STATUS_OPEN,
             .byteCount = 3749498LL,
-            .dataType = RBRGEN4_DATA_TYPE_FLOAT32 },
+            .dataType = RBRGEN4_DATA_TYPE_FLOAT32, },
           2,
-          { "tides_schedule", "DO_schedule" } },
+          { "tides_schedule", "DO_schedule" }, },
         /* Values the library does not model parse to the unknown members. */
         { "dataset d1 status=bogus schedulelist=s_cont bytecount=0"
           " datatype=bogus" RESPONSE_TERMINATOR,
@@ -259,26 +259,26 @@ TEST_LOGGER4(getDataset)
           { .label = "d1",
             .status = RBRGEN4_UNKNOWN_DATASET_STATUS,
             .byteCount = 0LL,
-            .dataType = RBRGEN4_UNKNOWN_DATA_TYPE },
+            .dataType = RBRGEN4_UNKNOWN_DATA_TYPE, },
           1,
-          { "s_cont" } },
+          { "s_cont" }, },
         /* A dataset which does not exist is a hardware error. */
         { "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
           { .label = "d1",
             .status = RBRGEN4_UNKNOWN_DATASET_STATUS,
             .byteCount = 0LL,
-            .dataType = RBRGEN4_UNKNOWN_DATA_TYPE },
+            .dataType = RBRGEN4_UNKNOWN_DATA_TYPE, },
           0,
-          { NULL } },
-        { NULL, 0, { .label = "" }, 0, { NULL } }
+          { NULL }, },
+        { NULL, 0, { .label = "", }, 0, { NULL }, },
     };
 
     RBRGen4Error err;
 
     for (int i = 0; tests[i].response != NULL; i++)
     {
-        RBRGen4Dataset actual = { .label = "d1" };
+        RBRGen4Dataset actual = { .label = "d1", };
         RBRGEN4_LABEL_LIST_DECL(scheduleList, 2);
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen4_getDataset(conn,
@@ -311,7 +311,7 @@ TEST_LOGGER4(getDataset)
     }
 
     /* An empty label is refused before the command. */
-    RBRGen4Dataset unlabelled = { .label = "" };
+    RBRGen4Dataset unlabelled = { .label = "", };
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen4_getDataset(conn, &unlabelled, NULL);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -320,7 +320,7 @@ TEST_LOGGER4(getDataset)
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     /* The schedule list may be skipped. */
-    RBRGen4Dataset unlisted = { .label = "d1" };
+    RBRGen4Dataset unlisted = { .label = "d1", };
     TestIOBuffers_init(buffers,
                        "dataset d1 status=closed schedulelist=s_cont"
                        " bytecount=5604 datatype=float64" RESPONSE_TERMINATOR,
@@ -332,7 +332,7 @@ TEST_LOGGER4(getDataset)
     TEST_ASSERT_EQ((int64_t) 5604, unlisted.byteCount, "%" PRId64);
 
     /* A schedule list which does not fit is truncated and reported. */
-    RBRGen4Dataset overfull = { .label = "d1" };
+    RBRGen4Dataset overfull = { .label = "d1", };
     RBRGEN4_LABEL_LIST_DECL(shortList, 1);
     TestIOBuffers_init(buffers,
                        "dataset d1 status=closed"
@@ -375,11 +375,11 @@ TEST_LOGGER4(datasetGetEventsBlock)
           "dataset d1/events" COMMAND_TERMINATOR,
           "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR, 0, 0 },
-        { NULL, NULL, NULL, 0, 0, 0 }
+        { NULL, NULL, NULL, 0, 0, 0 },
     };
 
     RBRGen4Error err;
-    RBRGen4Dataset dataset = { .label = "d1" };
+    RBRGen4Dataset dataset = { .label = "d1", };
     RBRGen4DatasetEventsBlock block;
 
     for (int i = 0; tests[i].command != NULL; i++)
@@ -414,11 +414,11 @@ TEST_LOGGER4(datasetGetMetaBlock)
           "dataset d1/meta" COMMAND_TERMINATOR,
           "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR, 0, 0 },
-        { NULL, NULL, NULL, 0, 0, 0 }
+        { NULL, NULL, NULL, 0, 0, 0 },
     };
 
     RBRGen4Error err;
-    RBRGen4Dataset dataset = { .label = "d1" };
+    RBRGen4Dataset dataset = { .label = "d1", };
     RBRGen4DatasetMetaBlock block;
 
     for (int i = 0; tests[i].command != NULL; i++)
@@ -454,11 +454,11 @@ TEST_LOGGER4(datasetGetScheduleBlock)
           "dataset d1/nosuch" COMMAND_TERMINATOR,
           "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR, 0, 0 },
-        { NULL, NULL, NULL, 0, 0, 0 }
+        { NULL, NULL, NULL, 0, 0, 0 },
     };
 
     RBRGen4Error err;
-    RBRGen4Dataset dataset = { .label = "d1" };
+    RBRGen4Dataset dataset = { .label = "d1", };
     RBRGen4DatasetScheduleBlock block;
 
     for (int i = 0; tests[i].command != NULL; i++)
@@ -507,11 +507,11 @@ TEST_LOGGER4(datasetGetScheduleEventsBlock)
           "dataset d1/nosuch/events" COMMAND_TERMINATOR,
           "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR, 0, 0 },
-        { NULL, NULL, NULL, 0, 0, 0 }
+        { NULL, NULL, NULL, 0, 0, 0 },
     };
 
     RBRGen4Error err;
-    RBRGen4Dataset dataset = { .label = "d1" };
+    RBRGen4Dataset dataset = { .label = "d1", };
     RBRGen4DatasetEventsBlock block;
 
     for (int i = 0; tests[i].command != NULL; i++)
@@ -555,11 +555,11 @@ TEST_LOGGER4(datasetGetScheduleDataBlock)
           "dataset d1/nosuch/data" COMMAND_TERMINATOR,
           "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR, 0, 0 },
-        { NULL, NULL, NULL, 0, 0, 0 }
+        { NULL, NULL, NULL, 0, 0, 0 },
     };
 
     RBRGen4Error err;
-    RBRGen4Dataset dataset = { .label = "d1" };
+    RBRGen4Dataset dataset = { .label = "d1", };
     RBRGen4DatasetDataBlock block;
 
     for (int i = 0; tests[i].command != NULL; i++)
@@ -604,7 +604,7 @@ TEST_LOGGER4(deleteDataset)
           "dataset delete nosuch" COMMAND_TERMINATOR,
           "ERR-304 dataset not found: 'nosuch'" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR },
-        { NULL, NULL, NULL, 0 }
+        { NULL, NULL, NULL, 0 },
     };
 
     RBRGen4Error err;
@@ -649,7 +649,7 @@ TEST_LOGGER4(deleteDatasetAll)
 TEST_LOGGER4(datasetDownloadScheduleData)
 {
     RBRGen4Error err;
-    RBRGen4Dataset dataset = { .label = "d1" };
+    RBRGen4Dataset dataset = { .label = "d1", };
     char data[16];
 
     /* A transfer in bytes: the payload follows the echo, then the CRC. */
@@ -661,7 +661,7 @@ TEST_LOGGER4(datasetDownloadScheduleData)
         .count = 8,
         .start = 0,
         .data = data,
-        .dataSize = sizeof(data)
+        .dataSize = sizeof(data),
     };
     TestIOBuffers_init(buffers, response, 0);
     err = RBRGen4Dataset_downloadScheduleData(conn,
@@ -790,7 +790,7 @@ TEST_LOGGER4(datasetDownloadScheduleData)
 TEST_LOGGER4(datasetDownloadEvents)
 {
     RBRGen4Error err;
-    RBRGen4Dataset dataset = { .label = "d1" };
+    RBRGen4Dataset dataset = { .label = "d1", };
     char data[24];
 
     /* A whole-dataset transfer measured in events. */
@@ -803,7 +803,7 @@ TEST_LOGGER4(datasetDownloadEvents)
         .count = 2,
         .start = 0,
         .data = data,
-        .dataSize = sizeof(data)
+        .dataSize = sizeof(data),
     };
     TestIOBuffers_init(buffers, response, 0);
     err = RBRGen4Dataset_downloadEvents(conn,
@@ -825,7 +825,7 @@ TEST_LOGGER4(datasetDownloadEvents)
 TEST_LOGGER4(datasetDownloadScheduleEvents)
 {
     RBRGen4Error err;
-    RBRGen4Dataset dataset = { .label = "d1" };
+    RBRGen4Dataset dataset = { .label = "d1", };
     char data[24];
 
     const char *response =
@@ -837,7 +837,7 @@ TEST_LOGGER4(datasetDownloadScheduleEvents)
         .count = 2,
         .start = 0,
         .data = data,
-        .dataSize = sizeof(data)
+        .dataSize = sizeof(data),
     };
     TestIOBuffers_init(buffers, response, 0);
     err = RBRGen4Dataset_downloadScheduleEvents(conn,
@@ -859,7 +859,7 @@ TEST_LOGGER4(datasetDownloadScheduleEvents)
 TEST_LOGGER4(datasetDownloadMeta)
 {
     RBRGen4Error err;
-    RBRGen4Dataset dataset = { .label = "d1" };
+    RBRGen4Dataset dataset = { .label = "d1", };
     char data[16];
 
     const char *response =
@@ -869,7 +869,7 @@ TEST_LOGGER4(datasetDownloadMeta)
         .byteCount = 8,
         .byteStart = 0,
         .data = data,
-        .dataSize = sizeof(data)
+        .dataSize = sizeof(data),
     };
     TestIOBuffers_init(buffers, response, 0);
     err = RBRGen4Dataset_downloadMeta(conn,

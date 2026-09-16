@@ -89,9 +89,9 @@ TEST_LOGGER3(fetch)
                 .readings = {
                     -129.993424,
                     0.349649536,
-                    0.500022304
-                }
-            }
+                    0.500022304,
+                },
+            },
         },
         {
             "fetch sleepafter = false" COMMAND_TERMINATOR,
@@ -114,9 +114,9 @@ TEST_LOGGER3(fetch)
                     RBRGen3Reading_setError(
                         RBRGEN3_READING_FLAG_ERROR,
                         14),
-                    1.0
-                }
-            }
+                    1.0,
+                },
+            },
         },
         {
             "fetch sleepafter = false, channels = temperature_00"
@@ -132,8 +132,8 @@ TEST_LOGGER3(fetch)
                     "temperature_01",
                     "temperature_02",
                     "temperature_03",
-                    "temperature_04"
-                }
+                    "temperature_04",
+                },
             },
             false,
             {
@@ -144,9 +144,9 @@ TEST_LOGGER3(fetch)
                     1.0,
                     2.0,
                     3.0,
-                    4.0
-                }
-            }
+                    4.0,
+                },
+            },
         },
         {
             "fetch sleepafter = false, channels ="
@@ -223,8 +223,8 @@ TEST_LOGGER3(fetch)
                     "3333333333333333333333333333333",
                     "4444444444444444444444444444444",
                     "5555555555555555555555555555555",
-                    "6666666666666666666666666666666"
-                }
+                    "6666666666666666666666666666666",
+                },
             },
             false,
             {
@@ -234,11 +234,11 @@ TEST_LOGGER3(fetch)
                     0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0,
                     8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0,
                     16.0, 17.0, 18.0, 19.0, 20.0, 21.0, 22.0, 23.0,
-                    24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0
-                }
-            }
+                    24.0, 25.0, 26.0, 27.0, 28.0, 29.0, 30.0, 31.0,
+                },
+            },
         },
-        {0}
+        {0},
     };
 
     return test_fetching(conn, buffers, tests);

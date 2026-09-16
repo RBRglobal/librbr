@@ -40,7 +40,7 @@ TEST_LOGGER2(link)
         {"link = usb" RESPONSE_TERMINATOR, RBRGEN3_LINK_USB},
         {"link = serial" RESPONSE_TERMINATOR, RBRGEN3_LINK_SERIAL},
         {"link = wifi" RESPONSE_TERMINATOR, RBRGEN3_LINK_WIFI},
-        {0}
+        {0},
     };
 
     return test_link(conn, buffers, tests);
@@ -52,7 +52,7 @@ TEST_LOGGER3(link)
         {"link type = usb" RESPONSE_TERMINATOR, RBRGEN3_LINK_USB},
         {"link type = serial" RESPONSE_TERMINATOR, RBRGEN3_LINK_SERIAL},
         {"link type = wifi" RESPONSE_TERMINATOR, RBRGEN3_LINK_WIFI},
-        {0}
+        {0},
     };
 
     return test_link(conn, buffers, tests);
@@ -81,8 +81,8 @@ TEST_LOGGER2(serial)
                 RBRGEN3_SERIAL_MODE_RS232
                 | RBRGEN3_SERIAL_MODE_RS485F
                 | RBRGEN3_SERIAL_MODE_UART
-                | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW
-            }
+                | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
+            },
         },
         {
             "serial baudrate = 115200, mode = rs485f" RESPONSE_TERMINATOR,
@@ -98,10 +98,10 @@ TEST_LOGGER2(serial)
                 RBRGEN3_SERIAL_MODE_RS232
                 | RBRGEN3_SERIAL_MODE_RS485F
                 | RBRGEN3_SERIAL_MODE_UART
-                | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW
-            }
+                | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
+            },
         },
-        {0}
+        {0},
     };
 
     RBRGen3Error err;
@@ -150,8 +150,8 @@ TEST_LOGGER3(serial)
                 RBRGEN3_SERIAL_MODE_RS232
                 | RBRGEN3_SERIAL_MODE_RS485F
                 | RBRGEN3_SERIAL_MODE_UART
-                | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW
-            }
+                | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
+            },
         },
         {
             "serial baudrate = 115200, mode = rs485f, availablebaudrates = "
@@ -171,10 +171,10 @@ TEST_LOGGER3(serial)
                 RBRGEN3_SERIAL_MODE_RS232
                 | RBRGEN3_SERIAL_MODE_RS485F
                 | RBRGEN3_SERIAL_MODE_UART
-                | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW
-            }
+                | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
+            },
         },
-        {0}
+        {0},
     };
 
     RBRGen3Error err;
@@ -261,10 +261,10 @@ TEST_LOGGER2(wifi)
                 RBRGEN3_UNKNOWN_WIFI,
                 60000,
                 90000,
-                RBRGEN3_SERIAL_BAUD_NONE
-            }
+                RBRGEN3_SERIAL_BAUD_NONE,
+            },
         },
-        {0}
+        {0},
     };
 
     return test_wifi(conn, buffers, tests);
@@ -282,8 +282,8 @@ TEST_LOGGER3(wifi)
                 RBRGEN3_WIFI_NA,
                 60000,
                 60000,
-                RBRGEN3_SERIAL_BAUD_921600
-            }
+                RBRGEN3_SERIAL_BAUD_921600,
+            },
         },
         {
             "wifi enabled = true, state = off, timeout = 90, "
@@ -294,8 +294,8 @@ TEST_LOGGER3(wifi)
                 RBRGEN3_WIFI_OFF,
                 90000,
                 30000,
-                RBRGEN3_SERIAL_BAUD_921600
-            }
+                RBRGEN3_SERIAL_BAUD_921600,
+            },
         },
         {
             "E0109 feature not available" RESPONSE_TERMINATOR,
@@ -305,10 +305,10 @@ TEST_LOGGER3(wifi)
                 RBRGEN3_UNKNOWN_WIFI,
                 0,
                 0,
-                RBRGEN3_SERIAL_BAUD_NONE
-            }
+                RBRGEN3_SERIAL_BAUD_NONE,
+            },
         },
-        {0}
+        {0},
     };
 
     return test_wifi(conn, buffers, tests);

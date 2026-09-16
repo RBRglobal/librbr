@@ -88,7 +88,7 @@ TEST_LOGGER2(pauseresume_error)
         {"pauseresume" COMMAND_TERMINATOR,
          "E0102 invalid command" RESPONSE_TERMINATOR,
          3},
-        {0}};
+        {0},};
     return test_pauseresume_error(conn, buffers, tests);
 }
 
@@ -98,7 +98,7 @@ TEST_LOGGER2(pause_error)
         {"pause" COMMAND_TERMINATOR,
          "E0102 invalid command" RESPONSE_TERMINATOR,
          1},
-        {0}};
+        {0},};
     return test_pause_error(conn, buffers, tests);
 }
 
@@ -108,7 +108,7 @@ TEST_LOGGER2(resume_error)
         {"resume" COMMAND_TERMINATOR,
          "E0102 invalid command" RESPONSE_TERMINATOR,
          2},
-        {0}};
+        {0},};
     return test_resume_error(conn, buffers, tests);
 }
 
@@ -121,7 +121,7 @@ TEST_LOGGER3(pauseresume_error)
         {"pauseresume" COMMAND_TERMINATOR,
          "E0109 feature not available" RESPONSE_TERMINATOR,
          3},
-        {0}};
+        {0},};
     return test_pauseresume_error(conn, buffers, tests);
 }
 
@@ -143,7 +143,7 @@ TEST_LOGGER3(pause_error)
         {"pause" COMMAND_TERMINATOR,
          "E0417 no gating allowed with regimes mode" RESPONSE_TERMINATOR,
          1},
-        {0}};
+        {0},};
     return test_pause_error(conn, buffers, tests);
 }
 
@@ -165,7 +165,7 @@ TEST_LOGGER3(resume_error)
         {"resume" COMMAND_TERMINATOR,
          "E0417 no gating allowed with regimes mode" RESPONSE_TERMINATOR,
          2},
-        {0}};
+        {0},};
     return test_resume_error(conn, buffers, tests);
 }
 
@@ -233,7 +233,7 @@ TEST_LOGGER3(pauseresume)
         {"pauseresume" COMMAND_TERMINATOR,
          "pauseresume state = running" RESPONSE_TERMINATOR,
          2},
-        {0}};
+        {0},};
 
     return test_pauseresume(conn, buffers, tests);
 }
@@ -244,7 +244,7 @@ TEST_LOGGER3(pause)
         {"pause" COMMAND_TERMINATOR,
          "pause status = paused" RESPONSE_TERMINATOR,
          0},
-        {0}};
+        {0},};
 
     return test_pause(conn, buffers, tests);
 }
@@ -258,7 +258,7 @@ TEST_LOGGER3(resume)
         {"resume" COMMAND_TERMINATOR,
          "resume status = logging" RESPONSE_TERMINATOR,
          1},
-        {0}};
+        {0},};
 
     return test_resume(conn, buffers, tests);
 }

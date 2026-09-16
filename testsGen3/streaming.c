@@ -26,12 +26,12 @@ TEST_LOGGER3(outputformat_channelslist)
     RBRGen3ChannelsList expected = {
         .count = 5,
         .channels = {
-            {.name = "temperature", .unit = "C"},
-            {.name = "pressure", .unit = "dbar"},
-            {.name = "pressure", .unit = "dbar"},
-            {.name = "depth", .unit = "m"},
-            {.name = "measurement_count", .unit = "counts"}
-        }
+            {.name = "temperature", .unit = "C",},
+            {.name = "pressure", .unit = "dbar",},
+            {.name = "pressure", .unit = "dbar",},
+            {.name = "depth", .unit = "m",},
+            {.name = "measurement_count", .unit = "counts",},
+        },
     };
 
     RBRGen3Error err;
@@ -78,8 +78,8 @@ TEST_LOGGER3(outputformat_labelslist)
             "pressure_00",
             "seapressure_00",
             "depth_00",
-            "count_00"
-        }
+            "count_00",
+        },
     };
 
     RBRGen3Error err;
@@ -202,7 +202,7 @@ TEST_LOGGER3(streamusb)
     ToggleTest tests[] = {
         {"streamusb state = on" RESPONSE_TERMINATOR, true},
         {"streamusb state = off" RESPONSE_TERMINATOR, false},
-        {NULL, 0}
+        {NULL, 0},
     };
 
     for (int i = 0; tests[i].response != NULL; i++)
@@ -224,7 +224,7 @@ TEST_LOGGER3(streamserial)
     ToggleTest tests[] = {
         {"streamserial state = on" RESPONSE_TERMINATOR, true},
         {"streamserial state = off" RESPONSE_TERMINATOR, false},
-        {NULL, 0}
+        {NULL, 0},
     };
 
     for (int i = 0; tests[i].response != NULL; i++)
@@ -246,7 +246,7 @@ TEST_LOGGER2(streamserial_aux)
         .setup = 1000,
         .hold = 1000,
         .active = RBRGEN3_ACTIVE_HIGH,
-        .sleep = RBRGEN3_SLEEP_TRISTATE
+        .sleep = RBRGEN3_SLEEP_TRISTATE,
     };
 
     RBRGen3Error err;
@@ -282,7 +282,7 @@ TEST_LOGGER2(streamserial_set_aux)
         .setup = 500,
         .hold = 750,
         .active = RBRGEN3_ACTIVE_LOW,
-        .sleep = RBRGEN3_SLEEP_HIGH
+        .sleep = RBRGEN3_SLEEP_HIGH,
     };
 
     RBRGen3Error err;
@@ -310,7 +310,7 @@ TEST_LOGGER3(streamserial_aux)
         .setup = 1000,
         .hold = 1000,
         .active = RBRGEN3_ACTIVE_HIGH,
-        .sleep = RBRGEN3_SLEEP_TRISTATE
+        .sleep = RBRGEN3_SLEEP_TRISTATE,
     };
 
     RBRGen3Error err;
@@ -361,7 +361,7 @@ TEST_LOGGER3(streamserial_set_aux)
         .setup = 500,
         .hold = 750,
         .active = RBRGEN3_ACTIVE_LOW,
-        .sleep = RBRGEN3_SLEEP_HIGH
+        .sleep = RBRGEN3_SLEEP_HIGH,
     };
 
     RBRGen3Error err;

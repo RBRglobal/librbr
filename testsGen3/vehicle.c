@@ -25,8 +25,8 @@ TEST_LOGGER3(regimes)
             {
                 .direction = RBRGEN3_DIRECTION_ASCENDING,
                 .count = 1,
-                .reference = RBRGEN3_REFERENCE_ABSOLUTE
-            }
+                .reference = RBRGEN3_REFERENCE_ABSOLUTE,
+            },
         },
         {
             "regimes direction = descending, count = 3, "
@@ -34,10 +34,10 @@ TEST_LOGGER3(regimes)
             {
                 .direction = RBRGEN3_DIRECTION_DESCENDING,
                 .count = 3,
-                .reference = RBRGEN3_REFERENCE_SEAPRESSURE
-            }
+                .reference = RBRGEN3_REFERENCE_SEAPRESSURE,
+            },
         },
-        {0}
+        {0},
     };
 
     RBRGen3Error err;
@@ -70,8 +70,8 @@ TEST_LOGGER3(regimes_set)
             {
                 .direction = RBRGEN3_DIRECTION_ASCENDING,
                 .count = 1,
-                .reference = RBRGEN3_REFERENCE_ABSOLUTE
-            }
+                .reference = RBRGEN3_REFERENCE_ABSOLUTE,
+            },
         },
         {
             "regimes direction = descending, count = 3, "
@@ -79,10 +79,10 @@ TEST_LOGGER3(regimes_set)
             {
                 .direction = RBRGEN3_DIRECTION_DESCENDING,
                 .count = 3,
-                .reference = RBRGEN3_REFERENCE_SEAPRESSURE
-            }
+                .reference = RBRGEN3_REFERENCE_SEAPRESSURE,
+            },
         },
-        {0}
+        {0},
     };
 
     RBRGen3Error err;
@@ -117,8 +117,8 @@ TEST_LOGGER3(regime)
                 .index = 1,
                 .boundary = 50.0,
                 .binSize = 0.1,
-                .samplingPeriod = 63
-            }
+                .samplingPeriod = 63,
+            },
         },
         {
             "regime 2 boundary = 100, binsize = 1.0, samplingperiod = 125"
@@ -127,10 +127,10 @@ TEST_LOGGER3(regime)
                 .index = 2,
                 .boundary = 100.0,
                 .binSize = 1.0,
-                .samplingPeriod = 125
-            }
+                .samplingPeriod = 125,
+            },
         },
-        {0}
+        {0},
     };
 
     RBRGen3Error err;
@@ -166,8 +166,8 @@ TEST_LOGGER3(regime_set)
                 .index = 1,
                 .boundary = 50.0,
                 .binSize = 0.1,
-                .samplingPeriod = 63
-            }
+                .samplingPeriod = 63,
+            },
         },
         {
             "regime 2 boundary = 100, binsize = 1.4, samplingperiod = 125",
@@ -175,10 +175,10 @@ TEST_LOGGER3(regime_set)
                 .index = 2,
                 .boundary = 100.123,
                 .binSize = 1.38,
-                .samplingPeriod = 125
-            }
+                .samplingPeriod = 125,
+            },
         },
-        {0}
+        {0},
     };
 
     RBRGen3Error err;
@@ -214,10 +214,10 @@ TEST_LOGGER3(ddsampling)
                 .fastPeriod = 63,
                 .slowPeriod = 1000,
                 .fastThreshold = 3.0,
-                .slowThreshold = 3.0
-            }
+                .slowThreshold = 3.0,
+            },
         },
-        {0}
+        {0},
     };
 
     RBRGen3Error err;
@@ -259,10 +259,10 @@ TEST_LOGGER3(ddsampling_set)
                 .fastPeriod = 63,
                 .slowPeriod = 1000,
                 .fastThreshold = 3.0,
-                .slowThreshold = 3.0
-            }
+                .slowThreshold = 3.0,
+            },
         },
-        {0}
+        {0},
     };
 
     RBRGen3Error err;

@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
         .read = TestIOBuffers_read,
         .write = TestIOBuffers_write,
         .sample = TestIOBuffers_sample,
-        .sampleBuffer = &ioBuffers.streamSample
+        .sampleBuffer = &ioBuffers.streamSample,
     };
 
     RBRGen3 instrumentL2Buffer;
@@ -328,7 +328,7 @@ int main(int argc, char *argv[])
         .sample = TestParserBuffers_sample,
         .sampleBuffer = &parserSample,
         .event = TestParserBuffers_event,
-        .eventBuffer = &parserEvent
+        .eventBuffer = &parserEvent,
     };
 
     RBRGen3Parser parserBuffer;

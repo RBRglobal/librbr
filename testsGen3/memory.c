@@ -16,10 +16,10 @@ TEST_LOGGER3(meminfo)
         .dataset = RBRGEN3_DATASET_STANDARD,
         .used = 1528,
         .remaining = 134216192,
-        .size = 134217728
+        .size = 134217728,
     };
     RBRGen3MemoryInfo actual = {
-        .dataset = RBRGEN3_DATASET_STANDARD
+        .dataset = RBRGEN3_DATASET_STANDARD,
     };
 
     TestIOBuffers_init(buffers,
@@ -42,7 +42,7 @@ TEST_LOGGER3(meminfo)
 TEST_LOGGER3(meminfo_invalid_dataset)
 {
     RBRGen3MemoryInfo test = {
-        .dataset = RBRGEN3_UNKNOWN_DATASET
+        .dataset = RBRGEN3_UNKNOWN_DATASET,
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -61,13 +61,13 @@ TEST_LOGGER2(read)
         .dataset = RBRGEN3_DATASET_STANDARD,
         .size    = 8,
         .offset  = 2800,
-        .data    = buf
+        .data    = buf,
     };
     RBRGen3Data actual = {
         .dataset = RBRGEN3_DATASET_STANDARD,
         .size    = 1400,
         .offset  = 2800,
-        .data    = buf
+        .data    = buf,
     };
 
     TestIOBuffers_init(buffers,
@@ -96,7 +96,7 @@ TEST_LOGGER2(read_offset_mismatch)
         .dataset = RBRGEN3_DATASET_STANDARD,
         .size    = 1400,
         .offset  = 2800,
-        .data    = buf
+        .data    = buf,
     };
 
 
@@ -121,13 +121,13 @@ TEST_LOGGER3(readdata)
         .dataset = RBRGEN3_DATASET_STANDARD,
         .size    = 8,
         .offset  = 2800,
-        .data    = buf
+        .data    = buf,
     };
     RBRGen3Data actual = {
         .dataset = RBRGEN3_DATASET_STANDARD,
         .size    = 1400,
         .offset  = 2800,
-        .data    = buf
+        .data    = buf,
     };
 
     TestIOBuffers_init(buffers,
@@ -156,7 +156,7 @@ TEST_LOGGER3(readdata_offset_mismatch)
         .dataset = RBRGEN3_DATASET_STANDARD,
         .size    = 1400,
         .offset  = 2800,
-        .data    = buf
+        .data    = buf,
     };
 
     TestIOBuffers_init(buffers,
@@ -179,7 +179,7 @@ TEST_LOGGER3(readdata_invalid_dataset)
         .dataset = RBRGEN3_UNKNOWN_DATASET,
         .size    = 0,
         .offset  = 0,
-        .data    = NULL
+        .data    = NULL,
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -198,13 +198,13 @@ TEST_LOGGER3(readdata_crc_failure)
         .dataset = RBRGEN3_DATASET_STANDARD,
         .size    = 0,
         .offset  = 2800,
-        .data    = buf
+        .data    = buf,
     };
     RBRGen3Data actual = {
         .dataset = RBRGEN3_DATASET_STANDARD,
         .size    = 1400,
         .offset  = 2800,
-        .data    = buf
+        .data    = buf,
     };
 
     TestIOBuffers_init(buffers,
@@ -332,26 +332,26 @@ TEST_LOGGER3(postprocessing)
             .channels = {
                 {
                     .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "pressure_01"
+                    .label = "pressure_01",
                 },
                 {
                     .function =
                         RBRGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
-                    .label = "pressure_01"
+                    .label = "pressure_01",
                 },
                 {
                     .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "temperature_01"
+                    .label = "temperature_01",
                 },
                 {
                     .function = RBRGEN3_POSTPROCESSING_AGGREGATE_STD,
-                    .label = "temperature_01"
+                    .label = "temperature_01",
                 },
                 {
                     .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "conductivity_01"
-                }
-            }
+                    .label = "conductivity_01",
+                },
+            },
         },
         .binReference = "pressure_01",
         .binFilter = RBRGEN3_POSTPROCESSING_BINFILTER_NONE,
@@ -363,7 +363,7 @@ TEST_LOGGER3(postprocessing)
         .dcAlpha = 0.08,
         .dcTau = 8.0,
         .dcTdelay = 0.35,
-        .dcCtCoeff = 2.4e-4
+        .dcCtCoeff = 2.4e-4,
     };
     RBRGen3Postprocessing actual;
 
@@ -421,26 +421,26 @@ TEST_LOGGER3(postprocessing_set)
             .channels = {
                 {
                     .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "pressure_01"
+                    .label = "pressure_01",
                 },
                 {
                     .function =
                         RBRGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
-                    .label = "pressure_01"
+                    .label = "pressure_01",
                 },
                 {
                     .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "temperature_01"
+                    .label = "temperature_01",
                 },
                 {
                     .function = RBRGEN3_POSTPROCESSING_AGGREGATE_STD,
-                    .label = "temperature_01"
+                    .label = "temperature_01",
                 },
                 {
                     .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "conductivity_01"
-                }
-            }
+                    .label = "conductivity_01",
+                },
+            },
         },
         .binReference = "pressure_01",
         .binFilter = RBRGEN3_POSTPROCESSING_BINFILTER_NONE,
@@ -452,7 +452,7 @@ TEST_LOGGER3(postprocessing_set)
         .dcAlpha = 0.08,
         .dcTau = 8.0,
         .dcTdelay = 0.35,
-        .dcCtCoeff = 2.4e-4
+        .dcCtCoeff = 2.4e-4,
     };
 
     const char *expectedCommand = "postprocessing binreference = pressure_01, "

@@ -208,7 +208,7 @@ TEST_LOGGER2(channels)
                         .gain = {
                             .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
-                            .availableGains = {NAN}
+                            .availableGains = {NAN},
                         },
                         .derived = false,
                         .label = "none",
@@ -219,11 +219,11 @@ TEST_LOGGER2(channels)
                                 -250.00002e-006,
                                 2.7000000e-006,
                                 23.000000e-009,
-                                NAN
+                                NAN,
                             },
                             .x = {NAN},
-                            .n = {0}
-                        }
+                            .n = {0},
+                        },
                     },
                     {
                         .type = "pres19",
@@ -236,7 +236,7 @@ TEST_LOGGER2(channels)
                         .gain = {
                             .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
-                            .availableGains = {NAN}
+                            .availableGains = {NAN},
                         },
                         .derived = false,
                         .label = "none",
@@ -247,7 +247,7 @@ TEST_LOGGER2(channels)
                                 1.0000000e+000,
                                 0.0000000e+000,
                                 0.0000000e+000,
-                                NAN
+                                NAN,
                             },
                             .x = {
                                 0.0000000e+000,
@@ -256,13 +256,13 @@ TEST_LOGGER2(channels)
                                 0.0000000e+000,
                                 0.0000000e+000,
                                 0.0000000e+000,
-                                NAN
+                                NAN,
                             },
                             .n = {
                                 RBRGEN3_VALUE_COEFFICIENT,
-                                0
-                            }
-                        }
+                                0,
+                            },
+                        },
                     },
                     {
                         .type = "volt00",
@@ -275,7 +275,7 @@ TEST_LOGGER2(channels)
                         .gain = {
                             .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
-                            .availableGains = {NAN}
+                            .availableGains = {NAN},
                         },
                         .derived = false,
                         .label = "none",
@@ -284,14 +284,14 @@ TEST_LOGGER2(channels)
                             .c = {
                                 0.0000000e+000,
                                 1.0000000e+000,
-                                NAN
+                                NAN,
                             },
                             .x = {NAN},
-                            .n = {0}
-                        }
-                    }
-                }
-            }
+                            .n = {0},
+                        },
+                    },
+                },
+            },
         },
         {
             "channels count = 1, on = 1, latency = 600, readtime = 1700, "
@@ -321,7 +321,7 @@ TEST_LOGGER2(channels)
                         .gain = {
                             .rangingMode = RBRGEN3_RANGING_AUTO,
                             .currentGain = NAN,
-                            .availableGains = {1.0, 3.0, 10.0, 30.0, NAN}
+                            .availableGains = {1.0, 3.0, 10.0, 30.0, NAN},
                         },
                         .derived = false,
                         .label = "none",
@@ -330,16 +330,16 @@ TEST_LOGGER2(channels)
                             .c = {
                                 203.47984e+000,
                                 -277.72070e+000,
-                                NAN
+                                NAN,
                             },
                             .x = {NAN},
-                            .n = {0}
-                        }
-                    }
-                }
-            }
+                            .n = {0},
+                        },
+                    },
+                },
+            },
         },
-        {0}
+        {0},
     };
 
     return test_channels(conn, buffers, tests);
@@ -415,7 +415,7 @@ TEST_LOGGER3(channels)
                         .gain = {
                             .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
-                            .availableGains = {NAN}
+                            .availableGains = {NAN},
                         },
                         .derived = false,
                         .label = "temperature_00",
@@ -426,11 +426,11 @@ TEST_LOGGER3(channels)
                                 -250.00002e-006,
                                 2.7000000e-006,
                                 23.000000e-009,
-                                NAN
+                                NAN,
                             },
                             .x = {NAN},
-                            .n = {0}
-                        }
+                            .n = {0},
+                        },
                     },
                     {
                         .type = "pres24",
@@ -443,7 +443,7 @@ TEST_LOGGER3(channels)
                         .gain = {
                             .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
-                            .availableGains = {NAN}
+                            .availableGains = {NAN},
                         },
                         .derived = false,
                         .label = "pressure_00",
@@ -454,7 +454,7 @@ TEST_LOGGER3(channels)
                                 1.0000000e+000,
                                 0.0000000e+000,
                                 0.0000000e+000,
-                                NAN
+                                NAN,
                             },
                             .x = {
                                 0.0000000e+000,
@@ -463,13 +463,13 @@ TEST_LOGGER3(channels)
                                 0.0000000e+000,
                                 0.0000000e+000,
                                 0.0000000e+000,
-                                NAN
+                                NAN,
                             },
                             .n = {
                                 6,
-                                0
-                            }
-                        }
+                                0,
+                            },
+                        },
                     },
                     {
                         .type = "pres08",
@@ -482,7 +482,7 @@ TEST_LOGGER3(channels)
                         .gain = {
                             .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
-                            .availableGains = {NAN}
+                            .availableGains = {NAN},
                         },
                         .derived = true,
                         .label = "seapressure_00",
@@ -493,9 +493,9 @@ TEST_LOGGER3(channels)
                             .n = {
                                 2,
                                 RBRGEN3_VALUE_COEFFICIENT,
-                                0
-                            }
-                        }
+                                0,
+                            },
+                        },
                     },
                     {
                         .type = "dpth01",
@@ -508,7 +508,7 @@ TEST_LOGGER3(channels)
                         .gain = {
                             .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
-                            .availableGains = {NAN}
+                            .availableGains = {NAN},
                         },
                         .derived = true,
                         .label = "depth_00",
@@ -519,9 +519,9 @@ TEST_LOGGER3(channels)
                             .n = {
                                 2,
                                 RBRGEN3_VALUE_COEFFICIENT,
-                                0
-                            }
-                        }
+                                0,
+                            },
+                        },
                     },
                     {
                         .type = "cnt_00",
@@ -534,7 +534,7 @@ TEST_LOGGER3(channels)
                         .gain = {
                             .rangingMode = RBRGEN3_RANGING_NONE,
                             .currentGain = NAN,
-                            .availableGains = {NAN}
+                            .availableGains = {NAN},
                         },
                         .derived = true,
                         .label = "count_00",
@@ -544,12 +544,12 @@ TEST_LOGGER3(channels)
                             .x = {NAN},
                             .n = {
                                 RBRGEN3_VALUE_COEFFICIENT,
-                                0
-                            }
-                        }
-                    }
-                }
-            }
+                                0,
+                            },
+                        },
+                    },
+                },
+            },
         },
         {
             "channels count = 1, on = 1, settlingtime = 5000, "
@@ -578,7 +578,7 @@ TEST_LOGGER3(channels)
                         .gain = {
                             .rangingMode = RBRGEN3_RANGING_AUTO,
                             .currentGain = NAN,
-                            .availableGains = {1.0, 10.0, 100.0, NAN}
+                            .availableGains = {1.0, 10.0, 100.0, NAN},
                         },
                         .derived = false,
                         .label = "chlorophyll_00",
@@ -587,14 +587,14 @@ TEST_LOGGER3(channels)
                             .c = {
                                 678.26611e+000,
                                 -925.73568e+000,
-                                NAN
+                                NAN,
                             },
                             .x = {NAN},
-                            .n = {0}
-                        }
-                    }
-                }
-            }
+                            .n = {0},
+                        },
+                    },
+                },
+            },
         },
         {
             "channels count = 1, on = 1, settlingtime = 5000, "
@@ -624,7 +624,7 @@ TEST_LOGGER3(channels)
                         .gain = {
                             .rangingMode = RBRGEN3_RANGING_MANUAL,
                             .currentGain = 20.0,
-                            .availableGains = {1.0, 5.0, 20.0, 100.0, NAN}
+                            .availableGains = {1.0, 5.0, 20.0, 100.0, NAN},
                         },
                         .derived = false,
                         .label = "turbidity_00",
@@ -633,16 +633,16 @@ TEST_LOGGER3(channels)
                             .c = {
                                 3.3910000e+003,
                                 -4.6280000e+003,
-                                NAN
+                                NAN,
                             },
                             .x = {NAN},
-                            .n = {0}
-                        }
-                    }
-                }
-            }
+                            .n = {0},
+                        },
+                    },
+                },
+            },
         },
-        {0}
+        {0},
     };
 
     return test_channels(conn, buffers, tests);
@@ -651,7 +651,7 @@ TEST_LOGGER3(channels)
 TEST_LOGGER3(channel_gain_set_auto)
 {
     RBRGen3ChannelGain gain = {
-        .rangingMode = RBRGEN3_RANGING_AUTO
+        .rangingMode = RBRGEN3_RANGING_AUTO,
     };
 
     const char *text = "channel 1 gain = auto";
@@ -674,7 +674,7 @@ TEST_LOGGER3(channel_gain_set_manual)
     RBRGen3ChannelGain gain = {
         .rangingMode = RBRGEN3_RANGING_MANUAL,
         .currentGain = 5.0,
-        .availableGains = {1.0, 5.0, 10.0, NAN}
+        .availableGains = {1.0, 5.0, 10.0, NAN},
     };
 
     const char *text = "channel 1 gain = 5.0";
@@ -701,10 +701,10 @@ TEST_LOGGER3(calibration_set)
             -250.00002e-006,
             2.7000000e-006,
             23.000000e-009,
-            NAN
+            NAN,
         },
         .x = {NAN},
-        .n = {0}
+        .n = {0},
     };
     const char *expectedCommand = "calibration 1 datetime = 20180919181615, "
                           "c0 = 0.0035" COMMAND_TERMINATOR
@@ -986,22 +986,22 @@ TEST_LOGGER2(sensor)
             .expected = {
                 {
                     .key = "serial",
-                    .value = "12345"
-                }
+                    .value = "12345",
+                },
             },
-            .size = 0
+            .size = 0,
         },
         {
             .response = "E0501 item is not configured" RESPONSE_TERMINATOR,
             .expected = {
                 {
                     .key = "serial",
-                    .value = "n/a"
-                }
+                    .value = "n/a",
+                },
             },
-            .size = 0
+            .size = 0,
         },
-        {0}
+        {0},
     };
 
     return test_sensor(conn, buffers, tests);
@@ -1015,10 +1015,10 @@ TEST_LOGGER2(sensor_all)
             .expected = {
                 {
                     .key = "serial",
-                    .value = "12345"
-                }
+                    .value = "12345",
+                },
             },
-            .size = 1
+            .size = 1,
         },
         {
             .response = "sensor 1 serial = 12345, manufacturer = Whoever, "
@@ -1026,24 +1026,24 @@ TEST_LOGGER2(sensor_all)
             .expected = {
                 {
                     .key = "serial",
-                    .value = "12345"
+                    .value = "12345",
                 },
                 {
                     .key = "manufacturer",
-                    .value = "Whoever"
+                    .value = "Whoever",
                 },
                 {
                     .key = "foo",
-                    .value = "bar"
-                }
+                    .value = "bar",
+                },
             },
-            .size = 3
+            .size = 3,
         },
         {
             .response = "E0109 feature not available" RESPONSE_TERMINATOR,
-            .size = 0
+            .size = 0,
         },
-        {0}
+        {0},
     };
 
     return test_sensors(conn, buffers, tests);
@@ -1057,22 +1057,22 @@ TEST_LOGGER3(sensor)
             .expected = {
                 {
                     .key = "serial",
-                    .value = "12345"
-                }
+                    .value = "12345",
+                },
             },
-            .size = 0
+            .size = 0,
         },
         {
             .response = "sensor 1 serial = n/a" RESPONSE_TERMINATOR,
             .expected = {
                 {
                     .key = "serial",
-                    .value = "n/a"
-                }
+                    .value = "n/a",
+                },
             },
-            .size = 0
+            .size = 0,
         },
-        {0}
+        {0},
     };
 
     return test_sensor(conn, buffers, tests);
@@ -1086,10 +1086,10 @@ TEST_LOGGER3(sensor_all)
             .expected = {
                 {
                     .key = "serial",
-                    .value = "12345"
-                }
+                    .value = "12345",
+                },
             },
-            .size = 1
+            .size = 1,
         },
         {
             .response = "sensor 1 serial = 12345, manufacturer = Whoever, "
@@ -1097,18 +1097,18 @@ TEST_LOGGER3(sensor_all)
             .expected = {
                 {
                     .key = "serial",
-                    .value = "12345"
+                    .value = "12345",
                 },
                 {
                     .key = "manufacturer",
-                    .value = "Whoever"
+                    .value = "Whoever",
                 },
                 {
                     .key = "foo",
-                    .value = "bar"
-                }
+                    .value = "bar",
+                },
             },
-            .size = 3
+            .size = 3,
         },
         {
             .response = "sensor 1 serial = 12345, manufacturer = Whoever, "
@@ -1116,24 +1116,24 @@ TEST_LOGGER3(sensor_all)
             .expected = {
                 {
                     .key = "serial",
-                    .value = "12345"
+                    .value = "12345",
                 },
                 {
                     .key = "manufacturer",
-                    .value = "Whoever"
+                    .value = "Whoever",
                 },
                 {
                     .key = "foo",
-                    .value = "bar"
-                }
+                    .value = "bar",
+                },
             },
-            .size = 3
+            .size = 3,
         },
         {
             .response = "sensor 1" RESPONSE_TERMINATOR,
-            .size = 0
+            .size = 0,
         },
-        {0}
+        {0},
     };
 
     return test_sensors(conn, buffers, tests);

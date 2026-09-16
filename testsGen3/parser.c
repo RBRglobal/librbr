@@ -17,9 +17,9 @@ TEST_PARSER_CONFIG(two_channels) = {
     .format = RBRGEN3_MEMFORMAT_CALBIN00,
     .formatConfig = {
         .easyParse = {
-            .channels = 2
-        }
-    }
+            .channels = 2,
+        },
+    },
 };
 
 TEST_PARSER(event, two_channels)
@@ -134,28 +134,28 @@ TEST_PARSER(samples, two_channels)
         {
             .timestamp = 1541620083000LL,
             .channels = 2,
-            .readings = {1.0, 2.0}
+            .readings = {1.0, 2.0},
         },
         {
             .timestamp = 1541620084000LL,
             .channels = 2,
-            .readings = {3.0, 4.0}
+            .readings = {3.0, 4.0},
         },
         {
             .timestamp = 1541620085000LL,
             .channels = 2,
-            .readings = {5.0, 6.0}
+            .readings = {5.0, 6.0},
         },
         {
             .timestamp = 1541620086000LL,
             .channels = 2,
-            .readings = {7.0, 8.0}
+            .readings = {7.0, 8.0},
         },
         {
             .timestamp = 1541620087000LL,
             .channels = 2,
-            .readings = {9.0, 10.0}
-        }
+            .readings = {9.0, 10.0},
+        },
     };
 
     RBRGen3Error err = RBRGen3Parser_parse(

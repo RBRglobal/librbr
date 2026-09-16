@@ -38,8 +38,8 @@ TEST_LOGGER4(nodelist)
      * RBRGen4_getNode(). */
     RBRGen4NodePool expected = {
         .count = 2,
-        .pool = { { .label = "self" },
-                  { .label = "fe4_minimal_00" } }
+        .pool = { { .label = "self", },
+                  { .label = "fe4_minimal_00", }, },
     };
     RBRGen4NodePool actual;
 
@@ -75,11 +75,11 @@ TEST_LOGGER4(node)
         .semver = "2.0.0-rc2-67-gdc557ad33",
         .fwtype = 150,
         .powerUpTime = 0,
-        .inrushOffsetTime = 0
+        .inrushOffsetTime = 0,
     };
 
     RBRGen4Node actual = {
-        .label = "self"
+        .label = "self",
     };
 
     TestIOBuffers_init(buffers,
@@ -110,11 +110,11 @@ TEST_LOGGER4(nodeWithoutPorts)
         .semver = "00000001",
         .fwtype = 0,
         .powerUpTime = 0,
-        .inrushOffsetTime = 0
+        .inrushOffsetTime = 0,
     };
 
     RBRGen4Node actual = {
-        .label = "fe4_minimal_00"
+        .label = "fe4_minimal_00",
     };
 
     TestIOBuffers_init(buffers,
@@ -163,18 +163,18 @@ TEST_LOGGER4(portlist)
         .count = 6,
         .pool = {
             { .label = "thermistor_00",
-              .portClass = RBRGEN4_UNKNOWN_PORT_CLASS },
+              .portClass = RBRGEN4_UNKNOWN_PORT_CLASS, },
             { .label = "pres_serial_00",
-              .portClass = RBRGEN4_UNKNOWN_PORT_CLASS },
+              .portClass = RBRGEN4_UNKNOWN_PORT_CLASS, },
             { .label = "internal_adc_00",
-              .portClass = RBRGEN4_UNKNOWN_PORT_CLASS },
+              .portClass = RBRGEN4_UNKNOWN_PORT_CLASS, },
             { .label = "serial_00",
-              .portClass = RBRGEN4_UNKNOWN_PORT_CLASS },
+              .portClass = RBRGEN4_UNKNOWN_PORT_CLASS, },
             { .label = "serial_01",
-              .portClass = RBRGEN4_UNKNOWN_PORT_CLASS },
+              .portClass = RBRGEN4_UNKNOWN_PORT_CLASS, },
             { .label = "serial_02",
-              .portClass = RBRGEN4_UNKNOWN_PORT_CLASS }
-        }
+              .portClass = RBRGEN4_UNKNOWN_PORT_CLASS, },
+        },
     };
     RBRGen4PortPool actual;
 
@@ -210,11 +210,11 @@ TEST_LOGGER4(port)
         .baudRate = 0,
         .deviceCount = 1,
         .deviceList = { "thermistor_00" },
-        .powerUpTime = 0
+        .powerUpTime = 0,
     };
 
     RBRGen4Port actual = {
-        .label = "thermistor_00"
+        .label = "thermistor_00",
     };
 
     TestIOBuffers_init(buffers,
@@ -242,11 +242,11 @@ TEST_LOGGER4(portWithoutDevices)
         .availableProtocols = RBRGEN4_PORT_PROTOCOL_NONE,
         .baudRate = 0,
         .deviceCount = 0,
-        .powerUpTime = 0
+        .powerUpTime = 0,
     };
 
     RBRGen4Port actual = {
-        .label = "serial_00"
+        .label = "serial_00",
     };
 
     TestIOBuffers_init(buffers,
@@ -284,11 +284,11 @@ TEST_LOGGER4(portSerial)
         .baudRate = 9600,
         .deviceCount = 2,
         .deviceList = { "cond_cell_00", "pres_sensor_01" },
-        .powerUpTime = 50
+        .powerUpTime = 50,
     };
 
     RBRGen4Port actual = {
-        .label = "serial_01"
+        .label = "serial_01",
     };
 
     TestIOBuffers_init(buffers,
@@ -348,12 +348,12 @@ TEST_LOGGER4(devicelist)
         .count = 3,
         .pool = {
             { .label = "thermistor_00",
-              .deviceClass = RBRGEN4_UNKNOWN_DEVICE_CLASS },
+              .deviceClass = RBRGEN4_UNKNOWN_DEVICE_CLASS, },
             { .label = "pres_sensor_00",
-              .deviceClass = RBRGEN4_UNKNOWN_DEVICE_CLASS },
+              .deviceClass = RBRGEN4_UNKNOWN_DEVICE_CLASS, },
             { .label = "internal_adc_00",
-              .deviceClass = RBRGEN4_UNKNOWN_DEVICE_CLASS }
-        }
+              .deviceClass = RBRGEN4_UNKNOWN_DEVICE_CLASS, },
+        },
     };
     RBRGen4DevicePool actual;
 
@@ -384,7 +384,7 @@ TEST_LOGGER4(discoverDevices)
      * ones it has just added, so the result has the same shape as the pool
      * getter's and carries labels only. */
     const char *expected[] = {
-        "thermistor_00", "pres_sensor_00", "internal_adc_00"
+        "thermistor_00", "pres_sensor_00", "internal_adc_00",
     };
     RBRGen4DevicePool actual;
 
@@ -444,11 +444,11 @@ TEST_LOGGER4(device)
         .powerUpTime = 12,
         .coolDownTime = 0,
         .powerDownTime = 0,
-        .inrushOffsetTime = 10
+        .inrushOffsetTime = 10,
     };
 
     RBRGen4Device actual = {
-        .label = "thermistor_00"
+        .label = "thermistor_00",
     };
 
     TestIOBuffers_init(buffers,
@@ -492,11 +492,11 @@ TEST_LOGGER4(deviceIdentity)
         .powerUpTime = 0,
         .coolDownTime = 0,
         .powerDownTime = 0,
-        .inrushOffsetTime = 0
+        .inrushOffsetTime = 0,
     };
 
     RBRGen4Device actual = {
-        .label = "internal_adc_00"
+        .label = "internal_adc_00",
     };
 
     TestIOBuffers_init(buffers,
@@ -539,11 +539,11 @@ TEST_LOGGER4(deviceWithUnlistedChannels)
         .powerUpTime = 0,
         .coolDownTime = 0,
         .powerDownTime = 0,
-        .inrushOffsetTime = 75
+        .inrushOffsetTime = 75,
     };
 
     RBRGen4Device actual = {
-        .label = "pres_sensor_00"
+        .label = "pres_sensor_00",
     };
 
     TestIOBuffers_init(buffers,
@@ -604,13 +604,13 @@ TEST_LOGGER4(calibration)
             3.50000011e-003f,
             -250.000012e-006f,
             2.70000010e-006f,
-            23.0000001e-009f
+            23.0000001e-009f,
         },
         .bCount = 0,
-        .mCount = 0
+        .mCount = 0,
     };
     RBRGen4Calibration actual = {
-        .label = "temperature_00"
+        .label = "temperature_00",
     };
 
     TestIOBuffers_init(
@@ -641,10 +641,10 @@ TEST_LOGGER4(calibrationCrossChannel)
         .aCount = 0,
         .bCount = 0,
         .mCount = 2,
-        .m = {"pressure_00", "param_atmosphere"}
+        .m = {"pressure_00", "param_atmosphere"},
     };
     RBRGen4Calibration actual = {
-        .label = "depth_00"
+        .label = "depth_00",
     };
 
     TestIOBuffers_init(
@@ -666,7 +666,7 @@ TEST_LOGGER4(calibrationCrossChannel)
 TEST_LOGGER4(calibrationUnusedReference)
 {
     RBRGen4Calibration actual = {
-        .label = "temperature_00"
+        .label = "temperature_00",
     };
 
     TestIOBuffers_init(buffers,
@@ -685,7 +685,7 @@ TEST_LOGGER4(calibrationUnusedReference)
 TEST_LOGGER4(calibrationEmptyGroup)
 {
     RBRGen4Calibration actual = {
-        .label = "temperature_00"
+        .label = "temperature_00",
     };
 
     TestIOBuffers_init(buffers,
@@ -714,9 +714,9 @@ TEST_LOGGER4(calibrationSet)
             3.50000011e-003f,
             -250.000012e-006f,
             2.70000010e-006f,
-            23.0000001e-009f
+            23.0000001e-009f,
         },
-        .bCount = 0
+        .bCount = 0,
     };
 
     TestIOBuffers_init(
@@ -750,7 +750,7 @@ TEST_LOGGER4(calibrationSetCrossChannel)
         .aCount = 0,
         .bCount = 0,
         .mCount = 2,
-        .m = {"pressure_00", "param_atmosphere"}
+        .m = {"pressure_00", "param_atmosphere"},
     };
 
     TestIOBuffers_init(
@@ -780,7 +780,7 @@ TEST_LOGGER4(calibrationSetUnusedReference)
         .userOffset = 0.0f,
         .userSlope = 1.0f,
         .mCount = 2,
-        .m = {"", "param_atmosphere"}
+        .m = {"", "param_atmosphere"},
     };
 
     TestIOBuffers_init(
@@ -806,7 +806,7 @@ TEST_LOGGER4(calibrationSetInvalidCount)
 {
     RBRGen4Calibration calibration = {
         .label = "temperature_00",
-        .aCount = RBRGEN4_CALIBRATION_COEFFICIENT_MAX + 1
+        .aCount = RBRGEN4_CALIBRATION_COEFFICIENT_MAX + 1,
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -825,7 +825,7 @@ TEST_LOGGER4(settings)
     RBRGen4Settings expected = {
         .prompt = true,
         .confirmation = true,
-        .pollPowerOffDelay = 8000
+        .pollPowerOffDelay = 8000,
     };
     RBRGen4Settings actual;
 
@@ -853,7 +853,7 @@ TEST_LOGGER4(settingsSet)
     RBRGen4Settings settings = {
         .prompt = true,
         .confirmation = true,
-        .pollPowerOffDelay = 9000
+        .pollPowerOffDelay = 9000,
     };
 
     TestIOBuffers_init(
@@ -878,7 +878,7 @@ TEST_LOGGER4(settingsSetConfirmationOff)
     RBRGen4Settings settings = {
         .prompt = true,
         .confirmation = false,
-        .pollPowerOffDelay = 8000
+        .pollPowerOffDelay = 8000,
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -899,7 +899,7 @@ TEST_LOGGER4(settingsSetInvalidPollPowerOffDelay)
     RBRGen4Settings settings = {
         .prompt = true,
         .confirmation = true,
-        .pollPowerOffDelay = -1
+        .pollPowerOffDelay = -1,
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -923,7 +923,7 @@ TEST_LOGGER4(parameters)
         .atmosphere = 10.1325006f,
         .density = 1.0260210f,
         .salinity = 35.0f,
-        .avgSoundSpeed = 1506.8f
+        .avgSoundSpeed = 1506.8f,
     };
     RBRGen4Parameters actual;
 
@@ -961,7 +961,7 @@ TEST_LOGGER4(parametersSet)
         .atmosphere = 10.1325006f,
         .density = 1.0260210f,
         .salinity = 35.0f,
-        .avgSoundSpeed = 1506.8f
+        .avgSoundSpeed = 1506.8f,
     };
 
     TestIOBuffers_init(
@@ -1008,7 +1008,7 @@ static bool test_channel(RBRGen4Channel *expected,
 TEST_LOGGER4(channellist)
 {
     const char *expected[] = {
-        "temperature_00", "pressure_00", "seapressure_00", "depth_00"
+        "temperature_00", "pressure_00", "seapressure_00", "depth_00",
     };
     RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
 
@@ -1129,10 +1129,10 @@ TEST_LOGGER4(channel)
         .derived = false,
         .node = "self",
         .port = "thermistor_00",
-        .device = "thermistor_00"
+        .device = "thermistor_00",
     };
     RBRGen4Channel actual = {
-        .label = "temperature_00"
+        .label = "temperature_00",
     };
 
     TestIOBuffers_init(
@@ -1166,10 +1166,10 @@ TEST_LOGGER4(channelDerived)
         .derived = true,
         .node = "",
         .port = "",
-        .device = ""
+        .device = "",
     };
     RBRGen4Channel actual = {
-        .label = "depth_00"
+        .label = "depth_00",
     };
 
     TestIOBuffers_init(
@@ -1193,7 +1193,7 @@ TEST_LOGGER4(channelDerived)
 TEST_LOGGER4(channelWithGroups)
 {
     RBRGen4Channel actual = {
-        .label = "temperature_00"
+        .label = "temperature_00",
     };
 
     TestIOBuffers_init(
@@ -1218,7 +1218,7 @@ TEST_LOGGER4(channelWithGroups)
 TEST_LOGGER4(channelEmptyLabel)
 {
     /* An empty label is refused before the command. */
-    RBRGen4Channel channel = { .label = "" };
+    RBRGen4Channel channel = { .label = "", };
 
     TestIOBuffers_init(buffers, "", 0);
 
@@ -1236,7 +1236,7 @@ TEST_LOGGER4(channelSet)
 {
     RBRGen4Channel channel = {
         .label = "temperature_00",
-        .userUnits = "C"
+        .userUnits = "C",
     };
 
     TestIOBuffers_init(buffers,
@@ -1258,7 +1258,7 @@ TEST_LOGGER4(channelSetEmptyUserUnits)
 {
     RBRGen4Channel channel = {
         .label = "temperature_00",
-        .userUnits = ""
+        .userUnits = "",
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -1340,7 +1340,7 @@ TEST_LOGGER4(grouplistWithoutGroups)
  * the parameter is skipped. */
 TEST_LOGGER4(group)
 {
-    RBRGen4Group group = { .label = "g_a" };
+    RBRGen4Group group = { .label = "g_a", };
     RBRGEN4_LABEL_LIST_DECL(channelList, 4);
 
     TestIOBuffers_init(
@@ -1363,7 +1363,7 @@ TEST_LOGGER4(group)
 
 TEST_LOGGER4(groupWithoutChannels)
 {
-    RBRGen4Group group = { .label = "g_b" };
+    RBRGen4Group group = { .label = "g_b", };
     RBRGEN4_LABEL_LIST_DECL(channelList, 4);
 
     TestIOBuffers_init(buffers,
@@ -1382,7 +1382,7 @@ TEST_LOGGER4(groupWithoutChannels)
 
 TEST_LOGGER4(groupWithoutChannelList)
 {
-    RBRGen4Group group = { .label = "g_a" };
+    RBRGen4Group group = { .label = "g_a", };
 
     TestIOBuffers_init(
         buffers,
@@ -1401,7 +1401,7 @@ TEST_LOGGER4(groupWithoutChannelList)
 
 TEST_LOGGER4(groupChannelListTooSmall)
 {
-    RBRGen4Group group = { .label = "g_a" };
+    RBRGen4Group group = { .label = "g_a", };
     RBRGEN4_LABEL_LIST_DECL(channelList, 1);
 
     TestIOBuffers_init(
@@ -1426,7 +1426,7 @@ TEST_LOGGER4(groupChannelListTooSmall)
 TEST_LOGGER4(groupEmptyLabel)
 {
     /* An empty label is refused before the command. */
-    RBRGen4Group group = { .label = "" };
+    RBRGen4Group group = { .label = "", };
 
     TestIOBuffers_init(buffers, "", 0);
 
@@ -1443,12 +1443,12 @@ TEST_LOGGER4(groupEmptyLabel)
 
 TEST_LOGGER4(groupSet)
 {
-    RBRGen4Group group = { .label = "g_a" };
+    RBRGen4Group group = { .label = "g_a", };
     RBRGen4Label labelBuf[] = { "temperature_00", "pressure_00" };
     RBRGen4LabelList channelList = {
         .size = 2,
         .count = 2,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(
@@ -1471,7 +1471,7 @@ TEST_LOGGER4(groupSet)
 TEST_LOGGER4(groupSetWithoutChannelList)
 {
     /* The setter has nothing to send without a list. */
-    RBRGen4Group group = { .label = "g_a" };
+    RBRGen4Group group = { .label = "g_a", };
 
     TestIOBuffers_init(buffers, "", 0);
 
@@ -1488,12 +1488,12 @@ TEST_LOGGER4(groupSetWithoutChannelList)
 
 TEST_LOGGER4(groupSetClearingChannels)
 {
-    RBRGen4Group group = { .label = "g_a" };
+    RBRGen4Group group = { .label = "g_a", };
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList channelList = {
         .size = 1,
         .count = 0,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(buffers,
@@ -1512,12 +1512,12 @@ TEST_LOGGER4(groupSetClearingChannels)
 
 TEST_LOGGER4(groupSetEmptyLabel)
 {
-    RBRGen4Group group = { .label = "" };
+    RBRGen4Group group = { .label = "", };
     RBRGen4Label labelBuf[] = { "temperature_00" };
     RBRGen4LabelList channelList = {
         .size = 1,
         .count = 1,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -1535,12 +1535,12 @@ TEST_LOGGER4(groupSetEmptyLabel)
 TEST_LOGGER4(groupSetInvalidChannelCount)
 {
     /* The count exceeds the array. */
-    RBRGen4Group group = { .label = "g_a" };
+    RBRGen4Group group = { .label = "g_a", };
     RBRGen4Label labelBuf[] = { "temperature_00", "pressure_00" };
     RBRGen4LabelList channelList = {
         .size = 2,
         .count = 3,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -1558,12 +1558,12 @@ TEST_LOGGER4(groupSetInvalidChannelCount)
 TEST_LOGGER4(groupSetEmptyChannelLabel)
 {
     /* An empty label would produce a malformed list. */
-    RBRGen4Group group = { .label = "g_a" };
+    RBRGen4Group group = { .label = "g_a", };
     RBRGen4Label labelBuf[] = { "temperature_00", "" };
     RBRGen4LabelList channelList = {
         .size = 2,
         .count = 2,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -1699,7 +1699,7 @@ TEST_LOGGER4(configlistWithoutConfigs)
 
 TEST_LOGGER4(config)
 {
-    RBRGen4Config config = { .label = "c_a" };
+    RBRGen4Config config = { .label = "c_a", };
     RBRGEN4_LABEL_LIST_DECL(scheduleList, 4);
 
     TestIOBuffers_init(buffers,
@@ -1719,7 +1719,7 @@ TEST_LOGGER4(config)
 
 TEST_LOGGER4(configWithoutSchedules)
 {
-    RBRGen4Config config = { .label = "c_a" };
+    RBRGen4Config config = { .label = "c_a", };
     RBRGEN4_LABEL_LIST_DECL(scheduleList, 4);
 
     TestIOBuffers_init(buffers,
@@ -1739,7 +1739,7 @@ TEST_LOGGER4(configWithoutSchedules)
 
 TEST_LOGGER4(configWithoutScheduleList)
 {
-    RBRGen4Config config = { .label = "c_a" };
+    RBRGen4Config config = { .label = "c_a", };
 
     TestIOBuffers_init(buffers,
                        "config c_a schedulelist=s_a" RESPONSE_TERMINATOR,
@@ -1756,7 +1756,7 @@ TEST_LOGGER4(configWithoutScheduleList)
 
 TEST_LOGGER4(configScheduleListTooSmall)
 {
-    RBRGen4Config config = { .label = "c_a" };
+    RBRGen4Config config = { .label = "c_a", };
     RBRGEN4_LABEL_LIST_DECL(scheduleList, 1);
 
     TestIOBuffers_init(buffers,
@@ -1779,7 +1779,7 @@ TEST_LOGGER4(configScheduleListTooSmall)
 TEST_LOGGER4(configEmptyLabel)
 {
     /* An empty label is refused before the command. */
-    RBRGen4Config config = { .label = "" };
+    RBRGen4Config config = { .label = "", };
 
     TestIOBuffers_init(buffers, "", 0);
 
@@ -1796,12 +1796,12 @@ TEST_LOGGER4(configEmptyLabel)
 
 TEST_LOGGER4(configSet)
 {
-    RBRGen4Config config = { .label = "cfgPrimary" };
+    RBRGen4Config config = { .label = "cfgPrimary", };
     RBRGen4Label labelBuf[] = { "schedule_fast", "schedule_burst" };
     RBRGen4LabelList scheduleList = {
         .size = 2,
         .count = 2,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(
@@ -1824,12 +1824,12 @@ TEST_LOGGER4(configSet)
 
 TEST_LOGGER4(configSetClearingSchedules)
 {
-    RBRGen4Config config = { .label = "c_a" };
+    RBRGen4Config config = { .label = "c_a", };
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList scheduleList = {
         .size = 1,
         .count = 0,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(buffers,
@@ -1848,12 +1848,12 @@ TEST_LOGGER4(configSetClearingSchedules)
 
 TEST_LOGGER4(configSetEmptyLabel)
 {
-    RBRGen4Config config = { .label = "" };
+    RBRGen4Config config = { .label = "", };
     RBRGen4Label labelBuf[] = { "s_a" };
     RBRGen4LabelList scheduleList = {
         .size = 1,
         .count = 1,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -1870,12 +1870,12 @@ TEST_LOGGER4(configSetEmptyLabel)
 
 TEST_LOGGER4(configSetEmptyScheduleLabel)
 {
-    RBRGen4Config config = { .label = "c_a" };
+    RBRGen4Config config = { .label = "c_a", };
     RBRGen4Label labelBuf[] = { "s_a", "" };
     RBRGen4LabelList scheduleList = {
         .size = 2,
         .count = 2,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -2058,7 +2058,7 @@ TEST_LOGGER4(schedulelistUnknownMode)
 TEST_LOGGER4(schedule)
 {
     RBRGen4Schedule actual = {
-        .label = "s"
+        .label = "s",
     };
 
     TestIOBuffers_init(buffers,
@@ -2092,7 +2092,7 @@ TEST_LOGGER4(schedule)
 TEST_LOGGER4(scheduleWithGroupsAndConfigs)
 {
     RBRGen4Schedule actual = {
-        .label = "s_a"
+        .label = "s_a",
     };
     RBRGEN4_LABEL_LIST_DECL(groupList, 4);
 
@@ -2117,7 +2117,7 @@ TEST_LOGGER4(scheduleWithGroupsAndConfigs)
 TEST_LOGGER4(scheduleGroupListTooSmall)
 {
     RBRGen4Schedule actual = {
-        .label = "s_a"
+        .label = "s_a",
     };
     RBRGEN4_LABEL_LIST_DECL(groupList, 1);
 
@@ -2144,7 +2144,7 @@ TEST_LOGGER4(scheduleGroupListTooSmall)
 TEST_LOGGER4(scheduleWithStorage)
 {
     RBRGen4Schedule actual = {
-        .label = "s"
+        .label = "s",
     };
 
     TestIOBuffers_init(buffers,
@@ -2168,7 +2168,7 @@ TEST_LOGGER4(scheduleWithStorage)
 TEST_LOGGER4(scheduleBursting)
 {
     RBRGen4Schedule actual = {
-        .label = "s_cap"
+        .label = "s_cap",
     };
 
     TestIOBuffers_init(buffers,
@@ -2206,7 +2206,7 @@ TEST_LOGGER4(scheduleDeferredMode)
 {
     /* The mode is read; its parameters are not modelled. */
     RBRGen4Schedule actual = {
-        .label = "s_cap"
+        .label = "s_cap",
     };
 
     TestIOBuffers_init(buffers,
@@ -2233,7 +2233,7 @@ TEST_LOGGER4(scheduleDeferredMode)
 TEST_LOGGER4(scheduleEmptyLabel)
 {
     /* An empty label is refused before the command. */
-    RBRGen4Schedule schedule = { .label = "" };
+    RBRGen4Schedule schedule = { .label = "", };
 
     TestIOBuffers_init(buffers, "", 0);
 
@@ -2256,14 +2256,14 @@ TEST_LOGGER4(scheduleSet)
         .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
         .castDetection = true,
         .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS,
-        .parameters = { .continuous = { .period = 2000 } }
+        .parameters = { .continuous = { .period = 2000, }, },
     };
 
     RBRGen4Label labelBuf[] = { "g_test" };
     RBRGen4LabelList groupList = {
         .size = sizeof(labelBuf) / sizeof(labelBuf[0]),
         .count = 1,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(buffers,
@@ -2292,7 +2292,7 @@ TEST_LOGGER4(scheduleSetWithoutGroupList)
         .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
         .castDetection = true,
         .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS,
-        .parameters = { .continuous = { .period = 2000 } }
+        .parameters = { .continuous = { .period = 2000, }, },
     };
 
     TestIOBuffers_init(buffers,
@@ -2325,16 +2325,16 @@ TEST_LOGGER4(scheduleSetWithStorage)
             .bursting = {
                 .period = 10000,
                 .measurementCount = 8,
-                .measurementPeriod = 1000
-            }
-        }
+                .measurementPeriod = 1000,
+            },
+        },
     };
 
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList groupList = {
         .size = 1,
         .count = 0,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(buffers,
@@ -2364,14 +2364,14 @@ TEST_LOGGER4(scheduleSetMultipleModes)
         .label = "s_cap",
         .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
         .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS
-                | RBRGEN4_SCHEDULE_MODE_AVERAGE
+                | RBRGEN4_SCHEDULE_MODE_AVERAGE,
     };
 
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList groupList = {
         .size = 1,
         .count = 0,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -2391,14 +2391,14 @@ TEST_LOGGER4(scheduleSetNoMode)
     RBRGen4Schedule schedule = {
         .label = "s_cap",
         .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
-        .mode = RBRGEN4_SCHEDULE_MODE_NONE
+        .mode = RBRGEN4_SCHEDULE_MODE_NONE,
     };
 
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList groupList = {
         .size = 1,
         .count = 0,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -2418,14 +2418,14 @@ TEST_LOGGER4(scheduleSetDeferredMode)
     RBRGen4Schedule schedule = {
         .label = "s_cap",
         .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
-        .mode = RBRGEN4_SCHEDULE_MODE_REGIMES
+        .mode = RBRGEN4_SCHEDULE_MODE_REGIMES,
     };
 
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList groupList = {
         .size = 1,
         .count = 0,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -2445,14 +2445,14 @@ TEST_LOGGER4(scheduleSetEmptyGroupLabel)
     RBRGen4Schedule schedule = {
         .label = "s_cap",
         .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
-        .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS
+        .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS,
     };
 
     RBRGen4Label labelBuf[] = { "g_test", "" };
     RBRGen4LabelList groupList = {
         .size = sizeof(labelBuf) / sizeof(labelBuf[0]),
         .count = 2,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(buffers, "", 0);
@@ -2522,7 +2522,7 @@ TEST_LOGGER4(scheduleEveryBurstingMode)
         { "average", RBRGEN4_SCHEDULE_MODE_AVERAGE },
         { "burst", RBRGEN4_SCHEDULE_MODE_BURST },
         { "tide", RBRGEN4_SCHEDULE_MODE_TIDE },
-        { "wave", RBRGEN4_SCHEDULE_MODE_WAVE }
+        { "wave", RBRGEN4_SCHEDULE_MODE_WAVE },
     };
 
     for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i)
@@ -2536,7 +2536,7 @@ TEST_LOGGER4(scheduleEveryBurstingMode)
                  cases[i].mode);
 
         RBRGen4Schedule actual = {
-            .label = "s_cap"
+            .label = "s_cap",
         };
         TestIOBuffers_init(buffers, response, 0);
 
@@ -2572,23 +2572,23 @@ TEST_LOGGER4(scheduleSetEveryBurstingMode)
             .bursting = {
                 .period = 10000,
                 .measurementPeriod = 1000,
-                .measurementCount = 8
-            }
-        }
+                .measurementCount = 8,
+            },
+        },
     };
 
     const RBRGen4ScheduleMode modes[] = {
         RBRGEN4_SCHEDULE_MODE_AVERAGE,
         RBRGEN4_SCHEDULE_MODE_BURST,
         RBRGEN4_SCHEDULE_MODE_TIDE,
-        RBRGEN4_SCHEDULE_MODE_WAVE
+        RBRGEN4_SCHEDULE_MODE_WAVE,
     };
 
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList groupList = {
         .size = 1,
         .count = 0,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     for (size_t i = 0; i < sizeof(modes) / sizeof(modes[0]); ++i)
@@ -2636,16 +2636,16 @@ TEST_LOGGER4(scheduleSetLongParameters)
             .bursting = {
                 .period = 86400000,
                 .measurementPeriod = 86400000,
-                .measurementCount = 65535
-            }
-        }
+                .measurementCount = 65535,
+            },
+        },
     };
 
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList groupList = {
         .size = 1,
         .count = 0,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
 
     TestIOBuffers_init(buffers,
@@ -2674,14 +2674,14 @@ TEST_LOGGER4(scheduleSetCommandTooLong)
         .label = "s",
         .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
         .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS,
-        .parameters = { .continuous = { .period = 1000 } }
+        .parameters = { .continuous = { .period = 1000, }, },
     };
 
     RBRGen4Label labelBuf[RBRGEN4_GROUP_COUNT_MAX];
     RBRGen4LabelList groupList = {
         .size = RBRGEN4_GROUP_COUNT_MAX,
         .count = RBRGEN4_GROUP_COUNT_MAX,
-        .labels = labelBuf
+        .labels = labelBuf,
     };
     for (int32_t i = 0; i < groupList.count; ++i)
     {
