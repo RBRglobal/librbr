@@ -177,7 +177,7 @@ int main(void)
     RESPONSE_TERMINATOR,
     0);
 
-    err = RBRGen4_open(&conn,
+    err = RBRGen4_open(conn,
                              &instrumentCallbacks,
                              /* command timeout */ 0,
                              &ioBuffers);

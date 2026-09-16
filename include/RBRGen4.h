@@ -53,10 +53,7 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
  * Must be large enough to hold the largest command you will want to send to
  * the instrument plus the trailing line termination (`\r\n\0`).
  *
- * A buffer of this size is included in RBRGen4. Whether you let
- * RBRGen4_open() perform its own allocation or you perform your own
- * allocation based on `sizeof(RBRGen4)`, a buffer of this size is
- * included.
+ * A buffer of this size is included in RBRGen4.
  */
 #ifndef RBRGEN4_COMMAND_BUFFER_MAX
 #define RBRGEN4_COMMAND_BUFFER_MAX 256
@@ -69,10 +66,7 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
  * receive. This does not include download data, which is read directly into a
  * user-managed buffer.
  *
- * A buffer of this size is included in RBRGen4. Whether you let
- * RBRGen4_open() perform its own allocation or you perform your own
- * allocation based on `sizeof(RBRGen4)`, a buffer of this size is
- * included.
+ * A buffer of this size is included in RBRGen4.
  */
 #ifndef RBRGEN4_RESPONSE_BUFFER_MAX
 #define RBRGEN4_RESPONSE_BUFFER_MAX 1024
@@ -875,19 +869,9 @@ typedef struct RBRGen4 {
  * that instrument (via serial, TCP/IP socket, RFC 1149, whatever) must be
  * managed externally and exposed to the library via callbacks.
  *
- * You need to allocate the memory for instrument pointer yourself (perhaps statically).
- * The size of RBRGen4 can be used to inform your allocation then pass a
- * pointer to that memory.
- *
- * For example:
- *
- * ~~~{.c}
- * RBRGen4 instrumentBuf;
- * RBRGen4 *instrument = &instrumentBuf;
- * RBRGen4_open(&instrument, ...);
- * ~~~
- *
- * If you pass pre-allocated memory, its contents will be discarded.
+ * The library never allocates memory: the caller provides the RBRGen4
+ * instance (statically, on the stack, or from a heap of its choosing) and the
+ * constructor initializes it in place. Any prior contents are discarded.
  *
  * The \a callbacks structure will be copied into the RBRGen4 structure;
  * no reference to it is retained, so any subsequent modifications will not
@@ -916,13 +900,11 @@ typedef struct RBRGen4 {
  * RBRGen4Callbacks.sample.
  * \see RBRGen4_setOutputFormat()
  *
- * In the event of any return value other than #RBRGEN4_SUCCESS, any
- * memory allocated by this constructor is freed. That is, in the event of
- * failure, no cleanup of library resources is required. In the event of a
- * successful result, RBRGen4_close() should be used to terminate the
- * instrument connection.
+ * In the event of any return value other than #RBRGEN4_SUCCESS, no cleanup of
+ * library resources is required. In the event of a successful result,
+ * RBRGen4_close() should be used to terminate the instrument connection.
  *
- * \param [in] conn the context object to populate
+ * \param [out] conn the context object to populate
  * \param [in] callbacks the set of callbacks to be used by the connection
  * \param [in] commandTimeout the command timeout in milliseconds
  * \param [in] userData arbitrary user data; useful in callbacks
@@ -933,14 +915,14 @@ typedef struct RBRGen4 {
  * \return #RBRGEN4_UNSUPPORTED if the instrument is unsupported
  * \see RBRGen4_close()
  */
-RBRGen4Error RBRGen4_open(RBRGen4 **conn, const RBRGen4Callbacks *callbacks,
+RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Callbacks *callbacks,
                           const RBRGen4DateTime commandTimeout, void *userData);
 
 /**
- * \brief Terminate the instrument connection and release any held resources.
+ * \brief Terminate the instrument connection.
  *
- * Frees the buffer allocated by RBRGen4_open() if necessary. Does not
- * perform any communication with the instrument.
+ * Clears the connection state. Does not release the caller-provided instance
+ * memory and does not perform any communication with the instrument.
  *
  * \param [in,out] conn the instrument connection to terminate
  * \return #RBRGEN4_SUCCESS if the instrument was closed successfully

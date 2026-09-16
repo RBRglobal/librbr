@@ -201,7 +201,7 @@ int main(void)
                        "instrument outputformat sn=off schedulelabel=on datetime=on crc=off "
                        "encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
                        0);
-    err = RBRGen4_open(&instrumentL4,
+    err = RBRGen4_open(instrumentL4,
                        &instrumentCallbacks,
                        /* command timeout */ 0,
                        &ioBuffers);
