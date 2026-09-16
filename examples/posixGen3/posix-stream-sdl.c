@@ -17,6 +17,8 @@
 #include <SDL2/SDL.h>
 /* Required for fprintf. */
 #include <stdio.h>
+/* Required for malloc, EXIT_FAILURE, EXIT_SUCCESS. */
+#include <stdlib.h>
 /* Required for memcpy, strerror. */
 #include <string.h>
 /* Required for close. */

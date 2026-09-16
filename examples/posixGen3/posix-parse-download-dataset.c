@@ -16,6 +16,8 @@
 #include <errno.h>
 /* Required for fprintf, printf. */
 #include <stdio.h>
+/* Required for EXIT_FAILURE, EXIT_SUCCESS, strtol. */
+#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
 /* Required for gmtime_r, time_t, strftime. */

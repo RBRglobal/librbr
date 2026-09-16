@@ -16,6 +16,8 @@
 #include <errno.h>
 /* Required for open. */
 #include <fcntl.h>
+/* Required for EXIT_FAILURE, EXIT_SUCCESS, strtol. */
+#include <stdlib.h>
 /* Required for open. */
 #include <sys/stat.h>
 /* Required for fprintf, printf. */

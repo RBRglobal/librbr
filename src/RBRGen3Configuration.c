@@ -12,6 +12,8 @@
 #include <math.h>
 /* Required for snprintf. */
 #include <stdio.h>
+/* Required for strtod, strtol. */
+#include <stdlib.h>
 /* Required for memset, strcmp. */
 #include <string.h>
 

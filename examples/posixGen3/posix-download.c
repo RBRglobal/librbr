@@ -20,6 +20,8 @@
 #include <limits.h>
 /* Required for fprintf, printf, snprintf. */
 #include <stdio.h>
+/* Required for EXIT_FAILURE, EXIT_SUCCESS. */
+#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
 /* Required for open. */

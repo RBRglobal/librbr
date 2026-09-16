@@ -22,7 +22,6 @@ extern "C" {
 
 #include <inttypes.h>
 #include <stdbool.h>
-#include <stdlib.h>
 
 #include "RBRGen3HardwareErrors.h"
 

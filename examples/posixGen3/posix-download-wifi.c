@@ -22,6 +22,8 @@
 #include <limits.h>
 /* Required for fprintf, printf, snprintf. */
 #include <stdio.h>
+/* Required for exit, EXIT_FAILURE, EXIT_SUCCESS. */
+#include <stdlib.h>
 /* Required for memmove, strerror. */
 #include <string.h>
 /* Required for open. */
