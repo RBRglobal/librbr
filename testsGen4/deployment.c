@@ -28,16 +28,16 @@ TEST_LOGGER4(getClock)
         { "clock datetime=20260824120000 offsetfromutc=0.00"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 1787572800000LL, 0.0f } },
+          { .dateTime = 1787572800000LL, .offsetFromUtc = 0.0f } },
         /* The instrument never signs a positive offset. */
         { "clock datetime=20260824120130 offsetfromutc=5.50"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 1787572890000LL, 5.5f } },
+          { .dateTime = 1787572890000LL, .offsetFromUtc = 5.5f } },
         { "clock datetime=20260824120000 offsetfromutc=-4.50"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 1787572800000LL, -4.5f } },
+          { .dateTime = 1787572800000LL, .offsetFromUtc = -4.5f } },
         /*
          * The response echoes the parameters in the order they were asked
          * for, so the getter must not depend on their position.
@@ -45,22 +45,22 @@ TEST_LOGGER4(getClock)
         { "clock offsetfromutc=14.00 datetime=20260824120000"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 1787572800000LL, 14.0f } },
+          { .dateTime = 1787572800000LL, .offsetFromUtc = 14.0f } },
         /* An unreported parameter keeps its unset value. */
         { "clock datetime=20260824120000" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 1787572800000LL, NAN } },
+          { .dateTime = 1787572800000LL, .offsetFromUtc = NAN } },
         { "clock" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 0, NAN } },
+          { .dateTime = 0, .offsetFromUtc = NAN } },
         /* Keys the library does not model are ignored. */
         { "clock datetime=20260824120000 offsetfromutc=0.00 bogus=1"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 1787572800000LL, 0.0f } },
+          { .dateTime = 1787572800000LL, .offsetFromUtc = 0.0f } },
         { "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR,
-          { 0, NAN } },
+          { .dateTime = 0, .offsetFromUtc = NAN } },
         { 0 }
     };
 
@@ -109,19 +109,19 @@ TEST_LOGGER4(setClock)
 {
     SetClockTest tests[] = {
         /* Both parameters are always sent. */
-        { { 1787572800000LL, 0.0f },
+        { { .dateTime = 1787572800000LL, .offsetFromUtc = 0.0f },
           "clock datetime=20260824120000 offsetfromutc=0.00"
           COMMAND_TERMINATOR,
           "clock datetime=20260824120000 offsetfromutc=0.00"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS },
-        { { 1787572890000LL, 5.5f },
+        { { .dateTime = 1787572890000LL, .offsetFromUtc = 5.5f },
           "clock datetime=20260824120130 offsetfromutc=5.50"
           COMMAND_TERMINATOR,
           "clock datetime=20260824120130 offsetfromutc=5.50"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS },
-        { { 1787572800000LL, -12.0f },
+        { { .dateTime = 1787572800000LL, .offsetFromUtc = -12.0f },
           "clock datetime=20260824120000 offsetfromutc=-12.00"
           COMMAND_TERMINATOR,
           "clock datetime=20260824120000 offsetfromutc=-12.00"
@@ -131,25 +131,25 @@ TEST_LOGGER4(setClock)
          * The offset is not range-checked: an offset the instrument will not
          * accept is sent and refused there.
          */
-        { { 1787572800000LL, 99.0f },
+        { { .dateTime = 1787572800000LL, .offsetFromUtc = 99.0f },
           "clock datetime=20260824120000 offsetfromutc=99.00"
           COMMAND_TERMINATOR,
           "ERR-108 invalid argument to command: '99.00'" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR },
         /* `NAN` would emit "nan", so it is refused before the command. */
-        { { 1787572800000LL, NAN },
+        { { .dateTime = 1787572800000LL, .offsetFromUtc = NAN },
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE },
-        { { RBRGEN4_DATETIME_MIN - 1, 0.0f },
+        { { .dateTime = RBRGEN4_DATETIME_MIN - 1, .offsetFromUtc = 0.0f },
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE },
-        { { RBRGEN4_DATETIME_MAX + 1, 0.0f },
+        { { .dateTime = RBRGEN4_DATETIME_MAX + 1, .offsetFromUtc = 0.0f },
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE },
-        { { 1787572800000LL, 0.0f },
+        { { .dateTime = 1787572800000LL, .offsetFromUtc = 0.0f },
           "clock datetime=20260824120000 offsetfromutc=0.00"
           COMMAND_TERMINATOR,
           "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR,
@@ -186,53 +186,53 @@ TEST_LOGGER4(getDeployment)
         { "deployment status=inactive gate=none simulation=off"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 0,
-            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_GATE_NONE,
-            false } },
+          { .startTime = 0,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_GATE_NONE,
+            .simulation = false } },
         /* Time gating adds the start time, ahead of the other parameters. */
         { "deployment starttime=20270101000000 status=inactive gate=time "
           "simulation=off" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 1798761600000LL,
-            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_GATE_TIME,
-            false } },
+          { .startTime = 1798761600000LL,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_GATE_TIME,
+            .simulation = false } },
         { "deployment status=sampling gate=none simulation=off"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 0,
-            RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
-            RBRGEN4_GATE_NONE,
-            false } },
+          { .startTime = 0,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
+            .gate = RBRGEN4_GATE_NONE,
+            .simulation = false } },
         { "deployment status=paused gate=none simulation=off"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 0,
-            RBRGEN4_DEPLOYMENT_STATUS_PAUSED,
-            RBRGEN4_GATE_NONE,
-            false } },
+          { .startTime = 0,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_PAUSED,
+            .gate = RBRGEN4_GATE_NONE,
+            .simulation = false } },
         { "deployment starttime=20270101000000 status=gated gate=time "
           "simulation=off" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 1798761600000LL,
-            RBRGEN4_DEPLOYMENT_STATUS_GATED,
-            RBRGEN4_GATE_TIME,
-            false } },
+          { .startTime = 1798761600000LL,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_GATED,
+            .gate = RBRGEN4_GATE_TIME,
+            .simulation = false } },
         { "deployment status=inactive gate=twistactivation simulation=on"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 0,
-            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_GATE_TWISTACTIVATION,
-            true } },
+          { .startTime = 0,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_GATE_TWISTACTIVATION,
+            .simulation = true } },
         { "deployment status=inactive gate=wetswitch simulation=off"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 0,
-            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_GATE_WETSWITCH,
-            false } },
+          { .startTime = 0,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_GATE_WETSWITCH,
+            .simulation = false } },
         /*
          * A value the library does not model reads as unknown rather than as
          * the first member.
@@ -240,25 +240,25 @@ TEST_LOGGER4(getDeployment)
         { "deployment status=bogus gate=bogus simulation=off"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 0,
-            RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
-            RBRGEN4_UNKNOWN_GATE,
-            false } },
+          { .startTime = 0,
+            .status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+            .gate = RBRGEN4_UNKNOWN_GATE,
+            .simulation = false } },
         /* An unreported parameter is left unknown, not zero. */
         { "deployment" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 0,
-            RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
-            RBRGEN4_UNKNOWN_GATE,
-            false } },
+          { .startTime = 0,
+            .status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+            .gate = RBRGEN4_UNKNOWN_GATE,
+            .simulation = false } },
         /* Keys the library does not model are ignored. */
         { "deployment status=inactive gate=none simulation=off bogus=1"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 0,
-            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_GATE_NONE,
-            false } },
+          { .startTime = 0,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_GATE_NONE,
+            .simulation = false } },
         { 0 }
     };
 
@@ -306,25 +306,33 @@ TEST_LOGGER4(setDeployment)
          * Without time gating only `gate` is sent: the instrument answers
          * `ERR-108` for `starttime` under any other condition.
          */
-        { { 0, RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_GATE_NONE, false },
+        { { .startTime = 0,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_GATE_NONE,
+            .simulation = false },
           "deployment gate=none" COMMAND_TERMINATOR,
           "deployment gate=none" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS },
         /* A start time left over from a previous read is not sent either. */
-        { { 1798761600000LL, RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_GATE_WETSWITCH, false },
+        { { .startTime = 1798761600000LL,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_GATE_WETSWITCH,
+            .simulation = false },
           "deployment gate=wetswitch" COMMAND_TERMINATOR,
           "deployment gate=wetswitch" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS },
-        { { 0, RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_GATE_TWISTACTIVATION, false },
+        { { .startTime = 0,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_GATE_TWISTACTIVATION,
+            .simulation = false },
           "deployment gate=twistactivation" COMMAND_TERMINATOR,
           "deployment gate=twistactivation" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS },
         /* Time gating takes both parameters in one command. */
-        { { 1798761600000LL, RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_GATE_TIME, false },
+        { { .startTime = 1798761600000LL,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_GATE_TIME,
+            .simulation = false },
           "deployment gate=time starttime=20270101000000"
           COMMAND_TERMINATOR,
           "deployment gate=time starttime=20270101000000"
@@ -335,44 +343,55 @@ TEST_LOGGER4(setDeployment)
          * an out-of-range value under time gating fails and the same value
          * under any other condition does not.
          */
-        { { RBRGEN4_DATETIME_MIN - 1,
-            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_GATE_TIME, false },
+        { { .startTime = RBRGEN4_DATETIME_MIN - 1,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_GATE_TIME,
+            .simulation = false },
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE },
-        { { RBRGEN4_DATETIME_MAX + 1,
-            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_GATE_TIME, false },
+        { { .startTime = RBRGEN4_DATETIME_MAX + 1,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_GATE_TIME,
+            .simulation = false },
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE },
-        { { RBRGEN4_DATETIME_MAX + 1,
-            RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_GATE_NONE, false },
+        { { .startTime = RBRGEN4_DATETIME_MAX + 1,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_GATE_NONE,
+            .simulation = false },
           "deployment gate=none" COMMAND_TERMINATOR,
           "deployment gate=none" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS },
         /* The sentinels a getter can leave behind never reach the command. */
-        { { 0, RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_UNKNOWN_GATE, false },
+        { { .startTime = 0,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_UNKNOWN_GATE,
+            .simulation = false },
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE },
-        { { 0, RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_GATE_COUNT, false },
+        { { .startTime = 0,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_GATE_COUNT,
+            .simulation = false },
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE },
         /* Both writable parameters are unavailable while logging. */
-        { { 0, RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
-            RBRGEN4_GATE_NONE, false },
+        { { .startTime = 0,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
+            .gate = RBRGEN4_GATE_NONE,
+            .simulation = false },
           "deployment gate=none" COMMAND_TERMINATOR,
           "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR,
           RBRGEN4_HARDWARE_ERROR },
         /* A gating condition the instrument does not offer is refused. */
-        { { 0, RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-            RBRGEN4_GATE_WETSWITCH, false },
+        { { .startTime = 0,
+            .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+            .gate = RBRGEN4_GATE_WETSWITCH,
+            .simulation = false },
           "deployment gate=wetswitch" COMMAND_TERMINATOR,
           "ERR-108 invalid argument to command: 'wetswitch'"
           RESPONSE_TERMINATOR,
