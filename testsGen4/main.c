@@ -264,7 +264,7 @@ int main(void)
 
         memset(&parserBuffers, 0, sizeof(TestParserBuffers));
 
-        err = RBRGen4Parser_init(&parser, &parserCallbacks, parserTests[i].config, &parserBuffers);
+        err = RBRGen4Parser_init(parser, &parserCallbacks, parserTests[i].config, &parserBuffers);
         if (err != RBRGEN4_SUCCESS) {
             printf(" \033[31minit fail\033[0m: %s\n", RBRGen4Error_name(err));
             success = EXIT_FAILURE;
