@@ -809,8 +809,8 @@ typedef struct RBRGen4
      *
      * See [Timeouts](timeouts.md) for details on how the library handles
      * timeouts.
-     * \see RBRGen4_getCommandTimeout();
-     * \see RBRGen4_setCommandTimeout();
+     * \see RBRGen4_getCommandTimeout()
+     * \see RBRGen4_setCommandTimeout()
      */
     RBRGen4DateTime commandTimeout;
 
@@ -820,15 +820,15 @@ typedef struct RBRGen4
      * RBRGen4_open() sets it to twice the command timeout. See
      * [Timeouts](timeouts.md) for details on how the library handles
      * timeouts.
-     * \see RBRGen4_getPollTimeout();
-     * \see RBRGen4_setPollTimeout();
+     * \see RBRGen4_getPollTimeout()
+     * \see RBRGen4_setPollTimeout()
      */
     RBRGen4DateTime pollTimeout;
 
     /**
      * \brief Arbitrary user data; useful in callbacks.
-     * \see RBRGen4_getUserData();
-     * \see RBRGen4_setUserData();
+     * \see RBRGen4_getUserData()
+     * \see RBRGen4_setUserData()
      */
     void *userData;
 

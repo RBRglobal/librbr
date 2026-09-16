@@ -96,7 +96,7 @@ RBRGen4Error RBRGen4_getId(RBRGen4 *conn,
  * \return #RBRGEN4_SUCCESS when the information is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRGen4_getInstrument();
+ * \see RBRGen4_getInstrument()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
  */
 RBRGen4Error RBRGen4_getId4(RBRGen4 *conn,

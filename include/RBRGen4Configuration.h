@@ -1021,9 +1021,10 @@ RBRGen4Error RBRGen4_setCalibration(
 
 /** 
  * \brief Instrument `settings` command parameters.
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828508/settings
+ *
  * \see RBRGen4_getSettings()
  * \see RBRGen4_setSettings()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828508/settings
  */
 typedef struct RBRGen4Settings
 {
@@ -1058,8 +1059,8 @@ typedef struct RBRGen4Settings
  * \return #RBRGEN4_SUCCESS when the setting is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828508/settings
  * \see RBRGen4_setSettings()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828508/settings
  */
 RBRGen4Error RBRGen4_getSettings(
     RBRGen4 *conn,
@@ -1081,8 +1082,8 @@ RBRGen4Error RBRGen4_getSettings(
  * \warning The library expects both \a prompt and \a confirmation to be on.
  *          With \a confirmation off the instrument answers a set with nothing
  *          at all, and every later setter blocks until the command timeout.
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828508/settings
  * \see RBRGen4_getSettings()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828508/settings
  */
 RBRGen4Error RBRGen4_setSettings(
     RBRGen4 *conn,
@@ -1090,9 +1091,10 @@ RBRGen4Error RBRGen4_setSettings(
 
 /** 
  * \brief `parameters` command parameters.
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/42729486/parameters
+ *
  * \see RBRGen4_getParameters()
  * \see RBRGen4_setParameters()
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/42729486/parameters
  */
 typedef struct RBRGen4Parameters
 {
@@ -1136,8 +1138,8 @@ typedef struct RBRGen4Parameters
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \see RBRGen4_setParameters()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/42729486/parameters
- * \see RBRGen4_setParameters
  */
 RBRGen4Error RBRGen4_getParameters(
     RBRGen4 *conn,
@@ -1157,8 +1159,8 @@ RBRGen4Error RBRGen4_getParameters(
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the parameters cannot be changed, or
  *                                      another hardware error occurs
+ * \see RBRGen4_getParameters()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/42729486/parameters
- * \see RBRGen4_getParameters
  */
 RBRGen4Error RBRGen4_setParameters(
     RBRGen4 *conn,
