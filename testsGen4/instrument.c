@@ -37,17 +37,17 @@ TEST_LOGGER4(id)
           "fwtype = 150"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { "L4",
-            "2.0.0",
-            999999,
-            150 } },
+          { .model = "L4",
+            .fwversion = "2.0.0",
+            .sn = 999999,
+            .fwtype = 150 } },
         /* A response carrying no parameters leaves the struct zeroed. */
         { "id" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { "",
-            "",
-            0,
-            0 } },
+          { .model = "",
+            .fwversion = "",
+            .sn = 0,
+            .fwtype = 0 } },
         /*
          * A name too long for the key buffer must not truncate onto one of
          * the names we look for: `versionfoo` would become `version` in a
@@ -58,10 +58,10 @@ TEST_LOGGER4(id)
           "versionfoo = 9.9.9"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { "L4",
-            "",
-            0,
-            0 } },
+          { .model = "L4",
+            .fwversion = "",
+            .sn = 0,
+            .fwtype = 0 } },
         { 0 }
     };
 
@@ -92,19 +92,19 @@ TEST_LOGGER4(id4)
           "fwtype=150"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { "L4",
-            "2.0.0",
-            "2.0.0-rc1-10-g148bc5eb1",
-            999999,
-            150 } },
+          { .model = "L4",
+            .fwversion = "2.0.0",
+            .semver = "2.0.0-rc1-10-g148bc5eb1",
+            .sn = 999999,
+            .fwtype = 150 } },
         /* A response carrying no parameters leaves the struct zeroed. */
         { "id4" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { "",
-            "",
-            "",
-            0,
-            0 } },
+          { .model = "",
+            .fwversion = "",
+            .semver = "",
+            .sn = 0,
+            .fwtype = 0 } },
         { 0 }
     };
 
@@ -142,8 +142,8 @@ TEST_LOGGER4(pcbalist)
      * RBRGen4_getPcba(). */
     RBRGen4PcbaPool expected = {
         .count = 2,
-        .pool = { { "self", 0, "", "" },
-                  { "fe4_cond_00", 0, "", "" } }
+        .pool = { { .label = "self", .sn = 0, .pn = "", .node = "" },
+                  { .label = "fe4_cond_00", .sn = 0, .pn = "", .node = "" } }
     };
     RBRGen4PcbaPool actual;
 
@@ -467,16 +467,16 @@ TEST_LOGGER4(conn)
           "fwlock=off datatype=float64 name=L4"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { RBRGEN4_INSTRUMENT_STATE_DISABLED,
-            999999,
-            "L4",
-            "9999999revA",
-            "2.0.0",
-            "2.0.0-rc1-10-g148bc5eb1",
-            150,
-            false,
-            RBRGEN4_DATATYPE_FLOAT64,
-            "L4" } },
+          { .state = RBRGEN4_INSTRUMENT_STATE_DISABLED,
+            .sn = 999999,
+            .model = "L4",
+            .pn = "9999999revA",
+            .fwversion = "2.0.0",
+            .semver = "2.0.0-rc1-10-g148bc5eb1",
+            .fwtype = 150,
+            .fwLock = false,
+            .dataType = RBRGEN4_DATATYPE_FLOAT64,
+            .name = "L4" } },
         /* An enabled instrument with the firmware locked, and the extended
          * name and part number populated. */
         { "instrument state=enabled sn=210000 model=RBRsolo4 "
@@ -485,32 +485,32 @@ TEST_LOGGER4(conn)
           "datatype=float32 name=RBRsolo^4_T.D!fast32"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { RBRGEN4_INSTRUMENT_STATE_ENABLED,
-            210000,
-            "RBRsolo4",
-            "L3-M11-BEC11-SC11-ST11-SP11",
-            "1.0.0",
-            "1.0.0-rc4-11-g941ae64",
-            130,
-            true,
-            RBRGEN4_DATATYPE_FLOAT32,
-            "RBRsolo^4_T.D!fast32" } },
+          { .state = RBRGEN4_INSTRUMENT_STATE_ENABLED,
+            .sn = 210000,
+            .model = "RBRsolo4",
+            .pn = "L3-M11-BEC11-SC11-ST11-SP11",
+            .fwversion = "1.0.0",
+            .semver = "1.0.0-rc4-11-g941ae64",
+            .fwtype = 130,
+            .fwLock = true,
+            .dataType = RBRGEN4_DATATYPE_FLOAT32,
+            .name = "RBRsolo^4_T.D!fast32" } },
         /* calfloat64 is reported only during a calibration-mode deployment. */
         { "instrument state=enabled sn=210000 model=RBRsolo4 pn=012345revA "
           "fwversion=1.0.0 semver=1.0.0 fwtype=130 fwlock=off "
           "datatype=calfloat64 name=RBRsolo4"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { RBRGEN4_INSTRUMENT_STATE_ENABLED,
-            210000,
-            "RBRsolo4",
-            "012345revA",
-            "1.0.0",
-            "1.0.0",
-            130,
-            false,
-            RBRGEN4_DATATYPE_CALFLOAT64,
-            "RBRsolo4" } },
+          { .state = RBRGEN4_INSTRUMENT_STATE_ENABLED,
+            .sn = 210000,
+            .model = "RBRsolo4",
+            .pn = "012345revA",
+            .fwversion = "1.0.0",
+            .semver = "1.0.0",
+            .fwtype = 130,
+            .fwLock = false,
+            .dataType = RBRGEN4_DATATYPE_CALFLOAT64,
+            .name = "RBRsolo4" } },
         /* An unrecognized data type must not be reported as float32, which is
          * the zero value of the enum. */
         { "instrument state=disabled sn=999999 model=L4 pn=9999999revA "
@@ -518,16 +518,16 @@ TEST_LOGGER4(conn)
           "datatype=float128 name=L4"
           RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { RBRGEN4_INSTRUMENT_STATE_DISABLED,
-            999999,
-            "L4",
-            "9999999revA",
-            "2.0.0",
-            "2.0.0",
-            150,
-            false,
-            RBRGEN4_UNKNOWN_DATATYPE,
-            "L4" } },
+          { .state = RBRGEN4_INSTRUMENT_STATE_DISABLED,
+            .sn = 999999,
+            .model = "L4",
+            .pn = "9999999revA",
+            .fwversion = "2.0.0",
+            .semver = "2.0.0",
+            .fwtype = 150,
+            .fwLock = false,
+            .dataType = RBRGEN4_UNKNOWN_DATATYPE,
+            .name = "L4" } },
         { 0 }
     };
     RBRGen4Error err;
@@ -623,19 +623,28 @@ TEST_LOGGER4(outputformat)
         /* The format an L4 reports out of the box. */
         { "instrument outputformat sn=off schedulelabel=on datetime=on "
           "crc=off encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
-          { false, true, true, false,
-            RBRGEN4_ENCODING_ASCII,
-            RBRGEN4_DATATYPE_FLOAT32 } },
+          { .sn = false,
+            .scheduleLabel = true,
+            .dateTime = true,
+            .crc = false,
+            .encoding = RBRGEN4_ENCODING_ASCII,
+            .dataType = RBRGEN4_DATATYPE_FLOAT32 } },
         { "instrument outputformat sn=on schedulelabel=on datetime=off "
           "crc=on encoding=binary datatype=float64" RESPONSE_TERMINATOR,
-          { true, true, false, true,
-            RBRGEN4_ENCODING_BINARY,
-            RBRGEN4_DATATYPE_FLOAT64 } },
+          { .sn = true,
+            .scheduleLabel = true,
+            .dateTime = false,
+            .crc = true,
+            .encoding = RBRGEN4_ENCODING_BINARY,
+            .dataType = RBRGEN4_DATATYPE_FLOAT64 } },
         { "instrument outputformat sn=off schedulelabel=off datetime=off "
           "crc=off encoding=ascii datatype=calfloat64" RESPONSE_TERMINATOR,
-          { false, false, false, false,
-            RBRGEN4_ENCODING_ASCII,
-            RBRGEN4_DATATYPE_CALFLOAT64 } },
+          { .sn = false,
+            .scheduleLabel = false,
+            .dateTime = false,
+            .crc = false,
+            .encoding = RBRGEN4_ENCODING_ASCII,
+            .dataType = RBRGEN4_DATATYPE_CALFLOAT64 } },
         { 0 }
     };
 
