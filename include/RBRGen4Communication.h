@@ -33,9 +33,6 @@ typedef enum RBRGen4LinkType
     RBRGEN4_LINK_TYPE_USB,
     /** Serial connectivity. */
     RBRGEN4_LINK_TYPE_SERIAL,
-    /** Wi-Fi connectivity. */
-    /* RBRGEN4_LINK_TYPE_WIFI, */
-    
     /** The number of specific link types. */
     RBRGEN4_LINK_TYPE_COUNT,
     /** An unknown or unrecognized link type. */
@@ -265,129 +262,6 @@ RBRGen4Error RBRGen4_setLinkSerial(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828337/Timeouts+output+blanking+and+power+saving
  */
 RBRGen4Error RBRGen4_sleep(RBRGen4 *conn);
-
-#if 0
-
-/**
- * \brief The state of the Wi-Fi connection.
- *
- * \see RBRGen4WiFi
- */
-typedef enum RBRGen4WiFiState
-{
-    /** \brief The Wi-Fi connection is disabled. */
-    RBRGEN4_WIFI_NA,
-    /** \brief The Wi-Fi radio is powered up and ready to communicate. */
-    RBRGEN4_WIFI_ON,
-    /** \brief The Wi-Fi radio is powered down. */
-    RBRGEN4_WIFI_OFF,
-    /** The number of specific states. */
-    RBRGEN4_WIFI_COUNT,
-    /** An unknown or unrecognized state. */
-    RBRGEN4_UNKNOWN_WIFI
-} RBRGen4WiFiState;
-
-/**
- * \brief Get a human-readable string name for a Wi-Fi connection state.
- *
- * \param [in] state the Wi-Fi connection state
- * \return a string name for the Wi-Fi connection state
- * \see RBRGen4Error_name() for a description of the format of names
- */
-const char *RBRGen4WiFiState_name(RBRGen4WiFiState state);
-
-/**
- * \brief Instrument `wifi` command parameters.
- *
- * \see RBRGen4_getWiFi()
- * \see RBRGen4_setWiFi()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
- */
-typedef struct RBRGen4WiFi
-{
-    /**
-     * \brief Enables or disables Wi-Fi connectivity.
-     *
-     * \nol2 Will be retrieved as `false`.
-     */
-    bool enabled;
-    /**
-     * \brief The state of the Wi-Fi radio.
-     *
-     * \readonly
-     *
-     * \nol2 Will be retrieved as #RBRGEN4_UNKNOWN_WIFI.
-     */
-    RBRGen4WiFiState state;
-    /**
-     * \brief How long the instrument will wait for a valid command after
-     * first powering up the Wi-Fi radio before powering it back down.
-     *
-     * Specified in whole seconds expressed as milliseconds. Must be in the
-     * range 5,000—600,000 (5 seconds to 10 minutes).
-     */
-    int32_t timeout;
-    /**
-     * \brief How long the instrument will wait between commands after the
-     * first command before powering down the Wi-Fi radio.
-     *
-     * Specified in whole seconds expressed as milliseconds. Must be in the
-     * range 5,000—600,000 (5 seconds to 10 minutes).
-     */
-    int32_t commandTimeout;
-    /**
-     * \brief The speed of the internal connection between the instrument's CPU
-     * and the Wi-Fi radio.
-     *
-     * \readonly
-     *
-     * \nol2 Will be retrieved as #RBRGEN4_LINK_SERIAL_BAUD_NONE.
-     */
-    RBRGen4LinkSerialBaudRate baudRate;
-} RBRGen4WiFi;
-
-/**
- * \brief Retrieve the current instrument Wi-Fi settings. 
- * L3.5 won't support, L4 supports it.
- *
- * \param [in] conn the instrument connection
- * \param [out] wifi the current Wi-Fi parameters
- * \return #RBRGEN4_SUCCESS when the setting is successfully read
- * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the feature is unavailable
- * \see RBRGen4_setWiFi()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
- */
-RBRGen4Error RBRGen4_getWiFi(RBRGen4 *conn,
-                                         RBRGen4WiFi *wifi);
-
-/**
- * \brief Reconfigure the instrument Wi-Fi settings.
- * L3.5 won't support, L4 supports it.
- *
- * For Logger3 instruments, this sends the values of RBRGen4WiFi.enabled,
- * RBRGen4WiFi.timeout, and RBRGen4WiFi.commandTimeout. For
- * Logger2 instruments, this sends only the values of
- * RBRGen4WiFi.timeout and RBRGen4WiFi.commandTimeout as the
- * RBRGen4WiFi.enabled parameter does not exist for that generation of
- * instruments.
- *
- * \param [in] conn the instrument connection
- * \param [out] wifi the new Wi-Fi parameters
- * \return #RBRGEN4_SUCCESS when the setting is successfully written
- * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the feature is unavailable
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when parameter values are out
- *                                                of range
- * \see RBRGen4_getWifi()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
- */
-RBRGen4Error RBRGen4_setWiFi(RBRGen4 *conn,
-                                         const RBRGen4WiFi *wifi);
-
-#endif
 
 #ifdef __cplusplus
 }
