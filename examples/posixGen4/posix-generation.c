@@ -1,7 +1,8 @@
 /**
  * \file posix-generation.c
  *
- * \brief Example of using the library to check generation of an instrument.
+ * \brief Example of using the library to check the generation of an
+ * instrument.
  *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
@@ -10,9 +11,7 @@
 
 /* Required for errno. */
 #include <errno.h>
-/* Required for isnan. */
-#include <math.h>
-/* Required for fprintf, printf, snprintf. */
+/* Required for fprintf, printf. */
 #include <stdio.h>
 /* Required for EXIT_SUCCESS, etc. */
 #include <stdlib.h>
@@ -21,33 +20,46 @@
 /* Required for close. */
 #include <unistd.h>
 
+#include "RBRGen4.h"
 #include "posix-shared.h"
+
+const char *programName = "";
+
+/* Report a failed library call. A hardware error also carries the
+ * instrument's own message, which says what it objected to. */
+void logCmdError(const RBRGen4 *conn, RBRGen4Error err, const char *msg)
+{
+    fprintf(stderr,
+            "%s: %s (%s)\n",
+            programName,
+            msg,
+            RBRGen4Error_name(err));
+    if (err == RBRGEN4_HARDWARE_ERROR)
+    {
+        fprintf(stderr,
+                "%s: Instrument reported: %s\n",
+                programName,
+                RBRGen4_getLastHardwareErrorMessage(conn));
+    }
+}
 
 int main(int argc, char *argv[])
 {
-    char *programName = argv[0];
-    char *devicePath;
-
-    int status = EXIT_SUCCESS;
-    int instrumentFd;
-
-    RBRGen4Error err;
-    RBRGen4 *conn = NULL;
-    //no dynamic allocation case:
-    RBRGen4 instrumentSpace;
-    conn = &instrumentSpace;
+    programName = argv[0];
 
     if (argc < 2)
     {
-        fprintf(stderr, "Usage: %s device\n", argv[0]);
+        fprintf(stderr, "Usage: %s device\n", programName);
         return EXIT_FAILURE;
     }
 
-    devicePath = argv[1];
+    int instrumentFd;
+    char *devicePath = argv[1];
 
     if ((instrumentFd = openSerialFd(devicePath)) < 0)
     {
-        fprintf(stderr, "%s: Failed to open serial device: %s!\n",
+        fprintf(stderr,
+                "%s: Failed to open serial device: %s!\n",
                 programName,
                 strerror(errno));
         return EXIT_FAILURE;
@@ -60,40 +72,46 @@ int main(int argc, char *argv[])
             RBRGEN4_LIB_VERSION,
             RBRGEN4_LIB_BUILD_DATE);
 
-    RBRGen4Callbacks callbacks = {
+    RBRGen4Error err = RBRGEN4_SUCCESS;
+    RBRGen4 conn;
+    const RBRGen4Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRGen4_open(
-             conn,
-             &callbacks,
-             INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
+    /* Opening the connection identifies the instrument, so an instrument of
+     * an unsupported generation is refused here with RBRGEN4_UNSUPPORTED. */
+    err = RBRGen4_open(&conn,
+                       &callbacks,
+                       INSTRUMENT_COMMAND_TIMEOUT_MSEC,
+                       (void *) &instrumentFd);
+    if (err)
     {
-        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
-                programName,
-                RBRGen4Error_name(err));
-        status = EXIT_FAILURE;
-        goto fileCleanup; //Failure case, memory allocated by this constructor is freed.
+        logCmdError(&conn, err, "Failed to establish instrument connection");
+        goto fileCleanup;
     }
 
- RBRGen4Generation generation;
- generation =  RBRGen4_getGeneration(conn);
- if (generation != RBRGEN4_LOGGER4)
- {
-    fprintf(stderr, "%s: Instrument generation %s not supported. Please check libRBR version.\n",
-            programName,
-            RBRGen4Generation_name(generation));
-            status = EXIT_FAILURE;
-            goto instrumentCleanup;
- }
+    RBRGen4Generation generation = RBRGen4_getGeneration(&conn);
+    printf("%s: Instrument generation is %s\n",
+           programName,
+           RBRGen4Generation_name(generation));
+    if (generation != RBRGEN4_LOGGER4)
+    {
+        err = RBRGEN4_UNSUPPORTED;
+        logCmdError(&conn,
+                    err,
+                    "Instrument generation is not supported by this library;"
+                    " please check the libRBR version");
+        goto instrumentCleanup;
+    }
 
 instrumentCleanup:
-    RBRGen4_close(conn);
+    RBRGen4_close(&conn);
+
 fileCleanup:
     close(instrumentFd);
-    return status;
+
+    return (err == RBRGEN4_SUCCESS) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
