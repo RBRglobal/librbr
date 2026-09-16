@@ -10,15 +10,14 @@
 
 /* Required for memcpy, memset, strcmp. */
 #include <string.h>
-/* Required for sscanf. */
+/* Required for snprintf. */
 #include <stdio.h>
-/* Required for strtol. */
+/* Required for strtol, strtoll. */
 #include <stdlib.h>
-/* Required for PRId32. */
+/* Required for PRId64. */
 #include <inttypes.h>
 
 #include "RBRGen4.h"
-#include "RBRGen4Configuration.h"
 #include "RBRGen4Internal.h"
 #include "RBRGen4Memory.h"
 

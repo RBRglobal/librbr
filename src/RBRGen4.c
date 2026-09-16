@@ -8,11 +8,12 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-/* Required for memcpy, memcmp, memset, strlen. */
+/* Required for memcpy, memset. */
 #include <string.h>
+
 #include "RBRGen4.h"
-#include "RBRGen4Instrument.h"
 #include "RBRGen4Internal.h"
+#include "RBRGen4Instrument.h"
 
 const char *RBRGEN4_LIB_NAME =
 #ifdef RBR_LIB_NAME

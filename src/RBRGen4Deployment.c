@@ -10,8 +10,9 @@
 
 /* Required for isnan, NAN. */
 #include <math.h>
-/* Required for memset, strcmp. */
+/* Required for strtod. */
 #include <stdlib.h>
+/* Required for memset, strcmp, strlen. */
 #include <string.h>
 /* Required for snprintf. */
 #include <stdio.h>

@@ -14,11 +14,12 @@
 #ifndef LIBRBR_RBRGEN4MEMORY_H
 #define LIBRBR_RBRGEN4MEMORY_H
 
-#include "RBRGen4.h"
-#include "RBRGen4Configuration.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "RBRGen4.h"
+#include "RBRGen4Configuration.h"
 
 /** \brief The maximum number of datasets the library can enumerate. */
 #define RBRGEN4_DATASET_COUNT_MAX 32

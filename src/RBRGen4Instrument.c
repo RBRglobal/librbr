@@ -10,13 +10,11 @@
 
 /* Required for isspace. */
 #include <ctype.h>
-/* Required for NAN. */
-#include <math.h>
-/* Required for memcpy, memset, strchr, strcmp. */
+/* Required for memcpy, memset, strchr, strcmp, strlen, strstr. */
 #include <string.h>
 /* Required for snprintf. */
 #include <stdio.h>
-/* Required for strtol. */
+/* Required for strtod, strtol. */
 #include <stdlib.h>
 
 #include "RBRGen4.h"
