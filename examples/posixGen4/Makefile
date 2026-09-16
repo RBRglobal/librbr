@@ -30,8 +30,7 @@ EXAMPLES := \
     posix-multiScheduleDiffConfig \
     posix-poll \
     posix-singleScheduleSingleConfig \
-    posix-stream \
-    posix-test
+    posix-stream
 
 all: $(EXAMPLES)
 
@@ -52,8 +51,6 @@ posix-profilingFloat: posix-shared.o posix-profilingFloat.o ../../bin/libRBR.a
 posix-singleScheduleSingleConfig: posix-shared.o posix-singleScheduleSingleConfig.o ../../bin/libRBR.a
 
 posix-stream: posix-shared.o posix-stream.o ../../bin/libRBR.a
-
-posix-test: posix-test.o ../../bin/libRBR.a
 
 ../../bin/libRBR.a:
 	$(MAKE) -C ../../ lib

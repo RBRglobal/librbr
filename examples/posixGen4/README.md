@@ -6,7 +6,7 @@
 * Runtime environment: Linux, macOS, or cygwin
 
 ~~~{.sh}
-Info: not all examples require hardware (posix-footprint and posix-test run standalone).
+Info: not all examples require hardware (posix-footprint runs standalone).
 ~~~
 
 ## Build all posix examples
@@ -49,7 +49,6 @@ posix-multiScheduleDiffConfig.c | ./posix-multiScheduleDiffConfig /dev/ttyUSB0 |
 posix-poll.c | ./posix-poll /dev/ttyUSB0 | polls on-demand samples; writes nothing
 posix-singleScheduleSingleConfig.c | ./posix-singleScheduleSingleConfig /dev/ttyUSB0 | **clears the instrument configuration** and enables a deployment with a single schedule and configuration
 posix-stream.c | ./posix-stream /dev/ttyUSB0 | **clears the instrument configuration**, enables a streaming deployment, prints samples until Ctrl-C, then disables
-posix-test.c | ./posix-test | runs against simulated I/O buffers; no instrument needed
 
 Two more examples, posix-parse-file.c and posix-profilingFloat.c, do not
 currently build. See the Makefile for details.

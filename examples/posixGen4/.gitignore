@@ -7,7 +7,6 @@ posix-multiScheduleDiffConfig
 posix-poll
 posix-singleScheduleSingleConfig
 posix-stream
-posix-test
 *.exe
 *.o
 
