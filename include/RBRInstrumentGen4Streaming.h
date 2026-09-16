@@ -21,23 +21,6 @@ extern "C" {
 #include "RBRInstrumentGen4.h"
 
 /*************************************************************************************************/
-/**
- * \brief A flag set on a sample reading.
- */
-typedef enum RBRInstrumentGen4ReadingFlag
-{
-    /** No flag. */
-    RBRINSTRUMENTGEN4_READING_FLAG_NONE,
-    /** The channel is uncalibrated. */
-    RBRINSTRUMENTGEN4_READING_FLAG_UNCALIBRATED,
-    /** The reading is an error. */
-    RBRINSTRUMENTGEN4_READING_FLAG_ERROR,
-    /** The number of reading flags. */
-    RBRINSTRUMENTGEN4_READING_FLAG_COUNT,
-    /** An unknown or unrecognized reading flag. */
-    RBRINSTRUMENTGEN4_UNKNOWN_READING_FLAG
-} RBRInstrumentGen4ReadingFlag;
-
 typedef enum RBRInstrumentGen4ReadingError
 {
     /** -NaN; General error condition; error from undefined mathematical operation */
@@ -95,51 +78,40 @@ typedef enum RBRInstrumentGen4ReadingError
 } RBRInstrumentGen4ReadingError;
 
 /**
- * \brief Get a human-readable string name for a reading flag.
+ * \brief Check whether a reading is an error rather than a value.
  *
- * \param [in] flag the reading flag
- * \return a string name for the reading flag
- * \see RBRInstrumentGen4Error_name() for a description of the format of names
- */
-const char *RBRInstrumentGen4ReadingFlag_name(RBRInstrumentGen4ReadingFlag flag);
-
-/**
- * \brief Get the error flag from a reading.
- *
- * If the reading is not a NaN, returns the error flag encoded within the NaN.
- * Otherwise, returns #RBRINSTRUMENTGEN4_READING_FLAG_NONE.
+ * Error readings are NaNs carrying an error code; a plain NaN reported by
+ * the instrument is not an error reading.
  *
  * \param [in] reading the reading
- * \return the error flag of the reading, if present
- * \see RBRInstrumentGen4Reading_getError() to get the error value, if present
- * \see RBRInstrumentGen4Reading_setError() to create a reading with an error set
+ * \return whether the reading is an error
+ * \see RBRInstrumentGen4Reading_getError() to get the error code
+ * \see RBRInstrumentGen4Reading_setError() to create an error reading
  */
-RBRInstrumentGen4ReadingFlag RBRInstrumentGen4Reading_getFlag(double reading);
+bool RBRInstrumentGen4Reading_isError(double reading);
 
 /**
- * \brief Get the error value from a reading.
+ * \brief Get the error code from an error reading.
  *
- * If the reading is not a NaN, returns the error value encoded within the NaN.
- * Otherwise, returns 0.
+ * Meaningful only when RBRInstrumentGen4Reading_isError() is true; returns 0
+ * otherwise.
  *
  * \param [in] reading the reading
- * \return the error value of the reading, if present
- * \see RBRInstrumentGen4Reading_getFlag() to get the error flag, if present
- * \see RBRInstrumentGen4Reading_setError() to create a reading with an error set
+ * \return the error code of the reading
+ * \see RBRInstrumentGen4Reading_isError() to check for an error first
+ * \see RBRInstrumentGen4Reading_setError() to create an error reading
  */
 RBRInstrumentGen4ReadingError RBRInstrumentGen4Reading_getError(double reading);
 
 /**
- * \brief Synthesize a reading with an error set.
+ * \brief Synthesize an error reading.
  *
- * \param [in] flag the error flag
- * \param [in] value the error value
+ * \param [in] error the error code
  * \return the error reading
- * \see RBRInstrumentGen4Reading_getFlag() to get the error flag, if present
- * \see RBRInstrumentGen4Reading_getError() to get the error value, if present
+ * \see RBRInstrumentGen4Reading_isError() to check for an error
+ * \see RBRInstrumentGen4Reading_getError() to get the error code
  */
-double RBRInstrumentGen4Reading_setError(RBRInstrumentGen4ReadingFlag flag,
-                                     uint8_t value);
+double RBRInstrumentGen4Reading_setError(RBRInstrumentGen4ReadingError error);
 
 /**
  * \brief An instrument sample.
@@ -148,6 +120,12 @@ typedef struct RBRInstrumentGen4Sample
 {
     /** \brief The timestamp of the sample. */
     RBRInstrumentGen4DateTime timestamp;
+    /**
+     * \brief The schedule label reported with the sample.
+     *
+     * An empty string when the output format omits the schedule label.
+     */
+    char scheduleLabel[RBRINSTRUMENTGEN4_LABEL_NAME_MAX + 1];
     /** \brief The number of populated sample readings. */
     int32_t channelCount;
     /**
@@ -157,12 +135,11 @@ typedef struct RBRInstrumentGen4Sample
      * Other readings will be set to 0.
      *
      * Readings are represented as double-precision floating point. If they
-     * need to encode an error, it's stored in the trailing bits of a NaN, and
-     * a flag is set to indicate which sort of error.
+     * need to encode an error, it's stored in the trailing bits of a NaN.
      *
-     * \see RBRInstrumentGen4Reading_getFlag() to get the error flag, if present
-     * \see RBRInstrumentGen4Reading_getError() to get the error value, if present
-     * \see RBRInstrumentGen4Reading_setError() to synthesize a error reading
+     * \see RBRInstrumentGen4Reading_isError() to check for an error
+     * \see RBRInstrumentGen4Reading_getError() to get the error code
+     * \see RBRInstrumentGen4Reading_setError() to synthesize an error reading
      */
     double readings[RBRINSTRUMENTGEN4_CHANNEL_MAX];
 } RBRInstrumentGen4Sample;
@@ -172,13 +149,18 @@ typedef struct RBRInstrumentGen4Sample
  *
  * This function waits for a streamed sample to arrive, parses it, then calls
  * the RBRInstrumentGen4SampleCallback provided to the instrument via
- * RBRInstrumentGen4Callbacks.sample.
+ * RBRInstrumentGen4Callbacks.sample, delivering the sample into
+ * RBRInstrumentGen4Callbacks.sampleBuffer.
+ *
+ * This requires RBRInstrumentGen4Callbacks.sample and
+ * RBRInstrumentGen4Callbacks.sampleBuffer to be populated.
  *
  * \param [in] instrument the instrument connection
  * \return #RBRINSTRUMENTGEN4_SUCCESS when a streaming sample has been read
+ * \return #RBRINSTRUMENTGEN4_MISSING_CALLBACK when the connection was opened
+ *         without a sample callback
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRInstrumentGen4_fetchSample() for on-demand sample fetching
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_readSample(RBRInstrumentGen4 *instrument);
 

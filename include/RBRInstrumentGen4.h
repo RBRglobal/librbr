@@ -816,7 +816,18 @@ typedef struct RBRInstrumentGen4
      */
     RBRInstrumentGen4DateTime commandTimeout;
 
-    /** 
+    /**
+     * \brief The poll timeout in milliseconds.
+     *
+     * RBRInstrumentGen4_open() sets it to twice the command timeout. See
+     * [Timeouts](timeouts.md) for details on how the library handles
+     * timeouts.
+     * \see RBRInstrumentGen4_getPollTimeout();
+     * \see RBRInstrumentGen4_setPollTimeout();
+     */
+    RBRInstrumentGen4DateTime pollTimeout;
+
+    /**
      * \brief Arbitrary user data; useful in callbacks.
      * \see RBRInstrumentGen4_getUserData();
      * \see RBRInstrumentGen4_setUserData();
@@ -919,9 +930,16 @@ typedef struct RBRInstrumentGen4
  * RBRInstrumentGen4 instance, and may be overwritten as soon as the callback
  * returns.
  *
- * This library supports only 4th-generation RBR instruments. If the library 
- * detects an unsupported instrument during connection, 
+ * This constructor supports only 4th-generation RBR instruments. If the 
+ * constructor detects an unsupported instrument during connection,
  * #RBRINSTRUMENTGEN4_UNSUPPORTED is returned.
+ *
+ * Until this function has read the instrument's output format, the library
+ * assumes it to be #RBRINSTRUMENTGEN4_DEFAULT_OUTPUTFORMAT. Samples streamed
+ * in any other format while the connection is being opened are not
+ * recognised as samples: they are discarded rather than passed to
+ * RBRInstrumentGen4Callbacks.sample.
+ * \see RBRInstrumentGen4_setOutputFormat()
  *
  * In the event of any return value other than #RBRINSTRUMENTGEN4_SUCCESS, any
  * memory allocated by this constructor is freed. That is, in the event of
@@ -986,6 +1004,26 @@ RBRInstrumentGen4DateTime RBRInstrumentGen4_getCommandTimeout(
  */
 void RBRInstrumentGen4_setCommandTimeout(RBRInstrumentGen4 *instrument,
                                      const RBRInstrumentGen4DateTime commandTimeout);
+
+/**
+ * \brief Get the poll timeout.
+ *
+ * \param [in] instrument the instrument connection
+ * \return the poll timeout
+ * \see RBRInstrumentGen4_setPollTimeout()
+ */
+RBRInstrumentGen4DateTime RBRInstrumentGen4_getPollTimeout(
+    const RBRInstrumentGen4 *instrument);
+
+/**
+ * \brief Set the poll timeout.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] pollTimeout the new poll timeout
+ * \see RBRInstrumentGen4_getPollTimeout()
+ */
+void RBRInstrumentGen4_setPollTimeout(RBRInstrumentGen4 *instrument,
+                                     const RBRInstrumentGen4DateTime pollTimeout);
 
 /**
  * \brief Get the pointer to arbitrary user data.

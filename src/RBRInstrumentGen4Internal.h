@@ -155,6 +155,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_sendCommand(RBRInstrumentGen4 *instrume
  * \param [in] instrument the instrument connection
  * \param [in] breakOnSample whether to return early when a sample is parsed
  * \param [out] sample where to put a parsed sample
+ * \param [in] startTime when the caller began waiting for this response
+ * \param [in] timeout the longest to wait, in milliseconds, from \a startTime
  * \return #RBRINSTRUMENTGEN4_SUCCESS when a response was successfully read
  * \return #RBRINSTRUMENTGEN4_SAMPLE when a sample is read and \a sample is given
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
@@ -165,7 +167,26 @@ RBRInstrumentGen4Error RBRInstrumentGen4_sendCommand(RBRInstrumentGen4 *instrume
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_readResponse(RBRInstrumentGen4 *instrument,
                                               bool breakOnSample,
-                                              RBRInstrumentGen4Sample *sample);
+                                              RBRInstrumentGen4Sample *sample,
+                                              RBRInstrumentGen4DateTime startTime,
+                                              RBRInstrumentGen4DateTime timeout);
+
+/**
+ * Deliver a sample to the RBRInstrumentGen4SampleCallback set via
+ * RBRInstrumentGen4Callbacks.sample, if any. If \a sample is not already
+ * RBRInstrumentGen4Callbacks.sampleBuffer, it will be copied there first;
+ * RBRInstrumentGen4_open() guarantees that sampleBuffer is non-`NULL`
+ * whenever the callback is set.
+ *
+ * \param [in] instrument the instrument connection
+ * \param [in] sample the sample to deliver
+ * \return #RBRINSTRUMENTGEN4_SUCCESS when no callback is set, or the value
+ *         returned by the callback otherwise
+ * \see RBRInstrumentGen4_open() for the sampleBuffer guarantee
+ */
+RBRInstrumentGen4Error RBRInstrumentGen4_deliverSample(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Sample *sample);
 
 /**
  * \brief Send a command to the instrument and await an appropriate response.
@@ -329,8 +350,8 @@ RBRInstrumentGen4Error RBRInstrumentGen4_errorCheckResponse(
     char *end);
 
 /**
- * \brief Parse a date/time string from a sample (i.e.,
- * “YYYY-mm-dd HH:MM:SS.sss” format) to a timestamp.
+ * \brief Parse a sample's timestamp: either a date/time string (i.e.,
+ * “YYYY-mm-dd HH:MM:SS.sss” format) or a bare count of milliseconds.
  *
  * If \a end is not given as `NULL`, it will be modified to point to the first
  * character after the timestamp in \a s. If the timestamp cannot be parsed, it

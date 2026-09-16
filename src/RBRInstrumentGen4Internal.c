@@ -82,13 +82,14 @@
 #define SAMPLE_NAN "nan"
 #define SAMPLE_INF "inf"
 #define SAMPLE_NINF "-inf"
-#define SAMPLE_UNCAL "###"
 #define SAMPLE_ERROR_PREFIX "Error-"
 #define SAMPLE_ERROR_PREFIX_LEN ((long) (sizeof(SAMPLE_ERROR_PREFIX) - 1))
 
 static const char *RBRInstrumentGen4DateTime_sampleFormat = "%04d-%02d-%02d %02d:%02d:%02d.%03d";
 
 static const char *RBRInstrumentGen4DateTime_sampleScanFormat = "%04d-%02d-%02d %02d:%02d:%02d.%03d%n";
+
+static const char *RBRInstrumentGen4DateTime_sampleMillisecondsScanFormat = "%" SCNi64 "%n";
 
 static const char *RBRInstrumentGen4DateTime_scheduleFormat = "%04d%02d%02d%02d%02d%02d";
 
@@ -254,6 +255,7 @@ static void RBRInstrumentGen4_removeLastResponse(RBRInstrumentGen4 *instrument)
  *
  * \param [in,out] instrument the instrument connection
  * \param [in] startTime when we started trying to read the command response
+ * \param [in] timeout the longest to wait, in milliseconds, from \a startTime
  * \param [out] end the end of the response within the response buffer
  * \return #RBRINSTRUMENTGEN4_SUCCESS when data is successfully read
  * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
@@ -262,6 +264,7 @@ static void RBRInstrumentGen4_removeLastResponse(RBRInstrumentGen4 *instrument)
 static RBRInstrumentGen4Error RBRInstrumentGen4_readSingleResponse(
     RBRInstrumentGen4 *instrument,
     RBRInstrumentGen4DateTime startTime,
+    RBRInstrumentGen4DateTime timeout,
     char **end)
 {
     /*
@@ -278,7 +281,7 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_readSingleResponse(
         /*
          * If we're not seeing any response at all then the read callback
          * should return a character-level timeout. But if we're reading
-         * characters, then we could also hit the command timeout if:
+         * characters, then we could also hit the timeout if:
          *
          * - We're not seeing the command terminator. This could happen if our
          *   connection to the instrument isn't direct and there's some
@@ -288,9 +291,10 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_readSingleResponse(
          *   responses have been samples. If the command got lost en-route and
          *   the instrument is streaming then we'll keep seeing complete
          *   responses, but none of them will be for the command. Because the
-         *   start time is set in RBRInstrumentGen4_readResponse(), we have context
-         *   for the total amount of time spent attempting to read a command
-         *   response, not just how long has been spent on _this_ response.
+         *   start time is supplied by the caller of RBRInstrumentGen4_readResponse(),
+         *   we have context for the total amount of time spent attempting to
+         *   read a command response, not just how long has been spent on
+         *   _this_ response.
          *
          * In either of these cases, we want to give up and indicate a timeout
          * to the caller.
@@ -299,13 +303,13 @@ static RBRInstrumentGen4Error RBRInstrumentGen4_readSingleResponse(
 
         /*
         fprintf(stdout,
-                "now: %ld, startTime: %ld, now - startTime: %ld, commandTimeout: %ld\n",
+                "now: %ld, startTime: %ld, now - startTime: %ld, timeout: %ld\n",
                 now,
                 startTime,
                 now - startTime,
-                instrument->commandTimeout);
+                timeout);
         */
-        if (now - startTime > instrument->commandTimeout)
+        if (now - startTime > timeout)
         {
             return RBRINSTRUMENTGEN4_TIMEOUT;
         }
@@ -456,7 +460,6 @@ static char *seek(const char *str, char delimiter)
  * \return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE if the response does not
  *         follow the specified output format
  */
-
 static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
     RBRInstrumentGen4Sample *sample,
     RBRInstrumentGen4OutputFormat *outputFormat,
@@ -464,145 +467,135 @@ static RBRInstrumentGen4Error RBRInstrumentGen4Sample_parse(
 {
     memset(sample, 0, sizeof(RBRInstrumentGen4Sample));
 
-    /*
-    All samples scenario:
-    2023-09-10 11:24:14.125 38.6671142e+000 22.0217124e+000
-    <RBR 999999 >polling 2023-09-10 11:24:14.125 38.6671142e+000 22.0217124e+000< 0xABCD>
-    <RBR 999999 ><scheduleLabel >2023-09-10 11:24:14.125 38.6671142e+000 22.0217124e+000< 0xABCD>
-    */
-
     double reading;
     sample->channelCount = 0;
-    if (strchr(response, PARAMETER_SEPARATOR_L4) != NULL)
+    char *token = response;
+    /* Serial numbers are expected to be of the form 'RBR [0-9]+' */
+    if (outputFormat->sn)
     {
-        char *token = response;
-        if (outputFormat->sn)
+        if (memcmp(token, "RBR", 3) != 0)
         {
-            if (memcmp(token, "RBR", 3) != 0)
-            {
-                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-            }
-            if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
-            {
-                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-            }
-            if (!isdigit(*token))
-            {
-                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-            }
-            if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
-            {
-                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-            }
+            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
         }
-
-        if (outputFormat->scheduleLabel)
+        /* Explicitly check for a ' ', not PARAMETER_SEPARATOR_L4 */
+        if ((token = seek(token, ' ')) == NULL)
         {
-            if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
-            {
-                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-            }
+            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
         }
-
-        if (outputFormat->dateTime)
+        /* Assume the serial number is valid if it starts with a digit */
+        if (!isdigit(*token))
         {
-            char* timestamp_end;
-            RBR_TRY(RBRInstrumentGen4DateTime_parseSampleTime(token,
-                                                        &sample->timestamp,
-                                                        &timestamp_end));
-            token = timestamp_end;
+            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
         }
-
-        while ((token = seek(token, PARAMETER_SEPARATOR_L4)) != NULL
-               && sample->channelCount < RBRINSTRUMENTGEN4_CHANNEL_MAX)
+        if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
         {
-            char *reading_end = token;
-            /*
-            if (memcmp(token,
-                       RBRINSTRUMENTGEN4_RESPONSE_TERMINATOR,
-                       RBRINSTRUMENTGEN4_RESPONSE_TERMINATOR_LEN))
+            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        }
+    }
+
+    /* Labels' naming constraints are enforced by the instrument, not here. */
+    if (outputFormat->scheduleLabel)
+    {
+        char *label_end = token;
+        while (*label_end != PARAMETER_SEPARATOR_L4
+               && *label_end != '\0')
+        {
+            ++label_end;
+        }
+        size_t label_len = (size_t) (label_end - token);
+        if (label_len > RBRINSTRUMENTGEN4_LABEL_NAME_MAX)
+        {
+            label_len = RBRINSTRUMENTGEN4_LABEL_NAME_MAX;
+        }
+        memcpy(sample->scheduleLabel, token, label_len);
+        sample->scheduleLabel[label_len] = '\0';
+
+        if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
+        {
+            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        }
+    }
+
+    /* The timestamp is either a date/time or a bare millisecond count. */
+    if (outputFormat->dateTime)
+    {
+        char* timestamp_end;
+        RBR_TRY(RBRInstrumentGen4DateTime_parseSampleTime(token,
+                                                          &sample->timestamp,
+                                                          &timestamp_end));
+        if ((token = seek(timestamp_end, PARAMETER_SEPARATOR_L4)) == NULL)
+        {
+            return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+        }
+    }
+
+    while (token != NULL
+           && sample->channelCount < RBRINSTRUMENTGEN4_CHANNEL_MAX)
+    {
+        char *reading_end = token;
+        if (memcmp(token, SAMPLE_NAN, 3) == 0)
+        {
+            reading = (double) NAN;
+        }
+        else if (memcmp(token, SAMPLE_INF, 3) == 0)
+        {
+            reading = (double) INFINITY;
+        }
+        else if (memcmp(token, SAMPLE_NINF, 4) == 0)
+        {
+            reading = -(double) INFINITY;
+        }
+        else if (memcmp(token,
+                        SAMPLE_ERROR_PREFIX,
+                        SAMPLE_ERROR_PREFIX_LEN) == 0)
+        {
+            /* Uh-oh. We'll encode the error in a NaN. Filtering, etc. will
+             * ignore the value and the sample formatter will output it just as
+             * we received it. */
+            reading = RBRInstrumentGen4Reading_setError(
+                strtol(token + SAMPLE_ERROR_PREFIX_LEN, NULL, 10));
+        }
+        else if (memcmp(token, "0x", 2) == 0)
+        {
+            if (outputFormat->crc)
             {
-                return RBRINSTRUMENTGEN4_SUCCESS;
-            }
-            else */
-            if (memcmp(token, SAMPLE_NAN, 3) == 0)
-            {
-                reading = (double) NAN;
-            }
-            else if (memcmp(token, SAMPLE_INF, 3) == 0)
-            {
-                reading = (double) INFINITY;
-            }
-            else if (memcmp(token, SAMPLE_NINF, 4) == 0)
-            {
-                reading = -(double) INFINITY;
-            }
-            else if (memcmp(token, SAMPLE_UNCAL, 3) == 0)
-            {
-                reading = RBRInstrumentGen4Reading_setError(
-                    RBRINSTRUMENTGEN4_READING_FLAG_UNCALIBRATED,
-                    0);
-            }
-            else if (memcmp(token,
-                            SAMPLE_ERROR_PREFIX,
-                            SAMPLE_ERROR_PREFIX_LEN) == 0)
-            {
-                /* Uh-oh. We'll encode the error in a NaN. Filtering, etc. will
-                    * ignore the value and the sample formatter will output it just as
-                    * we received it. */
-                reading = RBRInstrumentGen4Reading_setError(
-                    RBRINSTRUMENTGEN4_READING_FLAG_ERROR,
-                    strtol(token + SAMPLE_ERROR_PREFIX_LEN,
-                           NULL,
-                           10));
-            }
-            else if (memcmp(token, "0x", 2) == 0)
-            {
-                if (outputFormat->crc)
-                {
-                    /*
-                    * calculate CRC.
-                    * The CRC includes all characters already sent on this line, starting with the first, up to
-                    * and including the last space character before the <CRC>.
-                    */
-                    uint16_t realCrc = strtol(token, &reading_end, 16);
-                    if (reading == 0 && token == reading_end)
-                    {
-                        /* No value was parsed. */
-                        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-                    }
-                    uint16_t calCrc;
-                    calCrc = RBRInstrumentGen4_calculateCrc(response, token - response);
-                    if (calCrc != realCrc)
-                    {
-                        return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;
-                    }
-                    return RBRINSTRUMENTGEN4_SUCCESS;
-                }
-                else
-                {
-                    return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-                }
-            }
-            else
-            {
-                reading = strtod(token, &reading_end);
-                if (reading == 0 && token == reading_end)
+                /* Calculate the CRC. The CRC includes all characters already
+                 * sent on this line, starting with the first, up to
+                 * and including the last space character before the <CRC>. */
+                uint16_t realCrc = strtol(token, &reading_end, 16);
+                if (reading_end <= token + 2)
                 {
                     /* No value was parsed. */
                     return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
                 }
+                uint16_t calCrc;
+                calCrc = RBRInstrumentGen4_calculateCrc(response,
+                                                        token - response);
+                if (calCrc != realCrc)
+                {
+                    return RBRINSTRUMENTGEN4_CHECKSUM_ERROR;
+                }
+                return RBRINSTRUMENTGEN4_SUCCESS;
             }
-
-            sample->readings[sample->channelCount++] = reading;
+            else
+            {
+                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+            }
         }
-        return RBRINSTRUMENTGEN4_SUCCESS;
+        else
+        {
+            reading = strtod(token, &reading_end);
+            if (reading == 0 && token == reading_end)
+            {
+                /* No value was parsed. */
+                return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
+            }
+        }
+
+        sample->readings[sample->channelCount++] = reading;
+        token = seek(token, PARAMETER_SEPARATOR_L4);
     }
-    else 
-    {
-        /* No spaces in the response. Not likely but just in case. */
-        return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
-    }
+    return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
 /**
@@ -672,9 +665,29 @@ RBRInstrumentGen4Error RBRInstrumentGen4_errorCheckResponse(
     return RBRINSTRUMENTGEN4_SUCCESS;
 }
 
+RBRInstrumentGen4Error RBRInstrumentGen4_deliverSample(
+    RBRInstrumentGen4 *instrument,
+    const RBRInstrumentGen4Sample *sample)
+{
+    if (instrument->callbacks.sample == NULL)
+    {
+        return RBRINSTRUMENTGEN4_SUCCESS;
+    }
+
+    if (sample != instrument->callbacks.sampleBuffer)
+    {
+        *instrument->callbacks.sampleBuffer = *sample;
+    }
+
+    return instrument->callbacks.sample(instrument,
+                                        instrument->callbacks.sampleBuffer);
+}
+
 RBRInstrumentGen4Error RBRInstrumentGen4_readResponse(RBRInstrumentGen4 *instrument,
                                                       bool breakOnSample,
-                                                      RBRInstrumentGen4Sample *sample)
+                                                      RBRInstrumentGen4Sample *sample,
+                                                      RBRInstrumentGen4DateTime startTime,
+                                                      RBRInstrumentGen4DateTime timeout)
 {
     /* Reset the response state. */
     instrument->response.type = RBRINSTRUMENTGEN4_RESPONSE_UNKNOWN_TYPE;
@@ -692,24 +705,22 @@ RBRInstrumentGen4Error RBRInstrumentGen4_readResponse(RBRInstrumentGen4 *instrum
     }
 
     /* Skip over streaming samples until we find a real command response, or
-     * until we exceed the command timeout. */
-    RBRInstrumentGen4DateTime startTime;
-    RBR_TRY(instrument->callbacks.time(instrument, &startTime));
+     * until we exceed the timeout. */
     while (true)
     {
         RBRInstrumentGen4_removeLastResponse(instrument);
         char *beginning;
         char *end;
-        RBR_TRY(RBRInstrumentGen4_readSingleResponse(instrument, startTime, &end));
+        RBR_TRY(RBRInstrumentGen4_readSingleResponse(instrument, startTime, timeout, &end));
 
         RBRInstrumentGen4_terminateResponse(instrument, &beginning, end);
 
         if (sampleTarget != NULL && RBRInstrumentGen4Sample_parse(sampleTarget, &instrument->outputFormat, beginning) == RBRINSTRUMENTGEN4_SUCCESS)
         {
-            if (instrument->callbacks.sample != NULL && sample == NULL)
+            if (sample == NULL)
             {
-                RBR_TRY(instrument->callbacks.sample(instrument,
-                                                     sampleTarget));
+                RBR_TRY(RBRInstrumentGen4_deliverSample(instrument,
+                                                        sampleTarget));
             }
             if (breakOnSample)
             {
@@ -927,7 +938,17 @@ RBRInstrumentGen4Error RBRInstrumentGen4_converse(RBRInstrumentGen4 *instrument,
 
         do
         {
-            err = RBRInstrumentGen4_readResponse(instrument, false, NULL);
+            RBRInstrumentGen4DateTime now;
+            err = instrument->callbacks.time(instrument, &now);
+            if (err != RBRINSTRUMENTGEN4_SUCCESS)
+            {
+                break;
+            }
+            err = RBRInstrumentGen4_readResponse(instrument,
+                                                 false,
+                                                 NULL,
+                                                 now,
+                                                 instrument->commandTimeout);
             /*
              * There are a few reasons the instrument might generate an “E0102
              * invalid command” error, and we can make the user's life a bit
@@ -1178,9 +1199,10 @@ RBRInstrumentGen4Error RBRInstrumentGen4DateTime_parseSampleTime(
         *end = NULL;
     }
 
-    int32_t timestampLength;
+    int32_t timestampLength = 0;
     struct tm split = { 0 };
     int milliseconds;
+    int64_t elapsed;
 
     if (sscanf(s,
                RBRInstrumentGen4DateTime_sampleScanFormat,
@@ -1191,13 +1213,28 @@ RBRInstrumentGen4Error RBRInstrumentGen4DateTime_parseSampleTime(
                &split.tm_min,
                &split.tm_sec,
                &milliseconds,
-               &timestampLength) < 7)
+               &timestampLength) == 7)
+    {
+        *timestamp = milliseconds;
+        RBR_TRY(RBRInstrumentGen4DateTime_parse(&split, timestamp));
+    }
+    /* A bare count of milliseconds must make up the whole token so that a
+     * reading is never mistaken for one. */
+    else if (sscanf(s,
+                    RBRInstrumentGen4DateTime_sampleMillisecondsScanFormat,
+                    &elapsed,
+                    &timestampLength) == 1
+             && timestampLength > 0
+             && (s[timestampLength] == PARAMETER_SEPARATOR_L4
+                 || s[timestampLength] == '\0'))
+    {
+        *timestamp = elapsed;
+    }
+    else
     {
         return RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    *timestamp = milliseconds;
-    RBR_TRY(RBRInstrumentGen4DateTime_parse(&split, timestamp));
     if (end != NULL)
     {
         *end = (char *) s + timestampLength;

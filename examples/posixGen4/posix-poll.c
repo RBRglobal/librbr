@@ -152,8 +152,6 @@ int main(int argc, char *argv[])
     RBRInstrumentGen4_getOutputFormat(instrument, &outputformat);
     outputformat.sn = true;
     outputformat.scheduleLabel = true;
-    /* The library cannot currently parse samples without a timestamp; see
-     * SYS-1244. */
     outputformat.dateTime = true;
     outputformat.crc = true;
     RBRInstrumentGen4_setOutputFormat(instrument, &outputformat);
@@ -164,6 +162,7 @@ int main(int argc, char *argv[])
     {
         // poll one group
         err = RBRInstrumentGen4_pollGroups(instrument,
+                                           true,
                                            groupPool.pool[0].label,
                                            &sample);
         if (err != RBRINSTRUMENTGEN4_SUCCESS)
@@ -175,18 +174,14 @@ int main(int argc, char *argv[])
             printf("%" PRIi64, sample.timestamp);
             for (int32_t i = 0; i < sample.channelCount; i++)
             {
-                switch (RBRInstrumentGen4Reading_getFlag(sample.readings[i]))
+                if (RBRInstrumentGen4Reading_isError(sample.readings[i]))
                 {
-                case RBRINSTRUMENTGEN4_READING_FLAG_UNCALIBRATED:
-                    printf(", ###");
-                    break;
-                case RBRINSTRUMENTGEN4_READING_FLAG_ERROR:
-                    printf(", Error-%2d", RBRInstrumentGen4Reading_getError(sample.readings[i]));
-                    break;
-                case RBRINSTRUMENTGEN4_READING_FLAG_NONE:
-                default:
+                    printf(", Error-%2d",
+                           RBRInstrumentGen4Reading_getError(sample.readings[i]));
+                }
+                else
+                {
                     printf(", %lf", sample.readings[i]);
-                    break;
                 }
             }
             printf("\n");

@@ -32,21 +32,27 @@ extern "C" {
  * RBRInstrumentGen4SampleCallback defined in
  * RBRInstrumentGen4Callbacks.sample).
  *
- * Because polled samples are indistinguishable from streamed samples, this
- * function may return a streamed sample, _not_ a polled sample, if the
- * instrument is logging, streaming is enabled for the link over which the
- * library is communicating with the instrument, and a streamed sample is
- * produced by the instrument before the response to the `poll` command.
+ * With \a requireLabel set, only a sample labelled `polling` is returned;
+ * any streamed samples read while waiting for it are passed to
+ * RBRInstrumentGen4Callbacks.sample instead. With \a requireLabel unset, the
+ * first sample read is returned, which may be a streamed sample, not a
+ * polled sample, if the instrument is streaming over this link.
  *
  * \param [in] instrument the instrument connection
+ * \param [in] requireLabel whether to require and wait for a sample
+ *                          labelled `polling`
  * \param [out] sample the polled sample
  * \return #RBRINSTRUMENTGEN4_SUCCESS when a sample is successfully read
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_UNSUPPORTED when \a requireLabel is set but
+ *         instrument.outputformat.scheduleLabel is false
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs, or when no
+ *         polled sample arrives within RBRInstrumentGen4.pollTimeout
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_poll(
     RBRInstrumentGen4 *instrument,
+    bool requireLabel,
     RBRInstrumentGen4Sample *sample);
 
 /**
@@ -61,19 +67,24 @@ RBRInstrumentGen4Error RBRInstrumentGen4_poll(
  * RBRInstrumentGen4SampleCallback defined in
  * RBRInstrumentGen4Callbacks.sample).
  *
- * Because polled samples are indistinguishable from streamed samples, this
- * function may return a streamed sample, _not_ a polled sample, if the
- * instrument is logging, streaming is enabled for the link over which the
- * library is communicating with the instrument, and a streamed sample is
- * produced by the instrument before the response to the `poll` command.
+ * With \a requireLabel set, only a sample labelled `polling` is returned;
+ * any streamed samples read while waiting for it are passed to
+ * RBRInstrumentGen4Callbacks.sample instead. With \a requireLabel unset, the
+ * first sample read is returned, which may be a streamed sample, not a
+ * polled sample, if the instrument is streaming over this link.
  *
  * \param [in] instrument the instrument connection
+ * \param [in] requireLabel whether to require and wait for a sample
+ *                          labelled `polling`
  * \param [in] channelList the channels to sample
  * \param [out] sample the polled sample
  * \return #RBRINSTRUMENTGEN4_SUCCESS when a sample is successfully read
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the channel list
  *         is too long to send
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_UNSUPPORTED when \a requireLabel is set but
+ *         instrument.outputformat.scheduleLabel is false
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs, or when no
+ *         polled sample arrives within RBRInstrumentGen4.pollTimeout
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when an invalid channel is
  *         requested
@@ -81,6 +92,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_poll(
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_pollChannels(
     RBRInstrumentGen4 *instrument,
+    bool requireLabel,
     const char *channelList,
     RBRInstrumentGen4Sample *sample);
 
@@ -96,19 +108,24 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollChannels(
  * RBRInstrumentGen4SampleCallback defined in
  * RBRInstrumentGen4Callbacks.sample).
  *
- * Because polled samples are indistinguishable from streamed samples, this
- * function may return a streamed sample, _not_ a polled sample, if the
- * instrument is logging, streaming is enabled for the link over which the
- * library is communicating with the instrument, and a streamed sample is
- * produced by the instrument before the response to the `poll` command.
+ * With \a requireLabel set, only a sample labelled `polling` is returned;
+ * any streamed samples read while waiting for it are passed to
+ * RBRInstrumentGen4Callbacks.sample instead. With \a requireLabel unset, the
+ * first sample read is returned, which may be a streamed sample, not a
+ * polled sample, if the instrument is streaming over this link.
  *
  * \param [in] instrument the instrument connection
+ * \param [in] requireLabel whether to require and wait for a sample
+ *                          labelled `polling`
  * \param [in] groupList the groups of channels to sample
  * \param [out] sample the polled sample
  * \return #RBRINSTRUMENTGEN4_SUCCESS when a sample is successfully read
  * \return #RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE when the group list is
  *         too long to send
- * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRINSTRUMENTGEN4_UNSUPPORTED when \a requireLabel is set but
+ *         instrument.outputformat.scheduleLabel is false
+ * \return #RBRINSTRUMENTGEN4_TIMEOUT when a timeout occurs, or when no
+ *         polled sample arrives within RBRInstrumentGen4.pollTimeout
  * \return #RBRINSTRUMENTGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRINSTRUMENTGEN4_HARDWARE_ERROR when an invalid group is
  *         requested
@@ -116,6 +133,7 @@ RBRInstrumentGen4Error RBRInstrumentGen4_pollChannels(
  */
 RBRInstrumentGen4Error RBRInstrumentGen4_pollGroups(
     RBRInstrumentGen4 *instrument,
+    bool requireLabel,
     const char *groupList,
     RBRInstrumentGen4Sample *sample);
 

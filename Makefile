@@ -222,7 +222,8 @@ GEN4_TEST_MODULES := communication \
                      deployment \
                      instrument \
                      memory \
-                     realtime
+                     realtime \
+                     streaming
 
 bin/testsGen3: bin/libRBR.a \
            bin/libRBRDynamicCorrection.a \
