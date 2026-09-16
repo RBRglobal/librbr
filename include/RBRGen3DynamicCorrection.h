@@ -119,6 +119,24 @@ typedef enum
  *    time constant of short-term thermal mass correction
  *  \var RBRGen3DynamicCorrectionParams::CT_coeff
  *    magnitude of long-term thermal mass correction
+ *  \var RBRGen3DynamicCorrectionParams::alpha_a
+ *    coefficient for alpha estimation
+ *  \var RBRGen3DynamicCorrectionParams::alpha_e
+ *    coefficient for alpha estimation
+ *  \var RBRGen3DynamicCorrectionParams::tau_a
+ *    coefficient for tau estimation
+ *  \var RBRGen3DynamicCorrectionParams::tau_e
+ *    coefficient for tau estimation
+ *  \var RBRGen3DynamicCorrectionParams::ctcoeff_a
+ *    coefficient for CT_coeff estimation
+ *  \var RBRGen3DynamicCorrectionParams::ctcoeff_e
+ *    coefficient for CT_coeff estimation
+ *  \var RBRGen3DynamicCorrectionParams::Vp_min
+ *    minimum of ascent rate's validity range (m/s)
+ *  \var RBRGen3DynamicCorrectionParams::Vp_max
+ *    maximum of ascent rate's validity range (m/s)
+ *  \var RBRGen3DynamicCorrectionParams::Vp_fc
+ *    frequency cut of ascent rate estimation low pass filter (Hz)
  */
 typedef struct
 {
