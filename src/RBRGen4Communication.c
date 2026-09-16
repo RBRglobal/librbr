@@ -17,8 +17,7 @@
 
 const char *RBRGen4LinkType_name(RBRGen4LinkType linkType)
 {
-    switch (linkType)
-    {
+    switch (linkType) {
     case RBRGEN4_LINK_TYPE_USB:
         return "usb";
     case RBRGEN4_LINK_TYPE_SERIAL:
@@ -31,8 +30,7 @@ const char *RBRGen4LinkType_name(RBRGen4LinkType linkType)
     }
 }
 
-RBRGen4Error RBRGen4_getLink(RBRGen4 *conn,
-                                                RBRGen4Link *link)
+RBRGen4Error RBRGen4_getLink(RBRGen4 *conn, RBRGen4Link *link)
 {
     memset(link, 0, sizeof(RBRGen4Link));
     link->type = RBRGEN4_UNKNOWN_LINK_TYPE;
@@ -41,23 +39,14 @@ RBRGen4Error RBRGen4_getLink(RBRGen4 *conn,
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "type") == 0)
-        {
-            for (int i = 0; i < RBRGEN4_LINK_TYPE_COUNT; i++)
-            {
-                if (strcmp(RBRGen4LinkType_name(i),
-                           parameter.value) == 0)
-                {
+        } else if (strcmp(parameter.key, "type") == 0) {
+            for (int i = 0; i < RBRGEN4_LINK_TYPE_COUNT; i++) {
+                if (strcmp(RBRGen4LinkType_name(i), parameter.value) == 0) {
                     link->type = i;
                     break;
                 }
@@ -68,11 +57,9 @@ RBRGen4Error RBRGen4_getLink(RBRGen4 *conn,
     return RBRGEN4_SUCCESS;
 }
 
-const char *RBRGen4LinkSerialBaudRate_name(
-    RBRGen4LinkSerialBaudRate baud)
+const char *RBRGen4LinkSerialBaudRate_name(RBRGen4LinkSerialBaudRate baud)
 {
-    switch (baud)
-    {
+    switch (baud) {
     case RBRGEN4_LINK_SERIAL_BAUD_4800:
         return "4800";
     case RBRGEN4_LINK_SERIAL_BAUD_9600:
@@ -99,16 +86,10 @@ const char *RBRGen4LinkSerialBaudRate_name(
  * \param [in] value the response value
  * \return the baud rate, or #RBRGEN4_LINK_SERIAL_BAUD_NONE
  */
-static RBRGen4LinkSerialBaudRate
-RBRGen4LinkSerialBaudRate_parse(
-    const char *value)
+static RBRGen4LinkSerialBaudRate RBRGen4LinkSerialBaudRate_parse(const char *value)
 {
-    for (int i = RBRGEN4_LINK_SERIAL_BAUD_NONE + 1;
-         i <= RBRGEN4_LINK_SERIAL_BAUD_MAX;
-         i <<= 1)
-    {
-        if (strcmp(RBRGen4LinkSerialBaudRate_name(i), value) == 0)
-        {
+    for (int i = RBRGEN4_LINK_SERIAL_BAUD_NONE + 1; i <= RBRGEN4_LINK_SERIAL_BAUD_MAX; i <<= 1) {
+        if (strcmp(RBRGen4LinkSerialBaudRate_name(i), value) == 0) {
             return i;
         }
     }
@@ -116,11 +97,9 @@ RBRGen4LinkSerialBaudRate_parse(
     return RBRGEN4_LINK_SERIAL_BAUD_NONE;
 }
 
-const char *RBRGen4LinkSerialMode_name(
-    RBRGen4LinkSerialMode mode)
+const char *RBRGen4LinkSerialMode_name(RBRGen4LinkSerialMode mode)
 {
-    switch (mode)
-    {
+    switch (mode) {
     case RBRGEN4_LINK_SERIAL_MODE_RS232:
         return "rs232";
     case RBRGEN4_LINK_SERIAL_MODE_RS485F:
@@ -141,15 +120,10 @@ const char *RBRGen4LinkSerialMode_name(
  * \param [in] value the response value
  * \return the serial mode, or #RBRGEN4_LINK_SERIAL_MODE_NONE
  */
-static RBRGen4LinkSerialMode RBRGen4LinkSerialMode_parse(
-    const char *value)
+static RBRGen4LinkSerialMode RBRGen4LinkSerialMode_parse(const char *value)
 {
-    for (int i = RBRGEN4_LINK_SERIAL_MODE_NONE + 1;
-         i <= RBRGEN4_LINK_SERIAL_MODE_MAX;
-         i <<= 1)
-    {
-        if (strcmp(RBRGen4LinkSerialMode_name(i), value) == 0)
-        {
+    for (int i = RBRGEN4_LINK_SERIAL_MODE_NONE + 1; i <= RBRGEN4_LINK_SERIAL_MODE_MAX; i <<= 1) {
+        if (strcmp(RBRGen4LinkSerialMode_name(i), value) == 0) {
             return i;
         }
     }
@@ -157,59 +131,36 @@ static RBRGen4LinkSerialMode RBRGen4LinkSerialMode_parse(
     return RBRGEN4_LINK_SERIAL_MODE_NONE;
 }
 
-RBRGen4Error RBRGen4_getLinkSerial(
-    RBRGen4 *conn,
-    RBRGen4LinkSerial *serial)
+RBRGen4Error RBRGen4_getLinkSerial(RBRGen4 *conn, RBRGen4LinkSerial *serial)
 {
     memset(serial, 0, sizeof(RBRGen4LinkSerial));
 
-    RBR_TRY(RBRGen4_converse(
-        conn,
-        "link serial baudrate mode availablebaudrates availablemodes"
-        ));
+    RBR_TRY(RBRGen4_converse(conn, "link serial baudrate mode availablebaudrates availablemodes"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "baudrate") == 0)
-        {
-            serial->baudRate
-                = RBRGen4LinkSerialBaudRate_parse(parameter.value);
-        }
-        else if (strcmp(parameter.key, "mode") == 0)
-        {
-            serial->mode
-                = RBRGen4LinkSerialMode_parse(parameter.value);
-        }
-        else if (strcmp(parameter.key, "availablebaudrates") == 0)
-        {
+        } else if (strcmp(parameter.key, "baudrate") == 0) {
+            serial->baudRate = RBRGen4LinkSerialBaudRate_parse(parameter.value);
+        } else if (strcmp(parameter.key, "mode") == 0) {
+            serial->mode = RBRGen4LinkSerialMode_parse(parameter.value);
+        } else if (strcmp(parameter.key, "availablebaudrates") == 0) {
             char *value = parameter.value;
-            while (value != NULL)
-            {
+            while (value != NULL) {
                 char *nextValue = RBRGen4_splitListValue(value);
-                serial->availableBaudRates
-                    |= RBRGen4LinkSerialBaudRate_parse(value);
+                serial->availableBaudRates |= RBRGen4LinkSerialBaudRate_parse(value);
 
                 value = nextValue;
             }
-        }
-        else if (strcmp(parameter.key, "availablemodes") == 0)
-        {
+        } else if (strcmp(parameter.key, "availablemodes") == 0) {
             char *value = parameter.value;
-            while (value != NULL)
-            {
+            while (value != NULL) {
                 char *nextValue = RBRGen4_splitListValue(value);
-                serial->availableModes
-                    |= RBRGen4LinkSerialMode_parse(value);
+                serial->availableModes |= RBRGen4LinkSerialMode_parse(value);
 
                 value = nextValue;
             }
@@ -218,27 +169,22 @@ RBRGen4Error RBRGen4_getLinkSerial(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_setLinkSerial(
-    RBRGen4 *conn,
-    const RBRGen4LinkSerial *serial)
+RBRGen4Error RBRGen4_setLinkSerial(RBRGen4 *conn, const RBRGen4LinkSerial *serial)
 {
     /* The command takes one baud rate and one mode, so a field carrying
      * several flags is as invalid as one carrying none. */
-    if (serial->baudRate <= RBRGEN4_LINK_SERIAL_BAUD_NONE
-        || serial->baudRate > RBRGEN4_LINK_SERIAL_BAUD_MAX
-        || (serial->baudRate & (serial->baudRate - 1)) != 0
-        || serial->mode <= RBRGEN4_LINK_SERIAL_MODE_NONE
-        || serial->mode > RBRGEN4_LINK_SERIAL_MODE_MAX
-        || (serial->mode & (serial->mode - 1)) != 0)
-    {
+    if (serial->baudRate <= RBRGEN4_LINK_SERIAL_BAUD_NONE ||
+        serial->baudRate > RBRGEN4_LINK_SERIAL_BAUD_MAX ||
+        (serial->baudRate & (serial->baudRate - 1)) != 0 ||
+        serial->mode <= RBRGEN4_LINK_SERIAL_MODE_NONE ||
+        serial->mode > RBRGEN4_LINK_SERIAL_MODE_MAX || (serial->mode & (serial->mode - 1)) != 0) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRGen4_converse(
-        conn,
-        "link serial baudrate=%s mode=%s",
-        RBRGen4LinkSerialBaudRate_name(serial->baudRate),
-        RBRGen4LinkSerialMode_name(serial->mode));
+    return RBRGen4_converse(conn,
+                            "link serial baudrate=%s mode=%s",
+                            RBRGen4LinkSerialBaudRate_name(serial->baudRate),
+                            RBRGen4LinkSerialMode_name(serial->mode));
 }
 
 RBRGen4Error RBRGen4_sleep(RBRGen4 *conn)

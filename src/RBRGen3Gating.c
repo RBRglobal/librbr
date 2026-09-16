@@ -18,8 +18,7 @@
 
 const char *RBRGen3GatingState_name(RBRGen3GatingState state)
 {
-    switch (state)
-    {
+    switch (state) {
     case RBRGEN3_GATING_NA:
         return "n/a";
     case RBRGEN3_GATING_PAUSED:
@@ -34,11 +33,9 @@ const char *RBRGen3GatingState_name(RBRGen3GatingState state)
     }
 }
 
-const char *RBRGen3ThresholdingChannelSelection_name(
-    RBRGen3ThresholdingChannelSelection selection)
+const char *RBRGen3ThresholdingChannelSelection_name(RBRGen3ThresholdingChannelSelection selection)
 {
-    switch (selection)
-    {
+    switch (selection) {
     case RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX:
         return "index";
     case RBRGEN3_THRESHOLD_CHANNEL_BY_LABEL:
@@ -48,11 +45,9 @@ const char *RBRGen3ThresholdingChannelSelection_name(
     }
 }
 
-const char *RBRGen3ThresholdingCondition_name(
-    RBRGen3ThresholdingCondition condition)
+const char *RBRGen3ThresholdingCondition_name(RBRGen3ThresholdingCondition condition)
 {
-    switch (condition)
-    {
+    switch (condition) {
     case RBRGEN3_THRESHOLDING_ABOVE:
         return "above";
     case RBRGEN3_THRESHOLDING_BELOW:
@@ -65,14 +60,11 @@ const char *RBRGen3ThresholdingCondition_name(
     }
 }
 
-RBRGen3Error RBRGen3_getThresholding(
-    RBRGen3 *conn,
-    RBRGen3Thresholding *threshold)
+RBRGen3Error RBRGen3_getThresholding(RBRGen3 *conn, RBRGen3Thresholding *threshold)
 {
     memset(threshold, 0, sizeof(RBRGen3Thresholding));
 
-    RBRGen3GatingState *state =
-        (RBRGen3GatingState *) &threshold->state;
+    RBRGen3GatingState *state = (RBRGen3GatingState *) &threshold->state;
     *state = RBRGEN3_UNKNOWN_GATING;
 
     RBRGen3ThresholdingCondition *condition =
@@ -83,73 +75,40 @@ RBRGen3Error RBRGen3_getThresholding(
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen3_parseResponse(conn,
-                                    &command,
-                                    &parameter);
+    while (true) {
+        RBRGen3_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "enabled") == 0)
-        {
+        } else if (strcmp(parameter.key, "enabled") == 0) {
             threshold->enabled = (strcmp(parameter.value, "true") == 0);
-        }
-        else if (strcmp(parameter.key, "state") == 0)
-        {
-            if (conn->generation == RBRGEN3_LOGGER2)
-            {
+        } else if (strcmp(parameter.key, "state") == 0) {
+            if (conn->generation == RBRGEN3_LOGGER2) {
                 threshold->enabled = (strcmp(parameter.value, "on") == 0);
-            }
-            else
-            {
-                for (int i = RBRGEN3_GATING_NA;
-                     i < RBRGEN3_GATING_COUNT;
-                     i++)
-                {
-                    if (strcmp(RBRGen3GatingState_name(i),
-                               parameter.value) == 0)
-                    {
+            } else {
+                for (int i = RBRGEN3_GATING_NA; i < RBRGEN3_GATING_COUNT; i++) {
+                    if (strcmp(RBRGen3GatingState_name(i), parameter.value) == 0) {
                         *state = i;
                         break;
                     }
                 }
             }
-        }
-        else if (strcmp(parameter.key, "channelindex") == 0
-                 || strcmp(parameter.key, "channel") == 0)
-        {
+        } else if (strcmp(parameter.key, "channelindex") == 0 ||
+                   strcmp(parameter.key, "channel") == 0) {
             threshold->channelIndex = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "channellabel") == 0)
-        {
-            snprintf(threshold->channelLabel,
-                     sizeof(threshold->channelLabel),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "condition") == 0)
-        {
-            for (int i = RBRGEN3_THRESHOLDING_ABOVE;
-                 i < RBRGEN3_THRESHOLDING_COUNT;
-                 i++)
-            {
-                if (strcmp(RBRGen3ThresholdingCondition_name(i),
-                           parameter.value) == 0)
-                {
+        } else if (strcmp(parameter.key, "channellabel") == 0) {
+            snprintf(
+                threshold->channelLabel, sizeof(threshold->channelLabel), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "condition") == 0) {
+            for (int i = RBRGEN3_THRESHOLDING_ABOVE; i < RBRGEN3_THRESHOLDING_COUNT; i++) {
+                if (strcmp(RBRGen3ThresholdingCondition_name(i), parameter.value) == 0) {
                     *condition = i;
                     break;
                 }
             }
-        }
-        else if (strcmp(parameter.key, "value") == 0)
-        {
+        } else if (strcmp(parameter.key, "value") == 0) {
             threshold->value = strtod(parameter.value, NULL);
-        }
-        else if (strcmp(parameter.key, "interval") == 0)
-        {
+        } else if (strcmp(parameter.key, "interval") == 0) {
             threshold->interval = strtol(parameter.value, NULL, 10);
         }
     }
@@ -157,27 +116,18 @@ RBRGen3Error RBRGen3_getThresholding(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRGen3_setThresholding(
-    RBRGen3 *conn,
-    const RBRGen3Thresholding *threshold)
+RBRGen3Error RBRGen3_setThresholding(RBRGen3 *conn, const RBRGen3Thresholding *threshold)
 {
-    if (threshold->channelSelection < RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX
-        || threshold->channelSelection >
-        RBRGEN3_THRESHOLD_CHANNEL_BY_LABEL
-        || (threshold->channelSelection ==
-            RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX
-            && (threshold->channelIndex < 1
-                || threshold->channelIndex > RBRGEN3_CHANNEL_MAX))
-        || (threshold->channelSelection ==
-            RBRGEN3_THRESHOLD_CHANNEL_BY_LABEL
-            && (conn->generation == RBRGEN3_LOGGER2
-                || strlen(threshold->channelLabel) == 0))
-        || threshold->condition < RBRGEN3_THRESHOLDING_ABOVE
-        || threshold->condition > RBRGEN3_THRESHOLDING_BELOW
-        || threshold->interval <= 0
-        || threshold->interval > RBRGEN3_SAMPLING_PERIOD_MAX
-        || (threshold->interval >= 1000 && threshold->interval % 1000 != 0))
-    {
+    if (threshold->channelSelection < RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX ||
+        threshold->channelSelection > RBRGEN3_THRESHOLD_CHANNEL_BY_LABEL ||
+        (threshold->channelSelection == RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX &&
+         (threshold->channelIndex < 1 || threshold->channelIndex > RBRGEN3_CHANNEL_MAX)) ||
+        (threshold->channelSelection == RBRGEN3_THRESHOLD_CHANNEL_BY_LABEL &&
+         (conn->generation == RBRGEN3_LOGGER2 || strlen(threshold->channelLabel) == 0)) ||
+        threshold->condition < RBRGEN3_THRESHOLDING_ABOVE ||
+        threshold->condition > RBRGEN3_THRESHOLDING_BELOW || threshold->interval <= 0 ||
+        threshold->interval > RBRGEN3_SAMPLING_PERIOD_MAX ||
+        (threshold->interval >= 1000 && threshold->interval % 1000 != 0)) {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
@@ -186,93 +136,59 @@ RBRGen3Error RBRGen3_setThresholding(
     const char *channelParameter;
     char channelValue[RBRGEN3_CHANNEL_LABEL_MAX + 1];
 
-    if (conn->generation == RBRGEN3_LOGGER2)
-    {
+    if (conn->generation == RBRGEN3_LOGGER2) {
         enabledParameter = "state";
         enabledValue = (threshold->enabled) ? "on" : "off";
         channelParameter = "channel";
-    }
-    else
-    {
+    } else {
         enabledParameter = "enabled";
         enabledValue = (threshold->enabled) ? "true" : "false";
         channelParameter = "channelindex";
     }
 
-    if (threshold->channelSelection ==
-        RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX)
-    {
-        snprintf(channelValue,
-                 sizeof(channelValue),
-                 "%" PRIi32,
-                 threshold->channelIndex);
-    }
-    else
-    {
+    if (threshold->channelSelection == RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX) {
+        snprintf(channelValue, sizeof(channelValue), "%" PRIi32, threshold->channelIndex);
+    } else {
         channelParameter = "channellabel";
-        snprintf(channelValue,
-                 sizeof(channelValue),
-                 "%s",
-                 threshold->channelLabel);
+        snprintf(channelValue, sizeof(channelValue), "%s", threshold->channelLabel);
     }
 
-    return RBRGen3_converse(
-        conn,
-        "thresholding %s = %s, %s = %s, condition = %s, value = %0.4f, "
-        "interval = %d",
-        enabledParameter,
-        enabledValue,
-        channelParameter,
-        channelValue,
-        RBRGen3ThresholdingCondition_name(threshold->condition),
-        (double) threshold->value,
-        threshold->interval);
+    return RBRGen3_converse(conn,
+                            "thresholding %s = %s, %s = %s, condition = %s, value = %0.4f, "
+                            "interval = %d",
+                            enabledParameter,
+                            enabledValue,
+                            channelParameter,
+                            channelValue,
+                            RBRGen3ThresholdingCondition_name(threshold->condition),
+                            (double) threshold->value,
+                            threshold->interval);
 }
 
-RBRGen3Error RBRGen3_getTwistActivation(
-    RBRGen3 *conn,
-    RBRGen3TwistActivation *twistActivation)
+RBRGen3Error RBRGen3_getTwistActivation(RBRGen3 *conn, RBRGen3TwistActivation *twistActivation)
 {
     memset(twistActivation, 0, sizeof(RBRGen3TwistActivation));
 
-    RBRGen3GatingState *state =
-        (RBRGen3GatingState *) &twistActivation->state;
+    RBRGen3GatingState *state = (RBRGen3GatingState *) &twistActivation->state;
     *state = RBRGEN3_UNKNOWN_GATING;
 
     RBR_TRY(RBRGen3_converse(conn, "twistactivation"));
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen3_parseResponse(conn,
-                                    &command,
-                                    &parameter);
+    while (true) {
+        RBRGen3_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "enabled") == 0)
-        {
+        } else if (strcmp(parameter.key, "enabled") == 0) {
             twistActivation->enabled = (strcmp(parameter.value, "true") == 0);
-        }
-        else if (strcmp(parameter.key, "state") == 0)
-        {
-            if (conn->generation == RBRGEN3_LOGGER2)
-            {
-                twistActivation->enabled =
-                    (strcmp(parameter.value, "on") == 0);
-            }
-            else
-            {
-                for (int i = RBRGEN3_GATING_NA;
-                     i < RBRGEN3_GATING_COUNT;
-                     i++)
-                {
-                    if (strcmp(RBRGen3GatingState_name(i),
-                               parameter.value) == 0)
-                    {
+        } else if (strcmp(parameter.key, "state") == 0) {
+            if (conn->generation == RBRGEN3_LOGGER2) {
+                twistActivation->enabled = (strcmp(parameter.value, "on") == 0);
+            } else {
+                for (int i = RBRGEN3_GATING_NA; i < RBRGEN3_GATING_COUNT; i++) {
+                    if (strcmp(RBRGen3GatingState_name(i), parameter.value) == 0) {
                         *state = i;
                         break;
                     }
@@ -284,27 +200,19 @@ RBRGen3Error RBRGen3_getTwistActivation(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRGen3_setTwistActivation(
-    RBRGen3 *conn,
-    const RBRGen3TwistActivation *twistActivation)
+RBRGen3Error RBRGen3_setTwistActivation(RBRGen3 *conn,
+                                        const RBRGen3TwistActivation *twistActivation)
 {
     const char *enabledParameter;
     const char *enabledValue;
 
-    if (conn->generation == RBRGEN3_LOGGER2)
-    {
+    if (conn->generation == RBRGEN3_LOGGER2) {
         enabledParameter = "state";
         enabledValue = (twistActivation->enabled) ? "on" : "off";
-    }
-    else
-    {
+    } else {
         enabledParameter = "enabled";
         enabledValue = (twistActivation->enabled) ? "true" : "false";
     }
 
-    return RBRGen3_converse(
-        conn,
-        "twistactivation %s = %s",
-        enabledParameter,
-        enabledValue);
+    return RBRGen3_converse(conn, "twistactivation %s = %s", enabledParameter, enabledValue);
 }

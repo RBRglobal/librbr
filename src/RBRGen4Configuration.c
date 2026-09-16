@@ -21,9 +21,7 @@
 #include "RBRGen4Internal.h"
 #include "RBRGen4Configuration.h"
 
-RBRGen4Error RBRGen4_getNode(
-    RBRGen4 *conn,
-    RBRGen4Node *node)
+RBRGen4Error RBRGen4_getNode(RBRGen4 *conn, RBRGen4Node *node)
 {
     /* The label selects the node to read, so it has to outlive the reset of
      * the rest of the structure. */
@@ -38,35 +36,21 @@ RBRGen4Error RBRGen4_getNode(
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "pcba") == 0)
-        {
-            snprintf(node->pcba,
-                     sizeof(node->pcba),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "portlist") == 0)
-        {
+        } else if (strcmp(parameter.key, "pcba") == 0) {
+            snprintf(node->pcba, sizeof(node->pcba), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "portlist") == 0) {
             /* A node with no ports reports `none`, not an empty list. */
-            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0)
-            {
+            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
                 continue;
             }
 
             char *value = parameter.value;
-            while (value != NULL
-                   && node->portCount < RBRGEN4_PORT_COUNT_MAX)
-            {
+            while (value != NULL && node->portCount < RBRGEN4_PORT_COUNT_MAX) {
                 char *nextValue = RBRGen4_splitListValue(value);
 
                 snprintf(node->portList[node->portCount],
@@ -77,33 +61,17 @@ RBRGen4Error RBRGen4_getNode(
 
                 value = nextValue;
             }
-        }
-        else if (strcmp(parameter.key, "fwversion") == 0)
-        {
-            snprintf(node->fwversion,
-                     sizeof(node->fwversion),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "semver") == 0)
-        {
-            snprintf(node->semver,
-                     sizeof(node->semver),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "fwtype") == 0)
-        {
+        } else if (strcmp(parameter.key, "fwversion") == 0) {
+            snprintf(node->fwversion, sizeof(node->fwversion), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "semver") == 0) {
+            snprintf(node->semver, sizeof(node->semver), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "fwtype") == 0) {
             /* `na` is not a number, so it converts to the zero which stands
              * for it. */
             node->fwtype = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "poweruptime") == 0)
-        {
+        } else if (strcmp(parameter.key, "poweruptime") == 0) {
             node->powerUpTime = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "inrushoffsettime") == 0)
-        {
+        } else if (strcmp(parameter.key, "inrushoffsettime") == 0) {
             node->inrushOffsetTime = strtol(parameter.value, NULL, 10);
         }
     }
@@ -111,9 +79,7 @@ RBRGen4Error RBRGen4_getNode(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_getNodePool(
-    RBRGen4 *conn,
-    RBRGen4NodePool *nodePool)
+RBRGen4Error RBRGen4_getNodePool(RBRGen4 *conn, RBRGen4NodePool *nodePool)
 {
     memset(nodePool, 0, sizeof(RBRGen4NodePool));
 
@@ -121,39 +87,25 @@ RBRGen4Error RBRGen4_getNodePool(
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "count") == 0)
-        {
+        } else if (strcmp(parameter.key, "count") == 0) {
             nodePool->count = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "list") == 0)
-        {
+        } else if (strcmp(parameter.key, "list") == 0) {
             /* An instrument with no nodes reports `none` to indicate an empty list */
-            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0)
-            {
+            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
                 continue;
             }
 
             char *value = parameter.value;
-            for (int32_t node = 0;
-                 value != NULL && node < RBRGEN4_NODE_COUNT_MAX;
-                 node++)
-            {
+            for (int32_t node = 0; value != NULL && node < RBRGEN4_NODE_COUNT_MAX; node++) {
                 char *nextValue = RBRGen4_splitListValue(value);
 
-                snprintf(nodePool->pool[node].label,
-                         sizeof(nodePool->pool[node].label),
-                         "%s",
-                         value);
+                snprintf(
+                    nodePool->pool[node].label, sizeof(nodePool->pool[node].label), "%s", value);
 
                 value = nextValue;
             }
@@ -163,11 +115,9 @@ RBRGen4Error RBRGen4_getNodePool(
     return RBRGEN4_SUCCESS;
 }
 
-const char *RBRGen4PortClass_name(
-    RBRGen4PortClass portClass)
+const char *RBRGen4PortClass_name(RBRGen4PortClass portClass)
 {
-    switch (portClass)
-    {
+    switch (portClass) {
     case RBRGEN4_PORT_CLASS_VIRTUAL:
         return "virtual";
     case RBRGEN4_PORT_CLASS_SERIAL:
@@ -180,11 +130,9 @@ const char *RBRGen4PortClass_name(
     }
 }
 
-const char *RBRGen4PortProtocol_name(
-    RBRGen4PortProtocol protocol)
+const char *RBRGen4PortProtocol_name(RBRGen4PortProtocol protocol)
 {
-    switch (protocol)
-    {
+    switch (protocol) {
     case RBRGEN4_PORT_PROTOCOL_PRESSURE:
         return "pressure";
     case RBRGEN4_PORT_PROTOCOL_RBRSERIAL:
@@ -205,15 +153,10 @@ const char *RBRGen4PortProtocol_name(
  * \param [in] value the response value
  * \return the protocol, or #RBRGEN4_PORT_PROTOCOL_NONE
  */
-static RBRGen4PortProtocol RBRGen4PortProtocol_parse(
-    const char *value)
+static RBRGen4PortProtocol RBRGen4PortProtocol_parse(const char *value)
 {
-    for (int i = RBRGEN4_PORT_PROTOCOL_NONE + 1;
-         i <= RBRGEN4_PORT_PROTOCOL_MAX;
-         i <<= 1)
-    {
-        if (strcmp(RBRGen4PortProtocol_name(i), value) == 0)
-        {
+    for (int i = RBRGEN4_PORT_PROTOCOL_NONE + 1; i <= RBRGEN4_PORT_PROTOCOL_MAX; i <<= 1) {
+        if (strcmp(RBRGen4PortProtocol_name(i), value) == 0) {
             return i;
         }
     }
@@ -221,9 +164,7 @@ static RBRGen4PortProtocol RBRGen4PortProtocol_parse(
     return RBRGEN4_PORT_PROTOCOL_NONE;
 }
 
-RBRGen4Error RBRGen4_getPort(
-    RBRGen4 *conn,
-    RBRGen4Port *port)
+RBRGen4Error RBRGen4_getPort(RBRGen4 *conn, RBRGen4Port *port)
 {
     /* The label selects the port to read, so it has to outlive the reset of
      * the rest of the structure. */
@@ -239,68 +180,40 @@ RBRGen4Error RBRGen4_getPort(
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "node") == 0)
-        {
-            snprintf(port->node,
-                     sizeof(port->node),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "class") == 0)
-        {
-            for (int32_t i = 0; i < RBRGEN4_PORT_CLASS_COUNT; i++)
-            {
-                if (strcmp(RBRGen4PortClass_name(i),
-                           parameter.value) == 0)
-                {
+        } else if (strcmp(parameter.key, "node") == 0) {
+            snprintf(port->node, sizeof(port->node), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "class") == 0) {
+            for (int32_t i = 0; i < RBRGEN4_PORT_CLASS_COUNT; i++) {
+                if (strcmp(RBRGen4PortClass_name(i), parameter.value) == 0) {
                     port->portClass = i;
                     break;
                 }
             }
-        }
-        else if (strcmp(parameter.key, "protocol") == 0)
-        {
-            port->protocol
-                = RBRGen4PortProtocol_parse(parameter.value);
-        }
-        else if (strcmp(parameter.key, "availableprotocols") == 0)
-        {
+        } else if (strcmp(parameter.key, "protocol") == 0) {
+            port->protocol = RBRGen4PortProtocol_parse(parameter.value);
+        } else if (strcmp(parameter.key, "availableprotocols") == 0) {
             char *value = parameter.value;
-            while (value != NULL)
-            {
+            while (value != NULL) {
                 char *nextValue = RBRGen4_splitListValue(value);
-                port->availableProtocols
-                    |= RBRGen4PortProtocol_parse(value);
+                port->availableProtocols |= RBRGen4PortProtocol_parse(value);
 
                 value = nextValue;
             }
-        }
-        else if (strcmp(parameter.key, "baudrate") == 0)
-        {
+        } else if (strcmp(parameter.key, "baudrate") == 0) {
             port->baudRate = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "devicelist") == 0)
-        {
+        } else if (strcmp(parameter.key, "devicelist") == 0) {
             /* A port with no devices reports `none`, not an empty list. */
-            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0)
-            {
+            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
                 continue;
             }
 
             char *value = parameter.value;
-            while (value != NULL
-                   && port->deviceCount < RBRGEN4_DEVICE_COUNT_MAX)
-            {
+            while (value != NULL && port->deviceCount < RBRGEN4_DEVICE_COUNT_MAX) {
                 char *nextValue = RBRGen4_splitListValue(value);
 
                 snprintf(port->deviceList[port->deviceCount],
@@ -311,9 +224,7 @@ RBRGen4Error RBRGen4_getPort(
 
                 value = nextValue;
             }
-        }
-        else if (strcmp(parameter.key, "poweruptime") == 0)
-        {
+        } else if (strcmp(parameter.key, "poweruptime") == 0) {
             port->powerUpTime = strtol(parameter.value, NULL, 10);
         }
     }
@@ -321,16 +232,13 @@ RBRGen4Error RBRGen4_getPort(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_getPortPool(
-    RBRGen4 *conn,
-    RBRGen4PortPool *portPool)
+RBRGen4Error RBRGen4_getPortPool(RBRGen4 *conn, RBRGen4PortPool *portPool)
 {
     memset(portPool, 0, sizeof(RBRGen4PortPool));
 
     /* Zero is a real port class, so say the class is unknown until
      * RBRGen4_getPort() reads it. */
-    for (int32_t port = 0; port < RBRGEN4_PORT_COUNT_MAX; port++)
-    {
+    for (int32_t port = 0; port < RBRGEN4_PORT_COUNT_MAX; port++) {
         portPool->pool[port].portClass = RBRGEN4_UNKNOWN_PORT_CLASS;
     }
 
@@ -338,39 +246,25 @@ RBRGen4Error RBRGen4_getPortPool(
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "count") == 0)
-        {
+        } else if (strcmp(parameter.key, "count") == 0) {
             portPool->count = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "list") == 0)
-        {
+        } else if (strcmp(parameter.key, "list") == 0) {
             /* An instrument with no ports reports `none`, not an empty list. */
-            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0)
-            {
+            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
                 continue;
             }
 
             char *value = parameter.value;
-            for (int32_t port = 0;
-                 value != NULL && port < RBRGEN4_PORT_COUNT_MAX;
-                 port++)
-            {
+            for (int32_t port = 0; value != NULL && port < RBRGEN4_PORT_COUNT_MAX; port++) {
                 char *nextValue = RBRGen4_splitListValue(value);
 
-                snprintf(portPool->pool[port].label,
-                         sizeof(portPool->pool[port].label),
-                         "%s",
-                         value);
+                snprintf(
+                    portPool->pool[port].label, sizeof(portPool->pool[port].label), "%s", value);
 
                 value = nextValue;
             }
@@ -380,11 +274,9 @@ RBRGen4Error RBRGen4_getPortPool(
     return RBRGEN4_SUCCESS;
 }
 
-const char *RBRGen4DeviceClass_name(
-    RBRGen4DeviceClass deviceClass)
+const char *RBRGen4DeviceClass_name(RBRGen4DeviceClass deviceClass)
 {
-    switch (deviceClass)
-    {
+    switch (deviceClass) {
     case RBRGEN4_DEVICE_CLASS_SENSOR:
         return "sensor";
     case RBRGEN4_DEVICE_CLASS_ACTUATOR:
@@ -401,9 +293,7 @@ const char *RBRGen4DeviceClass_name(
     }
 }
 
-RBRGen4Error RBRGen4_getDevice(
-    RBRGen4 *conn,
-    RBRGen4Device *device)
+RBRGen4Error RBRGen4_getDevice(RBRGen4 *conn, RBRGen4Device *device)
 {
     /* The label selects the device to read, so it has to outlive the reset of
      * the rest of the structure. */
@@ -416,85 +306,49 @@ RBRGen4Error RBRGen4_getDevice(
     /* `lock` is deliberately absent from the response to a bare
      * `device <label>`, so name every parameter rather than take the
      * defaults. */
-    RBR_TRY(RBRGen4_converse(
-        conn,
-        "device %s port class sn pn fwversion fwtype name channellist lock"
-        " poweruptime cooldowntime powerdowntime inrushoffsettime",
-        label));
+    RBR_TRY(RBRGen4_converse(conn,
+                             "device %s port class sn pn fwversion fwtype name channellist lock"
+                             " poweruptime cooldowntime powerdowntime inrushoffsettime",
+                             label));
 
     snprintf(device->label, sizeof(device->label), "%s", label);
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "port") == 0)
-        {
-            snprintf(device->port,
-                     sizeof(device->port),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "class") == 0)
-        {
-            for (int32_t i = 0; i < RBRGEN4_DEVICE_CLASS_COUNT; i++)
-            {
-                if (strcmp(RBRGen4DeviceClass_name(i),
-                           parameter.value) == 0)
-                {
+        } else if (strcmp(parameter.key, "port") == 0) {
+            snprintf(device->port, sizeof(device->port), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "class") == 0) {
+            for (int32_t i = 0; i < RBRGEN4_DEVICE_CLASS_COUNT; i++) {
+                if (strcmp(RBRGen4DeviceClass_name(i), parameter.value) == 0) {
                     device->deviceClass = i;
                     break;
                 }
             }
-        }
-        else if (strcmp(parameter.key, "sn") == 0)
-        {
+        } else if (strcmp(parameter.key, "sn") == 0) {
             /* `na` is not a number, so it converts to the zero which stands
              * for it, as it does for the firmware type below. */
             device->sn = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "pn") == 0)
-        {
+        } else if (strcmp(parameter.key, "pn") == 0) {
             snprintf(device->pn, sizeof(device->pn), "%s", parameter.value);
-        }
-        else if (strcmp(parameter.key, "fwversion") == 0)
-        {
-            snprintf(device->fwversion,
-                     sizeof(device->fwversion),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "fwtype") == 0)
-        {
+        } else if (strcmp(parameter.key, "fwversion") == 0) {
+            snprintf(device->fwversion, sizeof(device->fwversion), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "fwtype") == 0) {
             device->fwtype = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "name") == 0)
-        {
-            snprintf(device->name,
-                     sizeof(device->name),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "channellist") == 0)
-        {
+        } else if (strcmp(parameter.key, "name") == 0) {
+            snprintf(device->name, sizeof(device->name), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "channellist") == 0) {
             /* A device with no channels reports `none`, not an empty list. */
-            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0)
-            {
+            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
                 continue;
             }
 
             char *value = parameter.value;
-            while (value != NULL
-                   && device->channelCount < RBRGEN4_CHANNEL_MAX)
-            {
+            while (value != NULL && device->channelCount < RBRGEN4_CHANNEL_MAX) {
                 char *nextValue = RBRGen4_splitListValue(value);
 
                 snprintf(device->channelList[device->channelCount],
@@ -505,25 +359,15 @@ RBRGen4Error RBRGen4_getDevice(
 
                 value = nextValue;
             }
-        }
-        else if (strcmp(parameter.key, "lock") == 0)
-        {
+        } else if (strcmp(parameter.key, "lock") == 0) {
             device->lock = (strcmp(parameter.value, "on") == 0);
-        }
-        else if (strcmp(parameter.key, "poweruptime") == 0)
-        {
+        } else if (strcmp(parameter.key, "poweruptime") == 0) {
             device->powerUpTime = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "cooldowntime") == 0)
-        {
+        } else if (strcmp(parameter.key, "cooldowntime") == 0) {
             device->coolDownTime = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "powerdowntime") == 0)
-        {
+        } else if (strcmp(parameter.key, "powerdowntime") == 0) {
             device->powerDownTime = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "inrushoffsettime") == 0)
-        {
+        } else if (strcmp(parameter.key, "inrushoffsettime") == 0) {
             device->inrushOffsetTime = strtol(parameter.value, NULL, 10);
         }
     }
@@ -531,54 +375,36 @@ RBRGen4Error RBRGen4_getDevice(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_getDevicePool(
-    RBRGen4 *conn,
-    RBRGen4DevicePool *devicePool)
+RBRGen4Error RBRGen4_getDevicePool(RBRGen4 *conn, RBRGen4DevicePool *devicePool)
 {
     memset(devicePool, 0, sizeof(RBRGen4DevicePool));
 
     /* Zero is a real device class, so say the class is unknown until
      * RBRGen4_getDevice() reads it. */
-    for (int32_t device = 0;
-         device < RBRGEN4_DEVICE_COUNT_MAX;
-         device++)
-    {
-        devicePool->pool[device].deviceClass
-            = RBRGEN4_UNKNOWN_DEVICE_CLASS;
+    for (int32_t device = 0; device < RBRGEN4_DEVICE_COUNT_MAX; device++) {
+        devicePool->pool[device].deviceClass = RBRGEN4_UNKNOWN_DEVICE_CLASS;
     }
 
     RBR_TRY(RBRGen4_converse(conn, "device"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "count") == 0)
-        {
+        } else if (strcmp(parameter.key, "count") == 0) {
             devicePool->count = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "list") == 0)
-        {
+        } else if (strcmp(parameter.key, "list") == 0) {
             /* An instrument with no devices reports `none`, not an empty
              * list. */
-            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0)
-            {
+            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
                 continue;
             }
 
             char *value = parameter.value;
-            for (int32_t device = 0;
-                 value != NULL && device < RBRGEN4_DEVICE_COUNT_MAX;
-                 device++)
-            {
+            for (int32_t device = 0; value != NULL && device < RBRGEN4_DEVICE_COUNT_MAX; device++) {
                 char *nextValue = RBRGen4_splitListValue(value);
 
                 snprintf(devicePool->pool[device].label,
@@ -594,49 +420,34 @@ RBRGen4Error RBRGen4_getDevicePool(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_discoverDevices(
-    RBRGen4 *conn,
-    RBRGen4DevicePool *devicePool)
+RBRGen4Error RBRGen4_discoverDevices(RBRGen4 *conn, RBRGen4DevicePool *devicePool)
 {
     memset(devicePool, 0, sizeof(RBRGen4DevicePool));
 
     /* Zero is a real device class, so say the class is unknown until
      * RBRGen4_getDevice() reads it. */
-    for (int32_t device = 0;
-         device < RBRGEN4_DEVICE_COUNT_MAX;
-         device++)
-    {
-        devicePool->pool[device].deviceClass
-            = RBRGEN4_UNKNOWN_DEVICE_CLASS;
+    for (int32_t device = 0; device < RBRGEN4_DEVICE_COUNT_MAX; device++) {
+        devicePool->pool[device].deviceClass = RBRGEN4_UNKNOWN_DEVICE_CLASS;
     }
 
     RBR_TRY(RBRGen4_converse(conn, "device discover"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "found") == 0)
-        {
+        } else if (strcmp(parameter.key, "found") == 0) {
             /* Discovery finding nothing reports `none`, not an empty list.
              * There is no count to read: the list is the whole answer. */
-            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0)
-            {
+            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
                 continue;
             }
 
             char *value = parameter.value;
-            while (value != NULL
-                   && devicePool->count < RBRGEN4_DEVICE_COUNT_MAX)
-            {
+            while (value != NULL && devicePool->count < RBRGEN4_DEVICE_COUNT_MAX) {
                 char *nextValue = RBRGen4_splitListValue(value);
 
                 snprintf(devicePool->pool[devicePool->count].label,
@@ -653,9 +464,7 @@ RBRGen4Error RBRGen4_discoverDevices(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_getCalibration(
-    RBRGen4 *conn,
-    RBRGen4Calibration *calibration)
+RBRGen4Error RBRGen4_getCalibration(RBRGen4 *conn, RBRGen4Calibration *calibration)
 {
     /* The label selects the calibration to read, so it has to outlive the
      * reset of the rest of the structure. */
@@ -670,14 +479,10 @@ RBRGen4Error RBRGen4_getCalibration(
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
         }
 
@@ -685,61 +490,35 @@ RBRGen4Error RBRGen4_getCalibration(
         char *end = NULL;
         char group = parameter.key[0];
         int32_t index = strtol(parameter.key + 1, &end, 10);
-        bool coefficient =
-            (parameter.key[1] != '\0'
-             && *end == '\0'
-             && index >= 0
-             && index < RBRGEN4_CALIBRATION_COEFFICIENT_MAX);
+        bool coefficient = (parameter.key[1] != '\0' && *end == '\0' && index >= 0 &&
+                            index < RBRGEN4_CALIBRATION_COEFFICIENT_MAX);
 
-        if (strcmp(parameter.key, "equation") == 0)
-        {
-            snprintf(calibration->equation,
-                     sizeof(calibration->equation),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "datetime") == 0)
-        {
+        if (strcmp(parameter.key, "equation") == 0) {
+            snprintf(calibration->equation, sizeof(calibration->equation), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "datetime") == 0) {
             calibration->dateTime = strtoll(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "offset") == 0)
-        {
+        } else if (strcmp(parameter.key, "offset") == 0) {
             calibration->userOffset = strtof(parameter.value, NULL);
-        }
-        else if (strcmp(parameter.key, "slope") == 0)
-        {
+        } else if (strcmp(parameter.key, "slope") == 0) {
             calibration->userSlope = strtof(parameter.value, NULL);
-        }
-        else if (coefficient && group == 'a')
-        {
+        } else if (coefficient && group == 'a') {
             calibration->a[index] = strtof(parameter.value, NULL);
-            if (index >= calibration->aCount)
-            {
+            if (index >= calibration->aCount) {
                 calibration->aCount = index + 1;
             }
-        }
-        else if (coefficient && group == 'b')
-        {
+        } else if (coefficient && group == 'b') {
             calibration->b[index] = strtof(parameter.value, NULL);
-            if (index >= calibration->bCount)
-            {
+            if (index >= calibration->bCount) {
                 calibration->bCount = index + 1;
             }
-        }
-        else if (coefficient && group == 'm')
-        {
+        } else if (coefficient && group == 'm') {
             /* An unused reference is reported as `none`. */
-            if (strcmp(parameter.value, "none") == 0)
-            {
+            if (strcmp(parameter.value, "none") == 0) {
                 continue;
             }
 
-            snprintf(calibration->m[index],
-                     sizeof(calibration->m[index]),
-                     "%s",
-                     parameter.value);
-            if (index >= calibration->mCount)
-            {
+            snprintf(calibration->m[index], sizeof(calibration->m[index]), "%s", parameter.value);
+            if (index >= calibration->mCount) {
                 calibration->mCount = index + 1;
             }
         }
@@ -754,30 +533,20 @@ RBRGen4Error RBRGen4_getCalibration(
  * \return #RBRGEN4_BUFFER_TOO_SMALL when the coefficient does not
  *                                             fit
  */
-static RBRGen4Error RBRGen4Calibration_appendCoefficient(
-    char *command,
-    int32_t size,
-    int32_t *length,
-    char group,
-    int32_t index,
-    float value)
+static RBRGen4Error RBRGen4Calibration_appendCoefficient(char *command, int32_t size,
+                                                         int32_t *length, char group, int32_t index,
+                                                         float value)
 {
     /* Checked before appending: the remaining space is only meaningful while
      * the length is still within the buffer. */
-    if (*length < 0 || *length >= size)
-    {
+    if (*length < 0 || *length >= size) {
         return RBRGEN4_BUFFER_TOO_SMALL;
     }
 
-    int32_t written = snprintf(command + *length,
-                               size - *length,
-                               " %c%" PRId32 "=%.9g",
-                               group,
-                               index,
-                               (double) value);
+    int32_t written = snprintf(
+        command + *length, size - *length, " %c%" PRId32 "=%.9g", group, index, (double) value);
 
-    if (written < 0 || *length + written >= size)
-    {
+    if (written < 0 || *length + written >= size) {
         return RBRGEN4_BUFFER_TOO_SMALL;
     }
 
@@ -793,15 +562,10 @@ static RBRGen4Error RBRGen4Calibration_appendCoefficient(
  *
  * \return #RBRGEN4_BUFFER_TOO_SMALL when the reference does not fit
  */
-static RBRGen4Error RBRGen4Calibration_appendReference(
-    char *command,
-    int32_t size,
-    int32_t *length,
-    int32_t index,
-    const char *label)
+static RBRGen4Error RBRGen4Calibration_appendReference(char *command, int32_t size, int32_t *length,
+                                                       int32_t index, const char *label)
 {
-    if (*length < 0 || *length >= size)
-    {
+    if (*length < 0 || *length >= size) {
         return RBRGEN4_BUFFER_TOO_SMALL;
     }
 
@@ -811,8 +575,7 @@ static RBRGen4Error RBRGen4Calibration_appendReference(
                                index,
                                label[0] == '\0' ? "none" : label);
 
-    if (written < 0 || *length + written >= size)
-    {
+    if (written < 0 || *length + written >= size) {
         return RBRGEN4_BUFFER_TOO_SMALL;
     }
 
@@ -820,68 +583,42 @@ static RBRGen4Error RBRGen4Calibration_appendReference(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_setCalibration(
-    RBRGen4 *conn,
-    const RBRGen4Calibration *calibration)
+RBRGen4Error RBRGen4_setCalibration(RBRGen4 *conn, const RBRGen4Calibration *calibration)
 {
-    if (calibration->aCount < 0
-        || calibration->aCount > RBRGEN4_CALIBRATION_COEFFICIENT_MAX
-        || calibration->bCount < 0
-        || calibration->bCount > RBRGEN4_CALIBRATION_COEFFICIENT_MAX
-        || calibration->mCount < 0
-        || calibration->mCount > RBRGEN4_CALIBRATION_COEFFICIENT_MAX)
-    {
+    if (calibration->aCount < 0 || calibration->aCount > RBRGEN4_CALIBRATION_COEFFICIENT_MAX ||
+        calibration->bCount < 0 || calibration->bCount > RBRGEN4_CALIBRATION_COEFFICIENT_MAX ||
+        calibration->mCount < 0 || calibration->mCount > RBRGEN4_CALIBRATION_COEFFICIENT_MAX) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     char coefficients[RBRGEN4_COMMAND_BUFFER_MAX] = "";
     int32_t length = 0;
 
-    for (int32_t a = 0; a < calibration->aCount; ++a)
-    {
+    for (int32_t a = 0; a < calibration->aCount; ++a) {
         RBR_TRY(RBRGen4Calibration_appendCoefficient(
-                    coefficients,
-                    (int32_t) sizeof(coefficients),
-                    &length,
-                    'a',
-                    a,
-                    calibration->a[a]));
+            coefficients, (int32_t) sizeof(coefficients), &length, 'a', a, calibration->a[a]));
     }
-    for (int32_t b = 0; b < calibration->bCount; ++b)
-    {
+    for (int32_t b = 0; b < calibration->bCount; ++b) {
         RBR_TRY(RBRGen4Calibration_appendCoefficient(
-                    coefficients,
-                    (int32_t) sizeof(coefficients),
-                    &length,
-                    'b',
-                    b,
-                    calibration->b[b]));
+            coefficients, (int32_t) sizeof(coefficients), &length, 'b', b, calibration->b[b]));
     }
-    for (int32_t m = 0; m < calibration->mCount; ++m)
-    {
+    for (int32_t m = 0; m < calibration->mCount; ++m) {
         RBR_TRY(RBRGen4Calibration_appendReference(
-                    coefficients,
-                    (int32_t) sizeof(coefficients),
-                    &length,
-                    m,
-                    calibration->m[m]));
+            coefficients, (int32_t) sizeof(coefficients), &length, m, calibration->m[m]));
     }
 
-    return RBRGen4_converse(
-        conn,
-        "calibration %s datetime=%014" PRId64 " offset=%.9g slope=%.9g%s",
-        calibration->label,
-        calibration->dateTime,
-        (double) calibration->userOffset,
-        (double) calibration->userSlope,
-        coefficients);
+    return RBRGen4_converse(conn,
+                            "calibration %s datetime=%014" PRId64 " offset=%.9g slope=%.9g%s",
+                            calibration->label,
+                            calibration->dateTime,
+                            (double) calibration->userOffset,
+                            (double) calibration->userSlope,
+                            coefficients);
 }
 
-const char *RBRGen4ScheduleStream_name(
-    RBRGen4ScheduleStream stream)
+const char *RBRGen4ScheduleStream_name(RBRGen4ScheduleStream stream)
 {
-    switch (stream)
-    {
+    switch (stream) {
     case RBRGEN4_SCHEDULE_STREAM_OFF:
         return "off";
     case RBRGEN4_SCHEDULE_STREAM_USB:
@@ -896,11 +633,9 @@ const char *RBRGen4ScheduleStream_name(
     }
 }
 
-const char *RBRGen4ChannelNature_name(
-    RBRGen4ChannelNature nature)
+const char *RBRGen4ChannelNature_name(RBRGen4ChannelNature nature)
 {
-    switch (nature)
-    {
+    switch (nature) {
     case RBRGEN4_CHANNEL_NATURE_SCIENTIFIC:
         return "scientific";
     case RBRGEN4_CHANNEL_NATURE_SYSTEM:
@@ -913,16 +648,10 @@ const char *RBRGen4ChannelNature_name(
     }
 }
 
-static RBRGen4ChannelNature RBRGen4ChannelNature_parse(
-    const char *value)
+static RBRGen4ChannelNature RBRGen4ChannelNature_parse(const char *value)
 {
-    for (int32_t nature = 0;
-         nature < RBRGEN4_CHANNEL_NATURE_COUNT;
-         ++nature)
-    {
-        if (strcmp(value,
-                   RBRGen4ChannelNature_name(nature)) == 0)
-        {
+    for (int32_t nature = 0; nature < RBRGEN4_CHANNEL_NATURE_COUNT; ++nature) {
+        if (strcmp(value, RBRGen4ChannelNature_name(nature)) == 0) {
             return nature;
         }
     }
@@ -935,12 +664,9 @@ static RBRGen4ChannelNature RBRGen4ChannelNature_parse(
  *
  * A derived channel has no node, port, or device.
  */
-static void RBRGen4_copyOptionalLabel(char *destination,
-                                                size_t size,
-                                                const char *value)
+static void RBRGen4_copyOptionalLabel(char *destination, size_t size, const char *value)
 {
-    if (strcmp(value, "na") == 0)
-    {
+    if (strcmp(value, "na") == 0) {
         destination[0] = '\0';
         return;
     }
@@ -951,52 +677,37 @@ static void RBRGen4_copyOptionalLabel(char *destination,
 /**
  * \brief Read the labels of a `channel` response into a pool.
  */
-static RBRGen4Error RBRGen4_parseChannelPool(
-    RBRGen4 *conn,
-    RBRGen4ChannelPool *channelPool)
+static RBRGen4Error RBRGen4_parseChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPool)
 {
     RBRGen4Error err = RBRGEN4_SUCCESS;
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "count") == 0)
-        {
+        } else if (strcmp(parameter.key, "count") == 0) {
             channelPool->count = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "list") == 0)
-        {
+        } else if (strcmp(parameter.key, "list") == 0) {
             /* An instrument with no channels reports `none`, not an empty
              * list. */
-            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0)
-            {
+            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
                 continue;
             }
 
             /* Channels past the pool's capacity are discarded. */
             char *value = parameter.value;
-            for (int32_t i = 0; value != NULL; i++)
-            {
-                if (i >= channelPool->size)
-                {
+            for (int32_t i = 0; value != NULL; i++) {
+                if (i >= channelPool->size) {
                     err = RBRGEN4_TRUNCATED;
                     break;
                 }
 
                 char *nextValue = RBRGen4_splitListValue(value);
 
-                snprintf(channelPool->pool[i].label,
-                         sizeof(channelPool->pool[i].label),
-                         "%s",
-                         value);
+                snprintf(
+                    channelPool->pool[i].label, sizeof(channelPool->pool[i].label), "%s", value);
 
                 value = nextValue;
             }
@@ -1006,148 +717,86 @@ static RBRGen4Error RBRGen4_parseChannelPool(
     return err;
 }
 
-RBRGen4Error RBRGen4_getChannel(
-    RBRGen4 *conn,
-    RBRGen4Channel *channel)
+RBRGen4Error RBRGen4_getChannel(RBRGen4 *conn, RBRGen4Channel *channel)
 {
-    if (channel->label[0] == '\0')
-    {
+    if (channel->label[0] == '\0') {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     RBR_RESET_EXCEPT(channel, label);
 
-    RBR_TRY(RBRGen4_converse(conn,
-                                       "channel %s",
-                                       channel->label));
+    RBR_TRY(RBRGen4_converse(conn, "channel %s", channel->label));
 
     channel->nature = RBRGEN4_UNKNOWN_CHANNEL_NATURE;
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "type") == 0)
-        {
-            snprintf(channel->type,
-                     sizeof(channel->type),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "settlingtime") == 0)
-        {
+        } else if (strcmp(parameter.key, "type") == 0) {
+            snprintf(channel->type, sizeof(channel->type), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "settlingtime") == 0) {
             channel->settlingTime = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "measuringtime") == 0)
-        {
+        } else if (strcmp(parameter.key, "measuringtime") == 0) {
             channel->measuringTime = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "readouttime") == 0)
-        {
+        } else if (strcmp(parameter.key, "readouttime") == 0) {
             channel->readOutTime = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "userunits") == 0)
-        {
-            snprintf(channel->userUnits,
-                     sizeof(channel->userUnits),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "nature") == 0)
-        {
-            channel->nature =
-                RBRGen4ChannelNature_parse(parameter.value);
-        }
-        else if (strcmp(parameter.key, "derived") == 0)
-        {
+        } else if (strcmp(parameter.key, "userunits") == 0) {
+            snprintf(channel->userUnits, sizeof(channel->userUnits), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "nature") == 0) {
+            channel->nature = RBRGen4ChannelNature_parse(parameter.value);
+        } else if (strcmp(parameter.key, "derived") == 0) {
             channel->derived = (strcmp(parameter.value, "true") == 0);
-        }
-        else if (strcmp(parameter.key, "node") == 0)
-        {
-            RBRGen4_copyOptionalLabel(channel->node,
-                                                sizeof(channel->node),
-                                                parameter.value);
-        }
-        else if (strcmp(parameter.key, "port") == 0)
-        {
-            RBRGen4_copyOptionalLabel(channel->port,
-                                                sizeof(channel->port),
-                                                parameter.value);
-        }
-        else if (strcmp(parameter.key, "device") == 0)
-        {
-            RBRGen4_copyOptionalLabel(channel->device,
-                                                sizeof(channel->device),
-                                                parameter.value);
+        } else if (strcmp(parameter.key, "node") == 0) {
+            RBRGen4_copyOptionalLabel(channel->node, sizeof(channel->node), parameter.value);
+        } else if (strcmp(parameter.key, "port") == 0) {
+            RBRGen4_copyOptionalLabel(channel->port, sizeof(channel->port), parameter.value);
+        } else if (strcmp(parameter.key, "device") == 0) {
+            RBRGen4_copyOptionalLabel(channel->device, sizeof(channel->device), parameter.value);
         }
     }
 
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_setChannel(
-    RBRGen4 *conn,
-    const RBRGen4Channel *channel)
+RBRGen4Error RBRGen4_setChannel(RBRGen4 *conn, const RBRGen4Channel *channel)
 {
-    if (channel->userUnits[0] == '\0')
-    {
+    if (channel->userUnits[0] == '\0') {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRGen4_converse(conn,
-                                      "channel %s userunits=%s",
-                                      channel->label,
-                                      channel->userUnits);
+    return RBRGen4_converse(conn, "channel %s userunits=%s", channel->label, channel->userUnits);
 }
 
-RBRGen4Error RBRGen4_getChannelPool(
-    RBRGen4 *conn,
-    RBRGen4ChannelPool *channelPool)
+RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPool)
 {
     channelPool->count = 0;
-    memset(channelPool->pool,
-           0,
-           channelPool->size * sizeof(RBRGen4Channel));
+    memset(channelPool->pool, 0, channelPool->size * sizeof(RBRGen4Channel));
 
     RBR_TRY(RBRGen4_converse(conn, "channel"));
 
     return RBRGen4_parseChannelPool(conn, channelPool);
 }
 
-RBRGen4Error RBRGen4_getChannelPoolByNature(
-    RBRGen4 *conn,
-    RBRGen4ChannelNature nature,
-    RBRGen4ChannelPool *channelPool)
+RBRGen4Error RBRGen4_getChannelPoolByNature(RBRGen4 *conn, RBRGen4ChannelNature nature,
+                                            RBRGen4ChannelPool *channelPool)
 {
-    if (nature < 0 || nature >= RBRGEN4_CHANNEL_NATURE_COUNT)
-    {
+    if (nature < 0 || nature >= RBRGEN4_CHANNEL_NATURE_COUNT) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     channelPool->count = 0;
-    memset(channelPool->pool,
-           0,
-           channelPool->size * sizeof(RBRGen4Channel));
+    memset(channelPool->pool, 0, channelPool->size * sizeof(RBRGen4Channel));
 
-    RBR_TRY(RBRGen4_converse(
-                conn,
-                "channel %s",
-                RBRGen4ChannelNature_name(nature)));
+    RBR_TRY(RBRGen4_converse(conn, "channel %s", RBRGen4ChannelNature_name(nature)));
 
     return RBRGen4_parseChannelPool(conn, channelPool);
 }
 
-RBRGen4Error RBRGen4_getSettings(
-    RBRGen4 *conn,
-    RBRGen4Settings *settings)
+RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings)
 {
     memset(settings, 0, sizeof(RBRGen4Settings));
 
@@ -1155,26 +804,16 @@ RBRGen4Error RBRGen4_getSettings(
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "prompt") == 0)
-        {
+        } else if (strcmp(parameter.key, "prompt") == 0) {
             settings->prompt = (strcmp(parameter.value, "on") == 0);
-        }
-        else if (strcmp(parameter.key, "confirmation") == 0)
-        {
+        } else if (strcmp(parameter.key, "confirmation") == 0) {
             settings->confirmation = (strcmp(parameter.value, "on") == 0);
-        }
-        else if (strcmp(parameter.key, "pollpoweroffdelay") == 0)
-        {
+        } else if (strcmp(parameter.key, "pollpoweroffdelay") == 0) {
             settings->pollPowerOffDelay = strtol(parameter.value, NULL, 10);
         }
     }
@@ -1182,35 +821,27 @@ RBRGen4Error RBRGen4_getSettings(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_setSettings(
-    RBRGen4 *conn,
-    const RBRGen4Settings *settings)
+RBRGen4Error RBRGen4_setSettings(RBRGen4 *conn, const RBRGen4Settings *settings)
 {
-    if (settings->pollPowerOffDelay < 0)
-    {
+    if (settings->pollPowerOffDelay < 0) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     /* The instrument answers with nothing at all once confirmation is off. */
-    if (!settings->confirmation)
-    {
-        return RBRGen4_sendCommand(
-            conn,
-            "settings prompt=%s confirmation=off pollpoweroffdelay=%" PRId32,
-            settings->prompt ? "on" : "off",
-            settings->pollPowerOffDelay);
+    if (!settings->confirmation) {
+        return RBRGen4_sendCommand(conn,
+                                   "settings prompt=%s confirmation=off pollpoweroffdelay=%" PRId32,
+                                   settings->prompt ? "on" : "off",
+                                   settings->pollPowerOffDelay);
     }
 
-    return RBRGen4_converse(
-        conn,
-        "settings prompt=%s confirmation=on pollpoweroffdelay=%" PRId32,
-        settings->prompt ? "on" : "off",
-        settings->pollPowerOffDelay);
+    return RBRGen4_converse(conn,
+                            "settings prompt=%s confirmation=on pollpoweroffdelay=%" PRId32,
+                            settings->prompt ? "on" : "off",
+                            settings->pollPowerOffDelay);
 }
 
-RBRGen4Error RBRGen4_getParameters(
-    RBRGen4 *conn,
-    RBRGen4Parameters *parameters)
+RBRGen4Error RBRGen4_getParameters(RBRGen4 *conn, RBRGen4Parameters *parameters)
 {
     memset(parameters, 0, sizeof(RBRGen4Parameters));
 
@@ -1218,46 +849,26 @@ RBRGen4Error RBRGen4_getParameters(
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "altitude") == 0)
-        {
+        } else if (strcmp(parameter.key, "altitude") == 0) {
             parameters->altitude = strtof(parameter.value, NULL);
-        }
-        else if (strcmp(parameter.key, "atmosphere") == 0)
-        {
+        } else if (strcmp(parameter.key, "atmosphere") == 0) {
             parameters->atmosphere = strtof(parameter.value, NULL);
-        }
-        else if (strcmp(parameter.key, "avgsoundspeed") == 0)
-        {
+        } else if (strcmp(parameter.key, "avgsoundspeed") == 0) {
             parameters->avgSoundSpeed = strtof(parameter.value, NULL);
-        }
-        else if (strcmp(parameter.key, "density") == 0)
-        {
+        } else if (strcmp(parameter.key, "density") == 0) {
             parameters->density = strtof(parameter.value, NULL);
-        }
-        else if (strcmp(parameter.key, "pressure") == 0)
-        {
+        } else if (strcmp(parameter.key, "pressure") == 0) {
             parameters->pressure = strtof(parameter.value, NULL);
-        }
-        else if (strcmp(parameter.key, "salinity") == 0)
-        {
+        } else if (strcmp(parameter.key, "salinity") == 0) {
             parameters->salinity = strtof(parameter.value, NULL);
-        }
-        else if (strcmp(parameter.key, "speccondtempco") == 0)
-        {
+        } else if (strcmp(parameter.key, "speccondtempco") == 0) {
             parameters->specCondTempCo = strtof(parameter.value, NULL);
-        }
-        else if (strcmp(parameter.key, "temperature") == 0)
-        {
+        } else if (strcmp(parameter.key, "temperature") == 0) {
             parameters->temperature = strtof(parameter.value, NULL);
         }
     }
@@ -1265,40 +876,31 @@ RBRGen4Error RBRGen4_getParameters(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_setParameters(
-    RBRGen4 *conn,
-    const RBRGen4Parameters *parameters)
+RBRGen4Error RBRGen4_setParameters(RBRGen4 *conn, const RBRGen4Parameters *parameters)
 {
     /* The instrument bounds these values; %.9g round-trips a float. */
-    return RBRGen4_converse(
-        conn,
-        "parameters altitude=%.9g atmosphere=%.9g avgsoundspeed=%.9g "
-        "density=%.9g pressure=%.9g salinity=%.9g speccondtempco=%.9g "
-        "temperature=%.9g",
-        (double) parameters->altitude,
-        (double) parameters->atmosphere,
-        (double) parameters->avgSoundSpeed,
-        (double) parameters->density,
-        (double) parameters->pressure,
-        (double) parameters->salinity,
-        (double) parameters->specCondTempCo,
-        (double) parameters->temperature);
+    return RBRGen4_converse(conn,
+                            "parameters altitude=%.9g atmosphere=%.9g avgsoundspeed=%.9g "
+                            "density=%.9g pressure=%.9g salinity=%.9g speccondtempco=%.9g "
+                            "temperature=%.9g",
+                            (double) parameters->altitude,
+                            (double) parameters->atmosphere,
+                            (double) parameters->avgSoundSpeed,
+                            (double) parameters->density,
+                            (double) parameters->pressure,
+                            (double) parameters->salinity,
+                            (double) parameters->specCondTempCo,
+                            (double) parameters->temperature);
 }
 
-
-RBRGen4Error RBRGen4_getGroup(
-    RBRGen4 *conn,
-    RBRGen4Group *group,
-    RBRGen4LabelList *channelList)
+RBRGen4Error RBRGen4_getGroup(RBRGen4 *conn, RBRGen4Group *group, RBRGen4LabelList *channelList)
 {
-    if (group->label[0] == '\0')
-    {
+    if (group->label[0] == '\0') {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     RBR_RESET_EXCEPT(group, label);
-    if (channelList != NULL)
-    {
+    if (channelList != NULL) {
         channelList->count = 0;
     }
 
@@ -1307,105 +909,69 @@ RBRGen4Error RBRGen4_getGroup(
     RBRGen4Error err = RBRGEN4_SUCCESS;
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "channellist") == 0
-                 && channelList != NULL)
-        {
-            err = RBRGen4_copyLabelList(channelList,
-                                                  parameter.value);
+        } else if (strcmp(parameter.key, "channellist") == 0 && channelList != NULL) {
+            err = RBRGen4_copyLabelList(channelList, parameter.value);
         }
     }
 
     return err;
 }
 
-RBRGen4Error RBRGen4_setGroup(
-    RBRGen4 *conn,
-    const RBRGen4Group *group,
-    const RBRGen4LabelList *channelList)
+RBRGen4Error RBRGen4_setGroup(RBRGen4 *conn, const RBRGen4Group *group,
+                              const RBRGen4LabelList *channelList)
 {
-    if (group->label[0] == '\0')
-    {
+    if (group->label[0] == '\0') {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     char value[RBRGEN4_COMMAND_BUFFER_MAX];
-    RBR_TRY(RBRGen4_formatLabelList(value,
-                                              (int32_t) sizeof(value),
-                                              channelList));
+    RBR_TRY(RBRGen4_formatLabelList(value, (int32_t) sizeof(value), channelList));
 
-    return RBRGen4_converse(conn,
-                                      "group %s channellist=%s",
-                                      group->label,
-                                      value);
+    return RBRGen4_converse(conn, "group %s channellist=%s", group->label, value);
 }
 
-RBRGen4Error RBRGen4_getGroupPool(
-    RBRGen4 *conn,
-    RBRGen4GroupPool *groupPool)
+RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool)
 {
     groupPool->count = 0;
     groupPool->maxCount = 0;
-    memset(groupPool->pool,
-           0,
-           groupPool->size * sizeof(RBRGen4Group));
+    memset(groupPool->pool, 0, groupPool->size * sizeof(RBRGen4Group));
 
     RBR_TRY(RBRGen4_converse(conn, "group"));
 
     RBRGen4Error err = RBRGEN4_SUCCESS;
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "count") == 0)
-        {
+        } else if (strcmp(parameter.key, "count") == 0) {
             groupPool->count = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "maxcount") == 0)
-        {
+        } else if (strcmp(parameter.key, "maxcount") == 0) {
             groupPool->maxCount = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "list") == 0)
-        {
+        } else if (strcmp(parameter.key, "list") == 0) {
             /* An empty pool reports `none`. */
-            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0)
-            {
+            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
                 continue;
             }
 
             /* Groups past the pool's capacity are discarded. */
             char *value = parameter.value;
-            for (int32_t i = 0; value != NULL; i++)
-            {
-                if (i >= groupPool->size)
-                {
+            for (int32_t i = 0; value != NULL; i++) {
+                if (i >= groupPool->size) {
                     err = RBRGEN4_TRUNCATED;
                     break;
                 }
 
                 char *nextValue = RBRGen4_splitListValue(value);
 
-                snprintf(groupPool->pool[i].label,
-                         sizeof(groupPool->pool[i].label),
-                         "%s",
-                         value);
+                snprintf(groupPool->pool[i].label, sizeof(groupPool->pool[i].label), "%s", value);
 
                 value = nextValue;
             }
@@ -1415,158 +981,108 @@ RBRGen4Error RBRGen4_getGroupPool(
     return err;
 }
 
-RBRGen4Error RBRGen4_createGroup(
-    RBRGen4 *conn,
-    const char *label)
+RBRGen4Error RBRGen4_createGroup(RBRGen4 *conn, const char *label)
 {
-    if (label[0] == '\0')
-    {
+    if (label[0] == '\0') {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     return RBRGen4_converse(conn, "group create %s", label);
 }
 
-RBRGen4Error RBRGen4_deleteGroup(
-    RBRGen4 *conn,
-    const char *label)
+RBRGen4Error RBRGen4_deleteGroup(RBRGen4 *conn, const char *label)
 {
-    if (label[0] == '\0')
-    {
+    if (label[0] == '\0') {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     return RBRGen4_converse(conn, "group delete %s", label);
 }
 
-RBRGen4Error RBRGen4_deleteGroupAll(
-    RBRGen4 *conn)
+RBRGen4Error RBRGen4_deleteGroupAll(RBRGen4 *conn)
 {
     return RBRGen4_converse(conn, "group delete all");
 }
 
-RBRGen4Error RBRGen4_getConfig(
-    RBRGen4 *conn,
-    RBRGen4Config *config,
-    RBRGen4LabelList *scheduleList)
+RBRGen4Error RBRGen4_getConfig(RBRGen4 *conn, RBRGen4Config *config, RBRGen4LabelList *scheduleList)
 {
-    if (config->label[0] == '\0')
-    {
+    if (config->label[0] == '\0') {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     RBR_RESET_EXCEPT(config, label);
-    if (scheduleList != NULL)
-    {
+    if (scheduleList != NULL) {
         scheduleList->count = 0;
     }
 
-    RBR_TRY(RBRGen4_converse(conn,
-                                       "config %s",
-                                       config->label));
+    RBR_TRY(RBRGen4_converse(conn, "config %s", config->label));
 
     RBRGen4Error err = RBRGEN4_SUCCESS;
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "schedulelist") == 0
-                 && scheduleList != NULL)
-        {
-            err = RBRGen4_copyLabelList(scheduleList,
-                                                  parameter.value);
+        } else if (strcmp(parameter.key, "schedulelist") == 0 && scheduleList != NULL) {
+            err = RBRGen4_copyLabelList(scheduleList, parameter.value);
         }
     }
 
     return err;
 }
 
-RBRGen4Error RBRGen4_setConfig(
-    RBRGen4 *conn,
-    const RBRGen4Config *config,
-    const RBRGen4LabelList *scheduleList)
+RBRGen4Error RBRGen4_setConfig(RBRGen4 *conn, const RBRGen4Config *config,
+                               const RBRGen4LabelList *scheduleList)
 {
-    if (config->label[0] == '\0')
-    {
+    if (config->label[0] == '\0') {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     char value[RBRGEN4_COMMAND_BUFFER_MAX];
-    RBR_TRY(RBRGen4_formatLabelList(value,
-                                              (int32_t) sizeof(value),
-                                              scheduleList));
+    RBR_TRY(RBRGen4_formatLabelList(value, (int32_t) sizeof(value), scheduleList));
 
-    return RBRGen4_converse(conn,
-                                      "config %s schedulelist=%s",
-                                      config->label,
-                                      value);
+    return RBRGen4_converse(conn, "config %s schedulelist=%s", config->label, value);
 }
 
-RBRGen4Error RBRGen4_getConfigPool(
-    RBRGen4 *conn,
-    RBRGen4ConfigPool *configPool)
+RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool)
 {
     configPool->count = 0;
     configPool->maxCount = 0;
-    memset(configPool->pool,
-           0,
-           configPool->size * sizeof(RBRGen4Config));
+    memset(configPool->pool, 0, configPool->size * sizeof(RBRGen4Config));
 
     RBR_TRY(RBRGen4_converse(conn, "config"));
 
     RBRGen4Error err = RBRGEN4_SUCCESS;
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "count") == 0)
-        {
+        } else if (strcmp(parameter.key, "count") == 0) {
             configPool->count = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "maxcount") == 0)
-        {
+        } else if (strcmp(parameter.key, "maxcount") == 0) {
             configPool->maxCount = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "list") == 0)
-        {
+        } else if (strcmp(parameter.key, "list") == 0) {
             /* An empty pool reports `none`. */
-            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0)
-            {
+            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
                 continue;
             }
 
             /* Configurations past the pool's capacity are discarded. */
             char *value = parameter.value;
-            for (int32_t i = 0; value != NULL; i++)
-            {
-                if (i >= configPool->size)
-                {
+            for (int32_t i = 0; value != NULL; i++) {
+                if (i >= configPool->size) {
                     err = RBRGEN4_TRUNCATED;
                     break;
                 }
 
                 char *nextValue = RBRGen4_splitListValue(value);
 
-                snprintf(configPool->pool[i].label,
-                         sizeof(configPool->pool[i].label),
-                         "%s",
-                         value);
+                snprintf(configPool->pool[i].label, sizeof(configPool->pool[i].label), "%s", value);
 
                 value = nextValue;
             }
@@ -1576,41 +1092,32 @@ RBRGen4Error RBRGen4_getConfigPool(
     return err;
 }
 
-RBRGen4Error RBRGen4_createConfig(
-    RBRGen4 *conn,
-    const char *label)
+RBRGen4Error RBRGen4_createConfig(RBRGen4 *conn, const char *label)
 {
-    if (label[0] == '\0')
-    {
+    if (label[0] == '\0') {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     return RBRGen4_converse(conn, "config create %s", label);
 }
 
-RBRGen4Error RBRGen4_deleteConfig(
-    RBRGen4 *conn,
-    const char *label)
+RBRGen4Error RBRGen4_deleteConfig(RBRGen4 *conn, const char *label)
 {
-    if (label[0] == '\0')
-    {
+    if (label[0] == '\0') {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     return RBRGen4_converse(conn, "config delete %s", label);
 }
 
-RBRGen4Error RBRGen4_deleteConfigAll(
-    RBRGen4 *conn)
+RBRGen4Error RBRGen4_deleteConfigAll(RBRGen4 *conn)
 {
     return RBRGen4_converse(conn, "config delete all");
 }
 
-const char *RBRGen4ScheduleMode_name(
-    RBRGen4ScheduleMode mode)
+const char *RBRGen4ScheduleMode_name(RBRGen4ScheduleMode mode)
 {
-    switch (mode)
-    {
+    switch (mode) {
     case RBRGEN4_SCHEDULE_MODE_CONTINUOUS:
         return "continuous";
     case RBRGEN4_SCHEDULE_MODE_AVERAGE:
@@ -1631,11 +1138,9 @@ const char *RBRGen4ScheduleMode_name(
     }
 }
 
-const char *RBRGen4ScheduleStorage_name(
-    RBRGen4ScheduleStorage storage)
+const char *RBRGen4ScheduleStorage_name(RBRGen4ScheduleStorage storage)
 {
-    switch (storage)
-    {
+    switch (storage) {
     case RBRGEN4_SCHEDULE_STORAGE_OFF:
         return "off";
     case RBRGEN4_SCHEDULE_STORAGE_ON:
@@ -1654,13 +1159,10 @@ const char *RBRGen4ScheduleStorage_name(
  * \param [in] value the response value
  * \return the destination, or #RBRGEN4_UNKNOWN_SCHEDULE_STREAM
  */
-static RBRGen4ScheduleStream RBRGen4ScheduleStream_parse(
-    const char *value)
+static RBRGen4ScheduleStream RBRGen4ScheduleStream_parse(const char *value)
 {
-    for (int i = 0; i < RBRGEN4_SCHEDULE_STREAM_COUNT; i++)
-    {
-        if (strcmp(RBRGen4ScheduleStream_name(i), value) == 0)
-        {
+    for (int i = 0; i < RBRGEN4_SCHEDULE_STREAM_COUNT; i++) {
+        if (strcmp(RBRGen4ScheduleStream_name(i), value) == 0) {
             return i;
         }
     }
@@ -1674,15 +1176,10 @@ static RBRGen4ScheduleStream RBRGen4ScheduleStream_parse(
  * \param [in] value the response value
  * \return the mode, or #RBRGEN4_SCHEDULE_MODE_NONE
  */
-static RBRGen4ScheduleMode RBRGen4ScheduleMode_parse(
-    const char *value)
+static RBRGen4ScheduleMode RBRGen4ScheduleMode_parse(const char *value)
 {
-    for (int i = RBRGEN4_SCHEDULE_MODE_NONE + 1;
-         i <= RBRGEN4_SCHEDULE_MODE_MAX;
-         i <<= 1)
-    {
-        if (strcmp(RBRGen4ScheduleMode_name(i), value) == 0)
-        {
+    for (int i = RBRGEN4_SCHEDULE_MODE_NONE + 1; i <= RBRGEN4_SCHEDULE_MODE_MAX; i <<= 1) {
+        if (strcmp(RBRGen4ScheduleMode_name(i), value) == 0) {
             return i;
         }
     }
@@ -1690,25 +1187,19 @@ static RBRGen4ScheduleMode RBRGen4ScheduleMode_parse(
     return RBRGEN4_SCHEDULE_MODE_NONE;
 }
 
-RBRGen4Error RBRGen4_getSchedule(
-    RBRGen4 *conn,
-    RBRGen4Schedule *schedule,
-    RBRGen4LabelList *groupList)
+RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
+                                 RBRGen4LabelList *groupList)
 {
-    if (schedule->label[0] == '\0')
-    {
+    if (schedule->label[0] == '\0') {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     RBR_RESET_EXCEPT(schedule, label);
-    if (groupList != NULL)
-    {
+    if (groupList != NULL) {
         groupList->count = 0;
     }
 
-    RBR_TRY(RBRGen4_converse(conn,
-                                       "schedule %s",
-                                       schedule->label));
+    RBR_TRY(RBRGen4_converse(conn, "schedule %s", schedule->label));
 
     schedule->stream = RBRGEN4_UNKNOWN_SCHEDULE_STREAM;
     schedule->storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE;
@@ -1721,57 +1212,32 @@ RBRGen4Error RBRGen4_getSchedule(
     RBRGen4Error err = RBRGEN4_SUCCESS;
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "grouplist") == 0
-                 && groupList != NULL)
-        {
+        } else if (strcmp(parameter.key, "grouplist") == 0 && groupList != NULL) {
             err = RBRGen4_copyLabelList(groupList, parameter.value);
-        }
-        else if (strcmp(parameter.key, "stream") == 0)
-        {
-            schedule->stream = RBRGen4ScheduleStream_parse(
-                parameter.value);
-        }
-        else if (strcmp(parameter.key, "storage") == 0)
-        {
-            schedule->storage = strcmp(parameter.value, "on") == 0
-                                ? RBRGEN4_SCHEDULE_STORAGE_ON
-                                : RBRGEN4_SCHEDULE_STORAGE_OFF;
-        }
-        else if (strcmp(parameter.key, "castdetection") == 0)
-        {
+        } else if (strcmp(parameter.key, "stream") == 0) {
+            schedule->stream = RBRGen4ScheduleStream_parse(parameter.value);
+        } else if (strcmp(parameter.key, "storage") == 0) {
+            schedule->storage = strcmp(parameter.value, "on") == 0 ? RBRGEN4_SCHEDULE_STORAGE_ON
+                                                                   : RBRGEN4_SCHEDULE_STORAGE_OFF;
+        } else if (strcmp(parameter.key, "castdetection") == 0) {
             schedule->castDetection = strcmp(parameter.value, "on") == 0;
-        }
-        else if (strcmp(parameter.key, "mode") == 0)
-        {
-            schedule->mode = RBRGen4ScheduleMode_parse(
-                parameter.value);
-        }
-        else if (strcmp(parameter.key, "period") == 0)
-        {
+        } else if (strcmp(parameter.key, "mode") == 0) {
+            schedule->mode = RBRGen4ScheduleMode_parse(parameter.value);
+        } else if (strcmp(parameter.key, "period") == 0) {
             period = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "measurementperiod") == 0)
-        {
+        } else if (strcmp(parameter.key, "measurementperiod") == 0) {
             measurementPeriod = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "measurementcount") == 0)
-        {
+        } else if (strcmp(parameter.key, "measurementcount") == 0) {
             measurementCount = strtol(parameter.value, NULL, 10);
         }
     }
 
-    switch (schedule->mode)
-    {
+    switch (schedule->mode) {
     case RBRGEN4_SCHEDULE_MODE_CONTINUOUS:
         schedule->parameters.continuous.period = period;
         break;
@@ -1790,20 +1256,16 @@ RBRGen4Error RBRGen4_getSchedule(
     return err;
 }
 
-RBRGen4Error RBRGen4_setSchedule(
-    RBRGen4 *conn,
-    const RBRGen4Schedule *schedule,
-    const RBRGen4LabelList *groupList)
+RBRGen4Error RBRGen4_setSchedule(RBRGen4 *conn, const RBRGen4Schedule *schedule,
+                                 const RBRGen4LabelList *groupList)
 {
     /* A schedule runs in exactly one mode. */
-    if (schedule->label[0] == '\0'
-        || schedule->stream >= RBRGEN4_SCHEDULE_STREAM_COUNT
-        || schedule->storage > RBRGEN4_UNKNOWN_SCHEDULE_STORAGE
-        || schedule->storage == RBRGEN4_SCHEDULE_STORAGE_COUNT
-        || schedule->mode == RBRGEN4_SCHEDULE_MODE_NONE
-        || schedule->mode > RBRGEN4_SCHEDULE_MODE_MAX
-        || (schedule->mode & (schedule->mode - 1)) != 0)
-    {
+    if (schedule->label[0] == '\0' || schedule->stream >= RBRGEN4_SCHEDULE_STREAM_COUNT ||
+        schedule->storage > RBRGEN4_UNKNOWN_SCHEDULE_STORAGE ||
+        schedule->storage == RBRGEN4_SCHEDULE_STORAGE_COUNT ||
+        schedule->mode == RBRGEN4_SCHEDULE_MODE_NONE ||
+        schedule->mode > RBRGEN4_SCHEDULE_MODE_MAX ||
+        (schedule->mode & (schedule->mode - 1)) != 0) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
@@ -1811,8 +1273,7 @@ RBRGen4Error RBRGen4_setSchedule(
     RBRGen4Period measurementPeriod = 0;
     int32_t measurementCount = 0;
 
-    switch (schedule->mode)
-    {
+    switch (schedule->mode) {
     case RBRGEN4_SCHEDULE_MODE_CONTINUOUS:
         period = schedule->parameters.continuous.period;
         break;
@@ -1832,80 +1293,62 @@ RBRGen4Error RBRGen4_setSchedule(
 
     /* A NULL list leaves the instrument's group list unchanged. */
     char groups[RBRGEN4_COMMAND_BUFFER_MAX] = "";
-    if (groupList != NULL)
-    {
+    if (groupList != NULL) {
         const char prefix[] = "grouplist=";
         memcpy(groups, prefix, sizeof(prefix));
         int32_t length = (int32_t) sizeof(prefix) - 1;
         /* Leave room for the separating space. */
         RBR_TRY(RBRGen4_formatLabelList(
-                    groups + length,
-                    (int32_t) sizeof(groups) - length - 1,
-                    groupList));
+            groups + length, (int32_t) sizeof(groups) - length - 1, groupList));
         strcat(groups, " ");
     }
 
     /* Sending a `storage` the getter never read would be an error. */
     const char *storage = "";
-    if (schedule->storage != RBRGEN4_UNKNOWN_SCHEDULE_STORAGE)
-    {
-        storage = schedule->storage == RBRGEN4_SCHEDULE_STORAGE_ON
-                  ? "storage=on "
-                  : "storage=off ";
+    if (schedule->storage != RBRGEN4_UNKNOWN_SCHEDULE_STORAGE) {
+        storage = schedule->storage == RBRGEN4_SCHEDULE_STORAGE_ON ? "storage=on " : "storage=off ";
     }
 
 /* The parameters every mode sends, shared by the two forms below so the
  * spelling cannot drift between them. */
-#define SCHEDULE_COMMON \
-    "schedule %s %sstream=%s %scastdetection=%s mode=%s"
+#define SCHEDULE_COMMON "schedule %s %sstream=%s %scastdetection=%s mode=%s"
 
-    if (schedule->mode == RBRGEN4_SCHEDULE_MODE_CONTINUOUS)
-    {
-        return RBRGen4_converse(
-            conn,
-            SCHEDULE_COMMON " period=%" PRId32,
-            schedule->label,
-            groups,
-            RBRGen4ScheduleStream_name(schedule->stream),
-            storage,
-            schedule->castDetection ? "on" : "off",
-            RBRGen4ScheduleMode_name(schedule->mode),
-            period);
+    if (schedule->mode == RBRGEN4_SCHEDULE_MODE_CONTINUOUS) {
+        return RBRGen4_converse(conn,
+                                SCHEDULE_COMMON " period=%" PRId32,
+                                schedule->label,
+                                groups,
+                                RBRGen4ScheduleStream_name(schedule->stream),
+                                storage,
+                                schedule->castDetection ? "on" : "off",
+                                RBRGen4ScheduleMode_name(schedule->mode),
+                                period);
     }
 
-    return RBRGen4_converse(
-        conn,
-        SCHEDULE_COMMON
-        " period=%" PRId32
-        " measurementcount=%" PRId32
-        " measurementperiod=%" PRId32,
-        schedule->label,
-        groups,
-        RBRGen4ScheduleStream_name(schedule->stream),
-        storage,
-        schedule->castDetection ? "on" : "off",
-        RBRGen4ScheduleMode_name(schedule->mode),
-        period,
-        measurementCount,
-        measurementPeriod);
+    return RBRGen4_converse(conn,
+                            SCHEDULE_COMMON " period=%" PRId32 " measurementcount=%" PRId32
+                                            " measurementperiod=%" PRId32,
+                            schedule->label,
+                            groups,
+                            RBRGen4ScheduleStream_name(schedule->stream),
+                            storage,
+                            schedule->castDetection ? "on" : "off",
+                            RBRGen4ScheduleMode_name(schedule->mode),
+                            period,
+                            measurementCount,
+                            measurementPeriod);
 
 #undef SCHEDULE_COMMON
 }
 
-RBRGen4Error RBRGen4_getSchedulePool(
-    RBRGen4 *conn,
-    RBRGen4SchedulePool *schedulePool)
+RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedulePool)
 {
     schedulePool->count = 0;
     schedulePool->maxCount = 0;
-    memset(schedulePool->pool,
-           0,
-           schedulePool->size * sizeof(RBRGen4Schedule));
+    memset(schedulePool->pool, 0, schedulePool->size * sizeof(RBRGen4Schedule));
     schedulePool->availableModes = RBRGEN4_SCHEDULE_MODE_NONE;
     schedulePool->availableFastPeriodCount = 0;
-    memset(schedulePool->availableFastPeriods,
-           0,
-           sizeof(schedulePool->availableFastPeriods));
+    memset(schedulePool->availableFastPeriods, 0, sizeof(schedulePool->availableFastPeriods));
     schedulePool->maxRegimes = 0;
 
     RBR_TRY(RBRGen4_converse(conn, "schedule"));
@@ -1913,87 +1356,60 @@ RBRGen4Error RBRGen4_getSchedulePool(
     RBRGen4Error err = RBRGEN4_SUCCESS;
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &command,
-                                        &parameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "count") == 0)
-        {
+        } else if (strcmp(parameter.key, "count") == 0) {
             schedulePool->count = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "maxcount") == 0)
-        {
+        } else if (strcmp(parameter.key, "maxcount") == 0) {
             schedulePool->maxCount = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "maxregimes") == 0)
-        {
+        } else if (strcmp(parameter.key, "maxregimes") == 0) {
             schedulePool->maxRegimes = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "list") == 0)
-        {
+        } else if (strcmp(parameter.key, "list") == 0) {
             /* An empty pool reports `none`. */
-            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0)
-            {
+            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
                 continue;
             }
 
             /* Schedules past the pool's capacity are discarded. */
             char *value = parameter.value;
-            for (int32_t i = 0; value != NULL; i++)
-            {
-                if (i >= schedulePool->size)
-                {
+            for (int32_t i = 0; value != NULL; i++) {
+                if (i >= schedulePool->size) {
                     err = RBRGEN4_TRUNCATED;
                     break;
                 }
 
                 char *nextValue = RBRGen4_splitListValue(value);
 
-                snprintf(schedulePool->pool[i].label,
-                         sizeof(schedulePool->pool[i].label),
-                         "%s",
-                         value);
+                snprintf(
+                    schedulePool->pool[i].label, sizeof(schedulePool->pool[i].label), "%s", value);
 
                 value = nextValue;
             }
-        }
-        else if (strcmp(parameter.key, "availablemodes") == 0)
-        {
+        } else if (strcmp(parameter.key, "availablemodes") == 0) {
             char *value = parameter.value;
-            while (value != NULL)
-            {
+            while (value != NULL) {
                 char *nextValue = RBRGen4_splitListValue(value);
 
                 /* An unrecognized mode parses to `NONE` and drops out. */
-                schedulePool->availableModes |=
-                    RBRGen4ScheduleMode_parse(value);
+                schedulePool->availableModes |= RBRGen4ScheduleMode_parse(value);
 
                 value = nextValue;
             }
-        }
-        else if (strcmp(parameter.key, "availablefastperiods") == 0)
-        {
+        } else if (strcmp(parameter.key, "availablefastperiods") == 0) {
             /* No fast periods reports `none`. */
-            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0)
-            {
+            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
                 continue;
             }
 
             char *value = parameter.value;
-            while (value != NULL
-                   && schedulePool->availableFastPeriodCount
-                   < RBRGEN4_AVAILABLE_FAST_PERIODS_MAX)
-            {
+            while (value != NULL &&
+                   schedulePool->availableFastPeriodCount < RBRGEN4_AVAILABLE_FAST_PERIODS_MAX) {
                 char *nextValue = RBRGen4_splitListValue(value);
 
-                schedulePool->availableFastPeriods[
-                    schedulePool->availableFastPeriodCount] =
+                schedulePool->availableFastPeriods[schedulePool->availableFastPeriodCount] =
                     strtol(value, NULL, 10);
                 schedulePool->availableFastPeriodCount++;
 
@@ -2005,32 +1421,25 @@ RBRGen4Error RBRGen4_getSchedulePool(
     return err;
 }
 
-RBRGen4Error RBRGen4_createSchedule(
-    RBRGen4 *conn,
-    const char *label)
+RBRGen4Error RBRGen4_createSchedule(RBRGen4 *conn, const char *label)
 {
-    if (label[0] == '\0')
-    {
+    if (label[0] == '\0') {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     return RBRGen4_converse(conn, "schedule create %s", label);
 }
 
-RBRGen4Error RBRGen4_deleteSchedule(
-    RBRGen4 *conn,
-    const char *label)
+RBRGen4Error RBRGen4_deleteSchedule(RBRGen4 *conn, const char *label)
 {
-    if (label[0] == '\0')
-    {
+    if (label[0] == '\0') {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     return RBRGen4_converse(conn, "schedule delete %s", label);
 }
 
-RBRGen4Error RBRGen4_deleteScheduleAll(
-    RBRGen4 *conn)
+RBRGen4Error RBRGen4_deleteScheduleAll(RBRGen4 *conn)
 {
     return RBRGen4_converse(conn, "schedule delete all");
 }

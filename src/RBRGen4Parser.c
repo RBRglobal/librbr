@@ -17,8 +17,7 @@
 
 const char *RBRGen4EventType_name(RBRGen4EventType type)
 {
-    switch (type)
-    {
+    switch (type) {
     case RBRGEN4_EVENT_UNKNOWN_OR_UNRECOGNIZED_EVENT:
     default:
         return "unknown or unrecognized event";
@@ -113,28 +112,22 @@ const char *RBRGen4EventType_name(RBRGen4EventType type)
     }
 }
 
-RBRGen4Error RBRGen4Parser_init(RBRGen4Parser **parser,
-                                  const RBRGen4ParserCallbacks *callbacks,
-                                  const RBRGen4ParserConfig *config,
-                                  void *userData)
+RBRGen4Error RBRGen4Parser_init(RBRGen4Parser **parser, const RBRGen4ParserCallbacks *callbacks,
+                                const RBRGen4ParserConfig *config, void *userData)
 {
-    if (callbacks == NULL
-        || (callbacks->sample != NULL && callbacks->sampleBuffer == NULL)
-        || (callbacks->event != NULL && callbacks->eventBuffer == NULL))
-    {
+    if (callbacks == NULL || (callbacks->sample != NULL && callbacks->sampleBuffer == NULL) ||
+        (callbacks->event != NULL && callbacks->eventBuffer == NULL)) {
         return RBRGEN4_MISSING_CALLBACK;
     }
 
-    if (config->channelCount <= 0
-        || config->channelCount > RBRGEN4_CHANNEL_MAX)
-    {
+    if (config->channelCount <= 0 || config->channelCount > RBRGEN4_CHANNEL_MAX) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     memset(*parser, 0, sizeof(RBRGen4Parser));
     memcpy(&(*parser)->config, config, sizeof(RBRGen4ParserConfig));
     memcpy(&(*parser)->callbacks, callbacks, sizeof(RBRGen4ParserCallbacks));
-    (*parser)->userData          = userData;
+    (*parser)->userData = userData;
 
     return RBRGEN4_SUCCESS;
 }
@@ -161,45 +154,35 @@ void RBRGen4Parser_setUserData(RBRGen4Parser *parser, void *userData)
 #define EP_EVENT_TIMESTAMP_OFFSET 4
 #define EP_EVENT_PAYLOAD_OFFSET   12
 
-static RBRGen4Error RBRGen4Parser_parseEPEvents(
-    RBRGen4Parser *parser,
-    const uint8_t *const data,
-    int32_t *size)
+static RBRGen4Error RBRGen4Parser_parseEPEvents(RBRGen4Parser *parser, const uint8_t *const data,
+                                                int32_t *size)
 {
     int32_t maxSize = *size;
     *size = 0;
 
     RBRGen4Event *event = parser->callbacks.eventBuffer;
-    if (event == NULL)
-    {
+    if (event == NULL) {
         return RBRGEN4_SUCCESS;
     }
 
-    for (; *size + EP_EVENT_SIZE <= maxSize; *size += EP_EVENT_SIZE)
-    {
+    for (; *size + EP_EVENT_SIZE <= maxSize; *size += EP_EVENT_SIZE) {
         memset(event, 0, sizeof(RBRGen4Event));
 
         event->type = *(uint8_t *) (data + *size + EP_EVENT_TYPE_OFFSET);
-        event->timestamp =
-            *(RBRGen4DateTime *) (data
-                                        + *size
-                                        + EP_EVENT_TIMESTAMP_OFFSET);
-        switch (event->type)
-        {
+        event->timestamp = *(RBRGen4DateTime *) (data + *size + EP_EVENT_TIMESTAMP_OFFSET);
+        switch (event->type) {
         case RBRGEN4_EVENT_START_OF_REGIME_BIN:
         case RBRGEN4_EVENT_BEGIN_PROFILING_UP_CAST:
         case RBRGEN4_EVENT_BEGIN_PROFILING_DOWN_CAST:
         case RBRGEN4_EVENT_END_OF_PROFILING_CAST:
             event->auxiliaryDataLength = 1;
-            event->auxiliaryData[0] =
-                *(uint32_t *) (data + *size + EP_EVENT_PAYLOAD_OFFSET);
+            event->auxiliaryData[0] = *(uint32_t *) (data + *size + EP_EVENT_PAYLOAD_OFFSET);
             break;
         default:
             event->auxiliaryDataLength = 0;
         }
 
-        if (parser->callbacks.event != NULL)
-        {
+        if (parser->callbacks.event != NULL) {
             RBR_TRY(parser->callbacks.event(parser, event));
         }
     }
@@ -207,13 +190,11 @@ static RBRGen4Error RBRGen4Parser_parseEPEvents(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4Parser_parse(RBRGen4Parser *parser,
-                                   RBRGen4Block block,
-                                   const void *const data,
-                                   int32_t *size)
+RBRGen4Error RBRGen4Parser_parse(RBRGen4Parser *parser, RBRGen4Block block, const void *const data,
+                                 int32_t *size)
 {
     const uint8_t *d = (const uint8_t *const) data;
 
-    (void)block;
+    (void) block;
     return RBRGen4Parser_parseEPEvents(parser, d, size);
 }

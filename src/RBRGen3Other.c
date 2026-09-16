@@ -36,16 +36,11 @@ int RBRGen3Version_compare(const char *inA, const char *inB)
     bool validLengthA = lengthA >= VERSION_MIN && lengthA <= VERSION_MAX;
     bool validLengthB = lengthB >= VERSION_MIN && lengthB <= VERSION_MAX;
 
-    if (!validLengthA && !validLengthB)
-    {
+    if (!validLengthA && !validLengthB) {
         return 0;
-    }
-    else if (!validLengthA)
-    {
+    } else if (!validLengthA) {
         return -1;
-    }
-    else if (!validLengthB)
-    {
+    } else if (!validLengthB) {
         return 1;
     }
 
@@ -58,36 +53,25 @@ int RBRGen3Version_compare(const char *inA, const char *inB)
 
     /* '.' for production firmware releases; 'X' for developer versions. */
     char *separatorPosA = strchr(a, '.');
-    if (separatorPosA == NULL)
-    {
+    if (separatorPosA == NULL) {
         separatorPosA = strchr(a, 'X');
     }
 
     char *separatorPosB = strchr(b, '.');
-    if (separatorPosB == NULL)
-    {
+    if (separatorPosB == NULL) {
         separatorPosB = strchr(b, 'X');
     }
 
     /* The separators must be present, and there must be at least one character
      * before and after the separator. */
-    bool validA = separatorPosA != NULL
-                  && separatorPosA - a > 0
-                  && separatorPosA - a < lengthA - 1;
-    bool validB = separatorPosB != NULL
-                  && separatorPosB - b > 0
-                  && separatorPosB - b < lengthB - 1;
+    bool validA = separatorPosA != NULL && separatorPosA - a > 0 && separatorPosA - a < lengthA - 1;
+    bool validB = separatorPosB != NULL && separatorPosB - b > 0 && separatorPosB - b < lengthB - 1;
 
-    if (!validA && !validB)
-    {
+    if (!validA && !validB) {
         return 0;
-    }
-    else if (!validA)
-    {
+    } else if (!validA) {
         return -1;
-    }
-    else if (!validB)
-    {
+    } else if (!validB) {
         return 1;
     }
 
@@ -101,16 +85,14 @@ int RBRGen3Version_compare(const char *inA, const char *inB)
     int majorA = strtol(a, NULL, 10);
     int majorB = strtol(b, NULL, 10);
     int majorDelta = majorA - majorB;
-    if (majorDelta != 0)
-    {
+    if (majorDelta != 0) {
         return majorDelta;
     }
 
     int minorA = strtol(separatorPosA + 1, NULL, 10);
     int minorB = strtol(separatorPosB + 1, NULL, 10);
     int minorDelta = minorA - minorB;
-    if (minorDelta != 0)
-    {
+    if (minorDelta != 0) {
         return minorDelta;
     }
 
@@ -121,8 +103,7 @@ int RBRGen3Version_compare(const char *inA, const char *inB)
     return -(separatorA - separatorB);
 }
 
-RBRGen3Error RBRGen3_getId(RBRGen3 *conn,
-                                       RBRGen3Id *id)
+RBRGen3Error RBRGen3_getId(RBRGen3 *conn, RBRGen3Id *id)
 {
     memset(id, 0, sizeof(RBRGen3Id));
 
@@ -130,58 +111,33 @@ RBRGen3Error RBRGen3_getId(RBRGen3 *conn,
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
-    do
-    {
-        RBRGen3_parseResponse(conn,
-                                    &command,
-                                    &parameter);
+    do {
+        RBRGen3_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
         }
-        if (strcmp(parameter.key, "model") == 0)
-        {
-            snprintf(id->model,
-                     sizeof(id->model),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "version") == 0)
-        {
-            snprintf(id->version,
-                     sizeof(id->version),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "serial") == 0)
-        {
+        if (strcmp(parameter.key, "model") == 0) {
+            snprintf(id->model, sizeof(id->model), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "version") == 0) {
+            snprintf(id->version, sizeof(id->version), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "serial") == 0) {
             id->serial = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "fwtype") == 0)
-        {
+        } else if (strcmp(parameter.key, "fwtype") == 0) {
             id->fwtype = strtol(parameter.value, NULL, 10);
-        }
-        else if (strcmp(parameter.key, "mode") == 0)
-        {
-            snprintf(id->mode,
-                     sizeof(id->mode),
-                     "%s",
-                     parameter.value);
+        } else if (strcmp(parameter.key, "mode") == 0) {
+            snprintf(id->mode, sizeof(id->mode), "%s", parameter.value);
         }
     } while (true);
 
-    if (id != &conn->id)
-    {
+    if (id != &conn->id) {
         memcpy(&conn->id, id, sizeof(RBRGen3Id));
     }
 
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRGen3_getHardwareRevision(
-    RBRGen3 *conn,
-    RBRGen3HardwareRevision *hwrev)
+RBRGen3Error RBRGen3_getHardwareRevision(RBRGen3 *conn, RBRGen3HardwareRevision *hwrev)
 {
     memset(hwrev, 0, sizeof(RBRGen3HardwareRevision));
 
@@ -189,29 +145,16 @@ RBRGen3Error RBRGen3_getHardwareRevision(
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen3_parseResponse(conn,
-                                    &command,
-                                    &parameter);
+    while (true) {
+        RBRGen3_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "pcb") == 0)
-        {
+        } else if (strcmp(parameter.key, "pcb") == 0) {
             hwrev->pcb = *parameter.value;
-        }
-        else if (strcmp(parameter.key, "cpu") == 0)
-        {
-            snprintf(hwrev->cpu,
-                     sizeof(hwrev->cpu),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "bsl") == 0)
-        {
+        } else if (strcmp(parameter.key, "cpu") == 0) {
+            snprintf(hwrev->cpu, sizeof(hwrev->cpu), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "bsl") == 0) {
             hwrev->bsl = *parameter.value;
         }
     }
@@ -221,8 +164,7 @@ RBRGen3Error RBRGen3_getHardwareRevision(
 
 const char *RBRGen3PowerSource_name(RBRGen3PowerSource source)
 {
-    switch (source)
-    {
+    switch (source) {
     case RBRGEN3_POWER_SOURCE_USB:
         return "usb";
     case RBRGEN3_POWER_SOURCE_INTERNAL:
@@ -237,65 +179,43 @@ const char *RBRGen3PowerSource_name(RBRGen3PowerSource source)
     }
 }
 
-RBRGen3Error RBRGen3_getPower(RBRGen3 *conn,
-                                          RBRGen3Power *power)
+RBRGen3Error RBRGen3_getPower(RBRGen3 *conn, RBRGen3Power *power)
 {
     memset(power, 0, sizeof(RBRGen3Power));
     power->source = RBRGEN3_UNKNOWN_POWER_SOURCE;
     power->internal = NAN;
     power->regulator = NAN;
 
-    if (conn->generation == RBRGEN3_LOGGER2)
-    {
+    if (conn->generation == RBRGEN3_LOGGER2) {
         RBR_TRY(RBRGen3_converse(conn, "powerstatus"));
-    }
-    else
-    {
+    } else {
         RBR_TRY(RBRGen3_converse(conn, "power"));
     }
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen3_parseResponse(conn,
-                                    &command,
-                                    &parameter);
+    while (true) {
+        RBRGen3_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "source") == 0)
-        {
-            for (int i = 0; i < RBRGEN3_POWER_SOURCE_COUNT; i++)
-            {
-                if (strcmp(RBRGen3PowerSource_name(i),
-                           parameter.value) == 0)
-                {
+        } else if (strcmp(parameter.key, "source") == 0) {
+            for (int i = 0; i < RBRGEN3_POWER_SOURCE_COUNT; i++) {
+                if (strcmp(RBRGen3PowerSource_name(i), parameter.value) == 0) {
                     power->source = i;
                     break;
                 }
             }
-        }
-        else if (strcmp(parameter.key, "int") == 0)
-        {
-            if (strcmp(parameter.value, "n/a") != 0)
-            {
+        } else if (strcmp(parameter.key, "int") == 0) {
+            if (strcmp(parameter.value, "n/a") != 0) {
                 power->internal = strtod(parameter.value, NULL);
             }
-        }
-        else if (strcmp(parameter.key, "ext") == 0)
-        {
-            if (strcmp(parameter.value, "n/a") != 0)
-            {
+        } else if (strcmp(parameter.key, "ext") == 0) {
+            if (strcmp(parameter.value, "n/a") != 0) {
                 power->external = strtod(parameter.value, NULL);
             }
-        }
-        else if (strcmp(parameter.key, "reg") == 0)
-        {
-            if (strcmp(parameter.value, "n/a") != 0)
-            {
+        } else if (strcmp(parameter.key, "reg") == 0) {
+            if (strcmp(parameter.value, "n/a") != 0) {
                 power->regulator = strtod(parameter.value, NULL);
             }
         }
@@ -304,11 +224,9 @@ RBRGen3Error RBRGen3_getPower(RBRGen3 *conn,
     return RBRGEN3_SUCCESS;
 }
 
-const char *RBRGen3InternalBatteryType_name(
-    RBRGen3InternalBatteryType type)
+const char *RBRGen3InternalBatteryType_name(RBRGen3InternalBatteryType type)
 {
-    switch (type)
-    {
+    switch (type) {
     case RBRGEN3_INTERNAL_BATTERY_NONE:
         return "none";
     case RBRGEN3_INTERNAL_BATTERY_LISOCL2:
@@ -329,11 +247,9 @@ const char *RBRGen3InternalBatteryType_name(
     }
 }
 
-const char *RBRGen3InternalBatteryType_displayName(
-    RBRGen3InternalBatteryType type)
+const char *RBRGen3InternalBatteryType_displayName(RBRGen3InternalBatteryType type)
 {
-    switch (type)
-    {
+    switch (type) {
     case RBRGEN3_INTERNAL_BATTERY_NONE:
         return "none";
     case RBRGEN3_INTERNAL_BATTERY_LISOCL2:
@@ -354,12 +270,9 @@ const char *RBRGen3InternalBatteryType_displayName(
     }
 }
 
-RBRGen3Error RBRGen3_getPowerInternal(
-    RBRGen3 *conn,
-    RBRGen3PowerInternal *power)
+RBRGen3Error RBRGen3_getPowerInternal(RBRGen3 *conn, RBRGen3PowerInternal *power)
 {
-    if (conn->generation == RBRGEN3_LOGGER2)
-    {
+    if (conn->generation == RBRGEN3_LOGGER2) {
         return RBRGEN3_UNSUPPORTED;
     }
 
@@ -370,34 +283,21 @@ RBRGen3Error RBRGen3_getPowerInternal(
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen3_parseResponse(conn,
-                                    &command,
-                                    &parameter);
+    while (true) {
+        RBRGen3_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "batterytype") == 0)
-        {
-            for (int i = 0; i < RBRGEN3_INTERNAL_BATTERY_COUNT; i++)
-            {
-                if (strcmp(RBRGen3InternalBatteryType_name(i),
-                           parameter.value) == 0)
-                {
+        } else if (strcmp(parameter.key, "batterytype") == 0) {
+            for (int i = 0; i < RBRGEN3_INTERNAL_BATTERY_COUNT; i++) {
+                if (strcmp(RBRGen3InternalBatteryType_name(i), parameter.value) == 0) {
                     power->batteryType = i;
                     break;
                 }
             }
-        }
-        else if (strcmp(parameter.key, "capacity") == 0)
-        {
+        } else if (strcmp(parameter.key, "capacity") == 0) {
             *(float *) &power->capacity = strtod(parameter.value, NULL);
-        }
-        else if (strcmp(parameter.key, "used") == 0)
-        {
+        } else if (strcmp(parameter.key, "used") == 0) {
             power->used = strtod(parameter.value, NULL);
         }
     }
@@ -405,32 +305,24 @@ RBRGen3Error RBRGen3_getPowerInternal(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRGen3_setPowerInternalBatteryType(
-    RBRGen3 *conn,
-    RBRGen3InternalBatteryType type)
+RBRGen3Error RBRGen3_setPowerInternalBatteryType(RBRGen3 *conn, RBRGen3InternalBatteryType type)
 {
-    if (type < 0 || type >= RBRGEN3_INTERNAL_BATTERY_COUNT)
-    {
+    if (type < 0 || type >= RBRGEN3_INTERNAL_BATTERY_COUNT) {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
     return RBRGen3_converse(
-        conn,
-        "powerinternal batterytype = %s",
-        RBRGen3InternalBatteryType_name(type));
+        conn, "powerinternal batterytype = %s", RBRGen3InternalBatteryType_name(type));
 }
 
-RBRGen3Error RBRGen3_resetPowerInternalUsed(
-    RBRGen3 *conn)
+RBRGen3Error RBRGen3_resetPowerInternalUsed(RBRGen3 *conn)
 {
     return RBRGen3_converse(conn, "powerinternal used = 0");
 }
 
-const char *RBRGen3ExternalBatteryType_name(
-    RBRGen3ExternalBatteryType type)
+const char *RBRGen3ExternalBatteryType_name(RBRGen3ExternalBatteryType type)
 {
-    switch (type)
-    {
+    switch (type) {
     case RBRGEN3_EXTERNAL_BATTERY_OTHER:
         return "other";
     case RBRGEN3_EXTERNAL_BATTERY_FERMATA_LISOCL2:
@@ -457,11 +349,9 @@ const char *RBRGen3ExternalBatteryType_name(
     }
 }
 
-const char *RBRGen3ExternalBatteryType_displayName(
-    RBRGen3ExternalBatteryType type)
+const char *RBRGen3ExternalBatteryType_displayName(RBRGen3ExternalBatteryType type)
 {
-    switch (type)
-    {
+    switch (type) {
     case RBRGEN3_EXTERNAL_BATTERY_OTHER:
         return "other";
     case RBRGEN3_EXTERNAL_BATTERY_FERMATA_LISOCL2:
@@ -488,12 +378,9 @@ const char *RBRGen3ExternalBatteryType_displayName(
     }
 }
 
-RBRGen3Error RBRGen3_getPowerExternal(
-    RBRGen3 *conn,
-    RBRGen3PowerExternal *power)
+RBRGen3Error RBRGen3_getPowerExternal(RBRGen3 *conn, RBRGen3PowerExternal *power)
 {
-    if (conn->generation == RBRGEN3_LOGGER2)
-    {
+    if (conn->generation == RBRGEN3_LOGGER2) {
         return RBRGEN3_UNSUPPORTED;
     }
 
@@ -504,34 +391,21 @@ RBRGen3Error RBRGen3_getPowerExternal(
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen3_parseResponse(conn,
-                                    &command,
-                                    &parameter);
+    while (true) {
+        RBRGen3_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "batterytype") == 0)
-        {
-            for (int i = 0; i < RBRGEN3_EXTERNAL_BATTERY_COUNT; i++)
-            {
-                if (strcmp(RBRGen3ExternalBatteryType_name(i),
-                           parameter.value) == 0)
-                {
+        } else if (strcmp(parameter.key, "batterytype") == 0) {
+            for (int i = 0; i < RBRGEN3_EXTERNAL_BATTERY_COUNT; i++) {
+                if (strcmp(RBRGen3ExternalBatteryType_name(i), parameter.value) == 0) {
                     power->batteryType = i;
                     break;
                 }
             }
-        }
-        else if (strcmp(parameter.key, "capacity") == 0)
-        {
+        } else if (strcmp(parameter.key, "capacity") == 0) {
             *(float *) &power->capacity = strtod(parameter.value, NULL);
-        }
-        else if (strcmp(parameter.key, "used") == 0)
-        {
+        } else if (strcmp(parameter.key, "used") == 0) {
             power->used = strtod(parameter.value, NULL);
         }
     }
@@ -539,33 +413,24 @@ RBRGen3Error RBRGen3_getPowerExternal(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRGen3_setPowerExternalBatteryType(
-    RBRGen3 *conn,
-    RBRGen3ExternalBatteryType type)
+RBRGen3Error RBRGen3_setPowerExternalBatteryType(RBRGen3 *conn, RBRGen3ExternalBatteryType type)
 {
-    if (type < 0 || type >= RBRGEN3_EXTERNAL_BATTERY_COUNT)
-    {
+    if (type < 0 || type >= RBRGEN3_EXTERNAL_BATTERY_COUNT) {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
     return RBRGen3_converse(
-        conn,
-        "powerexternal batterytype = %s",
-        RBRGen3ExternalBatteryType_name(type));
+        conn, "powerexternal batterytype = %s", RBRGen3ExternalBatteryType_name(type));
 }
 
-RBRGen3Error RBRGen3_resetPowerExternalUsed(
-    RBRGen3 *conn)
+RBRGen3Error RBRGen3_resetPowerExternalUsed(RBRGen3 *conn)
 {
     return RBRGen3_converse(conn, "powerexternal used = 0");
 }
 
-RBRGen3Error RBRGen3_getInfo(
-    RBRGen3 *conn,
-    RBRGen3Info *info)
+RBRGen3Error RBRGen3_getInfo(RBRGen3 *conn, RBRGen3Info *info)
 {
-    if (conn->generation == RBRGEN3_LOGGER2)
-    {
+    if (conn->generation == RBRGEN3_LOGGER2) {
         return RBRGEN3_UNSUPPORTED;
     }
 
@@ -575,25 +440,14 @@ RBRGen3Error RBRGen3_getInfo(
 
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
-    while (true)
-    {
-        RBRGen3_parseResponse(conn,
-                                    &command,
-                                    &parameter);
+    while (true) {
+        RBRGen3_parseResponse(conn, &command, &parameter);
 
-        if (parameter.key == NULL || parameter.value == NULL)
-        {
+        if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        }
-        else if (strcmp(parameter.key, "pn") == 0)
-        {
-            snprintf(info->partNumber,
-                     sizeof(info->partNumber),
-                     "%s",
-                     parameter.value);
-        }
-        else if (strcmp(parameter.key, "fwlock") == 0)
-        {
+        } else if (strcmp(parameter.key, "pn") == 0) {
+            snprintf(info->partNumber, sizeof(info->partNumber), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "fwlock") == 0) {
             info->fwLock = (strcmp(parameter.value, "on") == 0);
         }
     }
