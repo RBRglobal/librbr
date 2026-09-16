@@ -273,13 +273,13 @@ RBRGen4Error RBRGen4_resume(
 typedef enum RBRGen4DeploymentStorageMode
 {
     /** Calibration equations are applied to all channel data. */
-    RBRGEN4_STORAGEMODE_NORMAL,
+    RBRGEN4_STORAGE_MODE_NORMAL,
     /** Calibration equations are not applied. */
-    RBRGEN4_STORAGEMODE_CALIBRATION,
+    RBRGEN4_STORAGE_MODE_CALIBRATION,
     /** The number of specific storage modes. */
-    RBRGEN4_STORAGEMODE_COUNT,
+    RBRGEN4_STORAGE_MODE_COUNT,
     /** An unknown or unrecognized storage mode. */
-    RBRGEN4_UNKNOWN_STORAGEMODE,
+    RBRGEN4_UNKNOWN_STORAGE_MODE,
 } RBRGen4DeploymentStorageMode;
 
 /**

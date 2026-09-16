@@ -241,7 +241,7 @@ TEST_LOGGER4(getDataset)
           { .label = "d1",
             .status = RBRGEN4_DATASET_STATUS_CLOSED,
             .byteCount = 5604LL,
-            .dataType = RBRGEN4_DATATYPE_FLOAT64 },
+            .dataType = RBRGEN4_DATA_TYPE_FLOAT64 },
           1,
           { "s_cont" } },
         { "dataset d1 status=open schedulelist=tides_schedule|DO_schedule"
@@ -250,7 +250,7 @@ TEST_LOGGER4(getDataset)
           { .label = "d1",
             .status = RBRGEN4_DATASET_STATUS_OPEN,
             .byteCount = 3749498LL,
-            .dataType = RBRGEN4_DATATYPE_FLOAT32 },
+            .dataType = RBRGEN4_DATA_TYPE_FLOAT32 },
           2,
           { "tides_schedule", "DO_schedule" } },
         /* Values the library does not model parse to the unknown members. */
@@ -260,7 +260,7 @@ TEST_LOGGER4(getDataset)
           { .label = "d1",
             .status = RBRGEN4_UNKNOWN_DATASET_STATUS,
             .byteCount = 0LL,
-            .dataType = RBRGEN4_UNKNOWN_DATATYPE },
+            .dataType = RBRGEN4_UNKNOWN_DATA_TYPE },
           1,
           { "s_cont" } },
         /* A dataset which does not exist is a hardware error. */
@@ -269,7 +269,7 @@ TEST_LOGGER4(getDataset)
           { .label = "d1",
             .status = RBRGEN4_UNKNOWN_DATASET_STATUS,
             .byteCount = 0LL,
-            .dataType = RBRGEN4_UNKNOWN_DATATYPE },
+            .dataType = RBRGEN4_UNKNOWN_DATA_TYPE },
           0,
           { NULL } },
         { NULL, 0, { .label = "" }, 0, { NULL } }

@@ -432,7 +432,7 @@ TEST_LOGGER4(verify)
         /* All three parameters are always sent. */
         { { .label = "c_test" },
           "d1",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "verify config=c_test dataset=d1 storagemode=normal state=enabled"
@@ -441,7 +441,7 @@ TEST_LOGGER4(verify)
           RBRGEN4_INSTRUMENT_STATE_ENABLED },
         { { .label = "pH_cal" },
           "d_pHcal_20260824",
-          RBRGEN4_STORAGEMODE_CALIBRATION,
+          RBRGEN4_STORAGE_MODE_CALIBRATION,
           "verify config=pH_cal dataset=d_pHcal_20260824 "
           "storagemode=calibration" COMMAND_TERMINATOR,
           "verify config=pH_cal dataset=d_pHcal_20260824 "
@@ -454,7 +454,7 @@ TEST_LOGGER4(verify)
          */
         { { .label = "c_test" },
           "d1",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "verify state=disabled dataset=d1 config=c_test storagemode=normal"
@@ -464,7 +464,7 @@ TEST_LOGGER4(verify)
         /* A state the library does not model reads as unknown. */
         { { .label = "c_test" },
           "d1",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "verify config=c_test dataset=d1 state=bogus" RESPONSE_TERMINATOR,
@@ -473,7 +473,7 @@ TEST_LOGGER4(verify)
         /* A response with no state at all leaves it unknown. */
         { { .label = "c_test" },
           "d1",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "verify config=c_test dataset=d1" RESPONSE_TERMINATOR,
@@ -482,35 +482,35 @@ TEST_LOGGER4(verify)
         /* Out-of-range parameters never reach the instrument. */
         { { .label = "" },
           "d1",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "0123456789012345678901234567890123",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
-          RBRGEN4_UNKNOWN_STORAGEMODE,
+          RBRGEN4_UNKNOWN_STORAGE_MODE,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
-          RBRGEN4_STORAGEMODE_COUNT,
+          RBRGEN4_STORAGE_MODE_COUNT,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -518,7 +518,7 @@ TEST_LOGGER4(verify)
         /* Every failing check the instrument makes. */
         { { .label = "nope" },
           "d1",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=nope dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-108 invalid argument to command: 'nope'" RESPONSE_TERMINATOR,
@@ -526,7 +526,7 @@ TEST_LOGGER4(verify)
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d.1",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d.1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-131 illegal character in label 'd.1'" RESPONSE_TERMINATOR,
@@ -534,7 +534,7 @@ TEST_LOGGER4(verify)
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-120 'd1' is already in use" RESPONSE_TERMINATOR,
@@ -542,7 +542,7 @@ TEST_LOGGER4(verify)
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d5",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d5 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-431 dataset limit of '4' reached, delete dataset(s) to make "
@@ -551,7 +551,7 @@ TEST_LOGGER4(verify)
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d2",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "verify config=c_test dataset=d2 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-436 instrument was already enabled with different settings"
@@ -601,7 +601,7 @@ TEST_LOGGER4(enable)
     EnableTest tests[] = {
         { { .label = "c_test" },
           "d1",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "enable config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "enable config=c_test dataset=d1 storagemode=normal state=enabled"
@@ -610,7 +610,7 @@ TEST_LOGGER4(enable)
           RBRGEN4_INSTRUMENT_STATE_ENABLED },
         { { .label = "pH_cal" },
           "d_pHcal_20260824",
-          RBRGEN4_STORAGEMODE_CALIBRATION,
+          RBRGEN4_STORAGE_MODE_CALIBRATION,
           "enable config=pH_cal dataset=d_pHcal_20260824 "
           "storagemode=calibration" COMMAND_TERMINATOR,
           "enable config=pH_cal dataset=d_pHcal_20260824 "
@@ -620,14 +620,14 @@ TEST_LOGGER4(enable)
         /* Out-of-range parameters never reach the instrument. */
         { { .label = "" },
           "d1",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -638,14 +638,14 @@ TEST_LOGGER4(enable)
          */
         { { .label = "c_test" },
           "0123456789012345678901234567890123",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
-          RBRGEN4_UNKNOWN_STORAGEMODE,
+          RBRGEN4_UNKNOWN_STORAGE_MODE,
           "",
           "",
           RBRGEN4_INVALID_PARAMETER_VALUE,
@@ -653,7 +653,7 @@ TEST_LOGGER4(enable)
         /* Every failing check the instrument makes. */
         { { .label = "c_test" },
           "d1",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "enable config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-408 instrument was already enabled" RESPONSE_TERMINATOR,
@@ -661,7 +661,7 @@ TEST_LOGGER4(enable)
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d2",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "enable config=c_test dataset=d2 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-436 instrument was already enabled with different settings"
@@ -670,7 +670,7 @@ TEST_LOGGER4(enable)
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d1",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "enable config=c_test dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-120 'd1' is already in use" RESPONSE_TERMINATOR,
@@ -678,7 +678,7 @@ TEST_LOGGER4(enable)
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_test" },
           "d5",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "enable config=c_test dataset=d5 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-431 dataset limit of '4' reached, delete dataset(s) to make "
@@ -687,7 +687,7 @@ TEST_LOGGER4(enable)
           RBRGEN4_UNKNOWN_INSTRUMENT_STATE },
         { { .label = "c_empty" },
           "d1",
-          RBRGEN4_STORAGEMODE_NORMAL,
+          RBRGEN4_STORAGE_MODE_NORMAL,
           "enable config=c_empty dataset=d1 storagemode=normal"
           COMMAND_TERMINATOR,
           "ERR-430 empty schedule list in configuration 'c_empty'"

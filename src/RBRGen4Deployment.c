@@ -363,8 +363,8 @@ static RBRGen4Error RBRGen4_checkDeploymentParameters(
         || datasetLabel == NULL
         || datasetLabel[0] == '\0'
         || strlen(datasetLabel) > RBRGEN4_LABEL_NAME_MAX
-        || (storageMode != RBRGEN4_STORAGEMODE_NORMAL
-            && storageMode != RBRGEN4_STORAGEMODE_CALIBRATION))
+        || (storageMode != RBRGEN4_STORAGE_MODE_NORMAL
+            && storageMode != RBRGEN4_STORAGE_MODE_CALIBRATION))
     {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
@@ -399,13 +399,13 @@ const char *RBRGen4DeploymentStorageMode_name(RBRGen4DeploymentStorageMode stora
 {
     switch (storageMode)
     {
-    case RBRGEN4_STORAGEMODE_NORMAL:
+    case RBRGEN4_STORAGE_MODE_NORMAL:
         return "normal";
-    case RBRGEN4_STORAGEMODE_CALIBRATION:
+    case RBRGEN4_STORAGE_MODE_CALIBRATION:
         return "calibration";
-    case RBRGEN4_STORAGEMODE_COUNT:
+    case RBRGEN4_STORAGE_MODE_COUNT:
         return "storage mode count";
-    case RBRGEN4_UNKNOWN_STORAGEMODE:
+    case RBRGEN4_UNKNOWN_STORAGE_MODE:
     default:
         return "unknown storage mode";
     }

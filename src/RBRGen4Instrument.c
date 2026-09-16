@@ -641,13 +641,13 @@ RBRGen4Error RBRGen4_resetPowerExternalUsed(
  *
  * \param [in] value the parameter value reported by the instrument
  * \return the corresponding data type
- * \return #RBRGEN4_UNKNOWN_DATATYPE when the value is unrecognized
+ * \return #RBRGEN4_UNKNOWN_DATA_TYPE when the value is unrecognized
  */
 static RBRGen4DataType RBRGen4DataType_parse(
     const char *value)
 {
     for (int32_t dataType = 0;
-         dataType < RBRGEN4_DATATYPE_COUNT;
+         dataType < RBRGEN4_DATA_TYPE_COUNT;
          ++dataType)
     {
         if (strcmp(value,
@@ -658,7 +658,7 @@ static RBRGen4DataType RBRGen4DataType_parse(
         }
     }
 
-    return RBRGEN4_UNKNOWN_DATATYPE;
+    return RBRGEN4_UNKNOWN_DATA_TYPE;
 }
 
 RBRGen4Error RBRGen4_getInstrument(
@@ -667,7 +667,7 @@ RBRGen4Error RBRGen4_getInstrument(
 {
     memset(instrumentInfo, 0, sizeof(RBRGen4Instrument));
     instrumentInfo->state = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
-    instrumentInfo->dataType = RBRGEN4_UNKNOWN_DATATYPE;
+    instrumentInfo->dataType = RBRGEN4_UNKNOWN_DATA_TYPE;
 
     RBR_TRY(RBRGen4_converse(conn, "instrument"));
 
@@ -783,7 +783,7 @@ RBRGen4Error RBRGen4_getOutputFormat(
 {
     memset(outputFormat, 0, sizeof(RBRGen4OutputFormat));
     outputFormat->encoding = RBRGEN4_UNKNOWN_ENCODING;
-    outputFormat->dataType = RBRGEN4_UNKNOWN_DATATYPE;
+    outputFormat->dataType = RBRGEN4_UNKNOWN_DATA_TYPE;
 
     RBR_TRY(RBRGen4_converse(conn, "instrument outputformat"));
 
@@ -846,7 +846,7 @@ RBRGen4Error RBRGen4_setOutputFormat(
     if (outputFormat->encoding < 0
         || outputFormat->encoding >= RBRGEN4_ENCODING_COUNT
         || outputFormat->dataType < 0
-        || outputFormat->dataType >= RBRGEN4_DATATYPE_COUNT)
+        || outputFormat->dataType >= RBRGEN4_DATA_TYPE_COUNT)
     {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }

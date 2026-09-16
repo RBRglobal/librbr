@@ -324,7 +324,7 @@ int main(int argc, char *argv[])
     RBRGen4_verify(conn,
                              &config_ascent,
                              NEW_DATASET_LABEL,
-                             RBRGEN4_STORAGEMODE_NORMAL,
+                             RBRGEN4_STORAGE_MODE_NORMAL,
                              &loggingState);
 
     printf("%s: Start instrument logging with default_config.\n",
@@ -332,7 +332,7 @@ int main(int argc, char *argv[])
     if ((err = RBRGen4_enable(conn,
                                         &config_ascent,
                                         NEW_DATASET_LABEL,
-                                        RBRGEN4_STORAGEMODE_NORMAL,
+                                        RBRGEN4_STORAGE_MODE_NORMAL,
                                         &loggingState)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr,

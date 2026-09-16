@@ -219,7 +219,7 @@ int main(void)
                   conn,
                   &config,
                   datasetLabel,
-                  RBRGEN4_STORAGEMODE_NORMAL,
+                  RBRGEN4_STORAGE_MODE_NORMAL,
                   &verifyStatus)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "./posix-test.c: %s!\n",

@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 
     RBRGen4ParserConfig parserConfig = {
         .channelCount = channels,
-        .dataType = RBRGEN4_DATATYPE_FLOAT32
+        .dataType = RBRGEN4_DATA_TYPE_FLOAT32
     };
 
     RBRGen4Error err;
