@@ -129,19 +129,19 @@ typedef struct RBRGen4DynamicCorrectionParams
     float CT_coeff;
 
     /** \brief coefficient for alpha estimation*/
-    float alpha_a;    // alpha = alpha_a * powf(Vp * alpha_e)
+    float alpha_a;    /* alpha = alpha_a * powf(Vp * alpha_e) */
 
     /** \brief coefficient for alpha estimation*/
     float alpha_e;
 
     /** \brief coefficient for tau estimation*/
-    float tau_a;      // tau = tau_a * powf(Vp * tau_e)
+    float tau_a;      /* tau = tau_a * powf(Vp * tau_e) */
 
     /** \brief coefficient for tau estimation*/
     float tau_e;
 
     /** \brief coefficient for CT_coeff estimation*/
-    float ctcoeff_a;  // ctcoeff = ctcoeff_a * powf(Vp * ctcoeff_e)
+    float ctcoeff_a;  /* ctcoeff = ctcoeff_a * powf(Vp * ctcoeff_e) */
     
     /** \brief coefficient for CT_coeff estimation*/
     float ctcoeff_e;
@@ -155,8 +155,8 @@ typedef struct RBRGen4DynamicCorrectionParams
     /** \brief frequency cut of ascent rate estimation low pass filter(Hz)*/
     float Vp_fc;
 
-    // --- internal private data ---
-    /// @cond
+    /* --- internal private data --- */
+    /** \cond */
     int32_t _firstCall;
     int32_t _isError;
     float _ascentRate;
@@ -177,7 +177,7 @@ typedef struct RBRGen4DynamicCorrectionParams
     float _C_meas_lagArray[DCORR_MAX_LAG_ARRAY];
     float _P_meas_lagArray[DCORR_MAX_LAG_ARRAY];
     float _T_cond_lagArray[DCORR_MAX_LAG_ARRAY];    
-    /// @endcond
+    /** \endcond */
 } RBRGen4DynamicCorrectionParams;
 
 /** \brief RBRGen4DynamicCorrectionMeasurement
@@ -267,4 +267,4 @@ RBRGen4DynamicCorrectionError RBRGen4DynamicCorrection_update_Fs(const float Fs,
 RBRGen4DynamicCorrectionError RBRGen4DynamicCorrection_addMeasurement(const RBRGen4DynamicCorrectionMeasurement * measIn, RBRGen4DynamicCorrectionParams *params, RBRGen4DynamicCorrectionResult * corrMeasOut);
 
 
-#endif // LIBRBR_RBRGEN4DYNAMICCORRECTION_H
+#endif /* LIBRBR_RBRGEN4DYNAMICCORRECTION_H */

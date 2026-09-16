@@ -79,34 +79,34 @@ float RBRGen4DynamicCorrection_PSS78(float C, float T, float P)
     float S_1, S_2;
     float S;
 
-    // hydrostatic pressure(i.e. sea Pressure) in bars
+    /* hydrostatic pressure(i.e. sea Pressure) in bars */
     pressure=P*0.1f;
 
-    // temperature in ITS68...
+    /* temperature in ITS68... */
     T_its68=T*1.00024f;
 
-    // convert conductivity to a ratio
+    /* convert conductivity to a ratio */
     R= C/PSS78_C_REF;
 
-    // rT & Rp
-    //rT = PSS78_C0 + PSS78_C1*T_its68 + PSS78_C2*(T_its68*T_its68) + PSS78_C3*T_its68*(T_its68*T_its68) + 
-    //                        PSS78_C4*(T_its68*T_its68)*(T_its68*T_its68);
+    /* rT & Rp
+     * rT = PSS78_C0 + PSS78_C1*T_its68 + PSS78_C2*(T_its68*T_its68) + PSS78_C3*T_its68*(T_its68*T_its68) +
+     *                        PSS78_C4*(T_its68*T_its68)*(T_its68*T_its68); */
     rT = PSS78_C3 + PSS78_C4*T_its68;
     rT = PSS78_C2 + rT*T_its68;
     rT = PSS78_C1 + rT*T_its68;
     rT = PSS78_C0 + rT*T_its68;
 
-    //Rp_num = PSS78_E1*seaPressure + PSS78_E2*(seaPressure*seaPressure) + PSS78_E3*seaPressure*(seaPressure*seaPressure);
+    /* Rp_num = PSS78_E1*seaPressure + PSS78_E2*(seaPressure*seaPressure) + PSS78_E3*seaPressure*(seaPressure*seaPressure); */
     Rp_num = PSS78_E2 + PSS78_E3*pressure;
     Rp_num = (PSS78_E1 + Rp_num*pressure)*pressure;
 
     Rp_den = 1.0f + PSS78_D1*T_its68 + PSS78_D2*(T_its68*T_its68) + PSS78_D3*R + PSS78_D4*(T_its68*R);
     Rp = 1.0f + Rp_num/Rp_den;
 
-    // R_T
+    /* R_T */
     RT = R/(Rp*rT);
 
-    // sqrt(RT)
+    /* sqrt(RT) */
     RT_sqrt = sqrtf(RT);
     if ( ISNAN(RT_sqrt) )
     {
@@ -300,11 +300,11 @@ RBRGen4DynamicCorrectionError RBRGen4DynamicCorrection_update_Fs(const float Fs,
         return RBRGEN4DYNAMICCORRECTION_INVALID_SAMPLING_RATE;
     }
 
-    // parameters _cte_a and _cte_b no longer valid.
-    // But they will be updated on next call to _addMeasurement().
+    /* parameters _cte_a and _cte_b no longer valid.
+     * But they will be updated on next call to _addMeasurement(). */
     params->Fs = Fs;
 
-    // not enough info to update, keep unchanged
+    /* not enough info to update, keep unchanged */
     params->_T_short_lag = params->_T_short_lag;
 
     RBRGen4DynamicCorrection_initCorrectionCoeff(params, Fs);
@@ -350,7 +350,7 @@ float RBRGen4DynamicCorrection_calcAscentRate(RBRGen4DynamicCorrectionParams *pa
             }
         }
 
-        // update the pressure for next step
+        /* update the pressure for next step */
         params->_lastPressure = pressure;
         params->_lastPressureTime = timestamp;
         params->_ascentRate = Vp;
@@ -479,8 +479,8 @@ RBRGen4DynamicCorrectionError RBRGen4DynamicCorrection_addMeasurement(const RBRG
         params->_firstCall = 0;
     }
 
-    // Interpolate the temperature with time offset 't_delay'.
-    // (only for >= 1Hz data rate)
+    /* Interpolate the temperature with time offset 't_delay'.
+     * (only for >= 1Hz data rate) */
     if ( isFasterSampling )
     {
         T_cor = RBRGen4DynamicCorrection_applyTempCorr(params, T_meas);

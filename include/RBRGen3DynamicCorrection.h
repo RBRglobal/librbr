@@ -122,27 +122,27 @@ typedef enum
  */
 typedef struct
 {
-    float t_delay;  // time delay (sec), or C-T lag
-    float Fs;       // sampling rate (Hz)
+    float t_delay;  /* time delay (sec), or C-T lag */
+    float Fs;       /* sampling rate (Hz) */
     float alpha;
     float tau;
     float CT_coeff;
-    float alpha_a;  // alpha = alpha_a * powf(Vp * alpha_e)
+    float alpha_a;  /* alpha = alpha_a * powf(Vp * alpha_e) */
     float alpha_e;
-    float tau_a;  // tau = tau_a * powf(Vp * tau_e)
+    float tau_a;  /* tau = tau_a * powf(Vp * tau_e) */
     float tau_e;
-    float ctcoeff_a;  // ctcoeff = ctcoeff_a * powf(Vp * ctcoeff_e)
+    float ctcoeff_a;  /* ctcoeff = ctcoeff_a * powf(Vp * ctcoeff_e) */
     float ctcoeff_e;
     float Vp_min;
     float Vp_max;
     float Vp_fc;
-    // --- internal private data ---
-    /// @cond
+    /* --- internal private data --- */
+    /** \cond */
     int32_t _firstCall;
     int32_t _isError;
     float _ascentRate;
     float _lastPressure;
-    int64_t _lastPressureTime; //Time in milliseconds
+    int64_t _lastPressureTime; /* Time in milliseconds */
     float _phi;
     float _cte_a;
     float _cte_b;
@@ -155,11 +155,11 @@ typedef struct
     float _T_cor_lag;
     float _T_short_lag;
     int32_t _isValid_lagArray[DCORR_MAX_LAG_ARRAY];
-    int64_t _timestamp_lagArray[DCORR_MAX_LAG_ARRAY]; //in milliseconds
+    int64_t _timestamp_lagArray[DCORR_MAX_LAG_ARRAY]; /* in milliseconds */
     float _C_meas_lagArray[DCORR_MAX_LAG_ARRAY];
     float _P_meas_lagArray[DCORR_MAX_LAG_ARRAY];
     float _T_cond_lagArray[DCORR_MAX_LAG_ARRAY];
-    /// @endcond
+    /** \endcond */
 } RBRGen3DynamicCorrectionParams;
 
 /** @struct RBRGen3DynamicCorrectionMeasurement
@@ -178,11 +178,11 @@ typedef struct
  */
 typedef struct
 {
-    int64_t timestamp;        // Time in milliseconds
-    float conductivity;       // Conductivity measurement (mS/cm)
-    float marineTemperature;  // Marine temperature measurement (°C)
-    float condTemperature;    // Temperature of conductivity cell measurement (°C)
-    float pressure;           // Pressure measurement (dbar)
+    int64_t timestamp;        /* Time in milliseconds */
+    float conductivity;       /* Conductivity measurement (mS/cm) */
+    float marineTemperature;  /* Marine temperature measurement (°C) */
+    float condTemperature;    /* Temperature of conductivity cell measurement (°C) */
+    float pressure;           /* Pressure measurement (dbar) */
 } RBRGen3DynamicCorrectionMeasurement;
 
 /** @struct RBRGen3DynamicCorrectionResult
@@ -201,11 +201,11 @@ typedef struct
  */
 typedef struct
 {
-    int64_t timestamp;      // Time in milliseconds
-    float conductivity;     // Conductivity measurement (mS/cm)
-    float corrTemperature;  // Corrected temperature (°C)
-    float pressure;         // Sea pressure measurement (dbar)
-    float corrSalinity;     // Practical salinity after all corrections (unitless)
+    int64_t timestamp;      /* Time in milliseconds */
+    float conductivity;     /* Conductivity measurement (mS/cm) */
+    float corrTemperature;  /* Corrected temperature (°C) */
+    float pressure;         /* Sea pressure measurement (dbar) */
+    float corrSalinity;     /* Practical salinity after all corrections (unitless) */
 } RBRGen3DynamicCorrectionResult;
 
 /**
@@ -255,4 +255,4 @@ RBRGen3DynamicCorrectionError RBRGen3DynamicCorrection_addMeasurement(RBRGen3Dyn
                                                               const RBRGen3DynamicCorrectionMeasurement *measIn,
                                                               RBRGen3DynamicCorrectionResult *corrMeasOut);
 
-#endif  // LIBRBR_RBRGEN3DYNAMICCORRECTION_H
+#endif /* LIBRBR_RBRGEN3DYNAMICCORRECTION_H */
