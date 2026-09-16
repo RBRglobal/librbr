@@ -526,12 +526,8 @@ typedef struct RBRGen4Device
  *
  * The caller sets RBRGen4Device.label to select the device to read.
  *
- * \note Issues the `device <device_label> <param1> <param2> ...` command
- * \note This getter is special: the `device <device_label>` command has a
- * hidden `lock` parameter which does not appear unless queried by name, so this
- * getter explicitly requests *every* parameter of the command by name. This 
- * results in a larger command string than most getters, and therefore it may
- * take slightly longer to converse. 
+ * \note Issues the `device <device_label>` command with every
+ *       parameter named explicitly.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] device the device to read
@@ -1049,7 +1045,7 @@ typedef struct RBRGen4Settings
 
 /**
  * \brief Get miscellaneous logger settings
- * \note Issues the instrument `settings` command.
+ * \note Issues the `settings` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] settings the logger settings
@@ -1065,7 +1061,7 @@ RBRGen4Error RBRGen4_getSettings(
 
 /**
  * \brief Set the miscellaneous logger settings.
- * \note Issues the instrument `settings` command.
+ * \note Issues the `settings` command.
  *
  * \param [in] conn the instrument connection
  * \param [in] settings the values for the settings in the logger
@@ -1126,7 +1122,7 @@ typedef struct RBRGen4Parameters
 
 /**
  * \brief Get parameters which may be required when computing calibrated output.
- * \note Issues the instrument `parameters` command.
+ * \note Issues the `parameters` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] parameters the parameters in the logger
@@ -1142,7 +1138,7 @@ RBRGen4Error RBRGen4_getParameters(
 
 /**
  * \brief Set parameters which may be required when computing calibrated output.
- * \note Issues the instrument `parameters` command.
+ * \note Issues the `parameters` command.
  *
  * \warning Hardware errors may occur if the instrument is logging.
  *

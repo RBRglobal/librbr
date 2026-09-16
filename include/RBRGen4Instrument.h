@@ -68,7 +68,7 @@ const char *RBRGen4InstrumentState_name(
 
 /**
  * \brief Get identification information using the legacy `id` command.
- * \note Issues the `id` instrument command.
+ * \note Issues the `id` command.
  *
  * `id` predates the Gen4 API and keeps its original grammar: parameters are
  * separated by commas and assignments are padded with spaces. It reports the
@@ -89,7 +89,7 @@ RBRGen4Error RBRGen4_getId(RBRGen4 *conn,
 
 /**
  * \brief Get identification information from the instrument.
- * \note Issues the `id4` instrument command.
+ * \note Issues the `id4` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] id the instrument information
@@ -150,6 +150,7 @@ typedef struct RBRGen4PcbaPool {
 
 /**
  * \brief Populate the pool of the instrument's PCBAs.
+ * \note Issues the `pcba` command.
  *
  * \param [in] conn the instrument connection
  * \param [inout] pcbaPool the PCBAs of this instrument.
@@ -166,7 +167,7 @@ RBRGen4Error RBRGen4_getPcbaPool(
 
 /**
  * \brief Get an instrument's PCBA's parameters.
- * \note Issues the `pcba <pcba_label>` instrument command.
+ * \note Issues the `pcba <pcba_label>` command.
  *
  * RBRGen4Pcba.label must be populated by the caller to select the
  * PCBA to read; the remaining fields are overwritten. Labels can be
@@ -215,7 +216,7 @@ const char *RBRGen4PowerSource_name(RBRGen4PowerSource source);
 
 /**
  * \brief Get instrument power information.
- * \note Issues the `instrument power` instrument command.
+ * \note Issues the `instrument power` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] powerSource the power source from which the instrument is running
@@ -303,7 +304,7 @@ typedef struct RBRGen4PowerInternal
 
 /**
  * \brief Get instrument internal power information.
- * \note Issues the `instrument power internal` instrument command.
+ * \note Issues the `instrument power internal` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] power the power information
@@ -321,7 +322,7 @@ RBRGen4Error RBRGen4_getPowerInternal(
 
 /**
  * \brief Set the internal power battery type.
- * \note Issues the `instrument power internal` instrument command.
+ * \note Issues the `instrument power internal` command.
  *
  * \param [in] conn the instrument connection
  * \param [in] type the battery type
@@ -339,7 +340,7 @@ RBRGen4Error RBRGen4_setPowerInternalBatteryType(
 
 /**
  * \brief Reset the counter of energy used from the internal battery.
- * \note Issues the `instrument power internal` instrument command.
+ * \note Issues the `instrument power internal` command.
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
@@ -440,7 +441,7 @@ typedef struct RBRGen4PowerExternal
 
 /**
  * \brief Get instrument external power information.
- *
+ * \note Issues the `instrument power external` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] power the power information
@@ -457,7 +458,7 @@ RBRGen4Error RBRGen4_getPowerExternal(
 
 /**
  * \brief Set the external power battery type.
- * \note Issues the `instrument power external` instrument command.
+ * \note Issues the `instrument power external` command.
  *
  * \param [in] conn the instrument connection
  * \param [in] type the battery type
@@ -475,7 +476,7 @@ RBRGen4Error RBRGen4_setPowerExternalBatteryType(
 
 /**
  * \brief Reset the counter of energy used from the external battery.
- * \note Issues the `instrument power external` instrument command.
+ * \note Issues the `instrument power external` command.
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
@@ -533,7 +534,7 @@ typedef struct RBRGen4Instrument
 
 /**
  * \brief Get the instrument's identity and state.
- * \note Issues the `instrument` instrument command.
+ * \note Issues the `instrument` command.
  *
  * All of the parameters the command reports are returned. They are read-only,
  * so there is no corresponding setter.

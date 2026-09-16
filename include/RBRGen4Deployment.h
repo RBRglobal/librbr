@@ -45,7 +45,7 @@ typedef struct RBRGen4Clock
 
 /**
  * \brief Get the instrument clock.
- * \note Issues the `clock` instrument command.
+ * \note Issues the `clock` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] clock the clock value
@@ -60,7 +60,7 @@ RBRGen4Error RBRGen4_getClock(RBRGen4 *conn,
 
 /**
  * \brief Set the instrument clock.
- * \note Issues the `clock` instrument command.
+ * \note Issues the `clock` command.
  *
  * \param [in] conn the instrument connection
  * \param [in] clock the clock value
@@ -182,7 +182,7 @@ typedef struct RBRGen4Deployment
 
 /**
  * \brief Get the instrument deployment parameters.
- * \note Issues the `deployment` instrument command.
+ * \note Issues the `deployment` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] deployment the deployment parameters
@@ -198,7 +198,7 @@ RBRGen4Error RBRGen4_getDeployment(
 
 /**
  * \brief Set the instrument deployment parameters.
- * \note Issues the `deployment` instrument command.
+ * \note Issues the `deployment` command.
  *
  * RBRGen4Deployment.startTime is sent only when
  * RBRGen4Deployment.gate is #RBRGEN4_GATE_TIME.
@@ -226,7 +226,7 @@ RBRGen4Error RBRGen4_setDeployment(
 
 /**
  * \brief Pause an enabled deployment.
- * \note Issues the `pause` instrument command.
+ * \note Issues the `pause` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] status the deployment status; untouched unless the command
@@ -245,7 +245,7 @@ RBRGen4Error RBRGen4_pause(
 
 /**
  * \brief Resume a paused deployment.
- * \note Issues the `resume` instrument command.
+ * \note Issues the `resume` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] status the deployment status; untouched unless the command
@@ -294,7 +294,7 @@ const char *RBRGen4DeploymentStoragemode_name(
 /**
  * \brief Perform the deployment consistency checks of the `enable` command
  * without enabling the instrument (a dry run).
- * \note Issues the `verify` instrument command.
+ * \note Issues the `verify` command.
  *
  * All three parameters of the command are sent.
  *
@@ -324,7 +324,7 @@ RBRGen4Error RBRGen4_verify(
 
 /**
  * \brief Enable the instrument to sample for a new deployment.
- * \note Issues the `enable` instrument command.
+ * \note Issues the `enable` command.
  *
  * All three parameters of the command are sent. The command reports no
  * dataset, so read the deployment's dataset back with
@@ -357,7 +357,7 @@ RBRGen4Error RBRGen4_enable(
 
 /**
  * \brief Terminate the current deployment.
- * \note Issues the `disable` instrument command.
+ * \note Issues the `disable` command.
  *
  * A warning from the instrument is reported as
  * #RBRGEN4_HARDWARE_ERROR with the response type set to

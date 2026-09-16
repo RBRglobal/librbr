@@ -891,7 +891,7 @@ typedef struct RBRGen4
 
 /**
  * \brief Establish a connection with an instrument and initialize the context.
- * \note Issues `id` and `outputformat` commands.
+ * \note Issues the `id4` and `instrument outputformat` commands.
  *
  * “connection” in this library means purely the state tracking
  * and management of an instrument: the underlying physical communication with
@@ -975,7 +975,6 @@ RBRGen4Error RBRGen4_close(RBRGen4 *conn);
 
 /**
  * \brief Get the generation of an instrument.
- * \note Issues the `id` command.
  *
  * \param [in] conn the instrument connection
  * \return the instrument generation

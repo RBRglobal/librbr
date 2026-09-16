@@ -167,8 +167,7 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
 /**
  * \brief Requests an “on-demand” sample of every channel from the
  * instrument.
- *
- * Sends a bare `poll` command.
+ * \note Issues the `poll` command.
  *
  * Unlike streaming data/RBRGen4_readSample(), polled data is
  * returned directly to the caller (independent of any
@@ -201,9 +200,10 @@ RBRGen4Error RBRGen4_poll(
 /**
  * \brief Requests an “on-demand” sample of the given channels from the
  * instrument.
+ * \note Issues the `poll channellist=<channel_list>` command.
  *
- * Sends the `poll channellist=` command. \a channelList is sent verbatim as
- * the parameter value; see the command documentation for the list format.
+ * \a channelList is sent verbatim as the `channellist` parameter value; see
+ * the command documentation for the list format.
  *
  * Unlike streaming data/RBRGen4_readSample(), polled data is
  * returned directly to the caller (independent of any
@@ -242,9 +242,10 @@ RBRGen4Error RBRGen4_pollChannels(
 /**
  * \brief Requests an “on-demand” sample of the given groups of channels from
  * the instrument.
+ * \note Issues the `poll grouplist=<group_list>` command.
  *
- * Sends the `poll grouplist=` command. \a groupList is sent verbatim as the
- * parameter value; see the command documentation for the list format.
+ * \a groupList is sent verbatim as the `grouplist` parameter value; see the
+ * command documentation for the list format.
  *
  * Unlike streaming data/RBRGen4_readSample(), polled data is
  * returned directly to the caller (independent of any
