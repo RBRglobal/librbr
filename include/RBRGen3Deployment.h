@@ -35,7 +35,7 @@ extern "C" {
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if an error would occur when enabling
- *                                       logging
+ *                                 logging, or another hardware error occurs
  * \see RBRGen3_enable()
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/verify
  */
@@ -60,7 +60,8 @@ RBRGen3Error RBRGen3_verify(
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when an error occurs enabling logging
+ * \return #RBRGEN3_HARDWARE_ERROR when an error occurs enabling logging, or
+ *                                 another hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/enable
  */
 RBRGen3Error RBRGen3_enable(
@@ -109,7 +110,8 @@ typedef struct RBRGen3Simulation
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
+ *                                 hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
 RBRGen3Error RBRGen3_getSimulation(
@@ -131,7 +133,8 @@ RBRGen3Error RBRGen3_getSimulation(
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
+ *                                 another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an out-of-bounds
  *                                                simulation period is
  *                                                requested

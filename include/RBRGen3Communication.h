@@ -230,7 +230,8 @@ RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn,
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when a value is not supported
+ * \return #RBRGEN3_HARDWARE_ERROR when a value is not supported, or another
+ *                                 hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the baud/mode is invalid
  * \see RBRGen3_getSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
@@ -335,7 +336,8 @@ typedef struct RBRGen3WiFi
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
+ *                                 hardware error occurs
  * \see RBRGen3_setWiFi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
@@ -357,7 +359,8 @@ RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn,
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
+ *                                 hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see RBRGen3_getWifi()
