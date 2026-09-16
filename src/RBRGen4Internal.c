@@ -182,10 +182,6 @@ static RBRGen4Error RBRGen4_vSendCommand(RBRGen4 *conn,
         command,
         format);
 
-    /* Debug print
-    fprintf(stdout, ">>%s\n", (char *) instrument->commandBuffer);
-    */
-
     /* Make sure we're within buffer bounds. This is a greater-or-equal check,
      * not just a greater-than check, because vsnprintf doesn't include the
      * null terminator in its return value. The longest value vsnprintf can
@@ -301,14 +297,6 @@ static RBRGen4Error RBRGen4_readSingleResponse(
          */
         RBR_TRY(conn->callbacks.time(conn, &now));
 
-        /*
-        fprintf(stdout,
-                "now: %ld, startTime: %ld, now - startTime: %ld, timeout: %ld\n",
-                now,
-                startTime,
-                now - startTime,
-                timeout);
-        */
         if (now - startTime > timeout)
         {
             return RBRGEN4_TIMEOUT;
@@ -334,21 +322,6 @@ static RBRGen4Error RBRGen4_readSingleResponse(
 
         conn->responseBufferLength += readLength;
     }
-
-    /*
-    fprintf(stdout, "responseBuffer (%dB):\n", instrument->responseBufferLength);
-    fprintf(stdout, "<<");
-    for (int32_t i = 0; i < instrument->responseBufferLength; i++)
-    {
-        fprintf(stdout, "%c", instrument->responseBuffer[i]);
-    }
-    fprintf(stdout, "\n");
-    for (int32_t i = 0; i < instrument->responseBufferLength; i++)
-    {
-        fprintf(stdout, "%x ", instrument->responseBuffer[i]);
-    }
-    fprintf(stdout, "\n");
-    */
 
     return RBRGEN4_SUCCESS;
 }
@@ -749,8 +722,6 @@ void RBRGen4_parseResponse(RBRGen4 *conn,
         memset(parameter, 0, sizeof(RBRGen4ResponseParameter));
 
         *command = conn->response.response;
-        // char testcommand[103] = "id model=RBRoem fwtype=120 version=1.14.5+202310150927 serial=092431";
-        // *command = testcommand;
         char *commandEnd = *command;
 
         while (true)

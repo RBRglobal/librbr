@@ -212,50 +212,6 @@ static RBRGen4Error RBRGen4Parser_parseEPEvents(
     return RBRGEN4_SUCCESS;
 }
 
-#define EP_SAMPLE_TIMESTAMP_SIZE ((int32_t) sizeof(RBRGen4DateTime))
-#define EP_SAMPLE_READING_SIZE ((int32_t) sizeof(float))
-
-// static RBRGen4Error RBRGen4Parser_parseEPSamples(
-//     RBRGen4Parser *parser,
-//     const uint8_t *const data,
-//     int32_t *size)
-// {
-//     int32_t maxSize = *size;
-//     *size = 0;
-
-//     RBRGen4Sample *sample = parser->callbacks.sampleBuffer;
-//     if (sample == NULL)
-//     {
-//         return RBRGEN4_SUCCESS;
-//     }
-
-//     int32_t channels = parser->config.formatConfig.easyParse.channels;
-//     int32_t sampleSize = EP_SAMPLE_TIMESTAMP_SIZE
-//                          + EP_SAMPLE_READING_SIZE * channels;
-//     for (; *size + sampleSize <= maxSize; *size += sampleSize)
-//     {
-//         memset(sample, 0, sizeof(RBRGen4Event));
-
-//         sample->timestamp = *(RBRGen4DateTime *) (data + *size);
-//         sample->channels = channels;
-//         for (int32_t channel = 0; channel < channels; ++channel)
-//         {
-//             sample->readings[channel] =
-//                 *(float *) (data
-//                             + *size
-//                             + EP_SAMPLE_TIMESTAMP_SIZE
-//                             + channel * EP_SAMPLE_READING_SIZE);
-//         }
-
-//         if (parser->callbacks.sample != NULL)
-//         {
-//             RBR_TRY(parser->callbacks.sample(parser, sample));
-//         }
-//     }
-
-//     return RBRGEN4_SUCCESS;
-// }
-
 RBRGen4Error RBRGen4Parser_parse(RBRGen4Parser *parser,
                                    RBRGen4Block block,
                                    const void *const data,
@@ -263,16 +219,6 @@ RBRGen4Error RBRGen4Parser_parse(RBRGen4Parser *parser,
 {
     const uint8_t *d = (const uint8_t *const) data;
 
-    // switch (dataset)
-    // {
-    // case RBRGEN4_DATASET_EASYPARSE_EVENTS:
-    //     return RBRGen4Parser_parseEPEvents(parser, d, size);
-    // case RBRGEN4_DATASET_EASYPARSE_SAMPLE_DATA:
-    //     return RBRGen4Parser_parseEPSamples(parser, d, size);
-    // case RBRGEN4_DATASET_EASYPARSE_DEPLOYMENT_HEADER:
-    // default:
-    //     return RBRGEN4_INVALID_PARAMETER_VALUE;
-    // }
     (void)block;
     return RBRGen4Parser_parseEPEvents(parser, d, size);
 }
