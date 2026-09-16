@@ -737,7 +737,7 @@ TEST_LOGGER4(readSample)
           { .timestamp = 1710333949000LL,
             .scheduleLabel = "sch_asc_pts",
             .channelCount = 2,
-            .readings = { 9.83297000, 12.5356886 } } },
+            .readings = { 9.83297000, 12.5356886 } } }
     };
 
     RBRGen4Error err;
