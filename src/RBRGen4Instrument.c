@@ -428,11 +428,6 @@ RBRGen4Error RBRGen4_getPowerInternal(
     RBRGen4 *conn,
     RBRGen4PowerInternal *power)
 {
-    if (conn->generation == RBRGEN4_LOGGER2)
-    {
-        return RBRGEN4_UNSUPPORTED;
-    }
-
     memset(power, 0, sizeof(RBRGen4PowerInternal));
     power->batteryType = RBRGEN4_UNKNOWN_INTERNAL_BATTERY;
 
