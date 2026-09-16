@@ -132,8 +132,8 @@ pipelines:
                 name: Documentation compilation
                 image: docker.io/library/gcc:15
                 script:
-                    - apt-get update && apt-get -y install doxygen graphviz
-                    - make clean
+                    - apt-get update && apt-get -y install doxygen python3-venv
+                    - python3 -m venv /tmp/venv && . /tmp/venv/bin/activate
+                    - pip install -r docs/requirements.txt
+                    # Warnings are reported but not yet fatal (SYS-1615).
                     - make docs
-                    - make clean
-                    - make devdocs

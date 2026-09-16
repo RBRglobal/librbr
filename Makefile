@@ -5,14 +5,12 @@
 ## This makefile provides three different targets of interest to the end user:
 ##
 ## - `lib` will build the library (`bin/libRBR.a`)
-## - `docs` will generate the documentation via Doxygen (in `docs/`)
+## - `docs` will generate the documentation via Sphinx (in `docs/_build/html/`)
 ## - `tests` will run library tests (from `testsGen3/` and `testsGen4/`)
 ##
 ## Additional targets may be useful to developers:
 ##
 ## - `clean` will remove any compiled binaries and documentation
-## - `devdocs` will generate the documentation inclusive of content only of
-##   interest to library developers
 ##
 ## \copyright
 ## Copyright (c) 2018 RBR Ltd.
@@ -167,11 +165,7 @@ bin/libRBRDynamicCorrection.a: $(DYNAMICCORRECTION_OBJECTS) | bin
 
 .PHONY: docs
 docs:
-	doxygen tools/Doxyfile
-
-.PHONY: devdocs
-devdocs:
-	doxygen tools/Doxyfile-devdocs
+	$(MAKE) -C docs html
 
 TEST_BINARIES :=
 ifeq ($(GEN3),1)
@@ -290,4 +284,4 @@ bin:
 
 .PHONY: clean
 clean:
-	rm -Rf src/*.o bin/ testsGen3/tests.c testsGen3/*.o testsGen4/tests.c testsGen4/*.o docs/
+	rm -Rf src/*.o bin/ testsGen3/tests.c testsGen3/*.o testsGen4/tests.c testsGen4/*.o docs/_build/

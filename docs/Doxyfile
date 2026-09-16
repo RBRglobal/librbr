@@ -1,0 +1,36 @@
+# Doxygen configuration for the Sphinx documentation build. Doxygen emits only
+# XML here; Breathe renders it into the Sphinx pages under api/.
+DOXYFILE_ENCODING      = UTF-8
+PROJECT_NAME           = "libRBR"
+OPTIMIZE_OUTPUT_FOR_C  = YES
+QUIET                  = YES
+TYPEDEF_HIDES_STRUCT   = YES
+
+INPUT                  = ../include \
+                         ../src/RBRGen3Internal.h \
+                         ../src/RBRGen4Internal.h \
+                         ../testsGen3/tests.h \
+                         ../testsGen4/tests.h
+FILE_PATTERNS          = *.h
+
+OUTPUT_DIRECTORY       = _build
+GENERATE_HTML          = NO
+GENERATE_LATEX         = NO
+GENERATE_XML           = YES
+XML_OUTPUT             = xml
+XML_PROGRAMLISTING     = NO
+
+# Read-only and write-only members are explained in introduction.rst.
+ALIASES  = "readonly=**Read-only.**"
+ALIASES += "writeonly=**Write-only.**"
+ALIASES += "nol2=This parameter is unavailable for Logger2 instruments."
+ALIASES += "nol3=This parameter is unavailable for Logger3 instruments."
+
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+# Doxygen 1.9.8 emits a spurious "parameters of member X are not documented"
+# for every documented function when only XML output is generated; leave the
+# check off until the toolchain moves past that release.
+WARN_NO_PARAMDOC       = NO
+WARN_AS_ERROR          = NO
