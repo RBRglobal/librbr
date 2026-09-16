@@ -554,7 +554,7 @@ const char *RBRGen4ExternalBatteryType_displayName(
     case RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_NIMH:
         return "RBRfermette³ NiMH";
     case RBRGEN4_EXTERNAL_BATTERY_FERMATA_NIMH:
-        return "RBRfermata_nimh";
+        return "RBRfermata NiMH";
     case RBRGEN4_EXTERNAL_BATTERY_OTHER:
         return "other";
     case RBRGEN4_EXTERNAL_BATTERY_COUNT:
