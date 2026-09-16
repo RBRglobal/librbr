@@ -17,8 +17,6 @@
 extern "C" {
 #endif
 
-#include "RBRGen4.h"
-
 /**
  * \brief Possible instrument instrument states.
  * This tracks whether the deployment is running on the instrument.

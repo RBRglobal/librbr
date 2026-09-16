@@ -19,8 +19,6 @@ extern "C" {
 #include <stdbool.h>
 
 #include "RBRGen4.h"
-#include "RBRGen4Realtime.h"
-#include "RBRGen4Memory.h"
 
 /** \brief The maximum number of pieces of auxiliary data in an event. */
 #define RBRGEN4_EVENT_AUXILIARY_DATA_MAX 8

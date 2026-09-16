@@ -15,14 +15,11 @@
 extern "C" {
 #endif
 
-/** The order is important. 
- * Based on dependency, it has to be "communication", "configuration", "schedule";
- * And "Memory", "Deployment. "*/
 #include "RBRGen4Communication.h"
 #include "RBRGen4Configuration.h"
-#include "RBRGen4Memory.h"
-#include "RBRGen4Deployment.h"
 #include "RBRGen4Instrument.h"
+#include "RBRGen4Deployment.h"
+#include "RBRGen4Memory.h"
 #include "RBRGen4Realtime.h"
 
 #ifdef __cplusplus

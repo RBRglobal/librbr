@@ -18,8 +18,6 @@
 extern "C" {
 #endif
 
-#include "RBRGen4.h"
-
 /** \brief The maximum number of schedules count. */
 #define RBRGEN4_SCHEDULE_COUNT_MAX 16
 

@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-#include "RBRGen4.h"
-#include "RBRGen4Configuration.h"
-
 /** \brief The maximum number of datasets the library can enumerate. */
 #define RBRGEN4_DATASET_COUNT_MAX 32
 
