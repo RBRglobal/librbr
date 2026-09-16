@@ -1,15 +1,11 @@
-# Unlike the library and the Gen3 examples, these examples are not yet built
-# with -Wdouble-promotion, and -Wformat-truncation is disabled: the example
-# code predates those policies. Both relaxations should go away with the
-# example alignment planned for libRBR 2.0 (SYS-1194).
 CFLAGS := -I../../include \
           -Werror \
           -Wall \
           -Wextra \
+          -Wdouble-promotion \
           -pedantic \
           -pedantic-errors \
           -Wwrite-strings \
-          -Wno-format-truncation \
           -std=c99 \
           -g
 CPPFLAGS += -MMD -MP
