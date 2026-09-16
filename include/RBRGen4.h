@@ -138,8 +138,6 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
  * \brief The maximum number of characters in the instrument firmware version.
  *
  * Does not include any null terminator.
- * 
- * Gen4 todo: This value needs to be reviewed.
  */
 #define RBRGEN4_ID_VERSION_MAX 29
 

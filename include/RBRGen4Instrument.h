@@ -378,7 +378,7 @@ typedef enum RBRGen4ExternalBatteryType
     RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_LINIMNCO,
     /** RBRfermette³ NiMH */
     RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_NIMH,
-    /** RBRfermana NiMH - fw version 1.140 or later */
+    /** RBRfermata NiMH */
     RBRGEN4_EXTERNAL_BATTERY_FERMATA_NIMH,
     /** Other/unknown external battery type */
     RBRGEN4_EXTERNAL_BATTERY_OTHER,

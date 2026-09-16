@@ -273,7 +273,6 @@ RBRGen4Error RBRGen4Parser_parse(RBRGen4Parser *parser,
     // default:
     //     return RBRGEN4_INVALID_PARAMETER_VALUE;
     // }
-    //GEN4 todo: edit this parser.
     (void)block;
     return RBRGen4Parser_parseEPEvents(parser, d, size);
 }

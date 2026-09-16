@@ -46,7 +46,6 @@ typedef RBRGen4Error (*RBRGen4ParserSampleCallback)(
 
 /**
  * \brief Instrument event types.
- * Gen4 Todo: Currently under construction (FW-258)
  */
 typedef enum RBRGen4EventType
 {

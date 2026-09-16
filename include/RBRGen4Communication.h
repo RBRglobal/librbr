@@ -265,10 +265,6 @@ RBRGen4Error RBRGen4_setLinkSerial(
  */
 RBRGen4Error RBRGen4_sleep(RBRGen4 *conn);
 
-/**
- * L3.5/L4 WiFi interface is To Be Defined as of October 2024
- */
-
 #if 0
 
 /**

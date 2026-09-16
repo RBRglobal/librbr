@@ -654,7 +654,6 @@ RBRGen4Error RBRGen4_errorCheckResponse(
         {
             conn->response.response = NULL;
         }
-        /* Create an additional status for warnings? */
         return RBRGEN4_HARDWARE_ERROR;
     }
 
