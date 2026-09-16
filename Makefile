@@ -136,7 +136,6 @@ GEN4_OBJECTS := src/RBRInstrumentGen4.o \
                 src/RBRInstrumentGen4Internal.o \
                 src/RBRInstrumentGen4Memory.o \
                 src/RBRInstrumentGen4Realtime.o \
-                src/RBRInstrumentGen4Streaming.o \
                 src/RBRParserGen4.o
 
 LIB_OBJECTS :=
@@ -222,8 +221,7 @@ GEN4_TEST_MODULES := communication \
                      deployment \
                      instrument \
                      memory \
-                     realtime \
-                     streaming
+                     realtime
 
 bin/testsGen3: bin/libRBR.a \
            bin/libRBRDynamicCorrection.a \

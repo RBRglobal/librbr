@@ -26,7 +26,7 @@
 #include "RBRInstrumentGen4.h"
 #include "RBRInstrumentGen4Internal.h"
 #include "RBRInstrumentGen4Memory.h"
-#include "RBRInstrumentGen4Streaming.h"
+#include "RBRInstrumentGen4Realtime.h"
 
 /** \brief 10-second command timeout. */
 #define COMMAND_TIMEOUT (10 * 1000)
