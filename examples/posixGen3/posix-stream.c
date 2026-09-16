@@ -25,12 +25,12 @@
 
 #include "posix-shared.h"
 
-RBRInstrumentGen3Error instrumentSample(
-    const struct RBRInstrumentGen3 *instrument,
-    const struct RBRInstrumentGen3Sample *const sample)
+RBRGen3Error instrumentSample(
+    const struct RBRGen3 *conn,
+    const struct RBRGen3Sample *const sample)
 {
     /* Unused. */
-    (void) instrument;
+    (void) conn;
 
     char ftime[128];
     time_t sampleSeconds = (time_t) (sample->timestamp / 1000);
@@ -45,7 +45,7 @@ RBRInstrumentGen3Error instrumentSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -56,11 +56,11 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen3Error err;
-    RBRInstrumentGen3 *instrument = NULL;
+    RBRGen3Error err;
+    RBRGen3 *conn = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRInstrumentGen3 instrumentSpace;
-    instrument = &instrumentSpace;
+    RBRGen3 instrumentSpace;
+    conn = &instrumentSpace;
     #endif
 
     if (argc < 2)
@@ -82,11 +82,11 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENTGEN3_LIB_NAME,
-            RBRINSTRUMENTGEN3_LIB_VERSION);
+            RBRGEN3_LIB_NAME,
+            RBRGEN3_LIB_VERSION);
 
-    RBRInstrumentGen3Sample sampleBuffer;
-    RBRInstrumentGen3Callbacks callbacks = {
+    RBRGen3Sample sampleBuffer;
+    RBRGen3Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
@@ -95,39 +95,39 @@ int main(int argc, char *argv[])
         .sampleBuffer = &sampleBuffer
     };
 
-    if ((err = RBRInstrumentGen3_open(
-             &instrument,
+    if ((err = RBRGen3_open(
+             &conn,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
 
-    RBRInstrumentGen3Link link;
-    RBRInstrumentGen3_getLink(instrument, &link);
+    RBRGen3Link link;
+    RBRGen3_getLink(conn, &link);
     printf("Connected to the instrument via %s.\n",
-           RBRInstrumentGen3Link_name(link));
+           RBRGen3Link_name(link));
 
     switch (link)
     {
-    case RBRINSTRUMENTGEN3_LINK_USB:
-        RBRInstrumentGen3_setUSBStreamingState(instrument, true);
+    case RBRGEN3_LINK_USB:
+        RBRGen3_setUSBStreamingState(conn, true);
         break;
-    case RBRINSTRUMENTGEN3_LINK_SERIAL:
-    case RBRINSTRUMENTGEN3_LINK_WIFI:
+    case RBRGEN3_LINK_SERIAL:
+    case RBRGEN3_LINK_WIFI:
         {
-            RBRInstrumentGen3Serial serial;
-            RBRInstrumentGen3_getSerial(instrument, &serial);
+            RBRGen3Serial serial;
+            RBRGen3_getSerial(conn, &serial);
             printf("Connected in %s mode at %s baud.\n",
-                   RBRInstrumentGen3SerialMode_name(serial.mode),
-                   RBRInstrumentGen3SerialBaudRate_name(serial.baudRate));
+                   RBRGen3SerialMode_name(serial.mode),
+                   RBRGen3SerialBaudRate_name(serial.baudRate));
 
-            RBRInstrumentGen3_setSerialStreamingState(instrument, true);
+            RBRGen3_setSerialStreamingState(conn, true);
             break;
         }
     default:
@@ -137,20 +137,20 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    RBRInstrumentGen3Deployment deployment;
-    RBRInstrumentGen3_getDeployment(instrument, &deployment);
-    if (deployment.status != RBRINSTRUMENTGEN3_STATUS_LOGGING)
+    RBRGen3Deployment deployment;
+    RBRGen3_getDeployment(conn, &deployment);
+    if (deployment.status != RBRGEN3_STATUS_LOGGING)
     {
         printf("%s: Instrument is %s, not logging. I'm going to start it.\n",
                programName,
-               RBRInstrumentGen3DeploymentStatus_name(deployment.status));
+               RBRGen3DeploymentStatus_name(deployment.status));
 
-        if ((err = instrumentStart(instrument)) != RBRINSTRUMENTGEN3_SUCCESS)
+        if ((err = instrumentStart(conn)) != RBRGEN3_SUCCESS)
         {
             fprintf(stderr,
                     "%s: Failed to start instrument: %s!\n",
                     programName,
-                    RBRInstrumentGen3Error_name(err));
+                    RBRGen3Error_name(err));
             status = EXIT_FAILURE;
             goto instrumentCleanup;
         }
@@ -158,14 +158,14 @@ int main(int argc, char *argv[])
 
     while (true)
     {
-        if ((err = RBRInstrumentGen3_readSample(instrument)) != RBRINSTRUMENTGEN3_SUCCESS)
+        if ((err = RBRGen3_readSample(conn)) != RBRGEN3_SUCCESS)
         {
-            fprintf(stderr, "Error: %s\n", RBRInstrumentGen3Error_name(err));
+            fprintf(stderr, "Error: %s\n", RBRGen3Error_name(err));
         }
     }
 
 instrumentCleanup:
-    RBRInstrumentGen3_close(instrument);
+    RBRGen3_close(conn);
 fileCleanup:
     close(instrumentFd);
 

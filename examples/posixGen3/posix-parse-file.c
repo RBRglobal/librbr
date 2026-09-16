@@ -28,11 +28,11 @@
 #include <unistd.h>
 
 #include "posix-shared.h"
-#include "RBRParserGen3.h"
+#include "RBRGen3Parser.h"
 
-RBRInstrumentGen3Error parserSample(
-    const struct RBRParserGen3 *parser,
-    const struct RBRInstrumentGen3Sample *const sample)
+RBRGen3Error parserSample(
+    const struct RBRGen3Parser *parser,
+    const struct RBRGen3Sample *const sample)
 {
     /* Unused. */
     (void) parser;
@@ -50,7 +50,7 @@ RBRInstrumentGen3Error parserSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -82,23 +82,23 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENTGEN3_LIB_NAME,
-            RBRINSTRUMENTGEN3_LIB_VERSION);
+            RBRGEN3_LIB_NAME,
+            RBRGEN3_LIB_VERSION);
 
-    RBRParserGen3 *parser = NULL;
+    RBRGen3Parser *parser = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRParserGen3 parserSpace;
+    RBRGen3Parser parserSpace;
     parser = &parserSpace;
     #endif
 
-    RBRInstrumentGen3Sample sampleBuffer;
-    RBRParserGen3Callbacks parserCallbacks = {
+    RBRGen3Sample sampleBuffer;
+    RBRGen3ParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
 
-    RBRParserGen3Config parserConfig = {
-        .format = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00,
+    RBRGen3ParserConfig parserConfig = {
+        .format = RBRGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
                 .channels = channels
@@ -106,16 +106,16 @@ int main(int argc, char *argv[])
         }
     };
 
-    RBRInstrumentGen3Error err;
-    if ((err = RBRParserGen3_init(
+    RBRGen3Error err;
+    if ((err = RBRGen3Parser_init(
              &parser,
              &parserCallbacks,
              &parserConfig,
-             NULL)) != RBRINSTRUMENTGEN3_SUCCESS)
+             NULL)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to initialize parser: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
@@ -145,15 +145,15 @@ int main(int argc, char *argv[])
 
         bufSize += readSize;
         parsedSize = bufSize;
-        RBRParserGen3_parse(parser,
-                        RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
+        RBRGen3Parser_parse(parser,
+                        RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize);
         bufSize -= parsedSize;
         memmove(buf, buf + parsedSize, bufSize);
     }
 
-    RBRParserGen3_destroy(parser);
+    RBRGen3Parser_destroy(parser);
 fileCleanup:
     close(datasetFd);
 

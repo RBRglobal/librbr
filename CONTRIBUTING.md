@@ -70,7 +70,7 @@ Technical pedantry:
       not C++-style comments (`// ...`).
 * Use types to help error checking.
   Even if your compiler doesn't mind you
-  using a `uint8_t` interchangeably with `RBRInstrumentGen3ChannelIndex`,
+  using a `uint8_t` interchangeably with `RBRGen3ChannelIndex`,
   using a specific type can assist static analysis tools
   and makes type interchange mistakes easier
   for human readers to spot.
@@ -89,7 +89,7 @@ Technical pedantry:
     * Conventionally, `int32_t` is used as a counter
       even where it's far larger than necessary.
       This sort of consistency helps reduce mental overhead.
-* Most functions should return an `RBRInstrumentGen3Error`
+* Most functions should return an `RBRGen3Error`
   and pass actual values back to the caller via out pointers.
   Only the most trivial or pure functions
   should return a value directly.
@@ -138,17 +138,17 @@ A short example:
  *
  * A longer description of the function.
  *
- * \param [in] instrument the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] theseParametersAreAligned a description of the first parameter
  * \param [in] becauseTheyFitOnTheLine a description of the second parameter
  * \return a description of the return value
  */
-int32_t RBRInstrumentGen3_examplePrototype(RBRInstrumentGen3 *instrument,
-                                       int32_t theseParametersAreAligned,
-                                       int32_t *becauseTheyFitOnTheLine);
+int32_t RBRGen3_examplePrototype(RBRGen3 *conn,
+                                 int32_t theseParametersAreAligned,
+                                 int32_t *becauseTheyFitOnTheLine);
 
-RBRInstrumentGen3Error RBRInstrumentGen3_exampleOfAReallyLongFunctionName(
-    RBRInstrumentGen3 *instrument,
+RBRGen3Error RBRGen3_exampleOfAReallyLongFunctionName(
+    RBRGen3 *conn,
     int32_t theseParametersAreAllWrappedAndBroken,
     int32_t becauseTheyWouldPushPastTheLineLengthLimit,
     int32_t evenIf,

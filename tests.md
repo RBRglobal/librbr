@@ -39,13 +39,13 @@ let's consider the test for the `id` command:
 TEST_LOGGER3(id)
 {
     /* This is the result we expect from command parsing. */
-    RBRInstrumentGen3Id expected = {
+    RBRGen3Id expected = {
         .model = "RBRduo3",
         .version = "1.092",
         .serial = 923456,
         .fwtype = 104
     };
-    RBRInstrumentGen3Id actual;
+    RBRGen3Id actual;
 
     /* Populate the read buffer with the command response. */
     TestIOBuffers_init(buffers,
@@ -53,11 +53,11 @@ TEST_LOGGER3(id)
                        "serial = 923456, fwtype = 104" COMMAND_TERMINATOR,
                        0);
     /* Get the test instrument connection to send/parse the command. */
-    RBRInstrumentGen3Error err = RBRInstrumentGen3_getId(instrument, &actual);
+    RBRGen3Error err = RBRGen3_getId(conn, &actual);
     /* Check that the command sent matches our expectation. */
     TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
     /* Check the return value. */
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN3_SUCCESS, err, RBRInstrumentGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     /* Check the struct members. */
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
@@ -96,7 +96,7 @@ For example,
 
 ~~~{.c}
 TEST_PARSER_CONFIG(two_channels) = {
-    .format = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00,
+    .format = RBRGEN3_MEMFORMAT_CALBIN00,
     .formatConfig = {
         .easyParse = {
             .channels = 2

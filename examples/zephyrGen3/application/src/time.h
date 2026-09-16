@@ -15,13 +15,13 @@
 extern "C" {
 #endif
 
-#include <RBRInstrumentGen3.h>
+#include <RBRGen3.h>
 
-RBRInstrumentGen3Error ZephyrRBRInstrumentGen3Time_get(const struct RBRInstrumentGen3 *instrument,
-                                               RBRInstrumentGen3DateTime *time);
+RBRGen3Error ZephyrRBRGen3Time_get(const struct RBRGen3 *conn,
+                                               RBRGen3DateTime *time);
 
-RBRInstrumentGen3Error ZephyrRBRInstrumentGen3Time_sleep(const struct RBRInstrumentGen3 *instrument,
-                                                 RBRInstrumentGen3DateTime time);
+RBRGen3Error ZephyrRBRGen3Time_sleep(const struct RBRGen3 *conn,
+                                                 RBRGen3DateTime time);
 
 #ifdef __cplusplus
 }

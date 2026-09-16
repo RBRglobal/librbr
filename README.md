@@ -22,9 +22,9 @@ As of version 2.0.0,
 the library contains two independent APIs,
 one per instrument generation:
 the Gen3 API
-(`RBRInstrumentGen3_…`,
+(`RBRGen3…`,
 for Logger2/Logger3 instruments,
-the libRBR 1.x API with every identifier suffixed `Gen3`)
+the libRBR 1.x API renamed)
 and the Gen4 API
 (`RBRGen4…`,
 for Generation 4 instruments,
@@ -38,10 +38,10 @@ by default
 For example:
 
 ~~~{.c}
-RBRInstrumentGen3Sampling sampling;
-RBRInstrumentGen3_getSampling(instrument, &sampling);
+RBRGen3Sampling sampling;
+RBRGen3_getSampling(instrument, &sampling);
 printf("The instrument is performing %s sampling every %" PRIi32 "ms.\n",
-       RBRInstrumentGen3SamplingMode_name(sampling.mode),
+       RBRGen3SamplingMode_name(sampling.mode),
        sampling.period);
 ~~~
 
@@ -118,12 +118,14 @@ $ make GEN3=0 lib
 At least one generation must be enabled.
 Coming from libRBR 1.2.x?
 The Gen3 API is the 1.x API
-with `Gen3` appended to every file name
-and every `RBRInstrument`, `RBRParser`,
-and `RBRDynamicCorrection` identifier
-(`RBRInstrument_open()` is now `RBRInstrumentGen3_open()`,
-`RBRINSTRUMENT_SUCCESS` is now `RBRINSTRUMENTGEN3_SUCCESS`,
-and `RBRInstrument.h` is now `RBRInstrumentGen3.h`);
+with every file name and identifier
+carrying the `RBRGen3` prefix:
+`RBRInstrument` became `RBRGen3`,
+`RBRParser` became `RBRGen3Parser`,
+and `RBRDynamicCorrection` became `RBRGen3DynamicCorrection`
+(`RBRInstrument_open()` is now `RBRGen3_open()`,
+`RBRINSTRUMENT_SUCCESS` is now `RBRGEN3_SUCCESS`,
+and `RBRInstrument.h` is now `RBRGen3.h`);
 the behaviour is unchanged.
 When building as a Zephyr module,
 the equivalent Kconfig options are

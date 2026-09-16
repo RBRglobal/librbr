@@ -41,11 +41,11 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen3Error err;
-    RBRInstrumentGen3 *instrument = NULL;
+    RBRGen3Error err;
+    RBRGen3 *conn = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRInstrumentGen3 instrumentSpace;
-    instrument = &instrumentSpace;
+    RBRGen3 instrumentSpace;
+    conn = &instrumentSpace;
     #endif
 
     if (argc < 2)
@@ -67,34 +67,34 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENTGEN3_LIB_NAME,
-            RBRINSTRUMENTGEN3_LIB_VERSION);
+            RBRGEN3_LIB_NAME,
+            RBRGEN3_LIB_VERSION);
 
-    RBRInstrumentGen3Callbacks callbacks = {
+    RBRGen3Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrumentGen3_open(
-             &instrument,
+    if ((err = RBRGen3_open(
+             &conn,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto serialCleanup;
     }
     printf(
         "Looks like I'm connected to a %s instrument.\n",
-        RBRInstrumentGen3Generation_name(RBRInstrumentGen3_getGeneration(instrument)));
+        RBRGen3Generation_name(RBRGen3_getGeneration(conn)));
 
-    RBRInstrumentGen3Id id;
-    RBRInstrumentGen3_getId(instrument, &id);
+    RBRGen3Id id;
+    RBRGen3_getId(conn, &id);
     printf("The instrument is an %s (fwtype %d), serial number %06d, with "
            "firmware v%s.\n",
            id.model,
@@ -102,37 +102,37 @@ int main(int argc, char *argv[])
            id.serial,
            id.version);
 
-    RBRInstrumentGen3HardwareRevision hwrev;
-    RBRInstrumentGen3_getHardwareRevision(instrument, &hwrev);
+    RBRGen3HardwareRevision hwrev;
+    RBRGen3_getHardwareRevision(conn, &hwrev);
     printf("It's PCB rev%c, CPU rev%s, BSL v%c.\n",
            hwrev.pcb,
            hwrev.cpu,
            hwrev.bsl);
 
-    RBRInstrumentGen3MemoryInfo meminfo;
-    meminfo.dataset = RBRINSTRUMENTGEN3_DATASET_STANDARD;
-    RBRInstrumentGen3_getMemoryInfo(instrument, &meminfo);
+    RBRGen3MemoryInfo meminfo;
+    meminfo.dataset = RBRGEN3_DATASET_STANDARD;
+    RBRGen3_getMemoryInfo(conn, &meminfo);
     printf("Dataset %s is %0.2f%% full (%" PRIi32 "B used).\n",
-           RBRInstrumentGen3Dataset_name(meminfo.dataset),
+           RBRGen3Dataset_name(meminfo.dataset),
            ((double) meminfo.used) / meminfo.size * 100,
            meminfo.used);
 
-    RBRInstrumentGen3MemoryFormat memformat;
-    RBRInstrumentGen3_getAvailableMemoryFormats(instrument, &memformat);
+    RBRGen3MemoryFormat memformat;
+    RBRGen3_getAvailableMemoryFormats(conn, &memformat);
     printf("It supports these memory formats:\n");
-    for (int i = RBRINSTRUMENTGEN3_MEMFORMAT_NONE + 1;
-         i <= RBRINSTRUMENTGEN3_MEMFORMAT_MAX;
+    for (int i = RBRGEN3_MEMFORMAT_NONE + 1;
+         i <= RBRGEN3_MEMFORMAT_MAX;
          i <<= 1)
     {
         if (memformat & i)
         {
-            printf("\t%s\n", RBRInstrumentGen3MemoryFormat_name(i));
+            printf("\t%s\n", RBRGen3MemoryFormat_name(i));
         }
     }
 
-    RBRInstrumentGen3_getCurrentMemoryFormat(instrument, &memformat);
+    RBRGen3_getCurrentMemoryFormat(conn, &memformat);
     printf("It's currently storing data of format %s.\n",
-           RBRInstrumentGen3MemoryFormat_name(memformat));
+           RBRGen3MemoryFormat_name(memformat));
 
     char filename[PATH_MAX + 1];
     snprintf(filename, sizeof(filename), "%06d.bin", id.serial);
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
     }
 
     uint8_t buf[CHUNK_SIZE];
-    RBRInstrumentGen3Data data = {
+    RBRGen3Data data = {
         .dataset = meminfo.dataset,
         .offset  = initialOffset,
         .data    = buf
@@ -188,19 +188,19 @@ int main(int argc, char *argv[])
     while (data.offset < meminfo.used)
     {
         data.size = sizeof(buf);
-        err = RBRInstrumentGen3_readData(instrument, &data);
-        if (err == RBRINSTRUMENTGEN3_SUCCESS)
+        err = RBRGen3_readData(conn, &data);
+        if (err == RBRGEN3_SUCCESS)
         {
             write(downloadFd, data.data, data.size);
             data.offset += data.size;
         }
-        else if (err == RBRINSTRUMENTGEN3_TIMEOUT)
+        else if (err == RBRGEN3_TIMEOUT)
         {
             printf("\nWarning: timeout. Retrying...\n");
         }
         else
         {
-            printf("\nError: %s", RBRInstrumentGen3Error_name(err));
+            printf("\nError: %s", RBRGen3Error_name(err));
             break;
         }
 
@@ -230,7 +230,7 @@ int main(int argc, char *argv[])
 fileCleanup:
     close(downloadFd);
 instrumentCleanup:
-    RBRInstrumentGen3_close(instrument);
+    RBRGen3_close(conn);
 serialCleanup:
     close(instrumentFd);
 

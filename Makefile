@@ -44,8 +44,8 @@ export LIB_VERSION ?= $(shell ./tools/version.sh)
 ##
 ## The library contains two independent instrument APIs:
 ##
-## - `GEN3`: the `RBRInstrumentGen3_`-prefixed API for Logger2/Logger3
-##   instruments — the libRBR 1.x API, suffixed `Gen3`;
+## - `GEN3`: the `RBRGen3`-prefixed API for Logger2/Logger3
+##   instruments — the libRBR 1.x API, renamed;
 ## - `GEN4`: the `RBRGen4`-prefixed API for Generation 4
 ##   (SL4/SEN4/L4) instruments.
 ##
@@ -109,22 +109,22 @@ libdynamiccorrection: bin/libRBRDynamicCorrection.a
 lib: bin/libRBR.a
 
 ## \brief Objects for the Gen3 (Logger2/Logger3) API.
-GEN3_OBJECTS := src/RBRInstrumentGen3.o \
-                src/RBRInstrumentGen3Communication.o \
-                src/RBRInstrumentGen3Configuration.o \
-                src/RBRInstrumentGen3Deployment.o \
-                src/RBRInstrumentGen3Fetching.o \
-                src/RBRInstrumentGen3Gating.o \
-                src/RBRInstrumentGen3HardwareErrors.o \
-                src/RBRInstrumentGen3Internal.o \
-                src/RBRInstrumentGen3Memory.o \
-                src/RBRInstrumentGen3Other.o \
-                src/RBRInstrumentGen3Pauseresume.o \
-                src/RBRInstrumentGen3Schedule.o \
-                src/RBRInstrumentGen3Security.o \
-                src/RBRInstrumentGen3Streaming.o \
-                src/RBRInstrumentGen3Vehicle.o \
-                src/RBRParserGen3.o
+GEN3_OBJECTS := src/RBRGen3.o \
+                src/RBRGen3Communication.o \
+                src/RBRGen3Configuration.o \
+                src/RBRGen3Deployment.o \
+                src/RBRGen3Fetching.o \
+                src/RBRGen3Gating.o \
+                src/RBRGen3HardwareErrors.o \
+                src/RBRGen3Internal.o \
+                src/RBRGen3Memory.o \
+                src/RBRGen3Other.o \
+                src/RBRGen3Pauseresume.o \
+                src/RBRGen3Schedule.o \
+                src/RBRGen3Security.o \
+                src/RBRGen3Streaming.o \
+                src/RBRGen3Vehicle.o \
+                src/RBRGen3Parser.o
 
 ## \brief Objects for the Gen4 (SL4/SEN4/L4) API.
 GEN4_OBJECTS := src/RBRGen4.o \
@@ -142,7 +142,7 @@ LIB_OBJECTS :=
 DYNAMICCORRECTION_OBJECTS :=
 ifeq ($(GEN3),1)
 LIB_OBJECTS += $(GEN3_OBJECTS)
-DYNAMICCORRECTION_OBJECTS += src/RBRDynamicCorrectionGen3.o
+DYNAMICCORRECTION_OBJECTS += src/RBRGen3DynamicCorrection.o
 endif
 ifeq ($(GEN4),1)
 LIB_OBJECTS += $(GEN4_OBJECTS)
@@ -238,13 +238,13 @@ testsGen3/tests.c: $(foreach module,$(GEN3_TEST_MODULES),testsGen3/$(module).c)
 		| sed -e 's/$$/;/' >>$@
 	@echo "InstrumentTest instrumentTests[] = {" >>$@
 	@grep -ho 'TEST_LOGGER[23]([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRINSTRUMENTGEN3_LOGGER\1, test_\2_l\1},/' \
+		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRGEN3_LOGGER\1, test_\2_l\1},/' \
 		>>$@
 	@echo "    {0}" >>$@
 	@echo "};" >>$@
 
 	@grep -ho 'TEST_PARSER_CONFIG([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_PARSER_CONFIG(\([^,]*\))/extern const RBRParserGen3Config test_\1_parser_config;/' \
+		| sed -e 's/^TEST_PARSER_CONFIG(\([^,]*\))/extern const RBRGen3ParserConfig test_\1_parser_config;/' \
 		>>$@
 
 	@echo "ParserTest parserTests[] = {" >>$@

@@ -24,13 +24,13 @@
 #include <unistd.h>
 
 #include "posix-shared.h"
-#include "RBRParserGen3.h"
+#include "RBRGen3Parser.h"
 
 #define CHUNK_SIZE 1024
 
-RBRInstrumentGen3Error parserSample(
-    const struct RBRParserGen3 *parser,
-    const struct RBRInstrumentGen3Sample *const sample)
+RBRGen3Error parserSample(
+    const struct RBRGen3Parser *parser,
+    const struct RBRGen3Sample *const sample)
 {
     (void) parser;
 
@@ -47,7 +47,7 @@ RBRInstrumentGen3Error parserSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -58,11 +58,11 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen3Error err;
-    RBRInstrumentGen3 *instrument = NULL;
+    RBRGen3Error err;
+    RBRGen3 *conn = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRInstrumentGen3 instrumentSpace;
-    instrument = &instrumentSpace;
+    RBRGen3 instrumentSpace;
+    conn = &instrumentSpace;
     #endif
 
     if (argc < 2)
@@ -84,55 +84,55 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s.\n",
             programName,
-            RBRINSTRUMENTGEN3_LIB_NAME,
-            RBRINSTRUMENTGEN3_LIB_VERSION);
+            RBRGEN3_LIB_NAME,
+            RBRGEN3_LIB_VERSION);
 
-    RBRInstrumentGen3Callbacks instrumentCallbacks = {
+    RBRGen3Callbacks instrumentCallbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrumentGen3_open(
-             &instrument,
+    if ((err = RBRGen3_open(
+             &conn,
              &instrumentCallbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN3_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
 
-    RBRInstrumentGen3_setUSBStreamingState(instrument, false);
-    RBRInstrumentGen3_setSerialStreamingState(instrument, false);
+    RBRGen3_setUSBStreamingState(conn, false);
+    RBRGen3_setSerialStreamingState(conn, false);
 
-    if ((err = instrumentStart(instrument)) != RBRINSTRUMENTGEN3_SUCCESS)
+    if ((err = instrumentStart(conn)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr,
                 "%s: Failed to start instrument: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
 
-    RBRInstrumentGen3Channels channels;
-    RBRInstrumentGen3_getChannels(instrument, &channels);
+    RBRGen3Channels channels;
+    RBRGen3_getChannels(conn, &channels);
 
-    RBRParserGen3 *parser = NULL;
+    RBRGen3Parser *parser = NULL;
 
-    RBRInstrumentGen3Sample sampleBuffer;
-    RBRParserGen3Callbacks parserCallbacks = {
+    RBRGen3Sample sampleBuffer;
+    RBRGen3ParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
 
-    RBRParserGen3Config parserConfig = {
-        .format = RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00,
+    RBRGen3ParserConfig parserConfig = {
+        .format = RBRGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
                 .channels = channels.on
@@ -140,23 +140,23 @@ int main(int argc, char *argv[])
         }
     };
 
-    if ((err = RBRParserGen3_init(
+    if ((err = RBRGen3Parser_init(
              &parser,
              &parserCallbacks,
              &parserConfig,
-             NULL)) != RBRINSTRUMENTGEN3_SUCCESS)
+             NULL)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to initialize parser: %s!\n",
                 programName,
-                RBRInstrumentGen3Error_name(err));
+                RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
 
     uint8_t buf[CHUNK_SIZE];
     int32_t bufSize = 0;
-    RBRInstrumentGen3Data data = {
-        .dataset = RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
+    RBRGen3Data data = {
+        .dataset = RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
         .offset  = 0
     };
     int32_t parsedSize;
@@ -165,15 +165,15 @@ int main(int argc, char *argv[])
     {
         data.data = buf + bufSize;
         data.size = sizeof(buf) - bufSize;
-        err = RBRInstrumentGen3_readData(instrument, &data);
-        if (err == RBRINSTRUMENTGEN3_TIMEOUT)
+        err = RBRGen3_readData(conn, &data);
+        if (err == RBRGEN3_TIMEOUT)
         {
             printf("\nWarning: timeout. Retrying...\n");
             continue;
         }
-        else if (err != RBRINSTRUMENTGEN3_SUCCESS)
+        else if (err != RBRGEN3_SUCCESS)
         {
-            printf("\nError: %s", RBRInstrumentGen3Error_name(err));
+            printf("\nError: %s", RBRGen3Error_name(err));
             break;
         }
 
@@ -181,8 +181,8 @@ int main(int argc, char *argv[])
 
         bufSize += data.size;
         parsedSize = bufSize;
-        RBRParserGen3_parse(parser,
-                        RBRINSTRUMENTGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
+        RBRGen3Parser_parse(parser,
+                        RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize);
         bufSize -= parsedSize;
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
         nanosleep(&sleep, NULL);
     }
 instrumentCleanup:
-    RBRInstrumentGen3_close(instrument);
+    RBRGen3_close(conn);
 fileCleanup:
     close(instrumentFd);
 

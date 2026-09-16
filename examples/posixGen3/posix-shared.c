@@ -77,37 +77,37 @@ int openSerialFd(char *devicePath)
     return instrumentFd;
 }
 
-RBRInstrumentGen3Error instrumentTime(const struct RBRInstrumentGen3 *instrument,
-                                  RBRInstrumentGen3DateTime *time)
+RBRGen3Error instrumentTime(const struct RBRGen3 *conn,
+                                  RBRGen3DateTime *time)
 {
     /* Unused. */
-    (void) instrument;
+    (void) conn;
 
     struct timespec result;
     clock_gettime(CLOCK_MONOTONIC, &result);
     *time = (result.tv_sec * 1000) + (result.tv_nsec / 1000000);
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error instrumentSleep(const struct RBRInstrumentGen3 *instrument,
-                                   RBRInstrumentGen3DateTime time)
+RBRGen3Error instrumentSleep(const struct RBRGen3 *conn,
+                                   RBRGen3DateTime time)
 {
     /* Unused. */
-    (void) instrument;
+    (void) conn;
 
     struct timespec sleep = {
         .tv_sec  =  time / 1000,
         .tv_nsec = (time % 1000) * 1000000
     };
     nanosleep(&sleep, NULL);
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error instrumentRead(const struct RBRInstrumentGen3 *instrument,
+RBRGen3Error instrumentRead(const struct RBRGen3 *conn,
                                   void *data,
                                   int32_t *size)
 {
-    int *instrumentFd = (int *) RBRInstrumentGen3_getUserData(instrument);
+    int *instrumentFd = (int *) RBRGen3_getUserData(conn);
 
     /* A select() call to enforce a read timeout is unnecessary because we
      * configured the serial port in noncanonical mode and specified a read
@@ -120,23 +120,23 @@ RBRInstrumentGen3Error instrumentRead(const struct RBRInstrumentGen3 *instrument
                  *size);
     if (*size == 0)
     {
-        return RBRINSTRUMENTGEN3_TIMEOUT;
+        return RBRGEN3_TIMEOUT;
     }
     else if (*size < 0)
     {
-        return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
+        return RBRGEN3_CALLBACK_ERROR;
     }
     else
     {
-        return RBRINSTRUMENTGEN3_SUCCESS;
+        return RBRGEN3_SUCCESS;
     }
 }
 
-RBRInstrumentGen3Error instrumentWrite(const struct RBRInstrumentGen3 *instrument,
+RBRGen3Error instrumentWrite(const struct RBRGen3 *conn,
                                    const void *const data,
                                    int32_t size)
 {
-    int *instrumentFd = (int *) RBRInstrumentGen3_getUserData(instrument);
+    int *instrumentFd = (int *) RBRGen3_getUserData(conn);
     const uint8_t *const byteData = (const uint8_t *const) data;
     int32_t written = 0;
 
@@ -169,11 +169,11 @@ RBRInstrumentGen3Error instrumentWrite(const struct RBRInstrumentGen3 *instrumen
                                      &writeTimeout);
         if (instrumentReady < 0)
         {
-            return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
+            return RBRGEN3_CALLBACK_ERROR;
         }
         else if (instrumentReady == 0)
         {
-            return RBRINSTRUMENTGEN3_TIMEOUT;
+            return RBRGEN3_TIMEOUT;
         }
 
         int32_t chunkWritten = write(*instrumentFd,
@@ -183,79 +183,79 @@ RBRInstrumentGen3Error instrumentWrite(const struct RBRInstrumentGen3 *instrumen
          * an error, not just an unready device. */
         if (chunkWritten <= 0)
         {
-            return RBRINSTRUMENTGEN3_CALLBACK_ERROR;
+            return RBRGEN3_CALLBACK_ERROR;
         }
 
         written += chunkWritten;
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
 
-RBRInstrumentGen3Error instrumentStart(RBRInstrumentGen3 *instrument)
+RBRGen3Error instrumentStart(RBRGen3 *conn)
 {
-    RBRInstrumentGen3Error err;
+    RBRGen3Error err;
 
-    RBRInstrumentGen3DeploymentStatus status;
-    if ((err = RBRInstrumentGen3_disable(instrument, &status))
-        != RBRINSTRUMENTGEN3_SUCCESS)
+    RBRGen3DeploymentStatus status;
+    if ((err = RBRGen3_disable(conn, &status))
+        != RBRGEN3_SUCCESS)
     {
         return err;
     }
 
-    RBRInstrumentGen3Sampling sampling;
-    if ((err = RBRInstrumentGen3_getSampling(instrument, &sampling))
-        != RBRINSTRUMENTGEN3_SUCCESS)
+    RBRGen3Sampling sampling;
+    if ((err = RBRGen3_getSampling(conn, &sampling))
+        != RBRGEN3_SUCCESS)
     {
         return err;
     }
-    sampling.mode = RBRINSTRUMENTGEN3_SAMPLING_CONTINUOUS;
+    sampling.mode = RBRGEN3_SAMPLING_CONTINUOUS;
     sampling.period = sampling.userPeriodLimit;
-    if ((err = RBRInstrumentGen3_setSampling(instrument, &sampling))
-        != RBRINSTRUMENTGEN3_SUCCESS)
+    if ((err = RBRGen3_setSampling(conn, &sampling))
+        != RBRGEN3_SUCCESS)
     {
         return err;
     }
 
-    RBRInstrumentGen3Deployment deployment = {
-        .startTime = RBRINSTRUMENTGEN3_DATETIME_MIN,
-        .endTime = RBRINSTRUMENTGEN3_DATETIME_MAX
+    RBRGen3Deployment deployment = {
+        .startTime = RBRGEN3_DATETIME_MIN,
+        .endTime = RBRGEN3_DATETIME_MAX
     };
-    if ((err = RBRInstrumentGen3_setDeployment(instrument, &deployment))
-        != RBRINSTRUMENTGEN3_SUCCESS)
+    if ((err = RBRGen3_setDeployment(conn, &deployment))
+        != RBRGEN3_SUCCESS)
     {
         return err;
     }
 
-    if ((err = RBRInstrumentGen3_setNewMemoryFormat(
-             instrument,
-             RBRINSTRUMENTGEN3_MEMFORMAT_CALBIN00))
-        != RBRINSTRUMENTGEN3_SUCCESS)
+    if ((err = RBRGen3_setNewMemoryFormat(
+             conn,
+             RBRGEN3_MEMFORMAT_CALBIN00))
+        != RBRGEN3_SUCCESS)
     {
         return err;
     }
 
-    RBRInstrumentGen3Thresholding thresholding;
-    err = RBRInstrumentGen3_getThresholding(instrument, &thresholding);
-    if (err == RBRINSTRUMENTGEN3_SUCCESS && thresholding.enabled)
+    RBRGen3Thresholding thresholding;
+    err = RBRGen3_getThresholding(conn, &thresholding);
+    if (err == RBRGEN3_SUCCESS && thresholding.enabled)
     {
         thresholding.enabled = false;
-        RBRInstrumentGen3_setThresholding(instrument, &thresholding);
+        RBRGen3_setThresholding(conn, &thresholding);
     }
 
-    RBRInstrumentGen3TwistActivation twistActivation;
-    err = RBRInstrumentGen3_getTwistActivation(instrument, &twistActivation);
-    if (err == RBRINSTRUMENTGEN3_SUCCESS && twistActivation.enabled)
+    RBRGen3TwistActivation twistActivation;
+    err = RBRGen3_getTwistActivation(conn, &twistActivation);
+    if (err == RBRGEN3_SUCCESS && twistActivation.enabled)
     {
         twistActivation.enabled = false;
-        RBRInstrumentGen3_setTwistActivation(instrument, &twistActivation);
+        RBRGen3_setTwistActivation(conn, &twistActivation);
     }
 
-    if ((err = RBRInstrumentGen3_enable(instrument, true, &status))
-        != RBRINSTRUMENTGEN3_SUCCESS)
+    if ((err = RBRGen3_enable(conn, true, &status))
+        != RBRGEN3_SUCCESS)
     {
         return err;
     }
 
-    return RBRINSTRUMENTGEN3_SUCCESS;
+    return RBRGEN3_SUCCESS;
 }
