@@ -46,7 +46,7 @@ export LIB_VERSION ?= $(shell ./tools/version.sh)
 ##
 ## - `GEN3`: the `RBRInstrumentGen3_`-prefixed API for Logger2/Logger3
 ##   instruments — the libRBR 1.x API, suffixed `Gen3`;
-## - `GEN4`: the `RBRInstrumentGen4_`-prefixed API for Generation 4
+## - `GEN4`: the `RBRGen4`-prefixed API for Generation 4
 ##   (SL4/SEN4/L4) instruments.
 ##
 ## Both are enabled (`1`) by default and both land in the same
@@ -127,16 +127,16 @@ GEN3_OBJECTS := src/RBRInstrumentGen3.o \
                 src/RBRParserGen3.o
 
 ## \brief Objects for the Gen4 (SL4/SEN4/L4) API.
-GEN4_OBJECTS := src/RBRInstrumentGen4.o \
-                src/RBRInstrumentGen4Communication.o \
-                src/RBRInstrumentGen4Configuration.o \
-                src/RBRInstrumentGen4Deployment.o \
-                src/RBRInstrumentGen4HardwareErrors.o \
-                src/RBRInstrumentGen4Instrument.o \
-                src/RBRInstrumentGen4Internal.o \
-                src/RBRInstrumentGen4Memory.o \
-                src/RBRInstrumentGen4Realtime.o \
-                src/RBRParserGen4.o
+GEN4_OBJECTS := src/RBRGen4.o \
+                src/RBRGen4Communication.o \
+                src/RBRGen4Configuration.o \
+                src/RBRGen4Deployment.o \
+                src/RBRGen4HardwareErrors.o \
+                src/RBRGen4Instrument.o \
+                src/RBRGen4Internal.o \
+                src/RBRGen4Memory.o \
+                src/RBRGen4Realtime.o \
+                src/RBRGen4Parser.o
 
 LIB_OBJECTS :=
 DYNAMICCORRECTION_OBJECTS :=
@@ -146,7 +146,7 @@ DYNAMICCORRECTION_OBJECTS += src/RBRDynamicCorrectionGen3.o
 endif
 ifeq ($(GEN4),1)
 LIB_OBJECTS += $(GEN4_OBJECTS)
-DYNAMICCORRECTION_OBJECTS += src/RBRDynamicCorrectionGen4.o
+DYNAMICCORRECTION_OBJECTS += src/RBRGen4DynamicCorrection.o
 endif
 
 # Due to incompatibility between parallel builds (-j, --jobs) and Make's
@@ -269,13 +269,13 @@ testsGen4/tests.c: $(foreach module,$(GEN4_TEST_MODULES),testsGen4/$(module).c)
 		| sed -e 's/$$/;/' >>$@
 	@echo "InstrumentTest instrumentTests[] = {" >>$@
 	@grep -ho 'TEST_LOGGER[4]([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRINSTRUMENTGEN4_LOGGER\1, test_\2_l\1},/' \
+		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRGEN4_LOGGER\1, test_\2_l\1},/' \
 		>>$@
 	@echo "    {0}" >>$@
 	@echo "};" >>$@
 
 	@grep -ho 'TEST_PARSER_CONFIG([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_PARSER_CONFIG(\([^,]*\))/extern const RBRParserGen4Config test_\1_parser_config;/' \
+		| sed -e 's/^TEST_PARSER_CONFIG(\([^,]*\))/extern const RBRGen4ParserConfig test_\1_parser_config;/' \
 		>>$@
 
 	@echo "ParserTest parserTests[] = {" >>$@

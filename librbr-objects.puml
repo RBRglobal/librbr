@@ -1,8 +1,8 @@
 @startuml
 
-title RBRInstrumentGen4
+title RBRGen4
 
-package RBRInstrumentGen4 {
+package RBRGen4 {
     class lib {
         extern const char *NAME
         extern const char *VERSION
@@ -337,7 +337,7 @@ package RBRInstrumentGen4 {
             error advanceLog(log* log)
             error sendBuffer()
             error sendCommand(const char *command)
-            error readResponse(bool breakOnSample, RBRInstrumentGen4Sample *sample)
+            error readResponse(bool breakOnSample, RBRGen4Sample *sample)
             error converse()
             error parseBool(bool *parameter)
             error parseFloat(float *parameter)

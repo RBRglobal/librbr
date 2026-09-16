@@ -11,7 +11,7 @@
 /* Required for memset. */
 #include <string.h>
 
-#include "RBRInstrumentGen4Realtime.h"
+#include "RBRGen4Realtime.h"
 #include "tests.h"
 
 typedef struct PollTest
@@ -21,12 +21,12 @@ typedef struct PollTest
     bool requireLabel;
     const char *expectedCommand;
     const char *response;
-    RBRInstrumentGen4OutputFormat outputFormat;
-    RBRInstrumentGen4Error expectedError;
-    RBRInstrumentGen4Sample expected;
+    RBRGen4OutputFormat outputFormat;
+    RBRGen4Error expectedError;
+    RBRGen4Sample expected;
     /** \brief The streamed sample expected to reach the sample callback;
      * asserted only when its channelCount is non-zero. */
-    RBRInstrumentGen4Sample expectedStreamed;
+    RBRGen4Sample expectedStreamed;
 } PollTest;
 
 #define OUTPUTFORMAT_DEFAULT \
@@ -43,14 +43,14 @@ TEST_LOGGER4(poll)
           "2024-03-10 07:01:06.000 Error-01 Error-09 Error-09 Error-09"
           RESPONSE_TERMINATOR,
           OUTPUTFORMAT_DEFAULT,
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 1710054066000LL,
             .channelCount = 4,
             .readings = {
-              RBRInstrumentGen4Reading_setError(1),
-              RBRInstrumentGen4Reading_setError(9),
-              RBRInstrumentGen4Reading_setError(9),
-              RBRInstrumentGen4Reading_setError(9) } },
+              RBRGen4Reading_setError(1),
+              RBRGen4Reading_setError(9),
+              RBRGen4Reading_setError(9),
+              RBRGen4Reading_setError(9) } },
           { 0 } },
         { "temperature_00",
           NULL,
@@ -58,10 +58,10 @@ TEST_LOGGER4(poll)
           "poll channellist=temperature_00" COMMAND_TERMINATOR,
           "2024-03-10 07:01:07.000 Error-01" RESPONSE_TERMINATOR,
           OUTPUTFORMAT_DEFAULT,
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 1710054067000LL,
             .channelCount = 1,
-            .readings = { RBRInstrumentGen4Reading_setError(1) } },
+            .readings = { RBRGen4Reading_setError(1) } },
           { 0 } },
         /* A sample's timestamp may be a bare count of milliseconds. */
         { NULL,
@@ -70,7 +70,7 @@ TEST_LOGGER4(poll)
           "poll" COMMAND_TERMINATOR,
           "12345 12.5364470e+000 9.91695000e+000" RESPONSE_TERMINATOR,
           OUTPUTFORMAT_DEFAULT,
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 12345LL,
             .channelCount = 2,
             .readings = { 12.5364470, 9.91695000 } },
@@ -84,7 +84,7 @@ TEST_LOGGER4(poll)
           "poll" COMMAND_TERMINATOR,
           "12.5364470e+000 9.91695000e+000" RESPONSE_TERMINATOR,
           OUTPUTFORMAT_DEFAULT,
-          RBRINSTRUMENTGEN4_CALLBACK_ERROR,
+          RBRGEN4_CALLBACK_ERROR,
           { 0 },
           { 0 } },
         /* A repeated channel is reported at every requested position. */
@@ -96,13 +96,13 @@ TEST_LOGGER4(poll)
           "2024-03-10 07:01:09.000 Error-09 Error-01 Error-09"
           RESPONSE_TERMINATOR,
           OUTPUTFORMAT_DEFAULT,
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 1710054069000LL,
             .channelCount = 3,
             .readings = {
-              RBRInstrumentGen4Reading_setError(9),
-              RBRInstrumentGen4Reading_setError(1),
-              RBRInstrumentGen4Reading_setError(9) } },
+              RBRGen4Reading_setError(9),
+              RBRGen4Reading_setError(1),
+              RBRGen4Reading_setError(9) } },
           { 0 } },
         { NULL,
           "g",
@@ -110,10 +110,10 @@ TEST_LOGGER4(poll)
           "poll grouplist=g" COMMAND_TERMINATOR,
           "2024-03-10 07:01:10.000 Error-09" RESPONSE_TERMINATOR,
           OUTPUTFORMAT_DEFAULT,
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 1710054070000LL,
             .channelCount = 1,
-            .readings = { RBRInstrumentGen4Reading_setError(9) } },
+            .readings = { RBRGen4Reading_setError(9) } },
           { 0 } },
         /* Successful readings parse as their values. */
         { NULL,
@@ -123,7 +123,7 @@ TEST_LOGGER4(poll)
           "2024-10-21 11:50:49.000 18.1745130 12.7052970 2.69308210"
           RESPONSE_TERMINATOR,
           OUTPUTFORMAT_DEFAULT,
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 1729511449000LL,
             .channelCount = 3,
             .readings = { 18.1745130, 12.7052970, 2.69308210 } },
@@ -138,11 +138,11 @@ TEST_LOGGER4(poll)
             .scheduleLabel = true,
             .dateTime = true,
             .crc = false },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 1710054091000LL,
             .scheduleLabel = "polling",
             .channelCount = 1,
-            .readings = { RBRInstrumentGen4Reading_setError(1) } },
+            .readings = { RBRGen4Reading_setError(1) } },
           { 0 } },
         { "temperature_00",
           NULL,
@@ -153,10 +153,10 @@ TEST_LOGGER4(poll)
             .scheduleLabel = false,
             .dateTime = true,
             .crc = false },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 1710054093000LL,
             .channelCount = 1,
-            .readings = { RBRInstrumentGen4Reading_setError(1) } },
+            .readings = { RBRGen4Reading_setError(1) } },
           { 0 } },
         { "temperature_00",
           NULL,
@@ -167,10 +167,10 @@ TEST_LOGGER4(poll)
             .scheduleLabel = false,
             .dateTime = true,
             .crc = true },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 1710054095000LL,
             .channelCount = 1,
-            .readings = { RBRInstrumentGen4Reading_setError(1) } },
+            .readings = { RBRGen4Reading_setError(1) } },
           { 0 } },
         /* A single reading with no other fields is a one-token sample. */
         { "pressure_00",
@@ -182,7 +182,7 @@ TEST_LOGGER4(poll)
             .scheduleLabel = false,
             .dateTime = false,
             .crc = false },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 0,
             .channelCount = 1,
             .readings = { 9.85289000 } },
@@ -196,7 +196,7 @@ TEST_LOGGER4(poll)
             .scheduleLabel = false,
             .dateTime = false,
             .crc = true },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 0,
             .channelCount = 1,
             .readings = { 9.80449000 } },
@@ -213,7 +213,7 @@ TEST_LOGGER4(poll)
             .scheduleLabel = false,
             .dateTime = false,
             .crc = false },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 0,
             .channelCount = 4,
             .readings = { 12.5363015, 9.82848000,
@@ -229,7 +229,7 @@ TEST_LOGGER4(poll)
             .scheduleLabel = false,
             .dateTime = false,
             .crc = true },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 0,
             .channelCount = 4,
             .readings = { 12.5361167, 9.82034000,
@@ -245,7 +245,7 @@ TEST_LOGGER4(poll)
             .scheduleLabel = true,
             .dateTime = false,
             .crc = false },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 0,
             .scheduleLabel = "polling",
             .channelCount = 4,
@@ -262,7 +262,7 @@ TEST_LOGGER4(poll)
             .scheduleLabel = true,
             .dateTime = false,
             .crc = true },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 0,
             .scheduleLabel = "polling",
             .channelCount = 4,
@@ -279,7 +279,7 @@ TEST_LOGGER4(poll)
             .scheduleLabel = false,
             .dateTime = false,
             .crc = false },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 0,
             .channelCount = 4,
             .readings = { 12.5360777, 9.80820000,
@@ -295,7 +295,7 @@ TEST_LOGGER4(poll)
             .scheduleLabel = false,
             .dateTime = false,
             .crc = true },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 0,
             .channelCount = 4,
             .readings = { 12.5362042, 9.81825000,
@@ -311,7 +311,7 @@ TEST_LOGGER4(poll)
             .scheduleLabel = true,
             .dateTime = false,
             .crc = false },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 0,
             .scheduleLabel = "polling",
             .channelCount = 4,
@@ -328,7 +328,7 @@ TEST_LOGGER4(poll)
             .scheduleLabel = true,
             .dateTime = false,
             .crc = true },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .timestamp = 0,
             .scheduleLabel = "polling",
             .channelCount = 4,
@@ -349,8 +349,8 @@ TEST_LOGGER4(poll)
             .scheduleLabel = true,
             .dateTime = true,
             .crc = true,
-            .dataType = RBRINSTRUMENTGEN4_DATATYPE_FLOAT64 },
-          RBRINSTRUMENTGEN4_SUCCESS,
+            .dataType = RBRGEN4_DATATYPE_FLOAT64 },
+          RBRGEN4_SUCCESS,
           { .timestamp = 1710333456000LL,
             .scheduleLabel = "polling",
             .channelCount = 4,
@@ -367,7 +367,7 @@ TEST_LOGGER4(poll)
             .scheduleLabel = false,
             .dateTime = false,
             .crc = false },
-          RBRINSTRUMENTGEN4_UNSUPPORTED,
+          RBRGEN4_UNSUPPORTED,
           { 0 },
           { 0 } },
         /* With requireLabel set, streamed samples read while waiting for
@@ -383,7 +383,7 @@ TEST_LOGGER4(poll)
             .scheduleLabel = true,
             .dateTime = false,
             .crc = false },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .scheduleLabel = "polling",
             .channelCount = 1,
             .readings = { 9.83602000 } },
@@ -403,7 +403,7 @@ TEST_LOGGER4(poll)
             .scheduleLabel = true,
             .dateTime = false,
             .crc = false },
-          RBRINSTRUMENTGEN4_SUCCESS,
+          RBRGEN4_SUCCESS,
           { .scheduleLabel = "sch_asc_pts",
             .channelCount = 2,
             .readings = { 9.84050000, 12.5362918 } },
@@ -416,7 +416,7 @@ TEST_LOGGER4(poll)
           "ERR-117 'nosuchchannel_00' is not a known qualifier"
           RESPONSE_TERMINATOR,
           OUTPUTFORMAT_DEFAULT,
-          RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+          RBRGEN4_HARDWARE_ERROR,
           { 0 },
           { 0 } },
         { NULL,
@@ -426,7 +426,7 @@ TEST_LOGGER4(poll)
           "ERR-117 'nosuchgroup' is not a known qualifier"
           RESPONSE_TERMINATOR,
           OUTPUTFORMAT_DEFAULT,
-          RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+          RBRGEN4_HARDWARE_ERROR,
           { 0 },
           { 0 } },
         /* An empty list is refused by the instrument, not the library. */
@@ -436,47 +436,47 @@ TEST_LOGGER4(poll)
           "poll channellist=" COMMAND_TERMINATOR,
           "ERR-115 syntax error ''" RESPONSE_TERMINATOR,
           OUTPUTFORMAT_DEFAULT,
-          RBRINSTRUMENTGEN4_HARDWARE_ERROR,
+          RBRGEN4_HARDWARE_ERROR,
           { 0 },
           { 0 } },
         { NULL, NULL, false, NULL, NULL, { 0 }, 0, { 0 },
           { 0 } }
     };
 
-    RBRInstrumentGen4Error err;
-    RBRInstrumentGen4Sample actual;
+    RBRGen4Error err;
+    RBRGen4Sample actual;
 
     for (int i = 0; tests[i].expectedCommand != NULL; i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         memset(&buffers->streamSample, 0, sizeof(buffers->streamSample));
-        instrument->outputFormat = tests[i].outputFormat;
+        conn->outputFormat = tests[i].outputFormat;
         if (tests[i].channelList != NULL)
         {
-            err = RBRInstrumentGen4_pollChannels(instrument,
+            err = RBRGen4_pollChannels(conn,
                                                  tests[i].requireLabel,
                                                  tests[i].channelList,
                                                  &actual);
         }
         else if (tests[i].groupList != NULL)
         {
-            err = RBRInstrumentGen4_pollGroups(instrument,
+            err = RBRGen4_pollGroups(conn,
                                                tests[i].requireLabel,
                                                tests[i].groupList,
                                                &actual);
         }
         else
         {
-            err = RBRInstrumentGen4_poll(instrument,
+            err = RBRGen4_poll(conn,
                                          tests[i].requireLabel,
                                          &actual);
         }
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError,
                             err,
-                            RBRInstrumentGen4Error);
+                            RBRGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].expectedCommand, buffers->writeBuffer);
 
-        if (tests[i].expectedError != RBRINSTRUMENTGEN4_SUCCESS)
+        if (tests[i].expectedError != RBRGEN4_SUCCESS)
         {
             continue;
         }
@@ -492,17 +492,17 @@ TEST_LOGGER4(poll)
         for (int32_t channel = 0; channel < actual.channelCount; ++channel)
         {
             TEST_ASSERT_ENUM_EQ(
-                RBRInstrumentGen4Reading_isError(
+                RBRGen4Reading_isError(
                     tests[i].expected.readings[channel]),
-                RBRInstrumentGen4Reading_isError(actual.readings[channel]),
+                RBRGen4Reading_isError(actual.readings[channel]),
                 bool);
 
-            if (RBRInstrumentGen4Reading_isError(actual.readings[channel]))
+            if (RBRGen4Reading_isError(actual.readings[channel]))
             {
                 TEST_ASSERT_EQ(
-                    RBRInstrumentGen4Reading_getError(
+                    RBRGen4Reading_getError(
                         tests[i].expected.readings[channel]),
-                    RBRInstrumentGen4Reading_getError(
+                    RBRGen4Reading_getError(
                         actual.readings[channel]),
                     "%" PRIi8);
             }
@@ -533,47 +533,47 @@ TEST_LOGGER4(poll)
     }
 
     /* A label list too long to send is refused before the command. */
-    char longList[RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX];
+    char longList[RBRGEN4_COMMAND_BUFFER_MAX];
     memset(longList, 'a', sizeof(longList) - 1);
     longList[sizeof(longList) - 1] = '\0';
     TestIOBuffers_init(buffers, "", 0);
-    err = RBRInstrumentGen4_pollChannels(instrument, false, longList, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_INVALID_PARAMETER_VALUE,
+    err = RBRGen4_pollChannels(conn, false, longList, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE,
                         err,
-                        RBRInstrumentGen4Error);
+                        RBRGen4Error);
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
 }
 
 /** \brief A fake clock, advanced by pollTimeoutTime() on every call. */
-static RBRInstrumentGen4DateTime pollTimeoutClock;
+static RBRGen4DateTime pollTimeoutClock;
 
 /** \brief A time callback that advances #pollTimeoutClock by less than a
- * third of RBRInstrumentGen4.pollTimeout on every call, so a poll's
+ * third of RBRGen4.pollTimeout on every call, so a poll's
  * overall timeout can be exercised without waiting in real time. */
-static RBRInstrumentGen4Error pollTimeoutTime(
-    const struct RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4DateTime *time)
+static RBRGen4Error pollTimeoutTime(
+    const struct RBRGen4 *conn,
+    RBRGen4DateTime *time)
 {
-    (void) instrument;
+    (void) conn;
     *time = pollTimeoutClock;
     pollTimeoutClock += 3000;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 TEST_LOGGER4(pollTimeout)
 {
-    RBRInstrumentGen4Error err;
-    RBRInstrumentGen4Sample actual;
-    RBRInstrumentGen4TimeCallback savedTime = instrument->callbacks.time;
-    RBRInstrumentGen4DateTime savedPollTimeout = instrument->pollTimeout;
+    RBRGen4Error err;
+    RBRGen4Sample actual;
+    RBRGen4TimeCallback savedTime = conn->callbacks.time;
+    RBRGen4DateTime savedPollTimeout = conn->pollTimeout;
 
     pollTimeoutClock = 0;
-    instrument->callbacks.time = pollTimeoutTime;
-    instrument->pollTimeout = 10000;
+    conn->callbacks.time = pollTimeoutTime;
+    conn->pollTimeout = 10000;
 
-    instrument->outputFormat = (RBRInstrumentGen4OutputFormat) {
+    conn->outputFormat = (RBRGen4OutputFormat) {
         .sn = false,
         .scheduleLabel = true,
         .dateTime = false,
@@ -593,17 +593,17 @@ TEST_LOGGER4(pollTimeout)
         0);
     memset(&buffers->streamSample, 0, sizeof(buffers->streamSample));
 
-    err = RBRInstrumentGen4_pollChannels(instrument,
+    err = RBRGen4_pollChannels(conn,
                                          true,
                                          "pressure_00",
                                          &actual);
 
-    instrument->callbacks.time = savedTime;
-    instrument->pollTimeout = savedPollTimeout;
+    conn->callbacks.time = savedTime;
+    conn->pollTimeout = savedPollTimeout;
 
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_TIMEOUT,
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_TIMEOUT,
                         err,
-                        RBRInstrumentGen4Error);
+                        RBRGen4Error);
     TEST_ASSERT_STR_EQ("poll channellist=pressure_00" COMMAND_TERMINATOR,
                         buffers->writeBuffer);
     /* At least one streamed sample must have been forwarded before the
@@ -614,38 +614,38 @@ TEST_LOGGER4(pollTimeout)
 }
 
 /** \brief A fake clock, advanced by pollSlowResponseTime() on every call. */
-static RBRInstrumentGen4DateTime pollSlowResponseClock;
+static RBRGen4DateTime pollSlowResponseClock;
 
 /** \brief A time callback that advances #pollSlowResponseClock by more than
  * a small commandTimeout on every call, so that a wait spanning several
  * such ticks can be exercised without waiting in real time. */
-static RBRInstrumentGen4Error pollSlowResponseTime(
-    const struct RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4DateTime *time)
+static RBRGen4Error pollSlowResponseTime(
+    const struct RBRGen4 *conn,
+    RBRGen4DateTime *time)
 {
-    (void) instrument;
+    (void) conn;
     *time = pollSlowResponseClock;
     pollSlowResponseClock += 500;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 TEST_LOGGER4(pollSlowResponse)
 {
-    RBRInstrumentGen4Error err;
-    RBRInstrumentGen4Sample actual;
-    RBRInstrumentGen4TimeCallback savedTime = instrument->callbacks.time;
-    RBRInstrumentGen4DateTime savedCommandTimeout
-        = instrument->commandTimeout;
-    RBRInstrumentGen4DateTime savedPollTimeout = instrument->pollTimeout;
+    RBRGen4Error err;
+    RBRGen4Sample actual;
+    RBRGen4TimeCallback savedTime = conn->callbacks.time;
+    RBRGen4DateTime savedCommandTimeout
+        = conn->commandTimeout;
+    RBRGen4DateTime savedPollTimeout = conn->pollTimeout;
 
     pollSlowResponseClock = 0;
-    instrument->callbacks.time = pollSlowResponseTime;
+    conn->callbacks.time = pollSlowResponseTime;
     /* commandTimeout is small enough that it would trip on its own between
      * clock ticks; only pollTimeout is large enough to bound the wait. */
-    instrument->commandTimeout = 100;
-    instrument->pollTimeout = 10000;
+    conn->commandTimeout = 100;
+    conn->pollTimeout = 10000;
 
-    instrument->outputFormat = (RBRInstrumentGen4OutputFormat) {
+    conn->outputFormat = (RBRGen4OutputFormat) {
         .sn = false,
         .scheduleLabel = true,
         .dateTime = false,
@@ -658,15 +658,15 @@ TEST_LOGGER4(pollSlowResponse)
         "polling 12.5364470e+000 9.91695000e+000" RESPONSE_TERMINATOR,
         0);
 
-    err = RBRInstrumentGen4_poll(instrument, true, &actual);
+    err = RBRGen4_poll(conn, true, &actual);
 
-    instrument->callbacks.time = savedTime;
-    instrument->commandTimeout = savedCommandTimeout;
-    instrument->pollTimeout = savedPollTimeout;
+    conn->callbacks.time = savedTime;
+    conn->commandTimeout = savedCommandTimeout;
+    conn->pollTimeout = savedPollTimeout;
 
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS,
                         err,
-                        RBRInstrumentGen4Error);
+                        RBRGen4Error);
     TEST_ASSERT_EQ(2, actual.channelCount, "%" PRIi32);
 
     return true;
@@ -674,9 +674,9 @@ TEST_LOGGER4(pollSlowResponse)
 
 typedef struct ReadSampleTest
 {
-    RBRInstrumentGen4OutputFormat outputFormat;
+    RBRGen4OutputFormat outputFormat;
     const char *response;
-    RBRInstrumentGen4Sample expected;
+    RBRGen4Sample expected;
 } ReadSampleTest;
 
 TEST_LOGGER4(readSample)
@@ -719,7 +719,7 @@ TEST_LOGGER4(readSample)
             .scheduleLabel = false,
             .dateTime = false,
             .crc = false,
-            .dataType = RBRINSTRUMENTGEN4_DATATYPE_FLOAT64 },
+            .dataType = RBRGEN4_DATATYPE_FLOAT64 },
           "RBR 999999 9.84050000000000e+000 12.5362917963016e+000"
           RESPONSE_TERMINATOR,
           { .timestamp = 0,
@@ -740,18 +740,18 @@ TEST_LOGGER4(readSample)
             .readings = { 9.83297000, 12.5356886 } } },
     };
 
-    RBRInstrumentGen4Error err;
+    RBRGen4Error err;
 
     for (size_t i = 0; i < sizeof(tests) / sizeof(tests[0]); i++)
     {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         memset(&buffers->streamSample, 0, sizeof(buffers->streamSample));
-        instrument->outputFormat = tests[i].outputFormat;
+        conn->outputFormat = tests[i].outputFormat;
 
-        err = RBRInstrumentGen4_readSample(instrument);
-        TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_SUCCESS,
+        err = RBRGen4_readSample(conn);
+        TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS,
                             err,
-                            RBRInstrumentGen4Error);
+                            RBRGen4Error);
 
         TEST_ASSERT_EQ(tests[i].expected.timestamp,
                        buffers->streamSample.timestamp,
@@ -766,17 +766,17 @@ TEST_LOGGER4(readSample)
              ++channel)
         {
             TEST_ASSERT_ENUM_EQ(
-                RBRInstrumentGen4Reading_isError(
+                RBRGen4Reading_isError(
                     tests[i].expected.readings[channel]),
-                RBRInstrumentGen4Reading_isError(buffers->streamSample.readings[channel]),
+                RBRGen4Reading_isError(buffers->streamSample.readings[channel]),
                 bool);
 
-            if (RBRInstrumentGen4Reading_isError(buffers->streamSample.readings[channel]))
+            if (RBRGen4Reading_isError(buffers->streamSample.readings[channel]))
             {
                 TEST_ASSERT_EQ(
-                    RBRInstrumentGen4Reading_getError(
+                    RBRGen4Reading_getError(
                         tests[i].expected.readings[channel]),
-                    RBRInstrumentGen4Reading_getError(
+                    RBRGen4Reading_getError(
                         buffers->streamSample.readings[channel]),
                     "%" PRIi8);
             }
@@ -794,9 +794,9 @@ TEST_LOGGER4(readSample)
 
 TEST_LOGGER4(readSampleBadCrc)
 {
-    RBRInstrumentGen4Error err;
+    RBRGen4Error err;
 
-    instrument->outputFormat = (RBRInstrumentGen4OutputFormat) {
+    conn->outputFormat = (RBRGen4OutputFormat) {
         .sn = false,
         .scheduleLabel = true,
         .dateTime = false,
@@ -811,28 +811,28 @@ TEST_LOGGER4(readSampleBadCrc)
         0);
     memset(&buffers->streamSample, 0, sizeof(buffers->streamSample));
 
-    err = RBRInstrumentGen4_readSample(instrument);
+    err = RBRGen4_readSample(conn);
     /* The checksum failure makes the parser reject the line as a sample;
      * with no error/warning prefix, errorCheckResponse() then treats it as
      * an ordinary command response, so readSample() loops back for another
      * response and, finding no more data, fails with a callback error
      * rather than a checksum or timeout error. */
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_CALLBACK_ERROR,
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_CALLBACK_ERROR,
                         err,
-                        RBRInstrumentGen4Error);
+                        RBRGen4Error);
 
     return true;
 }
 
 TEST_LOGGER4(readSampleWithoutCallback)
 {
-    RBRInstrumentGen4Error err;
-    RBRInstrumentGen4SampleCallback savedCallback
-        = instrument->callbacks.sample;
+    RBRGen4Error err;
+    RBRGen4SampleCallback savedCallback
+        = conn->callbacks.sample;
 
-    instrument->callbacks.sample = NULL;
+    conn->callbacks.sample = NULL;
 
-    instrument->outputFormat = (RBRInstrumentGen4OutputFormat) {
+    conn->outputFormat = (RBRGen4OutputFormat) {
         .sn = false,
         .scheduleLabel = false,
         .dateTime = false,
@@ -842,13 +842,13 @@ TEST_LOGGER4(readSampleWithoutCallback)
                        "9.85054000e+000 12.5359318e+000" RESPONSE_TERMINATOR,
                        0);
 
-    err = RBRInstrumentGen4_readSample(instrument);
-    TEST_ASSERT_ENUM_EQ(RBRINSTRUMENTGEN4_MISSING_CALLBACK,
+    err = RBRGen4_readSample(conn);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_MISSING_CALLBACK,
                         err,
-                        RBRInstrumentGen4Error);
+                        RBRGen4Error);
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
-    instrument->callbacks.sample = savedCallback;
+    conn->callbacks.sample = savedCallback;
 
     return true;
 }

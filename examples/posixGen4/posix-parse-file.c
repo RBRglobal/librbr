@@ -30,11 +30,11 @@
 #include <unistd.h>
 
 #include "posix-shared.h"
-#include "RBRParserGen4.h"
+#include "RBRGen4Parser.h"
 
-RBRInstrumentGen4Error parserSample(
-    const struct RBRParserGen4 *parser,
-    const struct RBRInstrumentGen4Sample *const sample)
+RBRGen4Error parserSample(
+    const struct RBRGen4Parser *parser,
+    const struct RBRGen4Sample *const sample)
 {
     /* Unused. */
     (void) parser;
@@ -52,7 +52,7 @@ RBRInstrumentGen4Error parserSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -84,37 +84,37 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s (built %s).\n",
             programName,
-            RBRINSTRUMENTGEN4_LIB_NAME,
-            RBRINSTRUMENTGEN4_LIB_VERSION,
-            RBRINSTRUMENTGEN4_LIB_BUILD_DATE);
+            RBRGEN4_LIB_NAME,
+            RBRGEN4_LIB_VERSION,
+            RBRGEN4_LIB_BUILD_DATE);
 
-    RBRParserGen4 *parser = NULL;
+    RBRGen4Parser *parser = NULL;
     #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRParserGen4 parserSpace;
+    RBRGen4Parser parserSpace;
     parser = &parserSpace;
     #endif
 
-    RBRInstrumentGen4Sample sampleBuffer;
-    RBRParserGen4Callbacks parserCallbacks = {
+    RBRGen4Sample sampleBuffer;
+    RBRGen4ParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
 
-    RBRParserGen4Config parserConfig = {
+    RBRGen4ParserConfig parserConfig = {
         .channelCount = channels,
-        .datatype = RBRINSTRUMENTGEN4_DATATYPE_FLOAT32
+        .datatype = RBRGEN4_DATATYPE_FLOAT32
     };
 
-    RBRInstrumentGen4Error err;
-    if ((err = RBRParserGen4_init(
+    RBRGen4Error err;
+    if ((err = RBRGen4Parser_init(
              &parser,
              &parserCallbacks,
              &parserConfig,
-             NULL)) != RBRINSTRUMENTGEN4_SUCCESS)
+             NULL)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "%s: Failed to initialize parser: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
@@ -144,15 +144,15 @@ int main(int argc, char *argv[])
 
         bufSize += readSize;
         parsedSize = bufSize;
-        RBRParserGen4_parse(parser,
-                        RBRINSTRUMENTGEN4_BLOCK_DATA,
+        RBRGen4Parser_parse(parser,
+                        RBRGEN4_BLOCK_DATA,
                         buf,
                         &parsedSize);
         bufSize -= parsedSize;
         memmove(buf, buf + parsedSize, bufSize);
     }
 
-    RBRParserGen4_destroy(parser);
+    RBRGen4Parser_destroy(parser);
 fileCleanup:
     close(datasetFd);
 

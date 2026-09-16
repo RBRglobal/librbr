@@ -26,12 +26,12 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "RBRInstrumentGen4.h"
-#include "RBRInstrumentGen4Configuration.h"
-#include "RBRInstrumentGen4Deployment.h"
-#include "RBRInstrumentGen4Instrument.h"
-#include "RBRInstrumentGen4Memory.h"
-#include "RBRParserGen4.h"
+#include "RBRGen4.h"
+#include "RBRGen4Configuration.h"
+#include "RBRGen4Deployment.h"
+#include "RBRGen4Instrument.h"
+#include "RBRGen4Memory.h"
+#include "RBRGen4Parser.h"
 #include "posix-shared.h"
 
 //************************************* customer defined parameters *************************************//
@@ -41,7 +41,7 @@
 
 #define GROUP_PTS_LABEL "gr_pts"
 #define GROUP_PTS_CHANNELS                              \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
         SALINITY_DYNCORR,                               \
@@ -50,19 +50,19 @@
 #define GROUP_PTS_CHANNEL_COUNT 3
 
 #define SCHEDULE_PTS_LABEL "sch_asc_pts"
-#define SCHEDULE_PTS_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_REGIMES
-#define SCHEDULE_PTS_DIR RBRINSTRUMENTGEN4_DIRECTION_ASCENDING
-#define SCHEDULE_PTS_REF RBRINSTRUMENTGEN4_REFERENCE_SEAPRESSURE
+#define SCHEDULE_PTS_MODE RBRGEN4_SCHEDULE_MODE_REGIMES
+#define SCHEDULE_PTS_DIR RBRGEN4_DIRECTION_ASCENDING
+#define SCHEDULE_PTS_REF RBRGEN4_REFERENCE_SEAPRESSURE
 #define SCHEDULE_PTS_COUNT 3
 
 #define SCHEDULE_PTS_GROUPS                          \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         GROUP_PTS_LABEL                              \
     }
 #define SCHEDULE_PTS_GROUP_COUNT 1
 #define SCHEDULE_PTS_REGIMES           \
-    (RBRInstrumentGen4Regimes)         \
+    (RBRGen4Regimes)         \
     {                                  \
         .direction = SCHEDULE_PTS_DIR, \
         .count = SCHEDULE_PTS_COUNT,   \
@@ -80,7 +80,7 @@
 
 #define CONFIG_ASCENT_LABEL "cf_ascent"
 #define CONFIG_ASCENT_SCHEDULES                      \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         SCHEDULE_PTS_LABEL                           \
     }
@@ -91,9 +91,9 @@
 
 #define CHUNK_LEN_BYTES 1000
 
-RBRInstrumentGen4Error parserSample(
-    const struct RBRParserGen4 *parser,
-    const struct RBRInstrumentGen4Sample *const sample)
+RBRGen4Error parserSample(
+    const struct RBRGen4Parser *parser,
+    const struct RBRGen4Sample *const sample)
 {
     /* Unused. */
     (void) parser;
@@ -111,7 +111,7 @@ RBRInstrumentGen4Error parserSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -123,9 +123,9 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen4Error err;
-    RBRInstrumentGen4 instrumentSpace;
-    RBRInstrumentGen4 *instrument = &instrumentSpace;
+    RBRGen4Error err;
+    RBRGen4 instrumentSpace;
+    RBRGen4 *conn = &instrumentSpace;
 
     if (argc < 2)
     {
@@ -144,47 +144,47 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s (built %s).\n",
             programName,
-            RBRINSTRUMENTGEN4_LIB_NAME,
-            RBRINSTRUMENTGEN4_LIB_VERSION,
-            RBRINSTRUMENTGEN4_LIB_BUILD_DATE);
+            RBRGEN4_LIB_NAME,
+            RBRGEN4_LIB_VERSION,
+            RBRGEN4_LIB_BUILD_DATE);
 
     // check instrument communication is fine.
-    RBRInstrumentGen4Callbacks callbacks = {
+    RBRGen4Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRInstrumentGen4_open(
-             &instrument,
+    if ((err = RBRGen4_open(
+             &conn,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN4_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
     {
-        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRInstrumentGen4Error_name(err));
+        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup; // Failure case, memory allocated by this constructor is freed.
     }
 
     //------(optional) get link type: USB/serial/wifi---------------------------------------------
-    RBRInstrumentGen4Link link;
-    RBRInstrumentGen4_getLink(instrument, &link);
+    RBRGen4Link link;
+    RBRGen4_getLink(conn, &link);
     printf("Connected to the instrument via %s.\n",
-           RBRInstrumentGen4LinkType_name(link.type));
+           RBRGen4LinkType_name(link.type));
 
-    RBRInstrumentGen4LinkSerial serial;
+    RBRGen4LinkSerial serial;
 
     switch (link.type)
     {
-    case RBRINSTRUMENTGEN4_LINK_TYPE_USB:
+    case RBRGEN4_LINK_TYPE_USB:
         break;
-    case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
+    case RBRGEN4_LINK_TYPE_SERIAL:
     {
-        RBRInstrumentGen4_getLinkSerial(instrument, &serial);
+        RBRGen4_getLinkSerial(conn, &serial);
         printf("Connected in %s mode at %s baud.\n",
-               RBRInstrumentGen4LinkSerialMode_name(serial.mode),
-               RBRInstrumentGen4LinkSerialBaudRate_name(serial.baudRate));
+               RBRGen4LinkSerialMode_name(serial.mode),
+               RBRGen4LinkSerialBaudRate_name(serial.baudRate));
         break;
     }
     default:
@@ -195,30 +195,30 @@ int main(int argc, char *argv[])
     }
 
     /************ ensure default state ************/
-    RBRInstrumentGen4InstrumentState loggingState
-        = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
-    RBRInstrumentGen4_disable(instrument, &loggingState);
+    RBRGen4InstrumentState loggingState
+        = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
+    RBRGen4_disable(conn, &loggingState);
 
-    RBRInstrumentGen4DatasetPool datasetPool;
-    RBRInstrumentGen4_deleteDatasetAll(instrument, &datasetPool);
+    RBRGen4DatasetPool datasetPool;
+    RBRGen4_deleteDatasetAll(conn, &datasetPool);
 
-    RBRInstrumentGen4ConfigPool configPool;
-    RBRInstrumentGen4_deleteConfigAll(instrument);
+    RBRGen4ConfigPool configPool;
+    RBRGen4_deleteConfigAll(conn);
 
-    RBRInstrumentGen4SchedulePool schedulePool;
-    RBRInstrumentGen4_deleteScheduleAll(instrument, &schedulePool);
+    RBRGen4SchedulePool schedulePool;
+    RBRGen4_deleteScheduleAll(conn, &schedulePool);
 
-    RBRInstrumentGen4GroupPool groupPool;
-    RBRInstrumentGen4_deleteGroupAll(instrument);
+    RBRGen4GroupPool groupPool;
+    RBRGen4_deleteGroupAll(conn);
 
     /************ group definition ************/
     /* populate all channels and calibrations */
-    RBRInstrumentGen4ChannelPool channelPool;
-    RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
+    RBRGen4ChannelPool channelPool;
+    RBRGen4_getChannelPool(conn, &channelPool);
 
     for (int32_t i = 0; i < channelPool.count; i++)
     {
-        RBRInstrumentGen4_getChannel(instrument, &channelPool.pool[i]);
+        RBRGen4_getChannel(conn, &channelPool.pool[i]);
         printf(
             "%s,%s,%d,%d,%d,%s,%s,%s,%u",
             channelPool.pool[i].label,
@@ -227,25 +227,25 @@ int main(int argc, char *argv[])
             channelPool.pool[i].measuringTime,
             channelPool.pool[i].readOutTime,
             channelPool.pool[i].userUnits,
-            RBRInstrumentGen4ChannelNature_name(channelPool.pool[i].nature),
+            RBRGen4ChannelNature_name(channelPool.pool[i].nature),
             channelPool.pool[i].device,
             channelPool.pool[i].derived
         );
     }
     for (int32_t i = 0; i < channelPool.count; i++)
     {
-        RBRInstrumentGen4Calibration calibration;
+        RBRGen4Calibration calibration;
         snprintf(calibration.label,
                  sizeof(calibration.label),
                  "%s",
                  channelPool.pool[i].label);
-        RBRInstrumentGen4_getCalibration(instrument, &calibration);
+        RBRGen4_getCalibration(conn, &calibration);
     }
 
     /* specify groupLabel, channel labels, and create group instance */
-    RBRInstrumentGen4Group group_pts;
+    RBRGen4Group group_pts;
 
-    RBRInstrumentGen4_initNewGroup(instrument,
+    RBRGen4_initNewGroup(conn,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         GROUP_PTS_CHANNEL_COUNT,
@@ -253,8 +253,8 @@ int main(int argc, char *argv[])
                         &group_pts);
 
     /************ schedule definition ************/
-    RBRInstrumentGen4Schedule* schedule_asc_pts;
-    RBRInstrumentGen4_initNewScheduleRegimes(instrument,
+    RBRGen4Schedule* schedule_asc_pts;
+    RBRGen4_initNewScheduleRegimes(conn,
                          SCHEDULE_PTS_LABEL,
                          SCHEDULE_PTS_GROUPS,
                          SCHEDULE_PTS_GROUP_COUNT,
@@ -265,8 +265,8 @@ int main(int argc, char *argv[])
                          &schedule_asc_pts);
 
     /************ configuration definition ************/
-    RBRInstrumentGen4Config config_ascent;
-    RBRInstrumentGen4_initNewConfig(instrument,
+    RBRGen4Config config_ascent;
+    RBRGen4_initNewConfig(conn,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         GROUP_PTS_CHANNEL_COUNT,
@@ -274,82 +274,82 @@ int main(int argc, char *argv[])
                         &config_ascent);
 
     /************ deployment parameters ************/
-    RBRInstrumentGen4Deployment deployment;
-    deployment.gate = RBRINSTRUMENTGEN4_GATE_NONE;
-    RBRInstrumentGen4_getDeployment(instrument, &deployment);
+    RBRGen4Deployment deployment;
+    deployment.gate = RBRGEN4_GATE_NONE;
+    RBRGen4_getDeployment(conn, &deployment);
 
     str_to_deploymentDatetime(&deployment.startTime, STARTTIME);
-    RBRInstrumentGen4_setDeployment(instrument, &deployment);
+    RBRGen4_setDeployment(conn, &deployment);
 
     /************ start of ascent ************/
     /* enable the instrument */
-    RBRInstrumentGen4Dataset dataset_ascent_value = {
+    RBRGen4Dataset dataset_ascent_value = {
         .label = NEW_DATASET_LABEL
     };
-    RBRInstrumentGen4Dataset *dataset_ascent = &dataset_ascent_value;
-    RBRInstrumentGen4_enable(instrument,
+    RBRGen4Dataset *dataset_ascent = &dataset_ascent_value;
+    RBRGen4_enable(conn,
                              &config_ascent,
                              NEW_DATASET_LABEL,
-                             RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+                             RBRGEN4_STORAGEMODE_NORMAL,
                              &loggingState);
 
     /************ end of ascent ************/
     /* Stop the current deployment */
-    RBRInstrumentGen4_disable(instrument, &loggingState);
+    RBRGen4_disable(conn, &loggingState);
     /* Determine how much memory has been used */
-    RBRInstrumentGen4_getDataset(instrument,
+    RBRGen4_getDataset(conn,
                                  &configPool,
                                  dataset_ascent);
-    RBRInstrumentGen4DatasetInfo dataset_asc_info;
-    RBRInstrumentGen4_getDatasetByScheduleBlock(
-        instrument,
+    RBRGen4DatasetInfo dataset_asc_info;
+    RBRGen4_getDatasetByScheduleBlock(
+        conn,
         schedule_asc_pts,
-        RBRINSTRUMENTGEN4_BLOCK_DATA,
+        RBRGEN4_BLOCK_DATA,
         dataset_ascent,
         &dataset_asc_info);
     /* Get the data type */
-    RBRInstrumentGen4Instrument info;
-    RBRInstrumentGen4_getInstrument(instrument, &info);
+    RBRGen4Instrument info;
+    RBRGen4_getInstrument(conn, &info);
     /* Prepare the parser */
-    RBRParserGen4 parserSpace;
-    RBRParserGen4* parser = &parserSpace;
-    RBRParserGen4Config config = {
+    RBRGen4Parser parserSpace;
+    RBRGen4Parser* parser = &parserSpace;
+    RBRGen4ParserConfig config = {
         .channelCount = group_pts.channelCount,
         .datatype = info.dataType
     };
-    RBRInstrumentGen4Sample sampleBuffer;
-    RBRParserGen4Callbacks parserCallbacks = {
+    RBRGen4Sample sampleBuffer;
+    RBRGen4ParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
-    RBRParserGen4_init(&parser,
+    RBRGen4Parser_init(&parser,
                        &parserCallbacks,
                        &config,
                        NULL);
     /* Now loop over the data to download it in chunks */
     uint8_t buf[CHUNK_LEN_BYTES];
-    RBRInstrumentGen4Download download_data_pts = {
+    RBRGen4Download download_data_pts = {
         .dataset = dataset_ascent,
         .schedule = schedule_asc_pts,
-        .block = RBRINSTRUMENTGEN4_BLOCK_DATA,
-        .countKey = RBRINSTRUMENTGEN4_COUNTKEY_BYTECOUNT,
+        .block = RBRGEN4_BLOCK_DATA,
+        .countKey = RBRGEN4_COUNTKEY_BYTECOUNT,
         .countValue = CHUNK_LEN_BYTES,
-        .startKey = RBRINSTRUMENTGEN4_COUNTKEY_BYTECOUNT,
+        .startKey = RBRGEN4_COUNTKEY_BYTECOUNT,
         .startOffset = 1,
         .data = buf
     };
     while (download_data_pts.startOffset < dataset_ascent->byteCount) // if not downloaded all data from targetDataset/schedule/datablock
     {
-        RBRInstrumentGen4_download(instrument,
+        RBRGen4_download(conn,
                                    &download_data_pts);
-        RBRParserGen4_parse(parser,
+        RBRGen4Parser_parse(parser,
                             download_data_pts.block,
                             download_data_pts.data,
                             &download_data_pts.countValue);
     }
 
 instrumentCleanup:
-    RBRInstrumentGen4_close(instrument);
+    RBRGen4_close(conn);
 
 fileCleanup:
     close(instrumentFd);

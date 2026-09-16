@@ -8,8 +8,8 @@ Release TBD
 
 * Unified the Gen3 (Logger2/Logger3) and Gen4 (Generation 4) instrument
   APIs into a single source tree and library.
-  The Gen4 API (`RBRInstrumentGen4_…`, `RBRParserGen4_…`,
-  `RBRDynamicCorrectionGen4_…`),
+  The Gen4 API (`RBRGen4_…`, `RBRGen4Parser_…`,
+  `RBRGen4DynamicCorrection_…`),
   harvested from the 2023–2024 Gen4 development branches,
   now lives alongside the Gen3 API
   and is under active development.
@@ -24,6 +24,19 @@ Release TBD
 
 * Suffixed every Gen3 file name and identifier with `Gen3`,
   mirroring the Gen4 API (SYS-1877).
+  Behaviour is unchanged.
+* Renamed every Gen4 identifier and file name
+  to the `RBRGen4` prefix (SYS-1892):
+  `RBRInstrumentGen4` is now `RBRGen4`,
+  `RBRParserGen4` is `RBRGen4Parser`,
+  `RBRDynamicCorrectionGen4` is `RBRGen4DynamicCorrection`,
+  `RBRINSTRUMENTGEN4_SUCCESS` is `RBRGEN4_SUCCESS`,
+  and `RBRInstrumentGen4.h` is `RBRGen4.h`.
+  The Zephyr Kconfig buffer-size options follow
+  (`CONFIG_RBRINSTRUMENTGEN4_COMMAND_BUFFER_MAX`
+  is now `CONFIG_RBRGEN4_COMMAND_BUFFER_MAX`).
+  The connection parameter of every Gen4 method is now named `conn`
+  rather than `instrument`.
   Behaviour is unchanged.
 
 ## v1.3.0

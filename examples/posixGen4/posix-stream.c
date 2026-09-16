@@ -36,7 +36,7 @@
 
 #define GROUP_PTS_LABEL "gr_pts"
 #define GROUP_PTS_CHANNELS                              \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                   \
         PRESSURE,                                       \
             TEMPERATURE,                                \
@@ -45,12 +45,12 @@
 #define GROUP_PTS_CHANNEL_COUNT 3
 
 #define SCHEDULE_PTS_LABEL "sch_asc_pts"
-#define SCHEDULE_PTS_MODE RBRINSTRUMENTGEN4_SCHEDULE_MODE_CONTINUOUS
+#define SCHEDULE_PTS_MODE RBRGEN4_SCHEDULE_MODE_CONTINUOUS
 #define SCHEDULE_PTS_PERIOD 1000
 #define SCHEDULE_PTS_CASTDETECTION false
 
 #define SCHEDULE_PTS_GROUPS                          \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         GROUP_PTS_LABEL                              \
     }
@@ -58,7 +58,7 @@
 
 #define CONFIG_ASCENT_LABEL "cf_ascent"
 #define CONFIG_ASCENT_SCHEDULES                      \
-    (const RBRInstrumentGen4Label[]) \
+    (const RBRGen4Label[]) \
     {                                                \
         SCHEDULE_PTS_LABEL                           \
     }
@@ -81,12 +81,12 @@ void sig_handler(int signo)
     }
 }
 
-RBRInstrumentGen4Error instrumentSample(
-    const struct RBRInstrumentGen4 *instrument,
-    const struct RBRInstrumentGen4Sample *const sample)
+RBRGen4Error instrumentSample(
+    const struct RBRGen4 *conn,
+    const struct RBRGen4Sample *const sample)
 {
     /* Unused. */
-    (void) instrument;
+    (void) conn;
 
     char ftime[128];
     time_t sampleSeconds = (time_t) (sample->timestamp / 1000);
@@ -101,7 +101,7 @@ RBRInstrumentGen4Error instrumentSample(
     }
     printf("\n");
 
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 int main(int argc, char *argv[])
@@ -112,11 +112,11 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int instrumentFd;
 
-    RBRInstrumentGen4Error err;
-    RBRInstrumentGen4 *instrument = NULL;
+    RBRGen4Error err;
+    RBRGen4 *conn = NULL;
     // no dynamic allocation case:
-    RBRInstrumentGen4 instrumentSpace;
-    instrument = &instrumentSpace;
+    RBRGen4 instrumentSpace;
+    conn = &instrumentSpace;
 
     if (argc < 2)
     {
@@ -135,12 +135,12 @@ int main(int argc, char *argv[])
     fprintf(stderr,
             "%s: Using %s v%s (built %s).\n",
             programName,
-            RBRINSTRUMENTGEN4_LIB_NAME,
-            RBRINSTRUMENTGEN4_LIB_VERSION,
-            RBRINSTRUMENTGEN4_LIB_BUILD_DATE);
+            RBRGEN4_LIB_NAME,
+            RBRGEN4_LIB_VERSION,
+            RBRGEN4_LIB_BUILD_DATE);
 
-    RBRInstrumentGen4Sample sampleBuffer;
-    RBRInstrumentGen4Callbacks callbacks = {
+    RBRGen4Sample sampleBuffer;
+    RBRGen4Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
@@ -149,45 +149,45 @@ int main(int argc, char *argv[])
         .sampleBuffer = &sampleBuffer
     };
 
-    if ((err = RBRInstrumentGen4_open(
-             &instrument,
+    if ((err = RBRGen4_open(
+             &conn,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRINSTRUMENTGEN4_SUCCESS)
+             (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
     {
-        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRInstrumentGen4Error_name(err));
+        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
 
     // set streaming in real time during deployment:
-    RBRInstrumentGen4Link link;
-    RBRInstrumentGen4_getLink(instrument, &link);
+    RBRGen4Link link;
+    RBRGen4_getLink(conn, &link);
     printf("Connected to the instrument via %s.\n",
-           RBRInstrumentGen4LinkType_name(link.type));
+           RBRGen4LinkType_name(link.type));
 
     //(optional) get details about the connection.
     switch (link.type)
     {
-    case RBRINSTRUMENTGEN4_LINK_TYPE_USB:
+    case RBRGEN4_LINK_TYPE_USB:
         break;
-    case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
+    case RBRGEN4_LINK_TYPE_SERIAL:
     {
-        RBRInstrumentGen4LinkSerial serial;
-        RBRInstrumentGen4_getLinkSerial(instrument, &serial);
+        RBRGen4LinkSerial serial;
+        RBRGen4_getLinkSerial(conn, &serial);
         printf("Connected in %s mode at %s baud.\n",
-               RBRInstrumentGen4LinkSerialMode_name(serial.mode),
-               RBRInstrumentGen4LinkSerialBaudRate_name(serial.baudRate));
+               RBRGen4LinkSerialMode_name(serial.mode),
+               RBRGen4LinkSerialBaudRate_name(serial.baudRate));
         break;
     }
     /* WiFi is not yet implemented */
     #if 0
-    case RBRINSTRUMENTGEN4_LINK_TYPE_WIFI:
+    case RBRGEN4_LINK_TYPE_WIFI:
     {
-        RBRInstrumentGen4WiFi wifi;
-        RBRInstrumentGen4_getWiFi(instrument, &wifi);
+        RBRGen4WiFi wifi;
+        RBRGen4_getWiFi(conn, &wifi);
         printf("Connected in WiFi mode at %s baud. Timeout is %d\n",
-               RBRInstrumentGen4LinkSerialBaudRate_name(wifi.baudRate),
+               RBRGen4LinkSerialBaudRate_name(wifi.baudRate),
                wifi.commandTimeout);
         break;
     }
@@ -217,28 +217,28 @@ int main(int argc, char *argv[])
     // need to change all list to a struct (array of strings, and count)
 
     /************ ensure default state ************/
-    RBRInstrumentGen4InstrumentState loggingState
-        = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
-    RBRInstrumentGen4_disable(instrument, &loggingState);
+    RBRGen4InstrumentState loggingState
+        = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
+    RBRGen4_disable(conn, &loggingState);
 
-    RBRInstrumentGen4_deleteDatasetAll(instrument);
+    RBRGen4_deleteDatasetAll(conn);
 
-    RBRInstrumentGen4_deleteConfigAll(instrument);
-    RBRInstrumentGen4_deleteScheduleAll(instrument);
-    RBRInstrumentGen4_deleteGroupAll(instrument);
+    RBRGen4_deleteConfigAll(conn);
+    RBRGen4_deleteScheduleAll(conn);
+    RBRGen4_deleteGroupAll(conn);
 
     /************ group definition ************/
     // read the channel pool
-    RBRInstrumentGen4Channel channelBuf[RBRINSTRUMENTGEN4_CHANNEL_MAX];
-    RBRInstrumentGen4ChannelPool channelPool = {
-        .size = RBRINSTRUMENTGEN4_CHANNEL_MAX,
+    RBRGen4Channel channelBuf[RBRGEN4_CHANNEL_MAX];
+    RBRGen4ChannelPool channelPool = {
+        .size = RBRGEN4_CHANNEL_MAX,
         .pool = channelBuf
     };
-    RBRInstrumentGen4_getChannelPool(instrument, &channelPool);
+    RBRGen4_getChannelPool(conn, &channelPool);
 
     // specify groupLabel, channel labels, and create group instance
-    RBRInstrumentGen4Group group_pts;
-    RBRInstrumentGen4_initNewGroup(instrument,
+    RBRGen4Group group_pts;
+    RBRGen4_initNewGroup(conn,
                         GROUP_PTS_LABEL,
                         GROUP_PTS_CHANNELS,
                         GROUP_PTS_CHANNEL_COUNT,
@@ -246,13 +246,13 @@ int main(int argc, char *argv[])
                         &group_pts); // warning: need to read error!!!
 
     /************ schedule definition ************/
-    RBRInstrumentGen4Schedule schedule_pts;
-    RBRInstrumentGen4Label groupLabelBuf[SCHEDULE_PTS_GROUP_COUNT];
-    RBRInstrumentGen4LabelList groupList = {
+    RBRGen4Schedule schedule_pts;
+    RBRGen4Label groupLabelBuf[SCHEDULE_PTS_GROUP_COUNT];
+    RBRGen4LabelList groupList = {
         .size = SCHEDULE_PTS_GROUP_COUNT,
         .labels = groupLabelBuf
     };
-    RBRInstrumentGen4_initNewScheduleContinuous(instrument,
+    RBRGen4_initNewScheduleContinuous(conn,
                           SCHEDULE_PTS_LABEL,
                           SCHEDULE_PTS_GROUPS,
                           SCHEDULE_PTS_GROUP_COUNT,
@@ -265,11 +265,11 @@ int main(int argc, char *argv[])
     /* The link we are connected over is where this schedule should stream. */
     switch (link.type)
     {
-    case RBRINSTRUMENTGEN4_LINK_TYPE_USB:
-        schedule_pts.stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_USB;
+    case RBRGEN4_LINK_TYPE_USB:
+        schedule_pts.stream = RBRGEN4_SCHEDULE_STREAM_USB;
         break;
-    case RBRINSTRUMENTGEN4_LINK_TYPE_SERIAL:
-        schedule_pts.stream = RBRINSTRUMENTGEN4_SCHEDULE_STREAM_SERIAL;
+    case RBRGEN4_LINK_TYPE_SERIAL:
+        schedule_pts.stream = RBRGEN4_SCHEDULE_STREAM_SERIAL;
         break;
     default:
         /*
@@ -281,21 +281,21 @@ int main(int argc, char *argv[])
         fprintf(stderr,
                 "%s: cannot stream over link type %s.\n",
                 programName,
-                RBRInstrumentGen4LinkType_name(link.type));
+                RBRGen4LinkType_name(link.type));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
-    // warning: read error for RBRInstrumentGen4_initNewSchedule!!!
-    RBRInstrumentGen4_setSchedule(instrument, &schedule_pts, &groupList);
+    // warning: read error for RBRGen4_initNewSchedule!!!
+    RBRGen4_setSchedule(conn, &schedule_pts, &groupList);
 
     /************ configuration definition ************/
-    RBRInstrumentGen4Config config_ascent;
-    RBRInstrumentGen4Label scheduleLabelBuf[CONFIG_ASCENT_SCHEDULE_COUNT];
-    RBRInstrumentGen4LabelList scheduleList = {
+    RBRGen4Config config_ascent;
+    RBRGen4Label scheduleLabelBuf[CONFIG_ASCENT_SCHEDULE_COUNT];
+    RBRGen4LabelList scheduleList = {
         .size = CONFIG_ASCENT_SCHEDULE_COUNT,
         .labels = scheduleLabelBuf
     };
-    RBRInstrumentGen4_initNewConfig(instrument,
+    RBRGen4_initNewConfig(conn,
                          CONFIG_ASCENT_LABEL,
                          CONFIG_ASCENT_SCHEDULES,
                          CONFIG_ASCENT_SCHEDULE_COUNT,
@@ -304,41 +304,41 @@ int main(int argc, char *argv[])
 
     // specify outputformat. The setter sends every parameter of the command,
     // so read the current format and change only the sample fields.
-    RBRInstrumentGen4OutputFormat outputformat;
-    RBRInstrumentGen4_getOutputFormat(instrument, &outputformat);
+    RBRGen4OutputFormat outputformat;
+    RBRGen4_getOutputFormat(conn, &outputformat);
     outputformat.sn = true;
     outputformat.scheduleLabel = true;
     outputformat.dateTime = false;
     outputformat.crc = true;
-    RBRInstrumentGen4_setOutputFormat(instrument, &outputformat);
+    RBRGen4_setOutputFormat(conn, &outputformat);
 
     /************ deployment parameters ************/
     // need to stop if it's logging.
-    RBRInstrumentGen4Deployment deployment;
-    RBRInstrumentGen4_getDeployment(instrument, &deployment);
+    RBRGen4Deployment deployment;
+    RBRGen4_getDeployment(conn, &deployment);
 
     str_to_deploymentDatetime(&deployment.startTime, STARTTIME);
-    RBRInstrumentGen4_setDeployment(instrument, &deployment);
+    RBRGen4_setDeployment(conn, &deployment);
 
     // verify the configurations for enable
-    RBRInstrumentGen4_verify(instrument,
+    RBRGen4_verify(conn,
                              &config_ascent,
                              NEW_DATASET_LABEL,
-                             RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
+                             RBRGEN4_STORAGEMODE_NORMAL,
                              &loggingState);
 
     printf("%s: Start instrument logging with default_config.\n",
            programName);
-    if ((err = RBRInstrumentGen4_enable(instrument,
+    if ((err = RBRGen4_enable(conn,
                                         &config_ascent,
                                         NEW_DATASET_LABEL,
-                                        RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
-                                        &loggingState)) != RBRINSTRUMENTGEN4_SUCCESS)
+                                        RBRGEN4_STORAGEMODE_NORMAL,
+                                        &loggingState)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr,
                 "%s: Failed to start instrument: %s!\n",
                 programName,
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     };
@@ -347,14 +347,14 @@ int main(int argc, char *argv[])
     {
         signal(SIGINT, sig_handler);
         signal(SIGTERM, sig_handler);
-        if ((err = RBRInstrumentGen4_readSample(instrument)) != RBRINSTRUMENTGEN4_SUCCESS)
+        if ((err = RBRGen4_readSample(conn)) != RBRGEN4_SUCCESS)
         {
-            fprintf(stderr, "Error: %s\n", RBRInstrumentGen4Error_name(err));
+            fprintf(stderr, "Error: %s\n", RBRGen4Error_name(err));
         }
     }
 
 instrumentCleanup:
-    RBRInstrumentGen4_close(instrument);
+    RBRGen4_close(conn);
 fileCleanup:
     close(instrumentFd);
     return status;

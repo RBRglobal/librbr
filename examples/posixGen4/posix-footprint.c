@@ -23,25 +23,25 @@
 
 int main(void)
 {
-    RBRInstrumentGen4 instrument;
-    printf("%zu\n", sizeof(instrument)); //in bytes
+    RBRGen4 conn;
+    printf("%zu\n", sizeof(conn)); //in bytes
 
-    RBRInstrumentGen4ConfigPool configPool;
+    RBRGen4ConfigPool configPool;
     printf("%zu, %zu\n", sizeof(configPool), sizeof(configPool.pool[0]));
 
-    RBRInstrumentGen4SchedulePool schedulePool;
+    RBRGen4SchedulePool schedulePool;
     printf("%zu, %zu\n", sizeof(schedulePool), sizeof(schedulePool.pool[0]));
 
-    RBRInstrumentGen4GroupPool groupPool;
+    RBRGen4GroupPool groupPool;
     printf("%zu, %zu\n", sizeof(groupPool), sizeof(groupPool.pool[0]));
 
-    RBRInstrumentGen4ChannelPool channelPool;
+    RBRGen4ChannelPool channelPool;
     printf("%zu, %zu\n", sizeof(channelPool), sizeof(channelPool.pool[0]));
 
-    RBRInstrumentGen4Calibration calibration;
+    RBRGen4Calibration calibration;
     printf("%zu\n", sizeof(calibration));
 
-    RBRInstrumentGen4DatasetPool datasetPool;
+    RBRGen4DatasetPool datasetPool;
     printf("%zu, %zu\n", sizeof(datasetPool), sizeof(datasetPool.pool[0]));
 
 }

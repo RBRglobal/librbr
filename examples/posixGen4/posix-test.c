@@ -41,7 +41,7 @@ typedef struct TestIOBuffers
     /** \brief How far into the write buffer the instrument has written. */
     int32_t writeBufferPos;
     /** \brief The last sample received from the test instrument. */
-    RBRInstrumentGen4Sample streamSample;
+    RBRGen4Sample streamSample;
 } TestIOBuffers;
 
 void TestIOBuffers_init(TestIOBuffers *buffers,
@@ -60,34 +60,34 @@ void TestIOBuffers_init(TestIOBuffers *buffers,
     }
 }
 
-RBRInstrumentGen4Error TestIOBuffers_time(
-    const struct RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4DateTime *time)
+RBRGen4Error TestIOBuffers_time(
+    const struct RBRGen4 *conn,
+    RBRGen4DateTime *time)
 {
     /* No-op. */
-    (void)instrument;
+    (void)conn;
     (void)time;
     *time = 0;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error TestIOBuffers_sleep(
-    const struct RBRInstrumentGen4 *instrument,
-    RBRInstrumentGen4DateTime time)
+RBRGen4Error TestIOBuffers_sleep(
+    const struct RBRGen4 *conn,
+    RBRGen4DateTime time)
 {
     /* No-op. */
-    (void)instrument;
+    (void)conn;
     (void)time;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error TestIOBuffers_read(
-    const struct RBRInstrumentGen4 *instrument,
+RBRGen4Error TestIOBuffers_read(
+    const struct RBRGen4 *conn,
     void *data,
     int32_t *size)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRInstrumentGen4_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
 
     int32_t readLength = buffers->readBufferSize - buffers->readBufferPos;
     /* If we're out of data, indicate a callback error. */
@@ -100,7 +100,7 @@ RBRInstrumentGen4Error TestIOBuffers_read(
             __FILE__,
             __LINE__,
             *size);
-        return RBRINSTRUMENTGEN4_CALLBACK_ERROR;
+        return RBRGEN4_CALLBACK_ERROR;
     }
     else if (readLength > *size)
     {
@@ -110,15 +110,15 @@ RBRInstrumentGen4Error TestIOBuffers_read(
     memcpy(data, buffers->readBuffer + buffers->readBufferPos, readLength);
     *size = readLength;
     buffers->readBufferPos += readLength;
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error TestIOBuffers_write(const struct RBRInstrumentGen4 *instrument,
+RBRGen4Error TestIOBuffers_write(const struct RBRGen4 *conn,
                                            const void *const data,
                                            int32_t size)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRInstrumentGen4_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
 
     int32_t remaining = 4096 - buffers->writeBufferPos;
     /* If we're out of space, indicate a callback error. */
@@ -130,39 +130,39 @@ RBRInstrumentGen4Error TestIOBuffers_write(const struct RBRInstrumentGen4 *instr
             "B but only had space for %" PRIi32 "B.)\n",
             size,
             remaining);
-        return RBRINSTRUMENTGEN4_CALLBACK_ERROR;
+        return RBRGEN4_CALLBACK_ERROR;
     }
     /* Otherwise, store the data to the write buffer. */
     memcpy(buffers->writeBuffer + buffers->writeBufferPos, data, size);
     buffers->writeBufferPos += size;
     /* Null-terminate the buffer so we can do string comparisons with it. */
     buffers->writeBuffer[buffers->writeBufferPos] = '\0';
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
-RBRInstrumentGen4Error TestIOBuffers_sample(
-    const struct RBRInstrumentGen4 *instrument,
-    const struct RBRInstrumentGen4Sample *const sample)
+RBRGen4Error TestIOBuffers_sample(
+    const struct RBRGen4 *conn,
+    const struct RBRGen4Sample *const sample)
 {
     TestIOBuffers *buffers;
-    buffers = (TestIOBuffers *) RBRInstrumentGen4_getUserData(instrument);
+    buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
     if (sample != &buffers->streamSample)
     {
-        return RBRINSTRUMENTGEN4_CALLBACK_ERROR;
+        return RBRGEN4_CALLBACK_ERROR;
     }
-    return RBRINSTRUMENTGEN4_SUCCESS;
+    return RBRGEN4_SUCCESS;
 }
 
 int main(void)
 {
-    RBRInstrumentGen4 *instrument = NULL;
-    RBRInstrumentGen4 instrumentSpace;
-    instrument = &instrumentSpace;
+    RBRGen4 *conn = NULL;
+    RBRGen4 instrumentSpace;
+    conn = &instrumentSpace;
     TestIOBuffers ioBuffers;
     int status = EXIT_SUCCESS;
-    RBRInstrumentGen4Error err;
+    RBRGen4Error err;
 
-    RBRInstrumentGen4Callbacks instrumentCallbacks = {
+    RBRGen4Callbacks instrumentCallbacks = {
         .time = TestIOBuffers_time,
         .sleep = TestIOBuffers_sleep,
         .read = TestIOBuffers_read,
@@ -177,15 +177,15 @@ int main(void)
     RESPONSE_TERMINATOR,
     0);
 
-    err = RBRInstrumentGen4_open(&instrument,
+    err = RBRGen4_open(&conn,
                              &instrumentCallbacks,
                              /* command timeout */ 0,
                              &ioBuffers);
-    if (err != RBRINSTRUMENTGEN4_SUCCESS)
+    if (err != RBRGEN4_SUCCESS)
     {
         fprintf(stderr,
                 "Failure to open instrument: %s.\n",
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
@@ -208,22 +208,22 @@ int main(void)
             "storageMode = normal, status = pending, warning = none" RESPONSE_TERMINATOR,
         0);
 
-        RBRInstrumentGen4Config config = {
+        RBRGen4Config config = {
             .label = "profiling"
         };
         char datasetLabel[] = "test";
-        RBRInstrumentGen4InstrumentState verifyStatus
-            = RBRINSTRUMENTGEN4_UNKNOWN_INSTRUMENT_STATE;
+        RBRGen4InstrumentState verifyStatus
+            = RBRGEN4_UNKNOWN_INSTRUMENT_STATE;
 
-   if ((err = RBRInstrumentGen4_verify(
-                  instrument,
+   if ((err = RBRGen4_verify(
+                  conn,
                   &config,
                   datasetLabel,
-                  RBRINSTRUMENTGEN4_STORAGEMODE_NORMAL,
-                  &verifyStatus)) != RBRINSTRUMENTGEN4_SUCCESS)
+                  RBRGEN4_STORAGEMODE_NORMAL,
+                  &verifyStatus)) != RBRGEN4_SUCCESS)
     {
         fprintf(stderr, "./posix-test.c: %s!\n",
-                RBRInstrumentGen4Error_name(err));
+                RBRGen4Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup; //Failure case, memory allocated by this constructor is freed.
     }

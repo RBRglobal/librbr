@@ -25,9 +25,9 @@ extern "C" {
 /* Required for strcmp, strlen. */
 #include <string.h>
 
-#include "RBRInstrumentGen4.h"
-#include "RBRDynamicCorrectionGen4.h"
-#include "RBRParserGen4.h"
+#include "RBRGen4.h"
+#include "RBRGen4DynamicCorrection.h"
+#include "RBRGen4Parser.h"
 
 /**
  * \brief Assert that a condition is true.
@@ -194,72 +194,72 @@ extern "C" {
 #define COMMAND_RESPONSE_SIZE 1024
 
 /**
- * \brief Declare an empty RBRInstrumentGen4LabelList named \a name over a
+ * \brief Declare an empty RBRGen4LabelList named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
-#define RBRINSTRUMENTGEN4_LABEL_LIST_DECL(name, size_) \
-    RBRInstrumentGen4Label name##Buffer[size_]; \
-    RBRInstrumentGen4LabelList name = (RBRInstrumentGen4LabelList) { \
+#define RBRGEN4_LABEL_LIST_DECL(name, size_) \
+    RBRGen4Label name##Buffer[size_]; \
+    RBRGen4LabelList name = (RBRGen4LabelList) { \
         .size = (size_), \
         .count = 0, \
         .labels = name##Buffer \
     }
 
 /**
- * \brief Declare an empty RBRInstrumentGen4ChannelPool named \a name over a
+ * \brief Declare an empty RBRGen4ChannelPool named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
-#define RBRINSTRUMENTGEN4_CHANNEL_POOL_DECL(name, size_) \
-    RBRInstrumentGen4Channel name##Buffer[size_]; \
-    RBRInstrumentGen4ChannelPool name = (RBRInstrumentGen4ChannelPool) { \
+#define RBRGEN4_CHANNEL_POOL_DECL(name, size_) \
+    RBRGen4Channel name##Buffer[size_]; \
+    RBRGen4ChannelPool name = (RBRGen4ChannelPool) { \
         .size = (size_), \
         .count = 0, \
         .pool = name##Buffer \
     }
 
 /**
- * \brief Declare an empty RBRInstrumentGen4GroupPool named \a name over a
+ * \brief Declare an empty RBRGen4GroupPool named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
-#define RBRINSTRUMENTGEN4_GROUP_POOL_DECL(name, size_) \
-    RBRInstrumentGen4Group name##Buffer[size_]; \
-    RBRInstrumentGen4GroupPool name = (RBRInstrumentGen4GroupPool) { \
+#define RBRGEN4_GROUP_POOL_DECL(name, size_) \
+    RBRGen4Group name##Buffer[size_]; \
+    RBRGen4GroupPool name = (RBRGen4GroupPool) { \
         .size = (size_), \
         .count = 0, \
         .pool = name##Buffer \
     }
 
 /**
- * \brief Declare an empty RBRInstrumentGen4SchedulePool named \a name over a
+ * \brief Declare an empty RBRGen4SchedulePool named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
-#define RBRINSTRUMENTGEN4_SCHEDULE_POOL_DECL(name, size_) \
-    RBRInstrumentGen4Schedule name##Buffer[size_]; \
-    RBRInstrumentGen4SchedulePool name = (RBRInstrumentGen4SchedulePool) { \
+#define RBRGEN4_SCHEDULE_POOL_DECL(name, size_) \
+    RBRGen4Schedule name##Buffer[size_]; \
+    RBRGen4SchedulePool name = (RBRGen4SchedulePool) { \
         .size = (size_), \
         .count = 0, \
         .pool = name##Buffer \
     }
 
 /**
- * \brief Declare an empty RBRInstrumentGen4ConfigPool named \a name over a
+ * \brief Declare an empty RBRGen4ConfigPool named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
-#define RBRINSTRUMENTGEN4_CONFIG_POOL_DECL(name, size_) \
-    RBRInstrumentGen4Config name##Buffer[size_]; \
-    RBRInstrumentGen4ConfigPool name = (RBRInstrumentGen4ConfigPool) { \
+#define RBRGEN4_CONFIG_POOL_DECL(name, size_) \
+    RBRGen4Config name##Buffer[size_]; \
+    RBRGen4ConfigPool name = (RBRGen4ConfigPool) { \
         .size = (size_), \
         .count = 0, \
         .pool = name##Buffer \
     }
 
 /**
- * \brief Declare an empty RBRInstrumentGen4DatasetPool named \a name over a
+ * \brief Declare an empty RBRGen4DatasetPool named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
-#define RBRINSTRUMENTGEN4_DATASET_POOL_DECL(name, size_) \
-    RBRInstrumentGen4Dataset name##Buffer[size_]; \
-    RBRInstrumentGen4DatasetPool name = (RBRInstrumentGen4DatasetPool) { \
+#define RBRGEN4_DATASET_POOL_DECL(name, size_) \
+    RBRGen4Dataset name##Buffer[size_]; \
+    RBRGen4DatasetPool name = (RBRGen4DatasetPool) { \
         .size = (size_), \
         .count = 0, \
         .pool = name##Buffer \
@@ -315,7 +315,7 @@ typedef struct TestIOBuffers
     /** \brief How far into the write buffer the instrument has written. */
     int32_t writeBufferPos;
     /** \brief The last sample received from the test instrument. */
-    RBRInstrumentGen4Sample streamSample;
+    RBRGen4Sample streamSample;
 } TestIOBuffers;
 
 /**
@@ -349,7 +349,7 @@ const char *bool_name(bool value);
  */
 /* Uncrustify thinks that asterisks in macros are multiplication operators and
  * incorrectly adds spacing, so we'll turn *INDENT-OFF* just for this. */
-#define _TEST(fn) bool test_##fn(RBRInstrumentGen4 *instrument, \
+#define _TEST(fn) bool test_##fn(RBRGen4 *conn, \
                                  TestIOBuffers *buffers)
 /* *INDENT-ON* */
 
@@ -364,11 +364,11 @@ const char *bool_name(bool value);
 /**
  * \brief An instrument test to be run.
  *
- * \param instrument the instrument connection
+ * \param conn the instrument connection
  * \param buffers the test I/O buffers
  * \return whether the test passed
  */
-typedef bool (InstrumentTestFunction)(RBRInstrumentGen4 *instrument,
+typedef bool (InstrumentTestFunction)(RBRGen4 *conn,
                                       TestIOBuffers *buffers);
 
 /**
@@ -381,7 +381,7 @@ typedef struct InstrumentTest
     /** \brief The name of the test. */
     const char *name;
     /** \brief The instrument generation to which this test applies. */
-    RBRInstrumentGen4Generation generation;
+    RBRGen4Generation generation;
     /** \brief The test to be run. */
     InstrumentTestFunction *function;
 } InstrumentTest;
@@ -398,7 +398,7 @@ extern InstrumentTest instrumentTests[];
  *
  * \param [in] cfg the name of the configuration
  */
-#define TEST_PARSER_CONFIG(cfg) const RBRParserGen4Config test_##cfg##_parser_config
+#define TEST_PARSER_CONFIG(cfg) const RBRGen4ParserConfig test_##cfg##_parser_config
 
 /**
  * \brief Declare a parser test function.
@@ -408,7 +408,7 @@ extern InstrumentTest instrumentTests[];
  */
 /* *INDENT-OFF* */
 #define TEST_PARSER(fn, cfg) bool test_##fn##_parser( \
-    RBRParserGen4 *parser, \
+    RBRGen4Parser *parser, \
     TestParserBuffers *buffers)
 /* *INDENT-ON* */
 
@@ -420,11 +420,11 @@ typedef struct TestParserBuffers
     /** \brief The length of TestParserBuffers.samples. */
     int32_t samplesLength;
     /** \brief Parsed samples. */
-    RBRInstrumentGen4Sample samples[TESTPARSERBUFFERS_SAMPLES_MAX];
+    RBRGen4Sample samples[TESTPARSERBUFFERS_SAMPLES_MAX];
     /** \brief The length of TestParserBuffers.events. */
     int32_t eventsLength;
     /** \brief Parsed events. */
-    RBRInstrumentGen4Event events[TESTPARSERBUFFERS_EVENTS_MAX];
+    RBRGen4Event events[TESTPARSERBUFFERS_EVENTS_MAX];
 } TestParserBuffers;
 
 /**
@@ -434,7 +434,7 @@ typedef struct TestParserBuffers
  * \param buffers the parser result buffers
  * \return whether the test passed
  */
-typedef bool (ParserTestFunction)(RBRParserGen4 *parser,
+typedef bool (ParserTestFunction)(RBRGen4Parser *parser,
                                   TestParserBuffers *buffers);
 
 /**
@@ -447,7 +447,7 @@ typedef struct ParserTest
     /** \brief The name of the test. */
     const char *name;
     /** \brief The parser configuration. */
-    const RBRParserGen4Config *config;
+    const RBRGen4ParserConfig *config;
     /** \brief The test to be run. */
     ParserTestFunction *function;
 } ParserTest;

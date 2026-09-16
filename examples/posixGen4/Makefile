@@ -22,7 +22,7 @@ LDLIBS := -lRBR -lm
 ##
 ## - posix-multiScheduleDiffConfig predates the late-2024 API alignment (it
 ##   still refers to the WiFi and old group/config pool interfaces);
-## - posix-parse-file calls RBRParserGen4_destroy(), which is declared but
+## - posix-parse-file calls RBRGen4Parser_destroy(), which is declared but
 ##   not implemented (the Gen4 sample parser is incomplete);
 ## - posix-profilingFloat configures a `regimes` schedule; the `regimes` and
 ##   `ddsampling` modes are not modelled (SYS-1234). It also uses download
