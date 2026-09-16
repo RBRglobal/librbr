@@ -419,7 +419,7 @@ typedef struct VerifyTest
 {
     const RBRGen4Config config;
     const char *datasetLabel;
-    RBRGen4DeploymentStoragemode storageMode;
+    RBRGen4DeploymentStorageMode storageMode;
     const char *command;
     const char *response;
     RBRGen4Error expectedError;
@@ -589,7 +589,7 @@ typedef struct EnableTest
 {
     const RBRGen4Config config;
     const char *datasetLabel;
-    RBRGen4DeploymentStoragemode storageMode;
+    RBRGen4DeploymentStorageMode storageMode;
     const char *command;
     const char *response;
     RBRGen4Error expectedError;

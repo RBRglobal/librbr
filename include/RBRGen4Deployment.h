@@ -270,7 +270,7 @@ RBRGen4Error RBRGen4_resume(
  * \see RBRGen4_enable()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828476/enable
  */
-typedef enum RBRGen4DeploymentStoragemode
+typedef enum RBRGen4DeploymentStorageMode
 {
     /** Calibration equations are applied to all channel data. */
     RBRGEN4_STORAGEMODE_NORMAL,
@@ -280,7 +280,7 @@ typedef enum RBRGen4DeploymentStoragemode
     RBRGEN4_STORAGEMODE_COUNT,
     /** An unknown or unrecognized storage mode. */
     RBRGEN4_UNKNOWN_STORAGEMODE,
-} RBRGen4DeploymentStoragemode;
+} RBRGen4DeploymentStorageMode;
 
 /**
  * \brief Get a human-readable string name for a deployment storageMode.
@@ -289,8 +289,8 @@ typedef enum RBRGen4DeploymentStoragemode
  * \return a string name for the deployment storage mode
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRGen4DeploymentStoragemode_name(
-    RBRGen4DeploymentStoragemode storageMode);
+const char *RBRGen4DeploymentStorageMode_name(
+    RBRGen4DeploymentStorageMode storageMode);
 
 /**
  * \brief Perform the deployment consistency checks of the `enable` command
@@ -321,7 +321,7 @@ RBRGen4Error RBRGen4_verify(
     RBRGen4 *conn,
     const RBRGen4Config *config,
     const char *datasetLabel,
-    RBRGen4DeploymentStoragemode storageMode,
+    RBRGen4DeploymentStorageMode storageMode,
     RBRGen4InstrumentState *state);
 
 /**
@@ -354,7 +354,7 @@ RBRGen4Error RBRGen4_enable(
     RBRGen4 *conn,
     const RBRGen4Config *config,
     const char *datasetLabel,
-    RBRGen4DeploymentStoragemode storageMode,
+    RBRGen4DeploymentStorageMode storageMode,
     RBRGen4InstrumentState *state);
 
 /**

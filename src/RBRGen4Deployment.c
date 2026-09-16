@@ -356,7 +356,7 @@ static void RBRGen4_parseInstrumentState(
 static RBRGen4Error RBRGen4_checkDeploymentParameters(
     const RBRGen4Config *config,
     const char *datasetLabel,
-    RBRGen4DeploymentStoragemode storageMode)
+    RBRGen4DeploymentStorageMode storageMode)
 {
     if (config == NULL
         || config->label[0] == '\0'
@@ -376,7 +376,7 @@ RBRGen4Error RBRGen4_verify(
     RBRGen4 *conn,
     const RBRGen4Config *config,
     const char *datasetLabel,
-    RBRGen4DeploymentStoragemode storageMode,
+    RBRGen4DeploymentStorageMode storageMode,
     RBRGen4InstrumentState *state)
 {
     RBR_TRY(RBRGen4_checkDeploymentParameters(config,
@@ -388,14 +388,14 @@ RBRGen4Error RBRGen4_verify(
                 "verify config=%s dataset=%s storagemode=%s",
                 config->label,
                 datasetLabel,
-                RBRGen4DeploymentStoragemode_name(storageMode)));
+                RBRGen4DeploymentStorageMode_name(storageMode)));
 
     RBRGen4_parseInstrumentState(conn, state);
 
     return RBRGEN4_SUCCESS;
 }
 
-const char *RBRGen4DeploymentStoragemode_name(RBRGen4DeploymentStoragemode storageMode)
+const char *RBRGen4DeploymentStorageMode_name(RBRGen4DeploymentStorageMode storageMode)
 {
     switch (storageMode)
     {
@@ -415,7 +415,7 @@ RBRGen4Error RBRGen4_enable(
     RBRGen4 *conn,
     const RBRGen4Config *config,
     const char *datasetLabel,
-    RBRGen4DeploymentStoragemode storageMode,
+    RBRGen4DeploymentStorageMode storageMode,
     RBRGen4InstrumentState *state)
 {
     RBR_TRY(RBRGen4_checkDeploymentParameters(config,
@@ -427,7 +427,7 @@ RBRGen4Error RBRGen4_enable(
                 "enable config=%s dataset=%s storagemode=%s",
                 config->label,
                 datasetLabel,
-                RBRGen4DeploymentStoragemode_name(storageMode)));
+                RBRGen4DeploymentStorageMode_name(storageMode)));
 
     RBRGen4_parseInstrumentState(conn, state);
 
