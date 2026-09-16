@@ -64,9 +64,8 @@ int openSerialFd(char *devicePath)
 #define B9600 9600
 #endif
 
-    /*important!!!
-     change baudrate below if one is using 115200:
-     */
+    /* The instrument default. Change this if your instrument is configured
+     * for a different rate. */
     cfsetospeed(&portSettings, B115200);
 
     /* Input baud rate of 0 causes the output baud rate to be used. */
