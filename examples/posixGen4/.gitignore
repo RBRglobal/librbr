@@ -1,11 +1,11 @@
 # Generated artifacts.
 posix-communications
-posix-download-datablock-bySchedule
+posix-download
+posix-enable
+posix-enable-multiconfig
 posix-footprint
 posix-generation
-posix-multiScheduleDiffConfig
 posix-poll
-posix-singleScheduleSingleConfig
 posix-stream
 *.exe
 *.o

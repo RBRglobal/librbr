@@ -1,5 +1,5 @@
 /**
- * \file posix-singleScheduleSingleConfig.c
+ * \file posix-enable.c
  *
  * \brief Example of using the library to configure an instrument with a single
  * schedule and a single configuration measuring temperature and pressure.

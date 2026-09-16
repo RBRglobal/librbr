@@ -1,5 +1,5 @@
 /**
- * \file posix-multiScheduleDiffConfig.c
+ * \file posix-enable-multiconfig.c
  *
  * \brief Example of using the library to configure an instrument with several
  * schedules shared between two configurations: a fast "ascent" configuration

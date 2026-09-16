@@ -15,23 +15,15 @@ Assuming libRBR is already built with Gen4 support
 Go to the librbr/examples/posixGen4 directory, then run `make`.
 
 ## Tips before you start:
-(1) Check the baudrate:
-If it's 9600, it's all good. If not, you'll need to modify
-librbr/examples/posixGen4/posix-shared.c:
-~~~{.c}
-#ifndef B115200
-#define B115200 115200
-#define B9600 9600
-#endif
+(1) Check the baud rate:
+The examples open the serial port at 115200 baud, the instrument default. If
+your instrument is configured for another rate, change the `cfsetospeed()`
+call in `posix-shared.c` to match (e.g. `B9600`). The baud rate is
+irrelevant over a USB connection.
 
-    /*important!!!
-     change baudrate below if one is using 115200:
-     */
-    cfsetospeed(&portSettings, B9600);
-~~~
 (2) Confirm which port is in use:
-On Linux the instrument usually appears as /dev/ttyUSB0 or /dev/ttyACM0.
-In cygwin, if a terminal tool suggests COM6, it's most likely /dev/ttyS5;
+On Linux the instrument usually appears as `/dev/ttyUSB0` or `/dev/ttyACM0`.
+In cygwin, if a terminal tool suggests `COM6`, it's most likely `/dev/ttyS5`;
 alternatively, run `ls /dev/ttyS*` and try each one.
 
 (3) How to clean the built files:
@@ -41,14 +33,14 @@ directory.
 ## Usage for each example:
 File name     |  command to use it | things to know
 ------------- | ------------- | -------------
-posix-communications.c | ./posix-communications /dev/ttyUSB0 | reports how the instrument is connected and powered, then puts it to sleep; writes nothing
-posix-download-datablock-bySchedule.c | ./posix-download-datablock-bySchedule /dev/ttyUSB0 | downloads one schedule's data from the dataset recorded by posix-singleScheduleSingleConfig; writes nothing
-posix-footprint.c | ./posix-footprint | prints the memory footprint of the library structures; no instrument needed
-posix-generation.c | ./posix-generation /dev/ttyUSB0 | reports the instrument generation
-posix-multiScheduleDiffConfig.c | ./posix-multiScheduleDiffConfig /dev/ttyUSB0 | **clears the instrument configuration**, defines ascent and park configurations, and enables the ascent one
-posix-poll.c | ./posix-poll /dev/ttyUSB0 | polls on-demand samples; writes nothing
-posix-singleScheduleSingleConfig.c | ./posix-singleScheduleSingleConfig /dev/ttyUSB0 | **clears the instrument configuration** and enables a deployment with a single schedule and configuration
-posix-stream.c | ./posix-stream /dev/ttyUSB0 | **clears the instrument configuration**, enables a streaming deployment, prints samples until Ctrl-C, then disables
+`posix-communications.c` | `./posix-communications <device>` | reports how the instrument is connected and powered, then puts it to sleep; writes nothing
+`posix-download.c` | `./posix-download <device>` | downloads one schedule's data from the dataset recorded by posix-enable; writes nothing
+`posix-enable-multiconfig.c` | `./posix-enable-multiconfig <device>` | **clears the instrument configuration**, defines ascent and park configurations, and enables the ascent one
+`posix-enable.c` | `./posix-enable <device>` | **clears the instrument configuration** and enables a deployment with a single schedule and configuration
+`posix-footprint.c` | `./posix-footprint` | prints the memory footprint of the library structures; no instrument needed
+`posix-generation.c` | `./posix-generation <device>` | reports the instrument generation
+`posix-poll.c` | `./posix-poll <device>` | polls on-demand samples; writes nothing
+`posix-stream.c` | `./posix-stream <device>` | **clears the instrument configuration**, enables a streaming deployment, prints samples until Ctrl-C, then disables
 
 ## Contributing
 

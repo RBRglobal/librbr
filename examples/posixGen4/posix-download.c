@@ -1,10 +1,10 @@
 /**
- * \file posix-download-datablock-bySchedule.c
+ * \file posix-download.c
  *
  * \brief Example of using the library to download one schedule's sample data
  * from a dataset to a file.
  *
- * Intended to run after posix-singleScheduleSingleConfig has recorded some
+ * Intended to run after posix-enable has recorded some
  * data. Nothing is written to the instrument.
  *
  * \copyright
@@ -39,7 +39,7 @@
 
 /* == Customer defined parameters == */
 
-/* The dataset and schedule recorded by posix-singleScheduleSingleConfig. */
+/* The dataset and schedule recorded by posix-enable. */
 #define DATASET_LABEL "ds_ascent"
 #define SCHEDULE_LABEL "sch_asc_pt"
 
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
     {
         fprintf(stderr,
                 "%s: Dataset %s not found; run"
-                " posix-singleScheduleSingleConfig first\n",
+                " posix-enable first\n",
                 programName,
                 DATASET_LABEL);
         status = EXIT_FAILURE;
