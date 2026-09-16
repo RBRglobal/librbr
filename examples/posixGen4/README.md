@@ -50,9 +50,6 @@ posix-poll.c | ./posix-poll /dev/ttyUSB0 | polls on-demand samples; writes nothi
 posix-singleScheduleSingleConfig.c | ./posix-singleScheduleSingleConfig /dev/ttyUSB0 | **clears the instrument configuration** and enables a deployment with a single schedule and configuration
 posix-stream.c | ./posix-stream /dev/ttyUSB0 | **clears the instrument configuration**, enables a streaming deployment, prints samples until Ctrl-C, then disables
 
-Two more examples, posix-parse-file.c and posix-profilingFloat.c, do not
-currently build. See the Makefile for details.
-
 ## Contributing
 
 The library is primarily maintained by RBR, and development is directed by our needs and the needs of our [OEM] customers.

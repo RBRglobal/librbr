@@ -13,15 +13,6 @@ LDFLAGS := -L../../bin
 LDLIBS := -lRBR -lm
 
 ## \brief Gen4 example programs.
-##
-## Two examples are not listed and do not currently build:
-##
-## - posix-parse-file calls RBRGen4Parser_destroy(), which is declared but
-##   not implemented (the Gen4 sample parser is incomplete);
-## - posix-profilingFloat configures a `regimes` schedule; the `regimes` and
-##   `ddsampling` modes are not modelled (SYS-1234). It also uses download
-##   and dataset interfaces which have since been reworked, so it needs
-##   realignment beyond the regimes modelling.
 EXAMPLES := \
     posix-communications \
     posix-download-datablock-bySchedule \
@@ -45,8 +36,6 @@ posix-generation: posix-shared.o posix-generation.o ../../bin/libRBR.a
 posix-multiScheduleDiffConfig: posix-shared.o posix-multiScheduleDiffConfig.o ../../bin/libRBR.a
 
 posix-poll: posix-shared.o posix-poll.o ../../bin/libRBR.a
-
-posix-profilingFloat: posix-shared.o posix-profilingFloat.o ../../bin/libRBR.a
 
 posix-singleScheduleSingleConfig: posix-shared.o posix-singleScheduleSingleConfig.o ../../bin/libRBR.a
 
