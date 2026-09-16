@@ -20,7 +20,12 @@ extern "C" {
 
 #include "RBRGen4.h"
 
-/*************************************************************************************************/
+/**
+ * \brief Error codes carried by an error reading.
+ *
+ * \see RBRGen4Reading_getError()
+ * \see RBRGen4Reading_setError()
+ */
 typedef enum RBRGen4ReadingError
 {
     /** -NaN; General error condition; error from undefined mathematical operation */
@@ -131,7 +136,7 @@ typedef struct RBRGen4Sample
     /**
      * \brief The sample readings.
      *
-     * Only the first RBRGen4Sample.channels readings will be populated.
+     * Only the first RBRGen4Sample.channelCount readings will be populated.
      * Other readings will be set to 0.
      *
      * Readings are represented as double-precision floating point. If they

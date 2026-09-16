@@ -1030,22 +1030,19 @@ typedef struct RBRGen4Settings
 {
     /**
      * \brief Whether the instrument returns the “Ready:” prompt following a
-     * response. The as-shipped default value is on.
+     * response.
      */
     bool prompt;
 
     /**
      * \brief Whether the instrument returns a response from a create or
-     * set/modify operation to verify the new state. The as-shipped default
-     * value is on.
-     * A response will always be sent when a parameter value is simply
-     * requested.
+     * set/modify operation to verify the new state.
      */
     bool confirmation;
 
     /**
      * \brief The delay in milliseconds between the completion of a poll and
-     * the removal of sensor power. The as-shipped default value is 8000.
+     * the removal of sensor power.
      */
     RBRGen4Period pollPowerOffDelay;
 } RBRGen4Settings;

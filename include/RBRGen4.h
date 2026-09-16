@@ -113,7 +113,7 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
 #define RBRGEN4_DATETIME_MIN  946684800000LL
 
 /**
- * \brief The minimum date and time which the instrument can handle.
+ * \brief The maximum date and time which the instrument can handle.
  *
  * Specified in milliseconds since the Unix epoch (1970-01-01T00:00:00.000Z).
  * Represents 2099-12-31T23:59:59.000Z.
@@ -374,30 +374,30 @@ typedef struct RBRGen4OutputFormat
      * \brief Whether the output begins with “RBR” followed by the
      * instrument's 6-digit serial number.
      *
-     * The `sn` parameter. Off by default. Retrieved as `false` when the
-     * instrument does not report it.
+     * The `sn` parameter. Retrieved as `false` when the instrument does not
+     * report it.
      */
     bool sn;
     /**
      * \brief Whether the schedule label appears before the timestamp.
      *
-     * The `schedulelabel` parameter. On by default. Retrieved as `false` when
-     * the instrument does not report it.
+     * The `schedulelabel` parameter. Retrieved as `false` when the instrument
+     * does not report it.
      */
     bool scheduleLabel;
     /**
      * \brief Whether a timestamp appears before the data.
      *
-     * The `datetime` parameter. On by default. Retrieved as `false` when the
-     * instrument does not report it.
+     * The `datetime` parameter. Retrieved as `false` when the instrument does
+     * not report it.
      */
     bool dateTime;
     /**
      * \brief Whether a cyclic redundancy check appears after the data and
      * immediately before the terminating `\r\n`.
      *
-     * The `crc` parameter. Off by default. Retrieved as `false` when the
-     * instrument does not report it.
+     * The `crc` parameter. Retrieved as `false` when the instrument does not
+     * report it.
      */
     bool crc;
     /** \brief The encoding used to report samples. */

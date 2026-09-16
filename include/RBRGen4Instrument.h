@@ -503,8 +503,6 @@ RBRGen4Error RBRGen4_resetPowerExternalUsed(
  *
  * Distinct from #RBRGen4, which is the connection to an instrument.
  *
- * Fields are declared in the order the instrument reports them.
- *
  * \see RBRGen4_getInstrument()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/41582593/instrument
  */
@@ -635,8 +633,7 @@ RBRGen4Error RBRGen4_factoryReset(
  *
  * \param [in] conn the instrument connection
  * \param [in] delay time in milliseconds to wait before rebooting; zero omits
- *                   the parameter, rebooting without a delay. The command
- *                   has no default delay of its own.
+ *                   the parameter, rebooting without a delay
  * \return #RBRGEN4_SUCCESS when the reboot has been requested
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
