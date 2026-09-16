@@ -12,7 +12,6 @@
 #include <string.h>
 
 #include "tests.h"
-#include "RBRGen4Realtime.h"
 
 typedef struct PollTest
 {
