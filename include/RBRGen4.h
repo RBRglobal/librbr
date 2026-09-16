@@ -219,8 +219,6 @@ typedef int32_t RBRGen4Period;
 typedef enum RBRGen4Error {
     /** No error. */
     RBRGEN4_SUCCESS,
-    /** An error occurred while allocating memory. This is typically fatal. */
-    RBRGEN4_UNDERSIZED_STRUCTURE_ERROR,
     /** The command buffer was too small to hold the outbound command. */
     RBRGEN4_BUFFER_TOO_SMALL,
     /** A required callback function was not provided. */

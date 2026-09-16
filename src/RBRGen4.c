@@ -44,8 +44,6 @@ const char *RBRGen4Error_name(RBRGen4Error error)
     switch (error) {
     case RBRGEN4_SUCCESS:
         return "success";
-    case RBRGEN4_UNDERSIZED_STRUCTURE_ERROR:
-        return "undersized structure error";
     case RBRGEN4_BUFFER_TOO_SMALL:
         return "buffer too small";
     case RBRGEN4_MISSING_CALLBACK:
