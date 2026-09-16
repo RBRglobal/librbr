@@ -275,7 +275,7 @@ static RBRGen3Error RBRGen3Parser_parseEPSamples(
 
         if (parser->callbacks.sample != NULL)
         {
-            RBR_TRY(parser->callbacks.sample(parser, sample)); //calls the parser-> callback.sample function.
+            RBR_TRY(parser->callbacks.sample(parser, sample)); /* calls the parser-> callback.sample function. */
         }
     }
 

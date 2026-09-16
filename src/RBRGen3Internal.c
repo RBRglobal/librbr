@@ -444,19 +444,19 @@ static RBRGen3Error RBRGen3Sample_parse(
 
     /* if it starts with "RBR xxSNxx, ", skip it. it's outputFormat caltext07.*/
     if (sscanf(response, "RBR %d,%n", &_serialNum, &_prefixLen)==1){
-        // check if CRC is correct
-        // get string length used to calculate CRC:
+        /* check if CRC is correct */
+        /* get string length used to calculate CRC: */
         char *_end = response;
         uint32_t _responseLen = 0;
         while(*_end != '\0'){
             _end +=1;
             _responseLen +=1;
         }
-        // calculate CRC:
+        /* calculate CRC: */
         uint16_t _calCrc;
         _calCrc = calculateCrc(response, _responseLen-6);
         
-        // compare calculated CRC with real CRC read from instrument:
+        /* compare calculated CRC with real CRC read from instrument: */
         char *_endPt=NULL;
         uint16_t _realCrc = strtoul(_end-6, &_endPt, 16);
 
