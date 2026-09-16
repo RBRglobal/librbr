@@ -110,7 +110,7 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
  * Specified in milliseconds since the Unix epoch (1970-01-01T00:00:00.000Z).
  * Represents 2000-01-01T00:00:00.000Z.
  */
-#define RBRGEN4_DATETIME_MIN  946684800000LL
+#define RBRGEN4_DATETIME_MIN 946684800000LL
 
 /**
  * \brief The maximum date and time which the instrument can handle.
@@ -175,8 +175,7 @@ typedef char RBRGen4Label[RBRGEN4_LABEL_NAME_MAX + 1];
  * the object structure. The user sizes #labels for the lists it needs, and
  * may reuse one array across objects and commands.
  */
-typedef struct RBRGen4LabelList
-{
+typedef struct RBRGen4LabelList {
     /** \brief The number of labels #labels can hold. */
     int32_t size;
 
@@ -223,8 +222,7 @@ typedef int32_t RBRGen4Period;
  * data values; data will be passed back to the caller via out pointers. This
  * allows for predictable and consistent error checking by the caller.
  */
-typedef enum RBRGen4Error
-{
+typedef enum RBRGen4Error {
     /** No error. */
     RBRGEN4_SUCCESS,
     /** An error occurred while allocating memory. This is typically fatal. */
@@ -301,22 +299,21 @@ const char *RBRGen4Error_name(RBRGen4Error error);
 
 /**
  * \brief Possible instrument dataType.
- * dataType is the numeric format used to store data values in the memory for 
+ * dataType is the numeric format used to store data values in the memory for
  * all channels. Options include float32|float64|calfloat64.
  */
-typedef enum RBRGen4DataType
-{
-    /** IEEE single precision floating point. 
+typedef enum RBRGen4DataType {
+    /** IEEE single precision floating point.
      * Most instruments will use this dataType. */
     RBRGEN4_DATA_TYPE_FLOAT32,
-    /** IEEE double precision floating point. Instruments with very high 
-     * precision may use this format to maintain the necessary level 
+    /** IEEE double precision floating point. Instruments with very high
+     * precision may use this format to maintain the necessary level
      * of resolution.  */
     RBRGEN4_DATA_TYPE_FLOAT64,
     /** Same as Float64, but no calibration equation applied. It is presented
-     * as a ratio compared to nominal full-scale, so the expected range is 
+     * as a ratio compared to nominal full-scale, so the expected range is
      * nominally 0.0 to 1.0. The full thoretical range is -2.0 to +2.0, but the
-     * output of most channels will remain within or close to the expected 
+     * output of most channels will remain within or close to the expected
      * nominal range.
      */
     RBRGEN4_DATA_TYPE_CALFLOAT64,
@@ -340,8 +337,7 @@ const char *RBRGen4DataType_name(RBRGen4DataType dataType);
  *
  * \see RBRGen4_getOutputFormat()
  */
-typedef enum RBRGen4Encoding
-{
+typedef enum RBRGen4Encoding {
     /** Human-readable text. */
     RBRGEN4_ENCODING_ASCII,
     /** A more compact machine-readable form. */
@@ -368,8 +364,7 @@ const char *RBRGen4Encoding_name(RBRGen4Encoding encoding);
  * \see RBRGen4_setOutputFormat()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828467/outputformat
  */
-typedef struct RBRGen4OutputFormat
-{
+typedef struct RBRGen4OutputFormat {
     /**
      * \brief Whether the output begins with “RBR” followed by the
      * instrument's 6-digit serial number.
@@ -411,14 +406,13 @@ typedef struct RBRGen4OutputFormat
  *
  * \see RBRGen4_open()
  */
-#define RBRGEN4_DEFAULT_OUTPUT_FORMAT \
-    ((RBRGen4OutputFormat) { \
-         .sn = false, \
-         .scheduleLabel = true, \
-         .dateTime = true, \
-         .crc = false, \
-         .encoding = RBRGEN4_ENCODING_ASCII, \
-         .dataType = RBRGEN4_DATA_TYPE_FLOAT32 })
+#define RBRGEN4_DEFAULT_OUTPUT_FORMAT                           \
+    ((RBRGen4OutputFormat) {.sn = false,                        \
+                            .scheduleLabel = true,              \
+                            .dateTime = true,                   \
+                            .crc = false,                       \
+                            .encoding = RBRGEN4_ENCODING_ASCII, \
+                            .dataType = RBRGEN4_DATA_TYPE_FLOAT32})
 
 /**
  * \brief Instrument `id` command parameters.
@@ -426,8 +420,7 @@ typedef struct RBRGen4OutputFormat
  * \see RBRGen4_getId()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
  */
-typedef struct RBRGen4Id
-{
+typedef struct RBRGen4Id {
     /**
      * \brief The instrument model.
      *
@@ -452,8 +445,7 @@ typedef struct RBRGen4Id
  * \see RBRGen4_getId4()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
  */
-typedef struct RBRGen4Id4
-{
+typedef struct RBRGen4Id4 {
     /**
      * \brief The instrument model.
      *
@@ -480,12 +472,11 @@ typedef struct RBRGen4Id4
     int32_t fwtype;
 } RBRGen4Id4;
 
-/** 
+/**
  * \brief Generations of RBR instruments.
  * \see RBRGen4_getGeneration()
  */
-typedef enum RBRGen4Generation
-{
+typedef enum RBRGen4Generation {
     /** Logger1 (XR/XRX/TR/DR/TDR/HT). */
     RBRGEN4_LOGGER1,
     /** Logger2 (RBRvirtuoso/duo/concerto/maestro/solo/duet/coda). */
@@ -536,9 +527,7 @@ struct RBRGen4;
  * \see RBRGen4ReadCallback() for details on how the values returned from
  *                                  user callback functions are used
  */
-typedef RBRGen4Error (*RBRGen4TimeCallback)(
-    const struct RBRGen4 *conn,
-    RBRGen4DateTime *time);
+typedef RBRGen4Error (*RBRGen4TimeCallback)(const struct RBRGen4 *conn, RBRGen4DateTime *time);
 
 /**
  * \brief Callback to suspend instrument activity for a fixed amount of time.
@@ -556,9 +545,7 @@ typedef RBRGen4Error (*RBRGen4TimeCallback)(
  * \see RBRGen4ReadCallback() for details on how the values returned from
  *                                  user callback functions are used
  */
-typedef RBRGen4Error (*RBRGen4SleepCallback)(
-    const struct RBRGen4 *conn,
-    RBRGen4DateTime time);
+typedef RBRGen4Error (*RBRGen4SleepCallback)(const struct RBRGen4 *conn, RBRGen4DateTime time);
 
 /**
  * \brief Callback to read data from the physical instrument.
@@ -602,10 +589,7 @@ typedef RBRGen4Error (*RBRGen4SleepCallback)(
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRGen4Error (*RBRGen4ReadCallback)(
-    const struct RBRGen4 *conn,
-    void *data,
-    int32_t *size);
+typedef RBRGen4Error (*RBRGen4ReadCallback)(const struct RBRGen4 *conn, void *data, int32_t *size);
 
 /**
  * \brief Callback to write data to the physical instrument.
@@ -633,10 +617,8 @@ typedef RBRGen4Error (*RBRGen4ReadCallback)(
  * \see RBRGen4ReadCallback() for details on how the values returned from
  *                                  user callback functions are used
  */
-typedef RBRGen4Error (*RBRGen4WriteCallback)(
-    const struct RBRGen4 *conn,
-    const void *const data,
-    int32_t size);
+typedef RBRGen4Error (*RBRGen4WriteCallback)(const struct RBRGen4 *conn, const void *const data,
+                                             int32_t size);
 
 struct RBRGen4Sample;
 
@@ -663,9 +645,8 @@ struct RBRGen4Sample;
  * \return #RBRGEN4_SUCCESS when the sample data is successfully consumed
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRGen4Error (*RBRGen4SampleCallback)(
-    const struct RBRGen4 *conn,
-    const struct RBRGen4Sample *const sample);
+typedef RBRGen4Error (*RBRGen4SampleCallback)(const struct RBRGen4 *conn,
+                                              const struct RBRGen4Sample *const sample);
 
 /**
  * \brief A set of callbacks from library to user code.
@@ -673,8 +654,7 @@ typedef RBRGen4Error (*RBRGen4SampleCallback)(
  * RBRGen4_open() requires all callbacks to be populated except for
  * RBRGen4Callbacks.sample, which may be `NULL` when undesired.
  */
-typedef struct RBRGen4Callbacks
-{
+typedef struct RBRGen4Callbacks {
     /** \brief Callback to get the current platform time in milliseconds. */
     RBRGen4TimeCallback time;
 
@@ -708,8 +688,7 @@ typedef struct RBRGen4Callbacks
  *
  * Used by RBRGen4Response.
  */
-typedef enum RBRGen4ResponseType
-{
+typedef enum RBRGen4ResponseType {
     /** A success indicator or informational response. */
     RBRGEN4_RESPONSE_INFO,
     /** Typically indicates that the command succeeded but with caveats. */
@@ -734,8 +713,7 @@ const char *RBRGen4ResponseType_name(RBRGen4ResponseType type);
 /**
  * \brief A command response returned by the instrument.
  */
-typedef struct RBRGen4Response
-{
+typedef struct RBRGen4Response {
     /**
      * \brief The type of this response: informational, warning, or error.
      *
@@ -782,8 +760,7 @@ typedef struct RBRGen4Response
  * \see RBRGen4_open() to open an instrument connection
  * \see RBRGen4_close() to close an instrument connection
  */
-typedef struct RBRGen4
-{
+typedef struct RBRGen4 {
     /**
      * \brief The instrument identifier.
      *
@@ -898,7 +875,7 @@ typedef struct RBRGen4
  * that instrument (via serial, TCP/IP socket, RFC 1149, whatever) must be
  * managed externally and exposed to the library via callbacks.
  *
- * You need to allocate the memory for instrument pointer yourself (perhaps statically). 
+ * You need to allocate the memory for instrument pointer yourself (perhaps statically).
  * The size of RBRGen4 can be used to inform your allocation then pass a
  * pointer to that memory.
  *
@@ -914,12 +891,12 @@ typedef struct RBRGen4
  *
  * The \a callbacks structure will be copied into the RBRGen4 structure;
  * no reference to it is retained, so any subsequent modifications will not
- * affect the connection. 
- * 
- * All callbacks must be given except for RBRGen4Callbacks.sample. 
- * If any others are given as null pointers, the instrument connection will 
+ * affect the connection.
+ *
+ * All callbacks must be given except for RBRGen4Callbacks.sample.
+ * If any others are given as null pointers, the instrument connection will
  * not be opened, and #RBRGEN4_MISSING_CALLBACK is returned.
- * If RBRGen4Callbacks.sample is given, then 
+ * If RBRGen4Callbacks.sample is given, then
  * RBRGen4Callbacks.sampleBuffer must also be given; if it is not,
  * #RBRGEN4_MISSING_CALLBACK is returned.
  *
@@ -928,7 +905,7 @@ typedef struct RBRGen4
  * RBRGen4 instance, and may be overwritten as soon as the callback
  * returns.
  *
- * This constructor supports only 4th-generation RBR instruments. If the 
+ * This constructor supports only 4th-generation RBR instruments. If the
  * constructor detects an unsupported instrument during connection,
  * #RBRGEN4_UNSUPPORTED is returned.
  *
@@ -956,10 +933,8 @@ typedef struct RBRGen4
  * \return #RBRGEN4_UNSUPPORTED if the instrument is unsupported
  * \see RBRGen4_close()
  */
-RBRGen4Error RBRGen4_open(RBRGen4 **conn,
-                                      const RBRGen4Callbacks *callbacks,
-                                      const RBRGen4DateTime commandTimeout,
-                                      void *userData);
+RBRGen4Error RBRGen4_open(RBRGen4 **conn, const RBRGen4Callbacks *callbacks,
+                          const RBRGen4DateTime commandTimeout, void *userData);
 
 /**
  * \brief Terminate the instrument connection and release any held resources.
@@ -979,8 +954,7 @@ RBRGen4Error RBRGen4_close(RBRGen4 *conn);
  * \param [in] conn the instrument connection
  * \return the instrument generation
  */
-RBRGen4Generation RBRGen4_getGeneration(
-    const RBRGen4 *conn);
+RBRGen4Generation RBRGen4_getGeneration(const RBRGen4 *conn);
 
 /**
  * \brief Get the command timeout.
@@ -989,8 +963,7 @@ RBRGen4Generation RBRGen4_getGeneration(
  * \return the command timeout
  * \see RBRGen4_setCommandTimeout()
  */
-RBRGen4DateTime RBRGen4_getCommandTimeout(
-    const RBRGen4 *conn);
+RBRGen4DateTime RBRGen4_getCommandTimeout(const RBRGen4 *conn);
 
 /**
  * \brief Set the command timeout.
@@ -999,8 +972,7 @@ RBRGen4DateTime RBRGen4_getCommandTimeout(
  * \param [in] commandTimeout the new command timeout
  * \see RBRGen4_getCommandTimeout()
  */
-void RBRGen4_setCommandTimeout(RBRGen4 *conn,
-                                     const RBRGen4DateTime commandTimeout);
+void RBRGen4_setCommandTimeout(RBRGen4 *conn, const RBRGen4DateTime commandTimeout);
 
 /**
  * \brief Get the poll timeout.
@@ -1009,8 +981,7 @@ void RBRGen4_setCommandTimeout(RBRGen4 *conn,
  * \return the poll timeout
  * \see RBRGen4_setPollTimeout()
  */
-RBRGen4DateTime RBRGen4_getPollTimeout(
-    const RBRGen4 *conn);
+RBRGen4DateTime RBRGen4_getPollTimeout(const RBRGen4 *conn);
 
 /**
  * \brief Set the poll timeout.
@@ -1019,8 +990,7 @@ RBRGen4DateTime RBRGen4_getPollTimeout(
  * \param [in] pollTimeout the new poll timeout
  * \see RBRGen4_getPollTimeout()
  */
-void RBRGen4_setPollTimeout(RBRGen4 *conn,
-                                     const RBRGen4DateTime pollTimeout);
+void RBRGen4_setPollTimeout(RBRGen4 *conn, const RBRGen4DateTime pollTimeout);
 
 /**
  * \brief Get the pointer to arbitrary user data.
@@ -1064,8 +1034,7 @@ void RBRGen4_setUserData(RBRGen4 *conn, void *userData);
  * \return the last error
  * \see RBRGen4_getLastHardwareErrorMessage() for the error message
  */
-RBRGen4HardwareError RBRGen4_getLastHardwareError(
-    const RBRGen4 *conn);
+RBRGen4HardwareError RBRGen4_getLastHardwareError(const RBRGen4 *conn);
 
 /**
  * \brief Get the error message which resulted from the last instrument
@@ -1101,8 +1070,7 @@ RBRGen4HardwareError RBRGen4_getLastHardwareError(
  * \return the last error message
  * \see RBRGen4_getLastHardwareError() for the error number/presence
  */
-const char *RBRGen4_getLastHardwareErrorMessage(
-    const RBRGen4 *conn);
+const char *RBRGen4_getLastHardwareErrorMessage(const RBRGen4 *conn);
 
 /* To help keep declarations and documentation organized and discoverable,
  * instrument commands and structures are broken out into individual

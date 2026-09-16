@@ -56,8 +56,7 @@ int RBRGen3Version_compare(const char *a, const char *b);
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/id
  */
-RBRGen3Error RBRGen3_getId(RBRGen3 *conn,
-                                       RBRGen3Id *id);
+RBRGen3Error RBRGen3_getId(RBRGen3 *conn, RBRGen3Id *id);
 
 /**
  * \brief Instrument `hwrev` command parameters.
@@ -65,8 +64,7 @@ RBRGen3Error RBRGen3_getId(RBRGen3 *conn,
  * \see RBRGen3_getHardwareRevision()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/hwrev
  */
-typedef struct RBRGen3HardwareRevision
-{
+typedef struct RBRGen3HardwareRevision {
     /** The revision of the CPU PCB. */
     char pcb;
     /** The part number and revision of the CPU. */
@@ -85,17 +83,14 @@ typedef struct RBRGen3HardwareRevision
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/hwrev
  */
-RBRGen3Error RBRGen3_getHardwareRevision(
-    RBRGen3 *conn,
-    RBRGen3HardwareRevision *hwrev);
+RBRGen3Error RBRGen3_getHardwareRevision(RBRGen3 *conn, RBRGen3HardwareRevision *hwrev);
 
 /**
  * brief Possible instrument power sources.
  *
  * \see RBRGen3Power
  */
-typedef enum RBRGen3PowerSource
-{
+typedef enum RBRGen3PowerSource {
     /** USB power. */
     RBRGEN3_POWER_SOURCE_USB,
     /** Internal (battery) power. */
@@ -123,8 +118,7 @@ const char *RBRGen3PowerSource_name(RBRGen3PowerSource source);
  * \see RBRGen3_getPower()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/power
  */
-typedef struct RBRGen3Power
-{
+typedef struct RBRGen3Power {
     /** \brief The power source from which the instrument is running. */
     RBRGen3PowerSource source;
     /**
@@ -156,16 +150,14 @@ typedef struct RBRGen3Power
  *                                 another hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/power
  */
-RBRGen3Error RBRGen3_getPower(RBRGen3 *conn,
-                                          RBRGen3Power *power);
+RBRGen3Error RBRGen3_getPower(RBRGen3 *conn, RBRGen3Power *power);
 
 /**
  * Internal battery types.
  *
  * \see RBRGen3PowerInternal
  */
-typedef enum RBRGen3InternalBatteryType
-{
+typedef enum RBRGen3InternalBatteryType {
     /** No internal battery */
     RBRGEN3_INTERNAL_BATTERY_NONE,
     /** Li-SOCl₂ */
@@ -192,8 +184,7 @@ typedef enum RBRGen3InternalBatteryType
  * \see RBRGen3Error_name() for a description of the format of names
  * \see RBRGen3InternalBatteryType_displayName() for display names
  */
-const char *RBRGen3InternalBatteryType_name(
-    RBRGen3InternalBatteryType type);
+const char *RBRGen3InternalBatteryType_name(RBRGen3InternalBatteryType type);
 
 /**
  * \brief Get a human-readable display name for an internal battery type.
@@ -206,8 +197,7 @@ const char *RBRGen3InternalBatteryType_name(
  * \return a string name for the battery type
  * \see RBRGen3InternalBatteryType_name() for instrument-equivalent names
  */
-const char *RBRGen3InternalBatteryType_displayName(
-    RBRGen3InternalBatteryType type);
+const char *RBRGen3InternalBatteryType_displayName(RBRGen3InternalBatteryType type);
 
 /**
  * \brief Instrument `powerinternal` command parameters.
@@ -215,8 +205,7 @@ const char *RBRGen3InternalBatteryType_displayName(
  * \see RBRGen3_getPowerInternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
-typedef struct RBRGen3PowerInternal
-{
+typedef struct RBRGen3PowerInternal {
     /** \brief The type of battery. */
     RBRGen3InternalBatteryType batteryType;
     /**
@@ -246,9 +235,7 @@ typedef struct RBRGen3PowerInternal
  * \see RBRGen3_resetPowerInternalUsed()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
-RBRGen3Error RBRGen3_getPowerInternal(
-    RBRGen3 *conn,
-    RBRGen3PowerInternal *power);
+RBRGen3Error RBRGen3_getPowerInternal(RBRGen3 *conn, RBRGen3PowerInternal *power);
 
 /**
  * \brief Set the internal power battery type.
@@ -265,9 +252,7 @@ RBRGen3Error RBRGen3_getPowerInternal(
  * \see RBRGen3_getPowerInternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
-RBRGen3Error RBRGen3_setPowerInternalBatteryType(
-    RBRGen3 *conn,
-    RBRGen3InternalBatteryType type);
+RBRGen3Error RBRGen3_setPowerInternalBatteryType(RBRGen3 *conn, RBRGen3InternalBatteryType type);
 
 /**
  * \brief Reset the counter of energy used from the internal battery.
@@ -283,16 +268,14 @@ RBRGen3Error RBRGen3_setPowerInternalBatteryType(
  * \see RBRGen3_getPowerInternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
-RBRGen3Error RBRGen3_resetPowerInternalUsed(
-    RBRGen3 *conn);
+RBRGen3Error RBRGen3_resetPowerInternalUsed(RBRGen3 *conn);
 
 /**
  * External battery types.
  *
  * \see RBRGen3PowerExternal
  */
-typedef enum RBRGen3ExternalBatteryType
-{
+typedef enum RBRGen3ExternalBatteryType {
     /** Other/unknown external battery type */
     RBRGEN3_EXTERNAL_BATTERY_OTHER,
     /** RBRfermata Li-SOCl₂ */
@@ -325,8 +308,7 @@ typedef enum RBRGen3ExternalBatteryType
  * \see RBRGen3Error_name() for a description of the format of names
  * \see RBRGen3ExternalBatteryType_displayName() for display names
  */
-const char *RBRGen3ExternalBatteryType_name(
-    RBRGen3ExternalBatteryType type);
+const char *RBRGen3ExternalBatteryType_name(RBRGen3ExternalBatteryType type);
 
 /**
  * \brief Get a human-readable display name for an external battery type.
@@ -341,8 +323,7 @@ const char *RBRGen3ExternalBatteryType_name(
  * \return a string name for the battery type
  * \see RBRGen3ExternalBatteryType_name() for instrument-equivalent names
  */
-const char *RBRGen3ExternalBatteryType_displayName(
-    RBRGen3ExternalBatteryType type);
+const char *RBRGen3ExternalBatteryType_displayName(RBRGen3ExternalBatteryType type);
 
 /**
  * \brief Instrument `powerexternal` command parameters.
@@ -350,8 +331,7 @@ const char *RBRGen3ExternalBatteryType_displayName(
  * \see RBRGen3_getPowerExternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
-typedef struct RBRGen3PowerExternal
-{
+typedef struct RBRGen3PowerExternal {
     /** \brief The type of battery. */
     RBRGen3ExternalBatteryType batteryType;
     /**
@@ -381,9 +361,7 @@ typedef struct RBRGen3PowerExternal
  * \see RBRGen3_resetPowerExternalUsed()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
-RBRGen3Error RBRGen3_getPowerExternal(
-    RBRGen3 *conn,
-    RBRGen3PowerExternal *power);
+RBRGen3Error RBRGen3_getPowerExternal(RBRGen3 *conn, RBRGen3PowerExternal *power);
 
 /**
  * \brief Set the external power battery type.
@@ -398,9 +376,7 @@ RBRGen3Error RBRGen3_getPowerExternal(
  * \see RBRGen3_getPowerExternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
-RBRGen3Error RBRGen3_setPowerExternalBatteryType(
-    RBRGen3 *conn,
-    RBRGen3ExternalBatteryType type);
+RBRGen3Error RBRGen3_setPowerExternalBatteryType(RBRGen3 *conn, RBRGen3ExternalBatteryType type);
 
 /**
  * \brief Reset the counter of energy used from the external battery.
@@ -414,8 +390,7 @@ RBRGen3Error RBRGen3_setPowerExternalBatteryType(
  * \see RBRGen3_getPowerExternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
-RBRGen3Error RBRGen3_resetPowerExternalUsed(
-    RBRGen3 *conn);
+RBRGen3Error RBRGen3_resetPowerExternalUsed(RBRGen3 *conn);
 
 /**
  * \brief Instrument `info` command parameters.
@@ -423,8 +398,7 @@ RBRGen3Error RBRGen3_resetPowerExternalUsed(
  * \see RBRGen3_getInfo()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/info
  */
-typedef struct RBRGen3Info
-{
+typedef struct RBRGen3Info {
     /** The RBR part number of the instrument. */
     char partNumber[RBRGEN3_PART_NUMBER_MAX + 1];
     /** Whether firmware upgrades are locked. */
@@ -444,9 +418,7 @@ typedef struct RBRGen3Info
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/info
  */
-RBRGen3Error RBRGen3_getInfo(
-    RBRGen3 *conn,
-    RBRGen3Info *info);
+RBRGen3Error RBRGen3_getInfo(RBRGen3 *conn, RBRGen3Info *info);
 
 #ifdef __cplusplus
 }

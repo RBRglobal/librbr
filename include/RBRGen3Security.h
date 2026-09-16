@@ -35,8 +35,7 @@ extern "C" {
  *                                 another hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/permit
  */
-RBRGen3Error RBRGen3_permit(RBRGen3 *conn,
-                                        const char *command);
+RBRGen3Error RBRGen3_permit(RBRGen3 *conn, const char *command);
 
 /**
  * \brief Get the state of the “Ready:” prompt.
@@ -52,8 +51,7 @@ RBRGen3Error RBRGen3_permit(RBRGen3 *conn,
  * \see RBRGen3_setPrompt()
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/prompt
  */
-RBRGen3Error RBRGen3_getPrompt(RBRGen3 *conn,
-                                           bool *prompt);
+RBRGen3Error RBRGen3_getPrompt(RBRGen3 *conn, bool *prompt);
 
 /**
  * \brief Set the state of the “Ready:” prompt.
@@ -66,8 +64,7 @@ RBRGen3Error RBRGen3_getPrompt(RBRGen3 *conn,
  * \see RBRGen3_getPrompt()
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/prompt
  */
-RBRGen3Error RBRGen3_setPrompt(RBRGen3 *conn,
-                                           bool prompt);
+RBRGen3Error RBRGen3_setPrompt(RBRGen3 *conn, bool prompt);
 
 /**
  * \brief Get the state of the logger's confirmation responses.
@@ -83,8 +80,7 @@ RBRGen3Error RBRGen3_setPrompt(RBRGen3 *conn,
  * \see RBRGen3_setConfirmation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/confirmation
  */
-RBRGen3Error RBRGen3_getConfirmation(RBRGen3 *conn,
-                                                 bool *confirmation);
+RBRGen3Error RBRGen3_getConfirmation(RBRGen3 *conn, bool *confirmation);
 
 /**
  * \brief Set the state of the logger's confirmation responses.
@@ -101,8 +97,7 @@ RBRGen3Error RBRGen3_getConfirmation(RBRGen3 *conn,
  * \see RBRGen3_getConfirmation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/confirmation
  */
-RBRGen3Error RBRGen3_setConfirmation(RBRGen3 *conn,
-                                                 bool confirmation);
+RBRGen3Error RBRGen3_setConfirmation(RBRGen3 *conn, bool confirmation);
 
 /**
  * \brief Reset the logger CPU.
@@ -114,8 +109,7 @@ RBRGen3Error RBRGen3_setConfirmation(RBRGen3 *conn,
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/reboot
  */
-RBRGen3Error RBRGen3_reboot(RBRGen3 *conn,
-                                        int32_t delay);
+RBRGen3Error RBRGen3_reboot(RBRGen3 *conn, int32_t delay);
 
 #ifdef __cplusplus
 }

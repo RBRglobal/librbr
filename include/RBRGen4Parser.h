@@ -38,60 +38,64 @@ struct RBRGen4Parser;
  * \return #RBRGEN4_SUCCESS when the sample data is successfully consumed
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRGen4Error (*RBRGen4ParserSampleCallback)(
-    const struct RBRGen4Parser *parser,
-    const struct RBRGen4Sample *const sample);
+typedef RBRGen4Error (*RBRGen4ParserSampleCallback)(const struct RBRGen4Parser *parser,
+                                                    const struct RBRGen4Sample *const sample);
 
 /**
  * \brief Instrument event types.
  */
-typedef enum RBRGen4EventType
-{
-    RBRGEN4_EVENT_UNKNOWN_OR_UNRECOGNIZED_EVENT                                     = 0x00,
-    RBRGEN4_EVENT_TIME_SYNCHRONIZATION_MARKER                                       = 0x01, /* Reserved in L3.5 and L4 */
-    RBRGEN4_EVENT_DISABLE_COMMAND_RECEIVED                                          = 0x02,
-    RBRGEN4_EVENT_RUN_TIME_ERROR_ENCOUNTERED                                        = 0x03,
-    RBRGEN4_EVENT_CPU_RESET_DETECTED                                                = 0x04,
-    RBRGEN4_EVENT_ONE_OR_MORE_PARAMETERS_RECOVERED_AFTER_RESET                      = 0x05,
-    RBRGEN4_EVENT_RESTART_FAILED_RTC_CALENDAR_CONTENTS_NOT_VALID                    = 0x06,
-    RBRGEN4_EVENT_RESTART_FAILED_LOGGER_STATUS_NOT_VALID                            = 0x07,
+typedef enum RBRGen4EventType {
+    RBRGEN4_EVENT_UNKNOWN_OR_UNRECOGNIZED_EVENT = 0x00,
+    RBRGEN4_EVENT_TIME_SYNCHRONIZATION_MARKER = 0x01, /* Reserved in L3.5 and L4 */
+    RBRGEN4_EVENT_DISABLE_COMMAND_RECEIVED = 0x02,
+    RBRGEN4_EVENT_RUN_TIME_ERROR_ENCOUNTERED = 0x03,
+    RBRGEN4_EVENT_CPU_RESET_DETECTED = 0x04,
+    RBRGEN4_EVENT_ONE_OR_MORE_PARAMETERS_RECOVERED_AFTER_RESET = 0x05,
+    RBRGEN4_EVENT_RESTART_FAILED_RTC_CALENDAR_CONTENTS_NOT_VALID = 0x06,
+    RBRGEN4_EVENT_RESTART_FAILED_LOGGER_STATUS_NOT_VALID = 0x07,
     RBRGEN4_EVENT_RESTART_FAILED_PRIMARY_SCHEDULE_PARAMETERS_COULD_NOT_BE_RECOVERED = 0x08,
-    RBRGEN4_EVENT_UNABLE_TO_LOAD_ALARM_TIME_FOR_NEXT_SAMPLE                         = 0x09,
-    RBRGEN4_EVENT_SAMPLING_RESTARTED_AFTER_RESETTING_RTC                            = 0x0A,
-    RBRGEN4_EVENT_PARAMETERS_RECOVERED_SAMPLING_RESTARTED_AFTER_RESETTING_RTC       = 0x0B,
-    RBRGEN4_EVENT_SAMPLING_STOPPED_END_TIME_REACHED                                 = 0x0C,
-    RBRGEN4_EVENT_START_OF_A_RECORDED_BURST                                         = 0x0D, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_START_OF_A_WAVE_BURST                                             = 0x0E, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_USB                                      = 0x0F,
-    RBRGEN4_EVENT_STREAMING_NOW_OFF_FOR_BOTH_PORTS                                  = 0x10, /* Reserved in L3.5 and L4, used in L3 */
-    RBRGEN4_EVENT_STREAMING_ON_FOR_USB_OFF_FOR_SERIAL                               = 0x11, /* Reserved in L3.5 and L4, used in L3 */
-    RBRGEN4_EVENT_STREAMING_OFF_FOR_USB_ON_FOR_SERIAL                               = 0x12, /* Reserved in L3.5 and L4, used in L3 */
-    RBRGEN4_EVENT_STREAMING_NOW_ON_FOR_BOTH_PORTS                                   = 0x13, /* Reserved in L3.5 and L4, used in L3 */
-    RBRGEN4_EVENT_SAMPLING_STARTED_THRESHOLD_CONDITION_SATISFIED                    = 0x14, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_SAMPLING_PAUSED_THRESHOLD_CONDITION_NOT_MET                       = 0x15, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_INTERNAL_BATTERY                         = 0x16,
-    RBRGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_EXTERNAL_BATTERY                         = 0x17,
-    RBRGEN4_EVENT_TWIST_ACTIVATION_STARTED_SAMPLING                                 = 0x18, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_TWIST_ACTIVATION_PAUSED_SAMPLING                                  = 0x19, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_WIFI_MODULE_DETECTED_AND_ACTIVATED                                = 0x1A, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_WIFI_MODULE_DEACTIVATED_REMOVED_OR_ACTIVITY_TIMEOUT               = 0x1B, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_REGIMES_ENABLED_BUT_NOT_YET_IN_A_REGIME                           = 0x1C,
-    RBRGEN4_EVENT_ENTERED_REGIME_1                                                  = 0x1D,
-    RBRGEN4_EVENT_ENTERED_REGIME_2                                                  = 0x1E,
-    RBRGEN4_EVENT_ENTERED_REGIME_3                                                  = 0x1F,
-    RBRGEN4_EVENT_START_OF_REGIME_BIN                                               = 0x20,
-    RBRGEN4_EVENT_BEGIN_PROFILING_UP_CAST                                           = 0x21, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_BEGIN_PROFILING_DOWN_CAST                                         = 0x22, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_END_OF_PROFILING_CAST                                             = 0x23, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_BATTERY_FAILED_SCHEDULE_FINISHED                                  = 0x24,
-    RBRGEN4_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_FAST_SAMPLING_MODE    = 0x25, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_SLOW_SAMPLING_MODE    = 0x26, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_ENERGY_USED_MARKER_INTERNAL_BATTERY                               = 0x27, /* Reserved in L4 and L3.5, used in L3 */
-    RBRGEN4_EVENT_ENERGY_USED_MARKER_EXTERNAL_POWER_SOURCE                          = 0x28, /* Reserved in L4 and L3.5, used in L3 */
-    RBRGEN4_EVENT_DEVICE_CONTROL_ACTION_RESULT                                      = 0x29, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_DEPLOYMENT_RESUMED                                                = 0x2A, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_DEPLOYMENT_PAUSED                                                 = 0x2B, /* Reserved in L3.5 */
-    RBRGEN4_EVENT_REGIMES_PASSED_FINAL_BOUNDARY                                     = 0x2D  /* Reserved in L4 */
+    RBRGEN4_EVENT_UNABLE_TO_LOAD_ALARM_TIME_FOR_NEXT_SAMPLE = 0x09,
+    RBRGEN4_EVENT_SAMPLING_RESTARTED_AFTER_RESETTING_RTC = 0x0A,
+    RBRGEN4_EVENT_PARAMETERS_RECOVERED_SAMPLING_RESTARTED_AFTER_RESETTING_RTC = 0x0B,
+    RBRGEN4_EVENT_SAMPLING_STOPPED_END_TIME_REACHED = 0x0C,
+    RBRGEN4_EVENT_START_OF_A_RECORDED_BURST = 0x0D, /* Reserved in L3.5 */
+    RBRGEN4_EVENT_START_OF_A_WAVE_BURST = 0x0E,     /* Reserved in L3.5 */
+    RBRGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_USB = 0x0F,
+    RBRGEN4_EVENT_STREAMING_NOW_OFF_FOR_BOTH_PORTS = 0x10, /* Reserved in L3.5 and L4, used in L3 */
+    RBRGEN4_EVENT_STREAMING_ON_FOR_USB_OFF_FOR_SERIAL =
+        0x11, /* Reserved in L3.5 and L4, used in L3 */
+    RBRGEN4_EVENT_STREAMING_OFF_FOR_USB_ON_FOR_SERIAL =
+        0x12,                                             /* Reserved in L3.5 and L4, used in L3 */
+    RBRGEN4_EVENT_STREAMING_NOW_ON_FOR_BOTH_PORTS = 0x13, /* Reserved in L3.5 and L4, used in L3 */
+    RBRGEN4_EVENT_SAMPLING_STARTED_THRESHOLD_CONDITION_SATISFIED = 0x14, /* Reserved in L3.5 */
+    RBRGEN4_EVENT_SAMPLING_PAUSED_THRESHOLD_CONDITION_NOT_MET = 0x15,    /* Reserved in L3.5 */
+    RBRGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_INTERNAL_BATTERY = 0x16,
+    RBRGEN4_EVENT_POWER_SOURCE_SWITCHED_TO_EXTERNAL_BATTERY = 0x17,
+    RBRGEN4_EVENT_TWIST_ACTIVATION_STARTED_SAMPLING = 0x18,                   /* Reserved in L3.5 */
+    RBRGEN4_EVENT_TWIST_ACTIVATION_PAUSED_SAMPLING = 0x19,                    /* Reserved in L3.5 */
+    RBRGEN4_EVENT_WIFI_MODULE_DETECTED_AND_ACTIVATED = 0x1A,                  /* Reserved in L3.5 */
+    RBRGEN4_EVENT_WIFI_MODULE_DEACTIVATED_REMOVED_OR_ACTIVITY_TIMEOUT = 0x1B, /* Reserved in L3.5 */
+    RBRGEN4_EVENT_REGIMES_ENABLED_BUT_NOT_YET_IN_A_REGIME = 0x1C,
+    RBRGEN4_EVENT_ENTERED_REGIME_1 = 0x1D,
+    RBRGEN4_EVENT_ENTERED_REGIME_2 = 0x1E,
+    RBRGEN4_EVENT_ENTERED_REGIME_3 = 0x1F,
+    RBRGEN4_EVENT_START_OF_REGIME_BIN = 0x20,
+    RBRGEN4_EVENT_BEGIN_PROFILING_UP_CAST = 0x21,   /* Reserved in L3.5 */
+    RBRGEN4_EVENT_BEGIN_PROFILING_DOWN_CAST = 0x22, /* Reserved in L3.5 */
+    RBRGEN4_EVENT_END_OF_PROFILING_CAST = 0x23,     /* Reserved in L3.5 */
+    RBRGEN4_EVENT_BATTERY_FAILED_SCHEDULE_FINISHED = 0x24,
+    RBRGEN4_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_FAST_SAMPLING_MODE =
+        0x25, /* Reserved in L3.5 */
+    RBRGEN4_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_SLOW_SAMPLING_MODE =
+        0x26, /* Reserved in L3.5 */
+    RBRGEN4_EVENT_ENERGY_USED_MARKER_INTERNAL_BATTERY =
+        0x27, /* Reserved in L4 and L3.5, used in L3 */
+    RBRGEN4_EVENT_ENERGY_USED_MARKER_EXTERNAL_POWER_SOURCE =
+        0x28,                                          /* Reserved in L4 and L3.5, used in L3 */
+    RBRGEN4_EVENT_DEVICE_CONTROL_ACTION_RESULT = 0x29, /* Reserved in L3.5 */
+    RBRGEN4_EVENT_DEPLOYMENT_RESUMED = 0x2A,           /* Reserved in L3.5 */
+    RBRGEN4_EVENT_DEPLOYMENT_PAUSED = 0x2B,            /* Reserved in L3.5 */
+    RBRGEN4_EVENT_REGIMES_PASSED_FINAL_BOUNDARY = 0x2D /* Reserved in L4 */
 } RBRGen4EventType;
 
 /**
@@ -108,11 +112,10 @@ const char *RBRGen4EventType_name(RBRGen4EventType type);
  *
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828609/Event+data+storage+format
  */
-typedef struct RBRGen4Event
-{
+typedef struct RBRGen4Event {
     /** \brief The type of the event. */
     RBRGen4EventType type;
-    
+
     /** \brief The schedule(s) that this event belongs to. */
     RBRGen4Schedule *schedules[RBRGEN4_SCHEDULE_COUNT_MAX];
 
@@ -143,9 +146,8 @@ typedef struct RBRGen4Event
  * \return #RBRGEN4_SUCCESS when the event data is successfully consumed
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRGen4Error (*RBRGen4ParserEventCallback)(
-    const struct RBRGen4Parser *parser,
-    const struct RBRGen4Event *const event);
+typedef RBRGen4Error (*RBRGen4ParserEventCallback)(const struct RBRGen4Parser *parser,
+                                                   const struct RBRGen4Event *const event);
 
 /**
  * \brief A set of callbacks from parser to user code.
@@ -154,8 +156,7 @@ typedef RBRGen4Error (*RBRGen4ParserEventCallback)(
  * function is provided, the corresponding buffer must also be provided, or
  * else RBRGen4Parser_init() will return #RBRGEN4_MISSING_CALLBACK.
  */
-typedef struct RBRGen4ParserCallbacks
-{
+typedef struct RBRGen4ParserCallbacks {
     /**
      * \brief Called when a sample has been parsed.
      *
@@ -188,8 +189,7 @@ typedef struct RBRGen4ParserCallbacks
 /**
  * \brief Configuration for a RBRGen4Parser.
  */
-typedef struct RBRGen4ParserConfig
-{
+typedef struct RBRGen4ParserConfig {
     /**
      * \brief The number of instrument channels in each sample.
      *
@@ -223,8 +223,7 @@ typedef struct RBRGen4ParserConfig
  * \see RBRGen4Parser_init() to initialize a parser
  * \see RBRGen4Parser_destroy() to close a parser
  */
-typedef struct RBRGen4Parser
-{
+typedef struct RBRGen4Parser {
     /** \brief The parser configuration. */
     RBRGen4ParserConfig config;
 
@@ -276,10 +275,8 @@ typedef struct RBRGen4Parser
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE if the config is invalid
  * \see RBRGen4Parser_destroy()
  */
-RBRGen4Error RBRGen4Parser_init(RBRGen4Parser **parser,
-                                  const RBRGen4ParserCallbacks *callbacks,
-                                  const RBRGen4ParserConfig *config,
-                                  void *userData);
+RBRGen4Error RBRGen4Parser_init(RBRGen4Parser **parser, const RBRGen4ParserCallbacks *callbacks,
+                                const RBRGen4ParserConfig *config, void *userData);
 
 /**
  * \brief Release any resources held by the parser.
@@ -347,10 +344,8 @@ void RBRGen4Parser_setUserData(RBRGen4Parser *parser, void *userData);
  *                                                configuration is incomplete
  *                                                or invalid
  */
-RBRGen4Error RBRGen4Parser_parse(RBRGen4Parser *parser,
-                                   RBRGen4Block block,
-                                   const void *const data,
-                                   int32_t *size);
+RBRGen4Error RBRGen4Parser_parse(RBRGen4Parser *parser, RBRGen4Block block, const void *const data,
+                                 int32_t *size);
 
 #ifdef __cplusplus
 }

@@ -104,9 +104,9 @@ extern const char *RBRGEN3_LIB_BUILD_DATE;
 #endif
 
 /** \brief Stringize the result of macro expansion. */
-#define xstr(s) str(s)
+#define xstr(s)                 str(s)
 /** \brief Stringize the macro argument. */
-#define str(s) #s
+#define str(s)                  #s
 /** \brief The string length of the maximum number of instrument channels. */
 #define RBRGEN3_CHANNEL_MAX_LEN sizeof(xstr(RBRGEN3_CHANNEL_MAX))
 
@@ -146,7 +146,7 @@ extern const char *RBRGEN3_LIB_BUILD_DATE;
  * Specified in milliseconds since the Unix epoch (1970-01-01T00:00:00.000Z).
  * Represents 2000-01-01T00:00:00.000Z.
  */
-#define RBRGEN3_DATETIME_MIN  946684800000LL
+#define RBRGEN3_DATETIME_MIN 946684800000LL
 
 /**
  * \brief The minimum date and time which the instrument can handle.
@@ -207,8 +207,7 @@ typedef int32_t RBRGen3Period;
  * data values; data will be passed back to the caller via out pointers. This
  * allows for predictable and consistent error checking by the caller.
  */
-typedef enum RBRGen3Error
-{
+typedef enum RBRGen3Error {
     /** No error. */
     RBRGEN3_SUCCESS,
     /** An error occurred while allocating memory. This is typically fatal. */
@@ -287,8 +286,7 @@ const char *RBRGen3Error_name(RBRGen3Error error);
  * \see RBRGen3_getId()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/id
  */
-typedef struct RBRGen3Id
-{
+typedef struct RBRGen3Id {
     /** The instrument model. */
     char model[RBRGEN3_ID_MODEL_MAX + 1];
     /** The instrument firmware version. */
@@ -302,8 +300,7 @@ typedef struct RBRGen3Id
 } RBRGen3Id;
 
 /** \brief Generations of RBR instruments. */
-typedef enum RBRGen3Generation
-{
+typedef enum RBRGen3Generation {
     /** Logger1 (XR/XRX/TR/DR/TDR/HT). */
     RBRGEN3_LOGGER1,
     /** Logger2 (RBRvirtuoso/duo/concerto/maestro/solo/duet/coda). */
@@ -354,9 +351,7 @@ struct RBRGen3;
  * \see RBRGen3ReadCallback() for details on how the values returned from
  *                                  user callback functions are used
  */
-typedef RBRGen3Error (*RBRGen3TimeCallback)(
-    const struct RBRGen3 *conn,
-    RBRGen3DateTime *time);
+typedef RBRGen3Error (*RBRGen3TimeCallback)(const struct RBRGen3 *conn, RBRGen3DateTime *time);
 
 /**
  * \brief Callback to suspend instrument activity for a fixed amount of time.
@@ -374,9 +369,7 @@ typedef RBRGen3Error (*RBRGen3TimeCallback)(
  * \see RBRGen3ReadCallback() for details on how the values returned from
  *                                  user callback functions are used
  */
-typedef RBRGen3Error (*RBRGen3SleepCallback)(
-    const struct RBRGen3 *conn,
-    RBRGen3DateTime time);
+typedef RBRGen3Error (*RBRGen3SleepCallback)(const struct RBRGen3 *conn, RBRGen3DateTime time);
 
 /**
  * \brief Callback to read data from the physical instrument.
@@ -420,10 +413,7 @@ typedef RBRGen3Error (*RBRGen3SleepCallback)(
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRGen3Error (*RBRGen3ReadCallback)(
-    const struct RBRGen3 *conn,
-    void *data,
-    int32_t *size);
+typedef RBRGen3Error (*RBRGen3ReadCallback)(const struct RBRGen3 *conn, void *data, int32_t *size);
 
 /**
  * \brief Callback to write data to the physical instrument.
@@ -451,10 +441,8 @@ typedef RBRGen3Error (*RBRGen3ReadCallback)(
  * \see RBRGen3ReadCallback() for details on how the values returned from
  *                                  user callback functions are used
  */
-typedef RBRGen3Error (*RBRGen3WriteCallback)(
-    const struct RBRGen3 *conn,
-    const void *const data,
-    int32_t size);
+typedef RBRGen3Error (*RBRGen3WriteCallback)(const struct RBRGen3 *conn, const void *const data,
+                                             int32_t size);
 
 struct RBRGen3Sample;
 
@@ -481,9 +469,8 @@ struct RBRGen3Sample;
  * \return #RBRGEN3_SUCCESS when the sample data is successfully consumed
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRGen3Error (*RBRGen3SampleCallback)(
-    const struct RBRGen3 *conn,
-    const struct RBRGen3Sample *const sample);
+typedef RBRGen3Error (*RBRGen3SampleCallback)(const struct RBRGen3 *conn,
+                                              const struct RBRGen3Sample *const sample);
 
 /**
  * \brief A set of callbacks from library to user code.
@@ -491,8 +478,7 @@ typedef RBRGen3Error (*RBRGen3SampleCallback)(
  * RBRGen3_open() requires all callbacks to be populated except for
  * RBRGen3Callbacks.sample, which may be `NULL` when undesired.
  */
-typedef struct RBRGen3Callbacks
-{
+typedef struct RBRGen3Callbacks {
     /** \brief Callback to get the current platform time in milliseconds. */
     RBRGen3TimeCallback time;
 
@@ -526,8 +512,7 @@ typedef struct RBRGen3Callbacks
  *
  * Used by RBRGen3Response.
  */
-typedef enum RBRGen3ResponseType
-{
+typedef enum RBRGen3ResponseType {
     /** A success indicator or informational response. */
     RBRGEN3_RESPONSE_INFO,
     /** Typically indicates that the command succeeded but with caveats. */
@@ -552,8 +537,7 @@ const char *RBRGen3ResponseType_name(RBRGen3ResponseType type);
 /**
  * \brief A command response returned by the instrument.
  */
-typedef struct RBRGen3Response
-{
+typedef struct RBRGen3Response {
     /**
      * \brief The type of this response: informational, warning, or error.
      *
@@ -600,8 +584,7 @@ typedef struct RBRGen3Response
  * \see RBRGen3_open() to open an instrument connection
  * \see RBRGen3_close() to close an instrument connection
  */
-typedef struct RBRGen3
-{
+typedef struct RBRGen3 {
     /**
      * \brief The instrument identifier.
      *
@@ -767,10 +750,8 @@ typedef struct RBRGen3
  * \return #RBRGEN3_UNSUPPORTED if the instrument is unsupported
  * \see RBRGen3_close()
  */
-RBRGen3Error RBRGen3_open(RBRGen3 **conn,
-                                      const RBRGen3Callbacks *callbacks,
-                                      RBRGen3DateTime commandTimeout,
-                                      void *userData);
+RBRGen3Error RBRGen3_open(RBRGen3 **conn, const RBRGen3Callbacks *callbacks,
+                          RBRGen3DateTime commandTimeout, void *userData);
 
 /**
  * \brief Terminate the instrument connection and release any held resources.
@@ -790,8 +771,7 @@ RBRGen3Error RBRGen3_close(RBRGen3 *conn);
  * \param [in] conn the instrument connection
  * \return the instrument generation
  */
-RBRGen3Generation RBRGen3_getGeneration(
-    const RBRGen3 *conn);
+RBRGen3Generation RBRGen3_getGeneration(const RBRGen3 *conn);
 
 /**
  * \brief Get the command timeout.
@@ -800,8 +780,7 @@ RBRGen3Generation RBRGen3_getGeneration(
  * \return the command timeout
  * \see RBRGen3_setCommandTimeout()
  */
-RBRGen3DateTime RBRGen3_getCommandTimeout(
-    const RBRGen3 *conn);
+RBRGen3DateTime RBRGen3_getCommandTimeout(const RBRGen3 *conn);
 
 /**
  * \brief Set the command timeout.
@@ -810,8 +789,7 @@ RBRGen3DateTime RBRGen3_getCommandTimeout(
  * \param [in] commandTimeout the new command timeout
  * \see RBRGen3_getCommandTimeout()
  */
-void RBRGen3_setCommandTimeout(RBRGen3 *conn,
-                                     RBRGen3DateTime commandTimeout);
+void RBRGen3_setCommandTimeout(RBRGen3 *conn, RBRGen3DateTime commandTimeout);
 
 /**
  * \brief Get the pointer to arbitrary user data.
@@ -855,8 +833,7 @@ void RBRGen3_setUserData(RBRGen3 *conn, void *userData);
  * \return the last error
  * \see RBRGen3_getLastHardwareErrorMessage() for the error message
  */
-RBRGen3HardwareError RBRGen3_getLastHardwareError(
-    const RBRGen3 *conn);
+RBRGen3HardwareError RBRGen3_getLastHardwareError(const RBRGen3 *conn);
 
 /**
  * \brief Get the error message which resulted from the last instrument
@@ -892,8 +869,7 @@ RBRGen3HardwareError RBRGen3_getLastHardwareError(
  * \return the last error message
  * \see RBRGen3_getLastHardwareError() for the error number/presence
  */
-const char *RBRGen3_getLastHardwareErrorMessage(
-    const RBRGen3 *conn);
+const char *RBRGen3_getLastHardwareErrorMessage(const RBRGen3 *conn);
 
 /* To help keep declarations and documentation organized and discoverable,
  * instrument commands and structures are broken out into individual

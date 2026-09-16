@@ -104,8 +104,7 @@ typedef uint8_t RBRGen3ModuleAddress;
  * \see RBRGen3Channel
  * \see RBRGen3_setCalibration()
  */
-typedef struct RBRGen3Calibration
-{
+typedef struct RBRGen3Calibration {
     /**
      * \brief The date/time of the calibration.
      *
@@ -139,8 +138,7 @@ typedef struct RBRGen3Calibration
  * \see RBRGen3Channel
  * \see https://docs.rbr-global.com/L3commandreference/format-of-stored-data/standard-rawbin00-format/deployment-header/version-2-001
  */
-typedef enum RBRGen3ChannelRangingMode
-{
+typedef enum RBRGen3ChannelRangingMode {
     /** No gain ranging is available. */
     RBRGEN3_RANGING_NONE,
     /** A fixed gain is used. */
@@ -160,8 +158,7 @@ typedef enum RBRGen3ChannelRangingMode
  * \return a string name for the ranging mode
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRGen3ChannelRangingMode_name(
-    RBRGen3ChannelRangingMode mode);
+const char *RBRGen3ChannelRangingMode_name(RBRGen3ChannelRangingMode mode);
 
 /**
  * Gain parameters for a channel.
@@ -169,8 +166,7 @@ const char *RBRGen3ChannelRangingMode_name(
  * \see RBRGen3Channel
  * \see RBRGen3_setChannelGain()
  */
-typedef struct RBRGen3ChannelGain
-{
+typedef struct RBRGen3ChannelGain {
     /** \brief The gain selection mode employed by the sensor. */
     RBRGen3ChannelRangingMode rangingMode;
 
@@ -199,8 +195,7 @@ typedef struct RBRGen3ChannelGain
  *
  * \see RBRGen3Channels
  */
-typedef struct RBRGen3Channel
-{
+typedef struct RBRGen3Channel {
     /**
      * \brief A short, pre-defined “generic” name for the installed channel as
      * a null-terminated C string.
@@ -281,8 +276,7 @@ typedef struct RBRGen3Channel
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/calibration
  */
-typedef struct RBRGen3Channels
-{
+typedef struct RBRGen3Channels {
     /** \brief The number of installed and configured instrument channels. */
     int32_t count;
     /**
@@ -337,8 +331,7 @@ typedef struct RBRGen3Channels
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/calibration
  */
-RBRGen3Error RBRGen3_getChannels(RBRGen3 *conn,
-                                             RBRGen3Channels *channels);
+RBRGen3Error RBRGen3_getChannels(RBRGen3 *conn, RBRGen3Channels *channels);
 
 /**
  * \brief Get channel information for the instrument without calibration data.
@@ -358,9 +351,7 @@ RBRGen3Error RBRGen3_getChannels(RBRGen3 *conn,
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channels
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  */
-RBRGen3Error RBRGen3_getChannelsWithoutCalibrations(
-    RBRGen3 *conn,
-    RBRGen3Channels *channels);
+RBRGen3Error RBRGen3_getChannelsWithoutCalibrations(RBRGen3 *conn, RBRGen3Channels *channels);
 
 /**
  * \brief Set the status of a channel.
@@ -376,10 +367,7 @@ RBRGen3Error RBRGen3_getChannelsWithoutCalibrations(
  * \see RBRGen3_getChannels()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  */
-RBRGen3Error RBRGen3_setChannelStatus(
-    RBRGen3 *conn,
-    RBRGen3ChannelIndex channel,
-    bool status);
+RBRGen3Error RBRGen3_setChannelStatus(RBRGen3 *conn, RBRGen3ChannelIndex channel, bool status);
 
 /**
  * \brief Set the gain parameters of a channel.
@@ -415,10 +403,8 @@ RBRGen3Error RBRGen3_setChannelStatus(
  * \see RBRGen3_getChannels()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  */
-RBRGen3Error RBRGen3_setChannelGain(
-    RBRGen3 *conn,
-    RBRGen3ChannelIndex channel,
-    RBRGen3ChannelGain *gain);
+RBRGen3Error RBRGen3_setChannelGain(RBRGen3 *conn, RBRGen3ChannelIndex channel,
+                                    RBRGen3ChannelGain *gain);
 
 /**
  * \brief Update a channel's calibration coefficients.
@@ -453,10 +439,8 @@ RBRGen3Error RBRGen3_setChannelGain(
  * \see RBRGen3_getChannels()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/calibration
  */
-RBRGen3Error RBRGen3_setCalibration(
-    RBRGen3 *conn,
-    RBRGen3ChannelIndex channel,
-    const RBRGen3Calibration *calibration);
+RBRGen3Error RBRGen3_setCalibration(RBRGen3 *conn, RBRGen3ChannelIndex channel,
+                                    const RBRGen3Calibration *calibration);
 
 /**
  * \brief Get the fetch power-off delay.
@@ -473,9 +457,7 @@ RBRGen3Error RBRGen3_setCalibration(
  * \see RBRGen3_setFetchPowerOffDelay()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRGen3Error RBRGen3_getFetchPowerOffDelay(
-    RBRGen3 *conn,
-    RBRGen3Period *fetchPowerOffDelay);
+RBRGen3Error RBRGen3_getFetchPowerOffDelay(RBRGen3 *conn, RBRGen3Period *fetchPowerOffDelay);
 
 /**
  * \brief Set the fetch power-off delay.
@@ -495,9 +477,7 @@ RBRGen3Error RBRGen3_getFetchPowerOffDelay(
  * \see RBRGen3_getFetchPowerOffDelay()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRGen3Error RBRGen3_setFetchPowerOffDelay(
-    RBRGen3 *conn,
-    RBRGen3Period fetchPowerOffDelay);
+RBRGen3Error RBRGen3_setFetchPowerOffDelay(RBRGen3 *conn, RBRGen3Period fetchPowerOffDelay);
 
 /**
  * \brief Get whether sensor power is always on.
@@ -514,9 +494,7 @@ RBRGen3Error RBRGen3_setFetchPowerOffDelay(
  * \see RBRGen3_setSensorPowerAlwaysOn()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRGen3Error RBRGen3_isSensorPowerAlwaysOn(
-    RBRGen3 *conn,
-    bool *sensorPowerAlwaysOn);
+RBRGen3Error RBRGen3_isSensorPowerAlwaysOn(RBRGen3 *conn, bool *sensorPowerAlwaysOn);
 
 /**
  * \brief Set whether sensor power is always on.
@@ -533,9 +511,7 @@ RBRGen3Error RBRGen3_isSensorPowerAlwaysOn(
  * \see RBRGen3_isSensorPowerAlwaysOn()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRGen3Error RBRGen3_setSensorPowerAlwaysOn(
-    RBRGen3 *conn,
-    bool sensorPowerAlwaysOn);
+RBRGen3Error RBRGen3_setSensorPowerAlwaysOn(RBRGen3 *conn, bool sensorPowerAlwaysOn);
 
 /**
  * \brief Get whether cast detection is enabled.
@@ -551,8 +527,7 @@ RBRGen3Error RBRGen3_setSensorPowerAlwaysOn(
  * \see RBRGen3_setCastDetection()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRGen3Error RBRGen3_getCastDetection(RBRGen3 *conn,
-                                                  bool *castDetection);
+RBRGen3Error RBRGen3_getCastDetection(RBRGen3 *conn, bool *castDetection);
 
 /**
  * \brief Set whether cast detection is enabled.
@@ -569,8 +544,7 @@ RBRGen3Error RBRGen3_getCastDetection(RBRGen3 *conn,
  * \see RBRGen3_getCastDetection()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRGen3Error RBRGen3_setCastDetection(RBRGen3 *conn,
-                                                  bool castDetection);
+RBRGen3Error RBRGen3_setCastDetection(RBRGen3 *conn, bool castDetection);
 
 /**
  * \brief Get the timeout for output suppression while receiving commands.
@@ -587,9 +561,7 @@ RBRGen3Error RBRGen3_setCastDetection(RBRGen3 *conn,
  * \see RBRGen3_setInputTimeout()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRGen3Error RBRGen3_getInputTimeout(
-    RBRGen3 *conn,
-    RBRGen3Period *inputTimeout);
+RBRGen3Error RBRGen3_getInputTimeout(RBRGen3 *conn, RBRGen3Period *inputTimeout);
 
 /**
  * \brief Set the timeout for output suppression while receiving commands.
@@ -609,9 +581,7 @@ RBRGen3Error RBRGen3_getInputTimeout(
  * \see RBRGen3_getInputTimeout()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRGen3Error RBRGen3_setInputTimeout(
-    RBRGen3 *conn,
-    RBRGen3Period inputTimeout);
+RBRGen3Error RBRGen3_setInputTimeout(RBRGen3 *conn, RBRGen3Period inputTimeout);
 
 /**
  * \brief Value settings the instrument uses for calculation of derived
@@ -625,8 +595,7 @@ RBRGen3Error RBRGen3_setInputTimeout(
  * \see RBRGen3_setValueSetting()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-typedef enum RBRGen3ValueSetting
-{
+typedef enum RBRGen3ValueSetting {
     /**
      * The temperature coefficient used to correct the derived channel for
      * specific conductivity to 25°C.
@@ -713,10 +682,7 @@ const char *RBRGen3ValueSetting_name(RBRGen3ValueSetting setting);
  * \see RBRGen3_setValueSetting()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRGen3Error RBRGen3_getValueSetting(
-    RBRGen3 *conn,
-    RBRGen3ValueSetting setting,
-    float *value);
+RBRGen3Error RBRGen3_getValueSetting(RBRGen3 *conn, RBRGen3ValueSetting setting, float *value);
 
 /**
  * \brief Write the a value setting to the instrument.
@@ -737,10 +703,7 @@ RBRGen3Error RBRGen3_getValueSetting(
  * \see RBRGen3_getValueSetting()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
-RBRGen3Error RBRGen3_setValueSetting(
-    RBRGen3 *conn,
-    RBRGen3ValueSetting setting,
-    float value);
+RBRGen3Error RBRGen3_setValueSetting(RBRGen3 *conn, RBRGen3ValueSetting setting, float value);
 
 /**
  * \brief A sensor parameter.
@@ -749,8 +712,7 @@ RBRGen3Error RBRGen3_setValueSetting(
  * \see RBRGen3_getSensorParameters()
  * \see RBRGen3_setSensorParameter()
  */
-typedef struct RBRGen3SensorParameter
-{
+typedef struct RBRGen3SensorParameter {
     /** \brief The name of the parameter as a null-terminated C string. */
     char key[RBRGEN3_SENSOR_PARAMETER_KEY_MAX + 1];
     /** \brief The parameter value as a null-terminated C string. */
@@ -780,10 +742,8 @@ typedef struct RBRGen3SensorParameter
  * \see RBRGen3_setSensorParameter()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/sensor
  */
-RBRGen3Error RBRGen3_getSensorParameter(
-    RBRGen3 *conn,
-    RBRGen3ChannelIndex channel,
-    RBRGen3SensorParameter *parameter);
+RBRGen3Error RBRGen3_getSensorParameter(RBRGen3 *conn, RBRGen3ChannelIndex channel,
+                                        RBRGen3SensorParameter *parameter);
 
 /**
  * \brief Retrieve the sensor parameters for a channel.
@@ -806,11 +766,8 @@ RBRGen3Error RBRGen3_getSensorParameter(
  * \see RBRGen3_setSensorParameter()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/sensor
  */
-RBRGen3Error RBRGen3_getSensorParameters(
-    RBRGen3 *conn,
-    RBRGen3ChannelIndex channel,
-    RBRGen3SensorParameter *parameters,
-    int32_t *size);
+RBRGen3Error RBRGen3_getSensorParameters(RBRGen3 *conn, RBRGen3ChannelIndex channel,
+                                         RBRGen3SensorParameter *parameters, int32_t *size);
 
 /**
  * \brief Set a sensor parameter for a channel.
@@ -834,10 +791,8 @@ RBRGen3Error RBRGen3_getSensorParameters(
  * \see RBRGen3_getSensorParameters()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/sensor
  */
-RBRGen3Error RBRGen3_setSensorParameter(
-    RBRGen3 *conn,
-    RBRGen3ChannelIndex channel,
-    RBRGen3SensorParameter *parameter);
+RBRGen3Error RBRGen3_setSensorParameter(RBRGen3 *conn, RBRGen3ChannelIndex channel,
+                                        RBRGen3SensorParameter *parameter);
 
 #ifdef __cplusplus
 }

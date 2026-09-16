@@ -38,56 +38,54 @@ struct RBRGen3Parser;
  * \return #RBRGEN3_SUCCESS when the sample data is successfully consumed
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRGen3Error (*RBRGen3ParserSampleCallback)(
-    const struct RBRGen3Parser *parser,
-    const struct RBRGen3Sample *const sample);
+typedef RBRGen3Error (*RBRGen3ParserSampleCallback)(const struct RBRGen3Parser *parser,
+                                                    const struct RBRGen3Sample *const sample);
 
 /**
  * \brief Instrument event types.
  */
-typedef enum RBRGen3EventType
-{
-    RBRGEN3_EVENT_UNKNOWN_OR_UNRECOGNIZED_EVENT                                     = 0x00,
-    RBRGEN3_EVENT_TIME_SYNCHRONIZATION_MARKER                                       = 0x01,
-    RBRGEN3_EVENT_DISABLE_COMMAND_RECEIVED                                          = 0x02,
-    RBRGEN3_EVENT_RUN_TIME_ERROR_ENCOUNTERED                                        = 0x03,
-    RBRGEN3_EVENT_CPU_RESET_DETECTED                                                = 0x04,
-    RBRGEN3_EVENT_ONE_OR_MORE_PARAMETERS_RECOVERED_AFTER_RESET                      = 0x05,
-    RBRGEN3_EVENT_RESTART_FAILED_RTC_CALENDAR_CONTENTS_NOT_VALID                    = 0x06,
-    RBRGEN3_EVENT_RESTART_FAILED_LOGGER_STATUS_NOT_VALID                            = 0x07,
+typedef enum RBRGen3EventType {
+    RBRGEN3_EVENT_UNKNOWN_OR_UNRECOGNIZED_EVENT = 0x00,
+    RBRGEN3_EVENT_TIME_SYNCHRONIZATION_MARKER = 0x01,
+    RBRGEN3_EVENT_DISABLE_COMMAND_RECEIVED = 0x02,
+    RBRGEN3_EVENT_RUN_TIME_ERROR_ENCOUNTERED = 0x03,
+    RBRGEN3_EVENT_CPU_RESET_DETECTED = 0x04,
+    RBRGEN3_EVENT_ONE_OR_MORE_PARAMETERS_RECOVERED_AFTER_RESET = 0x05,
+    RBRGEN3_EVENT_RESTART_FAILED_RTC_CALENDAR_CONTENTS_NOT_VALID = 0x06,
+    RBRGEN3_EVENT_RESTART_FAILED_LOGGER_STATUS_NOT_VALID = 0x07,
     RBRGEN3_EVENT_RESTART_FAILED_PRIMARY_SCHEDULE_PARAMETERS_COULD_NOT_BE_RECOVERED = 0x08,
-    RBRGEN3_EVENT_UNABLE_TO_LOAD_ALARM_TIME_FOR_NEXT_SAMPLE                         = 0x09,
-    RBRGEN3_EVENT_SAMPLING_RESTARTED_AFTER_RESETTING_RTC                            = 0x0A,
-    RBRGEN3_EVENT_PARAMETERS_RECOVERED_SAMPLING_RESTARTED_AFTER_RESETTING_RTC       = 0x0B,
-    RBRGEN3_EVENT_SAMPLING_STOPPED_END_TIME_REACHED                                 = 0x0C,
-    RBRGEN3_EVENT_START_OF_A_RECORDED_BURST                                         = 0x0D,
-    RBRGEN3_EVENT_START_OF_A_WAVE_BURST                                             = 0x0E,
-    RBRGEN3_EVENT_RESERVED1                                                         = 0x0F,
-    RBRGEN3_EVENT_STREAMING_NOW_OFF_FOR_BOTH_PORTS                                  = 0x10,
-    RBRGEN3_EVENT_STREAMING_ON_FOR_USB_OFF_FOR_SERIAL                               = 0x11,
-    RBRGEN3_EVENT_STREAMING_OFF_FOR_USB_ON_FOR_SERIAL                               = 0x12,
-    RBRGEN3_EVENT_STREAMING_NOW_ON_FOR_BOTH_PORTS                                   = 0x13,
-    RBRGEN3_EVENT_SAMPLING_STARTED_THRESHOLD_CONDITION_SATISFIED                    = 0x14,
-    RBRGEN3_EVENT_SAMPLING_PAUSED_THRESHOLD_CONDITION_NOT_MET                       = 0x15,
-    RBRGEN3_EVENT_POWER_SOURCE_SWITCHED_TO_INTERNAL_BATTERY                         = 0x16,
-    RBRGEN3_EVENT_POWER_SOURCE_SWITCHED_TO_EXTERNAL_BATTERY                         = 0x17,
-    RBRGEN3_EVENT_TWIST_ACTIVATION_STARTED_SAMPLING                                 = 0x18,
-    RBRGEN3_EVENT_TWIST_ACTIVATION_PAUSED_SAMPLING                                  = 0x19,
-    RBRGEN3_EVENT_WIFI_MODULE_DETECTED_AND_ACTIVATED                                = 0x1A,
-    RBRGEN3_EVENT_WIFI_MODULE_DEACTIVATED_REMOVED_OR_ACTIVITY_TIMEOUT               = 0x1B,
-    RBRGEN3_EVENT_REGIMES_ENABLED_BUT_NOT_YET_IN_A_REGIME                           = 0x1C,
-    RBRGEN3_EVENT_ENTERED_REGIME_1                                                  = 0x1D,
-    RBRGEN3_EVENT_ENTERED_REGIME_2                                                  = 0x1E,
-    RBRGEN3_EVENT_ENTERED_REGIME_3                                                  = 0x1F,
-    RBRGEN3_EVENT_START_OF_REGIME_BIN                                               = 0x20,
-    RBRGEN3_EVENT_BEGIN_PROFILING_UP_CAST                                           = 0x21,
-    RBRGEN3_EVENT_BEGIN_PROFILING_DOWN_CAST                                         = 0x22,
-    RBRGEN3_EVENT_END_OF_PROFILING_CAST                                             = 0x23,
-    RBRGEN3_EVENT_BATTERY_FAILED_SCHEDULE_FINISHED                                  = 0x24,
-    RBRGEN3_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_FAST_SAMPLING_MODE    = 0x25,
-    RBRGEN3_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_SLOW_SAMPLING_MODE    = 0x26,
-    RBRGEN3_EVENT_ENERGY_USED_MARKER_INTERNAL_BATTERY                               = 0x27,
-    RBRGEN3_EVENT_ENERGY_USED_MARKER_EXTERNAL_POWER_SOURCE                          = 0x28
+    RBRGEN3_EVENT_UNABLE_TO_LOAD_ALARM_TIME_FOR_NEXT_SAMPLE = 0x09,
+    RBRGEN3_EVENT_SAMPLING_RESTARTED_AFTER_RESETTING_RTC = 0x0A,
+    RBRGEN3_EVENT_PARAMETERS_RECOVERED_SAMPLING_RESTARTED_AFTER_RESETTING_RTC = 0x0B,
+    RBRGEN3_EVENT_SAMPLING_STOPPED_END_TIME_REACHED = 0x0C,
+    RBRGEN3_EVENT_START_OF_A_RECORDED_BURST = 0x0D,
+    RBRGEN3_EVENT_START_OF_A_WAVE_BURST = 0x0E,
+    RBRGEN3_EVENT_RESERVED1 = 0x0F,
+    RBRGEN3_EVENT_STREAMING_NOW_OFF_FOR_BOTH_PORTS = 0x10,
+    RBRGEN3_EVENT_STREAMING_ON_FOR_USB_OFF_FOR_SERIAL = 0x11,
+    RBRGEN3_EVENT_STREAMING_OFF_FOR_USB_ON_FOR_SERIAL = 0x12,
+    RBRGEN3_EVENT_STREAMING_NOW_ON_FOR_BOTH_PORTS = 0x13,
+    RBRGEN3_EVENT_SAMPLING_STARTED_THRESHOLD_CONDITION_SATISFIED = 0x14,
+    RBRGEN3_EVENT_SAMPLING_PAUSED_THRESHOLD_CONDITION_NOT_MET = 0x15,
+    RBRGEN3_EVENT_POWER_SOURCE_SWITCHED_TO_INTERNAL_BATTERY = 0x16,
+    RBRGEN3_EVENT_POWER_SOURCE_SWITCHED_TO_EXTERNAL_BATTERY = 0x17,
+    RBRGEN3_EVENT_TWIST_ACTIVATION_STARTED_SAMPLING = 0x18,
+    RBRGEN3_EVENT_TWIST_ACTIVATION_PAUSED_SAMPLING = 0x19,
+    RBRGEN3_EVENT_WIFI_MODULE_DETECTED_AND_ACTIVATED = 0x1A,
+    RBRGEN3_EVENT_WIFI_MODULE_DEACTIVATED_REMOVED_OR_ACTIVITY_TIMEOUT = 0x1B,
+    RBRGEN3_EVENT_REGIMES_ENABLED_BUT_NOT_YET_IN_A_REGIME = 0x1C,
+    RBRGEN3_EVENT_ENTERED_REGIME_1 = 0x1D,
+    RBRGEN3_EVENT_ENTERED_REGIME_2 = 0x1E,
+    RBRGEN3_EVENT_ENTERED_REGIME_3 = 0x1F,
+    RBRGEN3_EVENT_START_OF_REGIME_BIN = 0x20,
+    RBRGEN3_EVENT_BEGIN_PROFILING_UP_CAST = 0x21,
+    RBRGEN3_EVENT_BEGIN_PROFILING_DOWN_CAST = 0x22,
+    RBRGEN3_EVENT_END_OF_PROFILING_CAST = 0x23,
+    RBRGEN3_EVENT_BATTERY_FAILED_SCHEDULE_FINISHED = 0x24,
+    RBRGEN3_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_FAST_SAMPLING_MODE = 0x25,
+    RBRGEN3_EVENT_DIRECTIONAL_DEPENDENT_SAMPLING_BEGINNING_OF_SLOW_SAMPLING_MODE = 0x26,
+    RBRGEN3_EVENT_ENERGY_USED_MARKER_INTERNAL_BATTERY = 0x27,
+    RBRGEN3_EVENT_ENERGY_USED_MARKER_EXTERNAL_POWER_SOURCE = 0x28
 } RBRGen3EventType;
 
 /**
@@ -105,8 +103,7 @@ const char *RBRGen3EventType_name(RBRGen3EventType type);
  * \see https://docs.rbr-global.com/L3commandreference/format-of-stored-data/standard-rawbin00-format/standard-format-events-markers
  * \see https://docs.rbr-global.com/L3commandreference/format-of-stored-data/easyparse-calbin00-format/easyparse-format-events-markers
  */
-typedef struct RBRGen3Event
-{
+typedef struct RBRGen3Event {
     /** \brief The type of the event. */
     RBRGen3EventType type;
     /** \brief The timestamp of the event. */
@@ -139,9 +136,8 @@ typedef struct RBRGen3Event
  * \return #RBRGEN3_SUCCESS when the event data is successfully consumed
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
  */
-typedef RBRGen3Error (*RBRGen3ParserEventCallback)(
-    const struct RBRGen3Parser *parser,
-    const struct RBRGen3Event *const event);
+typedef RBRGen3Error (*RBRGen3ParserEventCallback)(const struct RBRGen3Parser *parser,
+                                                   const struct RBRGen3Event *const event);
 
 /**
  * \brief A set of callbacks from parser to user code.
@@ -150,8 +146,7 @@ typedef RBRGen3Error (*RBRGen3ParserEventCallback)(
  * function is provided, the corresponding buffer must also be provided, or
  * else RBRGen3Parser_init() will return #RBRGEN3_MISSING_CALLBACK.
  */
-typedef struct RBRGen3ParserCallbacks
-{
+typedef struct RBRGen3ParserCallbacks {
     /**
      * \brief Called when a sample has been parsed.
      *
@@ -186,8 +181,7 @@ typedef struct RBRGen3ParserCallbacks
  *
  * \see RBRGen3ParserConfig
  */
-typedef struct RBRGen3ParserEasyParseConfig
-{
+typedef struct RBRGen3ParserEasyParseConfig {
     /**
      * \brief The number of instrument channels in each sample.
      *
@@ -201,14 +195,12 @@ typedef struct RBRGen3ParserEasyParseConfig
 /**
  * \brief Configuration for a RBRGen3Parser.
  */
-typedef struct RBRGen3ParserConfig
-{
+typedef struct RBRGen3ParserConfig {
     /** \brief The format of memory being parsed. */
     RBRGen3MemoryFormat format;
 
     /** \brief Format-specific configuration. */
-    union
-    {
+    union {
         /** \brief EasyParse-specific parser configuration. */
         struct RBRGen3ParserEasyParseConfig easyParse;
     } formatConfig;
@@ -225,8 +217,7 @@ typedef struct RBRGen3ParserConfig
  * \see RBRGen3Parser_init() to initialize a parser
  * \see RBRGen3Parser_destroy() to close a parser
  */
-typedef struct RBRGen3Parser
-{
+typedef struct RBRGen3Parser {
     /** \brief The parser configuration. */
     RBRGen3ParserConfig config;
 
@@ -284,10 +275,8 @@ typedef struct RBRGen3Parser
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE if the config is invalid
  * \see RBRGen3Parser_destroy()
  */
-RBRGen3Error RBRGen3Parser_init(RBRGen3Parser **parser,
-                                  const RBRGen3ParserCallbacks *callbacks,
-                                  const RBRGen3ParserConfig *config,
-                                  void *userData);
+RBRGen3Error RBRGen3Parser_init(RBRGen3Parser **parser, const RBRGen3ParserCallbacks *callbacks,
+                                const RBRGen3ParserConfig *config, void *userData);
 
 /**
  * \brief Release any resources held by the parser.
@@ -362,10 +351,8 @@ void RBRGen3Parser_setUserData(RBRGen3Parser *parser, void *userData);
  *                                                configuration is incomplete
  *                                                or invalid
  */
-RBRGen3Error RBRGen3Parser_parse(RBRGen3Parser *parser,
-                                   RBRGen3Dataset dataset,
-                                   const void *const data,
-                                   int32_t *size);
+RBRGen3Error RBRGen3Parser_parse(RBRGen3Parser *parser, RBRGen3Dataset dataset,
+                                 const void *const data, int32_t *size);
 
 #ifdef __cplusplus
 }

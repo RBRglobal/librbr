@@ -24,8 +24,7 @@ extern "C" {
  * \see RBRGen4Reading_getError()
  * \see RBRGen4Reading_setError()
  */
-typedef enum RBRGen4ReadingError
-{
+typedef enum RBRGen4ReadingError {
     /** -NaN; General error condition; error from undefined mathematical operation */
     RBRGEN4_READING_ERROR_GENERAL,
     /** ADC error – end of conversion */
@@ -119,8 +118,7 @@ double RBRGen4Reading_setError(RBRGen4ReadingError error);
 /**
  * \brief An instrument sample.
  */
-typedef struct RBRGen4Sample
-{
+typedef struct RBRGen4Sample {
     /** \brief The timestamp of the sample. */
     RBRGen4DateTime timestamp;
     /**
@@ -195,10 +193,7 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
-RBRGen4Error RBRGen4_poll(
-    RBRGen4 *conn,
-    bool requireLabel,
-    RBRGen4Sample *sample);
+RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sample);
 
 /**
  * \brief Requests an “on-demand” sample of the given channels from the
@@ -236,11 +231,8 @@ RBRGen4Error RBRGen4_poll(
  *                                      another hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
-RBRGen4Error RBRGen4_pollChannels(
-    RBRGen4 *conn,
-    bool requireLabel,
-    const char *channelList,
-    RBRGen4Sample *sample);
+RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel, const char *channelList,
+                                  RBRGen4Sample *sample);
 
 /**
  * \brief Requests an “on-demand” sample of the given groups of channels from
@@ -278,11 +270,8 @@ RBRGen4Error RBRGen4_pollChannels(
  *                                      another hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
-RBRGen4Error RBRGen4_pollGroups(
-    RBRGen4 *conn,
-    bool requireLabel,
-    const char *groupList,
-    RBRGen4Sample *sample);
+RBRGen4Error RBRGen4_pollGroups(RBRGen4 *conn, bool requireLabel, const char *groupList,
+                                RBRGen4Sample *sample);
 
 #ifdef __cplusplus
 }

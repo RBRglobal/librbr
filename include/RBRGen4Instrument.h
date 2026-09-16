@@ -3,7 +3,7 @@
  *
  * \brief Instrument commands and structures for miscellaneous commands.
  *
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/41582593/instrument 
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/41582593/instrument
  *
  * \copyright
  * Copyright (c) 2024 RBR Ltd.
@@ -30,8 +30,7 @@ extern "C" {
  * \see RBRGen4DeploymentStatus
  * \see RBRGen4Deployment
  */
-typedef enum RBRGen4InstrumentState
-{
+typedef enum RBRGen4InstrumentState {
     /** Logging is not enabled. */
     RBRGEN4_INSTRUMENT_STATE_DISABLED,
     /** Logging for at least one deployment is enabled. */
@@ -49,8 +48,7 @@ typedef enum RBRGen4InstrumentState
  * \return a string name for the instrument state
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRGen4InstrumentState_name(
-    RBRGen4InstrumentState state);
+const char *RBRGen4InstrumentState_name(RBRGen4InstrumentState state);
 
 /**
  * \brief The maximum number of characters in the instrument name.
@@ -82,8 +80,7 @@ const char *RBRGen4InstrumentState_name(
  * \see RBRGen4_getId4()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
  */
-RBRGen4Error RBRGen4_getId(RBRGen4 *conn,
-                                       RBRGen4Id *id);
+RBRGen4Error RBRGen4_getId(RBRGen4 *conn, RBRGen4Id *id);
 
 /**
  * \brief Get identification information from the instrument.
@@ -97,8 +94,7 @@ RBRGen4Error RBRGen4_getId(RBRGen4 *conn,
  * \see RBRGen4_getInstrument()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
  */
-RBRGen4Error RBRGen4_getId4(RBRGen4 *conn,
-                                       RBRGen4Id4 *id);
+RBRGen4Error RBRGen4_getId4(RBRGen4 *conn, RBRGen4Id4 *id);
 
 /**
  * \brief Instrument `pcba <pcba_label>` command parameters.
@@ -106,8 +102,7 @@ RBRGen4Error RBRGen4_getId4(RBRGen4 *conn,
  * \see RBRGen4_getPcba()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/44761149/pcba
  */
-typedef struct RBRGen4Pcba
-{
+typedef struct RBRGen4Pcba {
     /**
      * \brief PCBA label.
      *
@@ -144,7 +139,7 @@ typedef struct RBRGen4PcbaPool {
 
     /** \brief The pool of PCBAs. */
     RBRGen4Pcba pool[RBRGEN4_PCBA_COUNT_MAX];
-} RBRGen4PcbaPool ;
+} RBRGen4PcbaPool;
 
 /**
  * \brief Populate the pool of the instrument's PCBAs.
@@ -160,9 +155,7 @@ typedef struct RBRGen4PcbaPool {
  * \see RBRGen4_getPcba()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/44761149/pcba
  */
-RBRGen4Error RBRGen4_getPcbaPool(
-    RBRGen4 *conn,
-    RBRGen4PcbaPool *pcbaPool);
+RBRGen4Error RBRGen4_getPcbaPool(RBRGen4 *conn, RBRGen4PcbaPool *pcbaPool);
 
 /**
  * \brief Get an instrument's PCBA's parameters.
@@ -182,17 +175,14 @@ RBRGen4Error RBRGen4_getPcbaPool(
  * \see RBRGen4_getPcbaPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/44761149/pcba
  */
-RBRGen4Error RBRGen4_getPcba(
-    RBRGen4 *conn,
-    RBRGen4Pcba *pcba);
+RBRGen4Error RBRGen4_getPcba(RBRGen4 *conn, RBRGen4Pcba *pcba);
 
 /**
  * \brief Possible instrument power sources.
  *
  * \see RBRGen4_getPowerSource()
  */
-typedef enum RBRGen4PowerSource
-{
+typedef enum RBRGen4PowerSource {
     /** USB power. */
     RBRGEN4_POWER_SOURCE_USB,
     /** Internal (battery) power. */
@@ -227,16 +217,14 @@ const char *RBRGen4PowerSource_name(RBRGen4PowerSource source);
  *                                      another hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830328/power
  */
-RBRGen4Error RBRGen4_getPowerSource(RBRGen4 *conn,
-                                          RBRGen4PowerSource *powerSource);
+RBRGen4Error RBRGen4_getPowerSource(RBRGen4 *conn, RBRGen4PowerSource *powerSource);
 
 /**
  * \brief Internal battery types.
  *
  * \see RBRGen4PowerInternal
  */
-typedef enum RBRGen4InternalBatteryType
-{
+typedef enum RBRGen4InternalBatteryType {
     /** No internal battery */
     RBRGEN4_INTERNAL_BATTERY_NONE,
     /** Li-SOCl₂ */
@@ -263,8 +251,7 @@ typedef enum RBRGen4InternalBatteryType
  * \see RBRGen4Error_name() for a description of the format of names
  * \see RBRGen4InternalBatteryType_displayName() for display names
  */
-const char *RBRGen4InternalBatteryType_name(
-    RBRGen4InternalBatteryType type);
+const char *RBRGen4InternalBatteryType_name(RBRGen4InternalBatteryType type);
 
 /**
  * \brief Get a human-readable display name for an internal battery type.
@@ -277,8 +264,7 @@ const char *RBRGen4InternalBatteryType_name(
  * \return a string name for the battery type
  * \see RBRGen4InternalBatteryType_name() for instrument-equivalent names
  */
-const char *RBRGen4InternalBatteryType_displayName(
-    RBRGen4InternalBatteryType type);
+const char *RBRGen4InternalBatteryType_displayName(RBRGen4InternalBatteryType type);
 
 /**
  * \brief Instrument `instrument power internal` command parameters.
@@ -286,8 +272,7 @@ const char *RBRGen4InternalBatteryType_displayName(
  * \see RBRGen4_getPowerInternal()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828548/internal
  */
-typedef struct RBRGen4PowerInternal
-{
+typedef struct RBRGen4PowerInternal {
     /**
      * \brief The measured voltage of any internal power source.
      *
@@ -318,9 +303,7 @@ typedef struct RBRGen4PowerInternal
  * \see RBRGen4_resetPowerInternalUsed()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828548/internal
  */
-RBRGen4Error RBRGen4_getPowerInternal(
-    RBRGen4 *conn,
-    RBRGen4PowerInternal *power);
+RBRGen4Error RBRGen4_getPowerInternal(RBRGen4 *conn, RBRGen4PowerInternal *power);
 
 /**
  * \brief Set the internal power battery type.
@@ -337,9 +320,8 @@ RBRGen4Error RBRGen4_getPowerInternal(
  * \see RBRGen4_resetPowerInternalUsed()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828548/internal
  */
-RBRGen4Error RBRGen4_setPowerInternalBatteryType(
-    RBRGen4 *conn,
-    const RBRGen4InternalBatteryType type);
+RBRGen4Error RBRGen4_setPowerInternalBatteryType(RBRGen4 *conn,
+                                                 const RBRGen4InternalBatteryType type);
 
 /**
  * \brief Reset the counter of energy used from the internal battery.
@@ -355,16 +337,14 @@ RBRGen4Error RBRGen4_setPowerInternalBatteryType(
  * \see RBRGen4_setPowerInternalBatteryType()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828548/internal
  */
-RBRGen4Error RBRGen4_resetPowerInternalUsed(
-    RBRGen4 *conn);
+RBRGen4Error RBRGen4_resetPowerInternalUsed(RBRGen4 *conn);
 
 /**
  * \brief External battery types.
  *
  * \see RBRGen4PowerExternal
  */
-typedef enum RBRGen4ExternalBatteryType
-{
+typedef enum RBRGen4ExternalBatteryType {
     /** No external battery */
     RBRGEN4_EXTERNAL_BATTERY_NONE,
     /** RBRfermata Li-SOCl₂ */
@@ -401,8 +381,7 @@ typedef enum RBRGen4ExternalBatteryType
  * \see RBRGen4Error_name() for a description of the format of names
  * \see RBRGen4ExternalBatteryType_displayName() for display names
  */
-const char *RBRGen4ExternalBatteryType_name(
-    RBRGen4ExternalBatteryType type);
+const char *RBRGen4ExternalBatteryType_name(RBRGen4ExternalBatteryType type);
 
 /**
  * \brief Get a human-readable display name for an external battery type.
@@ -417,8 +396,7 @@ const char *RBRGen4ExternalBatteryType_name(
  * \return a string name for the battery type
  * \see RBRGen4ExternalBatteryType_name() for instrument-equivalent names
  */
-const char *RBRGen4ExternalBatteryType_displayName(
-    RBRGen4ExternalBatteryType type);
+const char *RBRGen4ExternalBatteryType_displayName(RBRGen4ExternalBatteryType type);
 
 /**
  * \brief Instrument `instrument power external` command parameters.
@@ -426,8 +404,7 @@ const char *RBRGen4ExternalBatteryType_displayName(
  * \see RBRGen4_getPowerExternal()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828551/external
  */
-typedef struct RBRGen4PowerExternal
-{
+typedef struct RBRGen4PowerExternal {
     /**
      * \brief The measured voltage of any external power source.
      *
@@ -456,9 +433,7 @@ typedef struct RBRGen4PowerExternal
  * \see RBRGen4_resetPowerExternalUsed()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerexternal
  */
-RBRGen4Error RBRGen4_getPowerExternal(
-    RBRGen4 *conn,
-    RBRGen4PowerExternal *power);
+RBRGen4Error RBRGen4_getPowerExternal(RBRGen4 *conn, RBRGen4PowerExternal *power);
 
 /**
  * \brief Set the external power battery type.
@@ -475,9 +450,8 @@ RBRGen4Error RBRGen4_getPowerExternal(
  * \see RBRGen4_resetPowerExternalUsed()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828551/external
  */
-RBRGen4Error RBRGen4_setPowerExternalBatteryType(
-    RBRGen4 *conn,
-    const RBRGen4ExternalBatteryType type);
+RBRGen4Error RBRGen4_setPowerExternalBatteryType(RBRGen4 *conn,
+                                                 const RBRGen4ExternalBatteryType type);
 
 /**
  * \brief Reset the counter of energy used from the external battery.
@@ -493,8 +467,7 @@ RBRGen4Error RBRGen4_setPowerExternalBatteryType(
  * \see RBRGen4_setPowerExternalBatteryType()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828551/external
  */
-RBRGen4Error RBRGen4_resetPowerExternalUsed(
-    RBRGen4 *conn);
+RBRGen4Error RBRGen4_resetPowerExternalUsed(RBRGen4 *conn);
 
 /**
  * \brief Instrument `instrument` command parameters.
@@ -504,8 +477,7 @@ RBRGen4Error RBRGen4_resetPowerExternalUsed(
  * \see RBRGen4_getInstrument()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/41582593/instrument
  */
-typedef struct RBRGen4Instrument
-{
+typedef struct RBRGen4Instrument {
     /** \brief Whether a deployment is currently logging. */
     RBRGen4InstrumentState state;
     /** \brief The serial number of the instrument. */
@@ -551,9 +523,7 @@ typedef struct RBRGen4Instrument
  * \see RBRGen4_getId4()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/41582593/instrument
  */
-RBRGen4Error RBRGen4_getInstrument(
-    RBRGen4 *conn,
-    RBRGen4Instrument *instrumentInfo);
+RBRGen4Error RBRGen4_getInstrument(RBRGen4 *conn, RBRGen4Instrument *instrumentInfo);
 
 /**
  * \brief Get the current output format.
@@ -570,9 +540,7 @@ RBRGen4Error RBRGen4_getInstrument(
  * \see RBRGen4_setOutputFormat()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRGen4Error RBRGen4_getOutputFormat(
-    RBRGen4 *conn,
-    RBRGen4OutputFormat *outputFormat);
+RBRGen4Error RBRGen4_getOutputFormat(RBRGen4 *conn, RBRGen4OutputFormat *outputFormat);
 
 /**
  * \brief Set the current output format.
@@ -606,9 +574,7 @@ RBRGen4Error RBRGen4_getOutputFormat(
  * \see RBRGen4_getOutputFormat()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
-RBRGen4Error RBRGen4_setOutputFormat(
-    RBRGen4 *conn,
-    const RBRGen4OutputFormat *outputFormat);
+RBRGen4Error RBRGen4_setOutputFormat(RBRGen4 *conn, const RBRGen4OutputFormat *outputFormat);
 
 /**
  * \brief Return the instrument's configuration to its factory state.
@@ -622,8 +588,7 @@ RBRGen4Error RBRGen4_setOutputFormat(
  *                                      hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/factory
  */
-RBRGen4Error RBRGen4_factoryReset(
-    RBRGen4 *conn);
+RBRGen4Error RBRGen4_factoryReset(RBRGen4 *conn);
 
 /**
  * \brief Reset the instrument CPU.
@@ -637,8 +602,7 @@ RBRGen4Error RBRGen4_factoryReset(
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/reboot
  */
-RBRGen4Error RBRGen4_reboot(RBRGen4 *conn,
-                                        const int32_t delay);
+RBRGen4Error RBRGen4_reboot(RBRGen4 *conn, const int32_t delay);
 
 #ifdef __cplusplus
 }

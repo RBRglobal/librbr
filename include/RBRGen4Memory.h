@@ -26,8 +26,7 @@ extern "C" {
  *
  * \see RBRGen4Storage
  */
-typedef enum RBRGen4StorageAccess
-{
+typedef enum RBRGen4StorageAccess {
     /** The instrument currently has access to its own data memory. */
     RBRGEN4_STORAGE_ACCESS_INSTRUMENT,
     /**
@@ -48,8 +47,7 @@ typedef enum RBRGen4StorageAccess
  * \return a string name for the storage access mode
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRGen4StorageAccess_name(
-    RBRGen4StorageAccess access);
+const char *RBRGen4StorageAccess_name(RBRGen4StorageAccess access);
 
 /**
  * \brief Instrument `storage` command parameters.
@@ -58,8 +56,7 @@ const char *RBRGen4StorageAccess_name(
  * \see RBRGen4_setStorage()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828279/storage
  */
-typedef struct RBRGen4Storage
-{
+typedef struct RBRGen4Storage {
     /**
      * \brief The number of bytes used for storage.
      * \readonly
@@ -92,9 +89,7 @@ typedef struct RBRGen4Storage
  * \see RBRGen4_setStorage()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828279/storage
  */
-RBRGen4Error RBRGen4_getStorage(
-    RBRGen4 *conn,
-    RBRGen4Storage *storage);
+RBRGen4Error RBRGen4_getStorage(RBRGen4 *conn, RBRGen4Storage *storage);
 
 /**
  * \brief Set the instrument storage parameters.
@@ -114,17 +109,14 @@ RBRGen4Error RBRGen4_getStorage(
  * \see RBRGen4_getStorage()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828279/storage
  */
-RBRGen4Error RBRGen4_setStorage(
-    RBRGen4 *conn,
-    const RBRGen4Storage *storage);
+RBRGen4Error RBRGen4_setStorage(RBRGen4 *conn, const RBRGen4Storage *storage);
 
 /**
  * \brief Possible dataset statuses.
  *
  * \see RBRGen4Dataset
  */
-typedef enum RBRGen4DatasetStatus
-{
+typedef enum RBRGen4DatasetStatus {
     /** The dataset is for a deployment currently in progress. */
     RBRGEN4_DATASET_STATUS_OPEN,
     /** The dataset is for a deployment that has ended. */
@@ -142,8 +134,7 @@ typedef enum RBRGen4DatasetStatus
  * \return a string name for the dataset status
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRGen4DatasetStatus_name(
-    RBRGen4DatasetStatus status);
+const char *RBRGen4DatasetStatus_name(RBRGen4DatasetStatus status);
 
 /**
  * \brief `dataset <dataset_label>` command parameters.
@@ -151,8 +142,7 @@ const char *RBRGen4DatasetStatus_name(
  * \see RBRGen4_getDataset()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-typedef struct RBRGen4Dataset
-{
+typedef struct RBRGen4Dataset {
     /**
      * \brief The dataset's label.
      *
@@ -177,8 +167,7 @@ typedef struct RBRGen4Dataset
  * \see RBRGen4_getDatasetPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-typedef struct RBRGen4DatasetPool
-{
+typedef struct RBRGen4DatasetPool {
     /** \brief The number of datasets #pool can hold. */
     int32_t size;
 
@@ -223,9 +212,7 @@ typedef struct RBRGen4DatasetPool
  * \see RBRGen4_getDataset()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-RBRGen4Error RBRGen4_getDatasetPool(
-    RBRGen4 *conn,
-    RBRGen4DatasetPool *datasetPool);
+RBRGen4Error RBRGen4_getDatasetPool(RBRGen4 *conn, RBRGen4DatasetPool *datasetPool);
 
 /**
  * \brief Populate the parameters of a dataset.
@@ -252,10 +239,8 @@ RBRGen4Error RBRGen4_getDatasetPool(
  * \see RBRGen4_getDatasetPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-RBRGen4Error RBRGen4_getDataset(
-    RBRGen4 *conn,
-    RBRGen4Dataset *dataset,
-    RBRGen4LabelList *scheduleList);
+RBRGen4Error RBRGen4_getDataset(RBRGen4 *conn, RBRGen4Dataset *dataset,
+                                RBRGen4LabelList *scheduleList);
 
 /**
  * \brief `dataset <dataset_label>/[<schedule_label>/]events` command
@@ -265,8 +250,7 @@ RBRGen4Error RBRGen4_getDataset(
  * \see RBRGen4Dataset_getScheduleEventsBlock()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-typedef struct RBRGen4DatasetEventsBlock
-{
+typedef struct RBRGen4DatasetEventsBlock {
     /** \brief The memory usage of the events block in bytes. */
     int64_t byteCount;
     /** \brief The memory usage of the events block in events. */
@@ -279,8 +263,7 @@ typedef struct RBRGen4DatasetEventsBlock
  * \see RBRGen4Dataset_getMetaBlock()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-typedef struct RBRGen4DatasetMetaBlock
-{
+typedef struct RBRGen4DatasetMetaBlock {
     /** \brief The memory usage of the metadata block in bytes. */
     int64_t byteCount;
 } RBRGen4DatasetMetaBlock;
@@ -291,8 +274,7 @@ typedef struct RBRGen4DatasetMetaBlock
  * \see RBRGen4Dataset_getScheduleBlock()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-typedef struct RBRGen4DatasetScheduleBlock
-{
+typedef struct RBRGen4DatasetScheduleBlock {
     /** \brief The memory usage of the schedule's blocks in bytes. */
     int64_t byteCount;
 } RBRGen4DatasetScheduleBlock;
@@ -303,8 +285,7 @@ typedef struct RBRGen4DatasetScheduleBlock
  * \see RBRGen4Dataset_getScheduleDataBlock()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-typedef struct RBRGen4DatasetDataBlock
-{
+typedef struct RBRGen4DatasetDataBlock {
     /** \brief The memory usage of the sample data block in bytes. */
     int64_t byteCount;
     /** \brief The memory usage of the sample data block in samples. */
@@ -328,10 +309,8 @@ typedef struct RBRGen4DatasetDataBlock
  *                                      hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-RBRGen4Error RBRGen4Dataset_getEventsBlock(
-    RBRGen4 *conn,
-    const RBRGen4Dataset *dataset,
-    RBRGen4DatasetEventsBlock *block);
+RBRGen4Error RBRGen4Dataset_getEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+                                           RBRGen4DatasetEventsBlock *block);
 
 /**
  * \brief Get the memory usage of all of a dataset's metadata.
@@ -349,10 +328,8 @@ RBRGen4Error RBRGen4Dataset_getEventsBlock(
  *                                      hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-RBRGen4Error RBRGen4Dataset_getMetaBlock(
-    RBRGen4 *conn,
-    const RBRGen4Dataset *dataset,
-    RBRGen4DatasetMetaBlock *block);
+RBRGen4Error RBRGen4Dataset_getMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+                                         RBRGen4DatasetMetaBlock *block);
 
 /**
  * \brief Get the memory usage of one of a dataset's schedules, summed over
@@ -374,11 +351,9 @@ RBRGen4Error RBRGen4Dataset_getMetaBlock(
  *                                      or another hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-RBRGen4Error RBRGen4Dataset_getScheduleBlock(
-    RBRGen4 *conn,
-    const RBRGen4Dataset *dataset,
-    const char *scheduleLabel,
-    RBRGen4DatasetScheduleBlock *block);
+RBRGen4Error RBRGen4Dataset_getScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+                                             const char *scheduleLabel,
+                                             RBRGen4DatasetScheduleBlock *block);
 
 /**
  * \brief Get the memory usage of one schedule's events within a dataset.
@@ -400,11 +375,9 @@ RBRGen4Error RBRGen4Dataset_getScheduleBlock(
  *                                      or another hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(
-    RBRGen4 *conn,
-    const RBRGen4Dataset *dataset,
-    const char *scheduleLabel,
-    RBRGen4DatasetEventsBlock *block);
+RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+                                                   const char *scheduleLabel,
+                                                   RBRGen4DatasetEventsBlock *block);
 
 /**
  * \brief Get the memory usage of one schedule's sample data within a
@@ -426,17 +399,15 @@ RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(
  *                                      or another hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-RBRGen4Error RBRGen4Dataset_getScheduleDataBlock(
-    RBRGen4 *conn,
-    const RBRGen4Dataset *dataset,
-    const char *scheduleLabel,
-    RBRGen4DatasetDataBlock *block);
+RBRGen4Error RBRGen4Dataset_getScheduleDataBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+                                                 const char *scheduleLabel,
+                                                 RBRGen4DatasetDataBlock *block);
 
-/** \brief It determines the type of information retrieved for the specific schedule. 
+/** \brief It determines the type of information retrieved for the specific schedule.
  * There are three keywoards: data|events|meta.
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/dataset
-*/
-typedef enum RBRGen4Block{
+ */
+typedef enum RBRGen4Block {
     /** Used to report memory usage for sample data. */
     RBRGEN4_BLOCK_DATA,
     /** Used to report memory usege for events. */
@@ -447,7 +418,7 @@ typedef enum RBRGen4Block{
     RBRGEN4_BLOCK_COUNT,
     /** The unknown or unrecognized block. */
     RBRGEN4_BLOCK_UNKNOWN
-}RBRGen4Block;
+} RBRGen4Block;
 
 /** \brief Get a human-readable block name.
  * \param [in] block the block.
@@ -471,9 +442,7 @@ const char *RBRGen4Block_name(RBRGen4Block block);
  * \see RBRGen4_deleteDatasetAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-RBRGen4Error RBRGen4_deleteDataset(
-    RBRGen4 *conn,
-    const char *label);
+RBRGen4Error RBRGen4_deleteDataset(RBRGen4 *conn, const char *label);
 
 /**
  * \brief Delete every dataset from the instrument's memory.
@@ -487,8 +456,7 @@ RBRGen4Error RBRGen4_deleteDataset(
  * \see RBRGen4_deleteDataset()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
-RBRGen4Error RBRGen4_deleteDatasetAll(
-    RBRGen4 *conn);
+RBRGen4Error RBRGen4_deleteDatasetAll(RBRGen4 *conn);
 
 /**
  * \brief The unit in which a sample data download's count and start offset
@@ -496,8 +464,7 @@ RBRGen4Error RBRGen4_deleteDatasetAll(
  *
  * \see RBRGen4DownloadData
  */
-typedef enum RBRGen4DownloadDataUnit
-{
+typedef enum RBRGen4DownloadDataUnit {
     /** The transfer is measured in bytes (`bytecount`/`bytestart`). */
     RBRGEN4_DOWNLOAD_DATA_UNIT_BYTES,
     /** The transfer is measured in samples (`samplecount`/`samplestart`). */
@@ -515,8 +482,7 @@ typedef enum RBRGen4DownloadDataUnit
  * \return a string name for the download unit
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRGen4DownloadDataUnit_name(
-    RBRGen4DownloadDataUnit unit);
+const char *RBRGen4DownloadDataUnit_name(RBRGen4DownloadDataUnit unit);
 
 /**
  * \brief The unit in which an events download's count and start offset are
@@ -524,8 +490,7 @@ const char *RBRGen4DownloadDataUnit_name(
  *
  * \see RBRGen4DownloadEvents
  */
-typedef enum RBRGen4DownloadEventsUnit
-{
+typedef enum RBRGen4DownloadEventsUnit {
     /** The transfer is measured in bytes (`bytecount`/`bytestart`). */
     RBRGEN4_DOWNLOAD_EVENTS_UNIT_BYTES,
     /** The transfer is measured in events (`eventcount`/`eventstart`). */
@@ -543,8 +508,7 @@ typedef enum RBRGen4DownloadEventsUnit
  * \return a string name for the download unit
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRGen4DownloadEventsUnit_name(
-    RBRGen4DownloadEventsUnit unit);
+const char *RBRGen4DownloadEventsUnit_name(RBRGen4DownloadEventsUnit unit);
 
 /**
  * \brief `download <dataset_label>/<schedule_label>/data` command
@@ -553,8 +517,7 @@ const char *RBRGen4DownloadEventsUnit_name(
  * \see RBRGen4Dataset_downloadScheduleData()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
-typedef struct RBRGen4DownloadData
-{
+typedef struct RBRGen4DownloadData {
     /** \brief The unit for both #count and #start. */
     RBRGen4DownloadDataUnit unit;
 
@@ -591,8 +554,7 @@ typedef struct RBRGen4DownloadData
  * \see RBRGen4Dataset_downloadScheduleEvents()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
-typedef struct RBRGen4DownloadEvents
-{
+typedef struct RBRGen4DownloadEvents {
     /** \brief The unit for both #count and #start. */
     RBRGen4DownloadEventsUnit unit;
 
@@ -627,8 +589,7 @@ typedef struct RBRGen4DownloadEvents
  * \see RBRGen4Dataset_downloadMeta()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
-typedef struct RBRGen4DownloadMeta
-{
+typedef struct RBRGen4DownloadMeta {
     /**
      * \brief The number of bytes to transfer: the requested amount,
      * updated to the amount the instrument reports. Excludes the trailing
@@ -680,11 +641,9 @@ typedef struct RBRGen4DownloadMeta
  *                                      or another hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
-RBRGen4Error RBRGen4Dataset_downloadScheduleData(
-    RBRGen4 *conn,
-    const RBRGen4Dataset *dataset,
-    const char *scheduleLabel,
-    RBRGen4DownloadData *download);
+RBRGen4Error RBRGen4Dataset_downloadScheduleData(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+                                                 const char *scheduleLabel,
+                                                 RBRGen4DownloadData *download);
 
 /**
  * \brief Download a dataset's events, including those not tied to any
@@ -714,10 +673,8 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleData(
  * \see RBRGen4Dataset_downloadScheduleEvents()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
-RBRGen4Error RBRGen4Dataset_downloadEvents(
-    RBRGen4 *conn,
-    const RBRGen4Dataset *dataset,
-    RBRGen4DownloadEvents *download);
+RBRGen4Error RBRGen4Dataset_downloadEvents(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+                                           RBRGen4DownloadEvents *download);
 
 /**
  * \brief Download part of one schedule's events within a dataset.
@@ -749,11 +706,9 @@ RBRGen4Error RBRGen4Dataset_downloadEvents(
  * \see RBRGen4Dataset_downloadEvents()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
-RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(
-    RBRGen4 *conn,
-    const RBRGen4Dataset *dataset,
-    const char *scheduleLabel,
-    RBRGen4DownloadEvents *download);
+RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+                                                   const char *scheduleLabel,
+                                                   RBRGen4DownloadEvents *download);
 
 /**
  * \brief Download a dataset's metadata.
@@ -780,10 +735,8 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(
  *                                      hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
-RBRGen4Error RBRGen4Dataset_downloadMeta(
-    RBRGen4 *conn,
-    const RBRGen4Dataset *dataset,
-    RBRGen4DownloadMeta *download);
+RBRGen4Error RBRGen4Dataset_downloadMeta(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+                                         RBRGen4DownloadMeta *download);
 
 /**
  * \brief Calculate the 16-bit CRC using the CCITT polynomial f(x)=x^16+x^12+x^5+1
@@ -795,9 +748,7 @@ RBRGen4Error RBRGen4Dataset_downloadMeta(
  * \return calculated CRC
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
-uint16_t RBRGen4_calculateCrc(
-    const void *data,
-    int64_t size);   
+uint16_t RBRGen4_calculateCrc(const void *data, int64_t size);
 
 #ifdef __cplusplus
 }

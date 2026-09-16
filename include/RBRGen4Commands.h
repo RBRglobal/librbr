@@ -27,4 +27,3 @@ extern "C" {
 #endif
 
 #endif /* LIBRBR_RBRGEN4COMMANDS_H */
-
