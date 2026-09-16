@@ -13,7 +13,7 @@
 
 #include <stdint.h>
 
-/*! @def DCORR_MAX_LAG_ARRAY
+/** \def DCORR_MAX_LAG_ARRAY
 * \brief Define the maximum amount of lag permitted.
 */
 
@@ -26,60 +26,60 @@
 /* default parameters
  * (applicable for 10cm/sec ascent/descent rate) */
 
-/*! @def DCORR_T_DELAY 
+/** \def DCORR_T_DELAY 
 * \brief Define the C-T lag adjustment delay (in seconds)
 */
 #define DCORR_T_DELAY       0.35f
-/*! @def DCORR_ALPHA
+/** \def DCORR_ALPHA
 * \brief Define the magnitude of short-term thermal mass correction (unitless)
 */
 #define DCORR_ALPHA         0.041f
-/*! @def DCORR_ALPHA_A
+/** \def DCORR_ALPHA_A
 * \brief Define the 'a' ascent-rate fit coefficient for alpha (unitless)
 */
 #define DCORR_ALPHA_A         0.00323f
-/*! @def DCORR_ALPHA_E
+/** \def DCORR_ALPHA_E
 * \brief Define the 'e' ascent-rate fit coefficient for alpha (unitless)
 */
 #define DCORR_ALPHA_E         -1.03f
-/*! 
-*   @def DCORR_TAU
+/**
+*   \def DCORR_TAU
 * \brief Define the time constant of short-term thermal mass correction (seconds)
 */
 #define DCORR_TAU           8.11f
-/*! @def DCORR_TAU_A
+/** \def DCORR_TAU_A
 * \brief Define the 'a' ascent-rate fit coefficient for alpha (unitless)
 */
 #define DCORR_TAU_A         4.93f
-/*! @def DCORR_TAU_E
+/** \def DCORR_TAU_E
 * \brief Define the 'e' ascent-rate fit coefficient for alpha (unitless)
 */
 #define DCORR_TAU_E         -0.26f
-/*! 
-*   @def DCORR_CT_COEFF
+/**
+*   \def DCORR_CT_COEFF
 * \brief Define the magnitude of long-term thermal mass correction (unitless)
 */
 #define DCORR_CT_COEFF      0.97e-2f
-/*! @def DCORR_CT_COEFF_A
+/** \def DCORR_CT_COEFF_A
 * \brief Define the 'a' ascent-rate fit coefficient for ctcoeff (unitless)
 */
 #define DCORR_CT_COEFF_A         0.00139f
-/*! @def DCORR_CT_COEFF_E
+/** \def DCORR_CT_COEFF_E
 * \brief Define the 'e' ascent-rate fit coefficient for ctcoeff (unitless)
 */
 #define DCORR_CT_COEFF_E         -1.00f
-/*! 
-*   @def DCORR_VP_MIN
+/**
+*   \def DCORR_VP_MIN
 * \brief Define the minimum for the range for ascent rate as pressure/time (dbar/sec)
 */
 #define DCORR_VP_MIN      0.03f
-/*! 
-*   @def DCORR_VP_MAX
+/**
+*   \def DCORR_VP_MAX
 * \brief Define the minimum for the range for ascent rate as pressure/time (dbar/sec)
 */
 #define DCORR_VP_MAX      0.45f
-/*! 
-*   @def DCORR_VP_FC
+/**
+*   \def DCORR_VP_FC
 * \brief Define the filter cutoff frequency for ascent rate as pressure/time (Hz)
 */
 #define DCORR_VP_FC      0.04f
@@ -221,23 +221,23 @@ typedef struct RBRGen4DynamicCorrectionResult{
 } RBRGen4DynamicCorrectionResult;
 
 /**
- * @brief Initialize the dynamic correction algorithm.
+ * \brief Initialize the dynamic correction algorithm.
  * 
  * Initialize the algorithm for the given sampling rate.
  *
- * @param [in] Fs sampling rate (Samples/sec)
- * @param [in] t_delay default value DCORR_T_DELAY used as input
- * @param [in] alpha_a default value DCORR_ALPHA_A used as input
- * @param [in] alpha_e default value DCORR_ALPHA_E used as input
- * @param [in] tau_a default value DCORR_TAU_A used as input
- * @param [in] tau_e default value DCORR_TAU_E used as input
- * @param [in] ctcoeff_a default value DCORR_COEFF_A used as input
- * @param [in] ctcoeff_e default value DCORR_COEFF_E used as input
- * @param [in] Vp_min default value DCORR_VP_MIN used as input
- * @param [in] Vp_max default value DCORR_VP_MAX used as input
- * @param [in] Vp_fc default value DCORR_VP_FC used as input
- * @param [inout] params Parameters for dynamic correction algorithm
- * @return error code (0 = no error)
+ * \param [in] Fs sampling rate (Samples/sec)
+ * \param [in] t_delay default value DCORR_T_DELAY used as input
+ * \param [in] alpha_a default value DCORR_ALPHA_A used as input
+ * \param [in] alpha_e default value DCORR_ALPHA_E used as input
+ * \param [in] tau_a default value DCORR_TAU_A used as input
+ * \param [in] tau_e default value DCORR_TAU_E used as input
+ * \param [in] ctcoeff_a default value DCORR_COEFF_A used as input
+ * \param [in] ctcoeff_e default value DCORR_COEFF_E used as input
+ * \param [in] Vp_min default value DCORR_VP_MIN used as input
+ * \param [in] Vp_max default value DCORR_VP_MAX used as input
+ * \param [in] Vp_fc default value DCORR_VP_FC used as input
+ * \param [inout] params Parameters for dynamic correction algorithm
+ * \return error code (0 = no error)
  */
 RBRGen4DynamicCorrectionError RBRGen4DynamicCorrection_init(const float Fs,
                                             const float t_delay, const float alpha_a, const float alpha_e, 
@@ -246,23 +246,23 @@ RBRGen4DynamicCorrectionError RBRGen4DynamicCorrection_init(const float Fs,
                                             RBRGen4DynamicCorrectionParams *params);
 
 /**
- * @brief Change the sampling rate for the algorithm.
+ * \brief Change the sampling rate for the algorithm.
  *
- * @param [in] Fs sampling rate (Samples/sec)
- * @param [inout] params Parameters for dynamic correction algorithm
- * @return error code (0 = no error)
+ * \param [in] Fs sampling rate (Samples/sec)
+ * \param [inout] params Parameters for dynamic correction algorithm
+ * \return error code (0 = no error)
  */
 RBRGen4DynamicCorrectionError RBRGen4DynamicCorrection_update_Fs(const float Fs, RBRGen4DynamicCorrectionParams *params);
 
 /**
- * @brief Feed a new measurement in the algorithm.  
+ * \brief Feed a new measurement in the algorithm.  
  * 
  * Return a corrected output (with proper time delay to align with all correction results)
  * 
- * @param [in] measIn Input measurements for algorithm
- * @param [inout] params Parameters for dynamic correction algorithm
- * @param [out] corrMeasOut Output corrected measurements (time aligned)
- * @return error code (0 = no error)
+ * \param [in] measIn Input measurements for algorithm
+ * \param [inout] params Parameters for dynamic correction algorithm
+ * \param [out] corrMeasOut Output corrected measurements (time aligned)
+ * \return error code (0 = no error)
  */
 RBRGen4DynamicCorrectionError RBRGen4DynamicCorrection_addMeasurement(const RBRGen4DynamicCorrectionMeasurement * measIn, RBRGen4DynamicCorrectionParams *params, RBRGen4DynamicCorrectionResult * corrMeasOut);
 
