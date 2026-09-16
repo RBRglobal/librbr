@@ -229,8 +229,8 @@ RBRGen4Error RBRGen4_poll(
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
  *         polled sample arrives within RBRGen4.pollTimeout
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when an invalid channel is
- *         requested
+ * \return #RBRGEN4_HARDWARE_ERROR when an invalid channel is requested, or
+ *                                      another hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
 RBRGen4Error RBRGen4_pollChannels(
@@ -271,8 +271,8 @@ RBRGen4Error RBRGen4_pollChannels(
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
  *         polled sample arrives within RBRGen4.pollTimeout
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when an invalid group is
- *         requested
+ * \return #RBRGEN4_HARDWARE_ERROR when an invalid group is requested, or
+ *                                      another hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
 RBRGen4Error RBRGen4_pollGroups(

@@ -67,7 +67,8 @@ RBRGen4Error RBRGen4_getClock(RBRGen4 *conn,
  * \return #RBRGEN4_SUCCESS when the settings are successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN4_HARDWARE_ERROR when the settings cannot be changed, or
+ *                                      another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the date and time is
  *         outside #RBRGEN4_DATETIME_MIN to
  *         #RBRGEN4_DATETIME_MAX, or the UTC offset is `NAN`
@@ -211,8 +212,8 @@ RBRGen4Error RBRGen4_getDeployment(
  *         changed
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the deployment cannot be
- *         changed
+ * \return #RBRGEN4_HARDWARE_ERROR when the deployment cannot be changed, or
+ *                                      another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the gating condition
  *         is set to more than one condition, or the start time is being sent 
  *         and is outside #RBRGEN4_DATETIME_MIN to 
@@ -234,8 +235,8 @@ RBRGen4Error RBRGen4_setDeployment(
  * \return #RBRGEN4_SUCCESS when the deployment is paused
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not
- *         enabled
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not enabled, or
+ *                                      another hardware error occurs
  * \see RBRGen4_resume()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828461/pause
  */
@@ -253,8 +254,8 @@ RBRGen4Error RBRGen4_pause(
  * \return #RBRGEN4_SUCCESS when the deployment is resumed
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not
- *         enabled
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not enabled, or
+ *                                      another hardware error occurs
  * \see RBRGen4_pause()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828463/resume
  */
@@ -308,7 +309,8 @@ const char *RBRGen4DeploymentStoragemode_name(
  * \return #RBRGEN4_SUCCESS when the checks all pass
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when a check fails
+ * \return #RBRGEN4_HARDWARE_ERROR when a check fails, or another hardware
+ *                                      error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the configuration or
  *         dataset label is empty or too long, or the storage mode is not a
  *         specific mode
@@ -339,8 +341,8 @@ RBRGen4Error RBRGen4_verify(
  * \return #RBRGEN4_SUCCESS when the instrument is enabled
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument cannot be
- *         enabled
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument cannot be enabled, or
+ *                                      another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the configuration or
  *         dataset label is empty or too long, or the storage mode is not a
  *         specific mode
@@ -369,7 +371,8 @@ RBRGen4Error RBRGen4_enable(
  * \return #RBRGEN4_SUCCESS when the deployment is terminated
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument was not enabled
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument was not enabled, or
+ *                                      another hardware error occurs
  * \see RBRGen4_enable()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828481/disable
  */

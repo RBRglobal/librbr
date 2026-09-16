@@ -157,7 +157,8 @@ typedef struct RBRGen4PcbaPool {
  * \return #RBRGEN4_SUCCESS when all PCBAs are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if a PCBA cannot be read
+ * \return #RBRGEN4_HARDWARE_ERROR when a PCBA cannot be read, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getPcba()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/44761149/pcba
  */
@@ -178,7 +179,8 @@ RBRGen4Error RBRGen4_getPcbaPool(
  * \return #RBRGEN4_SUCCESS when the information is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the information cannot be read
+ * \return #RBRGEN4_HARDWARE_ERROR when the information cannot be read, or
+ *                                      another hardware error occurs
  * \see RBRGen4_getPcbaPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/44761149/pcba
  */
@@ -223,7 +225,8 @@ const char *RBRGen4PowerSource_name(RBRGen4PowerSource source);
  * \return #RBRGEN4_SUCCESS when the information is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the information cannot be read
+ * \return #RBRGEN4_HARDWARE_ERROR when the information cannot be read, or
+ *                                      another hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830328/power
  */
 RBRGen4Error RBRGen4_getPowerSource(RBRGen4 *conn,
@@ -311,7 +314,8 @@ typedef struct RBRGen4PowerInternal
  * \return #RBRGEN4_SUCCESS when the information is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if an error occurs reading voltages
+ * \return #RBRGEN4_HARDWARE_ERROR when an error occurs reading voltages, or
+ *                                      another hardware error occurs
  * \see RBRGen4_setPowerInternalBatteryType()
  * \see RBRGen4_resetPowerInternalUsed()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828548/internal
@@ -329,7 +333,8 @@ RBRGen4Error RBRGen4_getPowerInternal(
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getPowerInternal()
  * \see RBRGen4_resetPowerInternalUsed()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828548/internal
@@ -346,7 +351,8 @@ RBRGen4Error RBRGen4_setPowerInternalBatteryType(
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getPowerInternal()
  * \see RBRGen4_setPowerInternalBatteryType()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828548/internal
@@ -465,7 +471,8 @@ RBRGen4Error RBRGen4_getPowerExternal(
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getPowerExternal()
  * \see RBRGen4_resetPowerExternalUsed()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828551/external
@@ -482,7 +489,8 @@ RBRGen4Error RBRGen4_setPowerExternalBatteryType(
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getPowerExternal()
  * \see RBRGen4_setPowerExternalBatteryType()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828551/external
@@ -597,7 +605,8 @@ RBRGen4Error RBRGen4_getOutputFormat(
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the encoding or
  *                                                   datatype is not a real
  *                                                   value
- * \return #RBRGEN4_HARDWARE_ERROR if the instrument refuses a value
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument refuses a value, or
+ *                                      another hardware error occurs
  * \see RBRGen4_getOutputFormat()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
@@ -613,7 +622,8 @@ RBRGen4Error RBRGen4_setOutputFormat(
  * \return #RBRGEN4_SUCCESS when the instrument has been reset
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the instrument refuses
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument refuses, or another
+ *                                      hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/factory
  */
 RBRGen4Error RBRGen4_factoryReset(

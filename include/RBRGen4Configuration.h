@@ -597,7 +597,8 @@ RBRGen4Error RBRGen4_getDevicePool(
  * \return #RBRGEN4_SUCCESS when discovery completes
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the instrument refuses
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument refuses, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getDevice()
  * \see RBRGen4_getDevicePool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830109/Configuration+information+and+calibration
@@ -871,7 +872,8 @@ typedef struct RBRGen4ChannelPool
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getChannelPool()
  * \see RBRGen4_setChannel()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
@@ -895,7 +897,8 @@ RBRGen4Error RBRGen4_getChannel(
  * \return #RBRGEN4_SUCCESS when the channel is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the channel cannot be changed
+ * \return #RBRGEN4_HARDWARE_ERROR when the channel cannot be changed, or
+ *                                      another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the units are empty
  * \see RBRGen4_getChannel()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
@@ -922,7 +925,8 @@ RBRGen4Error RBRGen4_setChannel(
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
- * \return #RBRGEN4_HARDWARE_ERROR if the channel pool cannot be read
+ * \return #RBRGEN4_HARDWARE_ERROR when the channel pool cannot be read, or
+ *                                      another hardware error occurs
  * \see RBRGen4_getChannelPoolByNature()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/47153202/channel
  */
@@ -949,7 +953,8 @@ RBRGen4Error RBRGen4_getChannelPool(
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
- * \return #RBRGEN4_HARDWARE_ERROR if the channel pool cannot be read
+ * \return #RBRGEN4_HARDWARE_ERROR when the channel pool cannot be read, or
+ *                                      another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the nature is not
  *                                                    one the command accepts
  * \see RBRGen4_getChannelPool()
@@ -972,7 +977,8 @@ RBRGen4Error RBRGen4_getChannelPoolByNature(
  * \return #RBRGEN4_SUCCESS when the calibration is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist, or another
+ *                                      hardware error occurs
  * \see RBRGen4_setCalibration()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828510/calibration
  */
@@ -1001,8 +1007,8 @@ RBRGen4Error RBRGen4_getCalibration(
  *                                    written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the calibration cannot be
- *                                           changed
+ * \return #RBRGEN4_HARDWARE_ERROR when the calibration cannot be changed, or
+ *                                      another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a coefficient count
  *                                                    is out of range
  * \see RBRGen4_getCalibration()
@@ -1068,7 +1074,8 @@ RBRGen4Error RBRGen4_getSettings(
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN4_HARDWARE_ERROR when the settings cannot be changed, or
+ *                                      another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the power-off delay
  *                                                    is negative
  * \warning The library expects both \a prompt and \a confirmation to be on.
@@ -1148,8 +1155,8 @@ RBRGen4Error RBRGen4_getParameters(
  *                                    written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the parameters cannot be
- *                                           changed
+ * \return #RBRGEN4_HARDWARE_ERROR when the parameters cannot be changed, or
+ *                                      another hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/42729486/parameters
  * \see RBRGen4_getParameters
  */
@@ -1196,7 +1203,8 @@ typedef struct RBRGen4Group
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
- * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getGroupPool()
  * \see RBRGen4_setGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
@@ -1220,7 +1228,8 @@ RBRGen4Error RBRGen4_getGroup(
  * \return #RBRGEN4_SUCCESS when the group is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be written
+ * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be written, or another
+ *                                      hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
  *                                                    \a channelList is `NULL`,
  *                                                    its count does not fit
@@ -1301,7 +1310,8 @@ RBRGen4Error RBRGen4_getGroupPool(
  * \return #RBRGEN4_SUCCESS when the group is successfully created
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be created
+ * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be created, or another
+ *                                      hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteGroup()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
@@ -1321,7 +1331,8 @@ RBRGen4Error RBRGen4_createGroup(
  * \return #RBRGEN4_SUCCESS when the group is successfully deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist, or another
+ *                                      hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteGroupAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/49021024/group
@@ -1561,7 +1572,8 @@ typedef struct RBRGen4Schedule
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
- * \return #RBRGEN4_HARDWARE_ERROR when the schedule does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the schedule does not exist, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getSchedulePool()
  * \see RBRGen4_setSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
@@ -1587,9 +1599,10 @@ RBRGen4Error RBRGen4_getSchedule(
  * \return #RBRGEN4_SUCCESS when the schedule is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the schedule cannot be
- *                                           written, or when `storage` is set
- *                                           where it is unavailable
+ * \return #RBRGEN4_HARDWARE_ERROR when the schedule cannot be written, or when
+ *                                      `storage` is set where it is
+ *                                      unavailable, or another hardware error
+ *                                      occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
  *                                                    the list's count does
  *                                                    not fit its array, a
@@ -1711,7 +1724,8 @@ RBRGen4Error RBRGen4_getSchedulePool(
  * \return #RBRGEN4_SUCCESS when the schedule is successfully created
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when it cannot be created
+ * \return #RBRGEN4_HARDWARE_ERROR when it cannot be created, or another
+ *                                      hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteSchedule()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
@@ -1731,7 +1745,8 @@ RBRGen4Error RBRGen4_createSchedule(
  * \return #RBRGEN4_SUCCESS when the schedule is successfully deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when it does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when it does not exist, or another hardware
+ *                                      error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteScheduleAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
@@ -1795,8 +1810,8 @@ typedef struct RBRGen4Config
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
- * \return #RBRGEN4_HARDWARE_ERROR when the configuration does not
- *                                           exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the configuration does not exist, or
+ *                                      another hardware error occurs
  * \see RBRGen4_getConfigPool()
  * \see RBRGen4_setConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config
@@ -1820,8 +1835,8 @@ RBRGen4Error RBRGen4_getConfig(
  * \return #RBRGEN4_SUCCESS when the configuration is written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the configuration cannot be
- *                                           written
+ * \return #RBRGEN4_HARDWARE_ERROR when the configuration cannot be written, or
+ *                                      another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
  *                                                    \a scheduleList is
  *                                                    `NULL`, its count does
@@ -1905,7 +1920,8 @@ RBRGen4Error RBRGen4_getConfigPool(
  * \return #RBRGEN4_SUCCESS when the configuration is created
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when it cannot be created
+ * \return #RBRGEN4_HARDWARE_ERROR when it cannot be created, or another
+ *                                      hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteConfig()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
@@ -1925,7 +1941,8 @@ RBRGen4Error RBRGen4_createConfig(
  * \return #RBRGEN4_SUCCESS when the configuration is deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when it does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when it does not exist, or another hardware
+ *                                      error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteConfigAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48955633/config

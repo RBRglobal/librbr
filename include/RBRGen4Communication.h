@@ -237,7 +237,8 @@ RBRGen4Error RBRGen4_getLinkSerial(
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when a value is not supported
+ * \return #RBRGEN4_HARDWARE_ERROR when a value is not supported, or another
+ *                                      hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the baud rate or
  *                                                   mode is not a real value
  * \see RBRGen4_getLinkSerial()
