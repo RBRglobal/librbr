@@ -28,37 +28,40 @@ TEST_LOGGER4(getStorage)
         { "storage used=15372 remaining=61016097780 size=61016113152"
           " access=instrument" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 15372LL,
-            61016097780LL,
-            61016113152LL,
-            RBRGEN4_STORAGE_ACCESS_INSTRUMENT } },
+          { .used = 15372LL,
+            .remaining = 61016097780LL,
+            .size = 61016113152LL,
+            .access = RBRGEN4_STORAGE_ACCESS_INSTRUMENT } },
         { "storage used=1528 remaining=134216192 size=134217728"
           " access=usbhost" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 1528LL,
-            134216192LL,
-            134217728LL,
-            RBRGEN4_STORAGE_ACCESS_USBHOST } },
+          { .used = 1528LL,
+            .remaining = 134216192LL,
+            .size = 134217728LL,
+            .access = RBRGEN4_STORAGE_ACCESS_USBHOST } },
         /* An unreported parameter keeps its unset value. */
         { "storage used=15372" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 15372LL, 0LL, 0LL, RBRGEN4_UNKNOWN_STORAGE_ACCESS } },
+          { .used = 15372LL,
+            .remaining = 0LL,
+            .size = 0LL,
+            .access = RBRGEN4_UNKNOWN_STORAGE_ACCESS } },
         /* An unrecognized access location parses to the unknown member. */
         { "storage used=15372 remaining=61016097780 size=61016113152"
           " access=cloud" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 15372LL,
-            61016097780LL,
-            61016113152LL,
-            RBRGEN4_UNKNOWN_STORAGE_ACCESS } },
+          { .used = 15372LL,
+            .remaining = 61016097780LL,
+            .size = 61016113152LL,
+            .access = RBRGEN4_UNKNOWN_STORAGE_ACCESS } },
         /* Keys the library does not model are ignored. */
         { "storage used=15372 remaining=61016097780 size=61016113152"
           " access=instrument bogus=1" RESPONSE_TERMINATOR,
           RBRGEN4_SUCCESS,
-          { 15372LL,
-            61016097780LL,
-            61016113152LL,
-            RBRGEN4_STORAGE_ACCESS_INSTRUMENT } },
+          { .used = 15372LL,
+            .remaining = 61016097780LL,
+            .size = 61016113152LL,
+            .access = RBRGEN4_STORAGE_ACCESS_INSTRUMENT } },
         { NULL, 0, { 0, 0, 0, 0 } }
     };
 
