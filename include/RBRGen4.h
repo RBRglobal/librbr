@@ -807,8 +807,8 @@ typedef struct RBRGen4
     /**
      * \brief The command timeout in milliseconds.
      *
-     * See [Timeouts](timeouts.md) for details on how the library handles
-     * timeouts.
+     * See the Timeouts page of the documentation for details on how the
+     * library handles timeouts.
      * \see RBRGen4_getCommandTimeout()
      * \see RBRGen4_setCommandTimeout()
      */
@@ -817,8 +817,8 @@ typedef struct RBRGen4
     /**
      * \brief The poll timeout in milliseconds.
      *
-     * RBRGen4_open() sets it to twice the command timeout. See
-     * [Timeouts](timeouts.md) for details on how the library handles
+     * RBRGen4_open() sets it to twice the command timeout. See the Timeouts
+     * page of the documentation for details on how the library handles
      * timeouts.
      * \see RBRGen4_getPollTimeout()
      * \see RBRGen4_setPollTimeout()

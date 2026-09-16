@@ -174,7 +174,7 @@ typedef struct RBRGen3Serial
      *
      * Treated as a bit field representation of available baud rates as defined
      * by RBRGen3SerialBaudRate. For details, consult
-     * [Working with Bit Fields](bitfields.md).
+     * the Working with Bit Fields page of the documentation.
      *
      * \readonly
      *
@@ -188,7 +188,7 @@ typedef struct RBRGen3Serial
      *
      * Treated as a bit field representation of available modes as defined by
      * RBRGen3SerialMode. For details, consult
-     * [Working with Bit Fields](bitfields.md).
+     * the Working with Bit Fields page of the documentation.
      *
      * \readonly
      *

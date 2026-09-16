@@ -178,7 +178,7 @@ typedef struct RBRGen4LinkSerial
      *
      * Treated as a bit field representation of available baud rates as
      * defined by RBRGen4LinkSerialBaudRate. For details, consult
-     * [Working with Bit Fields](bitfields.md).
+     * the Working with Bit Fields page of the documentation.
      *
      * \readonly
      */
@@ -188,7 +188,7 @@ typedef struct RBRGen4LinkSerial
      *
      * Treated as a bit field representation of available modes as defined by
      * RBRGen4LinkSerialMode. For details, consult
-     * [Working with Bit Fields](bitfields.md).
+     * the Working with Bit Fields page of the documentation.
      *
      * \readonly
      */

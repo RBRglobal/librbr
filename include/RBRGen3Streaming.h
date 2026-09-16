@@ -158,7 +158,7 @@ const char *RBRGen3OutputFormat_name(RBRGen3OutputFormat format);
  *
  * \a outputFormats will be treated as a bit field representation of available
  * output formats as defined by RBRGen3OutputFormat. For details, consult
- * [Working with Bit Fields](bitfields.md).
+ * the Working with Bit Fields page of the documentation.
  *
  * \param [in] conn the instrument connection
  * \param [out] outputFormats available output formats

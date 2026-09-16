@@ -316,7 +316,7 @@ typedef struct RBRGen4Port
      *
      * Treated as a bit field representation of available protocols as defined
      * by RBRGen4PortProtocol. For details, consult
-     * [Working with Bit Fields](bitfields.md).
+     * the Working with Bit Fields page of the documentation.
      */
     RBRGen4PortProtocol availableProtocols;
 
@@ -1364,7 +1364,6 @@ RBRGen4Error RBRGen4_deleteGroupAll(
  *
  * \see RBRGen4Schedule.mode
  * \see RBRGen4SchedulePool.availableModes
- * \see bitfields.md
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890051/schedule
  */
 typedef enum RBRGen4ScheduleMode

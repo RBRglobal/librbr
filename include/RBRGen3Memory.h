@@ -232,7 +232,7 @@ const char *RBRGen3MemoryFormat_name(RBRGen3MemoryFormat format);
  *
  * \a memoryFormats will be treated as a bit field representation of available
  * memory formats as defined by RBRGen3MemoryFormat. For details, consult
- * [Working with Bit Fields](bitfields.md).
+ * the Working with Bit Fields page of the documentation.
  *
  * \param [in] conn the instrument connection
  * \param [out] memoryFormats available memory formats
