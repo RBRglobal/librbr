@@ -136,6 +136,9 @@ RBRGen3Error RBRGen3Parser_init(RBRGen3Parser *parser, const RBRGen3ParserCallba
 
 RBRGen3Error RBRGen3Parser_destroy(RBRGen3Parser *parser)
 {
+    /* The library holds no resources, so there is nothing to release. This
+     * function is kept so that callers pair every init with a destroy and so
+     * that resource management can be added later without an API change. */
     memset(parser, 0, sizeof(RBRGen3Parser));
     return RBRGEN3_SUCCESS;
 }

@@ -134,6 +134,9 @@ RBRGen4Error RBRGen4Parser_init(RBRGen4Parser *parser, const RBRGen4ParserCallba
 
 RBRGen4Error RBRGen4Parser_destroy(RBRGen4Parser *parser)
 {
+    /* The library holds no resources, so there is nothing to release. This
+     * function is kept so that callers pair every init with a destroy and so
+     * that resource management can be added later without an API change. */
     memset(parser, 0, sizeof(RBRGen4Parser));
     return RBRGEN4_SUCCESS;
 }

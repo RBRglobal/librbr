@@ -220,6 +220,9 @@ RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Callbacks *callbacks,
 
 RBRGen4Error RBRGen4_close(RBRGen4 *conn)
 {
+    /* The library holds no resources, so there is nothing to release. This
+     * function is kept so that callers pair every open with a close and so
+     * that resource management can be added later without an API change. */
     memset(conn, 0, sizeof(RBRGen4));
     return RBRGEN4_SUCCESS;
 }

@@ -170,6 +170,9 @@ RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Callbacks *callbacks,
 
 RBRGen3Error RBRGen3_close(RBRGen3 *conn)
 {
+    /* The library holds no resources, so there is nothing to release. This
+     * function is kept so that callers pair every open with a close and so
+     * that resource management can be added later without an API change. */
     memset(conn, 0, sizeof(RBRGen3));
     return RBRGEN3_SUCCESS;
 }
