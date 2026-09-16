@@ -12,36 +12,25 @@
 #include <math.h>
 #include "tests.h"
 
-typedef struct ClockTest
-{
+typedef struct ClockTest {
     const char *command;
     const char *response;
     RBRGen3Clock expected;
 } ClockTest;
 
-static bool test_clock(RBRGen3 *conn,
-                       TestIOBuffers *buffers,
-                       ClockTest *tests)
+static bool test_clock(RBRGen3 *conn, TestIOBuffers *buffers, ClockTest *tests)
 {
     RBRGen3Clock actual;
 
-    for (int i = 0; tests[i].command != NULL; ++i)
-    {
+    for (int i = 0; tests[i].command != NULL; ++i) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         RBRGen3Error err = RBRGen3_getClock(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-        TEST_ASSERT_EQ(tests[i].expected.dateTime,
-                       actual.dateTime,
-                       "%" PRIi64);
-        if (isnan(tests[i].expected.offsetFromUtc))
-        {
+        TEST_ASSERT_EQ(tests[i].expected.dateTime, actual.dateTime, "%" PRIi64);
+        if (isnan(tests[i].expected.offsetFromUtc)) {
             TEST_ASSERT(isnan(actual.offsetFromUtc));
-        }
-        else
-        {
-            TEST_ASSERT_FLOAT_EQ(tests[i].expected.offsetFromUtc,
-                                 actual.offsetFromUtc,
-                                 0.0f);
+        } else {
+            TEST_ASSERT_FLOAT_EQ(tests[i].expected.offsetFromUtc, actual.offsetFromUtc, 0.0f);
         }
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
     }
@@ -53,8 +42,7 @@ TEST_LOGGER2(now)
 {
     ClockTest tests[] = {
         {
-            "settings offsetfromutc" COMMAND_TERMINATOR
-            "now" COMMAND_TERMINATOR,
+            "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
             "settings offsetfromutc = unknown" RESPONSE_TERMINATOR
             "now = 20180920214914" RESPONSE_TERMINATOR,
             {
@@ -63,8 +51,7 @@ TEST_LOGGER2(now)
             },
         },
         {
-            "settings offsetfromutc" COMMAND_TERMINATOR
-            "now" COMMAND_TERMINATOR,
+            "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
             "settings offsetfromutc = unknown" RESPONSE_TERMINATOR
             "now = 20000101000000" RESPONSE_TERMINATOR,
             {
@@ -73,8 +60,7 @@ TEST_LOGGER2(now)
             },
         },
         {
-            "settings offsetfromutc" COMMAND_TERMINATOR
-            "now" COMMAND_TERMINATOR,
+            "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
             "settings offsetfromutc = unknown" RESPONSE_TERMINATOR
             "now = 20991231235959" RESPONSE_TERMINATOR,
             {
@@ -83,8 +69,7 @@ TEST_LOGGER2(now)
             },
         },
         {
-            "settings offsetfromutc" COMMAND_TERMINATOR
-            "now" COMMAND_TERMINATOR,
+            "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
             "settings offsetfromutc = +7.50" RESPONSE_TERMINATOR
             "now = 20180920214914" RESPONSE_TERMINATOR,
             {
@@ -93,8 +78,7 @@ TEST_LOGGER2(now)
             },
         },
         {
-            "settings offsetfromutc" COMMAND_TERMINATOR
-            "now" COMMAND_TERMINATOR,
+            "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
             "settings offsetfromutc = -4.00" RESPONSE_TERMINATOR
             "now = 20180920214914" RESPONSE_TERMINATOR,
             {
@@ -115,15 +99,13 @@ TEST_LOGGER2(now_set)
         .offsetFromUtc = 0,
     };
 
-    const char *expectedCommand = "now = 20190215210558" COMMAND_TERMINATOR
-                          "permit = settings" COMMAND_TERMINATOR
-                          "settings offsetfromutc = 0.000000"
-                          COMMAND_TERMINATOR;
+    const char *expectedCommand =
+        "now = 20190215210558" COMMAND_TERMINATOR "permit = settings" COMMAND_TERMINATOR
+        "settings offsetfromutc = 0.000000" COMMAND_TERMINATOR;
 
-    const char *response = "now = 20190215210558" RESPONSE_TERMINATOR
-                          "permit = settings" RESPONSE_TERMINATOR
-                          "settings offsetfromutc = 0.000000"
-                          RESPONSE_TERMINATOR;
+    const char *response =
+        "now = 20190215210558" RESPONSE_TERMINATOR "permit = settings" RESPONSE_TERMINATOR
+        "settings offsetfromutc = 0.000000" RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
     RBRGen3Error err = RBRGen3_setClock(conn, &now);
@@ -195,7 +177,7 @@ TEST_LOGGER3(clock_set)
     };
 
     const char *text = "clock datetime = 20190215210558, "
-                          "offsetfromutc = 0.000000";
+                       "offsetfromutc = 0.000000";
     char expectedCommand[COMMAND_RESPONSE_SIZE];
     char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
@@ -208,53 +190,36 @@ TEST_LOGGER3(clock_set)
     return true;
 }
 
-typedef struct SamplingTest
-{
+typedef struct SamplingTest {
     const char *command;
     const char *response;
     RBRGen3Sampling expected;
 } SamplingTest;
 
-static bool test_sampling(RBRGen3 *conn,
-                          TestIOBuffers *buffers,
-                          SamplingTest *tests)
+static bool test_sampling(RBRGen3 *conn, TestIOBuffers *buffers, SamplingTest *tests)
 {
     RBRGen3Sampling actual;
 
-    for (int i = 0; tests[i].command != NULL; ++i)
-    {
+    for (int i = 0; tests[i].command != NULL; ++i) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        RBRGen3Error err = RBRGen3_getSampling(conn,
-                                                           &actual);
+        RBRGen3Error err = RBRGen3_getSampling(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected.mode,
-                            actual.mode,
-                            RBRGen3SamplingMode);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.mode, actual.mode, RBRGen3SamplingMode);
         TEST_ASSERT_EQ(tests[i].expected.period, actual.period, "%" PRIi32);
 
         for (int period = 0;
-             period < RBRGEN3_AVAILABLE_FAST_PERIODS_MAX
-             && (period == 0
-                 || tests[i].expected.availableFastPeriods[period - 1] != 0);
-             ++period)
-        {
+             period < RBRGEN3_AVAILABLE_FAST_PERIODS_MAX &&
+             (period == 0 || tests[i].expected.availableFastPeriods[period - 1] != 0);
+             ++period) {
             TEST_ASSERT_EQ(tests[i].expected.availableFastPeriods[period],
                            actual.availableFastPeriods[period],
                            "%" PRIi32);
         }
 
-        TEST_ASSERT_EQ(tests[i].expected.userPeriodLimit,
-                       actual.userPeriodLimit,
-                       "%" PRIi32);
-        TEST_ASSERT_EQ(tests[i].expected.burstLength,
-                       actual.burstLength,
-                       "%" PRIi32);
-        TEST_ASSERT_EQ(tests[i].expected.burstInterval,
-                       actual.burstInterval,
-                       "%" PRIi32);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected.gate,
-                            actual.gate,
-                            RBRGen3Gate);
+        TEST_ASSERT_EQ(tests[i].expected.userPeriodLimit, actual.userPeriodLimit, "%" PRIi32);
+        TEST_ASSERT_EQ(tests[i].expected.burstLength, actual.burstLength, "%" PRIi32);
+        TEST_ASSERT_EQ(tests[i].expected.burstInterval, actual.burstInterval, "%" PRIi32);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.gate, actual.gate, RBRGen3Gate);
 
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
     }
@@ -323,8 +288,7 @@ TEST_LOGGER3(sampling)
             "sampling all" COMMAND_TERMINATOR,
             "sampling mode = continuous, period = 1000, burstlength = 10, "
             "burstinterval = 10000, gate = thresholding, "
-            "userperiodlimit = 1000, availablefastperiods = none"
-            RESPONSE_TERMINATOR,
+            "userperiodlimit = 1000, availablefastperiods = none" RESPONSE_TERMINATOR,
             {
                 .mode = RBRGEN3_SAMPLING_CONTINUOUS,
                 .period = 1000,
@@ -341,8 +305,7 @@ TEST_LOGGER3(sampling)
     return test_sampling(conn, buffers, tests);
 }
 
-typedef struct SamplingSetTest
-{
+typedef struct SamplingSetTest {
     RBRGen3Sampling sampling;
     const char *response;
     const char *burstResponse;
@@ -416,15 +379,20 @@ TEST_LOGGER3(sampling_set)
             /* Failure because the burst interval is inconsistent. */
             RBRGEN3_INVALID_PARAMETER_VALUE,
         },
-        {{0}, 0, 0, 0, 0,},
+        {
+            {0},
+            0,
+            0,
+            0,
+            0,
+        },
     };
 
     RBRGen3Error err;
 
     char expectedCommand[COMMAND_RESPONSE_SIZE];
     char response[COMMAND_RESPONSE_SIZE];
-    for (int i = 0; tests[i].response != NULL; i++)
-    {
+    for (int i = 0; tests[i].response != NULL; i++) {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
         err = RBRGen3_setSampling(conn, &tests[i].sampling);
@@ -434,43 +402,30 @@ TEST_LOGGER3(sampling_set)
         rbr_prepareCommandResponse(tests[i].burstResponse, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
         err = RBRGen3_setBurstSampling(conn, &tests[i].sampling);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedBurstError,
-                            err,
-                            RBRGen3Error);
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedBurstError, err, RBRGen3Error);
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     }
 
     return true;
 }
 
-typedef struct DeploymentTest
-{
+typedef struct DeploymentTest {
     const char *command;
     const char *response;
     RBRGen3Deployment expected;
 } DeploymentTest;
 
-static bool test_deployment(RBRGen3 *conn,
-                            TestIOBuffers *buffers,
-                            DeploymentTest *tests)
+static bool test_deployment(RBRGen3 *conn, TestIOBuffers *buffers, DeploymentTest *tests)
 {
     RBRGen3Deployment actual;
 
-    for (int i = 0; tests[i].command != NULL; ++i)
-    {
+    for (int i = 0; tests[i].command != NULL; ++i) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        RBRGen3Error err = RBRGen3_getDeployment(conn,
-                                                             &actual);
+        RBRGen3Error err = RBRGen3_getDeployment(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-        TEST_ASSERT_EQ(tests[i].expected.startTime,
-                       actual.startTime,
-                       "%" PRIi64);
-        TEST_ASSERT_EQ(tests[i].expected.endTime,
-                       actual.endTime,
-                       "%" PRIi64);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected.status,
-                            actual.status,
-                            RBRGen3DeploymentStatus);
+        TEST_ASSERT_EQ(tests[i].expected.startTime, actual.startTime, "%" PRIi64);
+        TEST_ASSERT_EQ(tests[i].expected.endTime, actual.endTime, "%" PRIi64);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.status, actual.status, RBRGen3DeploymentStatus);
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
     }
 
@@ -481,9 +436,7 @@ TEST_LOGGER2(deployment)
 {
     DeploymentTest tests[] = {
         {
-            "starttime" COMMAND_TERMINATOR
-            "endtime" COMMAND_TERMINATOR
-            "status" COMMAND_TERMINATOR,
+            "starttime" COMMAND_TERMINATOR "endtime" COMMAND_TERMINATOR "status" COMMAND_TERMINATOR,
             "starttime = 20000101000000" RESPONSE_TERMINATOR
             "endtime = 2099123123595959" RESPONSE_TERMINATOR
             "status = disabled" RESPONSE_TERMINATOR,
@@ -518,8 +471,7 @@ TEST_LOGGER3(deployment)
     return test_deployment(conn, buffers, tests);
 }
 
-typedef struct DeploymentSetTest
-{
+typedef struct DeploymentSetTest {
     RBRGen3Deployment deployment;
     const char *response;
     RBRGen3Error expectedError;
@@ -578,19 +530,22 @@ TEST_LOGGER3(deployment_set)
             /* Failure because the end time is after the limit. */
             RBRGEN3_INVALID_PARAMETER_VALUE,
         },
-        {{0}, 0, 0,},
+        {
+            {0},
+            0,
+            0,
+        },
     };
 
     RBRGen3Error err;
 
     char expectedCommand[COMMAND_RESPONSE_SIZE];
     char response[COMMAND_RESPONSE_SIZE];
-    for (int i = 0; tests[i].response != NULL; i++)
-    {
+    for (int i = 0; tests[i].response != NULL; i++) {
         rbr_prepareCommandResponse(tests[i].response, expectedCommand, response);
         TestIOBuffers_init(buffers, response, 0);
         err = RBRGen3_setDeployment(conn, &tests[i].deployment);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);  
+        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
     }
 

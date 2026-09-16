@@ -24,8 +24,7 @@ TEST_LOGGER3(meminfo)
 
     TestIOBuffers_init(buffers,
                        "meminfo dataset = 1, used = 1528, "
-                       "remaining = 134216192, size = 134217728"
-                       RESPONSE_TERMINATOR,
+                       "remaining = 134216192, size = 134217728" RESPONSE_TERMINATOR,
                        0);
     RBRGen3Error err = RBRGen3_getMemoryInfo(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -33,8 +32,7 @@ TEST_LOGGER3(meminfo)
     TEST_ASSERT_EQ(expected.used, actual.used, "%" PRIi32);
     TEST_ASSERT_EQ(expected.remaining, actual.remaining, "%" PRIi32);
     TEST_ASSERT_EQ(expected.size, actual.size, "%" PRIi32);
-    TEST_ASSERT_STR_EQ("meminfo dataset = 1" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("meminfo dataset = 1" COMMAND_TERMINATOR, buffers->writeBuffer);
 
     return true;
 }
@@ -47,9 +45,7 @@ TEST_LOGGER3(meminfo_invalid_dataset)
 
     TestIOBuffers_init(buffers, "", 0);
     RBRGen3Error err = RBRGen3_getMemoryInfo(conn, &test);
-    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE,
-                        err,
-                        RBRGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
 
     return true;
 }
@@ -59,32 +55,26 @@ TEST_LOGGER2(read)
     uint8_t buf[1400];
     RBRGen3Data expected = {
         .dataset = RBRGEN3_DATASET_STANDARD,
-        .size    = 8,
-        .offset  = 2800,
-        .data    = buf,
+        .size = 8,
+        .offset = 2800,
+        .data = buf,
     };
     RBRGen3Data actual = {
         .dataset = RBRGEN3_DATASET_STANDARD,
-        .size    = 1400,
-        .offset  = 2800,
-        .data    = buf,
+        .size = 1400,
+        .offset = 2800,
+        .data = buf,
     };
 
-    TestIOBuffers_init(buffers,
-                       "data 1 8 2800"
-                       RESPONSE_TERMINATOR
-                       "AAAAAAAA\045\224"
-                       RESPONSE_TERMINATOR,
-                       0);
+    TestIOBuffers_init(
+        buffers, "data 1 8 2800" RESPONSE_TERMINATOR "AAAAAAAA\045\224" RESPONSE_TERMINATOR, 0);
     RBRGen3Error err = RBRGen3_readData(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(expected.dataset, actual.dataset, "%" PRIi32);
     TEST_ASSERT_EQ(expected.size, actual.size, "%" PRIi32);
     TEST_ASSERT_EQ(expected.offset, actual.offset, "%" PRIi32);
     TEST_ASSERT_EQ(expected.data, actual.data, "%p");
-    TEST_ASSERT_STR_EQ("read data 1 1400 2800"
-                       COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("read data 1 1400 2800" COMMAND_TERMINATOR, buffers->writeBuffer);
 
     return true;
 }
@@ -94,22 +84,15 @@ TEST_LOGGER2(read_offset_mismatch)
     uint8_t buf[1400];
     RBRGen3Data actual = {
         .dataset = RBRGEN3_DATASET_STANDARD,
-        .size    = 1400,
-        .offset  = 2800,
-        .data    = buf,
+        .size = 1400,
+        .offset = 2800,
+        .data = buf,
     };
 
-
-    TestIOBuffers_init(buffers,
-                       "data 1 8 1000"
-                       RESPONSE_TERMINATOR
-                       "AAAAAAAA\045\224"
-                       RESPONSE_TERMINATOR,
-                       0);
+    TestIOBuffers_init(
+        buffers, "data 1 8 1000" RESPONSE_TERMINATOR "AAAAAAAA\045\224" RESPONSE_TERMINATOR, 0);
     RBRGen3Error err = RBRGen3_readData(conn, &actual);
-    TEST_ASSERT_STR_EQ("read data 1 1400 2800"
-                       COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("read data 1 1400 2800" COMMAND_TERMINATOR, buffers->writeBuffer);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_COMMUNICATION_ERROR, err, RBRGen3Error);
     return true;
 }
@@ -119,22 +102,20 @@ TEST_LOGGER3(readdata)
     uint8_t buf[1400];
     RBRGen3Data expected = {
         .dataset = RBRGEN3_DATASET_STANDARD,
-        .size    = 8,
-        .offset  = 2800,
-        .data    = buf,
+        .size = 8,
+        .offset = 2800,
+        .data = buf,
     };
     RBRGen3Data actual = {
         .dataset = RBRGEN3_DATASET_STANDARD,
-        .size    = 1400,
-        .offset  = 2800,
-        .data    = buf,
+        .size = 1400,
+        .offset = 2800,
+        .data = buf,
     };
 
     TestIOBuffers_init(buffers,
-                       "readdata dataset = 1, size = 8, offset = 2800"
-                       RESPONSE_TERMINATOR
-                       "AAAAAAAA\045\224"
-                       RESPONSE_TERMINATOR,
+                       "readdata dataset = 1, size = 8, offset = 2800" RESPONSE_TERMINATOR
+                       "AAAAAAAA\045\224" RESPONSE_TERMINATOR,
                        0);
     RBRGen3Error err = RBRGen3_readData(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -142,8 +123,7 @@ TEST_LOGGER3(readdata)
     TEST_ASSERT_EQ(expected.size, actual.size, "%" PRIi32);
     TEST_ASSERT_EQ(expected.offset, actual.offset, "%" PRIi32);
     TEST_ASSERT_EQ(expected.data, actual.data, "%p");
-    TEST_ASSERT_STR_EQ("readdata dataset = 1, size = 1400, offset = 2800"
-                       COMMAND_TERMINATOR,
+    TEST_ASSERT_STR_EQ("readdata dataset = 1, size = 1400, offset = 2800" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
 
     return true;
@@ -154,20 +134,17 @@ TEST_LOGGER3(readdata_offset_mismatch)
     uint8_t buf[1400];
     RBRGen3Data actual = {
         .dataset = RBRGEN3_DATASET_STANDARD,
-        .size    = 1400,
-        .offset  = 2800,
-        .data    = buf,
+        .size = 1400,
+        .offset = 2800,
+        .data = buf,
     };
 
     TestIOBuffers_init(buffers,
-                       "readdata dataset = 1, size = 8, offset = 1000"
-                       RESPONSE_TERMINATOR
-                       "AAAAAAAA\045\024"
-                       RESPONSE_TERMINATOR,
+                       "readdata dataset = 1, size = 8, offset = 1000" RESPONSE_TERMINATOR
+                       "AAAAAAAA\045\024" RESPONSE_TERMINATOR,
                        0);
     RBRGen3Error err = RBRGen3_readData(conn, &actual);
-    TEST_ASSERT_STR_EQ("readdata dataset = 1, size = 1400, offset = 2800"
-                       COMMAND_TERMINATOR,
+    TEST_ASSERT_STR_EQ("readdata dataset = 1, size = 1400, offset = 2800" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_COMMUNICATION_ERROR, err, RBRGen3Error);
     return true;
@@ -177,16 +154,14 @@ TEST_LOGGER3(readdata_invalid_dataset)
 {
     RBRGen3Data test = {
         .dataset = RBRGEN3_UNKNOWN_DATASET,
-        .size    = 0,
-        .offset  = 0,
-        .data    = NULL,
+        .size = 0,
+        .offset = 0,
+        .data = NULL,
     };
 
     TestIOBuffers_init(buffers, "", 0);
     RBRGen3Error err = RBRGen3_readData(conn, &test);
-    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE,
-                        err,
-                        RBRGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
 
     return true;
 }
@@ -196,22 +171,20 @@ TEST_LOGGER3(readdata_crc_failure)
     uint8_t buf[1400];
     RBRGen3Data expected = {
         .dataset = RBRGEN3_DATASET_STANDARD,
-        .size    = 0,
-        .offset  = 2800,
-        .data    = buf,
+        .size = 0,
+        .offset = 2800,
+        .data = buf,
     };
     RBRGen3Data actual = {
         .dataset = RBRGEN3_DATASET_STANDARD,
-        .size    = 1400,
-        .offset  = 2800,
-        .data    = buf,
+        .size = 1400,
+        .offset = 2800,
+        .data = buf,
     };
 
     TestIOBuffers_init(buffers,
-                       "readdata dataset = 1, size = 8, offset = 2800"
-                       RESPONSE_TERMINATOR
-                       "AAAAAAAA00"
-                       RESPONSE_TERMINATOR,
+                       "readdata dataset = 1, size = 8, offset = 2800" RESPONSE_TERMINATOR
+                       "AAAAAAAA00" RESPONSE_TERMINATOR,
                        0);
     RBRGen3Error err = RBRGen3_readData(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_CHECKSUM_ERROR, err, RBRGen3Error);
@@ -219,8 +192,7 @@ TEST_LOGGER3(readdata_crc_failure)
     TEST_ASSERT_EQ(expected.size, actual.size, "%" PRIi32);
     TEST_ASSERT_EQ(expected.offset, actual.offset, "%" PRIi32);
     TEST_ASSERT_EQ(expected.data, actual.data, "%p");
-    TEST_ASSERT_STR_EQ("readdata dataset = 1, size = 1400, offset = 2800"
-                       COMMAND_TERMINATOR,
+    TEST_ASSERT_STR_EQ("readdata dataset = 1, size = 1400, offset = 2800" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
 
     return true;
@@ -228,42 +200,29 @@ TEST_LOGGER3(readdata_crc_failure)
 
 TEST_LOGGER2(memformat_support)
 {
-    RBRGen3MemoryFormat expected = RBRGEN3_MEMFORMAT_RAWBIN00
-                                         | RBRGEN3_MEMFORMAT_CALBIN00;
+    RBRGen3MemoryFormat expected = RBRGEN3_MEMFORMAT_RAWBIN00 | RBRGEN3_MEMFORMAT_CALBIN00;
     RBRGen3MemoryFormat actual = RBRGEN3_MEMFORMAT_NONE;
 
-    TestIOBuffers_init(buffers,
-                       "memformat support = rawbin00, calbin00"
-                       RESPONSE_TERMINATOR,
-                       0);
-    RBRGen3Error err = RBRGen3_getAvailableMemoryFormats(
-        conn,
-        &actual);
+    TestIOBuffers_init(buffers, "memformat support = rawbin00, calbin00" RESPONSE_TERMINATOR, 0);
+    RBRGen3Error err = RBRGen3_getAvailableMemoryFormats(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(expected, actual, "0x%04X");
-    TEST_ASSERT_STR_EQ("memformat support" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("memformat support" COMMAND_TERMINATOR, buffers->writeBuffer);
 
     return true;
 }
 
 TEST_LOGGER3(memformat_availabletypes)
 {
-    RBRGen3MemoryFormat expected = RBRGEN3_MEMFORMAT_RAWBIN00
-                                         | RBRGEN3_MEMFORMAT_CALBIN00;
+    RBRGen3MemoryFormat expected = RBRGEN3_MEMFORMAT_RAWBIN00 | RBRGEN3_MEMFORMAT_CALBIN00;
     RBRGen3MemoryFormat actual = RBRGEN3_MEMFORMAT_NONE;
 
-    TestIOBuffers_init(buffers,
-                       "memformat availabletypes = rawbin00|calbin00"
-                       RESPONSE_TERMINATOR,
-                       0);
-    RBRGen3Error err = RBRGen3_getAvailableMemoryFormats(
-        conn,
-        &actual);
+    TestIOBuffers_init(
+        buffers, "memformat availabletypes = rawbin00|calbin00" RESPONSE_TERMINATOR, 0);
+    RBRGen3Error err = RBRGen3_getAvailableMemoryFormats(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_EQ(expected, actual, "0x%04X");
-    TEST_ASSERT_STR_EQ("memformat availabletypes" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("memformat availabletypes" COMMAND_TERMINATOR, buffers->writeBuffer);
 
     return true;
 }
@@ -273,16 +232,11 @@ TEST_LOGGER3(memformat_type)
     RBRGen3MemoryFormat expected = RBRGEN3_MEMFORMAT_RAWBIN00;
     RBRGen3MemoryFormat actual = RBRGEN3_MEMFORMAT_NONE;
 
-    TestIOBuffers_init(buffers,
-                       "memformat type = rawbin00" RESPONSE_TERMINATOR,
-                       0);
-    RBRGen3Error err = RBRGen3_getCurrentMemoryFormat(
-        conn,
-        &actual);
+    TestIOBuffers_init(buffers, "memformat type = rawbin00" RESPONSE_TERMINATOR, 0);
+    RBRGen3Error err = RBRGen3_getCurrentMemoryFormat(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected, actual, RBRGen3MemoryFormat);
-    TEST_ASSERT_STR_EQ("memformat type" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("memformat type" COMMAND_TERMINATOR, buffers->writeBuffer);
 
     return true;
 }
@@ -292,16 +246,11 @@ TEST_LOGGER3(memformat_newtype)
     RBRGen3MemoryFormat expected = RBRGEN3_MEMFORMAT_CALBIN00;
     RBRGen3MemoryFormat actual = RBRGEN3_MEMFORMAT_NONE;
 
-    TestIOBuffers_init(buffers,
-                       "memformat newtype = calbin00" RESPONSE_TERMINATOR,
-                       0);
-    RBRGen3Error err = RBRGen3_getNewMemoryFormat(
-        conn,
-        &actual);
+    TestIOBuffers_init(buffers, "memformat newtype = calbin00" RESPONSE_TERMINATOR, 0);
+    RBRGen3Error err = RBRGen3_getNewMemoryFormat(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected, actual, RBRGen3MemoryFormat);
-    TEST_ASSERT_STR_EQ("memformat newtype" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("memformat newtype" COMMAND_TERMINATOR, buffers->writeBuffer);
 
     return true;
 }
@@ -314,9 +263,7 @@ TEST_LOGGER3(memformat_newtype_set)
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRGen3_setNewMemoryFormat(
-        conn,
-        RBRGEN3_MEMFORMAT_CALBIN00);
+    RBRGen3Error err = RBRGen3_setNewMemoryFormat(conn, RBRGEN3_MEMFORMAT_CALBIN00);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -327,32 +274,33 @@ TEST_LOGGER3(postprocessing)
 {
     RBRGen3Postprocessing expected = {
         .status = RBRGEN3_POSTPROCESSING_STATUS_IDLE,
-        .channels = {
-            .count = 5,
-            .channels = {
-                {
-                    .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "pressure_01",
-                },
-                {
-                    .function =
-                        RBRGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
-                    .label = "pressure_01",
-                },
-                {
-                    .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "temperature_01",
-                },
-                {
-                    .function = RBRGEN3_POSTPROCESSING_AGGREGATE_STD,
-                    .label = "temperature_01",
-                },
-                {
-                    .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "conductivity_01",
-                },
+        .channels =
+            {
+                .count = 5,
+                .channels =
+                    {
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
+                            .label = "pressure_01",
+                        },
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
+                            .label = "pressure_01",
+                        },
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
+                            .label = "temperature_01",
+                        },
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_STD,
+                            .label = "temperature_01",
+                        },
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
+                            .label = "conductivity_01",
+                        },
+                    },
             },
-        },
         .binReference = "pressure_01",
         .binFilter = RBRGEN3_POSTPROCESSING_BINFILTER_NONE,
         .binSize = 50.0,
@@ -368,35 +316,29 @@ TEST_LOGGER3(postprocessing)
     RBRGen3Postprocessing actual;
 
     const char *response = "postprocessing status = idle, channels = "
-                          "mean(pressure_01)|count(pressure_01)"
-                          "|mean(temperature_01)|std(temperature_01)"
-                          "|mean(conductivity_01), "
-                          "tstamp_min = 20000101000000, "
-                          "tstamp_max = 20991231235959, "
-                          "binsize = 50.0, binreference = pressure_01, "
-                          "depth_min = 10.0, depth_max = 1000.0, "
-                          "binfilter = none, "
-                          "dc_alpha = 0.08, dc_tau = 8.000, dc_tdelay = 0.35, dc_ctcoeff = 2.4e-4" RESPONSE_TERMINATOR;
+                           "mean(pressure_01)|count(pressure_01)"
+                           "|mean(temperature_01)|std(temperature_01)"
+                           "|mean(conductivity_01), "
+                           "tstamp_min = 20000101000000, "
+                           "tstamp_max = 20991231235959, "
+                           "binsize = 50.0, binreference = pressure_01, "
+                           "depth_min = 10.0, depth_max = 1000.0, "
+                           "binfilter = none, "
+                           "dc_alpha = 0.08, dc_tau = 8.000, dc_tdelay = 0.35, dc_ctcoeff = "
+                           "2.4e-4" RESPONSE_TERMINATOR;
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRGen3_getPostprocessing(conn,
-                                                             &actual);
+    RBRGen3Error err = RBRGen3_getPostprocessing(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-    TEST_ASSERT_ENUM_EQ(expected.status,
-                        actual.status,
-                        RBRGen3PostprocessingStatus);
+    TEST_ASSERT_ENUM_EQ(expected.status, actual.status, RBRGen3PostprocessingStatus);
     TEST_ASSERT_EQ(expected.channels.count, actual.channels.count, "%" PRIi32);
-    for (int i = 0; i < expected.channels.count; i++)
-    {
+    for (int i = 0; i < expected.channels.count; i++) {
         TEST_ASSERT_ENUM_EQ(expected.channels.channels[i].function,
                             actual.channels.channels[i].function,
                             RBRGen3PostprocessingAggregate);
-        TEST_ASSERT_STR_EQ(expected.channels.channels[i].label,
-                           actual.channels.channels[i].label);
+        TEST_ASSERT_STR_EQ(expected.channels.channels[i].label, actual.channels.channels[i].label);
     }
     TEST_ASSERT_STR_EQ(expected.binReference, actual.binReference);
-    TEST_ASSERT_ENUM_EQ(expected.binFilter,
-                        actual.binFilter,
-                        RBRGen3PostprocessingBinFilter);
+    TEST_ASSERT_ENUM_EQ(expected.binFilter, actual.binFilter, RBRGen3PostprocessingBinFilter);
     TEST_ASSERT_FLOAT_EQ(expected.binSize, actual.binSize, 0.0f);
     TEST_ASSERT_EQ(expected.tstampMin, actual.tstampMin, "%" PRIi64);
     TEST_ASSERT_EQ(expected.tstampMax, actual.tstampMax, "%" PRIi64);
@@ -406,8 +348,7 @@ TEST_LOGGER3(postprocessing)
     TEST_ASSERT_FLOAT_EQ(expected.dcTau, actual.dcTau, 0.0f);
     TEST_ASSERT_FLOAT_EQ(expected.dcTdelay, actual.dcTdelay, 0.0f);
     TEST_ASSERT_FLOAT_EQ(expected.dcCtCoeff, actual.dcCtCoeff, 0.0f);
-    TEST_ASSERT_STR_EQ("postprocessing all" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("postprocessing all" COMMAND_TERMINATOR, buffers->writeBuffer);
 
     return true;
 }
@@ -416,32 +357,33 @@ TEST_LOGGER3(postprocessing_set)
 {
     RBRGen3Postprocessing postprocessing = {
         .status = RBRGEN3_UNKNOWN_POSTPROCESSING_STATUS,
-        .channels = {
-            .count = 5,
-            .channels = {
-                {
-                    .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "pressure_01",
-                },
-                {
-                    .function =
-                        RBRGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
-                    .label = "pressure_01",
-                },
-                {
-                    .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "temperature_01",
-                },
-                {
-                    .function = RBRGEN3_POSTPROCESSING_AGGREGATE_STD,
-                    .label = "temperature_01",
-                },
-                {
-                    .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "conductivity_01",
-                },
+        .channels =
+            {
+                .count = 5,
+                .channels =
+                    {
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
+                            .label = "pressure_01",
+                        },
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
+                            .label = "pressure_01",
+                        },
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
+                            .label = "temperature_01",
+                        },
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_STD,
+                            .label = "temperature_01",
+                        },
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
+                            .label = "conductivity_01",
+                        },
+                    },
             },
-        },
         .binReference = "pressure_01",
         .binFilter = RBRGEN3_POSTPROCESSING_BINFILTER_NONE,
         .binSize = 50.0,
@@ -455,41 +397,30 @@ TEST_LOGGER3(postprocessing_set)
         .dcCtCoeff = 2.4e-4,
     };
 
-    const char *expectedCommand = "postprocessing binreference = pressure_01, "
-                          "binfilter = none, binsize = 50.0"
-                          COMMAND_TERMINATOR
-                          "postprocessing tstamp_min = 20000101000000"
-                          COMMAND_TERMINATOR
-                          "postprocessing tstamp_max = 20991231235959"
-                          COMMAND_TERMINATOR
-                          "postprocessing depth_min = 10.0, depth_max = 1000.0"
-                          COMMAND_TERMINATOR
-                          "postprocessing dc_alpha = 0.080, dc_tau = 8.000, dc_tdelay = 0.350, dc_ctcoeff = 2.4000e-04"
-                          COMMAND_TERMINATOR
-                          "postprocessing channels = mean(pressure_01)"
-                          "|count(pressure_01)|mean(temperature_01)"
-                          "|std(temperature_01)|mean(conductivity_01)"
-                          COMMAND_TERMINATOR;
+    const char *expectedCommand =
+        "postprocessing binreference = pressure_01, "
+        "binfilter = none, binsize = 50.0" COMMAND_TERMINATOR
+        "postprocessing tstamp_min = 20000101000000" COMMAND_TERMINATOR
+        "postprocessing tstamp_max = 20991231235959" COMMAND_TERMINATOR
+        "postprocessing depth_min = 10.0, depth_max = 1000.0" COMMAND_TERMINATOR
+        "postprocessing dc_alpha = 0.080, dc_tau = 8.000, dc_tdelay = 0.350, dc_ctcoeff = "
+        "2.4000e-04" COMMAND_TERMINATOR "postprocessing channels = mean(pressure_01)"
+        "|count(pressure_01)|mean(temperature_01)"
+        "|std(temperature_01)|mean(conductivity_01)" COMMAND_TERMINATOR;
 
-    const char *response = "postprocessing binreference = pressure_01, "
-                          "binfilter = none, binsize = 50.0"
-                          RESPONSE_TERMINATOR
-                          "postprocessing tstamp_min = 20000101000000"
-                          RESPONSE_TERMINATOR
-                          "postprocessing tstamp_max = 20991231235959"
-                          RESPONSE_TERMINATOR
-                          "postprocessing depth_min = 10.0, depth_max = 1000.0"
-                          RESPONSE_TERMINATOR
-                          "postprocessing dc_alpha = 0.080, dc_tau = 8.000, dc_tdelay = 0.350, dc_ctcoeff = 2.4000e-04"
-                          RESPONSE_TERMINATOR
-                          "postprocessing channels = mean(pressure_01)"
-                          "|count(pressure_01)|mean(temperature_01)"
-                          "|std(temperature_01)|mean(conductivity_01)"
-                          RESPONSE_TERMINATOR;
+    const char *response =
+        "postprocessing binreference = pressure_01, "
+        "binfilter = none, binsize = 50.0" RESPONSE_TERMINATOR
+        "postprocessing tstamp_min = 20000101000000" RESPONSE_TERMINATOR
+        "postprocessing tstamp_max = 20991231235959" RESPONSE_TERMINATOR
+        "postprocessing depth_min = 10.0, depth_max = 1000.0" RESPONSE_TERMINATOR
+        "postprocessing dc_alpha = 0.080, dc_tau = 8.000, dc_tdelay = 0.350, dc_ctcoeff = "
+        "2.4000e-04" RESPONSE_TERMINATOR "postprocessing channels = mean(pressure_01)"
+        "|count(pressure_01)|mean(temperature_01)"
+        "|std(temperature_01)|mean(conductivity_01)" RESPONSE_TERMINATOR;
 
     TestIOBuffers_init(buffers, response, 0);
-    RBRGen3Error err = RBRGen3_setPostprocessing(conn,
-                                                             &postprocessing);
+    RBRGen3Error err = RBRGen3_setPostprocessing(conn, &postprocessing);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
 
@@ -498,21 +429,16 @@ TEST_LOGGER3(postprocessing_set)
 
 TEST_LOGGER3(postprocessing_command)
 {
-    const char *response = "postprocessing status = processing"
-                          RESPONSE_TERMINATOR;
+    const char *response = "postprocessing status = processing" RESPONSE_TERMINATOR;
     TestIOBuffers_init(buffers, response, 0);
 
     RBRGen3PostprocessingStatus result;
-    RBRGen3Error err = RBRGen3_setPostprocessingCommand(
-        conn,
-        RBRGEN3_POSTPROCESSING_COMMAND_START,
-        &result);
+    RBRGen3Error err =
+        RBRGen3_setPostprocessingCommand(conn, RBRGEN3_POSTPROCESSING_COMMAND_START, &result);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-    TEST_ASSERT_ENUM_EQ(RBRGEN3_POSTPROCESSING_STATUS_PROCESSING,
-                        result,
-                        RBRGen3PostprocessingStatus);
-    TEST_ASSERT_STR_EQ("postprocessing command = start" COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
+    TEST_ASSERT_ENUM_EQ(
+        RBRGEN3_POSTPROCESSING_STATUS_PROCESSING, result, RBRGen3PostprocessingStatus);
+    TEST_ASSERT_STR_EQ("postprocessing command = start" COMMAND_TERMINATOR, buffers->writeBuffer);
 
     return true;
 }

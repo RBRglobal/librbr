@@ -10,35 +10,26 @@
 
 #include "tests.h"
 
-typedef struct StatusTest
-{
+typedef struct StatusTest {
     const char *response;
     RBRGen3Error expectedError;
     RBRGen3Response expectedResponse;
     RBRGen3DeploymentStatus expected;
 } StatusTest;
 
-static bool test_verify(RBRGen3 *conn,
-                        TestIOBuffers *buffers,
-                        StatusTest *tests)
+static bool test_verify(RBRGen3 *conn, TestIOBuffers *buffers, StatusTest *tests)
 {
     RBRGen3Error err;
     RBRGen3DeploymentStatus actual;
 
-    for (int i = 0; tests[i].response != NULL; i++)
-    {
+    for (int i = 0; tests[i].response != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_verify(conn, false, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
-                            conn->response.type,
-                            RBRGen3ResponseType);
-        TEST_ASSERT_EQ(tests[i].expectedResponse.error,
-                       conn->response.error,
-                       "%" PRIi32);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected,
-                            actual,
-                            RBRGen3DeploymentStatus);
+        TEST_ASSERT_ENUM_EQ(
+            tests[i].expectedResponse.type, conn->response.type, RBRGen3ResponseType);
+        TEST_ASSERT_EQ(tests[i].expectedResponse.error, conn->response.error, "%" PRIi32);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, RBRGen3DeploymentStatus);
     }
 
     return true;
@@ -66,8 +57,7 @@ TEST_LOGGER2(verify)
             RBRGEN3_STATUS_LOGGING,
         },
         {
-            "E0402 memory not empty, erase first, verify = stopped"
-            RESPONSE_TERMINATOR,
+            "E0402 memory not empty, erase first, verify = stopped" RESPONSE_TERMINATOR,
             RBRGEN3_HARDWARE_ERROR,
             {
                 .type = RBRGEN3_RESPONSE_ERROR,
@@ -76,8 +66,7 @@ TEST_LOGGER2(verify)
             RBRGEN3_UNKNOWN_STATUS,
         },
         {
-            "E0401 estimated memory usage exceeds capacity, verify = logging"
-            RESPONSE_TERMINATOR,
+            "E0401 estimated memory usage exceeds capacity, verify = logging" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_WARNING,
@@ -136,27 +125,19 @@ TEST_LOGGER3(verify)
     return test_verify(conn, buffers, tests);
 }
 
-static bool test_enable(RBRGen3 *conn,
-                        TestIOBuffers *buffers,
-                        StatusTest *tests)
+static bool test_enable(RBRGen3 *conn, TestIOBuffers *buffers, StatusTest *tests)
 {
     RBRGen3Error err;
     RBRGen3DeploymentStatus actual;
 
-    for (int i = 0; tests[i].response != NULL; i++)
-    {
+    for (int i = 0; tests[i].response != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_enable(conn, false, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
-                            conn->response.type,
-                            RBRGen3ResponseType);
-        TEST_ASSERT_EQ(tests[i].expectedResponse.error,
-                       conn->response.error,
-                       "%" PRIi32);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected,
-                            actual,
-                            RBRGen3DeploymentStatus);
+        TEST_ASSERT_ENUM_EQ(
+            tests[i].expectedResponse.type, conn->response.type, RBRGen3ResponseType);
+        TEST_ASSERT_EQ(tests[i].expectedResponse.error, conn->response.error, "%" PRIi32);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, RBRGen3DeploymentStatus);
     }
 
     return true;
@@ -184,8 +165,7 @@ TEST_LOGGER2(enable)
             RBRGEN3_STATUS_LOGGING,
         },
         {
-            "E0402 memory not empty, erase first"
-            RESPONSE_TERMINATOR,
+            "E0402 memory not empty, erase first" RESPONSE_TERMINATOR,
             RBRGEN3_HARDWARE_ERROR,
             {
                 .type = RBRGEN3_RESPONSE_ERROR,
@@ -194,8 +174,7 @@ TEST_LOGGER2(enable)
             RBRGEN3_UNKNOWN_STATUS,
         },
         {
-            "E0401 estimated memory usage exceeds capacity, enable = logging"
-            RESPONSE_TERMINATOR,
+            "E0401 estimated memory usage exceeds capacity, enable = logging" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_WARNING,
@@ -254,27 +233,19 @@ TEST_LOGGER3(enable)
     return test_enable(conn, buffers, tests);
 }
 
-static bool test_disable(RBRGen3 *conn,
-                         TestIOBuffers *buffers,
-                         StatusTest *tests)
+static bool test_disable(RBRGen3 *conn, TestIOBuffers *buffers, StatusTest *tests)
 {
     RBRGen3Error err;
     RBRGen3DeploymentStatus actual;
 
-    for (int i = 0; tests[i].response != NULL; i++)
-    {
+    for (int i = 0; tests[i].response != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_disable(conn, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
-                            conn->response.type,
-                            RBRGen3ResponseType);
-        TEST_ASSERT_EQ(tests[i].expectedResponse.error,
-                       conn->response.error,
-                       "%" PRIi32);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected,
-                            actual,
-                            RBRGen3DeploymentStatus);
+        TEST_ASSERT_ENUM_EQ(
+            tests[i].expectedResponse.type, conn->response.type, RBRGen3ResponseType);
+        TEST_ASSERT_EQ(tests[i].expectedResponse.error, conn->response.error, "%" PRIi32);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, RBRGen3DeploymentStatus);
     }
 
     return true;
@@ -361,8 +332,7 @@ TEST_LOGGER3(disable)
     return test_disable(conn, buffers, tests);
 }
 
-typedef struct SimulationTest
-{
+typedef struct SimulationTest {
     const char *response;
     RBRGen3Simulation expected;
 } SimulationTest;
@@ -390,8 +360,7 @@ TEST_LOGGER3(simulation)
     RBRGen3Error err;
     RBRGen3Simulation actual;
 
-    for (int i = 0; tests[i].response != NULL; i++)
-    {
+    for (int i = 0; tests[i].response != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_getSimulation(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -402,8 +371,7 @@ TEST_LOGGER3(simulation)
     return true;
 }
 
-typedef struct SimulationSetTest
-{
+typedef struct SimulationSetTest {
     RBRGen3Simulation simulation;
     const char *command;
     const char *response;
@@ -443,8 +411,7 @@ TEST_LOGGER3(simulation_set)
             "permit command = simulation" COMMAND_TERMINATOR
             "simulation state = on, period = 123" COMMAND_TERMINATOR,
             "permit command = simulation" RESPONSE_TERMINATOR
-            "E0108 invalid argument to command: '123'"
-            RESPONSE_TERMINATOR,
+            "E0108 invalid argument to command: '123'" RESPONSE_TERMINATOR,
             RBRGEN3_HARDWARE_ERROR,
         },
         {
@@ -456,13 +423,17 @@ TEST_LOGGER3(simulation_set)
             "",
             RBRGEN3_INVALID_PARAMETER_VALUE,
         },
-        {{0}, 0, 0, 0,},
+        {
+            {0},
+            0,
+            0,
+            0,
+        },
     };
 
     RBRGen3Error err;
 
-    for (int i = 0; tests[i].command != NULL; i++)
-    {
+    for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_setSimulation(conn, &tests[i].simulation);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
