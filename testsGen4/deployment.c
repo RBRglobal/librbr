@@ -8,11 +8,11 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#include "tests.h"
-#include "RBRGen4Deployment.h"
-
 /* Required for isnan, NAN. */
 #include <math.h>
+
+#include "tests.h"
+#include "RBRGen4Deployment.h"
 
 typedef struct GetClockTest
 {

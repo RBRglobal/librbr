@@ -11,8 +11,8 @@
 /* Required for memset. */
 #include <string.h>
 
-#include "RBRGen4Realtime.h"
 #include "tests.h"
+#include "RBRGen4Realtime.h"
 
 typedef struct PollTest
 {

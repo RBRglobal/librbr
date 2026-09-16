@@ -9,9 +9,8 @@
  */
 
 #include <math.h>
-#include "RBRGen4.h"
-#include "RBRGen4Configuration.h"
 #include "tests.h"
+#include "RBRGen4Configuration.h"
 
 static bool test_node(RBRGen4Node *expected,
                       RBRGen4Node *actual)

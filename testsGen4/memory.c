@@ -8,11 +8,11 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-#include "tests.h"
-#include "RBRGen4Memory.h"
-
 /* Required for PRId64. */
 #include <inttypes.h>
+
+#include "tests.h"
+#include "RBRGen4Memory.h"
 
 typedef struct GetStorageTest
 {
