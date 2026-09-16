@@ -1,7 +1,7 @@
 # How to use the Gen4 posix examples
 
 ## Setup
-* Hardware: an RBR Generation 4 instrument (L3.5, SL4, SEN4, or L4) with a
+* Hardware: an RBR Generation 4 instrument (SL4, SEN4, or L4) with a
   serial or USB connection
 * Runtime environment: Linux, macOS, or cygwin
 
@@ -41,19 +41,18 @@ directory.
 ## Usage for each example:
 File name     |  command to use it | things to know
 ------------- | ------------- | -------------
-posix-communications.c | ./posix-communications /dev/ttyUSB0 | opens a connection and exercises the sleep and link commands
-posix-download-datablock-bySchedule.c | ./posix-download-datablock-bySchedule /dev/ttyUSB0 | downloads stored data one schedule at a time
+posix-communications.c | ./posix-communications /dev/ttyUSB0 | reports how the instrument is connected and powered, then puts it to sleep; writes nothing
+posix-download-datablock-bySchedule.c | ./posix-download-datablock-bySchedule /dev/ttyUSB0 | downloads one schedule's data from the dataset recorded by posix-singleScheduleSingleConfig; writes nothing
 posix-footprint.c | ./posix-footprint | prints the memory footprint of the library structures; no instrument needed
-posix-generation.c | ./posix-generation /dev/ttyUSB0 | reports the instrument generation detected from its firmware type
-posix-poll.c | ./posix-poll /dev/ttyUSB0 | polls on-demand samples
-posix-profilingFloat.c | ./posix-profilingFloat /dev/ttyUSB0 | enables a regimes-mode (profiling float) deployment
-posix-singleScheduleSingleConfig.c | ./posix-singleScheduleSingleConfig /dev/ttyUSB0 | enables a deployment with a single schedule and configuration
-posix-stream.c | ./posix-stream /dev/ttyUSB0 | receives streamed samples
+posix-generation.c | ./posix-generation /dev/ttyUSB0 | reports the instrument generation
+posix-multiScheduleDiffConfig.c | ./posix-multiScheduleDiffConfig /dev/ttyUSB0 | **clears the instrument configuration**, defines ascent and park configurations, and enables the ascent one
+posix-poll.c | ./posix-poll /dev/ttyUSB0 | polls on-demand samples; writes nothing
+posix-singleScheduleSingleConfig.c | ./posix-singleScheduleSingleConfig /dev/ttyUSB0 | **clears the instrument configuration** and enables a deployment with a single schedule and configuration
+posix-stream.c | ./posix-stream /dev/ttyUSB0 | **clears the instrument configuration**, enables a streaming deployment, prints samples until Ctrl-C, then disables
 posix-test.c | ./posix-test | runs against simulated I/O buffers; no instrument needed
 
-Two more examples, posix-multiScheduleDiffConfig.c and posix-parse-file.c,
-do not currently build; re-enabling them is part of the example alignment
-planned for libRBR 2.0 (SYS-1194). See the Makefile for details.
+Two more examples, posix-parse-file.c and posix-profilingFloat.c, do not
+currently build. See the Makefile for details.
 
 ## Contributing
 
