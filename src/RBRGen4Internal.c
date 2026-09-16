@@ -492,7 +492,7 @@ static RBRGen4Error RBRGen4Sample_parse(
     /* The timestamp is either a date/time or a bare millisecond count. */
     if (outputFormat->dateTime)
     {
-        char* timestamp_end;
+        char *timestamp_end;
         RBR_TRY(RBRGen4DateTime_parseSampleTime(token,
                                                           &sample->timestamp,
                                                           &timestamp_end));
