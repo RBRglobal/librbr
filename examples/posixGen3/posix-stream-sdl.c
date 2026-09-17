@@ -199,7 +199,7 @@ int main(int argc, char *argv[])
         .read = instrumentRead,
         .write = instrumentWrite,
         .sample = instrumentSample,
-        .sampleBuffer = &callbackSample
+        .sampleBuffer = &callbackSample,
     };
 
     if ((err = RBRGen3_open(

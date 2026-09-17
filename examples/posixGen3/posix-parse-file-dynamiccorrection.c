@@ -161,14 +161,14 @@ int main(int argc, char *argv[])
     RBRGen3Sample sampleBuffer;
     RBRGen3ParserCallbacks parserCallbacks = {
         .sample = parserSample,
-        .sampleBuffer = &sampleBuffer
+        .sampleBuffer = &sampleBuffer,
     };
 
     RBRGen3ParserConfig parserConfig = {
         .format = RBRGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
-                .channels = channels
+                .channels = channels,
             }
         }
     };

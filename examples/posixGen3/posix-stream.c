@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
         .read = instrumentRead,
         .write = instrumentWrite,
         .sample = instrumentSample,
-        .sampleBuffer = &sampleBuffer
+        .sampleBuffer = &sampleBuffer,
     };
 
     if ((err = RBRGen3_open(

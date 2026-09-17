@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
-        .write = instrumentWrite
+        .write = instrumentWrite,
     };
 
     if ((err = RBRGen3_open(
@@ -135,14 +135,14 @@ int main(int argc, char *argv[])
     RBRGen3Sample sampleBuffer;
     RBRGen3ParserCallbacks parserCallbacks = {
         .sample = parserSample,
-        .sampleBuffer = &sampleBuffer
+        .sampleBuffer = &sampleBuffer,
     };
 
     RBRGen3ParserConfig parserConfig = {
         .format = RBRGEN3_MEMFORMAT_CALBIN00,
         .formatConfig = {
             .easyParse = {
-                .channels = channels.on
+                .channels = channels.on,
             }
         }
     };
@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
          * requests. We'll wait just a little bit between download attempts. */
         struct timespec sleep = {
             .tv_sec  = 0,
-            .tv_nsec = 32000000LL
+            .tv_nsec = 32000000LL,
         };
         nanosleep(&sleep, NULL);
     }

@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
-        .write = instrumentWrite
+        .write = instrumentWrite,
     };
 
     if ((err = RBRGen3_open(
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
                 },
                 {
                     .function = RBRGEN3_POSTPROCESSING_AGGREGATE_STD,
-                    .label = "temperature_00"
+                    .label = "temperature_00",
                 }
             }
         },
@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
         .dcAlpha = 0.08,
         .dcTau = 8.0,
         .dcTdelay = 0.35,
-        .dcCtCoeff = 2.4e-4
+        .dcCtCoeff = 2.4e-4,
     };
 
     if ((err = RBRGen3_setPostprocessing(
