@@ -98,7 +98,7 @@ RBRGen4Error instrumentSleep(const struct RBRGen4 *conn,
 
     struct timespec sleep = {
         .tv_sec = time / 1000,
-        .tv_nsec = (time % 1000) * 1000000
+        .tv_nsec = (time % 1000) * 1000000,
     };
     nanosleep(&sleep, NULL);
     return RBRGEN4_SUCCESS;
@@ -157,7 +157,7 @@ RBRGen4Error instrumentWrite(const struct RBRGen4 *conn,
          * have the same timeout, so we'll reset it before each use. */
         writeTimeout = (struct timeval){
             .tv_sec = INSTRUMENT_CHARACTER_TIMEOUT_MSEC / 1000,
-            .tv_usec = (INSTRUMENT_CHARACTER_TIMEOUT_MSEC % 1000) * 1000000
+            .tv_usec = (INSTRUMENT_CHARACTER_TIMEOUT_MSEC % 1000) * 1000000,
         };
 
         /* We could just loop on write(), but we want to enforce a timeout, so

@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
-        .write = instrumentWrite
+        .write = instrumentWrite,
     };
 
     err = RBRGen4_open(&conn,
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
     RBRGen4Dataset datasetPoolBuf[DATASET_COUNT];
     RBRGen4DatasetPool datasetPool = {
         .size = DATASET_COUNT,
-        .pool = datasetPoolBuf
+        .pool = datasetPoolBuf,
     };
     int32_t datasetCount;
     err = RBRGen4_getDatasetPool(&conn, &datasetPool);
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
     RBRGen4Label scheduleListBuf[SCHEDULE_COUNT];
     RBRGen4LabelList scheduleList = {
         .size = SCHEDULE_COUNT,
-        .labels = scheduleListBuf
+        .labels = scheduleListBuf,
     };
     int32_t scheduleCount;
     err = RBRGen4_getDataset(&conn, dataset, &scheduleList);
@@ -267,7 +267,7 @@ int main(int argc, char *argv[])
         .unit = RBRGEN4_DOWNLOAD_DATA_UNIT_BYTES,
         .start = 0,
         .data = buf,
-        .dataSize = sizeof(buf)
+        .dataSize = sizeof(buf),
     };
 
     struct timespec start;

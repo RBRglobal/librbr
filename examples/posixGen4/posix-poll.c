@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
-        .write = instrumentWrite
+        .write = instrumentWrite,
     };
 
     err = RBRGen4_open(&conn,
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
     RBRGen4Channel channelPoolBuf[CHANNEL_COUNT];
     RBRGen4ChannelPool channelPool = {
         .size = CHANNEL_COUNT,
-        .pool = channelPoolBuf
+        .pool = channelPoolBuf,
     };
     int32_t channelCount;
     err = RBRGen4_getChannelPool(&conn, &channelPool);

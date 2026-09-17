@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
         .read = instrumentRead,
         .write = instrumentWrite,
         .sample = instrumentSample,
-        .sampleBuffer = &sampleBuffer
+        .sampleBuffer = &sampleBuffer,
     };
 
     err = RBRGen4_open(&conn,

@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
-        .write = instrumentWrite
+        .write = instrumentWrite,
     };
 
     err = RBRGen4_open(&conn,
