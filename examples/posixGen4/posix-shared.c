@@ -34,8 +34,7 @@
 int openSerialFd(char *devicePath)
 {
     int instrumentFd;
-    if ((instrumentFd = open(devicePath, O_RDWR | O_NOCTTY)) < 0)
-    {
+    if ((instrumentFd = open(devicePath, O_RDWR | O_NOCTTY)) < 0) {
         return -1;
     }
 
@@ -61,7 +60,7 @@ int openSerialFd(char *devicePath)
  * doing so would break a vast number of existing applications). And this
  * approach is more platform-generic than an ioctl. */
 #define B115200 115200
-#define B9600 9600
+#define B9600   9600
 #endif
 
     /* The instrument default. Change this if your instrument is configured
@@ -71,16 +70,14 @@ int openSerialFd(char *devicePath)
     /* Input baud rate of 0 causes the output baud rate to be used. */
     cfsetispeed(&portSettings, B0);
 
-    if (tcsetattr(instrumentFd, TCSANOW, &portSettings) < 0)
-    {
+    if (tcsetattr(instrumentFd, TCSANOW, &portSettings) < 0) {
         close(instrumentFd);
         return -1;
     }
     return instrumentFd;
 }
 
-RBRGen4Error instrumentTime(const struct RBRGen4 *conn,
-                                      RBRGen4DateTime *time)
+RBRGen4Error instrumentTime(const struct RBRGen4 *conn, RBRGen4DateTime *time)
 {
     /* Unused. */
     (void) conn;
@@ -90,8 +87,7 @@ RBRGen4Error instrumentTime(const struct RBRGen4 *conn,
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error instrumentSleep(const struct RBRGen4 *conn,
-                                       RBRGen4DateTime time)
+RBRGen4Error instrumentSleep(const struct RBRGen4 *conn, RBRGen4DateTime time)
 {
     /* Unused. */
     (void) conn;
@@ -104,9 +100,7 @@ RBRGen4Error instrumentSleep(const struct RBRGen4 *conn,
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error instrumentRead(const struct RBRGen4 *conn,
-                                      void *data,
-                                      int32_t *size)
+RBRGen4Error instrumentRead(const struct RBRGen4 *conn, void *data, int32_t *size)
 {
     int *instrumentFd = (int *) RBRGen4_getUserData(conn);
 
@@ -116,26 +110,17 @@ RBRGen4Error instrumentRead(const struct RBRGen4 *conn,
      * read operations; on the other, it means timeouts can't conveniently be
      * changed based on context. For example, you might want to have a much
      * longer timeout for the `enable` or `memclear` commands than for `id`. */
-    *size = read(*instrumentFd,
-                 data,
-                 *size);
-    if (*size == 0)
-    {
+    *size = read(*instrumentFd, data, *size);
+    if (*size == 0) {
         return RBRGEN4_TIMEOUT;
-    }
-    else if (*size < 0)
-    {
+    } else if (*size < 0) {
         return RBRGEN4_CALLBACK_ERROR;
-    }
-    else
-    {
+    } else {
         return RBRGEN4_SUCCESS;
     }
 }
 
-RBRGen4Error instrumentWrite(const struct RBRGen4 *conn,
-                                       const void *const data,
-                                       int32_t size)
+RBRGen4Error instrumentWrite(const struct RBRGen4 *conn, const void *const data, int32_t size)
 {
     int *instrumentFd = (int *) RBRGen4_getUserData(conn);
     const uint8_t *const byteData = (const uint8_t *const) data;
@@ -150,12 +135,11 @@ RBRGen4Error instrumentWrite(const struct RBRGen4 *conn,
 
     struct timeval writeTimeout;
 
-    while (written < size)
-    {
+    while (written < size) {
         /* select() may (and on Linux, does) update the timeout argument with
          * how much of the timeout remained upon return. We want every check to
          * have the same timeout, so we'll reset it before each use. */
-        writeTimeout = (struct timeval){
+        writeTimeout = (struct timeval) {
             .tv_sec = INSTRUMENT_CHARACTER_TIMEOUT_MSEC / 1000,
             .tv_usec = (INSTRUMENT_CHARACTER_TIMEOUT_MSEC % 1000) * 1000000,
         };
@@ -163,27 +147,18 @@ RBRGen4Error instrumentWrite(const struct RBRGen4 *conn,
         /* We could just loop on write(), but we want to enforce a timeout, so
          * select() kills two birds with one stone: making sure the output
          * device is ready to be written to, and handling the timeout. */
-        int instrumentReady = select(*instrumentFd + 1,
-                                     NULL,
-                                     &instrumentFdSet,
-                                     NULL,
-                                     &writeTimeout);
-        if (instrumentReady < 0)
-        {
+        int instrumentReady =
+            select(*instrumentFd + 1, NULL, &instrumentFdSet, NULL, &writeTimeout);
+        if (instrumentReady < 0) {
             return RBRGEN4_CALLBACK_ERROR;
-        }
-        else if (instrumentReady == 0)
-        {
+        } else if (instrumentReady == 0) {
             return RBRGEN4_TIMEOUT;
         }
 
-        int32_t chunkWritten = write(*instrumentFd,
-                                     byteData + written,
-                                     size - written);
+        int32_t chunkWritten = write(*instrumentFd, byteData + written, size - written);
         /* select() told us we were good to go, so a 0-byte write is probably
          * an error, not just an unready device. */
-        if (chunkWritten <= 0)
-        {
+        if (chunkWritten <= 0) {
             return RBRGEN4_CALLBACK_ERROR;
         }
 

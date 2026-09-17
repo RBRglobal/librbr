@@ -38,21 +38,33 @@
 
 /* == Customer defined parameters == */
 
-#define PRESSURE "pressure_00"
+#define PRESSURE    "pressure_00"
 #define TEMPERATURE "temperature_00"
 
 #define GROUP_PT_LABEL "gr_pt"
-#define GROUP_PT_CHANNELS (RBRGen4Label[]) {PRESSURE, TEMPERATURE}
+#define GROUP_PT_CHANNELS     \
+    (RBRGen4Label[])          \
+    {                         \
+        PRESSURE, TEMPERATURE \
+    }
 #define GROUP_PT_CHANNEL_COUNT 2
 
-#define SCHEDULE_PT_LABEL "sch_stream_pt"
+#define SCHEDULE_PT_LABEL  "sch_stream_pt"
 #define SCHEDULE_PT_PERIOD 1000
 
-#define SCHEDULE_PT_GROUPS (RBRGen4Label[]) {GROUP_PT_LABEL}
+#define SCHEDULE_PT_GROUPS \
+    (RBRGen4Label[])       \
+    {                      \
+        GROUP_PT_LABEL     \
+    }
 #define SCHEDULE_PT_GROUP_COUNT 1
 
 #define CONFIG_STREAM_LABEL "cf_stream"
-#define CONFIG_STREAM_SCHEDULES (RBRGen4Label[]) {SCHEDULE_PT_LABEL}
+#define CONFIG_STREAM_SCHEDULES \
+    (RBRGen4Label[])            \
+    {                           \
+        SCHEDULE_PT_LABEL       \
+    }
 #define CONFIG_STREAM_SCHEDULE_COUNT 1
 
 #define NEW_DATASET_LABEL "ds_stream"
@@ -75,13 +87,8 @@ void handleSignal(int signo)
  * instrument's own message, which says what it objected to. */
 void logCmdError(const RBRGen4 *conn, RBRGen4Error err, const char *msg)
 {
-    fprintf(stderr,
-            "%s: %s (%s)\n",
-            programName,
-            msg,
-            RBRGen4Error_name(err));
-    if (err == RBRGEN4_HARDWARE_ERROR)
-    {
+    fprintf(stderr, "%s: %s (%s)\n", programName, msg, RBRGen4Error_name(err));
+    if (err == RBRGEN4_HARDWARE_ERROR) {
         fprintf(stderr,
                 "%s: Instrument reported: %s\n",
                 programName,
@@ -94,13 +101,12 @@ void logCmdError(const RBRGen4 *conn, RBRGen4Error err, const char *msg)
 RBRGen4Error disableIgnoreWarning(RBRGen4 *conn, RBRGen4InstrumentState *state)
 {
     RBRGen4Error err = RBRGen4_disable(conn, state);
-    if (err)
-    {
-        const bool isAlreadyDisabledWarning = (err == RBRGEN4_HARDWARE_ERROR)
-            && (RBRGen4_getLastHardwareError(conn) ==
-                RBRGEN4_HARDWARE_ERROR_INSTRUMENT_STATE_IS_ALREADY_DISABLED);
-        if (!isAlreadyDisabledWarning)
-        {
+    if (err) {
+        const bool isAlreadyDisabledWarning =
+            (err == RBRGEN4_HARDWARE_ERROR) &&
+            (RBRGen4_getLastHardwareError(conn) ==
+             RBRGEN4_HARDWARE_ERROR_INSTRUMENT_STATE_IS_ALREADY_DISABLED);
+        if (!isAlreadyDisabledWarning) {
             return err;
         }
     }
@@ -112,18 +118,15 @@ RBRGen4Error disableIgnoreWarning(RBRGen4 *conn, RBRGen4InstrumentState *state)
 void printHeader(void)
 {
     const char *separator = "";
-    if (outputFormat.scheduleLabel)
-    {
+    if (outputFormat.scheduleLabel) {
         printf("schedule");
         separator = ", ";
     }
-    if (outputFormat.dateTime)
-    {
+    if (outputFormat.dateTime) {
         printf("%stimestamp", separator);
         separator = ", ";
     }
-    for (int32_t i = 0; i < GROUP_PT_CHANNEL_COUNT; i++)
-    {
+    for (int32_t i = 0; i < GROUP_PT_CHANNEL_COUNT; i++) {
         printf("%s%s", separator, GROUP_PT_CHANNELS[i]);
         separator = ", ";
     }
@@ -134,20 +137,17 @@ void printHeader(void)
  * label and timestamp are only present when the output format includes them.
  * Error readings are NaNs carrying an error code; report the code instead of
  * the value. */
-RBRGen4Error instrumentSample(const struct RBRGen4 *conn,
-                              const struct RBRGen4Sample *const sample)
+RBRGen4Error instrumentSample(const struct RBRGen4 *conn, const struct RBRGen4Sample *const sample)
 {
     /* Unused. */
     (void) conn;
 
     const char *separator = "";
-    if (outputFormat.scheduleLabel)
-    {
+    if (outputFormat.scheduleLabel) {
         printf("%s", sample->scheduleLabel);
         separator = ", ";
     }
-    if (outputFormat.dateTime)
-    {
+    if (outputFormat.dateTime) {
         char ftime[32];
         time_t sampleSeconds = (time_t) (sample->timestamp / 1000);
         struct tm sampleTime;
@@ -156,16 +156,10 @@ RBRGen4Error instrumentSample(const struct RBRGen4 *conn,
         printf("%s%s.%03" PRId64, separator, ftime, sample->timestamp % 1000);
         separator = ", ";
     }
-    for (int32_t i = 0; i < sample->channelCount; i++)
-    {
-        if (RBRGen4Reading_isError(sample->readings[i]))
-        {
-            printf("%serror %d",
-                   separator,
-                   RBRGen4Reading_getError(sample->readings[i]));
-        }
-        else
-        {
+    for (int32_t i = 0; i < sample->channelCount; i++) {
+        if (RBRGen4Reading_isError(sample->readings[i])) {
+            printf("%serror %d", separator, RBRGen4Reading_getError(sample->readings[i]));
+        } else {
             printf("%s%f", separator, sample->readings[i]);
         }
         separator = ", ";
@@ -179,8 +173,7 @@ int main(int argc, char *argv[])
 {
     programName = argv[0];
 
-    if (argc < 2)
-    {
+    if (argc < 2) {
         fprintf(stderr, "Usage: %s device\n", programName);
         return EXIT_FAILURE;
     }
@@ -188,12 +181,8 @@ int main(int argc, char *argv[])
     int instrumentFd;
     char *devicePath = argv[1];
 
-    if ((instrumentFd = openSerialFd(devicePath)) < 0)
-    {
-        fprintf(stderr,
-                "%s: Failed to open serial device: %s!\n",
-                programName,
-                strerror(errno));
+    if ((instrumentFd = openSerialFd(devicePath)) < 0) {
+        fprintf(stderr, "%s: Failed to open serial device: %s!\n", programName, strerror(errno));
         return EXIT_FAILURE;
     }
 
@@ -218,20 +207,15 @@ int main(int argc, char *argv[])
         .sampleBuffer = &sampleBuffer,
     };
 
-    err = RBRGen4_open(&conn,
-                       &callbacks,
-                       INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-                       (void *) &instrumentFd);
-    if (err)
-    {
+    err = RBRGen4_open(&conn, &callbacks, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd);
+    if (err) {
         logCmdError(&conn, err, "Failed to establish instrument connection");
         goto fileCleanup;
     }
 
     /* Samples are printed according to the output format */
     err = RBRGen4_getOutputFormat(&conn, &outputFormat);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get output format");
         goto instrumentCleanup;
     }
@@ -239,17 +223,14 @@ int main(int argc, char *argv[])
     /* The schedule streams over whichever link we are connected by */
     RBRGen4Link link;
     err = RBRGen4_getLink(&conn, &link);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get link");
         goto instrumentCleanup;
     }
-    printf("Connected to the instrument via %s.\n",
-           RBRGen4LinkType_name(link.type));
+    printf("Connected to the instrument via %s.\n", RBRGen4LinkType_name(link.type));
 
     RBRGen4ScheduleStream stream;
-    switch (link.type)
-    {
+    switch (link.type) {
     case RBRGEN4_LINK_TYPE_USB:
         stream = RBRGEN4_SCHEDULE_STREAM_USB;
         break;
@@ -269,36 +250,32 @@ int main(int argc, char *argv[])
      * (commands that cannot be run while the instrument is enabled) */
     RBRGen4InstrumentState loggingState;
     err = disableIgnoreWarning(&conn, &loggingState);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to disable instrument");
         goto instrumentCleanup;
     }
 
     /* Clear any existing configuration state */
     err = RBRGen4_deleteDatasetAll(&conn);
-    if (err)
-    {
-        logCmdError(&conn, err,
+    if (err) {
+        logCmdError(&conn,
+                    err,
                     "Failed to delete all datasets -- does this instrument"
                     " support storing data?");
         goto instrumentCleanup;
     }
     err = RBRGen4_deleteConfigAll(&conn);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to delete all configs");
         goto instrumentCleanup;
     }
     err = RBRGen4_deleteScheduleAll(&conn);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to delete all schedules");
         goto instrumentCleanup;
     }
     err = RBRGen4_deleteGroupAll(&conn);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to delete all groups");
         goto instrumentCleanup;
     }
@@ -308,8 +285,7 @@ int main(int argc, char *argv[])
         .label = GROUP_PT_LABEL,
     };
     err = RBRGen4_createGroup(&conn, groupPt.label);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to create group");
         goto instrumentCleanup;
     }
@@ -319,8 +295,7 @@ int main(int argc, char *argv[])
         .labels = GROUP_PT_CHANNELS,
     };
     err = RBRGen4_setGroup(&conn, &groupPt, &groupPtChannelList);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to set new group");
         goto instrumentCleanup;
     }
@@ -330,15 +305,13 @@ int main(int argc, char *argv[])
         .label = SCHEDULE_PT_LABEL,
     };
     err = RBRGen4_createSchedule(&conn, schedule.label);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to create new schedule");
         goto instrumentCleanup;
     }
     /* Get default instrument schedule parameters */
     err = RBRGen4_getSchedule(&conn, &schedule, NULL);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get new schedule");
         goto instrumentCleanup;
     }
@@ -352,8 +325,7 @@ int main(int argc, char *argv[])
         .labels = SCHEDULE_PT_GROUPS,
     };
     err = RBRGen4_setSchedule(&conn, &schedule, &scheduleGroupList);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to set new schedule");
         goto instrumentCleanup;
     }
@@ -363,8 +335,7 @@ int main(int argc, char *argv[])
         .label = CONFIG_STREAM_LABEL,
     };
     err = RBRGen4_createConfig(&conn, config.label);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to create new config");
         goto instrumentCleanup;
     }
@@ -374,8 +345,7 @@ int main(int argc, char *argv[])
         .labels = CONFIG_STREAM_SCHEDULES,
     };
     err = RBRGen4_setConfig(&conn, &config, &configScheduleList);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to set new config");
         goto instrumentCleanup;
     }
@@ -383,27 +353,21 @@ int main(int argc, char *argv[])
     /* Start sampling as soon as the instrument is enabled */
     RBRGen4Deployment deployment;
     err = RBRGen4_getDeployment(&conn, &deployment);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get deployment");
         goto instrumentCleanup;
     }
     deployment.gate = RBRGEN4_GATE_NONE;
     err = RBRGen4_setDeployment(&conn, &deployment);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to set deployment");
         goto instrumentCleanup;
     }
 
     /* Enable the instrument */
-    err = RBRGen4_enable(&conn,
-                         &config,
-                         NEW_DATASET_LABEL,
-                         RBRGEN4_STORAGE_MODE_NORMAL,
-                         &loggingState);
-    if (err)
-    {
+    err = RBRGen4_enable(
+        &conn, &config, NEW_DATASET_LABEL, RBRGEN4_STORAGE_MODE_NORMAL, &loggingState);
+    if (err) {
         logCmdError(&conn, err, "Failed to enable instrument");
         goto instrumentCleanup;
     }
@@ -417,21 +381,15 @@ int main(int argc, char *argv[])
     signal(SIGTERM, handleSignal);
     printf("%s: Streaming; press Ctrl-C to stop.\n", programName);
     printHeader();
-    while (!terminate)
-    {
+    while (!terminate) {
         err = RBRGen4_readSample(&conn);
-        if (terminate)
-        {
+        if (terminate) {
             /* The signal interrupted the read; that is not a failure. */
             err = RBRGEN4_SUCCESS;
-        }
-        else if (err == RBRGEN4_TIMEOUT)
-        {
+        } else if (err == RBRGEN4_TIMEOUT) {
             /* Nothing arrived within the command timeout; keep waiting. */
             continue;
-        }
-        else if (err)
-        {
+        } else if (err) {
             logCmdError(&conn, err, "Failed to read sample");
             break;
         }
@@ -439,8 +397,7 @@ int main(int argc, char *argv[])
 
     /* Stop the deployment so the instrument is not left streaming */
     RBRGen4Error disableErr = disableIgnoreWarning(&conn, &loggingState);
-    if (disableErr)
-    {
+    if (disableErr) {
         logCmdError(&conn, disableErr, "Failed to disable instrument");
         err = disableErr;
         goto instrumentCleanup;

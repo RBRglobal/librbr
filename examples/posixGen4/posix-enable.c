@@ -35,21 +35,33 @@
  * channel count is used to be as compatible as possible off-the-shelf. */
 #define CHANNEL_COUNT 32
 
-#define PRESSURE "pressure_00"
+#define PRESSURE    "pressure_00"
 #define TEMPERATURE "temperature_00"
 
 #define GROUP_PT_LABEL "gr_pt"
-#define GROUP_PT_CHANNELS (RBRGen4Label[]) {PRESSURE, TEMPERATURE}
+#define GROUP_PT_CHANNELS     \
+    (RBRGen4Label[])          \
+    {                         \
+        PRESSURE, TEMPERATURE \
+    }
 #define GROUP_PT_CHANNEL_COUNT 2
 
-#define SCHEDULE_PT_LABEL "sch_asc_pt"
+#define SCHEDULE_PT_LABEL  "sch_asc_pt"
 #define SCHEDULE_PT_PERIOD 1000
 
-#define SCHEDULE_PT_GROUPS (RBRGen4Label[]) {GROUP_PT_LABEL}
+#define SCHEDULE_PT_GROUPS \
+    (RBRGen4Label[])       \
+    {                      \
+        GROUP_PT_LABEL     \
+    }
 #define SCHEDULE_PT_GROUP_COUNT 1
 
 #define CONFIG_ASCENT_LABEL "cf_ascent"
-#define CONFIG_ASCENT_SCHEDULES (RBRGen4Label[]) {SCHEDULE_PT_LABEL}
+#define CONFIG_ASCENT_SCHEDULES \
+    (RBRGen4Label[])            \
+    {                           \
+        SCHEDULE_PT_LABEL       \
+    }
 #define CONFIG_ASCENT_SCHEDULE_COUNT 1
 
 #define START_DELAY_MS ((RBRGen4DateTime) 5000)
@@ -62,13 +74,8 @@ const char *programName = "";
  * instrument's own message, which says what it objected to. */
 void logCmdError(const RBRGen4 *conn, RBRGen4Error err, const char *msg)
 {
-    fprintf(stderr,
-            "%s: %s (%s)\n",
-            programName,
-            msg,
-            RBRGen4Error_name(err));
-    if (err == RBRGEN4_HARDWARE_ERROR)
-    {
+    fprintf(stderr, "%s: %s (%s)\n", programName, msg, RBRGen4Error_name(err));
+    if (err == RBRGEN4_HARDWARE_ERROR) {
         fprintf(stderr,
                 "%s: Instrument reported: %s\n",
                 programName,
@@ -81,13 +88,12 @@ void logCmdError(const RBRGen4 *conn, RBRGen4Error err, const char *msg)
 RBRGen4Error disableIgnoreWarning(RBRGen4 *conn, RBRGen4InstrumentState *state)
 {
     RBRGen4Error err = RBRGen4_disable(conn, state);
-    if (err)
-    {
-        const bool isAlreadyDisabledWarning = (err == RBRGEN4_HARDWARE_ERROR)
-            && (RBRGen4_getLastHardwareError(conn) ==
-                RBRGEN4_HARDWARE_ERROR_INSTRUMENT_STATE_IS_ALREADY_DISABLED);
-        if (!isAlreadyDisabledWarning)
-        {
+    if (err) {
+        const bool isAlreadyDisabledWarning =
+            (err == RBRGEN4_HARDWARE_ERROR) &&
+            (RBRGen4_getLastHardwareError(conn) ==
+             RBRGEN4_HARDWARE_ERROR_INSTRUMENT_STATE_IS_ALREADY_DISABLED);
+        if (!isAlreadyDisabledWarning) {
             return err;
         }
     }
@@ -98,8 +104,7 @@ int main(int argc, char *argv[])
 {
     programName = argv[0];
 
-    if (argc < 2)
-    {
+    if (argc < 2) {
         fprintf(stderr, "Usage: %s device\n", programName);
         return EXIT_FAILURE;
     }
@@ -107,12 +112,8 @@ int main(int argc, char *argv[])
     int instrumentFd;
     char *devicePath = argv[1];
 
-    if ((instrumentFd = openSerialFd(devicePath)) < 0)
-    {
-        fprintf(stderr,
-                "%s: Failed to open serial device: %s!\n",
-                programName,
-                strerror(errno));
+    if ((instrumentFd = openSerialFd(devicePath)) < 0) {
+        fprintf(stderr, "%s: Failed to open serial device: %s!\n", programName, strerror(errno));
         return EXIT_FAILURE;
     }
 
@@ -132,37 +133,28 @@ int main(int argc, char *argv[])
         .write = instrumentWrite,
     };
 
-    err = RBRGen4_open(&conn,
-                       &callbacks,
-                       INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-                       (void *) &instrumentFd);
-    if (err)
-    {
+    err = RBRGen4_open(&conn, &callbacks, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd);
+    if (err) {
         logCmdError(&conn, err, "Failed to establish instrument connection");
         goto fileCleanup;
     }
 
     RBRGen4Link link;
     err = RBRGen4_getLink(&conn, &link);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get link");
         goto instrumentCleanup;
     }
-    printf("Connected to the instrument via %s.\n",
-           RBRGen4LinkType_name(link.type));
+    printf("Connected to the instrument via %s.\n", RBRGen4LinkType_name(link.type));
 
-    switch (link.type)
-    {
+    switch (link.type) {
     case RBRGEN4_LINK_TYPE_USB:
-    // case RBRGEN4_LINK_TYPE_WIFI:
+        // case RBRGEN4_LINK_TYPE_WIFI:
         break;
-    case RBRGEN4_LINK_TYPE_SERIAL:
-    {
+    case RBRGEN4_LINK_TYPE_SERIAL: {
         RBRGen4LinkSerial serial;
         err = RBRGen4_getLinkSerial(&conn, &serial);
-        if (err)
-        {
+        if (err) {
             logCmdError(&conn, err, "Failed to get link serial");
             goto instrumentCleanup;
         }
@@ -172,44 +164,39 @@ int main(int argc, char *argv[])
         break;
     }
     default:
-        fprintf(stderr,
-                "Warning: connection method to the instrument is unclear\n");
+        fprintf(stderr, "Warning: connection method to the instrument is unclear\n");
     }
 
     /* Ensure instrument is disabled before trying to run Unsafe commands
      * (commands that cannot be run while the instrument is enabled) */
     RBRGen4InstrumentState loggingState;
     err = disableIgnoreWarning(&conn, &loggingState);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to disable instrument");
         goto instrumentCleanup;
     }
 
     /* Clear any existing configuration state */
     err = RBRGen4_deleteDatasetAll(&conn);
-    if (err)
-    {
-        logCmdError(&conn, err,
+    if (err) {
+        logCmdError(&conn,
+                    err,
                     "Failed to delete all datasets -- does this instrument"
                     " support storing data?");
         goto instrumentCleanup;
     }
     err = RBRGen4_deleteConfigAll(&conn);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to delete all configs");
         goto instrumentCleanup;
     }
     err = RBRGen4_deleteScheduleAll(&conn);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to delete all schedules");
         goto instrumentCleanup;
     }
     err = RBRGen4_deleteGroupAll(&conn);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to delete all groups");
         goto instrumentCleanup;
     }
@@ -222,12 +209,9 @@ int main(int argc, char *argv[])
     };
     int32_t channelCount;
     err = RBRGen4_getChannelPool(&conn, &channelPool);
-    if (err == RBRGEN4_SUCCESS)
-    {
+    if (err == RBRGEN4_SUCCESS) {
         channelCount = channelPool.count;
-    }
-    else if (err == RBRGEN4_TRUNCATED)
-    {
+    } else if (err == RBRGEN4_TRUNCATED) {
         channelCount = channelPool.size;
         printf("%s: Warning: not enough space in channel pool to store all"
                " channels. Instrument reports %" PRId32 " but pool only has"
@@ -235,20 +219,16 @@ int main(int argc, char *argv[])
                programName,
                channelPool.count,
                channelPool.size);
-    }
-    else
-    {
+    } else {
         logCmdError(&conn, err, "Failed to get channel pool");
         goto instrumentCleanup;
     }
 
     /* Print the label and type of each channel */
-    for (int32_t i = 0; i < channelCount; i++)
-    {
+    for (int32_t i = 0; i < channelCount; i++) {
         RBRGen4Channel *channel = &channelPool.pool[i];
         err = RBRGen4_getChannel(&conn, channel);
-        if (err)
-        {
+        if (err) {
             logCmdError(&conn, err, "Failed to get channel");
             goto instrumentCleanup;
         }
@@ -260,8 +240,7 @@ int main(int argc, char *argv[])
         .label = GROUP_PT_LABEL,
     };
     err = RBRGen4_createGroup(&conn, groupPt.label);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to create group");
         goto instrumentCleanup;
     }
@@ -271,8 +250,7 @@ int main(int argc, char *argv[])
         .labels = GROUP_PT_CHANNELS,
     };
     err = RBRGen4_setGroup(&conn, &groupPt, &groupPtChannelList);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to set new group");
         goto instrumentCleanup;
     }
@@ -282,15 +260,13 @@ int main(int argc, char *argv[])
         .label = SCHEDULE_PT_LABEL,
     };
     err = RBRGen4_createSchedule(&conn, schedule.label);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to create new schedule");
         goto instrumentCleanup;
     }
     /* Get default instrument schedule parameters */
     err = RBRGen4_getSchedule(&conn, &schedule, NULL);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get new schedule");
         goto instrumentCleanup;
     }
@@ -303,8 +279,7 @@ int main(int argc, char *argv[])
         .labels = SCHEDULE_PT_GROUPS,
     };
     err = RBRGen4_setSchedule(&conn, &schedule, &scheduleGroupList);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to set new schedule");
         goto instrumentCleanup;
     }
@@ -314,8 +289,7 @@ int main(int argc, char *argv[])
         .label = CONFIG_ASCENT_LABEL,
     };
     err = RBRGen4_createConfig(&conn, config.label);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to create new config");
         goto instrumentCleanup;
     }
@@ -325,8 +299,7 @@ int main(int argc, char *argv[])
         .labels = CONFIG_ASCENT_SCHEDULES,
     };
     err = RBRGen4_setConfig(&conn, &config, &configScheduleList);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to set new config");
         goto instrumentCleanup;
     }
@@ -334,8 +307,7 @@ int main(int argc, char *argv[])
     /* Read instrument's clock */
     RBRGen4Clock clock;
     err = RBRGen4_getClock(&conn, &clock);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get clock");
         goto instrumentCleanup;
     }
@@ -343,61 +315,47 @@ int main(int argc, char *argv[])
     /* Set a deployment start time */
     RBRGen4Deployment deployment;
     err = RBRGen4_getDeployment(&conn, &deployment);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get deployment");
         goto instrumentCleanup;
     }
     deployment.gate = RBRGEN4_GATE_TIME;
     deployment.startTime = clock.dateTime + START_DELAY_MS;
     err = RBRGen4_setDeployment(&conn, &deployment);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to set deployment");
         goto instrumentCleanup;
     }
 
     /* Verify instrument configuration for enablement */
-    err = RBRGen4_verify(&conn,
-                         &config,
-                         NEW_DATASET_LABEL,
-                         RBRGEN4_STORAGE_MODE_NORMAL,
-                         &loggingState);
-    if (err)
-    {
+    err = RBRGen4_verify(
+        &conn, &config, NEW_DATASET_LABEL, RBRGEN4_STORAGE_MODE_NORMAL, &loggingState);
+    if (err) {
         logCmdError(&conn, err, "Failed to verify instrument configuration");
         goto instrumentCleanup;
     }
     printf("%s: Instrument configuration verified\n", programName);
 
     /* Enable the instrument */
-    err = RBRGen4_enable(&conn,
-                         &config,
-                         NEW_DATASET_LABEL,
-                         RBRGEN4_STORAGE_MODE_NORMAL,
-                         &loggingState);
-    if (err)
-    {
+    err = RBRGen4_enable(
+        &conn, &config, NEW_DATASET_LABEL, RBRGEN4_STORAGE_MODE_NORMAL, &loggingState);
+    if (err) {
         logCmdError(&conn, err, "Failed to enable instrument");
         goto instrumentCleanup;
     }
     printf("%s: Instrument enablement state is: %s\n",
-            programName,
-            RBRGen4InstrumentState_name(loggingState));
-
+           programName,
+           RBRGen4InstrumentState_name(loggingState));
 
     /* Check deployment status (depending on the value of deployment.startTime
      * set above, we expect to either be gated or sampling). */
     err = RBRGen4_getDeployment(&conn, &deployment);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get deployment");
         goto instrumentCleanup;
     }
-    printf("%s: deployment status=%s\n",
-           programName,
-           RBRGen4DeploymentStatus_name(deployment.status));
-
+    printf(
+        "%s: deployment status=%s\n", programName, RBRGen4DeploymentStatus_name(deployment.status));
 
 instrumentCleanup:
     RBRGen4_close(&conn);
