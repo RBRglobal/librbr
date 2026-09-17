@@ -8,6 +8,7 @@ CFLAGS := -I../../include \
           -Wwrite-strings \
           -std=c99 \
           -g
+CPPFLAGS += -MMD -MP
 LDFLAGS := -L../../bin
 LDLIBS := -lm
 
@@ -22,5 +23,7 @@ dynamicCorrection-example: dynamicCorrection-example.o ../../bin/libRBRDynamicCo
 clean:
 	rm -Rf \
 		*.o \
+		*.d \
 		dynamicCorrection-example \
 
+-include $(wildcard *.d)
