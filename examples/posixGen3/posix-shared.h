@@ -18,23 +18,17 @@ extern "C" {
 #include "RBRGen3.h"
 
 #define INSTRUMENT_CHARACTER_TIMEOUT_MSEC 4000
-#define INSTRUMENT_COMMAND_TIMEOUT_MSEC 10000
+#define INSTRUMENT_COMMAND_TIMEOUT_MSEC   10000
 
 int openSerialFd(char *devicePath);
 
-RBRGen3Error instrumentTime(const struct RBRGen3 *conn,
-                                  RBRGen3DateTime *time);
+RBRGen3Error instrumentTime(const struct RBRGen3 *conn, RBRGen3DateTime *time);
 
-RBRGen3Error instrumentSleep(const struct RBRGen3 *conn,
-                                   RBRGen3DateTime time);
+RBRGen3Error instrumentSleep(const struct RBRGen3 *conn, RBRGen3DateTime time);
 
-RBRGen3Error instrumentRead(const struct RBRGen3 *conn,
-                                  void *data,
-                                  int32_t *size);
+RBRGen3Error instrumentRead(const struct RBRGen3 *conn, void *data, int32_t *size);
 
-RBRGen3Error instrumentWrite(const struct RBRGen3 *conn,
-                                   const void *const data,
-                                   int32_t size);
+RBRGen3Error instrumentWrite(const struct RBRGen3 *conn, const void *const data, int32_t size);
 
 RBRGen3Error instrumentStart(RBRGen3 *conn);
 

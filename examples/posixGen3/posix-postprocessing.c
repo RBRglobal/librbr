@@ -37,27 +37,19 @@ int main(int argc, char *argv[])
     RBRGen3Error err;
     RBRGen3 conn;
 
-    if (argc < 2)
-    {
+    if (argc < 2) {
         fprintf(stderr, "Usage: %s device\n", argv[0]);
         return EXIT_FAILURE;
     }
 
     devicePath = argv[1];
 
-    if ((instrumentFd = openSerialFd(devicePath)) < 0)
-    {
-        fprintf(stderr, "%s: Failed to open serial device: %s!\n",
-                programName,
-                strerror(errno));
+    if ((instrumentFd = openSerialFd(devicePath)) < 0) {
+        fprintf(stderr, "%s: Failed to open serial device: %s!\n", programName, strerror(errno));
         return EXIT_FAILURE;
     }
 
-    fprintf(stderr,
-            "%s: Using %s v%s.\n",
-            programName,
-            RBRGEN3_LIB_NAME,
-            RBRGEN3_LIB_VERSION);
+    fprintf(stderr, "%s: Using %s v%s.\n", programName, RBRGEN3_LIB_NAME, RBRGEN3_LIB_VERSION);
 
     RBRGen3Callbacks callbacks = {
         .time = instrumentTime,
@@ -67,12 +59,10 @@ int main(int argc, char *argv[])
     };
 
     if ((err = RBRGen3_open(
-             &conn,
-             &callbacks,
-             INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRGEN3_SUCCESS)
-    {
-        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n",
+             &conn, &callbacks, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd)) !=
+        RBRGEN3_SUCCESS) {
+        fprintf(stderr,
+                "%s: Failed to establish instrument connection: %s!\n",
                 programName,
                 RBRGen3Error_name(err));
         status = EXIT_FAILURE;
@@ -87,22 +77,18 @@ int main(int argc, char *argv[])
            ((double) meminfo.used) / meminfo.size * 100,
            meminfo.used);
 
-    if (meminfo.used == 0)
-    {
-        fprintf(stderr,
-                "%s: Can't perform post-processing without data! Giving up.\n",
-                programName);
+    if (meminfo.used == 0) {
+        fprintf(
+            stderr, "%s: Can't perform post-processing without data! Giving up.\n", programName);
         status = EXIT_FAILURE;
         goto instrumentCleanup;
     }
 
     RBRGen3MemoryFormat memformat;
     RBRGen3_getCurrentMemoryFormat(&conn, &memformat);
-    printf("It's currently storing data of format %s.\n",
-           RBRGen3MemoryFormat_name(memformat));
+    printf("It's currently storing data of format %s.\n", RBRGen3MemoryFormat_name(memformat));
 
-    if (memformat != RBRGEN3_MEMFORMAT_CALBIN00)
-    {
+    if (memformat != RBRGEN3_MEMFORMAT_CALBIN00) {
         fprintf(stderr,
                 "%s: Post-processing can only operate on EasyParse datasets! "
                 "Giving up.\n",
@@ -112,11 +98,7 @@ int main(int argc, char *argv[])
     }
 
     RBRGen3Postprocessing postprocessing;
-    if ((err = RBRGen3_getPostprocessing(
-             &conn,
-             &postprocessing))
-        != RBRGEN3_SUCCESS)
-    {
+    if ((err = RBRGen3_getPostprocessing(&conn, &postprocessing)) != RBRGEN3_SUCCESS) {
         fprintf(stderr,
                 "%s: Failure retrieving post-processing configuration: %s!\n",
                 programName,
@@ -125,14 +107,10 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    if (postprocessing.status != RBRGEN3_POSTPROCESSING_STATUS_IDLE)
-    {
-        if ((err = RBRGen3_setPostprocessingCommand(
-                 &conn,
-                 RBRGEN3_POSTPROCESSING_COMMAND_RESET,
-                 &postprocessing.status))
-            != RBRGEN3_SUCCESS)
-        {
+    if (postprocessing.status != RBRGEN3_POSTPROCESSING_STATUS_IDLE) {
+        if ((err = RBRGen3_setPostprocessingCommand(&conn,
+                                                    RBRGEN3_POSTPROCESSING_COMMAND_RESET,
+                                                    &postprocessing.status)) != RBRGEN3_SUCCESS) {
             fprintf(stderr,
                     "%s: Failure resetting post-processing state: %s!\n",
                     programName,
@@ -146,23 +124,15 @@ int main(int argc, char *argv[])
     now *= 1000;
 
     postprocessing = (RBRGen3Postprocessing) {
-        .channels = {
-            .count = 3,
-            .channels = {
-                {
-                    .function = RBRGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
-                    .label = "pressure_00"
-                },
-                {
-                    .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
-                    .label = "temperature_00"
-                },
-                {
-                    .function = RBRGEN3_POSTPROCESSING_AGGREGATE_STD,
-                    .label = "temperature_00",
-                }
-            }
-        },
+        .channels = {.count = 3,
+                     .channels = {{.function = RBRGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
+                                   .label = "pressure_00"},
+                                  {.function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
+                                   .label = "temperature_00"},
+                                  {
+                                      .function = RBRGEN3_POSTPROCESSING_AGGREGATE_STD,
+                                      .label = "temperature_00",
+                                  }}},
         .binReference = "tstamp",
         .binFilter = RBRGEN3_POSTPROCESSING_BINFILTER_NONE,
         .binSize = 0,
@@ -176,11 +146,8 @@ int main(int argc, char *argv[])
         .dcCtCoeff = 2.4e-4,
     };
 
-    if ((err = RBRGen3_setPostprocessing(
-             &conn,
-             &postprocessing) != RBRGEN3_SUCCESS)
-        != RBRGEN3_SUCCESS)
-    {
+    if ((err = RBRGen3_setPostprocessing(&conn, &postprocessing) != RBRGEN3_SUCCESS) !=
+        RBRGEN3_SUCCESS) {
         fprintf(stderr,
                 "%s: Failure setting post-processing configuration: %s!\n",
                 programName,
@@ -189,12 +156,9 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    if ((err = RBRGen3_setPostprocessingCommand(
-             &conn,
-             RBRGEN3_POSTPROCESSING_COMMAND_START,
-             &postprocessing.status))
-        != RBRGEN3_SUCCESS)
-    {
+    if ((err = RBRGen3_setPostprocessingCommand(&conn,
+                                                RBRGEN3_POSTPROCESSING_COMMAND_START,
+                                                &postprocessing.status)) != RBRGEN3_SUCCESS) {
         fprintf(stderr,
                 "%s: Failure starting post-processing: %s!\n",
                 programName,
@@ -203,28 +167,22 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    do
-    {
+    do {
         sleep(1);
 
         printf("Checking post-processing status...\n");
 
-        if ((err = RBRGen3_getPostprocessing(
-                 &conn,
-                 &postprocessing))
-            != RBRGEN3_SUCCESS)
-        {
+        if ((err = RBRGen3_getPostprocessing(&conn, &postprocessing)) != RBRGEN3_SUCCESS) {
             fprintf(stderr,
                     "%s: Failure retrieving post-processing configuration: %s!\n",
                     programName,
                     RBRGen3Error_name(err));
-        status = EXIT_FAILURE;
-        goto instrumentCleanup;
+            status = EXIT_FAILURE;
+            goto instrumentCleanup;
         }
     } while (postprocessing.status == RBRGEN3_POSTPROCESSING_STATUS_PROCESSING);
 
-    if (postprocessing.status != RBRGEN3_POSTPROCESSING_STATUS_COMPLETED)
-    {
+    if (postprocessing.status != RBRGEN3_POSTPROCESSING_STATUS_COMPLETED) {
         fprintf(stderr,
                 "%s: Expected to find that the post-processing had completed, "
                 "but instead found that it was %s!\n",
@@ -232,9 +190,7 @@ int main(int argc, char *argv[])
                 RBRGen3PostprocessingStatus_name(postprocessing.status));
         status = EXIT_FAILURE;
         goto instrumentCleanup;
-    }
-    else
-    {
+    } else {
         printf("%s: Post-processing has concluded. See `posix-download` for an "
                "example of downloading data.\n",
                programName);
