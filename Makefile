@@ -100,6 +100,12 @@ ifneq ($(LIB_BUILD_DATE),)
 CFLAGS += -DRBR_LIB_BUILD_DATE=\"$(LIB_BUILD_DATE)\"
 endif
 
+## Have the compiler record the headers each object depends on so that an
+## incremental build rebuilds objects when a header changes. The dependency
+## files are included at the end of this makefile so that their rules cannot
+## become the default goal.
+CPPFLAGS += -MMD -MP
+
 all: lib libdynamiccorrection docs tests
 
 libdynamiccorrection: bin/libRBRDynamicCorrection.a
@@ -284,4 +290,8 @@ bin:
 
 .PHONY: clean
 clean:
-	rm -Rf src/*.o bin/ testsGen3/tests.c testsGen3/*.o testsGen4/tests.c testsGen4/*.o docs/_build/
+	rm -Rf src/*.o src/*.d bin/ testsGen3/tests.c testsGen3/*.o testsGen3/*.d testsGen4/tests.c testsGen4/*.o testsGen4/*.d docs/_build/
+
+## The dependency files are only ever a side effect of compilation, so a
+## clean tree has none to include yet.
+-include $(wildcard src/*.d testsGen3/*.d testsGen4/*.d)

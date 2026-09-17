@@ -12,6 +12,7 @@ CFLAGS := -I../../include \
           -Wno-format-truncation \
           -std=c99 \
           -g
+CPPFLAGS += -MMD -MP
 LDFLAGS := -L../../bin
 LDLIBS := -lRBR -lm
 
@@ -65,4 +66,7 @@ posix-test: posix-test.o ../../bin/libRBR.a
 clean:
 	rm -Rf \
 		*.o \
+		*.d \
 		$(EXAMPLES)
+
+-include $(wildcard *.d)

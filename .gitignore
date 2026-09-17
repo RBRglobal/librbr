@@ -4,6 +4,7 @@
 # Generated artifacts.
 bin/
 docs/_build/
+*.d
 testsGen3/tests.c
 testsGen4/tests.c
 *.o

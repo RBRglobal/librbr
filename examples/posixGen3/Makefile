@@ -8,6 +8,7 @@ CFLAGS := -I../../include \
           -Wwrite-strings \
           -std=c99 \
           -g
+CPPFLAGS += -MMD -MP
 LDFLAGS := -L../../bin
 LDLIBS := -lRBR -lm
 
@@ -72,6 +73,9 @@ posix-stream-sdl: posix-shared.o posix-stream-sdl.o ../../bin/libRBR.a
 clean:
 	rm -Rf \
 		*.o \
+		*.d \
 		$(ALWAYS_EXAMPLES) \
 		$(SDL_EXAMPLES) \
 		$(DYNAMICCORRECTION_EXAMPLES)
+
+-include $(wildcard *.d)
