@@ -349,7 +349,7 @@ TEST_LOGGER4(poll)
             .scheduleLabel = true,
             .dateTime = true,
             .crc = true,
-            .dataType = RBRGEN4_DATATYPE_FLOAT64 },
+            .dataType = RBRGEN4_DATA_TYPE_FLOAT64 },
           RBRGEN4_SUCCESS,
           { .timestamp = 1710333456000LL,
             .scheduleLabel = "polling",
@@ -719,7 +719,7 @@ TEST_LOGGER4(readSample)
             .scheduleLabel = false,
             .dateTime = false,
             .crc = false,
-            .dataType = RBRGEN4_DATATYPE_FLOAT64 },
+            .dataType = RBRGEN4_DATA_TYPE_FLOAT64 },
           "RBR 999999 9.84050000000000e+000 12.5362917963016e+000"
           RESPONSE_TERMINATOR,
           { .timestamp = 0,

@@ -202,7 +202,7 @@ RBRGen4Error RBRGen4_getDataset(
 
     RBR_RESET_EXCEPT(dataset, label);
     dataset->status = RBRGEN4_UNKNOWN_DATASET_STATUS;
-    dataset->dataType = RBRGEN4_UNKNOWN_DATATYPE;
+    dataset->dataType = RBRGEN4_UNKNOWN_DATA_TYPE;
     if (scheduleList != NULL)
     {
         scheduleList->count = 0;
@@ -249,7 +249,7 @@ RBRGen4Error RBRGen4_getDataset(
         }
         else if (strcmp(parameter.key, "datatype") == 0)
         {
-            for (int i = 0; i < RBRGEN4_DATATYPE_COUNT; i++)
+            for (int i = 0; i < RBRGEN4_DATA_TYPE_COUNT; i++)
             {
                 if (strcmp(parameter.value,
                            RBRGen4DataType_name(i)) == 0)

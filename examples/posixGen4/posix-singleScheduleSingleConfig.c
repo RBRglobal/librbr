@@ -250,14 +250,14 @@ int main(int argc, char *argv[])
     RBRGen4_verify(conn,
                              &config,
                              NEW_DATASET_LABEL,
-                             RBRGEN4_STORAGEMODE_NORMAL,
+                             RBRGEN4_STORAGE_MODE_NORMAL,
                              &loggingState);
 
     /* enable the instrument */
     RBRGen4_enable(conn,
                              &config,
                              NEW_DATASET_LABEL,
-                             RBRGEN4_STORAGEMODE_NORMAL,
+                             RBRGEN4_STORAGE_MODE_NORMAL,
                              &loggingState);
 
 instrumentCleanup:

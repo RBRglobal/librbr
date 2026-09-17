@@ -211,7 +211,7 @@ typedef struct RBRGen4ParserConfig
      * instrument with very high precision sensors may use float64 to maintain
      * the necessary level of resolution.
      */
-    RBRGen4DataType datatype;
+    RBRGen4DataType dataType;
 } RBRGen4ParserConfig;
 
 /**

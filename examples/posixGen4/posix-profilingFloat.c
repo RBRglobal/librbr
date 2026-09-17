@@ -290,7 +290,7 @@ int main(int argc, char *argv[])
     RBRGen4_enable(conn,
                              &config_ascent,
                              NEW_DATASET_LABEL,
-                             RBRGEN4_STORAGEMODE_NORMAL,
+                             RBRGEN4_STORAGE_MODE_NORMAL,
                              &loggingState);
 
     /************ end of ascent ************/
@@ -315,7 +315,7 @@ int main(int argc, char *argv[])
     RBRGen4Parser* parser = &parserSpace;
     RBRGen4ParserConfig config = {
         .channelCount = group_pts.channelCount,
-        .datatype = info.dataType
+        .dataType = info.dataType
     };
     RBRGen4Sample sampleBuffer;
     RBRGen4ParserCallbacks parserCallbacks = {

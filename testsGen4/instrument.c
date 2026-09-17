@@ -475,7 +475,7 @@ TEST_LOGGER4(conn)
             .semver = "2.0.0-rc1-10-g148bc5eb1",
             .fwtype = 150,
             .fwLock = false,
-            .dataType = RBRGEN4_DATATYPE_FLOAT64,
+            .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
             .name = "L4" } },
         /* An enabled instrument with the firmware locked, and the extended
          * name and part number populated. */
@@ -493,7 +493,7 @@ TEST_LOGGER4(conn)
             .semver = "1.0.0-rc4-11-g941ae64",
             .fwtype = 130,
             .fwLock = true,
-            .dataType = RBRGEN4_DATATYPE_FLOAT32,
+            .dataType = RBRGEN4_DATA_TYPE_FLOAT32,
             .name = "RBRsolo^4_T.D!fast32" } },
         /* calfloat64 is reported only during a calibration-mode deployment. */
         { "instrument state=enabled sn=210000 model=RBRsolo4 pn=012345revA "
@@ -509,7 +509,7 @@ TEST_LOGGER4(conn)
             .semver = "1.0.0",
             .fwtype = 130,
             .fwLock = false,
-            .dataType = RBRGEN4_DATATYPE_CALFLOAT64,
+            .dataType = RBRGEN4_DATA_TYPE_CALFLOAT64,
             .name = "RBRsolo4" } },
         /* An unrecognized data type must not be reported as float32, which is
          * the zero value of the enum. */
@@ -526,7 +526,7 @@ TEST_LOGGER4(conn)
             .semver = "2.0.0",
             .fwtype = 150,
             .fwLock = false,
-            .dataType = RBRGEN4_UNKNOWN_DATATYPE,
+            .dataType = RBRGEN4_UNKNOWN_DATA_TYPE,
             .name = "L4" } },
         { 0 }
     };
@@ -628,7 +628,7 @@ TEST_LOGGER4(outputformat)
             .dateTime = true,
             .crc = false,
             .encoding = RBRGEN4_ENCODING_ASCII,
-            .dataType = RBRGEN4_DATATYPE_FLOAT32 } },
+            .dataType = RBRGEN4_DATA_TYPE_FLOAT32 } },
         { "instrument outputformat sn=on schedulelabel=on datetime=off "
           "crc=on encoding=binary datatype=float64" RESPONSE_TERMINATOR,
           { .sn = true,
@@ -636,7 +636,7 @@ TEST_LOGGER4(outputformat)
             .dateTime = false,
             .crc = true,
             .encoding = RBRGEN4_ENCODING_BINARY,
-            .dataType = RBRGEN4_DATATYPE_FLOAT64 } },
+            .dataType = RBRGEN4_DATA_TYPE_FLOAT64 } },
         { "instrument outputformat sn=off schedulelabel=off datetime=off "
           "crc=off encoding=ascii datatype=calfloat64" RESPONSE_TERMINATOR,
           { .sn = false,
@@ -644,7 +644,7 @@ TEST_LOGGER4(outputformat)
             .dateTime = false,
             .crc = false,
             .encoding = RBRGEN4_ENCODING_ASCII,
-            .dataType = RBRGEN4_DATATYPE_CALFLOAT64 } },
+            .dataType = RBRGEN4_DATA_TYPE_CALFLOAT64 } },
         { 0 }
     };
 
@@ -679,7 +679,7 @@ TEST_LOGGER4(outputformat_set)
         .dateTime = true,
         .crc = false,
         .encoding = RBRGEN4_ENCODING_ASCII,
-        .dataType = RBRGEN4_DATATYPE_FLOAT32
+        .dataType = RBRGEN4_DATA_TYPE_FLOAT32
     };
 
     /* Every parameter of the command is sent. */

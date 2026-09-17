@@ -22,9 +22,9 @@ static bool test_node(RBRGen4Node *expected,
     {
         TEST_ASSERT_STR_EQ(expected->portList[port], actual->portList[port]);
     }
-    TEST_ASSERT_STR_EQ(expected->fwVersion, actual->fwVersion);
+    TEST_ASSERT_STR_EQ(expected->fwversion, actual->fwversion);
     TEST_ASSERT_STR_EQ(expected->semver, actual->semver);
-    TEST_ASSERT_EQ(expected->fwType, actual->fwType, "%" PRIi32);
+    TEST_ASSERT_EQ(expected->fwtype, actual->fwtype, "%" PRIi32);
     TEST_ASSERT_EQ(expected->powerUpTime, actual->powerUpTime, "%" PRIi32);
     TEST_ASSERT_EQ(expected->inrushOffsetTime,
                    actual->inrushOffsetTime,
@@ -72,9 +72,9 @@ TEST_LOGGER4(node)
         .portCount = 6,
         .portList = { "thermistor_00", "pres_serial_00", "internal_adc_00",
                       "serial_00", "serial_01", "serial_02" },
-        .fwVersion = "2.0.0",
+        .fwversion = "2.0.0",
         .semver = "2.0.0-rc2-67-gdc557ad33",
-        .fwType = 150,
+        .fwtype = 150,
         .powerUpTime = 0,
         .inrushOffsetTime = 0
     };
@@ -107,9 +107,9 @@ TEST_LOGGER4(nodeWithoutPorts)
         .label = "fe4_minimal_00",
         .pcba = "fe4_minimal_00",
         .portCount = 0,
-        .fwVersion = "00000001",
+        .fwversion = "00000001",
         .semver = "00000001",
-        .fwType = 0,
+        .fwtype = 0,
         .powerUpTime = 0,
         .inrushOffsetTime = 0
     };
@@ -321,8 +321,8 @@ static bool test_device(RBRGen4Device *expected,
                         RBRGen4DeviceClass);
     TEST_ASSERT_EQ(expected->sn, actual->sn, "%" PRIi32);
     TEST_ASSERT_STR_EQ(expected->pn, actual->pn);
-    TEST_ASSERT_STR_EQ(expected->fwVersion, actual->fwVersion);
-    TEST_ASSERT_EQ(expected->fwType, actual->fwType, "%" PRIi32);
+    TEST_ASSERT_STR_EQ(expected->fwversion, actual->fwversion);
+    TEST_ASSERT_EQ(expected->fwtype, actual->fwtype, "%" PRIi32);
     TEST_ASSERT_STR_EQ(expected->name, actual->name);
     TEST_ASSERT_EQ(expected->channelCount, actual->channelCount, "%" PRIi32);
     for (int32_t channel = 0; channel < expected->channelCount; ++channel)
@@ -436,8 +436,8 @@ TEST_LOGGER4(device)
         .deviceClass = RBRGEN4_DEVICE_CLASS_SENSOR,
         .sn = 0,
         .pn = "na",
-        .fwVersion = "0.0.0",
-        .fwType = 0,
+        .fwversion = "0.0.0",
+        .fwtype = 0,
         .name = "thermistor",
         .channelCount = 1,
         .channelList = { "temperature_00" },
@@ -484,8 +484,8 @@ TEST_LOGGER4(deviceIdentity)
         .deviceClass = RBRGEN4_DEVICE_CLASS_SENSOR,
         .sn = 850032,
         .pn = "na",
-        .fwVersion = "1.0.0",
-        .fwType = 170,
+        .fwversion = "1.0.0",
+        .fwtype = 170,
         .name = "internal_adc",
         .channelCount = 1,
         .channelList = { "vmon_bat_input_00" },
@@ -531,8 +531,8 @@ TEST_LOGGER4(deviceWithUnlistedChannels)
         .deviceClass = RBRGEN4_DEVICE_CLASS_SENSOR,
         .sn = 0,
         .pn = "na",
-        .fwVersion = "0.0.0",
-        .fwType = 0,
+        .fwversion = "0.0.0",
+        .fwtype = 0,
         .name = "pres_sensor",
         .channelCount = 2,
         .channelList = { "pressure_00", "temperature_01" },

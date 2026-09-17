@@ -524,14 +524,14 @@ int main(int argc, char *argv[])
     RBRGen4_verify(conn,
                              &config_ascent,
                              DATASET_ASCENT_LABEL,
-                             RBRGEN4_STORAGEMODE_NORMAL,
+                             RBRGEN4_STORAGE_MODE_NORMAL,
                              deploymentStatus);
 
     // enable the instrument
     RBRGen4_enable(conn,
                              &config_ascent,
                              DATASET_ASCENT_LABEL,
-                             RBRGEN4_STORAGEMODE_NORMAL,
+                             RBRGEN4_STORAGE_MODE_NORMAL,
                              deploymentStatus);
 
 instrumentCleanup:

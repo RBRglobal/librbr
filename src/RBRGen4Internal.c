@@ -469,19 +469,19 @@ static RBRGen4Error RBRGen4Sample_parse(
     /* Labels' naming constraints are enforced by the instrument, not here. */
     if (outputFormat->scheduleLabel)
     {
-        char *label_end = token;
-        while (*label_end != PARAMETER_SEPARATOR_L4
-               && *label_end != '\0')
+        char *labelEnd = token;
+        while (*labelEnd != PARAMETER_SEPARATOR_L4
+               && *labelEnd != '\0')
         {
-            ++label_end;
+            ++labelEnd;
         }
-        size_t label_len = (size_t) (label_end - token);
-        if (label_len > RBRGEN4_LABEL_NAME_MAX)
+        size_t labelLen = (size_t) (labelEnd - token);
+        if (labelLen > RBRGEN4_LABEL_NAME_MAX)
         {
-            label_len = RBRGEN4_LABEL_NAME_MAX;
+            labelLen = RBRGEN4_LABEL_NAME_MAX;
         }
-        memcpy(sample->scheduleLabel, token, label_len);
-        sample->scheduleLabel[label_len] = '\0';
+        memcpy(sample->scheduleLabel, token, labelLen);
+        sample->scheduleLabel[labelLen] = '\0';
 
         if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
         {
@@ -492,11 +492,11 @@ static RBRGen4Error RBRGen4Sample_parse(
     /* The timestamp is either a date/time or a bare millisecond count. */
     if (outputFormat->dateTime)
     {
-        char *timestamp_end;
+        char *timestampEnd;
         RBR_TRY(RBRGen4DateTime_parseSampleTime(token,
                                                           &sample->timestamp,
-                                                          &timestamp_end));
-        if ((token = seek(timestamp_end, PARAMETER_SEPARATOR_L4)) == NULL)
+                                                          &timestampEnd));
+        if ((token = seek(timestampEnd, PARAMETER_SEPARATOR_L4)) == NULL)
         {
             return RBRGEN4_INVALID_PARAMETER_VALUE;
         }
@@ -505,7 +505,7 @@ static RBRGen4Error RBRGen4Sample_parse(
     while (token != NULL
            && sample->channelCount < RBRGEN4_CHANNEL_MAX)
     {
-        char *reading_end = token;
+        char *readingEnd = token;
         if (memcmp(token, SAMPLE_NAN, 3) == 0)
         {
             reading = (double) NAN;
@@ -535,8 +535,8 @@ static RBRGen4Error RBRGen4Sample_parse(
                 /* Calculate the CRC. The CRC includes all characters already
                  * sent on this line, starting with the first, up to
                  * and including the last space character before the <CRC>. */
-                uint16_t realCrc = strtol(token, &reading_end, 16);
-                if (reading_end <= token + 2)
+                uint16_t realCrc = strtol(token, &readingEnd, 16);
+                if (readingEnd <= token + 2)
                 {
                     /* No value was parsed. */
                     return RBRGEN4_INVALID_PARAMETER_VALUE;
@@ -557,8 +557,8 @@ static RBRGen4Error RBRGen4Sample_parse(
         }
         else
         {
-            reading = strtod(token, &reading_end);
-            if (reading == 0 && token == reading_end)
+            reading = strtod(token, &readingEnd);
+            if (reading == 0 && token == readingEnd)
             {
                 /* No value was parsed. */
                 return RBRGEN4_INVALID_PARAMETER_VALUE;

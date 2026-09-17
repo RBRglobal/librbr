@@ -308,22 +308,22 @@ typedef enum RBRGen4DataType
 {
     /** IEEE single precision floating point. 
      * Most instruments will use this dataType. */
-    RBRGEN4_DATATYPE_FLOAT32,
+    RBRGEN4_DATA_TYPE_FLOAT32,
     /** IEEE double precision floating point. Instruments with very high 
      * precision may use this format to maintain the necessary level 
      * of resolution.  */
-    RBRGEN4_DATATYPE_FLOAT64,
+    RBRGEN4_DATA_TYPE_FLOAT64,
     /** Same as Float64, but no calibration equation applied. It is presented
      * as a ratio compared to nominal full-scale, so the expected range is 
      * nominally 0.0 to 1.0. The full thoretical range is -2.0 to +2.0, but the
      * output of most channels will remain within or close to the expected 
      * nominal range.
      */
-    RBRGEN4_DATATYPE_CALFLOAT64,
+    RBRGEN4_DATA_TYPE_CALFLOAT64,
     /** The number of specific datatypes. */
-    RBRGEN4_DATATYPE_COUNT,
+    RBRGEN4_DATA_TYPE_COUNT,
     /** An unknown or unrecognized dataType. */
-    RBRGEN4_UNKNOWN_DATATYPE
+    RBRGEN4_UNKNOWN_DATA_TYPE
 } RBRGen4DataType;
 
 /**
@@ -411,14 +411,14 @@ typedef struct RBRGen4OutputFormat
  *
  * \see RBRGen4_open()
  */
-#define RBRGEN4_DEFAULT_OUTPUTFORMAT \
+#define RBRGEN4_DEFAULT_OUTPUT_FORMAT \
     ((RBRGen4OutputFormat) { \
          .sn = false, \
          .scheduleLabel = true, \
          .dateTime = true, \
          .crc = false, \
          .encoding = RBRGEN4_ENCODING_ASCII, \
-         .dataType = RBRGEN4_DATATYPE_FLOAT32 })
+         .dataType = RBRGEN4_DATA_TYPE_FLOAT32 })
 
 /**
  * \brief Instrument `id` command parameters.
@@ -933,7 +933,7 @@ typedef struct RBRGen4
  * #RBRGEN4_UNSUPPORTED is returned.
  *
  * Until this function has read the instrument's output format, the library
- * assumes it to be #RBRGEN4_DEFAULT_OUTPUTFORMAT. Samples streamed
+ * assumes it to be #RBRGEN4_DEFAULT_OUTPUT_FORMAT. Samples streamed
  * in any other format while the connection is being opened are not
  * recognised as samples: they are discarded rather than passed to
  * RBRGen4Callbacks.sample.

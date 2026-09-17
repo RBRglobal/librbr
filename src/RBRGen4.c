@@ -77,13 +77,13 @@ const char *RBRGen4Error_name(RBRGen4Error error)
 const char *RBRGen4DataType_name(RBRGen4DataType dataType)
 {
     switch(dataType){
-        case RBRGEN4_DATATYPE_FLOAT32:
+        case RBRGEN4_DATA_TYPE_FLOAT32:
             return "float32";
-        case RBRGEN4_DATATYPE_FLOAT64:
+        case RBRGEN4_DATA_TYPE_FLOAT64:
             return "float64";
-        case RBRGEN4_DATATYPE_CALFLOAT64:
+        case RBRGEN4_DATA_TYPE_CALFLOAT64:
             return "calfloat64";
-        case RBRGEN4_UNKNOWN_DATATYPE:
+        case RBRGEN4_UNKNOWN_DATA_TYPE:
         default:
             return "unknown datatype";
     }
@@ -213,7 +213,7 @@ RBRGen4Error RBRGen4_open(RBRGen4 **conn,
     (*conn)->userData          = userData;
     (*conn)->lastActivityTime  = RBRGEN4_NO_ACTIVITY;
     (*conn)->response.type     = RBRGEN4_RESPONSE_UNKNOWN_TYPE;
-    (*conn)->outputFormat      = RBRGEN4_DEFAULT_OUTPUTFORMAT;
+    (*conn)->outputFormat      = RBRGEN4_DEFAULT_OUTPUT_FORMAT;
 
     /* We assume a default output format until it's read below, so samples
      * streamed in any other format in the meantime are dropped as
