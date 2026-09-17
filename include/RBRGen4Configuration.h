@@ -37,9 +37,11 @@ extern "C" {
  * \brief The maximum number of characters in a calibration equation name.
  *
  * Does not include any null terminator.
+ *
  * \see RBRGen4Calibration.equation
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828616/Metadata+layout
  */
-#define RBRGEN4_CALIBRATION_EQUATION_MAX 32
+#define RBRGEN4_CALIBRATION_EQUATION_MAX 31
 
 /**
  * \brief The maximum number of configs count.
