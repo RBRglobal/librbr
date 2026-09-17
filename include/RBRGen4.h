@@ -142,13 +142,6 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
  */
 #define RBRGEN4_ID_SEMVER_MAX 39
 
-/**
- * \brief The maximum number of characters in the instrument part number.
- *
- * Does not include any null terminator.
- */
-#define RBRGEN4_ID_PN_MAX 96
-
 /** \brief The maximum length of characters within a label.*/
 #define RBRGEN4_LABEL_NAME_MAX 31
 

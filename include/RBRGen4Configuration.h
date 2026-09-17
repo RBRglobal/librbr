@@ -21,21 +21,6 @@ extern "C" {
 /** \brief The maximum number of schedules count. */
 #define RBRGEN4_SCHEDULE_COUNT_MAX 16
 
-/** \brief The maximum number of permissionlist count. */
-#define RBRGEN4_PERMISSION_COUNT_MAX 14
-
-/** \brief The maximum schedule period in milliseconds. */
-#define RBRGEN4_SAMPLING_PERIOD_MAX 86400000
-
-/** \brief The maximum regime boundary in dbar. */
-#define RBRGEN4_REGIME_BOUNDARY_MAX 65535
-
-/** \brief The maximum regime bin size in dbar. */
-#define RBRGEN4_REGIME_BINSIZE_MAX 6553.5
-
-/** \brief The maximum sampling period within a regime. */
-#define RBRGEN4_REGIME_SAMPLING_PERIOD_MAX 65000
-
 /**
  * \brief The maximum number of coefficients in a calibration group.
  *
@@ -56,12 +41,6 @@ extern "C" {
  */
 #define RBRGEN4_CALIBRATION_EQUATION_MAX 32
 
-/** \brief The minimum input timeout. */
-#define RBRGEN4_INPUT_TIMEOUT_MIN 10000
-
-/** \brief The maximum input timeout. */
-#define RBRGEN4_INPUT_TIMEOUT_MAX 240000
-
 /**
  * \brief The maximum number of configs count.
  * \see RBRGen4ConfigPool.pool
@@ -73,11 +52,6 @@ extern "C" {
  * \see RBRGen4GroupPool.pool
  */
 #define RBRGEN4_GROUP_COUNT_MAX 16
-
-/** \brief The maximum number of characters in a bus address.
- * The bus address is from 0 to 255, with some reserved addresses.
- */
-#define RBRGEN4_BUS_ADDRESS_MAX 3
 
 /** \brief The maximum number of fast periods. */
 #define RBRGEN4_AVAILABLE_FAST_PERIODS_MAX 4
