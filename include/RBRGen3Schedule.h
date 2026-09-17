@@ -35,8 +35,7 @@ extern "C" {
  * \see RBRGen3_setClock()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
  */
-typedef struct RBRGen3Clock
-{
+typedef struct RBRGen3Clock {
     /**
      * \brief The instrument's date and time.
      */
@@ -77,8 +76,7 @@ typedef struct RBRGen3Clock
  * \see RBRGen3_setClock()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
  */
-RBRGen3Error RBRGen3_getClock(RBRGen3 *conn,
-                                          RBRGen3Clock *clock);
+RBRGen3Error RBRGen3_getClock(RBRGen3 *conn, RBRGen3Clock *clock);
 
 /**
  * \brief Set the instrument clock.
@@ -107,8 +105,7 @@ RBRGen3Error RBRGen3_getClock(RBRGen3 *conn,
  * \see RBRGen3_getClock()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
  */
-RBRGen3Error RBRGen3_setClock(RBRGen3 *conn,
-                                          const RBRGen3Clock *clock);
+RBRGen3Error RBRGen3_setClock(RBRGen3 *conn, const RBRGen3Clock *clock);
 
 /**
  * \brief Possible instrument sampling modes.
@@ -116,8 +113,7 @@ RBRGen3Error RBRGen3_setClock(RBRGen3 *conn,
  * \see RBRGen3Sampling
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  */
-typedef enum RBRGen3SamplingMode
-{
+typedef enum RBRGen3SamplingMode {
     /** Continuous sampling mode. */
     RBRGEN3_SAMPLING_CONTINUOUS,
     /** Burst sampling mode. */
@@ -160,8 +156,7 @@ const char *RBRGen3SamplingMode_name(RBRGen3SamplingMode mode);
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling
  */
-typedef enum RBRGen3Gate
-{
+typedef enum RBRGen3Gate {
     /** No gating. */
     RBRGEN3_GATE_NONE,
     /**
@@ -202,8 +197,7 @@ const char *RBRGen3Gate_name(RBRGen3Gate gate);
  * \see RBRGen3_setSampling()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  */
-typedef struct RBRGen3Sampling
-{
+typedef struct RBRGen3Sampling {
     /** \brief The instrument sampling mode. */
     RBRGen3SamplingMode mode;
     /**
@@ -231,8 +225,7 @@ typedef struct RBRGen3Sampling
      *
      * \readonly
      */
-    const RBRGen3Period
-        availableFastPeriods[RBRGEN3_AVAILABLE_FAST_PERIODS_MAX];
+    const RBRGen3Period availableFastPeriods[RBRGEN3_AVAILABLE_FAST_PERIODS_MAX];
     /**
      * \brief The minimum period which can be used in fast sampling modes.
      *
@@ -275,9 +268,7 @@ typedef struct RBRGen3Sampling
  * \see RBRGen3_setSampling()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  */
-RBRGen3Error RBRGen3_getSampling(
-    RBRGen3 *conn,
-    RBRGen3Sampling *sampling);
+RBRGen3Error RBRGen3_getSampling(RBRGen3 *conn, RBRGen3Sampling *sampling);
 
 /**
  * \brief Set the instrument sampling mode and period.
@@ -323,9 +314,7 @@ RBRGen3Error RBRGen3_getSampling(
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  * \see RBRGen3_setBurstSampling()
  */
-RBRGen3Error RBRGen3_setSampling(
-    RBRGen3 *conn,
-    const RBRGen3Sampling *sampling);
+RBRGen3Error RBRGen3_setSampling(RBRGen3 *conn, const RBRGen3Sampling *sampling);
 
 /**
  * \brief Set the instrument burst sampling length and interval.
@@ -358,9 +347,7 @@ RBRGen3Error RBRGen3_setSampling(
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  * \see RBRGen3_setSampling()
  */
-RBRGen3Error RBRGen3_setBurstSampling(
-    RBRGen3 *conn,
-    const RBRGen3Sampling *sampling);
+RBRGen3Error RBRGen3_setBurstSampling(RBRGen3 *conn, const RBRGen3Sampling *sampling);
 
 /**
  * \brief Possible instrument logging statuses.
@@ -371,8 +358,7 @@ RBRGen3Error RBRGen3_setBurstSampling(
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/enable
  */
-typedef enum RBRGen3DeploymentStatus
-{
+typedef enum RBRGen3DeploymentStatus {
     /** Logging is not enabled. */
     RBRGEN3_STATUS_DISABLED,
     /** Logging is enabled but the start time has not yet passed. */
@@ -412,8 +398,7 @@ typedef enum RBRGen3DeploymentStatus
  * \return a string name for the deployment status
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRGen3DeploymentStatus_name(
-    RBRGen3DeploymentStatus status);
+const char *RBRGen3DeploymentStatus_name(RBRGen3DeploymentStatus status);
 
 /**
  * \brief Instrument `deployment` command parameters.
@@ -422,8 +407,7 @@ const char *RBRGen3DeploymentStatus_name(
  * \see RBRGen3_setDeployment()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
-typedef struct RBRGen3Deployment
-{
+typedef struct RBRGen3Deployment {
     /**
      * \brief The deployment start date and time.
      *
@@ -455,9 +439,7 @@ typedef struct RBRGen3Deployment
  * \see RBRGen3_setDeployment()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
-RBRGen3Error RBRGen3_getDeployment(
-    RBRGen3 *conn,
-    RBRGen3Deployment *deployment);
+RBRGen3Error RBRGen3_getDeployment(RBRGen3 *conn, RBRGen3Deployment *deployment);
 
 /**
  * \brief Set the instrument deployment parameters.
@@ -482,9 +464,7 @@ RBRGen3Error RBRGen3_getDeployment(
  * \see RBRGen3_getDeployment()
  * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
-RBRGen3Error RBRGen3_setDeployment(
-    RBRGen3 *conn,
-    const RBRGen3Deployment *deployment);
+RBRGen3Error RBRGen3_setDeployment(RBRGen3 *conn, const RBRGen3Deployment *deployment);
 
 #ifdef __cplusplus
 }

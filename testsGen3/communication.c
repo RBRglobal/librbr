@@ -10,21 +10,17 @@
 
 #include "tests.h"
 
-typedef struct LinkTest
-{
+typedef struct LinkTest {
     const char *response;
     RBRGen3Link expected;
 } LinkTest;
 
-static bool test_link(RBRGen3 *conn,
-                      TestIOBuffers *buffers,
-                      LinkTest *tests)
+static bool test_link(RBRGen3 *conn, TestIOBuffers *buffers, LinkTest *tests)
 {
     RBRGen3Error err;
     RBRGen3Link actual;
 
-    for (int i = 0; tests[i].response != NULL; i++)
-    {
+    for (int i = 0; tests[i].response != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_getLink(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -40,7 +36,7 @@ TEST_LOGGER2(link)
         {"link = usb" RESPONSE_TERMINATOR, RBRGEN3_LINK_USB},
         {"link = serial" RESPONSE_TERMINATOR, RBRGEN3_LINK_SERIAL},
         {"link = wifi" RESPONSE_TERMINATOR, RBRGEN3_LINK_WIFI},
-        {0}
+        {0},
     };
 
     return test_link(conn, buffers, tests);
@@ -52,14 +48,13 @@ TEST_LOGGER3(link)
         {"link type = usb" RESPONSE_TERMINATOR, RBRGEN3_LINK_USB},
         {"link type = serial" RESPONSE_TERMINATOR, RBRGEN3_LINK_SERIAL},
         {"link type = wifi" RESPONSE_TERMINATOR, RBRGEN3_LINK_WIFI},
-        {0}
+        {0},
     };
 
     return test_link(conn, buffers, tests);
 }
 
-typedef struct SerialTest
-{
+typedef struct SerialTest {
     const char *response;
     RBRGen3Serial expected;
 } SerialTest;
@@ -72,58 +67,39 @@ TEST_LOGGER2(serial)
             {
                 RBRGEN3_SERIAL_BAUD_19200,
                 RBRGEN3_SERIAL_MODE_RS232,
-                RBRGEN3_SERIAL_BAUD_1200
-                | RBRGEN3_SERIAL_BAUD_2400
-                | RBRGEN3_SERIAL_BAUD_4800
-                | RBRGEN3_SERIAL_BAUD_9600
-                | RBRGEN3_SERIAL_BAUD_19200
-                | RBRGEN3_SERIAL_BAUD_115200,
-                RBRGEN3_SERIAL_MODE_RS232
-                | RBRGEN3_SERIAL_MODE_RS485F
-                | RBRGEN3_SERIAL_MODE_UART
-                | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW
-            }
+                RBRGEN3_SERIAL_BAUD_1200 | RBRGEN3_SERIAL_BAUD_2400 | RBRGEN3_SERIAL_BAUD_4800 |
+                    RBRGEN3_SERIAL_BAUD_9600 | RBRGEN3_SERIAL_BAUD_19200 |
+                    RBRGEN3_SERIAL_BAUD_115200,
+                RBRGEN3_SERIAL_MODE_RS232 | RBRGEN3_SERIAL_MODE_RS485F | RBRGEN3_SERIAL_MODE_UART |
+                    RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
+            },
         },
         {
             "serial baudrate = 115200, mode = rs485f" RESPONSE_TERMINATOR,
             {
                 RBRGEN3_SERIAL_BAUD_115200,
                 RBRGEN3_SERIAL_MODE_RS485F,
-                RBRGEN3_SERIAL_BAUD_1200
-                | RBRGEN3_SERIAL_BAUD_2400
-                | RBRGEN3_SERIAL_BAUD_4800
-                | RBRGEN3_SERIAL_BAUD_9600
-                | RBRGEN3_SERIAL_BAUD_19200
-                | RBRGEN3_SERIAL_BAUD_115200,
-                RBRGEN3_SERIAL_MODE_RS232
-                | RBRGEN3_SERIAL_MODE_RS485F
-                | RBRGEN3_SERIAL_MODE_UART
-                | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW
-            }
+                RBRGEN3_SERIAL_BAUD_1200 | RBRGEN3_SERIAL_BAUD_2400 | RBRGEN3_SERIAL_BAUD_4800 |
+                    RBRGEN3_SERIAL_BAUD_9600 | RBRGEN3_SERIAL_BAUD_19200 |
+                    RBRGEN3_SERIAL_BAUD_115200,
+                RBRGEN3_SERIAL_MODE_RS232 | RBRGEN3_SERIAL_MODE_RS485F | RBRGEN3_SERIAL_MODE_UART |
+                    RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
+            },
         },
-        {0}
+        {0},
     };
 
     RBRGen3Error err;
     RBRGen3Serial actual;
 
-    for (int i = 0; tests[i].response != NULL; i++)
-    {
+    for (int i = 0; tests[i].response != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_getSerial(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate,
-                            actual.baudRate,
-                            RBRGen3SerialBaudRate);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected.mode,
-                            actual.mode,
-                            RBRGen3SerialMode);
-        TEST_ASSERT_EQ(tests[i].expected.availableBaudRates,
-                       actual.availableBaudRates,
-                       "0x%04X");
-        TEST_ASSERT_EQ(tests[i].expected.availableModes,
-                       actual.availableModes,
-                       "0x%04X");
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate, actual.baudRate, RBRGen3SerialBaudRate);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.mode, actual.mode, RBRGen3SerialMode);
+        TEST_ASSERT_EQ(tests[i].expected.availableBaudRates, actual.availableBaudRates, "0x%04X");
+        TEST_ASSERT_EQ(tests[i].expected.availableModes, actual.availableModes, "0x%04X");
     }
 
     return true;
@@ -139,19 +115,13 @@ TEST_LOGGER3(serial)
             {
                 RBRGEN3_SERIAL_BAUD_19200,
                 RBRGEN3_SERIAL_MODE_RS232,
-                RBRGEN3_SERIAL_BAUD_1200
-                | RBRGEN3_SERIAL_BAUD_2400
-                | RBRGEN3_SERIAL_BAUD_4800
-                | RBRGEN3_SERIAL_BAUD_9600
-                | RBRGEN3_SERIAL_BAUD_19200
-                | RBRGEN3_SERIAL_BAUD_115200
-                | RBRGEN3_SERIAL_BAUD_230400
-                | RBRGEN3_SERIAL_BAUD_460800,
-                RBRGEN3_SERIAL_MODE_RS232
-                | RBRGEN3_SERIAL_MODE_RS485F
-                | RBRGEN3_SERIAL_MODE_UART
-                | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW
-            }
+                RBRGEN3_SERIAL_BAUD_1200 | RBRGEN3_SERIAL_BAUD_2400 | RBRGEN3_SERIAL_BAUD_4800 |
+                    RBRGEN3_SERIAL_BAUD_9600 | RBRGEN3_SERIAL_BAUD_19200 |
+                    RBRGEN3_SERIAL_BAUD_115200 | RBRGEN3_SERIAL_BAUD_230400 |
+                    RBRGEN3_SERIAL_BAUD_460800,
+                RBRGEN3_SERIAL_MODE_RS232 | RBRGEN3_SERIAL_MODE_RS485F | RBRGEN3_SERIAL_MODE_UART |
+                    RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
+            },
         },
         {
             "serial baudrate = 115200, mode = rs485f, availablebaudrates = "
@@ -160,43 +130,28 @@ TEST_LOGGER3(serial)
             {
                 RBRGEN3_SERIAL_BAUD_115200,
                 RBRGEN3_SERIAL_MODE_RS485F,
-                RBRGEN3_SERIAL_BAUD_1200
-                | RBRGEN3_SERIAL_BAUD_2400
-                | RBRGEN3_SERIAL_BAUD_4800
-                | RBRGEN3_SERIAL_BAUD_9600
-                | RBRGEN3_SERIAL_BAUD_19200
-                | RBRGEN3_SERIAL_BAUD_115200
-                | RBRGEN3_SERIAL_BAUD_230400
-                | RBRGEN3_SERIAL_BAUD_460800,
-                RBRGEN3_SERIAL_MODE_RS232
-                | RBRGEN3_SERIAL_MODE_RS485F
-                | RBRGEN3_SERIAL_MODE_UART
-                | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW
-            }
+                RBRGEN3_SERIAL_BAUD_1200 | RBRGEN3_SERIAL_BAUD_2400 | RBRGEN3_SERIAL_BAUD_4800 |
+                    RBRGEN3_SERIAL_BAUD_9600 | RBRGEN3_SERIAL_BAUD_19200 |
+                    RBRGEN3_SERIAL_BAUD_115200 | RBRGEN3_SERIAL_BAUD_230400 |
+                    RBRGEN3_SERIAL_BAUD_460800,
+                RBRGEN3_SERIAL_MODE_RS232 | RBRGEN3_SERIAL_MODE_RS485F | RBRGEN3_SERIAL_MODE_UART |
+                    RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
+            },
         },
-        {0}
+        {0},
     };
 
     RBRGen3Error err;
     RBRGen3Serial actual;
 
-    for (int i = 0; tests[i].response != NULL; i++)
-    {
+    for (int i = 0; tests[i].response != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_getSerial(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate,
-                            actual.baudRate,
-                            RBRGen3SerialBaudRate);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected.mode,
-                            actual.mode,
-                            RBRGen3SerialMode);
-        TEST_ASSERT_EQ(tests[i].expected.availableBaudRates,
-                       actual.availableBaudRates,
-                       "0x%04X");
-        TEST_ASSERT_EQ(tests[i].expected.availableModes,
-                       actual.availableModes,
-                       "0x%04X");
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate, actual.baudRate, RBRGen3SerialBaudRate);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.mode, actual.mode, RBRGen3SerialMode);
+        TEST_ASSERT_EQ(tests[i].expected.availableBaudRates, actual.availableBaudRates, "0x%04X");
+        TEST_ASSERT_EQ(tests[i].expected.availableModes, actual.availableModes, "0x%04X");
     }
 
     return true;
@@ -207,44 +162,32 @@ TEST_LOGGER3(sleep)
     TestIOBuffers_init(buffers, "", 0);
     RBRGen3Error err = RBRGen3_sleep(conn);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-    TEST_ASSERT_STR_EQ("sleep" COMMAND_TERMINATOR,buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("sleep" COMMAND_TERMINATOR, buffers->writeBuffer);
     TEST_ASSERT(conn->lastActivityTime < 0);
 
     return true;
 }
 
-typedef struct WiFiTest
-{
+typedef struct WiFiTest {
     const char *response;
     RBRGen3Error expectedError;
     RBRGen3WiFi expected;
 } WiFiTest;
 
-static bool test_wifi(RBRGen3 *conn,
-                      TestIOBuffers *buffers,
-                      WiFiTest *tests)
+static bool test_wifi(RBRGen3 *conn, TestIOBuffers *buffers, WiFiTest *tests)
 {
     RBRGen3Error err;
     RBRGen3WiFi actual;
 
-    for (int i = 0; tests[i].response != NULL; i++)
-    {
+    for (int i = 0; tests[i].response != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_getWiFi(conn, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.enabled, actual.enabled, bool);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected.state,
-                            actual.state,
-                            RBRGen3WiFiState);
-        TEST_ASSERT_EQ(tests[i].expected.powerTimeout,
-                       actual.powerTimeout,
-                       "%" PRIi32);
-        TEST_ASSERT_EQ(tests[i].expected.commandTimeout,
-                       actual.commandTimeout,
-                       "%" PRIi32);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate,
-                            actual.baudRate,
-                            RBRGen3SerialBaudRate);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.state, actual.state, RBRGen3WiFiState);
+        TEST_ASSERT_EQ(tests[i].expected.powerTimeout, actual.powerTimeout, "%" PRIi32);
+        TEST_ASSERT_EQ(tests[i].expected.commandTimeout, actual.commandTimeout, "%" PRIi32);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.baudRate, actual.baudRate, RBRGen3SerialBaudRate);
     }
 
     return true;
@@ -261,10 +204,10 @@ TEST_LOGGER2(wifi)
                 RBRGEN3_UNKNOWN_WIFI,
                 60000,
                 90000,
-                RBRGEN3_SERIAL_BAUD_NONE
-            }
+                RBRGEN3_SERIAL_BAUD_NONE,
+            },
         },
-        {0}
+        {0},
     };
 
     return test_wifi(conn, buffers, tests);
@@ -282,8 +225,8 @@ TEST_LOGGER3(wifi)
                 RBRGEN3_WIFI_NA,
                 60000,
                 60000,
-                RBRGEN3_SERIAL_BAUD_921600
-            }
+                RBRGEN3_SERIAL_BAUD_921600,
+            },
         },
         {
             "wifi enabled = true, state = off, timeout = 90, "
@@ -294,8 +237,8 @@ TEST_LOGGER3(wifi)
                 RBRGEN3_WIFI_OFF,
                 90000,
                 30000,
-                RBRGEN3_SERIAL_BAUD_921600
-            }
+                RBRGEN3_SERIAL_BAUD_921600,
+            },
         },
         {
             "E0109 feature not available" RESPONSE_TERMINATOR,
@@ -305,10 +248,10 @@ TEST_LOGGER3(wifi)
                 RBRGEN3_UNKNOWN_WIFI,
                 0,
                 0,
-                RBRGEN3_SERIAL_BAUD_NONE
-            }
+                RBRGEN3_SERIAL_BAUD_NONE,
+            },
         },
-        {0}
+        {0},
     };
 
     return test_wifi(conn, buffers, tests);

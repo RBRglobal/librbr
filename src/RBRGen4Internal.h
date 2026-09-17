@@ -27,15 +27,15 @@ extern "C" {
 #define RBRGEN4_NO_ACTIVITY ((RBRGen4DateTime) - 1)
 
 /** \brief The terminator at the end of a command sent to the instrument. */
-#define RBRGEN4_SEND_COMMAND_TERMINATOR "\r"
+#define RBRGEN4_SEND_COMMAND_TERMINATOR     "\r"
 /** \brief The length of the command terminator. */
 #define RBRGEN4_SEND_COMMAND_TERMINATOR_LEN 1
 /** \brief The terminator at the end of a command received from the instrument. */
-#define RBRGEN4_RESPONSE_TERMINATOR "\r\n"
+#define RBRGEN4_RESPONSE_TERMINATOR         "\r\n"
 /** \brief The length of the command terminator. */
-#define RBRGEN4_RESPONSE_TERMINATOR_LEN 2
+#define RBRGEN4_RESPONSE_TERMINATOR_LEN     2
 /** \brief The value an empty list is reported and sent as. */
-#define RBRGEN4_EMPTY_LIST "none"
+#define RBRGEN4_EMPTY_LIST                  "none"
 
 /**
  * \brief The length of the timestamp of a streamed sample.
@@ -58,13 +58,13 @@ extern "C" {
  * than #RBRGEN4_SUCCESS, then that value is returned again. Useful for
  * forwarding errors from other API functions.
  */
-#define RBR_TRY(op) do { \
-        RBRGen4Error _tryErr; \
-        if ((_tryErr = (op)) != RBRGEN4_SUCCESS) \
-        { \
-            return _tryErr; \
-        } \
-} while (0)
+#define RBR_TRY(op)                                \
+    do {                                           \
+        RBRGen4Error _tryErr;                      \
+        if ((_tryErr = (op)) != RBRGEN4_SUCCESS) { \
+            return _tryErr;                        \
+        }                                          \
+    } while (0)
 
 /**
  * \brief Zero every member of a structure except one.
@@ -72,15 +72,14 @@ extern "C" {
  * \param [in,out] object a pointer to the structure
  * \param [in] member the name of the member to keep
  */
-#define RBR_RESET_EXCEPT(object, member) do { \
-        char *_begin = (char *) (object); \
-        char *_keepBegin = (char *) &(object)->member; \
-        char *_keepEnd = _keepBegin + sizeof((object)->member); \
-        memset(_begin, 0, (size_t) (_keepBegin - _begin)); \
-        memset(_keepEnd, \
-               0, \
-               sizeof(*(object)) - (size_t) (_keepEnd - _begin)); \
-} while (0)
+#define RBR_RESET_EXCEPT(object, member)                                       \
+    do {                                                                       \
+        char *_begin = (char *) (object);                                      \
+        char *_keepBegin = (char *) &(object)->member;                         \
+        char *_keepEnd = _keepBegin + sizeof((object)->member);                \
+        memset(_begin, 0, (size_t) (_keepBegin - _begin));                     \
+        memset(_keepEnd, 0, sizeof(*(object)) - (size_t) (_keepEnd - _begin)); \
+    } while (0)
 
 /**
  * Send the first RBRGen4.commandBufferLength bytes of
@@ -123,9 +122,7 @@ RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *conn);
  * \see RBRGen4_readResponse() to read the command response
  * \see RBRGen4_converse() for a send/receive shortcut
  */
-RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn,
-                                             const char *command,
-                                             ...);
+RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn, const char *command, ...);
 
 /**
  * Read a response from the instrument. This function will block until a
@@ -165,11 +162,8 @@ RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn,
  * \see RBRGen4_sendCommand() to send a command
  * \see RBRGen4_converse() for a send/receive shortcut
  */
-RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn,
-                                              bool breakOnSample,
-                                              RBRGen4Sample *sample,
-                                              RBRGen4DateTime startTime,
-                                              RBRGen4DateTime timeout);
+RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn, bool breakOnSample, RBRGen4Sample *sample,
+                                  RBRGen4DateTime startTime, RBRGen4DateTime timeout);
 
 /**
  * Deliver a sample to the RBRGen4SampleCallback set via
@@ -184,9 +178,7 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn,
  *         returned by the callback otherwise
  * \see RBRGen4_open() for the sampleBuffer guarantee
  */
-RBRGen4Error RBRGen4_deliverSample(
-    RBRGen4 *conn,
-    const RBRGen4Sample *sample);
+RBRGen4Error RBRGen4_deliverSample(RBRGen4 *conn, const RBRGen4Sample *sample);
 
 /**
  * \brief Send a command to the instrument and await an appropriate response.
@@ -209,9 +201,7 @@ RBRGen4Error RBRGen4_deliverSample(
  * \see RBRGen4_sendCommand() to send a command
  * \see RBRGen4_readResponse() to read the command response
  */
-RBRGen4Error RBRGen4_converse(RBRGen4 *conn,
-                                          const char *command,
-                                          ...);
+RBRGen4Error RBRGen4_converse(RBRGen4 *conn, const char *command, ...);
 
 /**
  * \brief Read a single boolean parameter from the instrument.
@@ -235,10 +225,8 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn,
  * \see RBRGen4_getFloat() for the float equivalent
  * \see RBRGen4_getInt() for the integer equivalent
  */
-RBRGen4Error RBRGen4_getBool(RBRGen4 *conn,
-                                         const char *command,
-                                         const char *parameter,
-                                         bool *value);
+RBRGen4Error RBRGen4_getBool(RBRGen4 *conn, const char *command, const char *parameter,
+                             bool *value);
 
 /**
  * \brief Read a single float parameter from the instrument.
@@ -262,10 +250,8 @@ RBRGen4Error RBRGen4_getBool(RBRGen4 *conn,
  * \see RBRGen4_getBool() for the boolean equivalent
  * \see RBRGen4_getInt() for the integer equivalent
  */
-RBRGen4Error RBRGen4_getFloat(RBRGen4 *conn,
-                                          const char *command,
-                                          const char *parameter,
-                                          float *value);
+RBRGen4Error RBRGen4_getFloat(RBRGen4 *conn, const char *command, const char *parameter,
+                              float *value);
 
 /**
  * \brief Read a single integer parameter from the instrument.
@@ -289,14 +275,11 @@ RBRGen4Error RBRGen4_getFloat(RBRGen4 *conn,
  * \see RBRGen4_getBool() for the boolean equivalent
  * \see RBRGen4_getFloat() for the float equivalent
  */
-RBRGen4Error RBRGen4_getInt(RBRGen4 *conn,
-                                        const char *command,
-                                        const char *parameter,
-                                        int32_t *value);
+RBRGen4Error RBRGen4_getInt(RBRGen4 *conn, const char *command, const char *parameter,
+                            int32_t *value);
 
 /** \brief A parameter (key/value pair) from an instrument response. */
-typedef struct RBRGen4ResponseParameter
-{
+typedef struct RBRGen4ResponseParameter {
     /** \brief The number of index parameters prior to this parameter. */
     int32_t index;
     /** \brief The string value of the last index parameter. */
@@ -328,10 +311,7 @@ typedef struct RBRGen4ResponseParameter
  * \param [in,out] command the name of the command as indicated by the response
  * \param [in,out] parameter the most-recently-parsed response parameter
  */
-void RBRGen4_parseResponse(RBRGen4 *conn,
-                                 char **command,
-                                 RBRGen4ResponseParameter *parameter);
-
+void RBRGen4_parseResponse(RBRGen4 *conn, char **command, RBRGen4ResponseParameter *parameter);
 
 /**
  * \brief Check for errors or warnings in an instrument response.
@@ -344,10 +324,7 @@ void RBRGen4_parseResponse(RBRGen4 *conn,
  * \return #RBRGEN4_SUCCESS when the response is a warning or success
  * \return #RBRGEN4_HARDWARE_ERROR when the response indicates an error
  */
-RBRGen4Error RBRGen4_errorCheckResponse(
-    RBRGen4 *conn, 
-    char *beginning, 
-    char *end);
+RBRGen4Error RBRGen4_errorCheckResponse(RBRGen4 *conn, char *beginning, char *end);
 
 /**
  * \brief Parse a sample's timestamp: either a date/time string (i.e.,
@@ -363,10 +340,7 @@ RBRGen4Error RBRGen4_errorCheckResponse(
  * \return #RBRGEN4_SUCCESS when the timestamp is successfully parsed
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the time is invalid
  */
-RBRGen4Error RBRGen4DateTime_parseSampleTime(
-    const char *s,
-    RBRGen4DateTime *timestamp,
-    char **end);
+RBRGen4Error RBRGen4DateTime_parseSampleTime(const char *s, RBRGen4DateTime *timestamp, char **end);
 
 /**
  * \brief Parse a date/time string from a schedule setting (i.e.,
@@ -382,10 +356,8 @@ RBRGen4Error RBRGen4DateTime_parseSampleTime(
  * \return #RBRGEN4_SUCCESS when the timestamp is successfully parsed
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the time is invalid
  */
-RBRGen4Error RBRGen4DateTime_parseScheduleTime(
-    const char *s,
-    RBRGen4DateTime *timestamp,
-    char **end);
+RBRGen4Error RBRGen4DateTime_parseScheduleTime(const char *s, RBRGen4DateTime *timestamp,
+                                               char **end);
 
 /**
  * \brief Convert a timestamp to a sample time/date string (i.e.,
@@ -397,8 +369,7 @@ RBRGen4Error RBRGen4DateTime_parseScheduleTime(
  * \param [in] timestamp the timestamp
  * \param [out] s the destination buffer
  */
-void RBRGen4DateTime_toSampleTime(RBRGen4DateTime timestamp,
-                                        char *s);
+void RBRGen4DateTime_toSampleTime(RBRGen4DateTime timestamp, char *s);
 
 /**
  * \brief Convert a timestamp to a schedule setting time/date string (i.e.,
@@ -410,8 +381,7 @@ void RBRGen4DateTime_toSampleTime(RBRGen4DateTime timestamp,
  * \param [in] timestamp the timestamp
  * \param [out] s the destination buffer
  */
-void RBRGen4DateTime_toScheduleTime(RBRGen4DateTime timestamp,
-                                          char *s);
+void RBRGen4DateTime_toScheduleTime(RBRGen4DateTime timestamp, char *s);
 
 /**
  * \brief Terminate the first value of a list, and find the next one.
@@ -440,10 +410,7 @@ char *RBRGen4_splitListValue(char *value);
  *                                                    label is empty
  * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit
  */
-RBRGen4Error RBRGen4_formatLabelList(
-    char *value,
-    int32_t size,
-    const RBRGen4LabelList *labelList);
+RBRGen4Error RBRGen4_formatLabelList(char *value, int32_t size, const RBRGen4LabelList *labelList);
 
 /**
  * \brief Copy a pipe-separated parameter value into a label list.
@@ -456,9 +423,7 @@ RBRGen4Error RBRGen4_formatLabelList(
  * \return #RBRGEN4_SUCCESS when every label is stored
  * \return #RBRGEN4_TRUNCATED when labels were discarded
  */
-RBRGen4Error RBRGen4_copyLabelList(
-    RBRGen4LabelList *labelList,
-    char *value);
+RBRGen4Error RBRGen4_copyLabelList(RBRGen4LabelList *labelList, char *value);
 
 #ifdef __cplusplus
 }

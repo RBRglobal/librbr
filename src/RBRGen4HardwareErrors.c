@@ -13,8 +13,7 @@
 
 const char *RBRGen4HardwareError_name(RBRGen4HardwareError error)
 {
-    switch (error)
-    {
+    switch (error) {
     case RBRGEN4_HARDWARE_ERROR_NONE:
         return "none";
     case RBRGEN4_HARDWARE_ERROR_COMMAND_PARSER_BUSY:

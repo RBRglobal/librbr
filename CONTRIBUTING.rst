@@ -46,15 +46,11 @@ General rules:
 Technical pedantry:
 
 - Use UTF-8 encoding for all files.
-- Wrap comment and code lines at 79 characters.
+- Wrap comment and code lines at 100 characters.
 
   - Where possible to do so
     and still fit on the line,
     align when wrapping.
-  - If line breaks must occur between function arguments,
-    prefer to break between *all* arguments,
-    not just where strictly necessary
-    to adhere to the line length limit.
   - Prefer to place operators
     at the beginning of new lines,
     not trailing the previous line.
@@ -117,8 +113,10 @@ Technical pedantry:
   put the body in braces
   so that it's obvious what it is
   and where it starts and ends.
-- Braces get newlines
-  (except for ``do...while``).
+- Function bodies open their brace on a new line;
+  control statements (``if``/``for``/``while``/``switch``)
+  open their brace on the same line,
+  as in the Linux kernel style.
 - Generally, everything that can have a Doxygen comment
   should have a Doxygen comment
   (typedefs, macros, structs, enums, functions, etc.).
@@ -159,31 +157,27 @@ A short example:
                                     int32_t *becauseTheyFitOnTheLine);
 
    RBRGen3Error RBRGen3_exampleOfAReallyLongFunctionName(
-       RBRGen3 *conn,
-       int32_t theseParametersAreAllWrappedAndBroken,
-       int32_t becauseTheyWouldPushPastTheLineLengthLimit,
-       int32_t evenIf,
-       uint8_t *someWouldFit,
-       int32_t onTheSameLine)
+       RBRGen3 *conn, int32_t theseParametersAreAllWrapped,
+       int32_t becauseTheyWouldPushPastTheLineLengthLimit, int32_t butOnly,
+       uint8_t *whereNecessary)
    {
        int32_t i;
 
-       for (i = 0; i < onTheSameLine; i++)
-       {
-           while (*someWouldFit)
-           {
-               someWouldFit++;
+       for (i = 0; i < butOnly; i++) {
+           while (*whereNecessary) {
+               whereNecessary++;
            }
        }
    }
 
-If you have `Uncrustify <http://uncrustify.sourceforge.net/>`__ installed,
-you can invoke the ``tools/indent.sh`` script
-to make an automatic attempt
-at code indentation.
-The auto-indentation configuration
-leans toward the conservative side;
-in particular, it performs no line wrapping.
+Formatting is enforced with `clang-format <https://clang.llvm.org/docs/ClangFormat.html>`__
+using the ``.clang-format`` file at the repository root,
+which follows the `Zephyr project's <https://docs.zephyrproject.org/latest/contribute/guidelines.html#coding-style>`__ configuration.
+Run ``clang-format -i`` on the files you changed before committing;
+``tools/format-check.sh`` lists any library, header, or test source
+which would be changed by the formatter,
+and the same check runs in CI.
+The example programs are not yet formatted this way.
 
 Documentation
 ~~~~~~~~~~~~~

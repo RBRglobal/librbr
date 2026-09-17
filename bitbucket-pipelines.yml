@@ -129,6 +129,12 @@ pipelines:
                     - scan-build make
 
             - step:
+                name: Formatting check
+                image: docker.io/silkeh/clang:20
+                script:
+                    - ./tools/format-check.sh
+
+            - step:
                 name: Documentation compilation
                 image: docker.io/library/gcc:15
                 script:

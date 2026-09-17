@@ -39,10 +39,7 @@ extern "C" {
  * \see RBRGen3_enable()
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/verify
  */
-RBRGen3Error RBRGen3_verify(
-    RBRGen3 *conn,
-    bool eraseMemory,
-    RBRGen3DeploymentStatus *status);
+RBRGen3Error RBRGen3_verify(RBRGen3 *conn, bool eraseMemory, RBRGen3DeploymentStatus *status);
 
 /**
  * \brief Enable the instrument to sample according to the programmed schedule.
@@ -64,10 +61,7 @@ RBRGen3Error RBRGen3_verify(
  *                                 another hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/enable
  */
-RBRGen3Error RBRGen3_enable(
-    RBRGen3 *conn,
-    bool eraseMemory,
-    RBRGen3DeploymentStatus *status);
+RBRGen3Error RBRGen3_enable(RBRGen3 *conn, bool eraseMemory, RBRGen3DeploymentStatus *status);
 
 /**
  * \brief If the instrument is logging, terminate the current deployment.
@@ -79,9 +73,7 @@ RBRGen3Error RBRGen3_enable(
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/disable
  */
-RBRGen3Error RBRGen3_disable(
-    RBRGen3 *conn,
-    RBRGen3DeploymentStatus *status);
+RBRGen3Error RBRGen3_disable(RBRGen3 *conn, RBRGen3DeploymentStatus *status);
 
 /**
  * \brief Instrument `simulation` command parameters.
@@ -90,8 +82,7 @@ RBRGen3Error RBRGen3_disable(
  * \see RBRGen3_setSimulation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
-typedef struct RBRGen3Simulation
-{
+typedef struct RBRGen3Simulation {
     /** Whether simulation is enabled. */
     bool state;
     /**
@@ -115,9 +106,7 @@ typedef struct RBRGen3Simulation
  * \see RBRGen3_setSimulation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
-RBRGen3Error RBRGen3_getSimulation(
-    RBRGen3 *conn,
-    RBRGen3Simulation *simulation);
+RBRGen3Error RBRGen3_getSimulation(RBRGen3 *conn, RBRGen3Simulation *simulation);
 
 /**
  * \brief Set the instrument simulation settings.
@@ -142,9 +131,7 @@ RBRGen3Error RBRGen3_getSimulation(
  * \see RBRGen3_getSimulation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/simulation
  */
-RBRGen3Error RBRGen3_setSimulation(
-    RBRGen3 *conn,
-    const RBRGen3Simulation *simulation);
+RBRGen3Error RBRGen3_setSimulation(RBRGen3 *conn, const RBRGen3Simulation *simulation);
 
 #ifdef __cplusplus
 }

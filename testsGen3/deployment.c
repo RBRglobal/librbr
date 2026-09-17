@@ -10,35 +10,26 @@
 
 #include "tests.h"
 
-typedef struct StatusTest
-{
+typedef struct StatusTest {
     const char *response;
     RBRGen3Error expectedError;
     RBRGen3Response expectedResponse;
     RBRGen3DeploymentStatus expected;
 } StatusTest;
 
-static bool test_verify(RBRGen3 *conn,
-                        TestIOBuffers *buffers,
-                        StatusTest *tests)
+static bool test_verify(RBRGen3 *conn, TestIOBuffers *buffers, StatusTest *tests)
 {
     RBRGen3Error err;
     RBRGen3DeploymentStatus actual;
 
-    for (int i = 0; tests[i].response != NULL; i++)
-    {
+    for (int i = 0; tests[i].response != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_verify(conn, false, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
-                            conn->response.type,
-                            RBRGen3ResponseType);
-        TEST_ASSERT_EQ(tests[i].expectedResponse.error,
-                       conn->response.error,
-                       "%" PRIi32);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected,
-                            actual,
-                            RBRGen3DeploymentStatus);
+        TEST_ASSERT_ENUM_EQ(
+            tests[i].expectedResponse.type, conn->response.type, RBRGen3ResponseType);
+        TEST_ASSERT_EQ(tests[i].expectedResponse.error, conn->response.error, "%" PRIi32);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, RBRGen3DeploymentStatus);
     }
 
     return true;
@@ -52,40 +43,38 @@ TEST_LOGGER2(verify)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE,
             },
-            RBRGEN3_STATUS_PENDING
+            RBRGEN3_STATUS_PENDING,
         },
         {
             "verify = logging" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE,
             },
-            RBRGEN3_STATUS_LOGGING
+            RBRGEN3_STATUS_LOGGING,
         },
         {
-            "E0402 memory not empty, erase first, verify = stopped"
-            RESPONSE_TERMINATOR,
+            "E0402 memory not empty, erase first, verify = stopped" RESPONSE_TERMINATOR,
             RBRGEN3_HARDWARE_ERROR,
             {
                 .type = RBRGEN3_RESPONSE_ERROR,
-                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
+                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST,
             },
-            RBRGEN3_UNKNOWN_STATUS
+            RBRGEN3_UNKNOWN_STATUS,
         },
         {
-            "E0401 estimated memory usage exceeds capacity, verify = logging"
-            RESPONSE_TERMINATOR,
+            "E0401 estimated memory usage exceeds capacity, verify = logging" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_WARNING,
-                .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY
+                .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
             },
-            RBRGEN3_STATUS_LOGGING
+            RBRGEN3_STATUS_LOGGING,
         },
-        {0}
+        {0},
     };
 
     return test_verify(conn, buffers, tests);
@@ -99,64 +88,56 @@ TEST_LOGGER3(verify)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE,
             },
-            RBRGEN3_STATUS_PENDING
+            RBRGEN3_STATUS_PENDING,
         },
         {
             "verify status = logging, warning = none" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE,
             },
-            RBRGEN3_STATUS_LOGGING
+            RBRGEN3_STATUS_LOGGING,
         },
         {
             "E0402 memory not empty, erase first" RESPONSE_TERMINATOR,
             RBRGEN3_HARDWARE_ERROR,
             {
                 .type = RBRGEN3_RESPONSE_ERROR,
-                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
+                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST,
             },
-            RBRGEN3_UNKNOWN_STATUS
+            RBRGEN3_UNKNOWN_STATUS,
         },
         {
             "verify status = logging, warning = W0401" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_WARNING,
-                .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY
+                .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
             },
-            RBRGEN3_STATUS_LOGGING
+            RBRGEN3_STATUS_LOGGING,
         },
-        {0}
+        {0},
     };
 
     return test_verify(conn, buffers, tests);
 }
 
-static bool test_enable(RBRGen3 *conn,
-                        TestIOBuffers *buffers,
-                        StatusTest *tests)
+static bool test_enable(RBRGen3 *conn, TestIOBuffers *buffers, StatusTest *tests)
 {
     RBRGen3Error err;
     RBRGen3DeploymentStatus actual;
 
-    for (int i = 0; tests[i].response != NULL; i++)
-    {
+    for (int i = 0; tests[i].response != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_enable(conn, false, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
-                            conn->response.type,
-                            RBRGen3ResponseType);
-        TEST_ASSERT_EQ(tests[i].expectedResponse.error,
-                       conn->response.error,
-                       "%" PRIi32);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected,
-                            actual,
-                            RBRGen3DeploymentStatus);
+        TEST_ASSERT_ENUM_EQ(
+            tests[i].expectedResponse.type, conn->response.type, RBRGen3ResponseType);
+        TEST_ASSERT_EQ(tests[i].expectedResponse.error, conn->response.error, "%" PRIi32);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, RBRGen3DeploymentStatus);
     }
 
     return true;
@@ -170,40 +151,38 @@ TEST_LOGGER2(enable)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE,
             },
-            RBRGEN3_STATUS_PENDING
+            RBRGEN3_STATUS_PENDING,
         },
         {
             "enable = logging" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE,
             },
-            RBRGEN3_STATUS_LOGGING
+            RBRGEN3_STATUS_LOGGING,
         },
         {
-            "E0402 memory not empty, erase first"
-            RESPONSE_TERMINATOR,
+            "E0402 memory not empty, erase first" RESPONSE_TERMINATOR,
             RBRGEN3_HARDWARE_ERROR,
             {
                 .type = RBRGEN3_RESPONSE_ERROR,
-                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
+                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST,
             },
-            RBRGEN3_UNKNOWN_STATUS
+            RBRGEN3_UNKNOWN_STATUS,
         },
         {
-            "E0401 estimated memory usage exceeds capacity, enable = logging"
-            RESPONSE_TERMINATOR,
+            "E0401 estimated memory usage exceeds capacity, enable = logging" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_WARNING,
-                .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY
+                .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
             },
-            RBRGEN3_STATUS_LOGGING
+            RBRGEN3_STATUS_LOGGING,
         },
-        {0}
+        {0},
     };
 
     return test_enable(conn, buffers, tests);
@@ -217,64 +196,56 @@ TEST_LOGGER3(enable)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE,
             },
-            RBRGEN3_STATUS_PENDING
+            RBRGEN3_STATUS_PENDING,
         },
         {
             "enable status = logging, warning = none" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE,
             },
-            RBRGEN3_STATUS_LOGGING
+            RBRGEN3_STATUS_LOGGING,
         },
         {
             "E0402 memory not empty, erase first" RESPONSE_TERMINATOR,
             RBRGEN3_HARDWARE_ERROR,
             {
                 .type = RBRGEN3_RESPONSE_ERROR,
-                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST
+                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST,
             },
-            RBRGEN3_UNKNOWN_STATUS
+            RBRGEN3_UNKNOWN_STATUS,
         },
         {
             "enable status = logging, warning = W0401" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_WARNING,
-                .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY
+                .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
             },
-            RBRGEN3_STATUS_LOGGING
+            RBRGEN3_STATUS_LOGGING,
         },
-        {0}
+        {0},
     };
 
     return test_enable(conn, buffers, tests);
 }
 
-static bool test_disable(RBRGen3 *conn,
-                         TestIOBuffers *buffers,
-                         StatusTest *tests)
+static bool test_disable(RBRGen3 *conn, TestIOBuffers *buffers, StatusTest *tests)
 {
     RBRGen3Error err;
     RBRGen3DeploymentStatus actual;
 
-    for (int i = 0; tests[i].response != NULL; i++)
-    {
+    for (int i = 0; tests[i].response != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_disable(conn, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedResponse.type,
-                            conn->response.type,
-                            RBRGen3ResponseType);
-        TEST_ASSERT_EQ(tests[i].expectedResponse.error,
-                       conn->response.error,
-                       "%" PRIi32);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected,
-                            actual,
-                            RBRGen3DeploymentStatus);
+        TEST_ASSERT_ENUM_EQ(
+            tests[i].expectedResponse.type, conn->response.type, RBRGen3ResponseType);
+        TEST_ASSERT_EQ(tests[i].expectedResponse.error, conn->response.error, "%" PRIi32);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected, actual, RBRGen3DeploymentStatus);
     }
 
     return true;
@@ -288,38 +259,38 @@ TEST_LOGGER2(stop)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE,
             },
-            RBRGEN3_STATUS_STOPPED
+            RBRGEN3_STATUS_STOPPED,
         },
         {
             "E0406 not logging, stop = stopped" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_WARNING,
-                .error = RBRGEN3_HARDWARE_ERROR_NOT_LOGGING
+                .error = RBRGEN3_HARDWARE_ERROR_NOT_LOGGING,
             },
-            RBRGEN3_STATUS_STOPPED
+            RBRGEN3_STATUS_STOPPED,
         },
         {
             "E0406 not logging, stop = fullandstopped" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_WARNING,
-                .error = RBRGEN3_HARDWARE_ERROR_NOT_LOGGING
+                .error = RBRGEN3_HARDWARE_ERROR_NOT_LOGGING,
             },
-            RBRGEN3_STATUS_FULLANDSTOPPED
+            RBRGEN3_STATUS_FULLANDSTOPPED,
         },
         {
             "E0406 not logging, stop = disabled" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_WARNING,
-                .error = RBRGEN3_HARDWARE_ERROR_NOT_LOGGING
+                .error = RBRGEN3_HARDWARE_ERROR_NOT_LOGGING,
             },
-            RBRGEN3_STATUS_DISABLED
+            RBRGEN3_STATUS_DISABLED,
         },
-        {0}
+        {0},
     };
 
     return test_disable(conn, buffers, tests);
@@ -333,36 +304,35 @@ TEST_LOGGER3(disable)
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE,
             },
-            RBRGEN3_STATUS_STOPPED
+            RBRGEN3_STATUS_STOPPED,
         },
         {
             "disable status = fullandstopped" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE,
             },
-            RBRGEN3_STATUS_FULLANDSTOPPED
+            RBRGEN3_STATUS_FULLANDSTOPPED,
         },
         {
             "disable status = disabled" RESPONSE_TERMINATOR,
             RBRGEN3_SUCCESS,
             {
                 .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE
+                .error = RBRGEN3_HARDWARE_ERROR_NONE,
             },
-            RBRGEN3_STATUS_DISABLED
+            RBRGEN3_STATUS_DISABLED,
         },
-        {0}
+        {0},
     };
 
     return test_disable(conn, buffers, tests);
 }
 
-typedef struct SimulationTest
-{
+typedef struct SimulationTest {
     const char *response;
     RBRGen3Simulation expected;
 } SimulationTest;
@@ -374,24 +344,23 @@ TEST_LOGGER3(simulation)
             "simulation state = off, period = 3600000" RESPONSE_TERMINATOR,
             {
                 .state = false,
-                .period = 3600000
-            }
+                .period = 3600000,
+            },
         },
         {
             "simulation state = on, period = 3600000" RESPONSE_TERMINATOR,
             {
                 .state = true,
-                .period = 3600000
-            }
+                .period = 3600000,
+            },
         },
-        {0}
+        {0},
     };
 
     RBRGen3Error err;
     RBRGen3Simulation actual;
 
-    for (int i = 0; tests[i].response != NULL; i++)
-    {
+    for (int i = 0; tests[i].response != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_getSimulation(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
@@ -402,8 +371,7 @@ TEST_LOGGER3(simulation)
     return true;
 }
 
-typedef struct SimulationSetTest
-{
+typedef struct SimulationSetTest {
     RBRGen3Simulation simulation;
     const char *command;
     const char *response;
@@ -416,53 +384,56 @@ TEST_LOGGER3(simulation_set)
         {
             {
                 .state = false,
-                .period = 3600000
+                .period = 3600000,
             },
             "permit command = simulation" COMMAND_TERMINATOR
             "simulation state = off, period = 3600000" COMMAND_TERMINATOR,
             "permit command = simulation" RESPONSE_TERMINATOR
             "simulation state = off, period = 3600000" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS
+            RBRGEN3_SUCCESS,
         },
         {
             {
                 .state = true,
-                .period = 3600000
+                .period = 3600000,
             },
             "permit command = simulation" COMMAND_TERMINATOR
             "simulation state = on, period = 3600000" COMMAND_TERMINATOR,
             "permit command = simulation" RESPONSE_TERMINATOR
             "simulation state = on, period = 3600000" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS
+            RBRGEN3_SUCCESS,
         },
         {
             {
                 .state = true,
-                .period = 123
+                .period = 123,
             },
             "permit command = simulation" COMMAND_TERMINATOR
             "simulation state = on, period = 123" COMMAND_TERMINATOR,
             "permit command = simulation" RESPONSE_TERMINATOR
-            "E0108 invalid argument to command: '123'"
-            RESPONSE_TERMINATOR,
-            RBRGEN3_HARDWARE_ERROR
+            "E0108 invalid argument to command: '123'" RESPONSE_TERMINATOR,
+            RBRGEN3_HARDWARE_ERROR,
         },
         {
             {
                 .state = false,
-                .period = 0
+                .period = 0,
             },
             "",
             "",
-            RBRGEN3_INVALID_PARAMETER_VALUE
+            RBRGEN3_INVALID_PARAMETER_VALUE,
         },
-        {{0}, 0, 0, 0}
+        {
+            {0},
+            0,
+            0,
+            0,
+        },
     };
 
     RBRGen3Error err;
 
-    for (int i = 0; tests[i].command != NULL; i++)
-    {
+    for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_setSimulation(conn, &tests[i].simulation);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen3Error);

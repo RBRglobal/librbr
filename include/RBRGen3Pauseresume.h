@@ -19,8 +19,7 @@ extern "C" {
 #endif
 
 /** \brief The state of a pauseresume condition. */
-typedef enum RBRGen3PauseresumeState
-{
+typedef enum RBRGen3PauseresumeState {
     /** \brief The pauseresuming condition is disabled, or sampling mode is regimes. */
     RBRGEN3_PAUSERESUME_NA,
     /** \brief Deployment is enaled and paused. */
@@ -46,9 +45,9 @@ const char *RBRGen3PauseresumeState_name(RBRGen3PauseresumeState state);
  * \see RBRGen3Pause
  * \see https://docs.rbr-global.com/L3commandreference/commands/pause
  */
-typedef enum RBRGen3PauseStatus
-{
-    /** Deployment is paused and no more samples will be taken once the current acquisition finishes. */
+typedef enum RBRGen3PauseStatus {
+    /** Deployment is paused and no more samples will be taken once the current acquisition
+     * finishes. */
     RBRGEN3_PAUSE_PAUSED,
     /** An unknown or unrecognized pause status. */
     RBRGEN3_UNKNOWN_PAUSE
@@ -61,8 +60,7 @@ typedef enum RBRGen3PauseStatus
  * \return a string name for the pause status
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRGen3PauseStatus_name(
-    RBRGen3PauseStatus status);
+const char *RBRGen3PauseStatus_name(RBRGen3PauseStatus status);
 
 /**
  * \brief Possible instrument resume status.
@@ -70,8 +68,7 @@ const char *RBRGen3PauseStatus_name(
  * \see RBRGen3Resume
  * \see https://docs.rbr-global.com/L3commandreference/commands/resume
  */
-typedef enum RBRGen3ResumeStatus
-{
+typedef enum RBRGen3ResumeStatus {
     /** Deployment has resumed running as scheduled. */
     RBRGEN3_RESUME_PENDING,
     RBRGEN3_RESUME_LOGGING,
@@ -86,14 +83,13 @@ typedef enum RBRGen3ResumeStatus
  * \return a string name for the resume status
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRGen3ResumeStatus_name(
-    RBRGen3ResumeStatus status);
+const char *RBRGen3ResumeStatus_name(RBRGen3ResumeStatus status);
 
 /**
  * It allows the host to determine if the pauseresume feature is available on
  * the instrument. It allows an elevated host to allow and deny the feature
  * for the instrument.
- * 
+ *
  * \param [in] conn the instrument connection
  * \param [in, out] state the state of pauseresume
  * \return #RBRGEN3_SUCCESS when the state is one of the following:
@@ -102,12 +98,11 @@ const char *RBRGen3ResumeStatus_name(
  * pauseresume feature, or pauseresume is not allowed.
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
-RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *conn,
-                                       RBRGen3PauseresumeState *state);
+RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *conn, RBRGen3PauseresumeState *state);
 
 /**
  * It pauses an enabled deloyment.
- * 
+ *
  * \param [in] conn the instrument connection
  * \param [in, out] status the status of pause
  * \return #RBRGEN3_SUCCESS when the status is "paused".
@@ -115,12 +110,11 @@ RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *conn,
  * pauseresume feature, or pauseresume is not allowed.
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
-RBRGen3Error RBRGen3_pause(RBRGen3 *conn,
-                                       RBRGen3PauseStatus *status);
+RBRGen3Error RBRGen3_pause(RBRGen3 *conn, RBRGen3PauseStatus *status);
 /**
  * It resumes an enabled deployment which was previously
  * paused using the pause command
- * 
+ *
  * \param [in] conn the instrument connection
  * \param [in, out] status the status of resume
  * \return #RBRGEN3_SUCCESS when the state is one of the following:
@@ -129,8 +123,7 @@ RBRGen3Error RBRGen3_pause(RBRGen3 *conn,
  * pauseresume feature, or pauseresume is not allowed.
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
-RBRGen3Error RBRGen3_resume(RBRGen3 *conn,
-                                       RBRGen3ResumeStatus *status);
+RBRGen3Error RBRGen3_resume(RBRGen3 *conn, RBRGen3ResumeStatus *status);
 
 #ifdef __cplusplus
 }

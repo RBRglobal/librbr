@@ -24,8 +24,7 @@ extern "C" {
  * \see RBRGen3_getLink()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/link
  */
-typedef enum RBRGen3Link
-{
+typedef enum RBRGen3Link {
     /** USB CDC connectivity. */
     RBRGEN3_LINK_USB,
     /** Serial connectivity. */
@@ -57,9 +56,7 @@ const char *RBRGen3Link_name(RBRGen3Link link);
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/link
  */
-RBRGen3Error RBRGen3_getLink(
-    RBRGen3 *conn,
-    RBRGen3Link *link);
+RBRGen3Error RBRGen3_getLink(RBRGen3 *conn, RBRGen3Link *link);
 
 /**
  * \brief Instrument serial baud rates.
@@ -73,30 +70,29 @@ RBRGen3Error RBRGen3_getLink(
  * \see RBRGen3_setSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-typedef enum RBRGen3SerialBaudRate
-{
+typedef enum RBRGen3SerialBaudRate {
     /** None */
-    RBRGEN3_SERIAL_BAUD_NONE   =       0,
+    RBRGEN3_SERIAL_BAUD_NONE = 0,
     /** 300 Bd */
-    RBRGEN3_SERIAL_BAUD_300    = 1 <<  0,
+    RBRGEN3_SERIAL_BAUD_300 = 1 << 0,
     /** 600 Bd */
-    RBRGEN3_SERIAL_BAUD_600    = 1 <<  1,
+    RBRGEN3_SERIAL_BAUD_600 = 1 << 1,
     /** 1,200 Bd */
-    RBRGEN3_SERIAL_BAUD_1200   = 1 <<  2,
+    RBRGEN3_SERIAL_BAUD_1200 = 1 << 2,
     /** 2,400 Bd */
-    RBRGEN3_SERIAL_BAUD_2400   = 1 <<  3,
+    RBRGEN3_SERIAL_BAUD_2400 = 1 << 3,
     /** 4,800 Bd */
-    RBRGEN3_SERIAL_BAUD_4800   = 1 <<  4,
+    RBRGEN3_SERIAL_BAUD_4800 = 1 << 4,
     /** 9,600 Bd */
-    RBRGEN3_SERIAL_BAUD_9600   = 1 <<  5,
+    RBRGEN3_SERIAL_BAUD_9600 = 1 << 5,
     /** 19,200 Bd */
-    RBRGEN3_SERIAL_BAUD_19200  = 1 <<  6,
+    RBRGEN3_SERIAL_BAUD_19200 = 1 << 6,
     /** 28,800 Bd */
-    RBRGEN3_SERIAL_BAUD_28800  = 1 <<  7,
+    RBRGEN3_SERIAL_BAUD_28800 = 1 << 7,
     /** 38,400 Bd */
-    RBRGEN3_SERIAL_BAUD_38400  = 1 <<  8,
+    RBRGEN3_SERIAL_BAUD_38400 = 1 << 8,
     /** 57,600 Bd */
-    RBRGEN3_SERIAL_BAUD_57600  = 1 <<  9,
+    RBRGEN3_SERIAL_BAUD_57600 = 1 << 9,
     /** 115,200 Bd */
     RBRGEN3_SERIAL_BAUD_115200 = 1 << 10,
     /** 230,400 Bd */
@@ -106,7 +102,7 @@ typedef enum RBRGen3SerialBaudRate
     /** 921,600 Bd */
     RBRGEN3_SERIAL_BAUD_921600 = 1 << 13,
     /** Corresponds to the largest baud rate enum value. */
-    RBRGEN3_SERIAL_BAUD_MAX    = RBRGEN3_SERIAL_BAUD_921600
+    RBRGEN3_SERIAL_BAUD_MAX = RBRGEN3_SERIAL_BAUD_921600
 } RBRGen3SerialBaudRate;
 
 /**
@@ -129,18 +125,17 @@ const char *RBRGen3SerialBaudRate_name(RBRGen3SerialBaudRate baud);
  * \see RBRGen3_setSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-typedef enum RBRGen3SerialMode
-{
+typedef enum RBRGen3SerialMode {
     /** No serial mode */
-    RBRGEN3_SERIAL_MODE_NONE          =      0,
+    RBRGEN3_SERIAL_MODE_NONE = 0,
     /** RS-232/EIA-232/TIA-232. */
-    RBRGEN3_SERIAL_MODE_RS232         = 1 << 0,
+    RBRGEN3_SERIAL_MODE_RS232 = 1 << 0,
     /** RS-485/EIA-485/TIA-485. */
-    RBRGEN3_SERIAL_MODE_RS485F        = 1 << 1,
+    RBRGEN3_SERIAL_MODE_RS485F = 1 << 1,
     /** RS-485/EIA-485/TIA-485 (half-duplex). Unimplemented by the logger. */
-    RBRGEN3_SERIAL_MODE_RS485H        = 1 << 2,
+    RBRGEN3_SERIAL_MODE_RS485H = 1 << 2,
     /** 0-3.3V logic, idle high. */
-    RBRGEN3_SERIAL_MODE_UART          = 1 << 3,
+    RBRGEN3_SERIAL_MODE_UART = 1 << 3,
     /** 0-3.3V logic, idle low. */
     RBRGEN3_SERIAL_MODE_UART_IDLE_LOW = 1 << 4,
     /** Corresponds to the largest UART mode enum value. */
@@ -163,8 +158,7 @@ const char *RBRGen3SerialMode_name(RBRGen3SerialMode mode);
  * \see RBRGen3_setSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-typedef struct RBRGen3Serial
-{
+typedef struct RBRGen3Serial {
     /** \brief The baud rate of the instrument. */
     RBRGen3SerialBaudRate baudRate;
     /** \brief The serial mode of the instrument. */
@@ -210,8 +204,7 @@ typedef struct RBRGen3Serial
  * \see RBRGen3_setSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn,
-                                           RBRGen3Serial *serial);
+RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn, RBRGen3Serial *serial);
 
 /**
  * \brief Reconfigure the instrument serial baud rate and mode.
@@ -236,8 +229,7 @@ RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn,
  * \see RBRGen3_getSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-RBRGen3Error RBRGen3_setSerial(RBRGen3 *conn,
-                                           const RBRGen3Serial *serial);
+RBRGen3Error RBRGen3_setSerial(RBRGen3 *conn, const RBRGen3Serial *serial);
 
 /**
  * \brief Immediately shut down communications and implement any possible
@@ -255,8 +247,7 @@ RBRGen3Error RBRGen3_sleep(RBRGen3 *conn);
  *
  * \see RBRGen3WiFi
  */
-typedef enum RBRGen3WiFiState
-{
+typedef enum RBRGen3WiFiState {
     /** \brief The Wi-Fi connection is disabled. */
     RBRGEN3_WIFI_NA,
     /** \brief The Wi-Fi radio is powered up and ready to communicate. */
@@ -285,8 +276,7 @@ const char *RBRGen3WiFiState_name(RBRGen3WiFiState state);
  * \see RBRGen3_setWiFi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-typedef struct RBRGen3WiFi
-{
+typedef struct RBRGen3WiFi {
     /**
      * \brief Enables or disables Wi-Fi connectivity.
      *
@@ -341,8 +331,7 @@ typedef struct RBRGen3WiFi
  * \see RBRGen3_setWiFi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn,
-                                         RBRGen3WiFi *wifi);
+RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn, RBRGen3WiFi *wifi);
 
 /**
  * \brief Reconfigure the instrument Wi-Fi settings.
@@ -366,8 +355,7 @@ RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn,
  * \see RBRGen3_getWiFi()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
-RBRGen3Error RBRGen3_setWiFi(RBRGen3 *conn,
-                                         const RBRGen3WiFi *wifi);
+RBRGen3Error RBRGen3_setWiFi(RBRGen3 *conn, const RBRGen3WiFi *wifi);
 
 #ifdef __cplusplus
 }

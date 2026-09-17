@@ -25,8 +25,7 @@ extern "C" {
  * \see RBRGen4_getLink()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830279/link
  */
-typedef enum RBRGen4LinkType
-{
+typedef enum RBRGen4LinkType {
     /** USB CDC connectivity. */
     RBRGEN4_LINK_TYPE_USB,
     /** Serial connectivity. */
@@ -52,8 +51,7 @@ const char *RBRGen4LinkType_name(RBRGen4LinkType linkType);
  * \see RBRGen4_getLink()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830279/link
  */
-typedef struct RBRGen4Link
-{
+typedef struct RBRGen4Link {
     /** \brief The type of communication link carrying the connection. */
     RBRGen4LinkType type;
 } RBRGen4Link;
@@ -69,8 +67,7 @@ typedef struct RBRGen4Link
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830279/link
  */
-RBRGen4Error RBRGen4_getLink(RBRGen4 *conn,
-                                                RBRGen4Link *link);
+RBRGen4Error RBRGen4_getLink(RBRGen4 *conn, RBRGen4Link *link);
 
 /**
  * \brief Instrument serial baud rates.
@@ -84,27 +81,25 @@ RBRGen4Error RBRGen4_getLink(RBRGen4 *conn,
  * \see RBRGen4_setLinkSerial()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
-typedef enum RBRGen4LinkSerialBaudRate
-{
+typedef enum RBRGen4LinkSerialBaudRate {
     /** An unrecognized baud rate, or none being set. */
-    RBRGEN4_LINK_SERIAL_BAUD_NONE    =      0,
+    RBRGEN4_LINK_SERIAL_BAUD_NONE = 0,
     /** 4,800 Bd */
-    RBRGEN4_LINK_SERIAL_BAUD_4800    = 1 << 0,
+    RBRGEN4_LINK_SERIAL_BAUD_4800 = 1 << 0,
     /** 9,600 Bd */
-    RBRGEN4_LINK_SERIAL_BAUD_9600    = 1 << 1,
+    RBRGEN4_LINK_SERIAL_BAUD_9600 = 1 << 1,
     /** 19,200 Bd */
-    RBRGEN4_LINK_SERIAL_BAUD_19200   = 1 << 2,
+    RBRGEN4_LINK_SERIAL_BAUD_19200 = 1 << 2,
     /** 38,400 Bd */
-    RBRGEN4_LINK_SERIAL_BAUD_38400   = 1 << 3,
+    RBRGEN4_LINK_SERIAL_BAUD_38400 = 1 << 3,
     /** 57,600 Bd */
-    RBRGEN4_LINK_SERIAL_BAUD_57600   = 1 << 4,
+    RBRGEN4_LINK_SERIAL_BAUD_57600 = 1 << 4,
     /** 115,200 Bd */
-    RBRGEN4_LINK_SERIAL_BAUD_115200  = 1 << 5,
+    RBRGEN4_LINK_SERIAL_BAUD_115200 = 1 << 5,
     /** 230,400 Bd */
-    RBRGEN4_LINK_SERIAL_BAUD_230400  = 1 << 6,
+    RBRGEN4_LINK_SERIAL_BAUD_230400 = 1 << 6,
     /** Corresponds to the largest baud rate enum value. */
-    RBRGEN4_LINK_SERIAL_BAUD_MAX
-        = RBRGEN4_LINK_SERIAL_BAUD_230400
+    RBRGEN4_LINK_SERIAL_BAUD_MAX = RBRGEN4_LINK_SERIAL_BAUD_230400
 } RBRGen4LinkSerialBaudRate;
 
 /**
@@ -114,8 +109,7 @@ typedef enum RBRGen4LinkSerialBaudRate
  * \return a string name for the baud rate
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRGen4LinkSerialBaudRate_name(
-    RBRGen4LinkSerialBaudRate baud);
+const char *RBRGen4LinkSerialBaudRate_name(RBRGen4LinkSerialBaudRate baud);
 
 /**
  * \brief Instrument serial modes.
@@ -128,21 +122,19 @@ const char *RBRGen4LinkSerialBaudRate_name(
  * \see RBRGen4_setLinkSerial()
  * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
-typedef enum RBRGen4LinkSerialMode
-{
+typedef enum RBRGen4LinkSerialMode {
     /** An unrecognized serial mode, or none being set. */
-    RBRGEN4_LINK_SERIAL_MODE_NONE          =      0,
+    RBRGEN4_LINK_SERIAL_MODE_NONE = 0,
     /** RS-232/EIA-232/TIA-232. */
-    RBRGEN4_LINK_SERIAL_MODE_RS232         = 1 << 0,
+    RBRGEN4_LINK_SERIAL_MODE_RS232 = 1 << 0,
     /** RS-485/EIA-485/TIA-485. */
-    RBRGEN4_LINK_SERIAL_MODE_RS485F        = 1 << 1,
+    RBRGEN4_LINK_SERIAL_MODE_RS485F = 1 << 1,
     /** 0-3.3V logic, idle high. */
-    RBRGEN4_LINK_SERIAL_MODE_UART          = 1 << 2,
+    RBRGEN4_LINK_SERIAL_MODE_UART = 1 << 2,
     /** 0-3.3V logic, idle low. */
     RBRGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW = 1 << 3,
     /** Corresponds to the largest serial mode enum value. */
-    RBRGEN4_LINK_SERIAL_MODE_MAX
-        = RBRGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW
+    RBRGEN4_LINK_SERIAL_MODE_MAX = RBRGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW
 } RBRGen4LinkSerialMode;
 
 /**
@@ -152,8 +144,7 @@ typedef enum RBRGen4LinkSerialMode
  * \return a string name for the serial mode
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRGen4LinkSerialMode_name(
-    RBRGen4LinkSerialMode mode);
+const char *RBRGen4LinkSerialMode_name(RBRGen4LinkSerialMode mode);
 
 /**
  * \brief Instrument `link serial` command parameters.
@@ -162,8 +153,7 @@ const char *RBRGen4LinkSerialMode_name(
  * \see RBRGen4_setLinkSerial()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
-typedef struct RBRGen4LinkSerial
-{
+typedef struct RBRGen4LinkSerial {
     /** \brief The baud rate of the instrument. */
     RBRGen4LinkSerialBaudRate baudRate;
     /** \brief The serial mode of the instrument. */
@@ -205,9 +195,7 @@ typedef struct RBRGen4LinkSerial
  * \see RBRGen4_setLinkSerial()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
-RBRGen4Error RBRGen4_getLinkSerial(
-    RBRGen4 *conn,
-    RBRGen4LinkSerial *serial);
+RBRGen4Error RBRGen4_getLinkSerial(RBRGen4 *conn, RBRGen4LinkSerial *serial);
 
 /**
  * \brief Reconfigure the instrument serial baud rate and mode.
@@ -239,9 +227,7 @@ RBRGen4Error RBRGen4_getLinkSerial(
  * \see RBRGen4_getLinkSerial()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
-RBRGen4Error RBRGen4_setLinkSerial(
-    RBRGen4 *conn,
-    const RBRGen4LinkSerial *serial);
+RBRGen4Error RBRGen4_setLinkSerial(RBRGen4 *conn, const RBRGen4LinkSerial *serial);
 
 /**
  * \brief Immediately shut down communications and implement any possible

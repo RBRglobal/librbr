@@ -24,13 +24,13 @@ extern "C" {
 #define RBRGEN3_NO_ACTIVITY ((RBRGen3DateTime) - 1)
 
 /** \brief The terminator at the end of a command sent to the instrument. */
-#define RBRGEN3_SEND_COMMAND_TERMINATOR "\r"
+#define RBRGEN3_SEND_COMMAND_TERMINATOR     "\r"
 /** \brief The length of the command terminator. */
 #define RBRGEN3_SEND_COMMAND_TERMINATOR_LEN 1
 /** \brief The terminator at the end of a command received from the instrument. */
-#define RBRGEN3_COMMAND_TERMINATOR "\r\n"
+#define RBRGEN3_COMMAND_TERMINATOR          "\r\n"
 /** \brief The length of the command terminator. */
-#define RBRGEN3_COMMAND_TERMINATOR_LEN 2
+#define RBRGEN3_COMMAND_TERMINATOR_LEN      2
 
 /**
  * \brief The length of the timestamp of a streamed sample.
@@ -53,13 +53,13 @@ extern "C" {
  * than #RBRGEN3_SUCCESS, then that value is returned again. Useful for
  * forwarding errors from other API functions.
  */
-#define RBR_TRY(op) do { \
-        RBRGen3Error _tryErr; \
-        if ((_tryErr = (op)) != RBRGEN3_SUCCESS) \
-        { \
-            return _tryErr; \
-        } \
-} while (0)
+#define RBR_TRY(op)                                \
+    do {                                           \
+        RBRGen3Error _tryErr;                      \
+        if ((_tryErr = (op)) != RBRGEN3_SUCCESS) { \
+            return _tryErr;                        \
+        }                                          \
+    } while (0)
 
 /**
  * Send the first RBRGen3.commandBufferLength bytes of
@@ -102,9 +102,7 @@ RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *conn);
  * \see RBRGen3_readResponse() to read the command response
  * \see RBRGen3_converse() for a send/receive shortcut
  */
-RBRGen3Error RBRGen3_sendCommand(RBRGen3 *conn,
-                                             const char *command,
-                                             ...);
+RBRGen3Error RBRGen3_sendCommand(RBRGen3 *conn, const char *command, ...);
 
 /**
  * Read a response from the instrument. This function will block until a
@@ -142,9 +140,7 @@ RBRGen3Error RBRGen3_sendCommand(RBRGen3 *conn,
  * \see RBRGen3_sendCommand() to send a command
  * \see RBRGen3_converse() for a send/receive shortcut
  */
-RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn,
-                                              bool breakOnSample,
-                                              RBRGen3Sample *sample);
+RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Sample *sample);
 
 /**
  * \brief Send a command to the instrument and await an appropriate response.
@@ -167,9 +163,7 @@ RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn,
  * \see RBRGen3_sendCommand() to send a command
  * \see RBRGen3_readResponse() to read the command response
  */
-RBRGen3Error RBRGen3_converse(RBRGen3 *conn,
-                                          const char *command,
-                                          ...);
+RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...);
 
 /**
  * \brief Read a single boolean parameter from the instrument.
@@ -193,10 +187,8 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *conn,
  * \see RBRGen3_getFloat() for the float equivalent
  * \see RBRGen3_getInt() for the integer equivalent
  */
-RBRGen3Error RBRGen3_getBool(RBRGen3 *conn,
-                                         const char *command,
-                                         const char *parameter,
-                                         bool *value);
+RBRGen3Error RBRGen3_getBool(RBRGen3 *conn, const char *command, const char *parameter,
+                             bool *value);
 
 /**
  * \brief Read a single float parameter from the instrument.
@@ -220,10 +212,8 @@ RBRGen3Error RBRGen3_getBool(RBRGen3 *conn,
  * \see RBRGen3_getBool() for the boolean equivalent
  * \see RBRGen3_getInt() for the integer equivalent
  */
-RBRGen3Error RBRGen3_getFloat(RBRGen3 *conn,
-                                          const char *command,
-                                          const char *parameter,
-                                          float *value);
+RBRGen3Error RBRGen3_getFloat(RBRGen3 *conn, const char *command, const char *parameter,
+                              float *value);
 
 /**
  * \brief Read a single integer parameter from the instrument.
@@ -247,14 +237,11 @@ RBRGen3Error RBRGen3_getFloat(RBRGen3 *conn,
  * \see RBRGen3_getBool() for the boolean equivalent
  * \see RBRGen3_getFloat() for the float equivalent
  */
-RBRGen3Error RBRGen3_getInt(RBRGen3 *conn,
-                                        const char *command,
-                                        const char *parameter,
-                                        int32_t *value);
+RBRGen3Error RBRGen3_getInt(RBRGen3 *conn, const char *command, const char *parameter,
+                            int32_t *value);
 
 /** \brief A parameter (key/value pair) from an instrument response. */
-typedef struct RBRGen3ResponseParameter
-{
+typedef struct RBRGen3ResponseParameter {
     /** \brief The number of index parameters prior to this parameter. */
     int32_t index;
     /** \brief The string value of the last index parameter. */
@@ -286,10 +273,7 @@ typedef struct RBRGen3ResponseParameter
  * \param [in,out] command the name of the command as indicated by the response
  * \param [in,out] parameter the most-recently-parsed response parameter
  */
-void RBRGen3_parseResponse(RBRGen3 *conn,
-                                 char **command,
-                                 RBRGen3ResponseParameter *parameter);
-
+void RBRGen3_parseResponse(RBRGen3 *conn, char **command, RBRGen3ResponseParameter *parameter);
 
 /**
  * \brief Check for errors or warnings in an instrument response.
@@ -302,10 +286,7 @@ void RBRGen3_parseResponse(RBRGen3 *conn,
  * \return #RBRGEN3_SUCCESS when the response is a warning or success
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error
  */
-RBRGen3Error RBRGen3_errorCheckResponse(
-    RBRGen3 *conn, 
-    char *beginning, 
-    char *end);
+RBRGen3Error RBRGen3_errorCheckResponse(RBRGen3 *conn, char *beginning, char *end);
 
 /**
  * \brief Parse a date/time string from a sample (i.e.,
@@ -321,10 +302,7 @@ RBRGen3Error RBRGen3_errorCheckResponse(
  * \return #RBRGEN3_SUCCESS when the timestamp is successfully parsed
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the time is invalid
  */
-RBRGen3Error RBRGen3DateTime_parseSampleTime(
-    const char *s,
-    RBRGen3DateTime *timestamp,
-    char **end);
+RBRGen3Error RBRGen3DateTime_parseSampleTime(const char *s, RBRGen3DateTime *timestamp, char **end);
 
 /**
  * \brief Parse a date/time string from a schedule setting (i.e.,
@@ -340,10 +318,8 @@ RBRGen3Error RBRGen3DateTime_parseSampleTime(
  * \return #RBRGEN3_SUCCESS when the timestamp is successfully parsed
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the time is invalid
  */
-RBRGen3Error RBRGen3DateTime_parseScheduleTime(
-    const char *s,
-    RBRGen3DateTime *timestamp,
-    char **end);
+RBRGen3Error RBRGen3DateTime_parseScheduleTime(const char *s, RBRGen3DateTime *timestamp,
+                                               char **end);
 
 /**
  * \brief Convert a timestamp to a sample time/date string (i.e.,
@@ -355,8 +331,7 @@ RBRGen3Error RBRGen3DateTime_parseScheduleTime(
  * \param [in] timestamp the timestamp
  * \param [out] s the destination buffer
  */
-void RBRGen3DateTime_toSampleTime(RBRGen3DateTime timestamp,
-                                        char *s);
+void RBRGen3DateTime_toSampleTime(RBRGen3DateTime timestamp, char *s);
 
 /**
  * \brief Convert a timestamp to a schedule setting time/date string (i.e.,
@@ -368,8 +343,7 @@ void RBRGen3DateTime_toSampleTime(RBRGen3DateTime timestamp,
  * \param [in] timestamp the timestamp
  * \param [out] s the destination buffer
  */
-void RBRGen3DateTime_toScheduleTime(RBRGen3DateTime timestamp,
-                                          char *s);
+void RBRGen3DateTime_toScheduleTime(RBRGen3DateTime timestamp, char *s);
 
 #ifdef __cplusplus
 }

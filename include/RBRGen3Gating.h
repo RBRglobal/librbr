@@ -18,8 +18,7 @@ extern "C" {
 #endif
 
 /** \brief The state of a gating condition. */
-typedef enum RBRGen3GatingState
-{
+typedef enum RBRGen3GatingState {
     /** \brief The gating condition is disabled. */
     RBRGEN3_GATING_NA,
     /** \brief Logging is paused due to the gating. */
@@ -47,8 +46,7 @@ const char *RBRGen3GatingState_name(RBRGen3GatingState state);
  * \see RBRGen3Thresholding
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
-typedef enum RBRGen3ThresholdingChannelSelection
-{
+typedef enum RBRGen3ThresholdingChannelSelection {
     /** The channel is set by index. */
     RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
     /** The channel is set by label. */
@@ -63,8 +61,7 @@ typedef enum RBRGen3ThresholdingChannelSelection
  * \return a string name for the channel selection type
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRGen3ThresholdingChannelSelection_name(
-    RBRGen3ThresholdingChannelSelection selection);
+const char *RBRGen3ThresholdingChannelSelection_name(RBRGen3ThresholdingChannelSelection selection);
 
 /**
  * \brief Possible instrument thresholding conditions.
@@ -72,8 +69,7 @@ const char *RBRGen3ThresholdingChannelSelection_name(
  * \see RBRGen3Thresholding
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
-typedef enum RBRGen3ThresholdingCondition
-{
+typedef enum RBRGen3ThresholdingCondition {
     /** Sampling occurs when the monitored parameter is above the threshold. */
     RBRGEN3_THRESHOLDING_ABOVE,
     /** Sampling occurs when the monitored parameter is below the threshold. */
@@ -91,8 +87,7 @@ typedef enum RBRGen3ThresholdingCondition
  * \return a string name for the thresholding condition
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRGen3ThresholdingCondition_name(
-    RBRGen3ThresholdingCondition condition);
+const char *RBRGen3ThresholdingCondition_name(RBRGen3ThresholdingCondition condition);
 
 /**
  * \brief Instrument `thresholding` command parameters.
@@ -101,8 +96,7 @@ const char *RBRGen3ThresholdingCondition_name(
  * \see RBRGen3_setThresholding()
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
-typedef struct RBRGen3Thresholding
-{
+typedef struct RBRGen3Thresholding {
     /** \brief Enables or disables thresholding. */
     bool enabled;
     /**
@@ -176,9 +170,7 @@ typedef struct RBRGen3Thresholding
  * \see RBRGen3_setThresholding()
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
-RBRGen3Error RBRGen3_getThresholding(
-    RBRGen3 *conn,
-    RBRGen3Thresholding *threshold);
+RBRGen3Error RBRGen3_getThresholding(RBRGen3 *conn, RBRGen3Thresholding *threshold);
 
 /**
  * \brief Set the instrument thresholding settings.
@@ -202,9 +194,7 @@ RBRGen3Error RBRGen3_getThresholding(
  * \see RBRGen3_getThresholding()
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
-RBRGen3Error RBRGen3_setThresholding(
-    RBRGen3 *conn,
-    const RBRGen3Thresholding *threshold);
+RBRGen3Error RBRGen3_setThresholding(RBRGen3 *conn, const RBRGen3Thresholding *threshold);
 
 /**
  * \brief Instrument `twistactivation` command parameters.
@@ -213,8 +203,7 @@ RBRGen3Error RBRGen3_setThresholding(
  * \see RBRGen3_setTwistActivation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/twistactivation
  */
-typedef struct RBRGen3TwistActivation
-{
+typedef struct RBRGen3TwistActivation {
     /** \brief Enables or disables twist activation. */
     bool enabled;
     /**
@@ -240,9 +229,7 @@ typedef struct RBRGen3TwistActivation
  * \see RBRGen3_setTwistActivation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/twistactivation
  */
-RBRGen3Error RBRGen3_getTwistActivation(
-    RBRGen3 *conn,
-    RBRGen3TwistActivation *twistActivation);
+RBRGen3Error RBRGen3_getTwistActivation(RBRGen3 *conn, RBRGen3TwistActivation *twistActivation);
 
 /**
  * \brief Set the instrument twist activation settings.
@@ -262,9 +249,8 @@ RBRGen3Error RBRGen3_getTwistActivation(
  * \see RBRGen3_getTwistActivation()
  * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/twistactivation
  */
-RBRGen3Error RBRGen3_setTwistActivation(
-    RBRGen3 *conn,
-    const RBRGen3TwistActivation *twistActivation);
+RBRGen3Error RBRGen3_setTwistActivation(RBRGen3 *conn,
+                                        const RBRGen3TwistActivation *twistActivation);
 
 #ifdef __cplusplus
 }

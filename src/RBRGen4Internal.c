@@ -50,9 +50,9 @@
  * support a single match criteria by ensuring that attempts to wake the
  * instrument will trigger the same behaviour as regular commands.
  */
-#define WAKE_COMMAND RBRGEN4_RESPONSE_TERMINATOR
+#define WAKE_COMMAND      RBRGEN4_RESPONSE_TERMINATOR
 /** \brief The length of the wake sequence. */
-#define WAKE_COMMAND_LEN RBRGEN4_RESPONSE_TERMINATOR_LEN
+#define WAKE_COMMAND_LEN  RBRGEN4_RESPONSE_TERMINATOR_LEN
 /**
  * \brief How long to wait after the wake sequence.
  *
@@ -62,27 +62,27 @@
  */
 #define WAKE_COMMAND_WAIT 50
 
-#define COMMAND_PROMPT "ready: "
+#define COMMAND_PROMPT     "ready: "
 #define COMMAND_PROMPT_LEN 7
 
-#define ARRAY_SEPARATOR_L4 '|'
-#define PARAMETER_SEPARATOR_L4 ' '
+#define ARRAY_SEPARATOR_L4           '|'
+#define PARAMETER_SEPARATOR_L4       ' '
 #define PARAMETER_VALUE_SEPARATOR_L4 '='
 
 #define OFFSET_UNINITIALIZED (-1)
 
-#define ERROR_PARAMETER "ERR-"
+#define ERROR_PARAMETER     "ERR-"
 #define ERROR_PARAMETER_LEN ((long) (sizeof(ERROR_PARAMETER) - 1))
-#define ERROR_NUMBER_LEN 3
+#define ERROR_NUMBER_LEN    3
 
-#define WARNING_PARAMETER "WRN-"
+#define WARNING_PARAMETER     "WRN-"
 #define WARNING_PARAMETER_LEN ((long) (sizeof(WARNING_PARAMETER) - 1))
-#define WARNING_NUMBER_LEN 3
+#define WARNING_NUMBER_LEN    3
 
-#define SAMPLE_NAN "nan"
-#define SAMPLE_INF "inf"
-#define SAMPLE_NINF "-inf"
-#define SAMPLE_ERROR_PREFIX "Error-"
+#define SAMPLE_NAN              "nan"
+#define SAMPLE_INF              "inf"
+#define SAMPLE_NINF             "-inf"
+#define SAMPLE_ERROR_PREFIX     "Error-"
 #define SAMPLE_ERROR_PREFIX_LEN ((long) (sizeof(SAMPLE_ERROR_PREFIX) - 1))
 
 static const char *RBRGen4DateTime_sampleFormat = "%04d-%02d-%02d %02d:%02d:%02d.%03d";
@@ -105,15 +105,12 @@ static RBRGen4DateTime localTimeOffset = OFFSET_UNINITIALIZED;
  */
 static void *rbr_memmem(void *ptr1, size_t num1, const void *ptr2, size_t num2)
 {
-    if (num2 > num1)
-    {
+    if (num2 > num1) {
         return NULL;
     }
 
-    for (size_t offset = 0; offset <= num1 - num2; ++offset)
-    {
-        if (memcmp((uint8_t *) ptr1 + offset, ptr2, num2) == 0)
-        {
+    for (size_t offset = 0; offset <= num1 - num2; ++offset) {
+        if (memcmp((uint8_t *) ptr1 + offset, ptr2, num2) == 0) {
             return (uint8_t *) ptr1 + offset;
         }
     }
@@ -134,17 +131,13 @@ static RBRGen4Error RBRGen4_wake(const RBRGen4 *conn)
     RBRGen4DateTime now;
     RBR_TRY(conn->callbacks.time(conn, &now));
 
-    if (conn->lastActivityTime >= 0 && now - conn->lastActivityTime < COMMAND_TIMEOUT)
-    {
+    if (conn->lastActivityTime >= 0 && now - conn->lastActivityTime < COMMAND_TIMEOUT) {
         return RBRGEN4_SUCCESS;
     }
 
     /* Send the wake sequence twice to make sure it gets noticed. */
-    for (int pass = 0; pass < 2; ++pass)
-    {
-        RBR_TRY(conn->callbacks.write(conn,
-                                            WAKE_COMMAND,
-                                            WAKE_COMMAND_LEN));
+    for (int pass = 0; pass < 2; ++pass) {
+        RBR_TRY(conn->callbacks.write(conn, WAKE_COMMAND, WAKE_COMMAND_LEN));
         RBR_TRY(conn->callbacks.sleep(conn, WAKE_COMMAND_WAIT));
     }
 
@@ -156,65 +149,53 @@ RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *conn)
     /* Wake the instrument if necessary. */
     RBR_TRY(RBRGen4_wake(conn));
 
-    if (conn->commandBufferLength > RBRGEN4_COMMAND_BUFFER_MAX)
-    {
+    if (conn->commandBufferLength > RBRGEN4_COMMAND_BUFFER_MAX) {
         conn->commandBufferLength = RBRGEN4_COMMAND_BUFFER_MAX;
     }
 
     /* Send the command to the instrument. */
-    RBR_TRY(conn->callbacks.write(conn,
-                                        conn->commandBuffer,
-                                        conn->commandBufferLength));
-    RBR_TRY(conn->callbacks.time(conn,
-                                       &conn->lastActivityTime));
+    RBR_TRY(conn->callbacks.write(conn, conn->commandBuffer, conn->commandBufferLength));
+    RBR_TRY(conn->callbacks.time(conn, &conn->lastActivityTime));
     return RBRGEN4_SUCCESS;
 }
 
-static RBRGen4Error RBRGen4_vSendCommand(RBRGen4 *conn,
-                                                             const char *command,
-                                                             va_list format)
+static RBRGen4Error RBRGen4_vSendCommand(RBRGen4 *conn, const char *command, va_list format)
 {
     /* Prepare the command. */
 
-    conn->commandBufferLength = vsnprintf(
-        (char *) conn->commandBuffer,
-        sizeof(conn->commandBuffer),
-        command,
-        format);
+    conn->commandBufferLength =
+        vsnprintf((char *) conn->commandBuffer, sizeof(conn->commandBuffer), command, format);
 
     /* Make sure we're within buffer bounds. This is a greater-or-equal check,
      * not just a greater-than check, because vsnprintf doesn't include the
      * null terminator in its return value. The longest value vsnprintf can
      * write is RBRGEN4_COMMAND_BUFFER_MAX - 1 bytes. */
-    if (conn->commandBufferLength >= RBRGEN4_COMMAND_BUFFER_MAX)
-    {
+    if (conn->commandBufferLength >= RBRGEN4_COMMAND_BUFFER_MAX) {
         conn->commandBufferLength = RBRGEN4_COMMAND_BUFFER_MAX;
         return RBRGEN4_BUFFER_TOO_SMALL;
     }
 
     /* Make sure the command is LF-terminated. */
-    if (conn->commandBufferLength < RBRGEN4_SEND_COMMAND_TERMINATOR_LEN || memcmp(conn->commandBuffer + conn->commandBufferLength - RBRGEN4_SEND_COMMAND_TERMINATOR_LEN,
-                                                                                                  RBRGEN4_SEND_COMMAND_TERMINATOR,
-                                                                                                  RBRGEN4_SEND_COMMAND_TERMINATOR_LEN) != 0)
-    {
+    if (conn->commandBufferLength < RBRGEN4_SEND_COMMAND_TERMINATOR_LEN ||
+        memcmp(conn->commandBuffer + conn->commandBufferLength -
+                   RBRGEN4_SEND_COMMAND_TERMINATOR_LEN,
+               RBRGEN4_SEND_COMMAND_TERMINATOR,
+               RBRGEN4_SEND_COMMAND_TERMINATOR_LEN) != 0) {
         /* It isn't. Make sure there's room before adding it. */
-        if (conn->commandBufferLength + RBRGEN4_SEND_COMMAND_TERMINATOR_LEN > RBRGEN4_COMMAND_BUFFER_MAX)
-        {
+        if (conn->commandBufferLength + RBRGEN4_SEND_COMMAND_TERMINATOR_LEN >
+            RBRGEN4_COMMAND_BUFFER_MAX) {
             return RBRGEN4_BUFFER_TOO_SMALL;
         }
 
         memcpy(conn->commandBuffer + conn->commandBufferLength,
                RBRGEN4_SEND_COMMAND_TERMINATOR,
                RBRGEN4_SEND_COMMAND_TERMINATOR_LEN);
-        conn->commandBufferLength +=
-            RBRGEN4_SEND_COMMAND_TERMINATOR_LEN;
+        conn->commandBufferLength += RBRGEN4_SEND_COMMAND_TERMINATOR_LEN;
     }
     return RBRGen4_sendBuffer(conn);
 }
 
-RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn,
-                                                     const char *command,
-                                                     ...)
+RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn, const char *command, ...)
 {
     RBRGen4Error err;
     va_list format;
@@ -231,8 +212,7 @@ RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn,
  */
 static void RBRGen4_removeLastResponse(RBRGen4 *conn)
 {
-    if (conn->lastResponseLength <= 0 || conn->responseBufferLength == conn->lastResponseLength)
-    {
+    if (conn->lastResponseLength <= 0 || conn->responseBufferLength == conn->lastResponseLength) {
         conn->responseBufferLength = 0;
         conn->lastResponseLength = 0;
         return;
@@ -257,23 +237,18 @@ static void RBRGen4_removeLastResponse(RBRGen4 *conn)
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
  */
-static RBRGen4Error RBRGen4_readSingleResponse(
-    RBRGen4 *conn,
-    RBRGen4DateTime startTime,
-    RBRGen4DateTime timeout,
-    char **end)
+static RBRGen4Error RBRGen4_readSingleResponse(RBRGen4 *conn, RBRGen4DateTime startTime,
+                                               RBRGen4DateTime timeout, char **end)
 {
     /*
     fprintf(stdout, "In RBRGen4_readSingleResponse:\n");
     */
     RBRGen4DateTime now;
     int32_t readLength;
-    while ((*end = (char *) rbr_memmem(
-                conn->responseBuffer,
-                conn->responseBufferLength,
-                RBRGEN4_RESPONSE_TERMINATOR,
-                RBRGEN4_RESPONSE_TERMINATOR_LEN)) == NULL)
-    {
+    while ((*end = (char *) rbr_memmem(conn->responseBuffer,
+                                       conn->responseBufferLength,
+                                       RBRGEN4_RESPONSE_TERMINATOR,
+                                       RBRGEN4_RESPONSE_TERMINATOR_LEN)) == NULL) {
         /*
          * If we're not seeing any response at all then the read callback
          * should return a character-level timeout. But if we're reading
@@ -297,16 +272,14 @@ static RBRGen4Error RBRGen4_readSingleResponse(
          */
         RBR_TRY(conn->callbacks.time(conn, &now));
 
-        if (now - startTime > timeout)
-        {
+        if (now - startTime > timeout) {
             return RBRGEN4_TIMEOUT;
         }
 
         /* If the buffer is full but doesn't contain a terminator, there's
          * not much we can do about it: throw out the buffer, then keep
          * trying to fill it. */
-        if (conn->responseBufferLength == RBRGEN4_RESPONSE_BUFFER_MAX)
-        {
+        if (conn->responseBufferLength == RBRGEN4_RESPONSE_BUFFER_MAX) {
             conn->responseBufferLength = 0;
             conn->lastResponseLength = 0;
         }
@@ -316,9 +289,7 @@ static RBRGen4Error RBRGen4_readSingleResponse(
 
         /* read from the instrument and update responseBuffer length. */
         RBR_TRY(conn->callbacks.read(
-            conn,
-            conn->responseBuffer + conn->responseBufferLength,
-            &readLength));
+            conn, conn->responseBuffer + conn->responseBufferLength, &readLength));
 
         conn->responseBufferLength += readLength;
     }
@@ -333,10 +304,7 @@ static RBRGen4Error RBRGen4_readSingleResponse(
  * \param [out] beginning the beginning of the response
  * \param [in] end the end of the response
  */
-static void RBRGen4_terminateResponse(
-    RBRGen4 *conn,
-    char **beginning,
-    char *end)
+static void RBRGen4_terminateResponse(RBRGen4 *conn, char **beginning, char *end)
 {
     /*
      * Put a null terminator over the “\r” in the line terminator, but let
@@ -360,8 +328,7 @@ static void RBRGen4_terminateResponse(
 
     *beginning = (char *) conn->responseBuffer;
     *end = '\0';
-    conn->lastResponseLength =
-        end + RBRGEN4_RESPONSE_TERMINATOR_LEN - *beginning;
+    conn->lastResponseLength = end + RBRGEN4_RESPONSE_TERMINATOR_LEN - *beginning;
 
     /* Fast-forward leftover line termination characters. This shouldn't happen
      * in the middle of a standing conversation with an instrument, but it
@@ -370,16 +337,13 @@ static void RBRGen4_terminateResponse(
      * point and might encounter anything.
      *
      * In summary, it trims leading whitespace. */
-    while (isspace((unsigned char) **beginning) && **beginning != '\0')
-    {
+    while (isspace((unsigned char) **beginning) && **beginning != '\0') {
         ++*beginning;
     }
 
     /* Trim leading “Ready: ” prompts in the buffer, if any. */
-    while (end - *beginning >= COMMAND_PROMPT_LEN && memcmp(*beginning,
-                                                            COMMAND_PROMPT,
-                                                            COMMAND_PROMPT_LEN) == 0)
-    {
+    while (end - *beginning >= COMMAND_PROMPT_LEN &&
+           memcmp(*beginning, COMMAND_PROMPT, COMMAND_PROMPT_LEN) == 0) {
         *beginning += COMMAND_PROMPT_LEN;
     }
 }
@@ -394,30 +358,22 @@ static void RBRGen4_terminateResponse(
  */
 static char *seek(const char *str, char delimiter)
 {
-    char *token = (char *)str;
-    if (token == NULL
-        || *token == '\0')
-    {
+    char *token = (char *) str;
+    if (token == NULL || *token == '\0') {
         return NULL;
     }
 
-    while (*token != delimiter
-           && *token != '\0')
-    {
+    while (*token != delimiter && *token != '\0') {
         ++token;
     }
-    if (*token == '\0')
-    {
+    if (*token == '\0') {
         return NULL;
     }
 
-    while (*token == delimiter
-           && *token != '\0')
-    {
+    while (*token == delimiter && *token != '\0') {
         ++token;
     }
-    if (*token == '\0')
-    {
+    if (*token == '\0') {
         return NULL;
     }
     return token;
@@ -433,10 +389,8 @@ static char *seek(const char *str, char delimiter)
  * \return RBRGEN4_INVALID_PARAMETER_VALUE if the response does not
  *         follow the specified output format
  */
-static RBRGen4Error RBRGen4Sample_parse(
-    RBRGen4Sample *sample,
-    RBRGen4OutputFormat *outputFormat,
-    char *response)
+static RBRGen4Error RBRGen4Sample_parse(RBRGen4Sample *sample, RBRGen4OutputFormat *outputFormat,
+                                        char *response)
 {
     memset(sample, 0, sizeof(RBRGen4Sample));
 
@@ -444,122 +398,85 @@ static RBRGen4Error RBRGen4Sample_parse(
     sample->channelCount = 0;
     char *token = response;
     /* Serial numbers are expected to be of the form 'RBR [0-9]+' */
-    if (outputFormat->sn)
-    {
-        if (memcmp(token, "RBR", 3) != 0)
-        {
+    if (outputFormat->sn) {
+        if (memcmp(token, "RBR", 3) != 0) {
             return RBRGEN4_INVALID_PARAMETER_VALUE;
         }
         /* Explicitly check for a ' ', not PARAMETER_SEPARATOR_L4 */
-        if ((token = seek(token, ' ')) == NULL)
-        {
+        if ((token = seek(token, ' ')) == NULL) {
             return RBRGEN4_INVALID_PARAMETER_VALUE;
         }
         /* Assume the serial number is valid if it starts with a digit */
-        if (!isdigit(*token))
-        {
+        if (!isdigit(*token)) {
             return RBRGEN4_INVALID_PARAMETER_VALUE;
         }
-        if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
-        {
+        if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL) {
             return RBRGEN4_INVALID_PARAMETER_VALUE;
         }
     }
 
     /* Labels' naming constraints are enforced by the instrument, not here. */
-    if (outputFormat->scheduleLabel)
-    {
+    if (outputFormat->scheduleLabel) {
         char *labelEnd = token;
-        while (*labelEnd != PARAMETER_SEPARATOR_L4
-               && *labelEnd != '\0')
-        {
+        while (*labelEnd != PARAMETER_SEPARATOR_L4 && *labelEnd != '\0') {
             ++labelEnd;
         }
         size_t labelLen = (size_t) (labelEnd - token);
-        if (labelLen > RBRGEN4_LABEL_NAME_MAX)
-        {
+        if (labelLen > RBRGEN4_LABEL_NAME_MAX) {
             labelLen = RBRGEN4_LABEL_NAME_MAX;
         }
         memcpy(sample->scheduleLabel, token, labelLen);
         sample->scheduleLabel[labelLen] = '\0';
 
-        if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL)
-        {
+        if ((token = seek(token, PARAMETER_SEPARATOR_L4)) == NULL) {
             return RBRGEN4_INVALID_PARAMETER_VALUE;
         }
     }
 
     /* The timestamp is either a date/time or a bare millisecond count. */
-    if (outputFormat->dateTime)
-    {
+    if (outputFormat->dateTime) {
         char *timestampEnd;
-        RBR_TRY(RBRGen4DateTime_parseSampleTime(token,
-                                                          &sample->timestamp,
-                                                          &timestampEnd));
-        if ((token = seek(timestampEnd, PARAMETER_SEPARATOR_L4)) == NULL)
-        {
+        RBR_TRY(RBRGen4DateTime_parseSampleTime(token, &sample->timestamp, &timestampEnd));
+        if ((token = seek(timestampEnd, PARAMETER_SEPARATOR_L4)) == NULL) {
             return RBRGEN4_INVALID_PARAMETER_VALUE;
         }
     }
 
-    while (token != NULL
-           && sample->channelCount < RBRGEN4_CHANNEL_MAX)
-    {
+    while (token != NULL && sample->channelCount < RBRGEN4_CHANNEL_MAX) {
         char *readingEnd = token;
-        if (memcmp(token, SAMPLE_NAN, 3) == 0)
-        {
+        if (memcmp(token, SAMPLE_NAN, 3) == 0) {
             reading = (double) NAN;
-        }
-        else if (memcmp(token, SAMPLE_INF, 3) == 0)
-        {
+        } else if (memcmp(token, SAMPLE_INF, 3) == 0) {
             reading = (double) INFINITY;
-        }
-        else if (memcmp(token, SAMPLE_NINF, 4) == 0)
-        {
+        } else if (memcmp(token, SAMPLE_NINF, 4) == 0) {
             reading = -(double) INFINITY;
-        }
-        else if (memcmp(token,
-                        SAMPLE_ERROR_PREFIX,
-                        SAMPLE_ERROR_PREFIX_LEN) == 0)
-        {
+        } else if (memcmp(token, SAMPLE_ERROR_PREFIX, SAMPLE_ERROR_PREFIX_LEN) == 0) {
             /* Uh-oh. We'll encode the error in a NaN. Filtering, etc. will
              * ignore the value and the sample formatter will output it just as
              * we received it. */
-            reading = RBRGen4Reading_setError(
-                strtol(token + SAMPLE_ERROR_PREFIX_LEN, NULL, 10));
-        }
-        else if (memcmp(token, "0x", 2) == 0)
-        {
-            if (outputFormat->crc)
-            {
+            reading = RBRGen4Reading_setError(strtol(token + SAMPLE_ERROR_PREFIX_LEN, NULL, 10));
+        } else if (memcmp(token, "0x", 2) == 0) {
+            if (outputFormat->crc) {
                 /* Calculate the CRC. The CRC includes all characters already
                  * sent on this line, starting with the first, up to
                  * and including the last space character before the <CRC>. */
                 uint16_t realCrc = strtol(token, &readingEnd, 16);
-                if (readingEnd <= token + 2)
-                {
+                if (readingEnd <= token + 2) {
                     /* No value was parsed. */
                     return RBRGEN4_INVALID_PARAMETER_VALUE;
                 }
                 uint16_t calCrc;
-                calCrc = RBRGen4_calculateCrc(response,
-                                                        token - response);
-                if (calCrc != realCrc)
-                {
+                calCrc = RBRGen4_calculateCrc(response, token - response);
+                if (calCrc != realCrc) {
                     return RBRGEN4_CHECKSUM_ERROR;
                 }
                 return RBRGEN4_SUCCESS;
-            }
-            else
-            {
+            } else {
                 return RBRGEN4_INVALID_PARAMETER_VALUE;
             }
-        }
-        else
-        {
+        } else {
             reading = strtod(token, &readingEnd);
-            if (reading == 0 && token == readingEnd)
-            {
+            if (reading == 0 && token == readingEnd) {
                 /* No value was parsed. */
                 return RBRGEN4_INVALID_PARAMETER_VALUE;
             }
@@ -582,10 +499,7 @@ static RBRGen4Error RBRGen4Sample_parse(
  * \return #RBRGEN4_SUCCESS when the response is a warning or success
  * \return #RBRGEN4_HARDWARE_ERROR when the response indicates an error
  */
-RBRGen4Error RBRGen4_errorCheckResponse(
-    RBRGen4 *conn,
-    char *beginning,
-    char *end)
+RBRGen4Error RBRGen4_errorCheckResponse(RBRGen4 *conn, char *beginning, char *end)
 {
     /*
      * In L3.5 and L4, errors and warnings are found at the beginning of
@@ -597,34 +511,25 @@ RBRGen4Error RBRGen4_errorCheckResponse(
      * >> enable config=pH_cal dataset=d_pHcal_20240401 storagemode=calibration
      * << ERR-128 instrument was already enabled with different settings
      */
-    if (end - beginning >= (ERROR_PARAMETER_LEN + ERROR_NUMBER_LEN)
-        && memcmp(beginning, ERROR_PARAMETER, ERROR_PARAMETER_LEN) == 0)
-    {
+    if (end - beginning >= (ERROR_PARAMETER_LEN + ERROR_NUMBER_LEN) &&
+        memcmp(beginning, ERROR_PARAMETER, ERROR_PARAMETER_LEN) == 0) {
         conn->response.type = RBRGEN4_RESPONSE_ERROR;
         conn->response.error = strtol(beginning + ERROR_PARAMETER_LEN, NULL, 10);
         /* Make sure we actually have a message to go along with the error.
          * There should be one, but it's best to play safe. */
-        if (end - beginning >= (ERROR_PARAMETER_LEN + ERROR_NUMBER_LEN))
-        {
+        if (end - beginning >= (ERROR_PARAMETER_LEN + ERROR_NUMBER_LEN)) {
             conn->response.response = beginning + ERROR_PARAMETER_LEN + ERROR_NUMBER_LEN;
-        }
-        else
-        {
+        } else {
             conn->response.response = NULL;
         }
         return RBRGEN4_HARDWARE_ERROR;
-    }
-    else if (end - beginning >= (WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN)
-             && memcmp(beginning, WARNING_PARAMETER, WARNING_PARAMETER_LEN) == 0)
-    {
+    } else if (end - beginning >= (WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN) &&
+               memcmp(beginning, WARNING_PARAMETER, WARNING_PARAMETER_LEN) == 0) {
         conn->response.type = RBRGEN4_RESPONSE_WARNING;
         conn->response.error = strtol(beginning + WARNING_PARAMETER_LEN, NULL, 10);
-        if (end - beginning >= (WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN))
-        {
+        if (end - beginning >= (WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN)) {
             conn->response.response = beginning + WARNING_PARAMETER_LEN + WARNING_NUMBER_LEN;
-        }
-        else
-        {
+        } else {
             conn->response.response = NULL;
         }
         return RBRGEN4_HARDWARE_ERROR;
@@ -637,29 +542,21 @@ RBRGen4Error RBRGen4_errorCheckResponse(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_deliverSample(
-    RBRGen4 *conn,
-    const RBRGen4Sample *sample)
+RBRGen4Error RBRGen4_deliverSample(RBRGen4 *conn, const RBRGen4Sample *sample)
 {
-    if (conn->callbacks.sample == NULL)
-    {
+    if (conn->callbacks.sample == NULL) {
         return RBRGEN4_SUCCESS;
     }
 
-    if (sample != conn->callbacks.sampleBuffer)
-    {
+    if (sample != conn->callbacks.sampleBuffer) {
         *conn->callbacks.sampleBuffer = *sample;
     }
 
-    return conn->callbacks.sample(conn,
-                                        conn->callbacks.sampleBuffer);
+    return conn->callbacks.sample(conn, conn->callbacks.sampleBuffer);
 }
 
-RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn,
-                                                      bool breakOnSample,
-                                                      RBRGen4Sample *sample,
-                                                      RBRGen4DateTime startTime,
-                                                      RBRGen4DateTime timeout)
+RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn, bool breakOnSample, RBRGen4Sample *sample,
+                                  RBRGen4DateTime startTime, RBRGen4DateTime timeout)
 {
     /* Reset the response state. */
     conn->response.type = RBRGEN4_RESPONSE_UNKNOWN_TYPE;
@@ -667,19 +564,15 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn,
     conn->response.response = NULL;
 
     RBRGen4Sample *sampleTarget;
-    if (sample == NULL)
-    {
+    if (sample == NULL) {
         sampleTarget = conn->callbacks.sampleBuffer;
-    }
-    else
-    {
+    } else {
         sampleTarget = sample;
     }
 
     /* Skip over streaming samples until we find a real command response, or
      * until we exceed the timeout. */
-    while (true)
-    {
+    while (true) {
         RBRGen4_removeLastResponse(conn);
         char *beginning;
         char *end;
@@ -687,47 +580,35 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn,
 
         RBRGen4_terminateResponse(conn, &beginning, end);
 
-        if (sampleTarget != NULL && RBRGen4Sample_parse(sampleTarget, &conn->outputFormat, beginning) == RBRGEN4_SUCCESS)
-        {
-            if (sample == NULL)
-            {
-                RBR_TRY(RBRGen4_deliverSample(conn,
-                                                        sampleTarget));
+        if (sampleTarget != NULL &&
+            RBRGen4Sample_parse(sampleTarget, &conn->outputFormat, beginning) == RBRGEN4_SUCCESS) {
+            if (sample == NULL) {
+                RBR_TRY(RBRGen4_deliverSample(conn, sampleTarget));
             }
-            if (breakOnSample)
-            {
+            if (breakOnSample) {
                 return RBRGEN4_SAMPLE;
             }
-        }
-        else
-        {
-            return RBRGen4_errorCheckResponse(conn,
-                                                        beginning,
-                                                        end);
+        } else {
+            return RBRGen4_errorCheckResponse(conn, beginning, end);
         }
     }
 }
 
-void RBRGen4_parseResponse(RBRGen4 *conn,
-                                     char **command,
-                                     RBRGen4ResponseParameter *parameter)
+void RBRGen4_parseResponse(RBRGen4 *conn, char **command, RBRGen4ResponseParameter *parameter)
 {
     /*
      * If this has not been run, the command string is null, so the command end
      * seeks forward from the start of the response until finding the parameter
      * separator (' ') or the end of the string.
      */
-    if (*command == NULL)
-    {
+    if (*command == NULL) {
         memset(parameter, 0, sizeof(RBRGen4ResponseParameter));
 
         *command = conn->response.response;
         char *commandEnd = *command;
 
-        while (true)
-        {
-            switch (*commandEnd)
-            {
+        while (true) {
+            switch (*commandEnd) {
             case '\0':
                 parameter->key = NULL;
                 parameter->value = NULL;
@@ -748,8 +629,7 @@ void RBRGen4_parseResponse(RBRGen4 *conn,
         parameter->nextKey = commandEnd + 1;
     }
 
-    if (parameter->nextKey == NULL)
-    {
+    if (parameter->nextKey == NULL) {
         parameter->key = NULL;
         parameter->value = NULL;
         parameter->nextKey = NULL;
@@ -761,15 +641,16 @@ void RBRGen4_parseResponse(RBRGen4 *conn,
      * it with the response. E.g.,
      *
      *     >> channel conductivity_00
-     *     << channel conductivity_00 type=cond00 address=32 settlingtime=50 readtime=260 guardtime=20 userunits=mS/cm derived=off grouplist=none sensor=none
+     *     << channel conductivity_00 type=cond00 address=32 settlingtime=50 readtime=260
+     * guardtime=20 userunits=mS/cm derived=off grouplist=none sensor=none
      *
      * This gets parsed into:
-     * 
-     *     << channel\0conductivity_00\0type\0cond00\0address=32 settlingtime=50 readtime=260 guardtime=20 userunits=mS/cm derived=off grouplist=none sensor=none\0
-     *        ^command ^indexValue      ^key  ^value  ^nextKey
-     *        ^instrument->response.response 
      *
-     * Next, the value seeks forward from the key pointer until finding the 
+     *     << channel\0conductivity_00\0type\0cond00\0address=32 settlingtime=50 readtime=260
+     * guardtime=20 userunits=mS/cm derived=off grouplist=none sensor=none\0 ^command ^indexValue
+     * ^key  ^value  ^nextKey ^instrument->response.response
+     *
+     * Next, the value seeks forward from the key pointer until finding the
      * value separator ('='), saving the position of the rightmost parameter
      * separator (' '), which separates the end of the index parameter from the
      * beginning of the parameter key. Because this can theoretically happen both
@@ -780,38 +661,31 @@ void RBRGen4_parseResponse(RBRGen4 *conn,
     char *previousSpace = NULL;
     parameter->value = parameter->key;
 
-    while (true)
-    {
-        if (*parameter->value == '\0')
-        {
-            /* 
+    while (true) {
+        if (*parameter->value == '\0') {
+            /*
              * Nothing left to do if value reaches the end without finding the
              * value separator.
              */
             parameter->nextKey = NULL;
             return;
-        }
-        else if (*parameter->value == PARAMETER_VALUE_SEPARATOR_L4)
-        {
+        } else if (*parameter->value == PARAMETER_VALUE_SEPARATOR_L4) {
             /* Null-terminate the value if found. */
             *parameter->value = '\0';
             ++parameter->value;
             break;
-        }
-        else if (*parameter->value == PARAMETER_SEPARATOR_L4)
-        {
+        } else if (*parameter->value == PARAMETER_SEPARATOR_L4) {
             previousSpace = parameter->value;
         }
         ++parameter->value;
     }
 
-    /* 
+    /*
      * Finding the parameter separator between the key and the value indicates
-     * an index value. 
+     * an index value.
      * Set the index value to the current key and move the key past the separator.
      */
-    if (previousSpace != NULL)
-    {
+    if (previousSpace != NULL) {
         *previousSpace = '\0';
         ++parameter->index;
         parameter->indexValue = parameter->key;
@@ -823,30 +697,27 @@ void RBRGen4_parseResponse(RBRGen4 *conn,
      * lists. E.g.,
      *
      *     >> link serial availablebaudrates availablemodes
-     *     << link serial availablebaudrates=115200|19200|9600|4800|2400|1200|230400|460800 availablemodes=rs232|rs485f|uart|uart_idlelow
+     *     << link serial availablebaudrates=115200|19200|9600|4800|2400|1200|230400|460800
+     * availablemodes=rs232|rs485f|uart|uart_idlelow
      *
      * This gets parsed into:
-     *     << link serial\0availablebaudrates\0115200|19200|9600|4800|2400|1200|230400|460800\0availablemodes=rs232|rs485f|uart|uart_idlelow\0
-     *        ^command     ^key               ^value                                           ^nextKey
-     *        ^instrument->response.response 
+     *     << link
+     * serial\0availablebaudrates\0115200|19200|9600|4800|2400|1200|230400|460800\0availablemodes=rs232|rs485f|uart|uart_idlelow\0
+     *        ^command     ^key               ^value ^nextKey ^instrument->response.response
      *
      * At last, the next key seeks forward from the value until the parameter
      * separator (' ') or the end of the string.
      */
     parameter->nextKey = parameter->value;
-    while (true)
-    {
-        if (*parameter->nextKey == '\0')
-        {
-            /* 
+    while (true) {
+        if (*parameter->nextKey == '\0') {
+            /*
              * Nothing left to do if next key reaches the end without finding
              * the parameter separator.
              */
             parameter->nextKey = NULL;
             return;
-        }
-        else if (*parameter->nextKey == PARAMETER_SEPARATOR_L4)
-        {
+        } else if (*parameter->nextKey == PARAMETER_SEPARATOR_L4) {
             /* Null-terminate the next key. */
             *parameter->nextKey = '\0';
             ++parameter->nextKey;
@@ -856,9 +727,7 @@ void RBRGen4_parseResponse(RBRGen4 *conn,
     }
 }
 
-RBRGen4Error RBRGen4_converse(RBRGen4 *conn,
-                                                  const char *command,
-                                                  ...)
+RBRGen4Error RBRGen4_converse(RBRGen4 *conn, const char *command, ...)
 {
     RBRGen4Error err;
     va_list format;
@@ -868,8 +737,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn,
     /* Keep firing off the command and looking for a response until we find one
      * which matches. */
     bool retry;
-    do
-    {
+    do {
         /* The retry flag might be set on by the “E0102 invalid command” error
          * handling below. It needs to be reset every time we send the command
          * so that we don't accidentally retry infinitely. */
@@ -881,8 +749,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn,
         err = RBRGen4_vSendCommand(conn, command, formatSend);
         va_end(formatSend);
 
-        if (err != RBRGEN4_SUCCESS)
-        {
+        if (err != RBRGEN4_SUCCESS) {
             break;
         }
 
@@ -890,8 +757,8 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn,
          * its command word matches what we sent. To match that, we'll find the
          * first word of the command. */
         int32_t commandLength = 0;
-        while (!isspace(conn->commandBuffer[commandLength]) && conn->commandBuffer[commandLength] != '\0')
-        {
+        while (!isspace(conn->commandBuffer[commandLength]) &&
+               conn->commandBuffer[commandLength] != '\0') {
             ++commandLength;
         }
 
@@ -901,24 +768,17 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn,
          * expected response, or to specialize the command handling function
          * to include error checking/retry. */
         uint8_t *commandResponse = conn->commandBuffer;
-        if (commandLength == 4 && memcmp("read", conn->commandBuffer, 4) == 0)
-        {
+        if (commandLength == 4 && memcmp("read", conn->commandBuffer, 4) == 0) {
             commandResponse = (uint8_t *) "data";
         }
 
-        do
-        {
+        do {
             RBRGen4DateTime now;
             err = conn->callbacks.time(conn, &now);
-            if (err != RBRGEN4_SUCCESS)
-            {
+            if (err != RBRGEN4_SUCCESS) {
                 break;
             }
-            err = RBRGen4_readResponse(conn,
-                                                 false,
-                                                 NULL,
-                                                 now,
-                                                 conn->commandTimeout);
+            err = RBRGen4_readResponse(conn, false, NULL, now, conn->commandTimeout);
             /*
              * There are a few reasons the instrument might generate an “E0102
              * invalid command” error, and we can make the user's life a bit
@@ -939,65 +799,54 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn,
              * - Otherwise, the error message wasn't related to this command at
              *   all and should be ignored.
              */
-            if (err == RBRGEN4_HARDWARE_ERROR && (conn->response.error ==
-                                                            RBRGEN4_HARDWARE_ERROR_INVALID_COMMAND))
-            {
+            if (err == RBRGEN4_HARDWARE_ERROR &&
+                (conn->response.error == RBRGEN4_HARDWARE_ERROR_INVALID_COMMAND)) {
                 /* We have no message to inspect, so we can only assume the
                  * error is legitimate and pass it along to the user. */
-                if (conn->response.response == NULL)
-                {
+                if (conn->response.response == NULL) {
                     break;
                 }
 
                 /* The error message indicates what the invalid command was.
                  * It's enclosed in single quotes, so we can look for those to
                  * find its bounds. */
-                char *invalidCommand = strchr(conn->response.response,
-                                              '\'');
-                if (invalidCommand == NULL)
-                {
+                char *invalidCommand = strchr(conn->response.response, '\'');
+                if (invalidCommand == NULL) {
                     break;
                 }
                 ++invalidCommand;
 
                 char *invalidCommandEnd = strchr(invalidCommand, '\'');
-                if (invalidCommandEnd == NULL)
-                {
+                if (invalidCommandEnd == NULL) {
                     break;
                 }
 
                 int32_t invalidCommandLength = invalidCommandEnd - invalidCommand;
 
                 /* The command was actually invalid. Whoops. */
-                if (invalidCommandLength == commandLength && memcmp(invalidCommand,
-                                                                    conn->commandBuffer,
-                                                                    commandLength) == 0)
-                {
+                if (invalidCommandLength == commandLength &&
+                    memcmp(invalidCommand, conn->commandBuffer, commandLength) == 0) {
                     break;
                 }
                 /* We were on the right track, but there was garbage in the
                  * buffer. Retry. */
-                else if (invalidCommandLength > commandLength && memcmp(invalidCommand + invalidCommandLength - commandLength,
-                                                                        conn->commandBuffer,
-                                                                        commandLength) == 0)
-                {
+                else if (invalidCommandLength > commandLength &&
+                         memcmp(invalidCommand + invalidCommandLength - commandLength,
+                                conn->commandBuffer,
+                                commandLength) == 0) {
                     retry = true;
                     break;
                 }
                 /* Not our garbage, not our problem. We won't retry, but we'll
                  * keep trying to read a response. */
-                else
-                {
+                else {
                     continue;
                 }
-            }
-            else if (err != RBRGEN4_SUCCESS)
-            {
+            } else if (err != RBRGEN4_SUCCESS) {
                 break;
             }
-        } while ((conn->response.response == NULL || memcmp(conn->response.response,
-                                                                  commandResponse,
-                                                                  commandLength) != 0));
+        } while ((conn->response.response == NULL ||
+                  memcmp(conn->response.response, commandResponse, commandLength) != 0));
     } while (retry);
 
     va_end(format);
@@ -1005,10 +854,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn,
     return err;
 }
 
-RBRGen4Error RBRGen4_getBool(RBRGen4 *conn,
-                                                 const char *command,
-                                                 const char *parameter,
-                                                 bool *value)
+RBRGen4Error RBRGen4_getBool(RBRGen4 *conn, const char *command, const char *parameter, bool *value)
 {
     *value = false;
 
@@ -1016,18 +862,12 @@ RBRGen4Error RBRGen4_getBool(RBRGen4 *conn,
 
     char *responseCommand = NULL;
     RBRGen4ResponseParameter responseParameter;
-    do
-    {
-        RBRGen4_parseResponse(conn,
-                                        &responseCommand,
-                                        &responseParameter);
+    do {
+        RBRGen4_parseResponse(conn, &responseCommand, &responseParameter);
 
-        if (responseParameter.key == NULL)
-        {
+        if (responseParameter.key == NULL) {
             break;
-        }
-        else if (strcmp(responseParameter.key, parameter) != 0)
-        {
+        } else if (strcmp(responseParameter.key, parameter) != 0) {
             continue;
         }
 
@@ -1037,10 +877,8 @@ RBRGen4Error RBRGen4_getBool(RBRGen4 *conn,
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_getFloat(RBRGen4 *conn,
-                                                  const char *command,
-                                                  const char *parameter,
-                                                  float *value)
+RBRGen4Error RBRGen4_getFloat(RBRGen4 *conn, const char *command, const char *parameter,
+                              float *value)
 {
     *value = NAN;
 
@@ -1048,18 +886,12 @@ RBRGen4Error RBRGen4_getFloat(RBRGen4 *conn,
 
     char *responseCommand = NULL;
     RBRGen4ResponseParameter responseParameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &responseCommand,
-                                        &responseParameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &responseCommand, &responseParameter);
 
-        if (responseParameter.key == NULL)
-        {
+        if (responseParameter.key == NULL) {
             break;
-        }
-        else if (strcmp(responseParameter.key, parameter) != 0)
-        {
+        } else if (strcmp(responseParameter.key, parameter) != 0) {
             continue;
         }
 
@@ -1069,10 +901,8 @@ RBRGen4Error RBRGen4_getFloat(RBRGen4 *conn,
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_getInt(RBRGen4 *conn,
-                                                const char *command,
-                                                const char *parameter,
-                                                int32_t *value)
+RBRGen4Error RBRGen4_getInt(RBRGen4 *conn, const char *command, const char *parameter,
+                            int32_t *value)
 {
     *value = 0;
 
@@ -1080,18 +910,12 @@ RBRGen4Error RBRGen4_getInt(RBRGen4 *conn,
 
     char *responseCommand = NULL;
     RBRGen4ResponseParameter responseParameter;
-    while (true)
-    {
-        RBRGen4_parseResponse(conn,
-                                        &responseCommand,
-                                        &responseParameter);
+    while (true) {
+        RBRGen4_parseResponse(conn, &responseCommand, &responseParameter);
 
-        if (responseParameter.key == NULL)
-        {
+        if (responseParameter.key == NULL) {
             break;
-        }
-        else if (strcmp(responseParameter.key, parameter) != 0)
-        {
+        } else if (strcmp(responseParameter.key, parameter) != 0) {
             continue;
         }
 
@@ -1104,16 +928,9 @@ RBRGen4Error RBRGen4_getInt(RBRGen4 *conn,
 /** \brief Ensure localTimeOffset is initialized. */
 static inline void RBRGen4DateTime_initializeOffset(void)
 {
-    if (localTimeOffset == OFFSET_UNINITIALIZED)
-    {
+    if (localTimeOffset == OFFSET_UNINITIALIZED) {
         struct tm instrumentMinTimestamp = {
-            .tm_year = 100,
-            .tm_mon = 0,
-            .tm_mday = 1,
-            .tm_hour = 0,
-            .tm_min = 0,
-            .tm_sec = 0
-        };
+            .tm_year = 100, .tm_mon = 0, .tm_mday = 1, .tm_hour = 0, .tm_min = 0, .tm_sec = 0};
         localTimeOffset =
             RBRGEN4_DATETIME_MIN - ((RBRGen4DateTime) mktime(&instrumentMinTimestamp) * 1000);
     }
@@ -1129,9 +946,7 @@ static inline void RBRGen4DateTime_initializeOffset(void)
  * \return #RBRGEN4_SUCCESS when the timestamp is successfully parsed
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the time is invalid
  */
-static RBRGen4Error RBRGen4DateTime_parse(
-    struct tm *split,
-    RBRGen4DateTime *timestamp)
+static RBRGen4Error RBRGen4DateTime_parse(struct tm *split, RBRGen4DateTime *timestamp)
 {
     /* struct tm/mktime() expects years to be counted from 1900... */
     split->tm_year -= 1900;
@@ -1139,38 +954,33 @@ static RBRGen4Error RBRGen4DateTime_parse(
     split->tm_mon -= 1;
 
     /* Sanity check. */
-    if (split->tm_year < 100 || split->tm_year >= 200 || split->tm_mon > 11 || split->tm_mday > 31 || split->tm_hour > 23 || split->tm_min > 59 || split->tm_sec > 59 /* Instrument doesn't know about leap seconds. */
-        || *timestamp > 999)
-    {
+    if (split->tm_year < 100 || split->tm_year >= 200 || split->tm_mon > 11 ||
+        split->tm_mday > 31 || split->tm_hour > 23 || split->tm_min > 59 ||
+        split->tm_sec > 59 /* Instrument doesn't know about leap seconds. */
+        || *timestamp > 999) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     RBRGen4DateTime_initializeOffset();
 
-    *timestamp +=
-        (((RBRGen4DateTime) mktime(split)) * 1000) + localTimeOffset;
+    *timestamp += (((RBRGen4DateTime) mktime(split)) * 1000) + localTimeOffset;
 
-    if (*timestamp < RBRGEN4_DATETIME_MIN || *timestamp > RBRGEN4_DATETIME_MAX)
-    {
+    if (*timestamp < RBRGEN4_DATETIME_MIN || *timestamp > RBRGEN4_DATETIME_MAX) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4DateTime_parseSampleTime(
-    const char *s,
-    RBRGen4DateTime *timestamp,
-    char **end)
+RBRGen4Error RBRGen4DateTime_parseSampleTime(const char *s, RBRGen4DateTime *timestamp, char **end)
 {
     *timestamp = 0;
-    if (end != NULL)
-    {
+    if (end != NULL) {
         *end = NULL;
     }
 
     int32_t timestampLength = 0;
-    struct tm split = { 0 };
+    struct tm split = {0};
     int milliseconds;
     int64_t elapsed;
 
@@ -1183,49 +993,38 @@ RBRGen4Error RBRGen4DateTime_parseSampleTime(
                &split.tm_min,
                &split.tm_sec,
                &milliseconds,
-               &timestampLength) == 7)
-    {
+               &timestampLength) == 7) {
         *timestamp = milliseconds;
         RBR_TRY(RBRGen4DateTime_parse(&split, timestamp));
     }
     /* A bare count of milliseconds must make up the whole token so that a
      * reading is never mistaken for one. */
-    else if (sscanf(s,
-                    RBRGen4DateTime_sampleMillisecondsScanFormat,
-                    &elapsed,
-                    &timestampLength) == 1
-             && timestampLength > 0
-             && (s[timestampLength] == PARAMETER_SEPARATOR_L4
-                 || s[timestampLength] == '\0'))
-    {
+    else if (sscanf(s, RBRGen4DateTime_sampleMillisecondsScanFormat, &elapsed, &timestampLength) ==
+                 1 &&
+             timestampLength > 0 &&
+             (s[timestampLength] == PARAMETER_SEPARATOR_L4 || s[timestampLength] == '\0')) {
         *timestamp = elapsed;
-    }
-    else
-    {
+    } else {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    if (end != NULL)
-    {
+    if (end != NULL) {
         *end = (char *) s + timestampLength;
     }
 
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4DateTime_parseScheduleTime(
-    const char *s,
-    RBRGen4DateTime *timestamp,
-    char **end)
+RBRGen4Error RBRGen4DateTime_parseScheduleTime(const char *s, RBRGen4DateTime *timestamp,
+                                               char **end)
 {
     *timestamp = 0;
-    if (end != NULL)
-    {
+    if (end != NULL) {
         *end = NULL;
     }
 
     int32_t timestampLength;
-    struct tm split = { 0 };
+    struct tm split = {0};
     if (sscanf(s,
                RBRGen4DateTime_scheduleScanFormat,
                &split.tm_year,
@@ -1234,24 +1033,20 @@ RBRGen4Error RBRGen4DateTime_parseScheduleTime(
                &split.tm_hour,
                &split.tm_min,
                &split.tm_sec,
-               &timestampLength) < 6)
-    {
+               &timestampLength) < 6) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     RBR_TRY(RBRGen4DateTime_parse(&split, timestamp));
-    if (end != NULL)
-    {
+    if (end != NULL) {
         *end = (char *) s + timestampLength;
     }
 
     return RBRGEN4_SUCCESS;
 }
 
-static void RBRGen4DateTime_toFormat(RBRGen4DateTime timestamp,
-                                               char *s,
-                                               size_t size,
-                                               const char *format)
+static void RBRGen4DateTime_toFormat(RBRGen4DateTime timestamp, char *s, size_t size,
+                                     const char *format)
 {
     time_t t = timestamp / 1000;
     struct tm *split = gmtime(&t);
@@ -1268,30 +1063,23 @@ static void RBRGen4DateTime_toFormat(RBRGen4DateTime timestamp,
              milliseconds);
 }
 
-void RBRGen4DateTime_toSampleTime(RBRGen4DateTime timestamp,
-                                            char *s)
+void RBRGen4DateTime_toSampleTime(RBRGen4DateTime timestamp, char *s)
 {
-    RBRGen4DateTime_toFormat(timestamp,
-                                       s,
-                                       RBRGEN4_SAMPLE_TIME_LEN + 1,
-                                       RBRGen4DateTime_sampleFormat);
+    RBRGen4DateTime_toFormat(
+        timestamp, s, RBRGEN4_SAMPLE_TIME_LEN + 1, RBRGen4DateTime_sampleFormat);
 }
 
-void RBRGen4DateTime_toScheduleTime(RBRGen4DateTime timestamp,
-                                              char *s)
+void RBRGen4DateTime_toScheduleTime(RBRGen4DateTime timestamp, char *s)
 {
-    RBRGen4DateTime_toFormat(timestamp,
-                                       s,
-                                       RBRGEN4_SCHEDULE_TIME_LEN + 1,
-                                       RBRGen4DateTime_scheduleFormat);
+    RBRGen4DateTime_toFormat(
+        timestamp, s, RBRGEN4_SCHEDULE_TIME_LEN + 1, RBRGen4DateTime_scheduleFormat);
 }
 
 char *RBRGen4_splitListValue(char *value)
 {
     char *nextValue = strchr(value, ARRAY_SEPARATOR_L4);
 
-    if (nextValue != NULL)
-    {
+    if (nextValue != NULL) {
         *nextValue = '\0';
         ++nextValue;
     }
@@ -1299,43 +1087,28 @@ char *RBRGen4_splitListValue(char *value)
     return nextValue;
 }
 
-RBRGen4Error RBRGen4_formatLabelList(
-    char *value,
-    int32_t size,
-    const RBRGen4LabelList *labelList)
+RBRGen4Error RBRGen4_formatLabelList(char *value, int32_t size, const RBRGen4LabelList *labelList)
 {
-    if (labelList == NULL
-        || labelList->count < 0
-        || labelList->count > labelList->size)
-    {
+    if (labelList == NULL || labelList->count < 0 || labelList->count > labelList->size) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     int32_t length = 0;
 
-    if (labelList->count == 0)
-    {
+    if (labelList->count == 0) {
         length = snprintf(value, size, RBRGEN4_EMPTY_LIST);
-        return length > 0 && length < size
-               ? RBRGEN4_SUCCESS
-               : RBRGEN4_BUFFER_TOO_SMALL;
+        return length > 0 && length < size ? RBRGEN4_SUCCESS : RBRGEN4_BUFFER_TOO_SMALL;
     }
 
-    for (int32_t i = 0; i < labelList->count; ++i)
-    {
-        if (labelList->labels[i][0] == '\0')
-        {
+    for (int32_t i = 0; i < labelList->count; ++i) {
+        if (labelList->labels[i][0] == '\0') {
             return RBRGEN4_INVALID_PARAMETER_VALUE;
         }
 
-        int32_t written = snprintf(value + length,
-                                   size - length,
-                                   "%s%s",
-                                   i == 0 ? "" : "|",
-                                   labelList->labels[i]);
+        int32_t written = snprintf(
+            value + length, size - length, "%s%s", i == 0 ? "" : "|", labelList->labels[i]);
 
-        if (written < 0 || length + written >= size)
-        {
+        if (written < 0 || length + written >= size) {
             return RBRGEN4_BUFFER_TOO_SMALL;
         }
 
@@ -1345,27 +1118,20 @@ RBRGen4Error RBRGen4_formatLabelList(
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_copyLabelList(
-    RBRGen4LabelList *labelList,
-    char *value)
+RBRGen4Error RBRGen4_copyLabelList(RBRGen4LabelList *labelList, char *value)
 {
     labelList->count = 0;
 
-    if (strcmp(value, RBRGEN4_EMPTY_LIST) == 0)
-    {
+    if (strcmp(value, RBRGEN4_EMPTY_LIST) == 0) {
         return RBRGEN4_SUCCESS;
     }
 
-    while (value != NULL)
-    {
-        if (labelList->count >= labelList->size)
-        {
+    while (value != NULL) {
+        if (labelList->count >= labelList->size) {
             /* Count the rest of the labels without storing them. */
             labelList->count++;
-            for (; *value != '\0'; value++)
-            {
-                if (*value == ARRAY_SEPARATOR_L4)
-                {
+            for (; *value != '\0'; value++) {
+                if (*value == ARRAY_SEPARATOR_L4) {
                     labelList->count++;
                 }
             }
@@ -1385,4 +1151,3 @@ RBRGen4Error RBRGen4_copyLabelList(
 
     return RBRGEN4_SUCCESS;
 }
-

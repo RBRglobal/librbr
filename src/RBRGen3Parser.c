@@ -22,8 +22,7 @@
 
 const char *RBRGen3EventType_name(RBRGen3EventType type)
 {
-    switch (type)
-    {
+    switch (type) {
     case RBRGEN3_EVENT_UNKNOWN_OR_UNRECOGNIZED_EVENT:
     default:
         return "unknown or unrecognized event";
@@ -110,60 +109,50 @@ const char *RBRGen3EventType_name(RBRGen3EventType type)
     }
 }
 
-RBRGen3Error RBRGen3Parser_init(RBRGen3Parser **parser,
-                                  const RBRGen3ParserCallbacks *callbacks,
-                                  const RBRGen3ParserConfig *config,
-                                  void *userData)
+RBRGen3Error RBRGen3Parser_init(RBRGen3Parser **parser, const RBRGen3ParserCallbacks *callbacks,
+                                const RBRGen3ParserConfig *config, void *userData)
 {
-    if (callbacks == NULL
-        || (callbacks->sample != NULL && callbacks->sampleBuffer == NULL)
-        || (callbacks->event != NULL && callbacks->eventBuffer == NULL))
-    {
+    if (callbacks == NULL || (callbacks->sample != NULL && callbacks->sampleBuffer == NULL) ||
+        (callbacks->event != NULL && callbacks->eventBuffer == NULL)) {
         return RBRGEN3_MISSING_CALLBACK;
     }
 
-    if (config->format != RBRGEN3_MEMFORMAT_CALBIN00)
-    {
+    if (config->format != RBRGEN3_MEMFORMAT_CALBIN00) {
         return RBRGEN3_UNSUPPORTED;
     }
 
-    if (config->formatConfig.easyParse.channels <= 0
-        || config->formatConfig.easyParse.channels > RBRGEN3_CHANNEL_MAX)
-    {
+    if (config->formatConfig.easyParse.channels <= 0 ||
+        config->formatConfig.easyParse.channels > RBRGEN3_CHANNEL_MAX) {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
     bool allocated = false;
-    if (*parser == NULL)
-    {
+    if (*parser == NULL) {
         allocated = true;
-        #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
-        if ((*parser = malloc(sizeof(RBRGen3Parser))) == NULL)
-        {
-        #endif
+#ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
+        if ((*parser = malloc(sizeof(RBRGen3Parser))) == NULL) {
+#endif
             return RBRGEN3_ALLOCATION_FAILURE;
-        #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
+#ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
         }
-        #endif
+#endif
     }
 
     memset(*parser, 0, sizeof(RBRGen3Parser));
     memcpy(&(*parser)->config, config, sizeof(RBRGen3ParserConfig));
     memcpy(&(*parser)->callbacks, callbacks, sizeof(RBRGen3ParserCallbacks));
-    (*parser)->userData          = userData;
+    (*parser)->userData = userData;
     (*parser)->managedAllocation = allocated;
 
     return RBRGEN3_SUCCESS;
 }
 
-
 RBRGen3Error RBRGen3Parser_destroy(RBRGen3Parser *parser)
 {
-    if (parser->managedAllocation)
-    {
-        #ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
+    if (parser->managedAllocation) {
+#ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
         free(parser);
-        #endif
+#endif
     }
 
     return RBRGEN3_SUCCESS;
@@ -191,45 +180,35 @@ void RBRGen3Parser_setUserData(RBRGen3Parser *parser, void *userData)
 #define EP_EVENT_TIMESTAMP_OFFSET 4
 #define EP_EVENT_PAYLOAD_OFFSET   12
 
-static RBRGen3Error RBRGen3Parser_parseEPEvents(
-    RBRGen3Parser *parser,
-    const uint8_t *const data,
-    int32_t *size)
+static RBRGen3Error RBRGen3Parser_parseEPEvents(RBRGen3Parser *parser, const uint8_t *const data,
+                                                int32_t *size)
 {
     int32_t maxSize = *size;
     *size = 0;
 
     RBRGen3Event *event = parser->callbacks.eventBuffer;
-    if (event == NULL)
-    {
+    if (event == NULL) {
         return RBRGEN3_SUCCESS;
     }
 
-    for (; *size + EP_EVENT_SIZE <= maxSize; *size += EP_EVENT_SIZE)
-    {
+    for (; *size + EP_EVENT_SIZE <= maxSize; *size += EP_EVENT_SIZE) {
         memset(event, 0, sizeof(RBRGen3Event));
 
         event->type = *(uint8_t *) (data + *size + EP_EVENT_TYPE_OFFSET);
-        event->timestamp =
-            *(RBRGen3DateTime *) (data
-                                        + *size
-                                        + EP_EVENT_TIMESTAMP_OFFSET);
-        switch (event->type)
-        {
+        event->timestamp = *(RBRGen3DateTime *) (data + *size + EP_EVENT_TIMESTAMP_OFFSET);
+        switch (event->type) {
         case RBRGEN3_EVENT_START_OF_REGIME_BIN:
         case RBRGEN3_EVENT_BEGIN_PROFILING_UP_CAST:
         case RBRGEN3_EVENT_BEGIN_PROFILING_DOWN_CAST:
         case RBRGEN3_EVENT_END_OF_PROFILING_CAST:
             event->auxiliaryDataLength = 1;
-            event->auxiliaryData[0] =
-                *(uint32_t *) (data + *size + EP_EVENT_PAYLOAD_OFFSET);
+            event->auxiliaryData[0] = *(uint32_t *) (data + *size + EP_EVENT_PAYLOAD_OFFSET);
             break;
         default:
             event->auxiliaryDataLength = 0;
         }
 
-        if (parser->callbacks.event != NULL)
-        {
+        if (parser->callbacks.event != NULL) {
             RBR_TRY(parser->callbacks.event(parser, event));
         }
     }
@@ -238,59 +217,47 @@ static RBRGen3Error RBRGen3Parser_parseEPEvents(
 }
 
 #define EP_SAMPLE_TIMESTAMP_SIZE ((int32_t) sizeof(RBRGen3DateTime))
-#define EP_SAMPLE_READING_SIZE ((int32_t) sizeof(float))
+#define EP_SAMPLE_READING_SIZE   ((int32_t) sizeof(float))
 
-static RBRGen3Error RBRGen3Parser_parseEPSamples(
-    RBRGen3Parser *parser,
-    const uint8_t *const data,
-    int32_t *size)
+static RBRGen3Error RBRGen3Parser_parseEPSamples(RBRGen3Parser *parser, const uint8_t *const data,
+                                                 int32_t *size)
 {
     int32_t maxSize = *size;
     *size = 0;
 
     RBRGen3Sample *sample = parser->callbacks.sampleBuffer;
-    if (sample == NULL)
-    {
+    if (sample == NULL) {
         return RBRGEN3_SUCCESS;
     }
 
     int32_t channels = parser->config.formatConfig.easyParse.channels;
-    int32_t sampleSize = EP_SAMPLE_TIMESTAMP_SIZE
-                         + EP_SAMPLE_READING_SIZE * channels;
-    for (; *size + sampleSize <= maxSize; *size += sampleSize)
-    {
+    int32_t sampleSize = EP_SAMPLE_TIMESTAMP_SIZE + EP_SAMPLE_READING_SIZE * channels;
+    for (; *size + sampleSize <= maxSize; *size += sampleSize) {
         memset(sample, 0, sizeof(RBRGen3Sample));
 
         sample->timestamp = *(RBRGen3DateTime *) (data + *size);
         sample->channels = channels;
-        for (int32_t channel = 0; channel < channels; ++channel)
-        {
+        for (int32_t channel = 0; channel < channels; ++channel) {
             sample->readings[channel] =
-                (double)
-                *(float *) (data
-                            + *size
-                            + EP_SAMPLE_TIMESTAMP_SIZE
-                            + channel * EP_SAMPLE_READING_SIZE);
+                (double) *(float *) (data + *size + EP_SAMPLE_TIMESTAMP_SIZE +
+                                     channel * EP_SAMPLE_READING_SIZE);
         }
 
-        if (parser->callbacks.sample != NULL)
-        {
-            RBR_TRY(parser->callbacks.sample(parser, sample)); /* calls the parser-> callback.sample function. */
+        if (parser->callbacks.sample != NULL) {
+            RBR_TRY(parser->callbacks.sample(
+                parser, sample)); /* calls the parser-> callback.sample function. */
         }
     }
 
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRGen3Parser_parse(RBRGen3Parser *parser,
-                                   RBRGen3Dataset dataset,
-                                   const void *const data,
-                                   int32_t *size)
+RBRGen3Error RBRGen3Parser_parse(RBRGen3Parser *parser, RBRGen3Dataset dataset,
+                                 const void *const data, int32_t *size)
 {
     const uint8_t *d = (const uint8_t *const) data;
 
-    switch (dataset)
-    {
+    switch (dataset) {
     case RBRGEN3_DATASET_EASYPARSE_EVENTS:
         return RBRGen3Parser_parseEPEvents(parser, d, size);
     case RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA:
