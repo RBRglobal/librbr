@@ -93,7 +93,7 @@ if LIBRBR_GEN4
 
 config RBRGEN4_COMMAND_BUFFER_MAX
     int "The size of the buffer storing commands destined for the instrument."
-    default 120
+    default 256
     help
         Must be large enough to hold the largest command you will want to send
         to the instrument plus the trailing line termination (`\r\n\0`).
