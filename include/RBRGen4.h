@@ -133,18 +133,22 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
 #define RBRGEN4_ID_MODEL_MAX 14
 
 /**
- * \brief The maximum number of characters in the instrument firmware version.
+ * \brief The maximum number of characters in a firmware version.
  *
  * Does not include any null terminator.
+ *
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828616/Metadata+layout
  */
-#define RBRGEN4_ID_VERSION_MAX 29
+#define RBRGEN4_ID_VERSION_MAX 35
 
 /**
- * \brief The maximum number of characters in the instrument Semantic Version.
+ * \brief The maximum number of characters in a firmware Semantic Version.
  *
  * Does not include any null terminator.
+ *
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828616/Metadata+layout
  */
-#define RBRGEN4_ID_SEMVER_MAX 39
+#define RBRGEN4_ID_SEMVER_MAX 35
 
 /** \brief The maximum length of characters within a label.*/
 #define RBRGEN4_LABEL_NAME_MAX 31
