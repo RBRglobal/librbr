@@ -131,7 +131,7 @@ float RBRGen3DynamicCorrection_PSS78(float C, float T, float P)
 }
 
 /* Precalculate some factors/index used for temperature interpolation */
-int RBRGen3DynamicCorrection_initCorrectionCoeff(RBRGen3DynamicCorrectionParams *params, float Fs)
+static int RBRGen3DynamicCorrection_initCorrectionCoeff(RBRGen3DynamicCorrectionParams *params, float Fs)
 {
     params->_lagIndex = (int) (Fs * params->t_delay);
     params->_phi = (params->t_delay - params->_lagIndex / Fs) * Fs;
@@ -150,7 +150,7 @@ int RBRGen3DynamicCorrection_initCorrectionCoeff(RBRGen3DynamicCorrectionParams 
 }
 
 /* initial arrays */
-void RBRGen3DynamicCorrection_initLagArray(RBRGen3DynamicCorrectionParams *params)
+static void RBRGen3DynamicCorrection_initLagArray(RBRGen3DynamicCorrectionParams *params)
 {
     int k;
 
@@ -166,7 +166,7 @@ void RBRGen3DynamicCorrection_initLagArray(RBRGen3DynamicCorrectionParams *param
 }
 
 /* apply temperature interpolation */
-float RBRGen3DynamicCorrection_applyTempCorr(RBRGen3DynamicCorrectionParams *params, float T_meas)
+static float RBRGen3DynamicCorrection_applyTempCorr(RBRGen3DynamicCorrectionParams *params, float T_meas)
 {
     float T_cor;
 
@@ -177,7 +177,7 @@ float RBRGen3DynamicCorrection_applyTempCorr(RBRGen3DynamicCorrectionParams *par
 }
 
 /* sanity check on data */
-int32_t RBRGen3DynamicCorrection_checkData(RBRGen3DynamicCorrectionMeasurement *measIn)
+static int32_t RBRGen3DynamicCorrection_checkData(RBRGen3DynamicCorrectionMeasurement *measIn)
 {
     int32_t isError = 0;
 
@@ -198,7 +198,7 @@ int32_t RBRGen3DynamicCorrection_checkData(RBRGen3DynamicCorrectionMeasurement *
 }
 
 /* resample all lagged variables using new sampling rate */
-void RBRGen3DynamicCorrection_resampleLag(RBRGen3DynamicCorrectionParams *params, int64_t timestamp, float Fs)
+static void RBRGen3DynamicCorrection_resampleLag(RBRGen3DynamicCorrectionParams *params, int64_t timestamp, float Fs)
 {
     int64_t timestamp_array[DCORR_MAX_LAG_ARRAY];
     float C_meas_array[DCORR_MAX_LAG_ARRAY];
@@ -253,7 +253,7 @@ void RBRGen3DynamicCorrection_resampleLag(RBRGen3DynamicCorrectionParams *params
 }
 
 /* update all lagged variables */
-int32_t RBRGen3DynamicCorrection_updateLag(RBRGen3DynamicCorrectionParams *params,
+static int32_t RBRGen3DynamicCorrection_updateLag(RBRGen3DynamicCorrectionParams *params,
                                        const RBRGen3DynamicCorrectionMeasurement *measIn,
                                        RBRGen3DynamicCorrectionMeasurement *meas_out)
 {
@@ -380,7 +380,7 @@ void RBRGen3DynamicCorrection_updateVariables(RBRGen3DynamicCorrectionParams *pa
     params->_cte_b = 1.0f - 2.0f * factor;
 }
 
-void RBRGen3DynamicCorrection_updatePressure(RBRGen3DynamicCorrectionParams *params, int64_t timestamp, float pressure)
+static void RBRGen3DynamicCorrection_updatePressure(RBRGen3DynamicCorrectionParams *params, int64_t timestamp, float pressure)
 {
     float Vp = RBRGen3DynamicCorrection_calcAscentRate(params, timestamp, pressure);
 

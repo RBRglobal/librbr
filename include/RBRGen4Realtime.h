@@ -18,8 +18,6 @@
 extern "C" {
 #endif
 
-#include "RBRGen4.h"
-
 /**
  * \brief Error codes carried by an error reading.
  *

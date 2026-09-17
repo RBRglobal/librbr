@@ -12,7 +12,6 @@
 #include <math.h>
 
 #include "tests.h"
-#include "RBRGen4Deployment.h"
 
 typedef struct GetClockTest
 {

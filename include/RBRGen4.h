@@ -1107,9 +1107,7 @@ const char *RBRGen4_getLastHardwareErrorMessage(
 /* To help keep declarations and documentation organized and discoverable,
  * instrument commands and structures are broken out into individual
  * categorical headers. */
-#if 0
 #include "RBRGen4Commands.h"
-#endif
 
 #ifdef __cplusplus
 }

@@ -13,8 +13,6 @@
 #ifndef LIBRBR_RBRGEN4INSTRUMENT_H
 #define LIBRBR_RBRGEN4INSTRUMENT_H
 
-#include "RBRGen4.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

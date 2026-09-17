@@ -10,13 +10,11 @@
 
 /* Required for isspace. */
 #include <ctype.h>
-/* Required for NAN. */
-#include <math.h>
-/* Required for memcpy, memset, strchr, strcmp. */
+/* Required for memcpy, memset, strchr, strcmp, strlen, strstr. */
 #include <string.h>
 /* Required for snprintf. */
 #include <stdio.h>
-/* Required for strtol. */
+/* Required for strtod, strtol. */
 #include <stdlib.h>
 
 #include "RBRGen4.h"
@@ -430,11 +428,6 @@ RBRGen4Error RBRGen4_getPowerInternal(
     RBRGen4 *conn,
     RBRGen4PowerInternal *power)
 {
-    if (conn->generation == RBRGEN4_LOGGER2)
-    {
-        return RBRGEN4_UNSUPPORTED;
-    }
-
     memset(power, 0, sizeof(RBRGen4PowerInternal));
     power->batteryType = RBRGEN4_UNKNOWN_INTERNAL_BATTERY;
 
@@ -556,7 +549,7 @@ const char *RBRGen4ExternalBatteryType_displayName(
     case RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_NIMH:
         return "RBRfermette³ NiMH";
     case RBRGEN4_EXTERNAL_BATTERY_FERMATA_NIMH:
-        return "RBRfermata_nimh";
+        return "RBRfermata NiMH";
     case RBRGEN4_EXTERNAL_BATTERY_OTHER:
         return "other";
     case RBRGEN4_EXTERNAL_BATTERY_COUNT:

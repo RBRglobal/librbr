@@ -428,7 +428,7 @@ RBRGen3Error RBRGen3_getSampling(
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRGen3Sampling_validateSamplingPeriod(
+static RBRGen3Error RBRGen3Sampling_validateSamplingPeriod(
     const RBRGen3Sampling *sampling)
 {
     if (sampling->period <= 0

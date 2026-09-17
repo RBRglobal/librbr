@@ -8,17 +8,12 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-/* Required for NAN. */
-#include <math.h>
 /* Required for memcpy, memset. */
 #include <string.h>
 
-#include <stdio.h>
-#include <stddef.h>
-
-#include "../include/RBRGen4Parser.h"
-/* Required for RBR_TRY. */
+#include "RBRGen4.h"
 #include "RBRGen4Internal.h"
+#include "RBRGen4Parser.h"
 
 const char *RBRGen4EventType_name(RBRGen4EventType type)
 {

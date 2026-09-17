@@ -122,7 +122,7 @@ static RBRGen3DateTime localTimeOffset = OFFSET_UNINITIALIZED;
 /**
  * \brief Like strstr, but for memory.
  */
-void *rbr_memmem(void *ptr1, size_t num1, const void *ptr2, size_t num2)
+static void *rbr_memmem(void *ptr1, size_t num1, const void *ptr2, size_t num2)
 {
     if (num2 > num1)
     {
@@ -143,7 +143,7 @@ void *rbr_memmem(void *ptr1, size_t num1, const void *ptr2, size_t num2)
 /**
  * \brief Local implementation of strncasecmp, which is POSIX, but not C99.
  */
-int rbr_strncasecmp(const char *s1, const char *s2, size_t n)
+static int rbr_strncasecmp(const char *s1, const char *s2, size_t n)
 {
     int difference = 0;
     for (; n; --n) {

@@ -69,7 +69,7 @@
  * \param [in] P Sea Pressure
  * \return Salinity
  */
-float RBRGen4DynamicCorrection_PSS78(float C, float T, float P)
+static float RBRGen4DynamicCorrection_PSS78(float C, float T, float P)
 {
     float pressure;
     float T_its68;
@@ -134,7 +134,7 @@ float RBRGen4DynamicCorrection_PSS78(float C, float T, float P)
 
 
 /* Precalculate some factors/index used for temperature interpolation */
-int RBRGen4DynamicCorrection_initCorrectionCoeff(RBRGen4DynamicCorrectionParams *params, float Fs)
+static int RBRGen4DynamicCorrection_initCorrectionCoeff(RBRGen4DynamicCorrectionParams *params, float Fs)
 {
     params->_lagIndex = (int)(Fs * params->t_delay);
     params->_phi = (params->t_delay - params->_lagIndex/Fs)*Fs;
@@ -153,7 +153,7 @@ int RBRGen4DynamicCorrection_initCorrectionCoeff(RBRGen4DynamicCorrectionParams 
 }
 
 /* initial arrays */
-void RBRGen4DynamicCorrection_initLagArray(RBRGen4DynamicCorrectionParams *params)
+static void RBRGen4DynamicCorrection_initLagArray(RBRGen4DynamicCorrectionParams *params)
 {
     int k;
 
@@ -169,7 +169,7 @@ void RBRGen4DynamicCorrection_initLagArray(RBRGen4DynamicCorrectionParams *param
 }
 
 /* apply temperature interpolation */
-float RBRGen4DynamicCorrection_applyTempCorr(RBRGen4DynamicCorrectionParams *params, float T_meas)
+static float RBRGen4DynamicCorrection_applyTempCorr(RBRGen4DynamicCorrectionParams *params, float T_meas)
 {
     float T_cor;
 
@@ -181,7 +181,7 @@ float RBRGen4DynamicCorrection_applyTempCorr(RBRGen4DynamicCorrectionParams *par
 }
 
 /* sanity check on data */
-int32_t RBRGen4DynamicCorrection_checkData(RBRGen4DynamicCorrectionMeasurement * measIn)
+static int32_t RBRGen4DynamicCorrection_checkData(RBRGen4DynamicCorrectionMeasurement * measIn)
 {
     int32_t isError = 0;
 
@@ -202,7 +202,7 @@ int32_t RBRGen4DynamicCorrection_checkData(RBRGen4DynamicCorrectionMeasurement *
 }
 
 /* resample all lagged variables using new sampling rate */
-void RBRGen4DynamicCorrection_resampleLag(RBRGen4DynamicCorrectionParams *params, float timestamp, float Fs)
+static void RBRGen4DynamicCorrection_resampleLag(RBRGen4DynamicCorrectionParams *params, float timestamp, float Fs)
 {
     float timestamp_array[DCORR_MAX_LAG_ARRAY];
     float C_meas_array[DCORR_MAX_LAG_ARRAY];
@@ -254,7 +254,7 @@ void RBRGen4DynamicCorrection_resampleLag(RBRGen4DynamicCorrectionParams *params
 }
 
 /* update all lagged variables */
-int32_t RBRGen4DynamicCorrection_updateLag(RBRGen4DynamicCorrectionParams *params, const RBRGen4DynamicCorrectionMeasurement * measIn, RBRGen4DynamicCorrectionMeasurement * meas_out)
+static int32_t RBRGen4DynamicCorrection_updateLag(RBRGen4DynamicCorrectionParams *params, const RBRGen4DynamicCorrectionMeasurement * measIn, RBRGen4DynamicCorrectionMeasurement * meas_out)
 {
     int32_t lagIndex;
     int32_t isValid;
@@ -315,7 +315,7 @@ RBRGen4DynamicCorrectionError RBRGen4DynamicCorrection_update_Fs(const float Fs,
 
 /* calculate the ascent rate (in our case, using the pressure as unit).
  * return Vp (positive for ascent, negative for descent)*/
-float RBRGen4DynamicCorrection_calcAscentRate(RBRGen4DynamicCorrectionParams *params, float timestamp, float pressure)
+static float RBRGen4DynamicCorrection_calcAscentRate(RBRGen4DynamicCorrectionParams *params, float timestamp, float pressure)
 {
     float Vp;
     float a;
@@ -360,7 +360,7 @@ float RBRGen4DynamicCorrection_calcAscentRate(RBRGen4DynamicCorrectionParams *pa
     return Vp;
 }
 
-void RBRGen4DynamicCorrection_updateVariables(RBRGen4DynamicCorrectionParams *params, float Vp)
+static void RBRGen4DynamicCorrection_updateVariables(RBRGen4DynamicCorrectionParams *params, float Vp)
 {
     float F_nyquist;
     float alpha, tau;
@@ -389,7 +389,7 @@ void RBRGen4DynamicCorrection_updateVariables(RBRGen4DynamicCorrectionParams *pa
     params->_cte_b = 1.0f -  2.0f * params->_cte_a / alpha;
 }
 
-void RBRGen4DynamicCorrection_updatePressure(RBRGen4DynamicCorrectionParams *params, float timestamp, float pressure)
+static void RBRGen4DynamicCorrection_updatePressure(RBRGen4DynamicCorrectionParams *params, float timestamp, float pressure)
 {
     float Vp;
 

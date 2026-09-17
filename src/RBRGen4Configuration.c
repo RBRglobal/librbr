@@ -8,14 +8,13 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
-/* Required for PRId32. */
+/* Required for PRId32, PRId64. */
 #include <inttypes.h>
-/* Required for NAN. */
-#include <math.h>
 /* Required for snprintf. */
 #include <stdio.h>
-/* Required for memset, strcmp. */
+/* Required for strtof, strtol, strtoll. */
 #include <stdlib.h>
+/* Required for memcpy, memset, strcat, strcmp. */
 #include <string.h>
 
 #include "RBRGen4.h"
