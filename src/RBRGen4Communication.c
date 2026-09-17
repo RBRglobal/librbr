@@ -250,10 +250,6 @@ RBRGen4Error RBRGen4_sleep(RBRGen4 *conn)
     return RBRGEN4_SUCCESS;
 }
 
-/**
- * L3.5/L4 WiFi interface is To Be Defined as of October 2024.
-*/
-
 #if 0
 
 const char *RBRGen4WiFiState_name(RBRGen4WiFiState state)

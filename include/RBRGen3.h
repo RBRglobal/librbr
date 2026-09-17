@@ -622,8 +622,8 @@ typedef struct RBRGen3
     /**
      * \brief The command timeout in milliseconds.
      *
-     * See [Timeouts](timeouts.md) for details on how the library handles
-     * timeouts.
+     * See the Timeouts page of the documentation for details on how the
+     * library handles timeouts.
      */
     RBRGen3DateTime commandTimeout;
 

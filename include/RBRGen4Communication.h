@@ -178,7 +178,7 @@ typedef struct RBRGen4LinkSerial
      *
      * Treated as a bit field representation of available baud rates as
      * defined by RBRGen4LinkSerialBaudRate. For details, consult
-     * [Working with Bit Fields](bitfields.md).
+     * the Working with Bit Fields page of the documentation.
      *
      * \readonly
      */
@@ -188,7 +188,7 @@ typedef struct RBRGen4LinkSerial
      *
      * Treated as a bit field representation of available modes as defined by
      * RBRGen4LinkSerialMode. For details, consult
-     * [Working with Bit Fields](bitfields.md).
+     * the Working with Bit Fields page of the documentation.
      *
      * \readonly
      */
@@ -237,7 +237,8 @@ RBRGen4Error RBRGen4_getLinkSerial(
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when a value is not supported
+ * \return #RBRGEN4_HARDWARE_ERROR when a value is not supported, or another
+ *                                      hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the baud rate or
  *                                                   mode is not a real value
  * \see RBRGen4_getLinkSerial()
@@ -264,10 +265,6 @@ RBRGen4Error RBRGen4_setLinkSerial(
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828337/Timeouts+output+blanking+and+power+saving
  */
 RBRGen4Error RBRGen4_sleep(RBRGen4 *conn);
-
-/**
- * L3.5/L4 WiFi interface is To Be Defined as of October 2024
- */
 
 #if 0
 

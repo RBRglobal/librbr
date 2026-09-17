@@ -152,7 +152,8 @@ typedef struct RBRGen3Power
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if an error occurs reading voltages
+ * \return #RBRGEN3_HARDWARE_ERROR if an error occurs reading voltages, or
+ *                                 another hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/power
  */
 RBRGen3Error RBRGen3_getPower(RBRGen3 *conn,
@@ -259,7 +260,8 @@ RBRGen3Error RBRGen3_getPowerInternal(
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging, or another
+ *                                 hardware error occurs
  * \see RBRGen3_getPowerInternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */
@@ -276,7 +278,8 @@ RBRGen3Error RBRGen3_setPowerInternalBatteryType(
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging, or another
+ *                                 hardware error occurs
  * \see RBRGen3_getPowerInternal()
  * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/powerinternal
  */

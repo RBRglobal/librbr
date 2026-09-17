@@ -1,0 +1,12 @@
+# The command category headers are only valid when included through
+# RBRGen3.h or RBRGen4.h, so pre-include the top-level header when clangd
+# opens one of them on its own.
+If:
+  PathMatch: include/RBRGen3(Commands|Communication|Configuration|Deployment|Fetching|Gating|Memory|Other|Pauseresume|Schedule|Security|Streaming|Vehicle)\.h
+CompileFlags:
+  Add: [-include, RBRGen3.h]
+---
+If:
+  PathMatch: include/RBRGen4(Commands|Communication|Configuration|Deployment|Instrument|Memory|Realtime)\.h
+CompileFlags:
+  Add: [-include, RBRGen4.h]

@@ -20,7 +20,12 @@ extern "C" {
 
 #include "RBRGen4.h"
 
-/*************************************************************************************************/
+/**
+ * \brief Error codes carried by an error reading.
+ *
+ * \see RBRGen4Reading_getError()
+ * \see RBRGen4Reading_setError()
+ */
 typedef enum RBRGen4ReadingError
 {
     /** -NaN; General error condition; error from undefined mathematical operation */
@@ -131,7 +136,7 @@ typedef struct RBRGen4Sample
     /**
      * \brief The sample readings.
      *
-     * Only the first RBRGen4Sample.channels readings will be populated.
+     * Only the first RBRGen4Sample.channelCount readings will be populated.
      * Other readings will be set to 0.
      *
      * Readings are represented as double-precision floating point. If they
@@ -167,8 +172,7 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
 /**
  * \brief Requests an “on-demand” sample of every channel from the
  * instrument.
- *
- * Sends a bare `poll` command.
+ * \note Issues the `poll` command.
  *
  * Unlike streaming data/RBRGen4_readSample(), polled data is
  * returned directly to the caller (independent of any
@@ -201,9 +205,10 @@ RBRGen4Error RBRGen4_poll(
 /**
  * \brief Requests an “on-demand” sample of the given channels from the
  * instrument.
+ * \note Issues the `poll channellist=<channel_list>` command.
  *
- * Sends the `poll channellist=` command. \a channelList is sent verbatim as
- * the parameter value; see the command documentation for the list format.
+ * \a channelList is sent verbatim as the `channellist` parameter value; see
+ * the command documentation for the list format.
  *
  * Unlike streaming data/RBRGen4_readSample(), polled data is
  * returned directly to the caller (independent of any
@@ -229,8 +234,8 @@ RBRGen4Error RBRGen4_poll(
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
  *         polled sample arrives within RBRGen4.pollTimeout
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when an invalid channel is
- *         requested
+ * \return #RBRGEN4_HARDWARE_ERROR when an invalid channel is requested, or
+ *                                      another hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
 RBRGen4Error RBRGen4_pollChannels(
@@ -242,9 +247,10 @@ RBRGen4Error RBRGen4_pollChannels(
 /**
  * \brief Requests an “on-demand” sample of the given groups of channels from
  * the instrument.
+ * \note Issues the `poll grouplist=<group_list>` command.
  *
- * Sends the `poll grouplist=` command. \a groupList is sent verbatim as the
- * parameter value; see the command documentation for the list format.
+ * \a groupList is sent verbatim as the `grouplist` parameter value; see the
+ * command documentation for the list format.
  *
  * Unlike streaming data/RBRGen4_readSample(), polled data is
  * returned directly to the caller (independent of any
@@ -270,8 +276,8 @@ RBRGen4Error RBRGen4_pollChannels(
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
  *         polled sample arrives within RBRGen4.pollTimeout
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when an invalid group is
- *         requested
+ * \return #RBRGEN4_HARDWARE_ERROR when an invalid group is requested, or
+ *                                      another hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
 RBRGen4Error RBRGen4_pollGroups(

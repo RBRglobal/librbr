@@ -347,11 +347,8 @@ const char *bool_name(bool value);
  *
  * \param [in] fn the name of the test function
  */
-/* Uncrustify thinks that asterisks in macros are multiplication operators and
- * incorrectly adds spacing, so we'll turn *INDENT-OFF* just for this. */
 #define _TEST(fn) bool test_##fn(RBRGen4 *conn, \
                                  TestIOBuffers *buffers)
-/* *INDENT-ON* */
 
 
 /**
@@ -406,11 +403,9 @@ extern InstrumentTest instrumentTests[];
  * \param [in] fn the name of the test function
  * \param [in] cfg the name of the configuration used by the test
  */
-/* *INDENT-OFF* */
 #define TEST_PARSER(fn, cfg) bool test_##fn##_parser( \
     RBRGen4Parser *parser, \
     TestParserBuffers *buffers)
-/* *INDENT-ON* */
 
 /**
  * \brief The results of test parsings.

@@ -371,7 +371,8 @@ RBRGen3Error RBRGen3_getChannelsWithoutCalibrations(
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging
+ * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging, or another
+ *                                 hardware error occurs
  * \see RBRGen3_getChannels()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/channel
  */
@@ -404,8 +405,9 @@ RBRGen3Error RBRGen3_setChannelStatus(
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging, or an
- *                                       invalid gain value is given
+ * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging, or an invalid
+ *                                 gain value is given, or another hardware
+ *                                 error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE if the ranging mode is
  *                                                invalid, or if the gain value
  *                                                can be conclusively
@@ -442,7 +444,8 @@ RBRGen3Error RBRGen3_setChannelGain(
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the calibration cannot be changed
+ * \return #RBRGEN3_HARDWARE_ERROR when the calibration cannot be changed, or
+ *                                 another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the date/time of the
  *                                                calibration is out of range,
  *                                                or when no coefficients are
@@ -487,7 +490,8 @@ RBRGen3Error RBRGen3_getFetchPowerOffDelay(
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
+ *                                 another hardware error occurs
  * \see RBRGen3_getFetchPowerOffDelay()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
@@ -524,7 +528,8 @@ RBRGen3Error RBRGen3_isSensorPowerAlwaysOn(
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging
+ * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging, or another
+ *                                 hardware error occurs
  * \see RBRGen3_isSensorPowerAlwaysOn()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
@@ -559,7 +564,8 @@ RBRGen3Error RBRGen3_getCastDetection(RBRGen3 *conn,
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging
+ * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging, or another
+ *                                 hardware error occurs
  * \see RBRGen3_getCastDetection()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
@@ -598,7 +604,8 @@ RBRGen3Error RBRGen3_getInputTimeout(
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging
+ * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging, or another
+ *                                 hardware error occurs
  * \see RBRGen3_getInputTimeout()
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/settings
  */
@@ -722,7 +729,8 @@ RBRGen3Error RBRGen3_getValueSetting(
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging
+ * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging, or another
+ *                                 hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an unrecognized setting
  *                                                is requested or when the
  *                                                value is NaN
@@ -819,7 +827,8 @@ RBRGen3Error RBRGen3_getSensorParameters(
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the parameter cannot be changed
+ * \return #RBRGEN3_HARDWARE_ERROR when the parameter cannot be changed, or
+ *                                 another hardware error occurs
  * \see RBRGen3_getChannels()
  * \see RBRGen3_getSensorParameter()
  * \see RBRGen3_getSensorParameters()

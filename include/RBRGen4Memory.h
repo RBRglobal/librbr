@@ -249,7 +249,8 @@ RBRGen4Error RBRGen4_getDatasetPool(
  *                                      stored, and `count` is set to the value
  *                                      reported by the instrument which WILL
  *                                      exceed `size`
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getDatasetPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
@@ -325,7 +326,8 @@ typedef struct RBRGen4DatasetDataBlock
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
+ *                                      hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRGen4Error RBRGen4Dataset_getEventsBlock(
@@ -345,7 +347,8 @@ RBRGen4Error RBRGen4Dataset_getEventsBlock(
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
+ *                                      hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRGen4Error RBRGen4Dataset_getMetaBlock(
@@ -369,8 +372,8 @@ RBRGen4Error RBRGen4Dataset_getMetaBlock(
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is
  *                                                    empty
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does
- *                                           not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
+ *                                      or another hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRGen4Error RBRGen4Dataset_getScheduleBlock(
@@ -395,8 +398,8 @@ RBRGen4Error RBRGen4Dataset_getScheduleBlock(
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is
  *                                                    empty
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does
- *                                           not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
+ *                                      or another hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(
@@ -421,8 +424,8 @@ RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is
  *                                                    empty
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does
- *                                           not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
+ *                                      or another hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
 RBRGen4Error RBRGen4Dataset_getScheduleDataBlock(
@@ -465,7 +468,8 @@ const char *RBRGen4Block_name(RBRGen4Block block);
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
+ *                                      hardware error occurs
  * \see RBRGen4_deleteDatasetAll()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/48890208/dataset
  */
@@ -674,8 +678,8 @@ typedef struct RBRGen4DownloadMeta
  *                                             exceeds the buffer capacity
  * \return #RBRGEN4_CHECKSUM_ERROR when the transfer fails its CRC
  *                                           check
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule
- *                                           does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
+ *                                      or another hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
 RBRGen4Error RBRGen4Dataset_downloadScheduleData(
@@ -707,7 +711,8 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleData(
  *                                             exceeds the buffer capacity
  * \return #RBRGEN4_CHECKSUM_ERROR when the transfer fails its CRC
  *                                           check
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
+ *                                      hardware error occurs
  * \see RBRGen4Dataset_downloadScheduleEvents()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
@@ -741,8 +746,8 @@ RBRGen4Error RBRGen4Dataset_downloadEvents(
  *                                             exceeds the buffer capacity
  * \return #RBRGEN4_CHECKSUM_ERROR when the transfer fails its CRC
  *                                           check
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule
- *                                           does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
+ *                                      or another hardware error occurs
  * \see RBRGen4Dataset_downloadEvents()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
@@ -773,7 +778,8 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(
  *                                             exceeds the buffer capacity
  * \return #RBRGEN4_CHECKSUM_ERROR when the transfer fails its CRC
  *                                           check
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
+ *                                      hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830106/download
  */
 RBRGen4Error RBRGen4Dataset_downloadMeta(

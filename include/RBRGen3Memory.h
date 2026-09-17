@@ -104,7 +104,8 @@ typedef struct RBRGen3MemoryInfo
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is
  *                                                requested
- * \return #RBRGEN3_HARDWARE_ERROR if the dataset is unsupported
+ * \return #RBRGEN3_HARDWARE_ERROR if the dataset is unsupported, or another
+ *                                 hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/meminfo
  */
 RBRGen3Error RBRGen3_getMemoryInfo(
@@ -173,7 +174,8 @@ typedef struct RBRGen3Data
  * \return #RBRGEN3_CHECKSUM_ERROR in the event of a CRC failure
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is
  *                                                requested
- * \return #RBRGEN3_HARDWARE_ERROR if the dataset is unsupported
+ * \return #RBRGEN3_HARDWARE_ERROR if the dataset is unsupported, or another
+ *                                 hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/readdata
  */
 RBRGen3Error RBRGen3_readData(RBRGen3 *conn,
@@ -189,7 +191,8 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *conn,
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the memory failed to erase
+ * \return #RBRGEN3_HARDWARE_ERROR if the memory failed to erase, or another
+ *                                 hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memclear
  */
 RBRGen3Error RBRGen3_memoryClear(RBRGen3 *conn);
@@ -229,7 +232,7 @@ const char *RBRGen3MemoryFormat_name(RBRGen3MemoryFormat format);
  *
  * \a memoryFormats will be treated as a bit field representation of available
  * memory formats as defined by RBRGen3MemoryFormat. For details, consult
- * [Working with Bit Fields](bitfields.md).
+ * the Working with Bit Fields page of the documentation.
  *
  * \param [in] conn the instrument connection
  * \param [out] memoryFormats available memory formats
@@ -269,6 +272,7 @@ RBRGen3Error RBRGen3_getCurrentMemoryFormat(
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRGen3_setNewMemoryFormat()
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
 RBRGen3Error RBRGen3_getNewMemoryFormat(
@@ -290,9 +294,10 @@ RBRGen3Error RBRGen3_getNewMemoryFormat(
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid format is
  *                                                requested
- * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging or if
- *                                       an unavailable memory format is
- *                                       selected
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging or if an
+ *                                 unavailable memory format is selected, or
+ *                                 another hardware error occurs
+ * \see RBRGen3_getNewMemoryFormat()
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
 RBRGen3Error RBRGen3_setNewMemoryFormat(
@@ -591,7 +596,9 @@ typedef struct RBRGen3Postprocessing
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
+ *                                 hardware error occurs
+ * \see RBRGen3_setPostprocessing()
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 RBRGen3Error RBRGen3_getPostprocessing(
@@ -612,9 +619,11 @@ RBRGen3Error RBRGen3_getPostprocessing(
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
+ *                                 another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
+ * \see RBRGen3_getPostprocessing()
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 RBRGen3Error RBRGen3_setPostprocessing(
@@ -637,7 +646,8 @@ RBRGen3Error RBRGen3_setPostprocessing(
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
+ *                                 another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing

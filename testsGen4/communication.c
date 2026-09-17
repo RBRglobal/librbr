@@ -45,8 +45,6 @@ TEST_LOGGER4(link)
           RBRGEN4_LINK_TYPE_USB },
         { "link type=serial" RESPONSE_TERMINATOR,
           RBRGEN4_LINK_TYPE_SERIAL },
-        /* { "link type=wifi" RESPONSE_TERMINATOR,
-             RBRGEN4_LINK_TYPE_WIFI }, */
         { 0 }
     };
 

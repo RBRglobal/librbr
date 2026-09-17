@@ -10,7 +10,6 @@
 
 /* Required for isprint. */
 #include <ctype.h>
-#include <stdlib.h>
 
 #include "RBRGen4.h"
 #include "tests.h"

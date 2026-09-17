@@ -337,7 +337,6 @@ const char *RBRGen4PowerSource_name(RBRGen4PowerSource source)
         return "ext";
     case RBRGEN4_POWER_SOURCE_COUNT:
         return "power source count";
-    // case RBRGEN4_POWER_SOURCE_UNKNOWN:
     default:
         return "unknown power source";
     }
@@ -398,7 +397,6 @@ const char *RBRGen4InternalBatteryType_name(
         return "nimh";
     case RBRGEN4_INTERNAL_BATTERY_COUNT:
         return "internal battery type count";
-    // case RBRGEN4_UNKNOWN_INTERNAL_BATTERY:
     default:
         return "unknown internal battery type";
     }
@@ -423,7 +421,6 @@ const char *RBRGen4InternalBatteryType_displayName(
         return "NiMH";
     case RBRGEN4_INTERNAL_BATTERY_COUNT:
         return "internal battery type count";
-    // case RBRGEN4_UNKNOWN_INTERNAL_BATTERY:
     default:
         return "unknown internal battery type";
     }
@@ -530,7 +527,6 @@ const char *RBRGen4ExternalBatteryType_name(
         return "other";
     case RBRGEN4_EXTERNAL_BATTERY_COUNT:
         return "external battery type count";
-    // case RBRGEN4_UNKNOWN_EXTERNAL_BATTERY:
     default:
         return "unknown external battery type";
     }
@@ -565,7 +561,6 @@ const char *RBRGen4ExternalBatteryType_displayName(
         return "other";
     case RBRGEN4_EXTERNAL_BATTERY_COUNT:
         return "external battery type count";
-    // case RBRGEN4_UNKNOWN_EXTERNAL_BATTERY:
     default:
         return "unknown external battery type";
     }

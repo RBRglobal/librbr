@@ -62,7 +62,8 @@ typedef struct RBRGen3ChannelsList
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the command is unavailable
+ * \return #RBRGEN3_HARDWARE_ERROR when the command is unavailable, or another
+ *                                 hardware error occurs
  * \see RBRGen3_getLabelsList()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
@@ -103,7 +104,8 @@ typedef struct RBRGen3LabelsList
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the command is unavailable
+ * \return #RBRGEN3_HARDWARE_ERROR when the command is unavailable, or another
+ *                                 hardware error occurs
  * \see RBRGen3_getChannelsList()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
@@ -156,7 +158,7 @@ const char *RBRGen3OutputFormat_name(RBRGen3OutputFormat format);
  *
  * \a outputFormats will be treated as a bit field representation of available
  * output formats as defined by RBRGen3OutputFormat. For details, consult
- * [Working with Bit Fields](bitfields.md).
+ * the Working with Bit Fields page of the documentation.
  *
  * \param [in] conn the instrument connection
  * \param [out] outputFormats available output formats
@@ -177,6 +179,7 @@ RBRGen3Error RBRGen3_getAvailableOutputFormats(
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \see RBRGen3_setOutputFormat()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
 RBRGen3Error RBRGen3_getOutputFormat(
@@ -192,7 +195,8 @@ RBRGen3Error RBRGen3_getOutputFormat(
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when an unavailable output format is
- *                                       selected
+ *                                 selected, or another hardware error occurs
+ * \see RBRGen3_getOutputFormat()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
 RBRGen3Error RBRGen3_setOutputFormat(
@@ -207,7 +211,9 @@ RBRGen3Error RBRGen3_setOutputFormat(
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when USB streaming is unavailable
+ * \return #RBRGEN3_HARDWARE_ERROR when USB streaming is unavailable, or
+ *                                 another hardware error occurs
+ * \see RBRGen3_setUSBStreamingState()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamusb
  */
 RBRGen3Error RBRGen3_getUSBStreamingState(
@@ -222,7 +228,9 @@ RBRGen3Error RBRGen3_getUSBStreamingState(
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when USB streaming is unavailable
+ * \return #RBRGEN3_HARDWARE_ERROR when USB streaming is unavailable, or
+ *                                 another hardware error occurs
+ * \see RBRGen3_getUSBStreamingState()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamusb
  */
 RBRGen3Error RBRGen3_setUSBStreamingState(
@@ -237,7 +245,9 @@ RBRGen3Error RBRGen3_setUSBStreamingState(
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when serial streaming is unavailable
+ * \return #RBRGEN3_HARDWARE_ERROR when serial streaming is unavailable, or
+ *                                 another hardware error occurs
+ * \see RBRGen3_setSerialStreamingState()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
 RBRGen3Error RBRGen3_getSerialStreamingState(
@@ -252,7 +262,9 @@ RBRGen3Error RBRGen3_getSerialStreamingState(
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when serial streaming is unavailable
+ * \return #RBRGEN3_HARDWARE_ERROR when serial streaming is unavailable, or
+ *                                 another hardware error occurs
+ * \see RBRGen3_getSerialStreamingState()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
 RBRGen3Error RBRGen3_setSerialStreamingState(
@@ -391,9 +403,11 @@ typedef struct RBRGen3AuxOutput
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the auxiliary output signal is
- *                                       unavailable
+ *                                 unavailable, or another hardware error
+ *                                 occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the auxiliary output
  *                                                signal index is not `1`
+ * \see RBRGen3_setAuxOutput()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
 RBRGen3Error RBRGen3_getAuxOutput(
@@ -413,9 +427,11 @@ RBRGen3Error RBRGen3_getAuxOutput(
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
+ *                                 another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
+ * \see RBRGen3_getAuxOutput()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/streamserial
  */
 RBRGen3Error RBRGen3_setAuxOutput(

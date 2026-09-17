@@ -113,7 +113,7 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
 #define RBRGEN4_DATETIME_MIN  946684800000LL
 
 /**
- * \brief The minimum date and time which the instrument can handle.
+ * \brief The maximum date and time which the instrument can handle.
  *
  * Specified in milliseconds since the Unix epoch (1970-01-01T00:00:00.000Z).
  * Represents 2099-12-31T23:59:59.000Z.
@@ -138,8 +138,6 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
  * \brief The maximum number of characters in the instrument firmware version.
  *
  * Does not include any null terminator.
- * 
- * Gen4 todo: This value needs to be reviewed.
  */
 #define RBRGEN4_ID_VERSION_MAX 29
 
@@ -376,30 +374,30 @@ typedef struct RBRGen4OutputFormat
      * \brief Whether the output begins with “RBR” followed by the
      * instrument's 6-digit serial number.
      *
-     * The `sn` parameter. Off by default. Retrieved as `false` when the
-     * instrument does not report it.
+     * The `sn` parameter. Retrieved as `false` when the instrument does not
+     * report it.
      */
     bool sn;
     /**
      * \brief Whether the schedule label appears before the timestamp.
      *
-     * The `schedulelabel` parameter. On by default. Retrieved as `false` when
-     * the instrument does not report it.
+     * The `schedulelabel` parameter. Retrieved as `false` when the instrument
+     * does not report it.
      */
     bool scheduleLabel;
     /**
      * \brief Whether a timestamp appears before the data.
      *
-     * The `datetime` parameter. On by default. Retrieved as `false` when the
-     * instrument does not report it.
+     * The `datetime` parameter. Retrieved as `false` when the instrument does
+     * not report it.
      */
     bool dateTime;
     /**
      * \brief Whether a cyclic redundancy check appears after the data and
      * immediately before the terminating `\r\n`.
      *
-     * The `crc` parameter. Off by default. Retrieved as `false` when the
-     * instrument does not report it.
+     * The `crc` parameter. Retrieved as `false` when the instrument does not
+     * report it.
      */
     bool crc;
     /** \brief The encoding used to report samples. */
@@ -809,28 +807,28 @@ typedef struct RBRGen4
     /**
      * \brief The command timeout in milliseconds.
      *
-     * See [Timeouts](timeouts.md) for details on how the library handles
-     * timeouts.
-     * \see RBRGen4_getCommandTimeout();
-     * \see RBRGen4_setCommandTimeout();
+     * See the Timeouts page of the documentation for details on how the
+     * library handles timeouts.
+     * \see RBRGen4_getCommandTimeout()
+     * \see RBRGen4_setCommandTimeout()
      */
     RBRGen4DateTime commandTimeout;
 
     /**
      * \brief The poll timeout in milliseconds.
      *
-     * RBRGen4_open() sets it to twice the command timeout. See
-     * [Timeouts](timeouts.md) for details on how the library handles
+     * RBRGen4_open() sets it to twice the command timeout. See the Timeouts
+     * page of the documentation for details on how the library handles
      * timeouts.
-     * \see RBRGen4_getPollTimeout();
-     * \see RBRGen4_setPollTimeout();
+     * \see RBRGen4_getPollTimeout()
+     * \see RBRGen4_setPollTimeout()
      */
     RBRGen4DateTime pollTimeout;
 
     /**
      * \brief Arbitrary user data; useful in callbacks.
-     * \see RBRGen4_getUserData();
-     * \see RBRGen4_setUserData();
+     * \see RBRGen4_getUserData()
+     * \see RBRGen4_setUserData()
      */
     void *userData;
 
@@ -893,7 +891,7 @@ typedef struct RBRGen4
 
 /**
  * \brief Establish a connection with an instrument and initialize the context.
- * \note Issues `id` and `outputformat` commands.
+ * \note Issues the `id4` and `instrument outputformat` commands.
  *
  * “connection” in this library means purely the state tracking
  * and management of an instrument: the underlying physical communication with
@@ -977,7 +975,6 @@ RBRGen4Error RBRGen4_close(RBRGen4 *conn);
 
 /**
  * \brief Get the generation of an instrument.
- * \note Issues the `id` command.
  *
  * \param [in] conn the instrument connection
  * \return the instrument generation

@@ -68,7 +68,7 @@ static bool test_verify_ascent_rate(void)
     params.Vp_fc = 1/100.0f;
     params._lastPressure = -1.0f;
     params._lastPressureTime = -1.0f;
-    params._ascentRate = (float)(0.0f/0.0f); // NAN macro may be not exist
+    params._ascentRate = (float)(0.0f/0.0f); /* NAN macro may be not exist */
 
     int64_t step = (int64_t)llroundf(params.Fs *1000);
     
@@ -86,11 +86,11 @@ static bool test_verify_ascent_rate(void)
         }
         else if ( t > 120000 && t < 133000 )
         {
-            pressure = (float)(0.0f/0.0f);  // force a sequence of NAN
+            pressure = (float)(0.0f/0.0f);  /* force a sequence of NAN */
         }
         else if ( t == 700000 )
         {
-            pressure = (float)(0.0f/0.0f);  // force a single NAN
+            pressure = (float)(0.0f/0.0f);  /* force a single NAN */
         }
         else
         {
@@ -107,8 +107,8 @@ static bool test_verify_ascent_rate(void)
             TEST_ASSERT_FLOAT_EQ(Vp, 0.1f, 1e-2f);
         }
 
-        // print for manual check
-        //printf("%.3f, %.4f, %.4f\n", t, pressure, Vp);
+        /* print for manual check
+         * printf("%.3f, %.4f, %.4f\n", t, pressure, Vp); */
     }
 
     return true;
@@ -135,7 +135,7 @@ static bool test_verify_coeff_alpha_tau_ctcoeff(DCorrCoeffTest *tests)
 
         RBRGen3DynamicCorrection_updateVariables(&params, Vp);
 
-        // the data is fitted.  Check we are within 5% of value
+        /* the data is fitted.  Check we are within 5% of value */
         TEST_ASSERT_FLOAT_EQ(tests[i].alpha_expected, params.alpha, params.alpha * 5e-2f);
         TEST_ASSERT_FLOAT_EQ(tests[i].tau_expected, params.tau, params.tau * 5e-2f);
         TEST_ASSERT_FLOAT_EQ(tests[i].ctcoeff_expected, params.CT_coeff, params.CT_coeff * 5e-2f);
@@ -165,7 +165,7 @@ static bool test_dynamic_correction(float *dataset, float Fs)
 
     while ( datasetPtr[0] >= 0.0f )
     {
-        measIn.timestamp = (int64_t)llroundf(datasetPtr[0]*1000.0f); //time in millisecond
+        measIn.timestamp = (int64_t)llroundf(datasetPtr[0]*1000.0f); /* time in millisecond */
         measIn.conductivity = datasetPtr[1];
         measIn.marineTemperature = datasetPtr[2];
         measIn.pressure = datasetPtr[3];
@@ -210,7 +210,6 @@ TEST_LOGGER3(verify_ascent_rate)
 
 TEST_LOGGER3(verify_coeff_alpha_tau_ctcoeff)
 {
-    // https://wiki.rbr-global.com/display/RAD/Dynamic+processing+on+floats
     DCorrCoeffTest tests[] = {
             { 0.02f, 0.120f, 12.26f, 0.046f },
             { 0.03f, 0.120f, 12.26f, 0.046f },
@@ -228,7 +227,7 @@ TEST_LOGGER3(verify_coeff_alpha_tau_ctcoeff)
             { 0.20f, 0.0169f, 7.492f, 0.0069f },
             { 0.45f, 0.0074f, 6.07f, 0.0031f },
             { 0.50f, 0.0074f, 6.07f, 0.0031f },
-            { 0.0f, 0.0f, 0.f, 0.0f}    // end-of-test
+            { 0.0f, 0.0f, 0.f, 0.0f}    /* end-of-test */
     };
 
     return test_verify_coeff_alpha_tau_ctcoeff(tests);

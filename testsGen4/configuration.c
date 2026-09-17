@@ -9,9 +9,8 @@
  */
 
 #include <math.h>
-#include "RBRGen4.h"
-#include "RBRGen4Configuration.h"
 #include "tests.h"
+#include "RBRGen4Configuration.h"
 
 static bool test_node(RBRGen4Node *expected,
                       RBRGen4Node *actual)
@@ -268,7 +267,7 @@ TEST_LOGGER4(portWithoutDevices)
 TEST_LOGGER4(portSerial)
 {
     /*
-     * No port on the development instrument is bus-attached, so unlike the
+     * No port on the captured instrument is bus-attached, so unlike the
      * other port tests this response is constructed from the command
      * reference rather than captured. It covers the paths the captured
      * responses cannot reach: a non-`virtual` class, a selected protocol, a
@@ -473,11 +472,11 @@ TEST_LOGGER4(device)
 TEST_LOGGER4(deviceIdentity)
 {
     /*
-     * Zero stands for the `na` every device on the development instrument
+     * Zero stands for the `na` every device on the captured instrument
      * reports, so prove a real serial number and firmware type are read
-     * rather than left at that zero. The serial number is the one
-     * `device.adoc` uses in its worked example; no device to hand reports
-     * either.
+     * rather than left at that zero. The serial number is the one the
+     * command reference uses in its worked example; no device to hand
+     * reports either.
      */
     RBRGen4Device expected = {
         .label = "internal_adc_00",
@@ -522,7 +521,7 @@ TEST_LOGGER4(deviceWithUnlistedChannels)
 {
     /*
      * `channellist` can name channels the `channel` command does not
-     * enumerate and will not accept: on the development instrument this
+     * enumerate and will not accept: on the captured instrument this
      * device reports `temperature_01`, which `channel temperature_01`
      * answers with `ERR-117`.
      */

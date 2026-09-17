@@ -177,11 +177,6 @@ TEST_LOGGER3(thresholding_set_channel_by_index)
     char response[COMMAND_RESPONSE_SIZE];
     rbr_prepareCommandResponse(text, expectedCommand, response);
 
-    // const char *command = "thresholding enabled = true, channelindex = 1, "
-    //                        "condition = above, value = 0.0000, "
-    //                        "interval = 60000"
-    //                         COMMAND_TERMINATOR;
-
     TestIOBuffers_init(buffers, response, 0);
     err = RBRGen3_setThresholding(conn, &threshold);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);

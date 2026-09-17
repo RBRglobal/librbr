@@ -68,7 +68,7 @@ const char *RBRGen4InstrumentState_name(
 
 /**
  * \brief Get identification information using the legacy `id` command.
- * \note Issues the `id` instrument command.
+ * \note Issues the `id` command.
  *
  * `id` predates the Gen4 API and keeps its original grammar: parameters are
  * separated by commas and assignments are padded with spaces. It reports the
@@ -89,14 +89,14 @@ RBRGen4Error RBRGen4_getId(RBRGen4 *conn,
 
 /**
  * \brief Get identification information from the instrument.
- * \note Issues the `id4` instrument command.
+ * \note Issues the `id4` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] id the instrument information
  * \return #RBRGEN4_SUCCESS when the information is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRGen4_getInstrument();
+ * \see RBRGen4_getInstrument()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
  */
 RBRGen4Error RBRGen4_getId4(RBRGen4 *conn,
@@ -150,13 +150,15 @@ typedef struct RBRGen4PcbaPool {
 
 /**
  * \brief Populate the pool of the instrument's PCBAs.
+ * \note Issues the `pcba` command.
  *
  * \param [in] conn the instrument connection
  * \param [inout] pcbaPool the PCBAs of this instrument.
  * \return #RBRGEN4_SUCCESS when all PCBAs are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if a PCBA cannot be read
+ * \return #RBRGEN4_HARDWARE_ERROR when a PCBA cannot be read, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getPcba()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/44761149/pcba
  */
@@ -166,7 +168,7 @@ RBRGen4Error RBRGen4_getPcbaPool(
 
 /**
  * \brief Get an instrument's PCBA's parameters.
- * \note Issues the `pcba <pcba_label>` instrument command.
+ * \note Issues the `pcba <pcba_label>` command.
  *
  * RBRGen4Pcba.label must be populated by the caller to select the
  * PCBA to read; the remaining fields are overwritten. Labels can be
@@ -177,7 +179,8 @@ RBRGen4Error RBRGen4_getPcbaPool(
  * \return #RBRGEN4_SUCCESS when the information is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the information cannot be read
+ * \return #RBRGEN4_HARDWARE_ERROR when the information cannot be read, or
+ *                                      another hardware error occurs
  * \see RBRGen4_getPcbaPool()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/44761149/pcba
  */
@@ -215,14 +218,15 @@ const char *RBRGen4PowerSource_name(RBRGen4PowerSource source);
 
 /**
  * \brief Get instrument power information.
- * \note Issues the `instrument power` instrument command.
+ * \note Issues the `instrument power` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] powerSource the power source from which the instrument is running
  * \return #RBRGEN4_SUCCESS when the information is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the information cannot be read
+ * \return #RBRGEN4_HARDWARE_ERROR when the information cannot be read, or
+ *                                      another hardware error occurs
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830328/power
  */
 RBRGen4Error RBRGen4_getPowerSource(RBRGen4 *conn,
@@ -303,14 +307,15 @@ typedef struct RBRGen4PowerInternal
 
 /**
  * \brief Get instrument internal power information.
- * \note Issues the `instrument power internal` instrument command.
+ * \note Issues the `instrument power internal` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] power the power information
  * \return #RBRGEN4_SUCCESS when the information is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if an error occurs reading voltages
+ * \return #RBRGEN4_HARDWARE_ERROR when an error occurs reading voltages, or
+ *                                      another hardware error occurs
  * \see RBRGen4_setPowerInternalBatteryType()
  * \see RBRGen4_resetPowerInternalUsed()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828548/internal
@@ -321,14 +326,15 @@ RBRGen4Error RBRGen4_getPowerInternal(
 
 /**
  * \brief Set the internal power battery type.
- * \note Issues the `instrument power internal` instrument command.
+ * \note Issues the `instrument power internal` command.
  *
  * \param [in] conn the instrument connection
  * \param [in] type the battery type
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getPowerInternal()
  * \see RBRGen4_resetPowerInternalUsed()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828548/internal
@@ -339,13 +345,14 @@ RBRGen4Error RBRGen4_setPowerInternalBatteryType(
 
 /**
  * \brief Reset the counter of energy used from the internal battery.
- * \note Issues the `instrument power internal` instrument command.
+ * \note Issues the `instrument power internal` command.
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getPowerInternal()
  * \see RBRGen4_setPowerInternalBatteryType()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828548/internal
@@ -378,7 +385,7 @@ typedef enum RBRGen4ExternalBatteryType
     RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_LINIMNCO,
     /** RBRfermette³ NiMH */
     RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_NIMH,
-    /** RBRfermana NiMH - fw version 1.140 or later */
+    /** RBRfermata NiMH */
     RBRGEN4_EXTERNAL_BATTERY_FERMATA_NIMH,
     /** Other/unknown external battery type */
     RBRGEN4_EXTERNAL_BATTERY_OTHER,
@@ -440,7 +447,7 @@ typedef struct RBRGen4PowerExternal
 
 /**
  * \brief Get instrument external power information.
- *
+ * \note Issues the `instrument power external` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] power the power information
@@ -457,14 +464,15 @@ RBRGen4Error RBRGen4_getPowerExternal(
 
 /**
  * \brief Set the external power battery type.
- * \note Issues the `instrument power external` instrument command.
+ * \note Issues the `instrument power external` command.
  *
  * \param [in] conn the instrument connection
  * \param [in] type the battery type
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getPowerExternal()
  * \see RBRGen4_resetPowerExternalUsed()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828551/external
@@ -475,13 +483,14 @@ RBRGen4Error RBRGen4_setPowerExternalBatteryType(
 
 /**
  * \brief Reset the counter of energy used from the external battery.
- * \note Issues the `instrument power external` instrument command.
+ * \note Issues the `instrument power external` command.
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another
+ *                                      hardware error occurs
  * \see RBRGen4_getPowerExternal()
  * \see RBRGen4_setPowerExternalBatteryType()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828551/external
@@ -493,8 +502,6 @@ RBRGen4Error RBRGen4_resetPowerExternalUsed(
  * \brief Instrument `instrument` command parameters.
  *
  * Distinct from #RBRGen4, which is the connection to an instrument.
- *
- * Fields are declared in the order the instrument reports them.
  *
  * \see RBRGen4_getInstrument()
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/41582593/instrument
@@ -533,7 +540,7 @@ typedef struct RBRGen4Instrument
 
 /**
  * \brief Get the instrument's identity and state.
- * \note Issues the `instrument` instrument command.
+ * \note Issues the `instrument` command.
  *
  * All of the parameters the command reports are returned. They are read-only,
  * so there is no corresponding setter.
@@ -596,7 +603,8 @@ RBRGen4Error RBRGen4_getOutputFormat(
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the encoding or
  *                                                   datatype is not a real
  *                                                   value
- * \return #RBRGEN4_HARDWARE_ERROR if the instrument refuses a value
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument refuses a value, or
+ *                                      another hardware error occurs
  * \see RBRGen4_getOutputFormat()
  * \see https://docs.rbr-global.com/L3commandreference/commands/real-time-data/outputformat
  */
@@ -612,7 +620,8 @@ RBRGen4Error RBRGen4_setOutputFormat(
  * \return #RBRGEN4_SUCCESS when the instrument has been reset
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the instrument refuses
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument refuses, or another
+ *                                      hardware error occurs
  * \see https://docs.rbr-global.com/L3commandreference/commands/configuration-information-and-calibration/factory
  */
 RBRGen4Error RBRGen4_factoryReset(
@@ -624,8 +633,7 @@ RBRGen4Error RBRGen4_factoryReset(
  *
  * \param [in] conn the instrument connection
  * \param [in] delay time in milliseconds to wait before rebooting; zero omits
- *                   the parameter, rebooting without a delay. The command
- *                   has no default delay of its own.
+ *                   the parameter, rebooting without a delay
  * \return #RBRGEN4_SUCCESS when the reboot has been requested
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
