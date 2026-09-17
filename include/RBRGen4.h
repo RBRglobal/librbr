@@ -88,15 +88,19 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
  * \brief The maximum number of characters in a channel type (e.g., “temp09”).
  *
  * Does not include any null terminator.
+ *
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828616/Metadata+layout
  */
-#define RBRGEN4_CHANNEL_TYPE_MAX 11
+#define RBRGEN4_CHANNEL_TYPE_MAX 15
 
 /**
  * \brief The maximum number of characters in a channel unit name (e.g., “C”).
  *
  * Does not include any null terminator.
+ *
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828616/Metadata+layout
  */
-#define RBRGEN4_CHANNEL_UNIT_MAX 7
+#define RBRGEN4_CHANNEL_UNIT_MAX 15
 
 /**
  * \brief The minimum date and time which the instrument can handle.
