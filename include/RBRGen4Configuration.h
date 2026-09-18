@@ -426,12 +426,6 @@ typedef struct RBRGen4Device {
      */
     char channelList[RBRGEN4_CHANNEL_MAX][RBRGEN4_LABEL_NAME_MAX + 1];
 
-    /**
-     * \brief Whether the device is protected from being overridden by a
-     * subsequent device discovery.
-     */
-    bool lock;
-
     /** \brief The time in milliseconds the device takes to power up. */
     int32_t powerUpTime;
 
@@ -453,8 +447,7 @@ typedef struct RBRGen4Device {
  *
  * The caller sets RBRGen4Device.label to select the device to read.
  *
- * \note Issues the `device <device_label>` command with every
- *       parameter named explicitly.
+ * \note Issues the `device <device_label>`.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] device the device to read
