@@ -446,7 +446,7 @@ typedef struct RBRGen4Id {
  * \brief Instrument `id4` command parameters.
  *
  * \see RBRGen4_getId4()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830290/id
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/458817545/id4
  */
 typedef struct RBRGen4Id4 {
     /**
