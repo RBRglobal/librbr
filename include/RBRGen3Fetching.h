@@ -4,8 +4,6 @@
  * \brief Instrument commands and structures pertaining to on-demand data
  * acquisition.
  *
- * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample
- *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.
@@ -47,7 +45,6 @@ extern "C" {
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when an invalid channel is requested, or
  *                                 another hardware error occurs
- * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/fetch
  */
 RBRGen3Error RBRGen3_fetch(RBRGen3 *conn, RBRGen3LabelsList *channels, bool sleepAfter,
                            RBRGen3Sample *sample);

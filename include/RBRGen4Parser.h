@@ -22,8 +22,6 @@ extern "C" {
 
 /**
  * \brief The number of bytes of auxiliary data in an event.
- *
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828609/Event+data+storage+format
  */
 #define RBRGEN4_EVENT_AUXILIARY_DATA_MAX 8
 
@@ -113,8 +111,6 @@ const char *RBRGen4EventType_name(RBRGen4EventType type);
 
 /**
  * \brief An instrument event.
- *
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828609/Event+data+storage+format
  */
 typedef struct RBRGen4Event {
     /** \brief The type of the event. */

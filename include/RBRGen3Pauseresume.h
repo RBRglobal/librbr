@@ -4,8 +4,6 @@
  * \brief Instrument commands and structures pertaining to pauseresume.
  * This feature is available in firmware versions 1.116 or later.
  *
- * \see https://docs.rbr-global.com/L3commandreference/commands/pauseresume
- *
  * \copyright
  * Copyright (c) 2022 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.
@@ -43,7 +41,6 @@ const char *RBRGen3PauseresumeState_name(RBRGen3PauseresumeState state);
  * \brief Possible instrument pause status.
  *
  * \see RBRGen3Pause
- * \see https://docs.rbr-global.com/L3commandreference/commands/pause
  */
 typedef enum RBRGen3PauseStatus {
     /** Deployment is paused and no more samples will be taken once the current acquisition
@@ -66,7 +63,6 @@ const char *RBRGen3PauseStatus_name(RBRGen3PauseStatus status);
  * \brief Possible instrument resume status.
  *
  * \see RBRGen3Resume
- * \see https://docs.rbr-global.com/L3commandreference/commands/resume
  */
 typedef enum RBRGen3ResumeStatus {
     /** Deployment has resumed running as scheduled. */

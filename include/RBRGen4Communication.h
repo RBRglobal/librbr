@@ -4,8 +4,6 @@
  * \brief Instrument commands and structures pertaining to the communication
  * interfaces of the instrument.
  *
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830218/Communications
- *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.
@@ -23,7 +21,6 @@ extern "C" {
  *
  * \see RBRGen4Link
  * \see RBRGen4_getLink()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830279/link
  */
 typedef enum RBRGen4LinkType {
     /** USB CDC connectivity. */
@@ -49,7 +46,6 @@ const char *RBRGen4LinkType_name(RBRGen4LinkType linkType);
  * \brief Instrument `link` command parameters.
  *
  * \see RBRGen4_getLink()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830279/link
  */
 typedef struct RBRGen4Link {
     /** \brief The type of communication link carrying the connection. */
@@ -65,7 +61,6 @@ typedef struct RBRGen4Link {
  * \return #RBRGEN4_SUCCESS when the setting is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830279/link
  */
 RBRGen4Error RBRGen4_getLink(RBRGen4 *conn, RBRGen4Link *link);
 
@@ -79,7 +74,6 @@ RBRGen4Error RBRGen4_getLink(RBRGen4 *conn, RBRGen4Link *link);
  * \see RBRGen4LinkSerial
  * \see RBRGen4_getLinkSerial()
  * \see RBRGen4_setLinkSerial()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
 typedef enum RBRGen4LinkSerialBaudRate {
     /** An unrecognized baud rate, or none being set. */
@@ -120,7 +114,6 @@ const char *RBRGen4LinkSerialBaudRate_name(RBRGen4LinkSerialBaudRate baud);
  * \see RBRGen4LinkSerial
  * \see RBRGen4_getLinkSerial()
  * \see RBRGen4_setLinkSerial()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
 typedef enum RBRGen4LinkSerialMode {
     /** An unrecognized serial mode, or none being set. */
@@ -151,7 +144,6 @@ const char *RBRGen4LinkSerialMode_name(RBRGen4LinkSerialMode mode);
  *
  * \see RBRGen4_getLinkSerial()
  * \see RBRGen4_setLinkSerial()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
 typedef struct RBRGen4LinkSerial {
     /** \brief The baud rate of the instrument. */
@@ -193,7 +185,6 @@ typedef struct RBRGen4LinkSerial {
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_setLinkSerial()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
 RBRGen4Error RBRGen4_getLinkSerial(RBRGen4 *conn, RBRGen4LinkSerial *serial);
 
@@ -225,7 +216,6 @@ RBRGen4Error RBRGen4_getLinkSerial(RBRGen4 *conn, RBRGen4LinkSerial *serial);
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the baud rate or
  *                                                   mode is not a real value
  * \see RBRGen4_getLinkSerial()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/97222817/serial
  */
 RBRGen4Error RBRGen4_setLinkSerial(RBRGen4 *conn, const RBRGen4LinkSerial *serial);
 
@@ -242,8 +232,6 @@ RBRGen4Error RBRGen4_setLinkSerial(RBRGen4 *conn, const RBRGen4LinkSerial *seria
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the instrument has been put to sleep
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828543/sleep
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828337/Timeouts+output+blanking+and+power+saving
  */
 RBRGen4Error RBRGen4_sleep(RBRGen4 *conn);
 

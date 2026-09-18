@@ -31,9 +31,7 @@
 /** \brief 10-second command timeout. */
 #define COMMAND_TIMEOUT (10 * 1000)
 
-/* At https://docs.rbr-global.com/L3commandreference/introduction/command-
- * processing-and-timeouts/timeouts-output-blanking-and-power-saving, the
- * command reference suggests using a carriage return (`\r`) as the wake
+/* The command reference suggests using a carriage return (`\r`) as the wake
  * character with a 10ms pause. This works well when talking directly to the
  * instrument over a USB or serial link. However, without giving the user the
  * option of reconfiguring wake behaviour, we need to consider how possible

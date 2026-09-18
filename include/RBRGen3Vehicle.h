@@ -3,8 +3,6 @@
  *
  * \brief Instrument commands and structures pertaining to vehicle support.
  *
- * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support
- *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.
@@ -34,8 +32,6 @@ extern "C" {
  *
  * \see RBRGen3Regimes
  * \see RBRGen3DirectionDependentSampling
- * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
- * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/ddsampling
  */
 typedef enum RBRGen3Direction {
     /** The settings apply while ascending. */
@@ -62,7 +58,6 @@ const char *RBRGen3Direction_name(RBRGen3Direction direction);
  * determination of the current regime and bin.
  *
  * \see RBRGen3Regimes
- * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  */
 typedef enum RBRGen3RegimesReference {
     /** Absolute pressure is used as the reference. */
@@ -89,7 +84,6 @@ const char *RBRGen3RegimesReference_name(RBRGen3RegimesReference reference);
  *
  * \see RBRGen3_getRegimes()
  * \see RBRGen3_setRegimes()
- * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  */
 typedef struct RBRGen3Regimes {
     /** \brief The regimes-relevant direction through the water column. */
@@ -115,7 +109,6 @@ typedef struct RBRGen3Regimes {
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
  *                                 hardware error occurs
  * \see RBRGen3_setRegimes()
- * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  */
 RBRGen3Error RBRGen3_getRegimes(RBRGen3 *conn, RBRGen3Regimes *regimes);
 
@@ -140,7 +133,6 @@ RBRGen3Error RBRGen3_getRegimes(RBRGen3 *conn, RBRGen3Regimes *regimes);
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when too many regimes are
  *                                                requested
  * \see RBRGen3_getRegimes()
- * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regimes
  */
 RBRGen3Error RBRGen3_setRegimes(RBRGen3 *conn, const RBRGen3Regimes *regimes);
 
@@ -152,7 +144,6 @@ typedef uint8_t RBRGen3RegimeIndex;
  *
  * \see RBRGen3_getRegime()
  * \see RBRGen3_setRegime()
- * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regime
  */
 typedef struct RBRGen3Regime {
     /**
@@ -207,7 +198,6 @@ typedef struct RBRGen3Regime {
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE if an invalid regime index
  *                                                is given
  * \see RBRGen3_setRegime()
- * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regime
  */
 RBRGen3Error RBRGen3_getRegime(RBRGen3 *conn, RBRGen3Regime *regime);
 
@@ -230,7 +220,6 @@ RBRGen3Error RBRGen3_getRegime(RBRGen3 *conn, RBRGen3Regime *regime);
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see RBRGen3_getRegime()
- * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/regime
  */
 RBRGen3Error RBRGen3_setRegime(RBRGen3 *conn, const RBRGen3Regime *regime);
 
@@ -239,7 +228,6 @@ RBRGen3Error RBRGen3_setRegime(RBRGen3 *conn, const RBRGen3Regime *regime);
  *
  * \see RBRGen3_getDirectionDependentSampling()
  * \see RBRGen3_setDirectionDependentSampling()
- * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/ddsampling
  */
 typedef struct RBRGen3DirectionDependentSampling {
     /** \brief In which direction the instrument samples at the fast rate. */
@@ -287,7 +275,6 @@ typedef struct RBRGen3DirectionDependentSampling {
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
  *                                 hardware error occurs
  * \see RBRGen3_setDirectionDependentSampling()
- * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/ddsampling
  */
 RBRGen3Error RBRGen3_getDirectionDependentSampling(RBRGen3 *conn,
                                                    RBRGen3DirectionDependentSampling *ddsampling);
@@ -311,7 +298,6 @@ RBRGen3Error RBRGen3_getDirectionDependentSampling(RBRGen3 *conn,
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see RBRGen3_getDirectionDependentSampling()
- * \see https://docs.rbr-global.com/L3commandreference/commands/vehicle-support/ddsampling
  */
 RBRGen3Error RBRGen3_setDirectionDependentSampling(RBRGen3 *conn,
                                                    RBRGen3DirectionDependentSampling *ddsampling);
