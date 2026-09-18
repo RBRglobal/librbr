@@ -20,7 +20,11 @@ extern "C" {
 
 #include "RBRGen4.h"
 
-/** \brief The maximum number of pieces of auxiliary data in an event. */
+/**
+ * \brief The number of bytes of auxiliary data in an event.
+ *
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828609/Event+data+storage+format
+ */
 #define RBRGEN4_EVENT_AUXILIARY_DATA_MAX 8
 
 struct RBRGen4Parser;

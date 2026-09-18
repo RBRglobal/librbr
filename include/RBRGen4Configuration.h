@@ -59,19 +59,25 @@ extern "C" {
 #define RBRGEN4_AVAILABLE_FAST_PERIODS_MAX 4
 
 /**
- * \brief The maximum number of nodes.
+ * \brief The number of nodes RBRGen4NodePool can hold.
+ *
  * \see RBRGen4NodePool.pool
  */
 #define RBRGEN4_NODE_COUNT_MAX 12
 
 /**
- * \brief The maximum number of ports.
+ * \brief The number of ports RBRGen4PortPool and a node's port list can hold.
+ *
+ * \see RBRGen4PortPool.pool
  * \see RBRGen4Node.portList
  */
 #define RBRGEN4_PORT_COUNT_MAX 16
 
 /**
- * \brief The maximum number of devices.
+ * \brief The number of devices RBRGen4DevicePool and a port's device list can
+ * hold.
+ *
+ * \see RBRGen4DevicePool.pool
  * \see RBRGen4Port.deviceList
  */
 #define RBRGEN4_DEVICE_COUNT_MAX 16

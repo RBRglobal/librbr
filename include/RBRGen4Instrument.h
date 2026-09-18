@@ -54,11 +54,15 @@ const char *RBRGen4InstrumentState_name(RBRGen4InstrumentState state);
  * \brief The maximum number of characters in the instrument name.
  *
  * Does not include any null terminator.
+ *
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/41582593/instrument
  */
 #define RBRGEN4_INSTRUMENT_NAME_MAX 32
 
 /**
- * \brief The maximum number of PCBAs in the instrument.
+ * \brief The number of PCBAs RBRGen4PcbaPool can hold.
+ *
+ * \see RBRGen4PcbaPool.pool
  */
 #define RBRGEN4_PCBA_COUNT_MAX 12
 

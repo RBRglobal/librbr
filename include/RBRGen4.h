@@ -122,6 +122,8 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
  * \brief The maximum number of characters in an instrument part number.
  *
  * Does not include any null terminator.
+ *
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/41582593/instrument
  */
 #define RBRGEN4_PART_NUMBER_MAX 255
 
@@ -129,6 +131,8 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
  * \brief The maximum number of characters in the instrument model name.
  *
  * Does not include any null terminator.
+ *
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/41582593/instrument
  */
 #define RBRGEN4_ID_MODEL_MAX 14
 
@@ -150,7 +154,13 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
  */
 #define RBRGEN4_ID_SEMVER_MAX 35
 
-/** \brief The maximum length of characters within a label.*/
+/**
+ * \brief The maximum number of characters in a label.
+ *
+ * Does not include any null terminator.
+ *
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830131/Parameter+naming+constraints
+ */
 #define RBRGEN4_LABEL_NAME_MAX 31
 
 /**
