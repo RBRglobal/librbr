@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     };
 
     if ((err = RBRGen4_open(
-             &conn,
+             conn,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
              (void *) &instrumentFd)) != RBRGEN4_SUCCESS)

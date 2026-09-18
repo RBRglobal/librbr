@@ -16,6 +16,8 @@
 #include <errno.h>
 /* Required for fprintf, printf. */
 #include <stdio.h>
+/* Required for EXIT_FAILURE, EXIT_SUCCESS. */
+#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
 /* Required for gmtime_r, time_t, strftime. */
@@ -59,11 +61,7 @@ int main(int argc, char *argv[])
     int instrumentFd;
 
     RBRGen3Error err;
-    RBRGen3 *conn = NULL;
-    #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRGen3 instrumentSpace;
-    conn = &instrumentSpace;
-    #endif
+    RBRGen3 conn;
 
     if (argc < 2)
     {
@@ -107,10 +105,10 @@ int main(int argc, char *argv[])
         goto fileCleanup;
     }
 
-    RBRGen3_setUSBStreamingState(conn, false);
-    RBRGen3_setSerialStreamingState(conn, false);
+    RBRGen3_setUSBStreamingState(&conn, false);
+    RBRGen3_setSerialStreamingState(&conn, false);
 
-    if ((err = instrumentStart(conn)) != RBRGEN3_SUCCESS)
+    if ((err = instrumentStart(&conn)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr,
                 "%s: Failed to start instrument: %s!\n",
@@ -121,9 +119,9 @@ int main(int argc, char *argv[])
     }
 
     RBRGen3Channels channels;
-    RBRGen3_getChannels(conn, &channels);
+    RBRGen3_getChannels(&conn, &channels);
 
-    RBRGen3Parser *parser = NULL;
+    RBRGen3Parser parser;
 
     RBRGen3Sample sampleBuffer;
     RBRGen3ParserCallbacks parserCallbacks = {
@@ -165,7 +163,7 @@ int main(int argc, char *argv[])
     {
         data.data = buf + bufSize;
         data.size = sizeof(buf) - bufSize;
-        err = RBRGen3_readData(conn, &data);
+        err = RBRGen3_readData(&conn, &data);
         if (err == RBRGEN3_TIMEOUT)
         {
             printf("\nWarning: timeout. Retrying...\n");
@@ -181,7 +179,7 @@ int main(int argc, char *argv[])
 
         bufSize += data.size;
         parsedSize = bufSize;
-        RBRGen3Parser_parse(parser,
+        RBRGen3Parser_parse(&parser,
                         RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize);
@@ -197,7 +195,7 @@ int main(int argc, char *argv[])
         nanosleep(&sleep, NULL);
     }
 instrumentCleanup:
-    RBRGen3_close(conn);
+    RBRGen3_close(&conn);
 fileCleanup:
     close(instrumentFd);
 

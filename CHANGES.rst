@@ -44,6 +44,17 @@ Changed
   The connection parameter of every method is now named ``conn``
   rather than ``instrument``.
   Behaviour is unchanged.
+- The library no longer allocates memory (SYS-1875).
+  ``RBRGen3_open()``, ``RBRGen3Parser_init()``,
+  ``RBRGen4_open()``, and ``RBRGen4Parser_init()``
+  take a pointer to a caller-provided instance
+  (``RBRGen3 *`` rather than ``RBRGen3 **``, and likewise for Gen4)
+  and no longer accept a null pointer;
+  the corresponding close/destroy functions no longer free it.
+  ``RBRGEN3_ALLOCATION_FAILURE`` and the ``nomalloc`` Makefile target
+  (``RBR_LIB_NODYNAMICMEMORYALLOCATION``) are removed.
+  The build now verifies that the library archives
+  do not depend on ``malloc``, ``calloc``, ``realloc``, or ``free``.
 
 v1.3.0
 ------

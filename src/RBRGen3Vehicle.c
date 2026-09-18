@@ -8,6 +8,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
+/* Required for strtod, strtol. */
+#include <stdlib.h>
 /* Required for memset, strcmp. */
 #include <string.h>
 

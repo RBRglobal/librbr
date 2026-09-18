@@ -22,7 +22,6 @@ extern "C" {
 
 #include <inttypes.h>
 #include <stdbool.h>
-#include <stdlib.h>
 
 #include "RBRGen3HardwareErrors.h"
 
@@ -64,10 +63,7 @@ extern const char *RBRGEN3_LIB_BUILD_DATE;
  * Must be large enough to hold the largest command you will want to send to
  * the instrument plus the trailing line termination (`\r\n\0`).
  *
- * A buffer of this size is included in RBRGen3. Whether you let
- * RBRGen3_open() perform its own allocation or you perform your own
- * allocation based on `sizeof(RBRGen3)`, a buffer of this size is
- * included.
+ * A buffer of this size is included in RBRGen3.
  */
 #ifndef RBRGEN3_COMMAND_BUFFER_MAX
 #define RBRGEN3_COMMAND_BUFFER_MAX 120
@@ -80,10 +76,7 @@ extern const char *RBRGEN3_LIB_BUILD_DATE;
  * receive. This does not include download data, which is read directly into a
  * user-managed buffer.
  *
- * A buffer of this size is included in RBRGen3. Whether you let
- * RBRGen3_open() perform its own allocation or you perform your own
- * allocation based on `sizeof(RBRGen3)`, a buffer of this size is
- * included.
+ * A buffer of this size is included in RBRGen3.
  */
 #ifndef RBRGEN3_RESPONSE_BUFFER_MAX
 #define RBRGEN3_RESPONSE_BUFFER_MAX 1024
@@ -210,8 +203,6 @@ typedef int32_t RBRGen3Period;
 typedef enum RBRGen3Error {
     /** No error. */
     RBRGEN3_SUCCESS,
-    /** An error occurred while allocating memory. This is typically fatal. */
-    RBRGEN3_ALLOCATION_FAILURE,
     /** The command buffer was too small to hold the outbound command. */
     RBRGEN3_BUFFER_TOO_SMALL,
     /** A required callback function was not provided. */
@@ -662,12 +653,6 @@ typedef struct RBRGen3 {
      * response buffer are recorded within this struct.
      */
     RBRGen3Response response;
-
-    /**
-     * \brief Whether the instance memory was dynamically allocated by the
-     * constructor.
-     */
-    bool managedAllocation;
 } RBRGen3;
 
 /**
@@ -678,40 +663,9 @@ typedef struct RBRGen3 {
  * that instrument (via serial, TCP/IP socket, RFC 1149, whatever) must be
  * managed externally and exposed to the library via callbacks.
  *
- * If the instrument pointer is `NULL`, enough memory will be allocated (via
- * `malloc(3)`) to satisfy the requirements of all instrument communications.
- *
- * For example:
- *
- * ~~~{.c}
- * RBRGen3 *instrument = NULL;
- * RBRGen3_open(&instrument, ...);
- * ~~~
- *
- * *Do not* pass an uninitialized pointer to this constructor! It will be
- * dereferenced, which is undefined behaviour; and if a non-`NULL` value is
- * read, the constructor will think memory has been preallocated and will
- * attempt to write through the pointer.
- *
- * ~~~{.c}
- * /​* Don't do this! *​/
- * RBRGen3 *instrument;
- * RBRGen3_open(&instrument, ...);
- * ~~~
- *
- * If you would rather allocate this memory yourself (perhaps statically), you
- * can use the size of RBRGen3 to inform your allocation then pass a
- * pointer to that memory.
- *
- * For example:
- *
- * ~~~{.c}
- * RBRGen3 instrumentBuf;
- * RBRGen3 *instrument = &instrumentBuf;
- * RBRGen3_open(&instrument, ...);
- * ~~~
- *
- * If you pass pre-allocated memory, its contents will be discarded.
+ * The library never allocates memory: the caller provides the RBRGen3
+ * instance (statically, on the stack, or from a heap of its choosing) and the
+ * constructor initializes it in place. Any prior contents are discarded.
  *
  * The \a callbacks structure will be copied into the RBRGen3 structure;
  * no reference to it is retained, so any subsequent modifications will not
@@ -732,32 +686,29 @@ typedef struct RBRGen3 {
  * instruments are not supported. If the library detects an unsupported
  * instrument during connection, #RBRGEN3_UNSUPPORTED is returned.
  *
- * In the event of any return value other than #RBRGEN3_SUCCESS, any
- * memory allocated by this constructor is freed. That is, in the event of
- * failure, no cleanup of library resources is required. In the event of a
- * successful result, RBRGen3_close() should be used to terminate the
- * instrument connection.
+ * In the event of any return value other than #RBRGEN3_SUCCESS, no cleanup of
+ * library resources is required. In the event of a successful result,
+ * RBRGen3_close() should be used to terminate the instrument connection.
  *
- * \param [in,out] conn the context object to populate
+ * \param [out] conn the context object to populate
  * \param [in] callbacks the set of callbacks to be used by the connection
  * \param [in] commandTimeout the command timeout in milliseconds
  * \param [in] userData arbitrary user data; useful in callbacks
  * \return #RBRGEN3_SUCCESS if the instrument was opened successfully
- * \return #RBRGEN3_ALLOCATION_FAILURE if memory allocation failed
  * \return #RBRGEN3_MISSING_CALLBACK if a callback was not provided
  * \return #RBRGEN3_TIMEOUT if an instrument communication timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_UNSUPPORTED if the instrument is unsupported
  * \see RBRGen3_close()
  */
-RBRGen3Error RBRGen3_open(RBRGen3 **conn, const RBRGen3Callbacks *callbacks,
+RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Callbacks *callbacks,
                           RBRGen3DateTime commandTimeout, void *userData);
 
 /**
- * \brief Terminate the instrument connection and release any held resources.
+ * \brief Terminate the instrument connection.
  *
- * Frees the buffer allocated by RBRGen3_open() if necessary. Does not
- * perform any communication with the instrument.
+ * Clears the connection state. Does not release the caller-provided instance
+ * memory and does not perform any communication with the instrument.
  *
  * \param [in,out] conn the instrument connection to terminate
  * \return #RBRGEN3_SUCCESS if the instrument was closed successfully

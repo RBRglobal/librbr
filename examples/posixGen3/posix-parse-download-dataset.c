@@ -16,6 +16,8 @@
 #include <errno.h>
 /* Required for fprintf, printf. */
 #include <stdio.h>
+/* Required for EXIT_FAILURE, EXIT_SUCCESS, strtol. */
+#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
 /* Required for gmtime_r, time_t, strftime. */
@@ -57,11 +59,7 @@ int main(int argc, char *argv[])
     int instrumentFd;
 
     RBRGen3Error err;
-    RBRGen3 *conn = NULL;
-    #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRGen3 instrumentSpace;
-    conn = &instrumentSpace;
-    #endif
+    RBRGen3 conn;
 
     if (argc < 3)
     {
@@ -115,12 +113,12 @@ int main(int argc, char *argv[])
         goto fileCleanup;
     }
 
-    RBRGen3_setUSBStreamingState(conn, false);
-    RBRGen3_setSerialStreamingState(conn, false);
+    RBRGen3_setUSBStreamingState(&conn, false);
+    RBRGen3_setSerialStreamingState(&conn, false);
 
     RBRGen3Channels channels;
     if (_downloadFrom == 1){
-        RBRGen3_getChannels(conn, &channels);
+        RBRGen3_getChannels(&conn, &channels);
     }
     else if(_downloadFrom == 4){
         //important!!!
@@ -132,7 +130,7 @@ int main(int argc, char *argv[])
         channels.minimumPeriod = 480;
     }
 
-    RBRGen3Parser *parser = NULL;
+    RBRGen3Parser parser;
 
     RBRGen3Sample sampleBuffer;
     RBRGen3ParserCallbacks parserCallbacks = {
@@ -175,7 +173,7 @@ int main(int argc, char *argv[])
     {
         data.data = buf + bufSize;
         data.size = sizeof(buf) - bufSize;
-        err = RBRGen3_readData(conn, &data);
+        err = RBRGen3_readData(&conn, &data);
 
         if (err == RBRGEN3_TIMEOUT)
         {
@@ -192,7 +190,7 @@ int main(int argc, char *argv[])
 
         bufSize += data.size;
         parsedSize = bufSize;
-        RBRGen3Parser_parse(parser,
+        RBRGen3Parser_parse(&parser,
                         RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                         buf,
                         &parsedSize);
@@ -210,7 +208,7 @@ int main(int argc, char *argv[])
     }
     
 instrumentCleanup:
-    RBRGen3_close(conn);
+    RBRGen3_close(&conn);
 fileCleanup:
     close(instrumentFd);
 

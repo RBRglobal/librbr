@@ -18,6 +18,8 @@
 #include <math.h>
 /* Required for fprintf, printf, snprintf. */
 #include <stdio.h>
+/* Required for EXIT_FAILURE, EXIT_SUCCESS. */
+#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
 /* Required for gmtime_r, time_t, strftime. */
@@ -157,11 +159,7 @@ int main(int argc, char *argv[])
     int instrumentFd;
 
     RBRGen3Error err;
-    RBRGen3 *conn = NULL;
-    #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRGen3 instrumentSpace;
-    conn = &instrumentSpace;
-    #endif
+    RBRGen3 conn;
 
     if (argc < 2)
     {
@@ -210,7 +208,7 @@ int main(int argc, char *argv[])
 
     /* query labels to check for CTD */
     RBRGen3LabelsList labelList;
-    err = RBRGen3_getLabelsList(conn, &labelList);
+    err = RBRGen3_getLabelsList(&conn, &labelList);
     if ( err != RBRGEN3_SUCCESS )
     {
             fprintf(stderr, "%s: Failed to query label list: %s!\n",
@@ -297,25 +295,25 @@ int main(int argc, char *argv[])
     }
 
     RBRGen3Link link;
-    RBRGen3_getLink(conn, &link);
+    RBRGen3_getLink(&conn, &link);
     printf("Connected to the instrument via %s.\n",
            RBRGen3Link_name(link));
 
     switch (link)
     {
     case RBRGEN3_LINK_USB:
-        RBRGen3_setUSBStreamingState(conn, true);
+        RBRGen3_setUSBStreamingState(&conn, true);
         break;
     case RBRGEN3_LINK_SERIAL:
     case RBRGEN3_LINK_WIFI:
         {
             RBRGen3Serial serial;
-            RBRGen3_getSerial(conn, &serial);
+            RBRGen3_getSerial(&conn, &serial);
             printf("Connected in %s mode at %s baud.\n",
                    RBRGen3SerialMode_name(serial.mode),
                    RBRGen3SerialBaudRate_name(serial.baudRate));
 
-            RBRGen3_setSerialStreamingState(conn, true);
+            RBRGen3_setSerialStreamingState(&conn, true);
             break;
         }
     default:
@@ -326,14 +324,14 @@ int main(int argc, char *argv[])
     }
 
     RBRGen3Deployment deployment;
-    RBRGen3_getDeployment(conn, &deployment);
+    RBRGen3_getDeployment(&conn, &deployment);
     if (deployment.status != RBRGEN3_STATUS_LOGGING)
     {
         printf("%s: Instrument is %s, not logging. I'm going to start it.\n",
                programName,
                RBRGen3DeploymentStatus_name(deployment.status));
 
-        if ((err = instrumentStart(conn)) != RBRGEN3_SUCCESS)
+        if ((err = instrumentStart(&conn)) != RBRGEN3_SUCCESS)
         {
             fprintf(stderr,
                     "%s: Failed to start instrument: %s!\n",
@@ -346,7 +344,7 @@ int main(int argc, char *argv[])
 
     /* get sampling rate from instrument */
     RBRGen3Sampling sampling;
-    if ((err = RBRGen3_getSampling(conn, &sampling)) != RBRGEN3_SUCCESS)
+    if ((err = RBRGen3_getSampling(&conn, &sampling)) != RBRGEN3_SUCCESS)
     {
         fprintf(stderr,
                 "%s: Failed to query 'sampling' from instrument: %s!\n",
@@ -359,7 +357,7 @@ int main(int argc, char *argv[])
     float samplingRate = 1000.0f / (float) sampling.period;
 
     if(isCtd == true) {
-        err = applyCorrection(conn, dynamicCorrection_channel, _flagAbsP, samplingRate);
+        err = applyCorrection(&conn, dynamicCorrection_channel, _flagAbsP, samplingRate);
         if (err != RBRGEN3_SUCCESS)
         {
             fprintf(stderr, "Unexpected termination\n");
@@ -367,7 +365,7 @@ int main(int argc, char *argv[])
     }
 
 instrumentCleanup:
-    RBRGen3_close(conn);
+    RBRGen3_close(&conn);
 fileCleanup:
     close(instrumentFd);
 

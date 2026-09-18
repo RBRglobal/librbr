@@ -238,13 +238,11 @@ typedef struct RBRGen4Parser {
 /**
  * \brief Initialize a dataset parser.
  *
- * The use of the \a parser argument is the same as that of the \a conn
- * argument to RBRGen4_open(): when given as `NULL`, instance memory will
- * be allocated for you; otherwise, the pointer target will be used as instance
- * storage. See RBRGen4_open() for “do”s and “don't”s inherent to this
- * approach.
+ * As with the \a conn argument to RBRGen4_open(), the caller provides the
+ * RBRGen4Parser instance and it is initialized in place; the library never
+ * allocates memory.
  *
- * Again, as with the \a callbacks argument to RBRGen4_open(), the
+ * As with the \a callbacks argument to RBRGen4_open(), the
  * \a config and \a callbacks structures will be copied into the RBRGen4Parser
  * structure and no references to them are retained.
  *
@@ -259,13 +257,11 @@ typedef struct RBRGen4Parser {
  * #RBRGEN4_MISSING_CALLBACK is returned and the parser instantiation
  * will not be completed.
  *
- * In the event of any return value other than #RBRGEN4_SUCCESS, any
- * memory allocated by this constructor is freed. That is, in the event of
- * failure, no cleanup of library resources is required. In the event of a
- * successful result, RBRGen4Parser_destroy() should be used to release allocated
- * resources.
+ * In the event of any return value other than #RBRGEN4_SUCCESS, no cleanup of
+ * library resources is required. In the event of a successful result,
+ * RBRGen4Parser_destroy() should be used to close the parser.
  *
- * \param [in,out] parser the context object to populate
+ * \param [out] parser the context object to populate
  * \param [in] callbacks the set of callbacks to be used by the parser
  * \param [in] config the parser configuration
  * \param [in] userData arbitrary user data; useful in callbacks
@@ -275,13 +271,14 @@ typedef struct RBRGen4Parser {
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE if the config is invalid
  * \see RBRGen4Parser_destroy()
  */
-RBRGen4Error RBRGen4Parser_init(RBRGen4Parser **parser, const RBRGen4ParserCallbacks *callbacks,
+RBRGen4Error RBRGen4Parser_init(RBRGen4Parser *parser, const RBRGen4ParserCallbacks *callbacks,
                                 const RBRGen4ParserConfig *config, void *userData);
 
 /**
- * \brief Release any resources held by the parser.
+ * \brief Close the parser.
  *
- * Frees the buffer allocated by RBRGen4Parser_init() if necessary.
+ * Clears the parser state. Does not release the caller-provided instance
+ * memory.
  *
  * \param [in,out] parser the dataset parser to close
  * \return #RBRGEN4_SUCCESS if the parser was closed successfully

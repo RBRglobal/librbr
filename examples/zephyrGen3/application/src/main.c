@@ -79,7 +79,7 @@ int main(void)
     };
 
     err = RBRGen3_open(
-        &conn,
+        conn,
         &callbacks,
         CONFIG_INSTRUMENT_COMMAND_TIMEOUT_MSEC,
         (void *) &io);

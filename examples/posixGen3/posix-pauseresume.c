@@ -13,6 +13,8 @@
 #include <errno.h>
 /* Required for fprintf, printf. */
 #include <stdio.h>
+/* Required for EXIT_FAILURE, EXIT_SUCCESS. */
+#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
 /* Required for gmtime_r, time_t, strftime. */
@@ -32,11 +34,7 @@ int main(int argc, char *argv[])
     int instrumentFd;
 
     RBRGen3Error err;
-    RBRGen3 *conn = NULL;
-    #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRGen3 instrumentSpace;
-    conn = &instrumentSpace;
-    #endif
+    RBRGen3 conn;
 
     if (argc < 2)
     {
@@ -81,25 +79,25 @@ int main(int argc, char *argv[])
     }
 
     RBRGen3Link link;
-    RBRGen3_getLink(conn, &link);
+    RBRGen3_getLink(&conn, &link);
     printf("Connected to the instrument via %s.\n",
            RBRGen3Link_name(link));
 
     switch (link)
     {
     case RBRGEN3_LINK_USB:
-        RBRGen3_setUSBStreamingState(conn, true);
+        RBRGen3_setUSBStreamingState(&conn, true);
         break;
     case RBRGEN3_LINK_SERIAL:
     case RBRGEN3_LINK_WIFI:
         {
             RBRGen3Serial serial;
-            RBRGen3_getSerial(conn, &serial);
+            RBRGen3_getSerial(&conn, &serial);
             printf("Connected in %s mode at %s baud.\n",
                    RBRGen3SerialMode_name(serial.mode),
                    RBRGen3SerialBaudRate_name(serial.baudRate));
 
-            RBRGen3_setSerialStreamingState(conn, true);
+            RBRGen3_setSerialStreamingState(&conn, true);
             break;
         }
     default:
@@ -116,11 +114,11 @@ int main(int argc, char *argv[])
     RBRGen3PauseStatus pauseStatus;
     pauseStatus = RBRGEN3_UNKNOWN_PAUSE;
 
-    if((err = RBRGen3_getPauseresume(conn, &state)) != RBRGEN3_SUCCESS){
+    if((err = RBRGen3_getPauseresume(&conn, &state)) != RBRGEN3_SUCCESS){
         /* if this isn't an RBR instrument, or if the firmware in use doesn't support pauseresume.*/
         fprintf(stderr, "%s: Feature not supported: %s! \n", programName, RBRGen3Error_name(err));
         status = EXIT_FAILURE;
-        fprintf(stderr, "E%d %s\n", conn->response.error, conn->response.response);
+        fprintf(stderr, "E%d %s\n", conn.response.error, conn.response.response);
         goto fileCleanup;
     };
 
@@ -135,11 +133,11 @@ int main(int argc, char *argv[])
 
     /* Proceeds with command 'pause' in this case. */
     else if(state == RBRGEN3_PAUSERESUME_RUNNING){
-        err = RBRGen3_pause(conn, &pauseStatus);
+        err = RBRGen3_pause(&conn, &pauseStatus);
         const char *statusName = RBRGen3PauseStatus_name(pauseStatus);
         printf("pause status=%s\n", statusName);
         if(pauseStatus == RBRGEN3_UNKNOWN_PAUSE){
-            fprintf(stderr, "E%d %s\n", conn->response.error, conn->response.response);
+            fprintf(stderr, "E%d %s\n", conn.response.error, conn.response.response);
         }
     }
 
@@ -147,16 +145,16 @@ int main(int argc, char *argv[])
     if(state == RBRGEN3_PAUSERESUME_PAUSED || pauseStatus == RBRGEN3_PAUSE_PAUSED){
         RBRGen3ResumeStatus resumeStatus;
         resumeStatus = RBRGEN3_UNKNOWN_RESUME;
-        err = RBRGen3_resume(conn, &resumeStatus);
+        err = RBRGen3_resume(&conn, &resumeStatus);
         const char *statusName = RBRGen3ResumeStatus_name(resumeStatus);
         printf("resume status=%s\n", statusName);
         if(resumeStatus == RBRGEN3_UNKNOWN_RESUME){
-            fprintf(stderr, "E%d %s\n", conn->response.error, conn->response.response);
+            fprintf(stderr, "E%d %s\n", conn.response.error, conn.response.response);
         }
     }
 
 instrumentCleanup:
-    RBRGen3_close(conn);
+    RBRGen3_close(&conn);
 fileCleanup:
     close(instrumentFd);
     return status;

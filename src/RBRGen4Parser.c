@@ -112,7 +112,7 @@ const char *RBRGen4EventType_name(RBRGen4EventType type)
     }
 }
 
-RBRGen4Error RBRGen4Parser_init(RBRGen4Parser **parser, const RBRGen4ParserCallbacks *callbacks,
+RBRGen4Error RBRGen4Parser_init(RBRGen4Parser *parser, const RBRGen4ParserCallbacks *callbacks,
                                 const RBRGen4ParserConfig *config, void *userData)
 {
     if (callbacks == NULL || (callbacks->sample != NULL && callbacks->sampleBuffer == NULL) ||
@@ -124,11 +124,20 @@ RBRGen4Error RBRGen4Parser_init(RBRGen4Parser **parser, const RBRGen4ParserCallb
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    memset(*parser, 0, sizeof(RBRGen4Parser));
-    memcpy(&(*parser)->config, config, sizeof(RBRGen4ParserConfig));
-    memcpy(&(*parser)->callbacks, callbacks, sizeof(RBRGen4ParserCallbacks));
-    (*parser)->userData = userData;
+    memset(parser, 0, sizeof(RBRGen4Parser));
+    memcpy(&parser->config, config, sizeof(RBRGen4ParserConfig));
+    memcpy(&parser->callbacks, callbacks, sizeof(RBRGen4ParserCallbacks));
+    parser->userData = userData;
 
+    return RBRGEN4_SUCCESS;
+}
+
+RBRGen4Error RBRGen4Parser_destroy(RBRGen4Parser *parser)
+{
+    /* The library holds no resources, so there is nothing to release. This
+     * function is kept so that callers pair every init with a destroy and so
+     * that resource management can be added later without an API change. */
+    memset(parser, 0, sizeof(RBRGen4Parser));
     return RBRGEN4_SUCCESS;
 }
 

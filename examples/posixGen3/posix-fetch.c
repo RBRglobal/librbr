@@ -15,6 +15,8 @@
 #include <math.h>
 /* Required for fprintf, printf, snprintf. */
 #include <stdio.h>
+/* Required for EXIT_FAILURE, EXIT_SUCCESS. */
+#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
 /* Required for close. */
@@ -31,11 +33,7 @@ int main(int argc, char *argv[])
     int instrumentFd;
 
     RBRGen3Error err;
-    RBRGen3 *conn = NULL;
-    #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRGen3 instrumentSpace;
-    conn = &instrumentSpace;
-    #endif
+    RBRGen3 conn;
 
     if (argc < 2)
     {
@@ -80,25 +78,25 @@ int main(int argc, char *argv[])
     }
 
     RBRGen3Link link;
-    RBRGen3_getLink(conn, &link);
+    RBRGen3_getLink(&conn, &link);
     printf("Connected to the instrument via %s.\n",
            RBRGen3Link_name(link));
 
     switch (link)
     {
     case RBRGEN3_LINK_USB:
-        RBRGen3_setUSBStreamingState(conn, false);
+        RBRGen3_setUSBStreamingState(&conn, false);
         break;
     case RBRGEN3_LINK_SERIAL:
     case RBRGEN3_LINK_WIFI:
         {
             RBRGen3Serial serial;
-            RBRGen3_getSerial(conn, &serial);
+            RBRGen3_getSerial(&conn, &serial);
             printf("Connected in %s mode at %s baud.\n",
                    RBRGen3SerialMode_name(serial.mode),
                    RBRGen3SerialBaudRate_name(serial.baudRate));
 
-            RBRGen3_setSerialStreamingState(conn, false);
+            RBRGen3_setSerialStreamingState(&conn, false);
             break;
         }
     default:
@@ -111,7 +109,7 @@ int main(int argc, char *argv[])
     RBRGen3Sample sample;
     while (true)
     {
-        err = RBRGen3_fetch(conn, NULL, false, &sample);
+        err = RBRGen3_fetch(&conn, NULL, false, &sample);
         if (err != RBRGEN3_SUCCESS)
         {
             fprintf(stderr, "Error: %s\n", RBRGen3Error_name(err));
@@ -140,7 +138,7 @@ int main(int argc, char *argv[])
     }
 
 instrumentCleanup:
-    RBRGen3_close(conn);
+    RBRGen3_close(&conn);
 fileCleanup:
     close(instrumentFd);
 

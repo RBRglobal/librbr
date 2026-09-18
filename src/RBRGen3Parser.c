@@ -109,7 +109,7 @@ const char *RBRGen3EventType_name(RBRGen3EventType type)
     }
 }
 
-RBRGen3Error RBRGen3Parser_init(RBRGen3Parser **parser, const RBRGen3ParserCallbacks *callbacks,
+RBRGen3Error RBRGen3Parser_init(RBRGen3Parser *parser, const RBRGen3ParserCallbacks *callbacks,
                                 const RBRGen3ParserConfig *config, void *userData)
 {
     if (callbacks == NULL || (callbacks->sample != NULL && callbacks->sampleBuffer == NULL) ||
@@ -126,35 +126,20 @@ RBRGen3Error RBRGen3Parser_init(RBRGen3Parser **parser, const RBRGen3ParserCallb
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    bool allocated = false;
-    if (*parser == NULL) {
-        allocated = true;
-#ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
-        if ((*parser = malloc(sizeof(RBRGen3Parser))) == NULL) {
-#endif
-            return RBRGEN3_ALLOCATION_FAILURE;
-#ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
-        }
-#endif
-    }
-
-    memset(*parser, 0, sizeof(RBRGen3Parser));
-    memcpy(&(*parser)->config, config, sizeof(RBRGen3ParserConfig));
-    memcpy(&(*parser)->callbacks, callbacks, sizeof(RBRGen3ParserCallbacks));
-    (*parser)->userData = userData;
-    (*parser)->managedAllocation = allocated;
+    memset(parser, 0, sizeof(RBRGen3Parser));
+    memcpy(&parser->config, config, sizeof(RBRGen3ParserConfig));
+    memcpy(&parser->callbacks, callbacks, sizeof(RBRGen3ParserCallbacks));
+    parser->userData = userData;
 
     return RBRGEN3_SUCCESS;
 }
 
 RBRGen3Error RBRGen3Parser_destroy(RBRGen3Parser *parser)
 {
-    if (parser->managedAllocation) {
-#ifndef RBR_LIB_NODYNAMICMEMORYALLOCATION
-        free(parser);
-#endif
-    }
-
+    /* The library holds no resources, so there is nothing to release. This
+     * function is kept so that callers pair every init with a destroy and so
+     * that resource management can be added later without an API change. */
+    memset(parser, 0, sizeof(RBRGen3Parser));
     return RBRGEN3_SUCCESS;
 }
 

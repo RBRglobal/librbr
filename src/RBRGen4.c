@@ -44,8 +44,6 @@ const char *RBRGen4Error_name(RBRGen4Error error)
     switch (error) {
     case RBRGEN4_SUCCESS:
         return "success";
-    case RBRGEN4_UNDERSIZED_STRUCTURE_ERROR:
-        return "undersized structure error";
     case RBRGEN4_BUFFER_TOO_SMALL:
         return "buffer too small";
     case RBRGEN4_MISSING_CALLBACK:
@@ -171,7 +169,7 @@ static RBRGen4Error RBRGen4_populateGeneration(RBRGen4 *conn)
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_open(RBRGen4 **conn, const RBRGen4Callbacks *callbacks,
+RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Callbacks *callbacks,
                           const RBRGen4DateTime commandTimeout, void *userData)
 {
     if (callbacks == NULL || callbacks->time == NULL || callbacks->sleep == NULL ||
@@ -180,48 +178,51 @@ RBRGen4Error RBRGen4_open(RBRGen4 **conn, const RBRGen4Callbacks *callbacks,
         return RBRGEN4_MISSING_CALLBACK;
     }
 
-    memset(*conn, 0, sizeof(RBRGen4));
-    memcpy(&(*conn)->callbacks, callbacks, sizeof(RBRGen4Callbacks));
+    memset(conn, 0, sizeof(RBRGen4));
+    memcpy(&conn->callbacks, callbacks, sizeof(RBRGen4Callbacks));
     /* We don't want the streaming sample data callback to be called before the
      * constructor has finished. */
-    (*conn)->callbacks.sample = NULL;
-    (*conn)->commandTimeout = commandTimeout;
-    (*conn)->pollTimeout = 2 * commandTimeout;
-    (*conn)->userData = userData;
-    (*conn)->lastActivityTime = RBRGEN4_NO_ACTIVITY;
-    (*conn)->response.type = RBRGEN4_RESPONSE_UNKNOWN_TYPE;
-    (*conn)->outputFormat = RBRGEN4_DEFAULT_OUTPUT_FORMAT;
+    conn->callbacks.sample = NULL;
+    conn->commandTimeout = commandTimeout;
+    conn->pollTimeout = 2 * commandTimeout;
+    conn->userData = userData;
+    conn->lastActivityTime = RBRGEN4_NO_ACTIVITY;
+    conn->response.type = RBRGEN4_RESPONSE_UNKNOWN_TYPE;
+    conn->outputFormat = RBRGEN4_DEFAULT_OUTPUT_FORMAT;
 
     /* We assume a default output format until it's read below, so samples
      * streamed in any other format in the meantime are dropped as
      * unrecognised responses. See the RBRGen4_open() doc comment. */
     RBRGen4Error err;
-    err = RBRGen4_populateGeneration(*conn);
+    err = RBRGen4_populateGeneration(conn);
 
     if (err != RBRGEN4_SUCCESS) {
         return err;
     }
 
-    if ((*conn)->generation != RBRGEN4_LOGGER4) {
+    if (conn->generation != RBRGEN4_LOGGER4) {
         return RBRGEN4_UNSUPPORTED;
     }
 
     /* Caches the sample field flags into the instrument for the parser. */
-    err = RBRGen4_getOutputFormat(*conn, &(*conn)->outputFormat);
+    err = RBRGen4_getOutputFormat(conn, &conn->outputFormat);
 
     if (err != RBRGEN4_SUCCESS) {
         return err;
     }
 
     /* Enable the streaming callback, if applicable. */
-    (*conn)->callbacks.sample = callbacks->sample;
-    (*conn)->callbacks.sampleBuffer = callbacks->sampleBuffer;
+    conn->callbacks.sample = callbacks->sample;
+    conn->callbacks.sampleBuffer = callbacks->sampleBuffer;
 
     return RBRGEN4_SUCCESS;
 }
 
 RBRGen4Error RBRGen4_close(RBRGen4 *conn)
 {
+    /* The library holds no resources, so there is nothing to release. This
+     * function is kept so that callers pair every open with a close and so
+     * that resource management can be added later without an API change. */
     memset(conn, 0, sizeof(RBRGen4));
     return RBRGEN4_SUCCESS;
 }

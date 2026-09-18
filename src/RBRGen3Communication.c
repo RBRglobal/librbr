@@ -8,6 +8,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
+/* Required for strtol. */
+#include <stdlib.h>
 /* Required for strcmp. */
 #include <string.h>
 

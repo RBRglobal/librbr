@@ -22,6 +22,8 @@
 #include <limits.h>
 /* Required for fprintf, printf, snprintf. */
 #include <stdio.h>
+/* Required for exit, EXIT_FAILURE, EXIT_SUCCESS. */
+#include <stdlib.h>
 /* Required for memmove, strerror. */
 #include <string.h>
 /* Required for open. */
@@ -337,11 +339,7 @@ int main(int argc, char *argv[])
     int instrumentFd;
 
     RBRGen3Error err;
-    RBRGen3 *conn = NULL;
-    #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRGen3 instrumentSpace;
-    conn = &instrumentSpace;
-    #endif
+    RBRGen3 conn;
 
     //first listen for UDP packets indicating a connection is alive.
     listenUdp();
@@ -382,10 +380,10 @@ int main(int argc, char *argv[])
 
     printf(
         "Looks like I'm connected to a %s instrument.\n",
-        RBRGen3Generation_name(RBRGen3_getGeneration(conn)));
+        RBRGen3Generation_name(RBRGen3_getGeneration(&conn)));
 
     RBRGen3Id id;
-    RBRGen3_getId(conn, &id);
+    RBRGen3_getId(&conn, &id);
     printf("The instrument is an %s (fwtype %d), serial number %06d, with "
            "firmware v%s.\n",
            id.model,
@@ -394,7 +392,7 @@ int main(int argc, char *argv[])
            id.version);
 
     RBRGen3HardwareRevision hwrev;
-    RBRGen3_getHardwareRevision(conn, &hwrev);
+    RBRGen3_getHardwareRevision(&conn, &hwrev);
     printf("It's PCB rev%c, CPU rev%s, BSL v%c.\n",
            hwrev.pcb,
            hwrev.cpu,
@@ -402,14 +400,14 @@ int main(int argc, char *argv[])
 
     RBRGen3MemoryInfo meminfo;
     meminfo.dataset = RBRGEN3_DATASET_STANDARD;
-    RBRGen3_getMemoryInfo(conn, &meminfo);
+    RBRGen3_getMemoryInfo(&conn, &meminfo);
     printf("Dataset %s is %0.2f%% full (%" PRIi32 "B used).\n",
            RBRGen3Dataset_name(meminfo.dataset),
            ((double) meminfo.used) / meminfo.size * 100,
            meminfo.used);
 
     RBRGen3MemoryFormat memformat;
-    RBRGen3_getAvailableMemoryFormats(conn, &memformat);
+    RBRGen3_getAvailableMemoryFormats(&conn, &memformat);
     printf("It supports these memory formats:\n");
     for (int i = RBRGEN3_MEMFORMAT_NONE + 1;
          i <= RBRGEN3_MEMFORMAT_MAX;
@@ -421,7 +419,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    RBRGen3_getCurrentMemoryFormat(conn, &memformat);
+    RBRGen3_getCurrentMemoryFormat(&conn, &memformat);
     printf("It's currently storing data of format %s.\n",
            RBRGen3MemoryFormat_name(memformat));
 
@@ -481,7 +479,7 @@ int main(int argc, char *argv[])
     while (data.offset < meminfo.used)
     {
         data.size = sizeof(buf);
-        err = RBRGen3_readData(conn, &data);
+        err = RBRGen3_readData(&conn, &data);
         if (err != RBRGEN3_SUCCESS)
         {
             if (isRetriableDownloadError(err) && chunkRetries < MAX_CHUNK_RETRIES)
@@ -534,7 +532,7 @@ int main(int argc, char *argv[])
 fileCleanup:
     close(downloadFd);
 instrumentCleanup:
-    RBRGen3_close(conn);
+    RBRGen3_close(&conn);
 socketCleanup:
     close(instrumentFd);
 

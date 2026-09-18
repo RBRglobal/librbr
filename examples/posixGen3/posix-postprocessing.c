@@ -15,6 +15,8 @@
 #include <math.h>
 /* Required for fprintf, printf, snprintf. */
 #include <stdio.h>
+/* Required for EXIT_FAILURE, EXIT_SUCCESS. */
+#include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
 /* Required for time. */
@@ -33,11 +35,7 @@ int main(int argc, char *argv[])
     int instrumentFd;
 
     RBRGen3Error err;
-    RBRGen3 *conn = NULL;
-    #ifdef RBR_LIB_NODYNAMICMEMORYALLOCATION
-    RBRGen3 instrumentSpace;
-    conn = &instrumentSpace;
-    #endif
+    RBRGen3 conn;
 
     if (argc < 2)
     {
@@ -83,7 +81,7 @@ int main(int argc, char *argv[])
 
     RBRGen3MemoryInfo meminfo;
     meminfo.dataset = RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA;
-    RBRGen3_getMemoryInfo(conn, &meminfo);
+    RBRGen3_getMemoryInfo(&conn, &meminfo);
     printf("Dataset %s is %0.2f%% full (%" PRIi32 "B used).\n",
            RBRGen3Dataset_name(meminfo.dataset),
            ((double) meminfo.used) / meminfo.size * 100,
@@ -99,7 +97,7 @@ int main(int argc, char *argv[])
     }
 
     RBRGen3MemoryFormat memformat;
-    RBRGen3_getCurrentMemoryFormat(conn, &memformat);
+    RBRGen3_getCurrentMemoryFormat(&conn, &memformat);
     printf("It's currently storing data of format %s.\n",
            RBRGen3MemoryFormat_name(memformat));
 
@@ -115,7 +113,7 @@ int main(int argc, char *argv[])
 
     RBRGen3Postprocessing postprocessing;
     if ((err = RBRGen3_getPostprocessing(
-             conn,
+             &conn,
              &postprocessing))
         != RBRGEN3_SUCCESS)
     {
@@ -130,7 +128,7 @@ int main(int argc, char *argv[])
     if (postprocessing.status != RBRGEN3_POSTPROCESSING_STATUS_IDLE)
     {
         if ((err = RBRGen3_setPostprocessingCommand(
-                 conn,
+                 &conn,
                  RBRGEN3_POSTPROCESSING_COMMAND_RESET,
                  &postprocessing.status))
             != RBRGEN3_SUCCESS)
@@ -179,7 +177,7 @@ int main(int argc, char *argv[])
     };
 
     if ((err = RBRGen3_setPostprocessing(
-             conn,
+             &conn,
              &postprocessing) != RBRGEN3_SUCCESS)
         != RBRGEN3_SUCCESS)
     {
@@ -192,7 +190,7 @@ int main(int argc, char *argv[])
     }
 
     if ((err = RBRGen3_setPostprocessingCommand(
-             conn,
+             &conn,
              RBRGEN3_POSTPROCESSING_COMMAND_START,
              &postprocessing.status))
         != RBRGEN3_SUCCESS)
@@ -212,7 +210,7 @@ int main(int argc, char *argv[])
         printf("Checking post-processing status...\n");
 
         if ((err = RBRGen3_getPostprocessing(
-                 conn,
+                 &conn,
                  &postprocessing))
             != RBRGEN3_SUCCESS)
         {
@@ -243,7 +241,7 @@ int main(int argc, char *argv[])
     }
 
 instrumentCleanup:
-    RBRGen3_close(conn);
+    RBRGen3_close(&conn);
 serialCleanup:
     close(instrumentFd);
 

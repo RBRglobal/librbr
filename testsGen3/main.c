@@ -199,7 +199,7 @@ int main(int argc, char *argv[])
         "RBR RBRoem 1.430 999999" RESPONSE_TERMINATOR
         "id model = RBRoem, version = 1.430, serial = 999999, fwtype = 103" RESPONSE_TERMINATOR,
         0);
-    err = RBRGen3_open(&instrumentL2,
+    err = RBRGen3_open(instrumentL2,
                        &instrumentCallbacks,
                        /* command timeout */ 0,
                        &ioBuffers);
@@ -218,7 +218,7 @@ int main(int argc, char *argv[])
         "RBR RBRduo3 1.090 999999" RESPONSE_TERMINATOR
         "id model = RBRoem3, version = 1.134, serial = 999999, fwtype = 104" RESPONSE_TERMINATOR,
         0);
-    err = RBRGen3_open(&instrumentL3,
+    err = RBRGen3_open(instrumentL3,
                        &instrumentCallbacks,
                        /* command timeout */ 0,
                        &ioBuffers);
@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
         &ioBuffers,
         "id model = RBRduet4, version = 1.0.0, serial = 999999, fwtype = 131" RESPONSE_TERMINATOR,
         0);
-    err = RBRGen3_open(&instrumentL4,
+    err = RBRGen3_open(instrumentL4,
                        &instrumentCallbacks,
                        /* command timeout */ 0,
                        &ioBuffers);
@@ -303,7 +303,7 @@ int main(int argc, char *argv[])
 
         memset(&parserBuffers, 0, sizeof(TestParserBuffers));
 
-        err = RBRGen3Parser_init(&parser, &parserCallbacks, parserTests[i].config, &parserBuffers);
+        err = RBRGen3Parser_init(parser, &parserCallbacks, parserTests[i].config, &parserBuffers);
         if (err != RBRGEN3_SUCCESS) {
             printf(" \033[31minit fail\033[0m: %s\n", RBRGen3Error_name(err));
             success = EXIT_FAILURE;

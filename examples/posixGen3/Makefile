@@ -35,9 +35,6 @@ all: $(ALWAYS_EXAMPLES) $(SDL_EXAMPLES) $(DYNAMICCORRECTION_EXAMPLES)
 
 nosdl: $(ALWAYS_EXAMPLES) $(DYNAMICCORRECTION_EXAMPLES)
 
-nomalloc: CFLAGS += -DRBR_LIB_NODYNAMICMEMORYALLOCATION
-nomalloc: $(ALWAYS_EXAMPLES) $(DYNAMICCORRECTION_EXAMPLES)
-
 posix-download: posix-shared.o posix-download.o ../../bin/libRBR.a
 
 posix-download-wifi: posix-shared.o posix-download-wifi.o ../../bin/libRBR.a

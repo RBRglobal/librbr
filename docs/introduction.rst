@@ -80,14 +80,11 @@ when writing parameters to the instrument.
 Memory Ownership
 ~~~~~~~~~~~~~~~~
 
-The only dynamic memory allocations
-performed by the library
-occur within :c:func:`RBRGen3_open`
-and :c:func:`RBRGen3Parser_init`,
-as described in the documentation
-for those functions.
-In all other cases,
-the buffers into which data
+The library never allocates memory.
+Context objects
+(:c:type:`RBRGen3`, :c:type:`RBRGen3Parser`,
+:c:type:`RBRGen4`, :c:type:`RBRGen4Parser`)
+and the buffers into which data
 is to be returned
 must be allocated by the caller.
 This can be static, stack,

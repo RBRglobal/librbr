@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
     };
 
     if ((err = RBRGen4_open(
-             &conn,
+             conn,
              &callbacks,
              INSTRUMENT_COMMAND_TIMEOUT_MSEC,
              (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
@@ -322,7 +322,7 @@ int main(int argc, char *argv[])
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer
     };
-    RBRGen4Parser_init(&parser,
+    RBRGen4Parser_init(parser,
                        &parserCallbacks,
                        &config,
                        NULL);
