@@ -41,17 +41,9 @@ extern "C" {
 #define RBRGEN4_AVAILABLE_FAST_PERIODS_MAX 4
 
 /**
- * \brief The number of nodes RBRGen4NodePool can hold.
- *
- * \see RBRGen4NodePool.pool
- */
-#define RBRGEN4_NODE_COUNT_MAX 12
-
-/**
- * \brief The number of ports RBRGen4PortPool and a node's port list can hold.
+ * \brief The number of ports RBRGen4PortPool can hold.
  *
  * \see RBRGen4PortPool.pool
- * \see RBRGen4Node.portList
  */
 #define RBRGEN4_PORT_COUNT_MAX 16
 
@@ -63,110 +55,6 @@ extern "C" {
  * \see RBRGen4Port.deviceList
  */
 #define RBRGEN4_DEVICE_COUNT_MAX 16
-
-/**
- * \brief `node <node_label>` command parameters.
- *
- * A node is a front-end PCBA, plus the `self` node standing for the main CPU
- * board. Nodes are the top of the instrument's configuration hierarchy: a node
- * carries ports, a port carries devices, and a device exposes channels.
- *
- * \see RBRGen4NodePool
- * \see RBRGen4_getNode()
- */
-typedef struct RBRGen4Node {
-    /**
-     * \brief Node label.
-     *
-     * Set by the caller to select the node to read; see
-     * RBRGen4_getNode().
-     */
-    char label[RBRGEN4_LABEL_NAME_MAX + 1];
-
-    /** \brief The label of the PCBA implementing the node. */
-    char pcba[RBRGEN4_LABEL_NAME_MAX + 1];
-
-    /** \brief The number of ports on the node. */
-    int32_t portCount;
-
-    /** \brief The labels of the ports on the node. */
-    char portList[RBRGEN4_PORT_COUNT_MAX][RBRGEN4_LABEL_NAME_MAX + 1];
-
-    /** \brief The firmware version running on the node. */
-    char fwversion[RBRGEN4_ID_VERSION_MAX + 1];
-
-    /** \brief The node firmware version in semantic-version form. */
-    char semver[RBRGEN4_ID_SEMVER_MAX + 1];
-
-    /**
-     * \brief The firmware type running on the node.
-     *
-     * Zero when the node runs no firmware of its own, which it reports as
-     * `na`.
-     */
-    int32_t fwtype;
-
-    /** \brief The time in milliseconds the node takes to power up. */
-    int32_t powerUpTime;
-
-    /**
-     * \brief The time in milliseconds to wait after powering the node up
-     * before powering anything beneath it.
-     */
-    int32_t inrushOffsetTime;
-} RBRGen4Node;
-
-/**
- * \brief Populate the parameters of a node.
- *
- * The caller sets RBRGen4Node.label to select the node to read.
- *
- * \note Issues the `node <node_label>` command.
- *
- * \param [in] conn the instrument connection
- * \param [in,out] node the node to read
- * \return #RBRGEN4_SUCCESS when the node is successfully read
- * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRGen4_getNodePool()
- */
-RBRGen4Error RBRGen4_getNode(RBRGen4 *conn, RBRGen4Node *node);
-
-/**
- * \brief `node` command parameters.
- *
- * \see RBRGen4_getNodePool()
- */
-typedef struct RBRGen4NodePool {
-    /**
-     * \brief The number of nodes on the instrument.
-     *
-     * \warning Use `min(count, RBRGEN4_NODE_COUNT_MAX)` to avoid an
-     * out-of-bounds error when accessing #pool if
-     * #count > #RBRGEN4_NODE_COUNT_MAX.
-     */
-    int32_t count;
-
-    /** \brief The pool of nodes. */
-    RBRGen4Node pool[RBRGEN4_NODE_COUNT_MAX];
-} RBRGen4NodePool;
-
-/**
- * \brief Populate the pool of the instrument's nodes.
- *
- * Only the labels are reported; read the rest of a node's parameters with
- * RBRGen4_getNode().
- *
- * \note Issues the `node` command.
- *
- * \param [in] conn the instrument connection
- * \param [out] nodePool the populated pool of nodes
- * \return #RBRGEN4_SUCCESS when the nodes are successfully read
- * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRGen4_getNode()
- */
-RBRGen4Error RBRGen4_getNodePool(RBRGen4 *conn, RBRGen4NodePool *nodePool);
 
 /**
  * \brief The classes of port.
