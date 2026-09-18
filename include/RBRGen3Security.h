@@ -4,8 +4,6 @@
  * \brief Instrument commands and structures pertaining to command security and
  * interaction.
  *
- * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction
- *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.
@@ -33,7 +31,6 @@ extern "C" {
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the command can't be permitted, or
  *                                 another hardware error occurs
- * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/permit
  */
 RBRGen3Error RBRGen3_permit(RBRGen3 *conn, const char *command);
 
@@ -49,7 +46,6 @@ RBRGen3Error RBRGen3_permit(RBRGen3 *conn, const char *command);
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setPrompt()
- * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/prompt
  */
 RBRGen3Error RBRGen3_getPrompt(RBRGen3 *conn, bool *prompt);
 
@@ -62,7 +58,6 @@ RBRGen3Error RBRGen3_getPrompt(RBRGen3 *conn, bool *prompt);
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_getPrompt()
- * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/prompt
  */
 RBRGen3Error RBRGen3_setPrompt(RBRGen3 *conn, bool prompt);
 
@@ -78,7 +73,6 @@ RBRGen3Error RBRGen3_setPrompt(RBRGen3 *conn, bool prompt);
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setConfirmation()
- * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/confirmation
  */
 RBRGen3Error RBRGen3_getConfirmation(RBRGen3 *conn, bool *confirmation);
 
@@ -95,7 +89,6 @@ RBRGen3Error RBRGen3_getConfirmation(RBRGen3 *conn, bool *confirmation);
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_getConfirmation()
- * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/confirmation
  */
 RBRGen3Error RBRGen3_setConfirmation(RBRGen3 *conn, bool confirmation);
 
@@ -107,7 +100,6 @@ RBRGen3Error RBRGen3_setConfirmation(RBRGen3 *conn, bool confirmation);
  * \return #RBRGEN3_SUCCESS when the CPU has been rebooted
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/security-and-interaction/reboot
  */
 RBRGen3Error RBRGen3_reboot(RBRGen3 *conn, int32_t delay);
 

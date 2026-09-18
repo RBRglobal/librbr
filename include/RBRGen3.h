@@ -275,7 +275,6 @@ const char *RBRGen3Error_name(RBRGen3Error error);
  * RBRGen3.
  *
  * \see RBRGen3_getId()
- * \see https://docs.rbr-global.com/L3commandreference/commands/other-information/id
  */
 typedef struct RBRGen3Id {
     /** The instrument model. */

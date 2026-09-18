@@ -99,9 +99,6 @@ const char *RBRGen3EventType_name(RBRGen3EventType type);
 
 /**
  * \brief An instrument event.
- *
- * \see https://docs.rbr-global.com/L3commandreference/format-of-stored-data/standard-rawbin00-format/standard-format-events-markers
- * \see https://docs.rbr-global.com/L3commandreference/format-of-stored-data/easyparse-calbin00-format/easyparse-format-events-markers
  */
 typedef struct RBRGen3Event {
     /** \brief The type of the event. */

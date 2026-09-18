@@ -3,8 +3,6 @@
  *
  * \brief Instrument commands and structures pertaining to time and schedule.
  *
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule
- *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.
@@ -33,7 +31,6 @@ extern "C" {
  *
  * \see RBRGen3_getClock()
  * \see RBRGen3_setClock()
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
  */
 typedef struct RBRGen3Clock {
     /**
@@ -74,7 +71,6 @@ typedef struct RBRGen3Clock {
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setClock()
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
  */
 RBRGen3Error RBRGen3_getClock(RBRGen3 *conn, RBRGen3Clock *clock);
 
@@ -103,7 +99,6 @@ RBRGen3Error RBRGen3_getClock(RBRGen3 *conn, RBRGen3Clock *clock);
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the clock values are out
  *                                                of range
  * \see RBRGen3_getClock()
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/clock
  */
 RBRGen3Error RBRGen3_setClock(RBRGen3 *conn, const RBRGen3Clock *clock);
 
@@ -111,7 +106,6 @@ RBRGen3Error RBRGen3_setClock(RBRGen3 *conn, const RBRGen3Clock *clock);
  * \brief Possible instrument sampling modes.
  *
  * \see RBRGen3Sampling
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  */
 typedef enum RBRGen3SamplingMode {
     /** Continuous sampling mode. */
@@ -153,8 +147,6 @@ const char *RBRGen3SamplingMode_name(RBRGen3SamplingMode mode);
  *
  * \see RBRGen3Sampling
  * \see RBRGen3Gating.h
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
- * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling
  */
 typedef enum RBRGen3Gate {
     /** No gating. */
@@ -195,7 +187,6 @@ const char *RBRGen3Gate_name(RBRGen3Gate gate);
  *
  * \see RBRGen3_getSampling()
  * \see RBRGen3_setSampling()
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  */
 typedef struct RBRGen3Sampling {
     /** \brief The instrument sampling mode. */
@@ -266,7 +257,6 @@ typedef struct RBRGen3Sampling {
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setSampling()
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  */
 RBRGen3Error RBRGen3_getSampling(RBRGen3 *conn, RBRGen3Sampling *sampling);
 
@@ -311,7 +301,6 @@ RBRGen3Error RBRGen3_getSampling(RBRGen3 *conn, RBRGen3Sampling *sampling);
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see RBRGen3_getSampling()
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  * \see RBRGen3_setBurstSampling()
  */
 RBRGen3Error RBRGen3_setSampling(RBRGen3 *conn, const RBRGen3Sampling *sampling);
@@ -344,7 +333,6 @@ RBRGen3Error RBRGen3_setSampling(RBRGen3 *conn, const RBRGen3Sampling *sampling)
  *                                 another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/sampling
  * \see RBRGen3_setSampling()
  */
 RBRGen3Error RBRGen3_setBurstSampling(RBRGen3 *conn, const RBRGen3Sampling *sampling);
@@ -355,8 +343,6 @@ RBRGen3Error RBRGen3_setBurstSampling(RBRGen3 *conn, const RBRGen3Sampling *samp
  * \see RBRGen3Deployment
  * \see RBRGen3_getDeployment()
  * \see RBRGen3_enable()
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
- * \see https://docs.rbr-global.com/L3commandreference/commands/deployments/enable
  */
 typedef enum RBRGen3DeploymentStatus {
     /** Logging is not enabled. */
@@ -405,7 +391,6 @@ const char *RBRGen3DeploymentStatus_name(RBRGen3DeploymentStatus status);
  *
  * \see RBRGen3_getDeployment()
  * \see RBRGen3_setDeployment()
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
 typedef struct RBRGen3Deployment {
     /**
@@ -437,7 +422,6 @@ typedef struct RBRGen3Deployment {
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setDeployment()
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
 RBRGen3Error RBRGen3_getDeployment(RBRGen3 *conn, RBRGen3Deployment *deployment);
 
@@ -462,7 +446,6 @@ RBRGen3Error RBRGen3_getDeployment(RBRGen3 *conn, RBRGen3Deployment *deployment)
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the start or end time
  *                                                values are out of range
  * \see RBRGen3_getDeployment()
- * \see https://docs.rbr-global.com/L3commandreference/commands/time-and-schedule/deployment
  */
 RBRGen3Error RBRGen3_setDeployment(RBRGen3 *conn, const RBRGen3Deployment *deployment);
 

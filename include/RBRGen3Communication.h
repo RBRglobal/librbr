@@ -4,8 +4,6 @@
  * \brief Instrument commands and structures pertaining to the communication
  * interfaces of the instrument.
  *
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications
- *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.
@@ -22,7 +20,6 @@ extern "C" {
  * \brief Instrument link types.
  *
  * \see RBRGen3_getLink()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/link
  */
 typedef enum RBRGen3Link {
     /** USB CDC connectivity. */
@@ -54,7 +51,6 @@ const char *RBRGen3Link_name(RBRGen3Link link);
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/link
  */
 RBRGen3Error RBRGen3_getLink(RBRGen3 *conn, RBRGen3Link *link);
 
@@ -68,7 +64,6 @@ RBRGen3Error RBRGen3_getLink(RBRGen3 *conn, RBRGen3Link *link);
  * \see RBRGen3Serial
  * \see RBRGen3_getSerial()
  * \see RBRGen3_setSerial()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
 typedef enum RBRGen3SerialBaudRate {
     /** None */
@@ -123,7 +118,6 @@ const char *RBRGen3SerialBaudRate_name(RBRGen3SerialBaudRate baud);
  * \see RBRGen3Serial
  * \see RBRGen3_getSerial()
  * \see RBRGen3_setSerial()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
 typedef enum RBRGen3SerialMode {
     /** No serial mode */
@@ -156,7 +150,6 @@ const char *RBRGen3SerialMode_name(RBRGen3SerialMode mode);
  *
  * \see RBRGen3_getSerial()
  * \see RBRGen3_setSerial()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
 typedef struct RBRGen3Serial {
     /** \brief The baud rate of the instrument. */
@@ -202,7 +195,6 @@ typedef struct RBRGen3Serial {
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setSerial()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
 RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn, RBRGen3Serial *serial);
 
@@ -227,7 +219,6 @@ RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn, RBRGen3Serial *serial);
  *                                 hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the baud/mode is invalid
  * \see RBRGen3_getSerial()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/serial
  */
 RBRGen3Error RBRGen3_setSerial(RBRGen3 *conn, const RBRGen3Serial *serial);
 
@@ -238,7 +229,6 @@ RBRGen3Error RBRGen3_setSerial(RBRGen3 *conn, const RBRGen3Serial *serial);
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the instrument has been put to sleep
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/sleep
  */
 RBRGen3Error RBRGen3_sleep(RBRGen3 *conn);
 
@@ -274,7 +264,6 @@ const char *RBRGen3WiFiState_name(RBRGen3WiFiState state);
  *
  * \see RBRGen3_getWiFi()
  * \see RBRGen3_setWiFi()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
 typedef struct RBRGen3WiFi {
     /**
@@ -329,7 +318,6 @@ typedef struct RBRGen3WiFi {
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
  *                                 hardware error occurs
  * \see RBRGen3_setWiFi()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
 RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn, RBRGen3WiFi *wifi);
 
@@ -353,7 +341,6 @@ RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn, RBRGen3WiFi *wifi);
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see RBRGen3_getWiFi()
- * \see https://docs.rbr-global.com/L3commandreference/commands/communications/wifi
  */
 RBRGen3Error RBRGen3_setWiFi(RBRGen3 *conn, const RBRGen3WiFi *wifi);
 

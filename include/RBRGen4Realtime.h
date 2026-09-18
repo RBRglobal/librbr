@@ -4,8 +4,6 @@
  * \brief Instrument commands and structures pertaining to streamed and
  * on-demand data acquisition.
  *
- * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample
- *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.
@@ -191,7 +189,6 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
  *         polled sample arrives within RBRGen4.pollTimeout
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
 RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sample);
 
@@ -229,7 +226,6 @@ RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sampl
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when an invalid channel is requested, or
  *                                      another hardware error occurs
- * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
 RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel, const char *channelList,
                                   RBRGen4Sample *sample);
@@ -268,7 +264,6 @@ RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel, const char *
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when an invalid group is requested, or
  *                                      another hardware error occurs
- * \see https://docs.rbr-global.com/L3commandreference/commands/data-sample/poll
  */
 RBRGen4Error RBRGen4_pollGroups(RBRGen4 *conn, bool requireLabel, const char *groupList,
                                 RBRGen4Sample *sample);

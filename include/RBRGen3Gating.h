@@ -3,8 +3,6 @@
  *
  * \brief Instrument commands and structures pertaining to gated sampling.
  *
- * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling
- *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.
@@ -44,7 +42,6 @@ const char *RBRGen3GatingState_name(RBRGen3GatingState state);
  * \brief Means of instrument thresholding channel selection.
  *
  * \see RBRGen3Thresholding
- * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
 typedef enum RBRGen3ThresholdingChannelSelection {
     /** The channel is set by index. */
@@ -67,7 +64,6 @@ const char *RBRGen3ThresholdingChannelSelection_name(RBRGen3ThresholdingChannelS
  * \brief Possible instrument thresholding conditions.
  *
  * \see RBRGen3Thresholding
- * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
 typedef enum RBRGen3ThresholdingCondition {
     /** Sampling occurs when the monitored parameter is above the threshold. */
@@ -94,7 +90,6 @@ const char *RBRGen3ThresholdingCondition_name(RBRGen3ThresholdingCondition condi
  *
  * \see RBRGen3_getThresholding()
  * \see RBRGen3_setThresholding()
- * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
 typedef struct RBRGen3Thresholding {
     /** \brief Enables or disables thresholding. */
@@ -168,7 +163,6 @@ typedef struct RBRGen3Thresholding {
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
  *                                 hardware error occurs
  * \see RBRGen3_setThresholding()
- * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
 RBRGen3Error RBRGen3_getThresholding(RBRGen3 *conn, RBRGen3Thresholding *threshold);
 
@@ -192,7 +186,6 @@ RBRGen3Error RBRGen3_getThresholding(RBRGen3 *conn, RBRGen3Thresholding *thresho
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see RBRGen3_getThresholding()
- * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/thresholding
  */
 RBRGen3Error RBRGen3_setThresholding(RBRGen3 *conn, const RBRGen3Thresholding *threshold);
 
@@ -201,7 +194,6 @@ RBRGen3Error RBRGen3_setThresholding(RBRGen3 *conn, const RBRGen3Thresholding *t
  *
  * \see RBRGen3_getTwistActivation()
  * \see RBRGen3_setTwistActivation()
- * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/twistactivation
  */
 typedef struct RBRGen3TwistActivation {
     /** \brief Enables or disables twist activation. */
@@ -227,7 +219,6 @@ typedef struct RBRGen3TwistActivation {
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
  *                                 hardware error occurs
  * \see RBRGen3_setTwistActivation()
- * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/twistactivation
  */
 RBRGen3Error RBRGen3_getTwistActivation(RBRGen3 *conn, RBRGen3TwistActivation *twistActivation);
 
@@ -247,7 +238,6 @@ RBRGen3Error RBRGen3_getTwistActivation(RBRGen3 *conn, RBRGen3TwistActivation *t
  * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
  *                                 another hardware error occurs
  * \see RBRGen3_getTwistActivation()
- * \see https://docs.rbr-global.com/L3commandreference/commands/gated-sampling/twistactivation
  */
 RBRGen3Error RBRGen3_setTwistActivation(RBRGen3 *conn,
                                         const RBRGen3TwistActivation *twistActivation);

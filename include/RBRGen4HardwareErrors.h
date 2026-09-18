@@ -3,8 +3,6 @@
  *
  * \brief Instrument hardware errors.
  *
- * \see https://docs.rbr-global.com/L3commandreference/error-messages
- *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.

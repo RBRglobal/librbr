@@ -4,8 +4,6 @@
  * \brief Instrument commands and structures pertaining to memory and data
  * retrieval.
  *
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval
- *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.
@@ -70,7 +68,6 @@ const char *RBRGen3Dataset_name(RBRGen3Dataset dataset);
  * \brief Instrument `meminfo` command parameters.
  *
  * \see RBRGen3_getMemoryInfo()
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/meminfo
  */
 typedef struct RBRGen3MemoryInfo {
     /** \brief The index of the dataset being queried. */
@@ -104,7 +101,6 @@ typedef struct RBRGen3MemoryInfo {
  *                                                requested
  * \return #RBRGEN3_HARDWARE_ERROR if the dataset is unsupported, or another
  *                                 hardware error occurs
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/meminfo
  */
 RBRGen3Error RBRGen3_getMemoryInfo(RBRGen3 *conn, RBRGen3MemoryInfo *memoryInfo);
 
@@ -112,7 +108,6 @@ RBRGen3Error RBRGen3_getMemoryInfo(RBRGen3 *conn, RBRGen3MemoryInfo *memoryInfo)
  * \brief Instrument `readdata` command parameters.
  *
  * \see RBRGen3_readData()
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/readdata
  */
 typedef struct RBRGen3Data {
     /** \brief The index of the dataset being queried. */
@@ -171,7 +166,6 @@ typedef struct RBRGen3Data {
  *                                                requested
  * \return #RBRGEN3_HARDWARE_ERROR if the dataset is unsupported, or another
  *                                 hardware error occurs
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/readdata
  */
 RBRGen3Error RBRGen3_readData(RBRGen3 *conn, RBRGen3Data *data);
 
@@ -187,7 +181,6 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *conn, RBRGen3Data *data);
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the memory failed to erase, or another
  *                                 hardware error occurs
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memclear
  */
 RBRGen3Error RBRGen3_memoryClear(RBRGen3 *conn);
 
@@ -198,7 +191,6 @@ RBRGen3Error RBRGen3_memoryClear(RBRGen3 *conn);
  * \see RBRGen3_getCurrentMemoryFormat()
  * \see RBRGen3_getNewMemoryFormat()
  * \see RBRGen3_setNewMemoryFormat()
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
 typedef enum RBRGen3MemoryFormat {
     /** No format. */
@@ -232,7 +224,6 @@ const char *RBRGen3MemoryFormat_name(RBRGen3MemoryFormat format);
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
 RBRGen3Error RBRGen3_getAvailableMemoryFormats(RBRGen3 *conn, RBRGen3MemoryFormat *memoryFormats);
 
@@ -249,7 +240,6 @@ RBRGen3Error RBRGen3_getAvailableMemoryFormats(RBRGen3 *conn, RBRGen3MemoryForma
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
 RBRGen3Error RBRGen3_getCurrentMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *memoryFormat);
 
@@ -262,7 +252,6 @@ RBRGen3Error RBRGen3_getCurrentMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setNewMemoryFormat()
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
 RBRGen3Error RBRGen3_getNewMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *memoryFormat);
 
@@ -285,7 +274,6 @@ RBRGen3Error RBRGen3_getNewMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *memo
  *                                 unavailable memory format is selected, or
  *                                 another hardware error occurs
  * \see RBRGen3_getNewMemoryFormat()
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/memformat
  */
 RBRGen3Error RBRGen3_setNewMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat memoryFormat);
 
@@ -293,7 +281,6 @@ RBRGen3Error RBRGen3_setNewMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat memor
  * \brief Functions available to aggregate channel values within bins.
  *
  * \see RBRGen3PostprocessingChannel
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 typedef enum RBRGen3PostprocessingAggregate {
     /** average value in the bin */
@@ -327,7 +314,6 @@ const char *RBRGen3PostprocessingAggregate_name(RBRGen3PostprocessingAggregate f
  * Post-processing channel configurations.
  *
  * \see RBRGen3Postprocessing
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 typedef struct RBRGen3PostprocessingChannelsList {
     /** \brief The number of channels generated by post-processing. */
@@ -345,7 +331,6 @@ typedef struct RBRGen3PostprocessingChannelsList {
  * \brief Post-processing job statuses.
  *
  * \see RBRGen3Postprocessing
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 typedef enum RBRGen3PostprocessingStatus {
     /** Post-processing is idle. */
@@ -375,7 +360,6 @@ const char *RBRGen3PostprocessingStatus_name(RBRGen3PostprocessingStatus status)
  * \brief Post-processing control commands.
  *
  * \see RBRGen3Postprocessing
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 typedef enum RBRGen3PostprocessingCommand {
     /** Start the post-processing job. */
@@ -403,7 +387,6 @@ const char *RBRGen3PostprocessingCommand_name(RBRGen3PostprocessingCommand comma
  * \brief Post-processing bin filters.
  *
  * \see RBRGen3Postprocessing
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 typedef enum RBRGen3PostprocessingBinFilter {
     /** No filter. */
@@ -442,7 +425,6 @@ const char *RBRGen3PostprocessingBinFilter_name(RBRGen3PostprocessingBinFilter f
  *
  * \see RBRGen3_getPostprocessing()
  * \see RBRGen3_setPostprocessing()
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 typedef struct RBRGen3Postprocessing {
     /**
@@ -573,7 +555,6 @@ typedef struct RBRGen3Postprocessing {
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
  *                                 hardware error occurs
  * \see RBRGen3_setPostprocessing()
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 RBRGen3Error RBRGen3_getPostprocessing(RBRGen3 *conn, RBRGen3Postprocessing *postprocessing);
 
@@ -596,7 +577,6 @@ RBRGen3Error RBRGen3_getPostprocessing(RBRGen3 *conn, RBRGen3Postprocessing *pos
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
  * \see RBRGen3_getPostprocessing()
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessing *postprocessing);
 
@@ -620,7 +600,6 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
  *                                 another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 RBRGen3Error RBRGen3_setPostprocessingCommand(RBRGen3 *conn, RBRGen3PostprocessingCommand command,
                                               RBRGen3PostprocessingStatus *status);
@@ -633,7 +612,6 @@ RBRGen3Error RBRGen3_setPostprocessingCommand(RBRGen3 *conn, RBRGen3Postprocessi
  * \param [in] data the data string used to calculate the CRC
  * \param [in] size the number of characters in the string used to calculate the CRC
  * \return calculated CRC
- * \see https://docs.rbr-global.com/L3commandreference/commands/memory-and-data-retrieval/postprocessing
  */
 uint16_t calculateCrc(const void *data, int32_t size);
 

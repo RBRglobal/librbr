@@ -125,8 +125,3 @@ Cpp11BracedListStyle: true
 BinPackArguments: false
 InsertTrailingCommas: Wrapped
 IncludeBlocks: Preserve
-
-
-# libRBR addition: leave doc comments containing URLs unwrapped so that
-# `\see https://...` references stay on one line.
-CommentPragmas: 'https?://'

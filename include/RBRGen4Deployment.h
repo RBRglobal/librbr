@@ -3,8 +3,6 @@
  *
  * \brief Instrument commands and structures pertaining to deployments.
  *
- * \see https://docs.rbr-global.com/L3commandreference/commands/deployments
- *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.
@@ -22,7 +20,6 @@ extern "C" {
  *
  * \see RBRGen4_getClock()
  * \see RBRGen4_setClock()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
 typedef struct RBRGen4Clock {
     /** \brief The instrument's date and time. */
@@ -46,7 +43,6 @@ typedef struct RBRGen4Clock {
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_setClock()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
 RBRGen4Error RBRGen4_getClock(RBRGen4 *conn, RBRGen4Clock *clock);
 
@@ -65,7 +61,6 @@ RBRGen4Error RBRGen4_getClock(RBRGen4 *conn, RBRGen4Clock *clock);
  *         outside #RBRGEN4_DATETIME_MIN to
  *         #RBRGEN4_DATETIME_MAX, or the UTC offset is `NAN`
  * \see RBRGen4_getClock()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13830141/clock
  */
 RBRGen4Error RBRGen4_setClock(RBRGen4 *conn, const RBRGen4Clock *clock);
 
@@ -77,7 +72,6 @@ RBRGen4Error RBRGen4_setClock(RBRGen4 *conn, const RBRGen4Clock *clock);
  * \see RBRGen4_getDeployment()
  * \see RBRGen4_pause()
  * \see RBRGen4_resume()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
 typedef enum RBRGen4DeploymentStatus {
     /** The deployment is sampling. */
@@ -107,7 +101,6 @@ const char *RBRGen4DeploymentStatus_name(RBRGen4DeploymentStatus status);
  * \brief Possible deployment gating conditions.
  *
  * \see RBRGen4Deployment
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
 typedef enum RBRGen4Gate {
     /** No gating condition. */
@@ -138,7 +131,6 @@ const char *RBRGen4Gate_name(RBRGen4Gate gate);
  *
  * \see RBRGen4_getDeployment()
  * \see RBRGen4_setDeployment()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
 typedef struct RBRGen4Deployment {
     /**
@@ -177,7 +169,6 @@ typedef struct RBRGen4Deployment {
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_setDeployment()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
 RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment);
 
@@ -203,7 +194,6 @@ RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment)
  *         and is outside #RBRGEN4_DATETIME_MIN to
  *         #RBRGEN4_DATETIME_MAX
  * \see RBRGen4_getDeployment()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828403/deployment
  */
 RBRGen4Error RBRGen4_setDeployment(RBRGen4 *conn, const RBRGen4Deployment *deployment);
 
@@ -220,7 +210,6 @@ RBRGen4Error RBRGen4_setDeployment(RBRGen4 *conn, const RBRGen4Deployment *deplo
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not enabled, or
  *                                      another hardware error occurs
  * \see RBRGen4_resume()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828461/pause
  */
 RBRGen4Error RBRGen4_pause(RBRGen4 *conn, RBRGen4DeploymentStatus *status);
 
@@ -237,7 +226,6 @@ RBRGen4Error RBRGen4_pause(RBRGen4 *conn, RBRGen4DeploymentStatus *status);
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not enabled, or
  *                                      another hardware error occurs
  * \see RBRGen4_pause()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828463/resume
  */
 RBRGen4Error RBRGen4_resume(RBRGen4 *conn, RBRGen4DeploymentStatus *status);
 
@@ -246,7 +234,6 @@ RBRGen4Error RBRGen4_resume(RBRGen4 *conn, RBRGen4DeploymentStatus *status);
  *
  * \see RBRGen4_verify()
  * \see RBRGen4_enable()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828476/enable
  */
 typedef enum RBRGen4DeploymentStorageMode {
     /** Calibration equations are applied to all channel data. */
@@ -291,7 +278,6 @@ const char *RBRGen4DeploymentStorageMode_name(RBRGen4DeploymentStorageMode stora
  *         dataset label is empty or too long, or the storage mode is not a
  *         specific mode
  * \see RBRGen4_enable()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828472/verify
  */
 RBRGen4Error RBRGen4_verify(RBRGen4 *conn, const RBRGen4Config *config, const char *datasetLabel,
                             RBRGen4DeploymentStorageMode storageMode,
@@ -321,7 +307,6 @@ RBRGen4Error RBRGen4_verify(RBRGen4 *conn, const RBRGen4Config *config, const ch
  *         specific mode
  * \see RBRGen4_verify()
  * \see RBRGen4_disable()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828476/enable
  */
 RBRGen4Error RBRGen4_enable(RBRGen4 *conn, const RBRGen4Config *config, const char *datasetLabel,
                             RBRGen4DeploymentStorageMode storageMode,
@@ -344,7 +329,6 @@ RBRGen4Error RBRGen4_enable(RBRGen4 *conn, const RBRGen4Config *config, const ch
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument was not enabled, or
  *                                      another hardware error occurs
  * \see RBRGen4_enable()
- * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828481/disable
  */
 RBRGen4Error RBRGen4_disable(RBRGen4 *conn, RBRGen4InstrumentState *state);
 
