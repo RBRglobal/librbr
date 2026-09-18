@@ -12,13 +12,15 @@ from the low-level details
 of instrument communication
 by wrapping each instrument command
 in a function with fully typed arguments.
-Familiarity with the `instrument command set <https://docs.rbr-global.com/L3commandreference>`__
+Familiarity with the instrument command set
 is still required
 in order to know which commands to send,
 but the library handles the intricacies
 of waking the instrument,
 response parsing,
 etc.
+The command reference for each instrument generation
+can be found by searching https://docs.rbr-global.com/.
 
 As of version 2.0.0,
 the library contains two independent APIs,
@@ -48,7 +50,7 @@ For example:
           sampling.period);
 
 The library also offers basic parsing
-for `EasyParse <https://docs.rbr-global.com/L3commandreference/format-of-stored-data/overview/easyparse-format>`__ sample data and events.
+for EasyParse sample data and events.
 
 The library tries to be platform-agnostic.
 It targets C99

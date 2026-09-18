@@ -10,7 +10,7 @@ and one must be handled by the library consumer.
 Instrument Sleep
 ----------------
 
-As described in `the command reference <https://docs.rbr-global.com/L3commandreference/introduction/command-processing-and-timeouts/timeouts-output-blanking-and-power-saving>`__,
+As described in the command reference,
 RBR instruments will sleep after 10 seconds without input.
 The library tracks when a command
 was last sent to the instrument

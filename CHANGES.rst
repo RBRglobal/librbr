@@ -55,6 +55,11 @@ Changed
   (``RBR_LIB_NODYNAMICMEMORYALLOCATION``) are removed.
   The build now verifies that the library archives
   do not depend on ``malloc``, ``calloc``, ``realloc``, or ``free``.
+- Removed the links to the instrument command reference
+  from the API documentation (SYS-1878).
+  The README now points to https://docs.rbr-global.com/,
+  where the command reference for each instrument generation
+  can be found.
 
 v1.3.0
 ------
