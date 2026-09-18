@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-/** \brief The maximum number of datasets the library can enumerate. */
-#define RBRGEN4_DATASET_COUNT_MAX 32
-
 /**
  * \brief Possible storage access modes for the instrument's data memory.
  *

@@ -18,9 +18,6 @@
 extern "C" {
 #endif
 
-/** \brief The maximum number of schedules count. */
-#define RBRGEN4_SCHEDULE_COUNT_MAX 16
-
 /**
  * \brief The maximum number of coefficients in a calibration group.
  *
@@ -42,18 +39,6 @@ extern "C" {
  * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828616/Metadata+layout
  */
 #define RBRGEN4_CALIBRATION_EQUATION_MAX 31
-
-/**
- * \brief The maximum number of configs count.
- * \see RBRGen4ConfigPool.pool
- */
-#define RBRGEN4_CONFIG_COUNT_MAX 16
-
-/**
- * \brief The maximum number of groups count.
- * \see RBRGen4GroupPool.pool
- */
-#define RBRGEN4_GROUP_COUNT_MAX 16
 
 /** \brief The maximum number of fast periods. */
 #define RBRGEN4_AVAILABLE_FAST_PERIODS_MAX 4

@@ -41,6 +41,9 @@
 //********************************* customer defined ************************************//
 #define DATASET_LABEL "ds_ascent"
 #define SCHEDULE_LABEL "sch_asc_pts"
+// Room for the datasets and schedules the instrument may report.
+#define DATASET_MAX 16
+#define SCHEDULE_MAX 16
 
 void getCurrentTimestamp(char currentTimestamp[])
 {
@@ -139,9 +142,9 @@ int main(int argc, char *argv[])
 
     //*******************download data from instrument. Support only bytecount. *******************//
     // quit if there's no dataset available.
-    RBRGen4Dataset datasetBuf[RBRGEN4_DATASET_COUNT_MAX];
+    RBRGen4Dataset datasetBuf[DATASET_MAX];
     RBRGen4DatasetPool datasetPool = {
-        .size = RBRGEN4_DATASET_COUNT_MAX,
+        .size = DATASET_MAX,
         .pool = datasetBuf
     };
     err = RBRGen4_getDatasetPool(conn, &datasetPool);
@@ -165,10 +168,9 @@ int main(int argc, char *argv[])
     }
 
     // Read the dataset's parameters, including the schedules it ran.
-    RBRGen4Label
-        scheduleLabelBuf[RBRGEN4_SCHEDULE_COUNT_MAX];
+    RBRGen4Label scheduleLabelBuf[SCHEDULE_MAX];
     RBRGen4LabelList scheduleList = {
-        .size = RBRGEN4_SCHEDULE_COUNT_MAX,
+        .size = SCHEDULE_MAX,
         .labels = scheduleLabelBuf
     };
     err = RBRGen4_getDataset(conn,

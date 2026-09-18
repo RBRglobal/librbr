@@ -11,6 +11,9 @@
 #include <math.h>
 #include "tests.h"
 
+/** \brief Room for the pools and lists the fixtures report. */
+#define POOL_SIZE 16
+
 static bool test_node(RBRGen4Node *expected, RBRGen4Node *actual)
 {
     TEST_ASSERT_STR_EQ(expected->label, actual->label);
@@ -1157,7 +1160,7 @@ TEST_LOGGER4(channelSetEmptyUserUnits)
 
 TEST_LOGGER4(grouplist)
 {
-    RBRGEN4_GROUP_POOL_DECL(actual, RBRGEN4_GROUP_COUNT_MAX);
+    RBRGEN4_GROUP_POOL_DECL(actual, POOL_SIZE);
 
     TestIOBuffers_init(buffers, "group count=2 maxcount=16 list=g_a|g_b" RESPONSE_TERMINATOR, 0);
 
@@ -1188,7 +1191,7 @@ TEST_LOGGER4(grouplistTooSmall)
 
 TEST_LOGGER4(grouplistWithoutGroups)
 {
-    RBRGEN4_GROUP_POOL_DECL(actual, RBRGEN4_GROUP_COUNT_MAX);
+    RBRGEN4_GROUP_POOL_DECL(actual, POOL_SIZE);
 
     TestIOBuffers_init(buffers, "group count=0 maxcount=16 list=none" RESPONSE_TERMINATOR, 0);
 
@@ -1463,7 +1466,7 @@ TEST_LOGGER4(groupDeleteAll)
 
 TEST_LOGGER4(configlist)
 {
-    RBRGEN4_CONFIG_POOL_DECL(actual, RBRGEN4_CONFIG_COUNT_MAX);
+    RBRGEN4_CONFIG_POOL_DECL(actual, POOL_SIZE);
 
     TestIOBuffers_init(buffers, "config count=1 maxcount=2 list=c_a" RESPONSE_TERMINATOR, 0);
 
@@ -1493,7 +1496,7 @@ TEST_LOGGER4(configlistTooSmall)
 
 TEST_LOGGER4(configlistWithoutConfigs)
 {
-    RBRGEN4_CONFIG_POOL_DECL(actual, RBRGEN4_CONFIG_COUNT_MAX);
+    RBRGEN4_CONFIG_POOL_DECL(actual, POOL_SIZE);
 
     TestIOBuffers_init(buffers, "config count=0 maxcount=2 list=none" RESPONSE_TERMINATOR, 0);
 
@@ -1720,7 +1723,7 @@ TEST_LOGGER4(configDeleteEmptyLabel)
 
 TEST_LOGGER4(schedulelist)
 {
-    RBRGEN4_SCHEDULE_POOL_DECL(actual, RBRGEN4_SCHEDULE_COUNT_MAX);
+    RBRGEN4_SCHEDULE_POOL_DECL(actual, POOL_SIZE);
 
     TestIOBuffers_init(buffers,
                        "schedule count=1 maxcount=8 list=s "
@@ -1763,7 +1766,7 @@ TEST_LOGGER4(schedulelistTooSmall)
 
 TEST_LOGGER4(schedulelistEveryMode)
 {
-    RBRGEN4_SCHEDULE_POOL_DECL(actual, RBRGEN4_SCHEDULE_COUNT_MAX);
+    RBRGEN4_SCHEDULE_POOL_DECL(actual, POOL_SIZE);
 
     TestIOBuffers_init(buffers,
                        "schedule count=1 maxcount=8 list=s "
@@ -1789,7 +1792,7 @@ TEST_LOGGER4(schedulelistEveryMode)
 TEST_LOGGER4(schedulelistUnknownMode)
 {
     /* An unrecognized mode drops out of the set. */
-    RBRGEN4_SCHEDULE_POOL_DECL(actual, RBRGEN4_SCHEDULE_COUNT_MAX);
+    RBRGEN4_SCHEDULE_POOL_DECL(actual, POOL_SIZE);
 
     TestIOBuffers_init(buffers,
                        "schedule count=0 maxcount=8 list=none "
@@ -2347,10 +2350,10 @@ TEST_LOGGER4(scheduleSetCommandTooLong)
             },
     };
 
-    RBRGen4Label labelBuf[RBRGEN4_GROUP_COUNT_MAX];
+    RBRGen4Label labelBuf[POOL_SIZE];
     RBRGen4LabelList groupList = {
-        .size = RBRGEN4_GROUP_COUNT_MAX,
-        .count = RBRGEN4_GROUP_COUNT_MAX,
+        .size = POOL_SIZE,
+        .count = POOL_SIZE,
         .labels = labelBuf,
     };
     for (int32_t i = 0; i < groupList.count; ++i) {

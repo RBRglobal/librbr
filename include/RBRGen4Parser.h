@@ -121,7 +121,7 @@ typedef struct RBRGen4Event {
     RBRGen4EventType type;
 
     /** \brief The schedule(s) that this event belongs to. */
-    RBRGen4Schedule *schedules[RBRGEN4_SCHEDULE_COUNT_MAX];
+    RBRGen4Schedule *schedules[16];
 
     /** \brief The timestamp of the event. */
     RBRGen4DateTime timestamp;
