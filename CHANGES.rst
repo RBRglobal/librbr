@@ -11,7 +11,7 @@ Added
 
 - Unified the Gen3 (Logger2/Logger3) and Gen4 (Generation 4) instrument
   APIs into a single source tree and library.
-  The Gen4 API (``RBRGen4_…``, ``RBRGen4DynamicCorrection_…``),
+  The Gen4 API (``RBRGen4_…``),
   harvested from the 2023–2024 Gen4 development branches,
   now lives alongside the Gen3 API
   and is under active development.
@@ -34,8 +34,7 @@ Changed
   ``RBRINSTRUMENT_SUCCESS`` is ``RBRGEN3_SUCCESS``,
   and ``RBRInstrument.h`` is ``RBRGen3.h``)
   and the Gen4 API is ``RBRGen4…``
-  (``RBRInstrumentGen4`` is now ``RBRGen4``
-  and ``RBRDynamicCorrectionGen4`` is ``RBRGen4DynamicCorrection``).
+  (``RBRInstrumentGen4`` is now ``RBRGen4``).
   The Zephyr Kconfig buffer-size options follow
   (``CONFIG_RBRINSTRUMENTGEN3_COMMAND_BUFFER_MAX``
   is now ``CONFIG_RBRGEN3_COMMAND_BUFFER_MAX``, and likewise for Gen4).

@@ -26,7 +26,6 @@ extern "C" {
 #include <string.h>
 
 #include "RBRGen4.h"
-#include "RBRGen4DynamicCorrection.h"
 
 /**
  * \brief Assert that a condition is true.
