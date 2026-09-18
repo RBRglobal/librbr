@@ -18,24 +18,6 @@
 extern "C" {
 #endif
 
-/** \brief The maximum number of schedules count. */
-#define RBRGEN4_SCHEDULE_COUNT_MAX 16
-
-/** \brief The maximum number of permissionlist count. */
-#define RBRGEN4_PERMISSION_COUNT_MAX 14
-
-/** \brief The maximum schedule period in milliseconds. */
-#define RBRGEN4_SAMPLING_PERIOD_MAX 86400000
-
-/** \brief The maximum regime boundary in dbar. */
-#define RBRGEN4_REGIME_BOUNDARY_MAX 65535
-
-/** \brief The maximum regime bin size in dbar. */
-#define RBRGEN4_REGIME_BINSIZE_MAX 6553.5
-
-/** \brief The maximum sampling period within a regime. */
-#define RBRGEN4_REGIME_SAMPLING_PERIOD_MAX 65000
-
 /**
  * \brief The maximum number of coefficients in a calibration group.
  *
@@ -52,50 +34,35 @@ extern "C" {
  * \brief The maximum number of characters in a calibration equation name.
  *
  * Does not include any null terminator.
+ *
  * \see RBRGen4Calibration.equation
+ * \see https://docs-rbr.atlassian.net/wiki/spaces/GEN4CR/pages/13828616/Metadata+layout
  */
-#define RBRGEN4_CALIBRATION_EQUATION_MAX 32
-
-/** \brief The minimum input timeout. */
-#define RBRGEN4_INPUT_TIMEOUT_MIN 10000
-
-/** \brief The maximum input timeout. */
-#define RBRGEN4_INPUT_TIMEOUT_MAX 240000
-
-/**
- * \brief The maximum number of configs count.
- * \see RBRGen4ConfigPool.pool
- */
-#define RBRGEN4_CONFIG_COUNT_MAX 16
-
-/**
- * \brief The maximum number of groups count.
- * \see RBRGen4GroupPool.pool
- */
-#define RBRGEN4_GROUP_COUNT_MAX 16
-
-/** \brief The maximum number of characters in a bus address.
- * The bus address is from 0 to 255, with some reserved addresses.
- */
-#define RBRGEN4_BUS_ADDRESS_MAX 3
+#define RBRGEN4_CALIBRATION_EQUATION_MAX 31
 
 /** \brief The maximum number of fast periods. */
 #define RBRGEN4_AVAILABLE_FAST_PERIODS_MAX 4
 
 /**
- * \brief The maximum number of nodes.
+ * \brief The number of nodes RBRGen4NodePool can hold.
+ *
  * \see RBRGen4NodePool.pool
  */
 #define RBRGEN4_NODE_COUNT_MAX 12
 
 /**
- * \brief The maximum number of ports.
+ * \brief The number of ports RBRGen4PortPool and a node's port list can hold.
+ *
+ * \see RBRGen4PortPool.pool
  * \see RBRGen4Node.portList
  */
 #define RBRGEN4_PORT_COUNT_MAX 16
 
 /**
- * \brief The maximum number of devices.
+ * \brief The number of devices RBRGen4DevicePool and a port's device list can
+ * hold.
+ *
+ * \see RBRGen4DevicePool.pool
  * \see RBRGen4Port.deviceList
  */
 #define RBRGEN4_DEVICE_COUNT_MAX 16
