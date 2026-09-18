@@ -448,9 +448,9 @@ RBRGen4Error RBRGen4_getOutputFormat(RBRGen4 *conn, RBRGen4OutputFormat *outputF
  * populated: read the current format with RBRGen4_getOutputFormat()
  * and modify it if only some parameters are of interest.
  *
- * \warning RBRGen4Parser reads only #RBRGEN4_ENCODING_ASCII.
- *          Selecting #RBRGEN4_ENCODING_BINARY will stop this library
- *          from being able to interpret samples or command responses.
+ * \warning This library reads only #RBRGEN4_ENCODING_ASCII. Selecting
+ *          #RBRGEN4_ENCODING_BINARY will stop it from being able to
+ *          interpret samples or command responses.
  *
  * On success, the library caches the output format and uses it to parse
  * subsequently received samples. On failure the cache is left unchanged and

@@ -18,17 +18,10 @@ LDLIBS := -lRBR -lm
 
 ## \brief Gen4 example programs.
 ##
-## Three examples are not listed and do not currently build; re-enabling them
-## is part of the example alignment planned for libRBR 2.0 (SYS-1194):
-##
-## - posix-multiScheduleDiffConfig predates the late-2024 API alignment (it
-##   still refers to the WiFi and old group/config pool interfaces);
-## - posix-parse-file calls RBRGen4Parser_destroy(), which is declared but
-##   not implemented (the Gen4 sample parser is incomplete);
-## - posix-profilingFloat configures a `regimes` schedule; the `regimes` and
-##   `ddsampling` modes are not modelled (SYS-1234). It also uses download
-##   and dataset interfaces which have since been reworked, so it needs
-##   realignment beyond the regimes modelling.
+## posix-multiScheduleDiffConfig is not listed and does not currently build;
+## it predates the late-2024 API alignment (it still refers to the WiFi and
+## old group/config pool interfaces). Re-enabling it is part of the example
+## alignment planned for libRBR 2.0 (SYS-1194).
 EXAMPLES := \
     posix-communications \
     posix-download-datablock-bySchedule \
@@ -50,8 +43,6 @@ posix-footprint: posix-shared.o posix-footprint.o ../../bin/libRBR.a
 posix-generation: posix-shared.o posix-generation.o ../../bin/libRBR.a
 
 posix-poll: posix-shared.o posix-poll.o ../../bin/libRBR.a
-
-posix-profilingFloat: posix-shared.o posix-profilingFloat.o ../../bin/libRBR.a
 
 posix-singleScheduleSingleConfig: posix-shared.o posix-singleScheduleSingleConfig.o ../../bin/libRBR.a
 

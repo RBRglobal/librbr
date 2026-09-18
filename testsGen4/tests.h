@@ -27,7 +27,6 @@ extern "C" {
 
 #include "RBRGen4.h"
 #include "RBRGen4DynamicCorrection.h"
-#include "RBRGen4Parser.h"
 
 /**
  * \brief Assert that a condition is true.
@@ -174,12 +173,6 @@ extern "C" {
 
 /** \brief The characters terminating an instrument command response. */
 #define RESPONSE_TERMINATOR "\r\n"
-
-/** \brief The maximum number of parsed samples to buffer. */
-#define TESTPARSERBUFFERS_SAMPLES_MAX 64
-
-/** \brief The maximum number of parsed events to buffer. */
-#define TESTPARSERBUFFERS_EVENTS_MAX 64
 
 /** \brief The size of the array for expectedCommand and response used in tests*/
 #define COMMAND_RESPONSE_SIZE 1024
@@ -368,66 +361,6 @@ typedef struct InstrumentTest {
  * Generated in `tests.c` at build time.
  */
 extern InstrumentTest instrumentTests[];
-
-/**
- * \brief Declare a test parser configuration.
- *
- * \param [in] cfg the name of the configuration
- */
-#define TEST_PARSER_CONFIG(cfg) const RBRGen4ParserConfig test_##cfg##_parser_config
-
-/**
- * \brief Declare a parser test function.
- *
- * \param [in] fn the name of the test function
- * \param [in] cfg the name of the configuration used by the test
- */
-#define TEST_PARSER(fn, cfg) \
-    bool test_##fn##_parser(RBRGen4Parser *parser, TestParserBuffers *buffers)
-
-/**
- * \brief The results of test parsings.
- */
-typedef struct TestParserBuffers {
-    /** \brief The length of TestParserBuffers.samples. */
-    int32_t samplesLength;
-    /** \brief Parsed samples. */
-    RBRGen4Sample samples[TESTPARSERBUFFERS_SAMPLES_MAX];
-    /** \brief The length of TestParserBuffers.events. */
-    int32_t eventsLength;
-    /** \brief Parsed events. */
-    RBRGen4Event events[TESTPARSERBUFFERS_EVENTS_MAX];
-} TestParserBuffers;
-
-/**
- * \brief A parser test to be run.
- *
- * \param parser the parser to test
- * \param buffers the parser result buffers
- * \return whether the test passed
- */
-typedef bool(ParserTestFunction)(RBRGen4Parser *parser, TestParserBuffers *buffers);
-
-/**
- * \brief Declaration of a parser test.
- *
- * Instances are generated in `tests.c` at build time.
- */
-typedef struct ParserTest {
-    /** \brief The name of the test. */
-    const char *name;
-    /** \brief The parser configuration. */
-    const RBRGen4ParserConfig *config;
-    /** \brief The test to be run. */
-    ParserTestFunction *function;
-} ParserTest;
-
-/**
- * \brief All the parser tests to run.
- *
- * Generated in `tests.c` at build time.
- */
-extern ParserTest parserTests[];
 
 #ifdef __cplusplus
 }

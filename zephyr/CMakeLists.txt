@@ -74,7 +74,6 @@ if(CONFIG_LIBRBR)
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Internal.h
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Memory.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Realtime.c
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Parser.c
         )
     endif()
 endif()

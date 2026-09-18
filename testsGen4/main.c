@@ -146,30 +146,6 @@ RBRGen4Error TestIOBuffers_sample(const struct RBRGen4 *conn,
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error TestParserBuffers_sample(const struct RBRGen4Parser *parser,
-                                      const struct RBRGen4Sample *const sample)
-{
-    TestParserBuffers *buffers;
-    buffers = (TestParserBuffers *) RBRGen4Parser_getUserData(parser);
-    if (buffers->samplesLength >= TESTPARSERBUFFERS_SAMPLES_MAX) {
-        return RBRGEN4_CALLBACK_ERROR;
-    }
-    memcpy(&buffers->samples[buffers->samplesLength++], sample, sizeof(RBRGen4Sample));
-    return RBRGEN4_SUCCESS;
-}
-
-RBRGen4Error TestParserBuffers_event(const struct RBRGen4Parser *parser,
-                                     const struct RBRGen4Event *const event)
-{
-    TestParserBuffers *buffers;
-    buffers = (TestParserBuffers *) RBRGen4Parser_getUserData(parser);
-    if (buffers->eventsLength >= TESTPARSERBUFFERS_EVENTS_MAX) {
-        return RBRGEN4_CALLBACK_ERROR;
-    }
-    memcpy(&buffers->events[buffers->eventsLength++], event, sizeof(RBRGen4Event));
-    return RBRGEN4_SUCCESS;
-}
-
 const char *bool_name(bool value)
 {
     if (value) {
@@ -213,19 +189,6 @@ int main(void)
         printf("Initialized Logger4 test instrument.\n");
     }
 
-    TestParserBuffers parserBuffers;
-    RBRGen4Sample parserSample;
-    RBRGen4Event parserEvent;
-    RBRGen4ParserCallbacks parserCallbacks = {
-        .sample = TestParserBuffers_sample,
-        .sampleBuffer = &parserSample,
-        .event = TestParserBuffers_event,
-        .eventBuffer = &parserEvent,
-    };
-
-    RBRGen4Parser parserBuffer;
-    RBRGen4Parser *parser = &parserBuffer;
-
     printf("Running tests...\n");
     int success = EXIT_SUCCESS;
     RBRGen4 *testInstrument;
@@ -251,28 +214,6 @@ int main(void)
         ++testsTotal;
         if (instrumentTests[i].function(testInstrument, &ioBuffers)) {
             printf(" \033[32mpass\033[0m\n");
-            ++testsPassed;
-        } else {
-            printf(" \033[31mfail\033[0m\n");
-            success = EXIT_FAILURE;
-        }
-    }
-
-    for (int32_t i = 0; parserTests[i].function != NULL; i++) {
-        printf("Running parser test \"%s\"...", parserTests[i].name);
-        ++testsTotal;
-
-        memset(&parserBuffers, 0, sizeof(TestParserBuffers));
-
-        err = RBRGen4Parser_init(parser, &parserCallbacks, parserTests[i].config, &parserBuffers);
-        if (err != RBRGEN4_SUCCESS) {
-            printf(" \033[31minit fail\033[0m: %s\n", RBRGen4Error_name(err));
-            success = EXIT_FAILURE;
-            continue;
-        }
-
-        if (parserTests[i].function(parser, &parserBuffers)) {
-            printf(" \033[32mok\033[0m\n");
             ++testsPassed;
         } else {
             printf(" \033[31mfail\033[0m\n");
