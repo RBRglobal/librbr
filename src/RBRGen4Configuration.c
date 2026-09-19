@@ -483,7 +483,6 @@ RBRGen4Error RBRGen4_setGroup(RBRGen4 *conn, const RBRGen4Group *group,
 RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool)
 {
     groupPool->len = 0;
-    groupPool->maxCount = 0;
     memset(groupPool->pool, 0, groupPool->size * sizeof(RBRGen4Group));
 
     RBR_TRY(RBRGen4_converse(conn, "group"));
@@ -496,8 +495,6 @@ RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool)
 
         if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        } else if (strcmp(parameter.key, "maxcount") == 0) {
-            groupPool->maxCount = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "list") == 0) {
             /* An empty pool reports `none`. */
             if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
@@ -527,6 +524,16 @@ RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool)
     }
 
     return err;
+}
+
+RBRGen4Error RBRGen4_getGroupCount(RBRGen4 *conn, int32_t *count)
+{
+    return RBRGen4_getInt(conn, "group", "count", count);
+}
+
+RBRGen4Error RBRGen4_getGroupMaxCount(RBRGen4 *conn, int32_t *maxCount)
+{
+    return RBRGen4_getInt(conn, "group", "maxcount", maxCount);
 }
 
 RBRGen4Error RBRGen4_createGroup(RBRGen4 *conn, const char *label)

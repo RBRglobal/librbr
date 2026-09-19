@@ -610,11 +610,13 @@ typedef struct RBRGen4GroupPool {
     /** \brief The number of groups #pool can hold. */
     int32_t size;
 
-    /** \brief The number of groups stored in #pool. Never exceeds #size. */
+    /**
+     * \brief The number of groups stored in #pool. Never exceeds #size.
+     *
+     * \see RBRGen4_getGroupCount() for the number the instrument has.
+     * \see RBRGen4_getGroupMaxCount() for the number it can hold.
+     */
     int32_t len;
-
-    /** \brief The maximum number of groups that can exist on the instrument. */
-    int32_t maxCount;
 
     /** \brief User provided buffer of the groups defined. */
     RBRGen4Group *pool;
@@ -639,6 +641,39 @@ typedef struct RBRGen4GroupPool {
  * \see RBRGen4_getGroup()
  */
 RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool);
+
+/**
+ * \brief Read the number of groups defined on the instrument.
+ *
+ * \note Issues the `group count` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] count the number of groups defined
+ * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getGroupPool()
+ * \see RBRGen4_getGroupMaxCount()
+ */
+RBRGen4Error RBRGen4_getGroupCount(RBRGen4 *conn, int32_t *count);
+
+/**
+ * \brief Read the maximum number of groups the instrument can hold.
+ *
+ * \note Issues the `group maxcount` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] maxCount the maximum number of groups
+ * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getGroupCount()
+ */
+RBRGen4Error RBRGen4_getGroupMaxCount(RBRGen4 *conn, int32_t *maxCount);
 
 /**
  * \brief Create an empty group.

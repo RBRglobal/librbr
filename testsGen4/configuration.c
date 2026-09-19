@@ -694,7 +694,6 @@ TEST_LOGGER4(grouplist)
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("group" COMMAND_TERMINATOR, buffers->writeBuffer);
     TEST_ASSERT_EQ(2, actual.len, "%" PRIi32);
-    TEST_ASSERT_EQ(16, actual.maxCount, "%" PRIi32);
     TEST_ASSERT_STR_EQ("g_a", actual.pool[0].label);
     TEST_ASSERT_STR_EQ("g_b", actual.pool[1].label);
 
@@ -724,8 +723,35 @@ TEST_LOGGER4(grouplistWithoutGroups)
     RBRGen4Error err = RBRGen4_getGroupPool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_EQ(0, actual.len, "%" PRIi32);
-    TEST_ASSERT_EQ(16, actual.maxCount, "%" PRIi32);
     TEST_ASSERT_STR_EQ("", actual.pool[0].label);
+
+    return true;
+}
+
+TEST_LOGGER4(groupCount)
+{
+    int32_t count = -1;
+
+    TestIOBuffers_init(buffers, "group count=3" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getGroupCount(conn, &count);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("group count" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(3, count, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(groupMaxCount)
+{
+    int32_t maxCount = -1;
+
+    TestIOBuffers_init(buffers, "group maxcount=16" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getGroupMaxCount(conn, &maxCount);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("group maxcount" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(16, maxCount, "%" PRIi32);
 
     return true;
 }
