@@ -454,10 +454,6 @@ RBRGen4Error RBRGen4_getOutputFormat(RBRGen4 *conn, RBRGen4OutputFormat *outputF
  * populated: read the current format with RBRGen4_getOutputFormat()
  * and modify it if only some parameters are of interest.
  *
- * \warning This library reads only #RBRGEN4_ENCODING_ASCII. Selecting
- *          #RBRGEN4_ENCODING_BINARY will stop it from being able to
- *          interpret samples or command responses.
- *
  * On success, the library caches the output format and uses it to parse
  * subsequently received samples. On failure the cache is left unchanged and
  * may no longer match the instrument. Samples received while the cache is
@@ -470,8 +466,7 @@ RBRGen4Error RBRGen4_getOutputFormat(RBRGen4 *conn, RBRGen4OutputFormat *outputF
  * \return #RBRGEN4_SUCCESS when the settings are successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the encoding or
- *                                                   datatype is not a real
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the datatype is not a real
  *                                                   value
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument refuses a value, or
  *                                      another hardware error occurs

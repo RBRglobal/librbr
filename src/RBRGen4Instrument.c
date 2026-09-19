@@ -480,28 +480,9 @@ RBRGen4Error RBRGen4_getInstrument(RBRGen4 *conn, RBRGen4Instrument *instrumentI
     return RBRGEN4_SUCCESS;
 }
 
-/**
- * \brief Resolve an `encoding` parameter value to its enum member.
- *
- * \param [in] value the parameter value reported by the instrument
- * \return the corresponding encoding
- * \return #RBRGEN4_UNKNOWN_ENCODING when the value is unrecognized
- */
-static RBRGen4Encoding RBRGen4Encoding_parse(const char *value)
-{
-    for (int32_t encoding = 0; encoding < RBRGEN4_ENCODING_COUNT; ++encoding) {
-        if (strcmp(value, RBRGen4Encoding_name((RBRGen4Encoding) encoding)) == 0) {
-            return (RBRGen4Encoding) encoding;
-        }
-    }
-
-    return RBRGEN4_UNKNOWN_ENCODING;
-}
-
 RBRGen4Error RBRGen4_getOutputFormat(RBRGen4 *conn, RBRGen4OutputFormat *outputFormat)
 {
     memset(outputFormat, 0, sizeof(RBRGen4OutputFormat));
-    outputFormat->encoding = RBRGEN4_UNKNOWN_ENCODING;
     outputFormat->dataType = RBRGEN4_UNKNOWN_DATA_TYPE;
 
     RBR_TRY(RBRGen4_converse(conn, "instrument outputformat"));
@@ -525,8 +506,6 @@ RBRGen4Error RBRGen4_getOutputFormat(RBRGen4 *conn, RBRGen4OutputFormat *outputF
             outputFormat->dateTime = enabled;
         } else if (strcmp(parameter.key, "crc") == 0) {
             outputFormat->crc = enabled;
-        } else if (strcmp(parameter.key, "encoding") == 0) {
-            outputFormat->encoding = RBRGen4Encoding_parse(parameter.value);
         } else if (strcmp(parameter.key, "datatype") == 0) {
             outputFormat->dataType = RBRGen4DataType_parse(parameter.value);
         }
@@ -542,19 +521,17 @@ RBRGen4Error RBRGen4_getOutputFormat(RBRGen4 *conn, RBRGen4OutputFormat *outputF
 
 RBRGen4Error RBRGen4_setOutputFormat(RBRGen4 *conn, const RBRGen4OutputFormat *outputFormat)
 {
-    if (outputFormat->encoding < 0 || outputFormat->encoding >= RBRGEN4_ENCODING_COUNT ||
-        outputFormat->dataType < 0 || outputFormat->dataType >= RBRGEN4_DATA_TYPE_COUNT) {
+    if (outputFormat->dataType < 0 || outputFormat->dataType >= RBRGEN4_DATA_TYPE_COUNT) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     RBR_TRY(RBRGen4_converse(conn,
                              "instrument outputformat sn=%s schedulelabel=%s datetime=%s"
-                             " crc=%s encoding=%s datatype=%s",
+                             " crc=%s datatype=%s",
                              outputFormat->sn ? "on" : "off",
                              outputFormat->scheduleLabel ? "on" : "off",
                              outputFormat->dateTime ? "on" : "off",
                              outputFormat->crc ? "on" : "off",
-                             RBRGen4Encoding_name(outputFormat->encoding),
                              RBRGen4DataType_name(outputFormat->dataType)));
 
     conn->outputFormat = *outputFormat;

@@ -106,21 +106,6 @@ const char *RBRGen4Generation_name(RBRGen4Generation generation)
     }
 }
 
-const char *RBRGen4Encoding_name(RBRGen4Encoding encoding)
-{
-    switch (encoding) {
-    case RBRGEN4_ENCODING_ASCII:
-        return "ascii";
-    case RBRGEN4_ENCODING_BINARY:
-        return "binary";
-    case RBRGEN4_ENCODING_COUNT:
-        return "encoding count";
-    case RBRGEN4_UNKNOWN_ENCODING:
-    default:
-        return "unknown encoding";
-    }
-}
-
 const char *RBRGen4ResponseType_name(RBRGen4ResponseType type)
 {
     switch (type) {

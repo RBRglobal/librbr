@@ -527,7 +527,6 @@ static bool test_outputformat(RBRGen4OutputFormat *expected, RBRGen4OutputFormat
     TEST_ASSERT_EQ(expected->scheduleLabel, actual->scheduleLabel, "%d");
     TEST_ASSERT_EQ(expected->dateTime, actual->dateTime, "%d");
     TEST_ASSERT_EQ(expected->crc, actual->crc, "%d");
-    TEST_ASSERT_ENUM_EQ(expected->encoding, actual->encoding, RBRGen4Encoding);
     TEST_ASSERT_ENUM_EQ(expected->dataType, actual->dataType, RBRGen4DataType);
 
     return true;
@@ -539,37 +538,34 @@ TEST_LOGGER4(outputformat)
         /* The format an L4 reports out of the box. */
         {
             "instrument outputformat sn=off schedulelabel=on datetime=on "
-            "crc=off encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
+            "crc=off datatype=float32" RESPONSE_TERMINATOR,
             {
                 .sn = false,
                 .scheduleLabel = true,
                 .dateTime = true,
                 .crc = false,
-                .encoding = RBRGEN4_ENCODING_ASCII,
                 .dataType = RBRGEN4_DATA_TYPE_FLOAT32,
             },
         },
         {
             "instrument outputformat sn=on schedulelabel=on datetime=off "
-            "crc=on encoding=binary datatype=float64" RESPONSE_TERMINATOR,
+            "crc=on datatype=float64" RESPONSE_TERMINATOR,
             {
                 .sn = true,
                 .scheduleLabel = true,
                 .dateTime = false,
                 .crc = true,
-                .encoding = RBRGEN4_ENCODING_BINARY,
                 .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
             },
         },
         {
             "instrument outputformat sn=off schedulelabel=off datetime=off "
-            "crc=off encoding=ascii datatype=calfloat64" RESPONSE_TERMINATOR,
+            "crc=off datatype=calfloat64" RESPONSE_TERMINATOR,
             {
                 .sn = false,
                 .scheduleLabel = false,
                 .dateTime = false,
                 .crc = false,
-                .encoding = RBRGEN4_ENCODING_ASCII,
                 .dataType = RBRGEN4_DATA_TYPE_CALFLOAT64,
             },
         },
@@ -602,19 +598,18 @@ TEST_LOGGER4(outputformat_set)
         .scheduleLabel = true,
         .dateTime = true,
         .crc = false,
-        .encoding = RBRGEN4_ENCODING_ASCII,
         .dataType = RBRGEN4_DATA_TYPE_FLOAT32,
     };
 
     /* Every parameter of the command is sent. */
     TestIOBuffers_init(buffers,
                        "instrument outputformat sn=off schedulelabel=on "
-                       "datetime=on crc=off encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
+                       "datetime=on crc=off datatype=float32" RESPONSE_TERMINATOR,
                        0);
     RBRGen4Error err = RBRGen4_setOutputFormat(conn, &outputformat);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("instrument outputformat sn=off schedulelabel=on "
-                       "datetime=on crc=off encoding=ascii datatype=float32" COMMAND_TERMINATOR,
+                       "datetime=on crc=off datatype=float32" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
     if (!test_outputformat(&outputformat, &conn->outputFormat)) {
         return false;
@@ -625,20 +620,20 @@ TEST_LOGGER4(outputformat_set)
     modified.crc = true;
     TestIOBuffers_init(buffers,
                        "instrument outputformat sn=off schedulelabel=on "
-                       "datetime=on crc=on encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
+                       "datetime=on crc=on datatype=float32" RESPONSE_TERMINATOR,
                        0);
     err = RBRGen4_setOutputFormat(conn, &modified);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("instrument outputformat sn=off schedulelabel=on "
-                       "datetime=on crc=on encoding=ascii datatype=float32" COMMAND_TERMINATOR,
+                       "datetime=on crc=on datatype=float32" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
     if (!test_outputformat(&modified, &conn->outputFormat)) {
         return false;
     }
 
-    /* An encoding or datatype which is not a real value is not sent. */
+    /* A datatype which is not a real value is not sent. */
     RBRGen4OutputFormat unreported = modified;
-    unreported.encoding = RBRGEN4_UNKNOWN_ENCODING;
+    unreported.dataType = RBRGEN4_UNKNOWN_DATA_TYPE;
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen4_setOutputFormat(conn, &unreported);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);

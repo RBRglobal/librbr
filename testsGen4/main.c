@@ -176,7 +176,7 @@ int main(void)
                        "semver=2.0.0-rc1-10-g148bc5eb1 fwtype=150 "
                        "apiversion=2.1" RESPONSE_TERMINATOR
                        "instrument outputformat sn=off schedulelabel=on datetime=on crc=off "
-                       "encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
+                       "datatype=float32" RESPONSE_TERMINATOR,
                        0);
     err = RBRGen4_open(instrumentL4,
                        &instrumentCallbacks,
