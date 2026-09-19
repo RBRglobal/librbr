@@ -1284,7 +1284,6 @@ TEST_LOGGER4(schedulelist)
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("schedule" COMMAND_TERMINATOR, buffers->writeBuffer);
     TEST_ASSERT_EQ(1, actual.len, "%" PRIi32);
-    TEST_ASSERT_EQ(8, actual.maxCount, "%" PRIi32);
     TEST_ASSERT_STR_EQ("s", actual.pool[0].label);
     TEST_ASSERT_EQ(3, actual.maxRegimes, "%" PRIi32);
 
@@ -1303,6 +1302,34 @@ TEST_LOGGER4(schedulelistTooSmall)
     TEST_ASSERT_EQ(1, actual.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("s_a", actual.pool[0].label);
     TEST_ASSERT_EQ(3, actual.maxRegimes, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(scheduleCount)
+{
+    int32_t count = -1;
+
+    TestIOBuffers_init(buffers, "schedule count=3" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getScheduleCount(conn, &count);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("schedule count" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(3, count, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(scheduleMaxCount)
+{
+    int32_t maxCount = -1;
+
+    TestIOBuffers_init(buffers, "schedule maxcount=16" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getScheduleMaxCount(conn, &maxCount);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("schedule maxcount" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(16, maxCount, "%" PRIi32);
 
     return true;
 }

@@ -902,7 +902,6 @@ RBRGen4Error RBRGen4_setSchedule(RBRGen4 *conn, const RBRGen4Schedule *schedule,
 RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedulePool)
 {
     schedulePool->len = 0;
-    schedulePool->maxCount = 0;
     memset(schedulePool->pool, 0, schedulePool->size * sizeof(RBRGen4Schedule));
     schedulePool->maxRegimes = 0;
 
@@ -916,8 +915,6 @@ RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedul
 
         if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        } else if (strcmp(parameter.key, "maxcount") == 0) {
-            schedulePool->maxCount = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "maxregimes") == 0) {
             schedulePool->maxRegimes = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "list") == 0) {
@@ -949,6 +946,16 @@ RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedul
     }
 
     return err;
+}
+
+RBRGen4Error RBRGen4_getScheduleCount(RBRGen4 *conn, int32_t *count)
+{
+    return RBRGen4_getInt(conn, "schedule", "count", count);
+}
+
+RBRGen4Error RBRGen4_getScheduleMaxCount(RBRGen4 *conn, int32_t *maxCount)
+{
+    return RBRGen4_getInt(conn, "schedule", "maxcount", maxCount);
 }
 
 RBRGen4Error RBRGen4_createSchedule(RBRGen4 *conn, const char *label)

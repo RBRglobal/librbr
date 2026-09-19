@@ -971,14 +971,13 @@ typedef struct RBRGen4SchedulePool {
     /** \brief The number of schedules #pool can hold. */
     int32_t size;
 
-    /** \brief The number of schedules stored in #pool. Never exceeds #size. */
-    int32_t len;
-
     /**
-     * \brief The maximum number of schedules that can exist on the
-     * instrument.
+     * \brief The number of schedules stored in #pool. Never exceeds #size.
+     *
+     * \see RBRGen4_getScheduleCount() for the number the instrument has.
+     * \see RBRGen4_getScheduleMaxCount() for the number it can hold.
      */
-    int32_t maxCount;
+    int32_t len;
 
     /** \brief User provided buffer of the schedules defined. */
     RBRGen4Schedule *pool;
@@ -1015,6 +1014,39 @@ const char *RBRGen4ScheduleMode_name(RBRGen4ScheduleMode mode);
  * \see RBRGen4_getSchedule()
  */
 RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedulePool);
+
+/**
+ * \brief Read the number of schedules defined on the instrument.
+ *
+ * \note Issues the `schedule count` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] count the number of schedules defined
+ * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getSchedulePool()
+ * \see RBRGen4_getScheduleMaxCount()
+ */
+RBRGen4Error RBRGen4_getScheduleCount(RBRGen4 *conn, int32_t *count);
+
+/**
+ * \brief Read the maximum number of schedules the instrument can hold.
+ *
+ * \note Issues the `schedule maxcount` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] maxCount the maximum number of schedules
+ * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getScheduleCount()
+ */
+RBRGen4Error RBRGen4_getScheduleMaxCount(RBRGen4 *conn, int32_t *maxCount);
 
 /**
  * \brief Create a schedule with default parameters.
