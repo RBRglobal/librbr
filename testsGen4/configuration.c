@@ -393,9 +393,6 @@ static bool test_channel(RBRGen4Channel *expected, RBRGen4Channel *actual)
     TEST_ASSERT_STR_EQ(expected->userUnits, actual->userUnits);
     TEST_ASSERT_ENUM_EQ(expected->nature, actual->nature, RBRGen4ChannelNature);
     TEST_ASSERT_ENUM_EQ(expected->derived, actual->derived, bool);
-    TEST_ASSERT_STR_EQ(expected->node, actual->node);
-    TEST_ASSERT_STR_EQ(expected->port, actual->port);
-    TEST_ASSERT_STR_EQ(expected->device, actual->device);
 
     return true;
 }
@@ -504,9 +501,6 @@ TEST_LOGGER4(channel)
         .userUnits = "C",
         .nature = RBRGEN4_CHANNEL_NATURE_SCIENTIFIC,
         .derived = false,
-        .node = "self",
-        .port = "thermistor_00",
-        .device = "thermistor_00",
     };
     RBRGen4Channel actual = {
         .label = "temperature_00",
@@ -537,9 +531,6 @@ TEST_LOGGER4(channelDerived)
         .userUnits = "m",
         .nature = RBRGEN4_CHANNEL_NATURE_SCIENTIFIC,
         .derived = true,
-        .node = "",
-        .port = "",
-        .device = "",
     };
     RBRGen4Channel actual = {
         .label = "depth_00",
@@ -558,8 +549,8 @@ TEST_LOGGER4(channelDerived)
     return test_channel(&expected, &actual);
 }
 
-/* Group membership is reported by the instrument but not modelled here: the
- * parameter is skipped. */
+/* Group membership and the node, port, and device labels are reported by the
+ * instrument but not modelled here: the parameters are skipped. */
 TEST_LOGGER4(channelWithGroups)
 {
     RBRGen4Channel actual = {
@@ -576,7 +567,8 @@ TEST_LOGGER4(channelWithGroups)
     RBRGen4Error err = RBRGen4_getChannel(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("temp006", actual.type);
-    TEST_ASSERT_STR_EQ("thermistor_00", actual.device);
+    /* Parsed after the skipped parameter. */
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_CHANNEL_NATURE_SCIENTIFIC, actual.nature, RBRGen4ChannelNature);
 
     return true;
 }

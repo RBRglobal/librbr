@@ -217,21 +217,6 @@ static RBRGen4ChannelNature RBRGen4ChannelNature_parse(const char *value)
 }
 
 /**
- * \brief Copy a label the instrument reports as `na` as an empty string.
- *
- * A derived channel has no node, port, or device.
- */
-static void RBRGen4_copyOptionalLabel(char *destination, size_t size, const char *value)
-{
-    if (strcmp(value, "na") == 0) {
-        destination[0] = '\0';
-        return;
-    }
-
-    snprintf(destination, size, "%s", value);
-}
-
-/**
  * \brief Read the labels of a `channel` response into a pool.
  */
 static RBRGen4Error RBRGen4_parseChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPool)
@@ -307,12 +292,6 @@ RBRGen4Error RBRGen4_getChannel(RBRGen4 *conn, RBRGen4Channel *channel)
             channel->nature = RBRGen4ChannelNature_parse(parameter.value);
         } else if (strcmp(parameter.key, "derived") == 0) {
             channel->derived = (strcmp(parameter.value, "true") == 0);
-        } else if (strcmp(parameter.key, "node") == 0) {
-            RBRGen4_copyOptionalLabel(channel->node, sizeof(channel->node), parameter.value);
-        } else if (strcmp(parameter.key, "port") == 0) {
-            RBRGen4_copyOptionalLabel(channel->port, sizeof(channel->port), parameter.value);
-        } else if (strcmp(parameter.key, "device") == 0) {
-            RBRGen4_copyOptionalLabel(channel->device, sizeof(channel->device), parameter.value);
         }
     }
 
