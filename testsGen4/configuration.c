@@ -1026,7 +1026,6 @@ TEST_LOGGER4(configlist)
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("config" COMMAND_TERMINATOR, buffers->writeBuffer);
     TEST_ASSERT_EQ(1, actual.len, "%" PRIi32);
-    TEST_ASSERT_EQ(2, actual.maxCount, "%" PRIi32);
     TEST_ASSERT_STR_EQ("c_a", actual.pool[0].label);
 
     return true;
@@ -1055,8 +1054,35 @@ TEST_LOGGER4(configlistWithoutConfigs)
     RBRGen4Error err = RBRGen4_getConfigPool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_EQ(0, actual.len, "%" PRIi32);
-    TEST_ASSERT_EQ(2, actual.maxCount, "%" PRIi32);
     TEST_ASSERT_STR_EQ("", actual.pool[0].label);
+
+    return true;
+}
+
+TEST_LOGGER4(configCount)
+{
+    int32_t count = -1;
+
+    TestIOBuffers_init(buffers, "config count=5" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getConfigCount(conn, &count);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("config count" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(5, count, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(configMaxCount)
+{
+    int32_t maxCount = -1;
+
+    TestIOBuffers_init(buffers, "config maxcount=16" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getConfigMaxCount(conn, &maxCount);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("config maxcount" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(16, maxCount, "%" PRIi32);
 
     return true;
 }

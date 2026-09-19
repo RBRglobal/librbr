@@ -604,7 +604,6 @@ RBRGen4Error RBRGen4_setConfig(RBRGen4 *conn, const RBRGen4Config *config,
 RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool)
 {
     configPool->len = 0;
-    configPool->maxCount = 0;
     memset(configPool->pool, 0, configPool->size * sizeof(RBRGen4Config));
 
     RBR_TRY(RBRGen4_converse(conn, "config"));
@@ -617,8 +616,6 @@ RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool)
 
         if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        } else if (strcmp(parameter.key, "maxcount") == 0) {
-            configPool->maxCount = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "list") == 0) {
             /* An empty pool reports `none`. */
             if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
@@ -648,6 +645,16 @@ RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool)
     }
 
     return err;
+}
+
+RBRGen4Error RBRGen4_getConfigCount(RBRGen4 *conn, int32_t *count)
+{
+    return RBRGen4_getInt(conn, "config", "count", count);
+}
+
+RBRGen4Error RBRGen4_getConfigMaxCount(RBRGen4 *conn, int32_t *maxCount)
+{
+    return RBRGen4_getInt(conn, "config", "maxcount", maxCount);
 }
 
 RBRGen4Error RBRGen4_createConfig(RBRGen4 *conn, const char *label)

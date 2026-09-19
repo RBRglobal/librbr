@@ -1182,14 +1182,11 @@ typedef struct RBRGen4ConfigPool {
     /**
      * \brief The number of configurations stored in #pool. Never exceeds
      * #size.
+     *
+     * \see RBRGen4_getConfigCount() for the number the instrument has.
+     * \see RBRGen4_getConfigMaxCount() for the number it can hold.
      */
     int32_t len;
-
-    /**
-     * \brief The maximum number of configurations that can exist on the
-     * instrument.
-     */
-    int32_t maxCount;
 
     /** \brief User provided buffer of the configurations defined. */
     RBRGen4Config *pool;
@@ -1214,6 +1211,39 @@ typedef struct RBRGen4ConfigPool {
  * \see RBRGen4_getConfig()
  */
 RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool);
+
+/**
+ * \brief Read the number of configurations defined on the instrument.
+ *
+ * \note Issues the `config count` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] count the number of configurations defined
+ * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getConfigPool()
+ * \see RBRGen4_getConfigMaxCount()
+ */
+RBRGen4Error RBRGen4_getConfigCount(RBRGen4 *conn, int32_t *count);
+
+/**
+ * \brief Read the maximum number of configurations the instrument can hold.
+ *
+ * \note Issues the `config maxcount` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] maxCount the maximum number of configurations
+ * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getConfigCount()
+ */
+RBRGen4Error RBRGen4_getConfigMaxCount(RBRGen4 *conn, int32_t *maxCount);
 
 /**
  * \brief Create an empty configuration.
