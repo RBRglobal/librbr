@@ -341,9 +341,45 @@ RBRGen4Error RBRGen4_getChannelCount(RBRGen4 *conn, int32_t *count)
     return RBRGen4_getInt(conn, "channel", "count", count);
 }
 
+const char *RBRGen4SettingsState_name(RBRGen4SettingsState state)
+{
+    switch (state) {
+    case RBRGEN4_SETTINGS_STATE_OFF:
+        return "off";
+    case RBRGEN4_SETTINGS_STATE_ON:
+        return "on";
+    case RBRGEN4_SETTINGS_STATE_COUNT:
+        return "setting state count";
+    case RBRGEN4_SETTINGS_STATE_UNAVAILABLE:
+        return "unavailable setting state";
+    case RBRGEN4_UNKNOWN_SETTINGS_STATE:
+    default:
+        return "unknown setting state";
+    }
+}
+
+/**
+ * \brief Find the setting state a response value names.
+ *
+ * \param [in] value the response value
+ * \return the state, or #RBRGEN4_UNKNOWN_SETTINGS_STATE
+ */
+static RBRGen4SettingsState RBRGen4SettingsState_parse(const char *value)
+{
+    for (int i = 0; i < RBRGEN4_SETTINGS_STATE_COUNT; i++) {
+        if (strcmp(RBRGen4SettingsState_name(i), value) == 0) {
+            return i;
+        }
+    }
+
+    return RBRGEN4_UNKNOWN_SETTINGS_STATE;
+}
+
 RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings)
 {
     memset(settings, 0, sizeof(RBRGen4Settings));
+    settings->prompt = RBRGEN4_SETTINGS_STATE_UNAVAILABLE;
+    settings->confirmation = RBRGEN4_SETTINGS_STATE_UNAVAILABLE;
 
     RBR_TRY(RBRGen4_converse(conn, "settings"));
 
@@ -355,9 +391,9 @@ RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings)
         if (parameter.key == NULL || parameter.value == NULL) {
             break;
         } else if (strcmp(parameter.key, "prompt") == 0) {
-            settings->prompt = (strcmp(parameter.value, "on") == 0);
+            settings->prompt = RBRGen4SettingsState_parse(parameter.value);
         } else if (strcmp(parameter.key, "confirmation") == 0) {
-            settings->confirmation = (strcmp(parameter.value, "on") == 0);
+            settings->confirmation = RBRGen4SettingsState_parse(parameter.value);
         } else if (strcmp(parameter.key, "pollpoweroffdelay") == 0) {
             settings->pollPowerOffDelay = strtol(parameter.value, NULL, 10);
         }
@@ -368,21 +404,41 @@ RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings)
 
 RBRGen4Error RBRGen4_setSettings(RBRGen4 *conn, const RBRGen4Settings *settings)
 {
-    if (settings->pollPowerOffDelay < 0) {
+    if (settings->pollPowerOffDelay < 0 ||
+        (settings->prompt >= RBRGEN4_SETTINGS_STATE_COUNT &&
+         settings->prompt != RBRGEN4_SETTINGS_STATE_UNAVAILABLE) ||
+        (settings->confirmation >= RBRGEN4_SETTINGS_STATE_COUNT &&
+         settings->confirmation != RBRGEN4_SETTINGS_STATE_UNAVAILABLE)) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
+    /* An unavailable parameter is left out. */
+    char prompt[sizeof("prompt=off ")] = "";
+    if (settings->prompt < RBRGEN4_SETTINGS_STATE_COUNT) {
+        snprintf(prompt, sizeof(prompt), "prompt=%s ", RBRGen4SettingsState_name(settings->prompt));
+    }
+
+    char confirmation[sizeof("confirmation=off ")] = "";
+    if (settings->confirmation < RBRGEN4_SETTINGS_STATE_COUNT) {
+        snprintf(confirmation,
+                 sizeof(confirmation),
+                 "confirmation=%s ",
+                 RBRGen4SettingsState_name(settings->confirmation));
+    }
+
     /* The instrument answers with nothing at all once confirmation is off. */
-    if (!settings->confirmation) {
+    if (settings->confirmation == RBRGEN4_SETTINGS_STATE_OFF) {
         return RBRGen4_sendCommand(conn,
-                                   "settings prompt=%s confirmation=off pollpoweroffdelay=%" PRId32,
-                                   settings->prompt ? "on" : "off",
+                                   "settings %s%spollpoweroffdelay=%" PRId32,
+                                   prompt,
+                                   confirmation,
                                    settings->pollPowerOffDelay);
     }
 
     return RBRGen4_converse(conn,
-                            "settings prompt=%s confirmation=on pollpoweroffdelay=%" PRId32,
-                            settings->prompt ? "on" : "off",
+                            "settings %s%spollpoweroffdelay=%" PRId32,
+                            prompt,
+                            confirmation,
                             settings->pollPowerOffDelay);
 }
 

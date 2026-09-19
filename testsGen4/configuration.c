@@ -239,8 +239,8 @@ TEST_LOGGER4(calibrationSetInvalidCount)
 TEST_LOGGER4(settings)
 {
     RBRGen4Settings expected = {
-        .prompt = true,
-        .confirmation = true,
+        .prompt = RBRGEN4_SETTINGS_STATE_ON,
+        .confirmation = RBRGEN4_SETTINGS_STATE_ON,
         .pollPowerOffDelay = 8000,
     };
     RBRGen4Settings actual;
@@ -253,8 +253,8 @@ TEST_LOGGER4(settings)
     RBRGen4Error err = RBRGen4_getSettings(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("settings" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_ENUM_EQ(expected.prompt, actual.prompt, bool);
-    TEST_ASSERT_ENUM_EQ(expected.confirmation, actual.confirmation, bool);
+    TEST_ASSERT_ENUM_EQ(expected.prompt, actual.prompt, RBRGen4SettingsState);
+    TEST_ASSERT_ENUM_EQ(expected.confirmation, actual.confirmation, RBRGen4SettingsState);
     TEST_ASSERT_EQ(expected.pollPowerOffDelay, actual.pollPowerOffDelay, "%" PRIi32);
 
     return true;
@@ -263,8 +263,8 @@ TEST_LOGGER4(settings)
 TEST_LOGGER4(settingsSet)
 {
     RBRGen4Settings settings = {
-        .prompt = true,
-        .confirmation = true,
+        .prompt = RBRGEN4_SETTINGS_STATE_ON,
+        .confirmation = RBRGEN4_SETTINGS_STATE_ON,
         .pollPowerOffDelay = 9000,
     };
 
@@ -285,8 +285,8 @@ TEST_LOGGER4(settingsSet)
 TEST_LOGGER4(settingsSetConfirmationOff)
 {
     RBRGen4Settings settings = {
-        .prompt = true,
-        .confirmation = false,
+        .prompt = RBRGEN4_SETTINGS_STATE_ON,
+        .confirmation = RBRGEN4_SETTINGS_STATE_OFF,
         .pollPowerOffDelay = 8000,
     };
 
@@ -304,9 +304,173 @@ TEST_LOGGER4(settingsSetConfirmationOff)
 TEST_LOGGER4(settingsSetInvalidPollPowerOffDelay)
 {
     RBRGen4Settings settings = {
-        .prompt = true,
-        .confirmation = true,
+        .prompt = RBRGEN4_SETTINGS_STATE_ON,
+        .confirmation = RBRGEN4_SETTINGS_STATE_ON,
         .pollPowerOffDelay = -1,
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRGen4Error err = RBRGen4_setSettings(conn, &settings);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+
+    return true;
+}
+
+TEST_LOGGER4(settingsWithoutPrompt)
+{
+    RBRGen4Settings actual;
+
+    TestIOBuffers_init(
+        buffers, "settings confirmation=on pollpoweroffdelay=8000" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getSettings(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SETTINGS_STATE_UNAVAILABLE, actual.prompt, RBRGen4SettingsState);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SETTINGS_STATE_ON, actual.confirmation, RBRGen4SettingsState);
+    TEST_ASSERT_EQ(8000, actual.pollPowerOffDelay, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(settingsWithoutConfirmation)
+{
+    RBRGen4Settings actual;
+
+    TestIOBuffers_init(buffers, "settings prompt=on pollpoweroffdelay=8000" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getSettings(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SETTINGS_STATE_ON, actual.prompt, RBRGen4SettingsState);
+    TEST_ASSERT_ENUM_EQ(
+        RBRGEN4_SETTINGS_STATE_UNAVAILABLE, actual.confirmation, RBRGen4SettingsState);
+
+    return true;
+}
+
+TEST_LOGGER4(settingsUnknownPrompt)
+{
+    RBRGen4Settings actual;
+
+    TestIOBuffers_init(
+        buffers,
+        "settings prompt=maybe confirmation=on pollpoweroffdelay=8000" RESPONSE_TERMINATOR,
+        0);
+
+    RBRGen4Error err = RBRGen4_getSettings(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_UNKNOWN_SETTINGS_STATE, actual.prompt, RBRGen4SettingsState);
+
+    return true;
+}
+
+TEST_LOGGER4(settingsFailed)
+{
+    RBRGen4Settings actual;
+
+    TestIOBuffers_init(buffers, "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getSettings(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_HARDWARE_ERROR, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SETTINGS_STATE_UNAVAILABLE, actual.prompt, RBRGen4SettingsState);
+    TEST_ASSERT_ENUM_EQ(
+        RBRGEN4_SETTINGS_STATE_UNAVAILABLE, actual.confirmation, RBRGen4SettingsState);
+
+    return true;
+}
+
+TEST_LOGGER4(settingsSetWithoutPrompt)
+{
+    RBRGen4Settings settings = {
+        .prompt = RBRGEN4_SETTINGS_STATE_UNAVAILABLE,
+        .confirmation = RBRGEN4_SETTINGS_STATE_ON,
+        .pollPowerOffDelay = 9000,
+    };
+
+    TestIOBuffers_init(
+        buffers, "settings confirmation=on pollpoweroffdelay=9000" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_setSettings(conn, &settings);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("settings confirmation=on pollpoweroffdelay=9000" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(settingsSetWithoutPromptOrConfirmation)
+{
+    RBRGen4Settings settings = {
+        .prompt = RBRGEN4_SETTINGS_STATE_UNAVAILABLE,
+        .confirmation = RBRGEN4_SETTINGS_STATE_UNAVAILABLE,
+        .pollPowerOffDelay = 9000,
+    };
+
+    TestIOBuffers_init(buffers, "settings pollpoweroffdelay=9000" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_setSettings(conn, &settings);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("settings pollpoweroffdelay=9000" COMMAND_TERMINATOR, buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(settingsSetConfirmationOffWithoutPrompt)
+{
+    RBRGen4Settings settings = {
+        .prompt = RBRGEN4_SETTINGS_STATE_UNAVAILABLE,
+        .confirmation = RBRGEN4_SETTINGS_STATE_OFF,
+        .pollPowerOffDelay = 8000,
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRGen4Error err = RBRGen4_setSettings(conn, &settings);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("settings confirmation=off pollpoweroffdelay=8000" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(settingsSetUnknownConfirmation)
+{
+    RBRGen4Settings settings = {
+        .prompt = RBRGEN4_SETTINGS_STATE_ON,
+        .confirmation = RBRGEN4_UNKNOWN_SETTINGS_STATE,
+        .pollPowerOffDelay = 8000,
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRGen4Error err = RBRGen4_setSettings(conn, &settings);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+
+    return true;
+}
+
+TEST_LOGGER4(settingsSetPromptCount)
+{
+    RBRGen4Settings settings = {
+        .prompt = RBRGEN4_SETTINGS_STATE_COUNT,
+        .confirmation = RBRGEN4_SETTINGS_STATE_ON,
+        .pollPowerOffDelay = 8000,
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRGen4Error err = RBRGen4_setSettings(conn, &settings);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+
+    return true;
+}
+
+TEST_LOGGER4(settingsSetUnknownPrompt)
+{
+    RBRGen4Settings settings = {
+        .prompt = RBRGEN4_UNKNOWN_SETTINGS_STATE,
+        .confirmation = RBRGEN4_SETTINGS_STATE_ON,
+        .pollPowerOffDelay = 8000,
     };
 
     TestIOBuffers_init(buffers, "", 0);
