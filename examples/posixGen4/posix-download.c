@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
     /* Get the size of the schedule's sample data. This fails if the schedule
      * is not in the dataset. */
     RBRGen4DatasetDataBlock dataBlock;
-    err = RBRGen4Dataset_getScheduleDataBlock(&conn, dataset, SCHEDULE_LABEL, &dataBlock);
+    err = RBRGen4_getDatasetScheduleDataBlock(&conn, dataset, SCHEDULE_LABEL, &dataBlock);
     if (err) {
         logCmdError(&conn, err, "Failed to get schedule data block");
         goto instrumentCleanup;
@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
     clock_gettime(CLOCK_MONOTONIC, &start);
     while (download.start < dataBlock.byteCount) {
         download.count = sizeof(buf);
-        err = RBRGen4Dataset_downloadScheduleData(&conn, dataset, SCHEDULE_LABEL, &download);
+        err = RBRGen4_downloadDatasetScheduleData(&conn, dataset, SCHEDULE_LABEL, &download);
         if (err == RBRGEN4_TIMEOUT || err == RBRGEN4_CHECKSUM_ERROR) {
             /* The chunk is requested again from the same offset. */
             printf("\n%s: Warning: %s; retrying\n", programName, RBRGen4Error_name(err));
