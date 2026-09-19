@@ -512,6 +512,34 @@ TEST_LOGGER4(channellistWithoutChannels)
     return true;
 }
 
+TEST_LOGGER4(channelCount)
+{
+    int32_t count = -1;
+
+    TestIOBuffers_init(buffers, "channel count=6" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getChannelCount(conn, &count);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("channel count" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(6, count, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(channelCountWithoutChannels)
+{
+    int32_t count = -1;
+
+    TestIOBuffers_init(buffers, "channel count=0" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getChannelCount(conn, &count);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("channel count" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(0, count, "%" PRIi32);
+
+    return true;
+}
+
 TEST_LOGGER4(channellistUnknownNature)
 {
     RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);

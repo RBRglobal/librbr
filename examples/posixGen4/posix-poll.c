@@ -144,10 +144,19 @@ int main(int argc, char *argv[])
     };
     err = RBRGen4_getChannelPool(&conn, &channelPool);
     if (err == RBRGEN4_TRUNCATED) {
+        int32_t count;
+        err = RBRGen4_getChannelCount(&conn, &count);
+        if (err != RBRGEN4_SUCCESS) {
+            logCmdError(&conn, err, "Failed to get channel count");
+            goto instrumentCleanup;
+        }
+
         printf("%s: Warning: not enough space in channel pool to store all"
-               " channels; only the first %" PRId32 " are stored\n",
+               " channels; only the first %" PRId32 " are stored out of the"
+               " instrument's %" PRId32 " channels\n",
                programName,
-               channelPool.len);
+               channelPool.len,
+               count);
     } else if (err) {
         logCmdError(&conn, err, "Failed to get channel pool");
         goto instrumentCleanup;

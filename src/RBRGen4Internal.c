@@ -912,7 +912,7 @@ RBRGen4Error RBRGen4_getInt(RBRGen4 *conn, const char *command, const char *para
     while (true) {
         RBRGen4_parseResponse(conn, &responseCommand, &responseParameter);
 
-        if (responseParameter.key == NULL) {
+        if (responseParameter.key == NULL || responseParameter.value == NULL) {
             break;
         } else if (strcmp(responseParameter.key, parameter) != 0) {
             continue;

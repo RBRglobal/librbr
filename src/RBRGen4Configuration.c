@@ -336,6 +336,11 @@ RBRGen4Error RBRGen4_getChannelPoolByNature(RBRGen4 *conn, RBRGen4ChannelNature 
     return RBRGen4_parseChannelPool(conn, channelPool);
 }
 
+RBRGen4Error RBRGen4_getChannelCount(RBRGen4 *conn, int32_t *count)
+{
+    return RBRGen4_getInt(conn, "channel", "count", count);
+}
+
 RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings)
 {
     memset(settings, 0, sizeof(RBRGen4Settings));

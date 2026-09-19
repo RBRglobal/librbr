@@ -232,7 +232,11 @@ typedef struct RBRGen4ChannelPool {
     /** \brief The number of channels #pool can hold. */
     int32_t size;
 
-    /** \brief The number of channels stored in #pool. Never exceeds #size. */
+    /**
+     * \brief The number of channels stored in #pool. Never exceeds #size.
+     *
+     * \see RBRGen4_getChannelCount() for the number the instrument has.
+     */
     int32_t len;
 
     /**
@@ -334,6 +338,22 @@ RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPo
  */
 RBRGen4Error RBRGen4_getChannelPoolByNature(RBRGen4 *conn, RBRGen4ChannelNature nature,
                                             RBRGen4ChannelPool *channelPool);
+
+/**
+ * \brief Read the number of channels present on the instrument.
+ *
+ * \note Issues the `channel count` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] count the number of channels present
+ * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getChannelPool()
+ */
+RBRGen4Error RBRGen4_getChannelCount(RBRGen4 *conn, int32_t *count);
 
 /**
  * \brief Read a channel's calibration.
