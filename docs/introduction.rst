@@ -83,7 +83,7 @@ Memory Ownership
 The library never allocates memory.
 Context objects
 (:c:type:`RBRGen3`, :c:type:`RBRGen3Parser`,
-:c:type:`RBRGen4`, :c:type:`RBRGen4Parser`)
+:c:type:`RBRGen4`)
 and the buffers into which data
 is to be returned
 must be allocated by the caller.

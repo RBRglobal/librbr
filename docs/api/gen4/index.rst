@@ -8,10 +8,8 @@ Gen4 API
    RBRGen4Communication
    RBRGen4Configuration
    RBRGen4Deployment
-   RBRGen4DynamicCorrection
    RBRGen4HardwareErrors
    RBRGen4Instrument
    RBRGen4Memory
-   RBRGen4Parser
    RBRGen4Realtime
    RBRGen4

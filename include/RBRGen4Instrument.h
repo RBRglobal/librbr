@@ -56,13 +56,6 @@ const char *RBRGen4InstrumentState_name(RBRGen4InstrumentState state);
 #define RBRGEN4_INSTRUMENT_NAME_MAX 32
 
 /**
- * \brief The number of PCBAs RBRGen4PcbaPool can hold.
- *
- * \see RBRGen4PcbaPool.pool
- */
-#define RBRGEN4_PCBA_COUNT_MAX 12
-
-/**
  * \brief Get identification information using the legacy `id` command.
  * \note Issues the `id` command.
  *
@@ -93,83 +86,6 @@ RBRGen4Error RBRGen4_getId(RBRGen4 *conn, RBRGen4Id *id);
  * \see RBRGen4_getInstrument()
  */
 RBRGen4Error RBRGen4_getId4(RBRGen4 *conn, RBRGen4Id4 *id);
-
-/**
- * \brief Instrument `pcba <pcba_label>` command parameters.
- *
- * \see RBRGen4_getPcba()
- */
-typedef struct RBRGen4Pcba {
-    /**
-     * \brief PCBA label.
-     *
-     * Set by the caller to select the PCBA to read; see
-     * RBRGen4_getPcba().
-     */
-    char label[RBRGEN4_LABEL_NAME_MAX + 1];
-    /**
-     * \brief PCBA serial number.
-     *
-     * Zero when the instrument has no serial number recorded for the PCBA,
-     * which it reports as `na`.
-     */
-    int32_t sn;
-    /**
-     * \brief PCBA part number.
-     *
-     * Reported as `na` when unrecorded.
-     */
-    char pn[RBRGEN4_PART_NUMBER_MAX + 1];
-    /** \brief The label of the node this PCBA belongs to. */
-    char node[RBRGEN4_LABEL_NAME_MAX + 1];
-} RBRGen4Pcba;
-
-/**
- * \brief Instrument `pcba` command parameters.
- *
- * \see RBRGen4_getPcbaPool()
- */
-typedef struct RBRGen4PcbaPool {
-    /** \brief The number of PCBAs detected. */
-    int32_t count;
-
-    /** \brief The pool of PCBAs. */
-    RBRGen4Pcba pool[RBRGEN4_PCBA_COUNT_MAX];
-} RBRGen4PcbaPool;
-
-/**
- * \brief Populate the pool of the instrument's PCBAs.
- * \note Issues the `pcba` command.
- *
- * \param [in] conn the instrument connection
- * \param [inout] pcbaPool the PCBAs of this instrument.
- * \return #RBRGEN4_SUCCESS when all PCBAs are successfully read
- * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when a PCBA cannot be read, or another
- *                                      hardware error occurs
- * \see RBRGen4_getPcba()
- */
-RBRGen4Error RBRGen4_getPcbaPool(RBRGen4 *conn, RBRGen4PcbaPool *pcbaPool);
-
-/**
- * \brief Get an instrument's PCBA's parameters.
- * \note Issues the `pcba <pcba_label>` command.
- *
- * RBRGen4Pcba.label must be populated by the caller to select the
- * PCBA to read; the remaining fields are overwritten. Labels can be
- * discovered with RBRGen4_getPcbaPool().
- *
- * \param [in] conn the instrument connection
- * \param [inout] pcba the label of the PCBA to read, and its information
- * \return #RBRGEN4_SUCCESS when the information is successfully read
- * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the information cannot be read, or
- *                                      another hardware error occurs
- * \see RBRGen4_getPcbaPool()
- */
-RBRGen4Error RBRGen4_getPcba(RBRGen4 *conn, RBRGen4Pcba *pcba);
 
 /**
  * \brief Possible instrument power sources.
@@ -532,9 +448,9 @@ RBRGen4Error RBRGen4_getOutputFormat(RBRGen4 *conn, RBRGen4OutputFormat *outputF
  * populated: read the current format with RBRGen4_getOutputFormat()
  * and modify it if only some parameters are of interest.
  *
- * \warning RBRGen4Parser reads only #RBRGEN4_ENCODING_ASCII.
- *          Selecting #RBRGEN4_ENCODING_BINARY will stop this library
- *          from being able to interpret samples or command responses.
+ * \warning This library reads only #RBRGEN4_ENCODING_ASCII. Selecting
+ *          #RBRGEN4_ENCODING_BINARY will stop it from being able to
+ *          interpret samples or command responses.
  *
  * On success, the library caches the output format and uses it to parse
  * subsequently received samples. On failure the cache is left unchanged and

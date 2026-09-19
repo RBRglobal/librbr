@@ -63,7 +63,6 @@ if(CONFIG_LIBRBR)
         )
 
         zephyr_library_sources(
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4DynamicCorrection.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Communication.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Configuration.c
@@ -74,7 +73,6 @@ if(CONFIG_LIBRBR)
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Internal.h
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Memory.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Realtime.c
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Parser.c
         )
     endif()
 endif()
