@@ -29,6 +29,27 @@ typedef struct PollTest {
 
 #define OUTPUTFORMAT_DEFAULT {.sn = false, .scheduleLabel = false, .dateTime = true, .crc = false}
 
+/**
+ * \brief Fill \a list with the pipe-separated labels of \a labels.
+ *
+ * Lets a PollTest spell its list the way the command does.
+ */
+static void PollTest_labelList(const char *labels, RBRGen4LabelList *list)
+{
+    list->count = 0;
+    while (*labels != '\0' && list->count < list->size) {
+        const char *separator = strchr(labels, '|');
+        size_t length = separator != NULL ? (size_t) (separator - labels) : strlen(labels);
+        snprintf(list->labels[list->count],
+                 sizeof(list->labels[list->count]),
+                 "%.*s",
+                 (int) length,
+                 labels);
+        list->count++;
+        labels += separator != NULL ? length + 1 : length;
+    }
+}
+
 TEST_LOGGER4(poll)
 {
     PollTest tests[] = {
@@ -539,15 +560,16 @@ TEST_LOGGER4(poll)
             {0},
             {0},
         },
-        /* An empty list is refused by the instrument, not the library. */
+        /* An empty list is refused before the command: `poll` has no
+         * equivalent of the `none` an empty list is otherwise sent as. */
         {
             "",
             NULL,
             false,
-            "poll channellist=" COMMAND_TERMINATOR,
-            "ERR-115 syntax error ''" RESPONSE_TERMINATOR,
+            "",
+            "",
             OUTPUTFORMAT_DEFAULT,
-            RBRGEN4_HARDWARE_ERROR,
+            RBRGEN4_INVALID_PARAMETER_VALUE,
             {0},
             {0},
         },
@@ -571,10 +593,13 @@ TEST_LOGGER4(poll)
         TestIOBuffers_init(buffers, tests[i].response, 0);
         memset(&buffers->streamSample, 0, sizeof(buffers->streamSample));
         conn->outputFormat = tests[i].outputFormat;
+        RBRGEN4_LABEL_LIST_DECL(list, RBRGEN4_CHANNEL_MAX);
         if (tests[i].channelList != NULL) {
-            err = RBRGen4_pollChannels(conn, tests[i].requireLabel, tests[i].channelList, &actual);
+            PollTest_labelList(tests[i].channelList, &list);
+            err = RBRGen4_pollChannels(conn, tests[i].requireLabel, &list, &actual);
         } else if (tests[i].groupList != NULL) {
-            err = RBRGen4_pollGroups(conn, tests[i].requireLabel, tests[i].groupList, &actual);
+            PollTest_labelList(tests[i].groupList, &list);
+            err = RBRGen4_pollGroups(conn, tests[i].requireLabel, &list, &actual);
         } else {
             err = RBRGen4_poll(conn, tests[i].requireLabel, &actual);
         }
@@ -618,12 +643,14 @@ TEST_LOGGER4(poll)
     }
 
     /* A label list too long to send is refused before the command. */
-    char longList[RBRGEN4_COMMAND_BUFFER_MAX];
-    memset(longList, 'a', sizeof(longList) - 1);
-    longList[sizeof(longList) - 1] = '\0';
+    RBRGEN4_LABEL_LIST_DECL(longList, RBRGEN4_CHANNEL_MAX);
+    for (longList.count = 0; longList.count < longList.size; longList.count++) {
+        memset(longList.labels[longList.count], 'a', RBRGEN4_LABEL_NAME_MAX);
+        longList.labels[longList.count][RBRGEN4_LABEL_NAME_MAX] = '\0';
+    }
     TestIOBuffers_init(buffers, "", 0);
-    err = RBRGen4_pollChannels(conn, false, longList, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+    err = RBRGen4_pollChannels(conn, false, &longList, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_BUFFER_TOO_SMALL, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
@@ -669,7 +696,9 @@ TEST_LOGGER4(pollTimeout)
                        0);
     memset(&buffers->streamSample, 0, sizeof(buffers->streamSample));
 
-    err = RBRGen4_pollChannels(conn, true, "pressure_00", &actual);
+    RBRGEN4_LABEL_LIST_DECL(channelList, 1);
+    PollTest_labelList("pressure_00", &channelList);
+    err = RBRGen4_pollChannels(conn, true, &channelList, &actual);
 
     conn->callbacks.time = savedTime;
     conn->pollTimeout = savedPollTimeout;

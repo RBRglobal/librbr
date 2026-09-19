@@ -197,8 +197,7 @@ RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sampl
  * instrument.
  * \note Issues the `poll channellist=<channel_list>` command.
  *
- * \a channelList is sent verbatim as the `channellist` parameter value; see
- * the command documentation for the list format.
+ * The labels of \a channelList are sent as the `channellist` parameter value.
  *
  * Unlike streaming data/RBRGen4_readSample(), polled data is
  * returned directly to the caller (independent of any
@@ -217,8 +216,10 @@ RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sampl
  * \param [in] channelList the channels to sample
  * \param [out] sample the polled sample
  * \return #RBRGEN4_SUCCESS when a sample is successfully read
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the channel list
- *         is too long to send
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a channelList is `NULL`,
+ *         empty, its count is out of range, or a channel label is empty
+ * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
+ *         command
  * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but
  *         instrument.outputformat.scheduleLabel is false
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
@@ -227,16 +228,15 @@ RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sampl
  * \return #RBRGEN4_HARDWARE_ERROR when an invalid channel is requested, or
  *                                      another hardware error occurs
  */
-RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel, const char *channelList,
-                                  RBRGen4Sample *sample);
+RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel,
+                                  const RBRGen4LabelList *channelList, RBRGen4Sample *sample);
 
 /**
  * \brief Requests an “on-demand” sample of the given groups of channels from
  * the instrument.
  * \note Issues the `poll grouplist=<group_list>` command.
  *
- * \a groupList is sent verbatim as the `grouplist` parameter value; see the
- * command documentation for the list format.
+ * The labels of \a groupList are sent as the `grouplist` parameter value.
  *
  * Unlike streaming data/RBRGen4_readSample(), polled data is
  * returned directly to the caller (independent of any
@@ -255,8 +255,10 @@ RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel, const char *
  * \param [in] groupList the groups of channels to sample
  * \param [out] sample the polled sample
  * \return #RBRGEN4_SUCCESS when a sample is successfully read
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the group list is
- *         too long to send
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a groupList is `NULL`,
+ *         empty, its count is out of range, or a group label is empty
+ * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
+ *         command
  * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but
  *         instrument.outputformat.scheduleLabel is false
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
@@ -265,7 +267,7 @@ RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel, const char *
  * \return #RBRGEN4_HARDWARE_ERROR when an invalid group is requested, or
  *                                      another hardware error occurs
  */
-RBRGen4Error RBRGen4_pollGroups(RBRGen4 *conn, bool requireLabel, const char *groupList,
+RBRGen4Error RBRGen4_pollGroups(RBRGen4 *conn, bool requireLabel, const RBRGen4LabelList *groupList,
                                 RBRGen4Sample *sample);
 
 #ifdef __cplusplus
