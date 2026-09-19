@@ -120,10 +120,19 @@ int main(int argc, char *argv[])
     };
     err = RBRGen4_getDatasetPool(&conn, &datasetPool);
     if (err == RBRGEN4_TRUNCATED) {
+        int32_t count;
+        err = RBRGen4_getDatasetCount(&conn, &count);
+        if (err != RBRGEN4_SUCCESS) {
+            logCmdError(&conn, err, "Failed to get dataset count");
+            goto instrumentCleanup;
+        }
+
         printf("%s: Warning: not enough space in dataset pool to store all"
-               " datasets; only the first %" PRId32 " are stored\n",
+               " datasets; only the first %" PRId32 " are stored out of the"
+               " instrument's %" PRId32 " datasets\n",
                programName,
-               datasetPool.len);
+               datasetPool.len,
+               count);
     } else if (err) {
         logCmdError(&conn,
                     err,

@@ -96,7 +96,6 @@ const char *RBRGen4DatasetStatus_name(RBRGen4DatasetStatus status)
 RBRGen4Error RBRGen4_getDatasetPool(RBRGen4 *conn, RBRGen4DatasetPool *datasetPool)
 {
     datasetPool->len = 0;
-    datasetPool->maxCount = 0;
     memset(datasetPool->pool, 0, datasetPool->size * sizeof(RBRGen4Dataset));
 
     RBR_TRY(RBRGen4_converse(conn, "dataset"));
@@ -109,8 +108,6 @@ RBRGen4Error RBRGen4_getDatasetPool(RBRGen4 *conn, RBRGen4DatasetPool *datasetPo
 
         if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        } else if (strcmp(parameter.key, "maxcount") == 0) {
-            datasetPool->maxCount = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "list") == 0) {
             /* An empty pool reports `none`. */
             if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
@@ -140,6 +137,16 @@ RBRGen4Error RBRGen4_getDatasetPool(RBRGen4 *conn, RBRGen4DatasetPool *datasetPo
     }
 
     return err;
+}
+
+RBRGen4Error RBRGen4_getDatasetCount(RBRGen4 *conn, int32_t *count)
+{
+    return RBRGen4_getInt(conn, "dataset", "count", count);
+}
+
+RBRGen4Error RBRGen4_getDatasetMaxCount(RBRGen4 *conn, int32_t *maxCount)
+{
+    return RBRGen4_getInt(conn, "dataset", "maxcount", maxCount);
 }
 
 RBRGen4Error RBRGen4_getDataset(RBRGen4 *conn, RBRGen4Dataset *dataset,
