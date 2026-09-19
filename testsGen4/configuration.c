@@ -1196,11 +1196,8 @@ TEST_LOGGER4(schedulelist)
 {
     RBRGEN4_SCHEDULE_POOL_DECL(actual, POOL_SIZE);
 
-    TestIOBuffers_init(buffers,
-                       "schedule count=1 maxcount=8 list=s "
-                       "availablemodes=continuous "
-                       "availablefastperiods=none maxregimes=3" RESPONSE_TERMINATOR,
-                       0);
+    TestIOBuffers_init(
+        buffers, "schedule count=1 maxcount=8 list=s maxregimes=3" RESPONSE_TERMINATOR, 0);
 
     RBRGen4Error err = RBRGen4_getSchedulePool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -1208,9 +1205,6 @@ TEST_LOGGER4(schedulelist)
     TEST_ASSERT_EQ(1, actual.count, "%" PRIi32);
     TEST_ASSERT_EQ(8, actual.maxCount, "%" PRIi32);
     TEST_ASSERT_STR_EQ("s", actual.pool[0].label);
-    TEST_ASSERT_ENUM_EQ(
-        RBRGEN4_SCHEDULE_MODE_CONTINUOUS, actual.availableModes, RBRGen4ScheduleMode);
-    TEST_ASSERT_EQ(0, actual.availableFastPeriodCount, "%" PRIi32);
     TEST_ASSERT_EQ(3, actual.maxRegimes, "%" PRIi32);
 
     return true;
@@ -1220,11 +1214,8 @@ TEST_LOGGER4(schedulelistTooSmall)
 {
     RBRGEN4_SCHEDULE_POOL_DECL(actual, 1);
 
-    TestIOBuffers_init(buffers,
-                       "schedule count=2 maxcount=8 list=s_a|s_b "
-                       "availablemodes=continuous "
-                       "availablefastperiods=none maxregimes=3" RESPONSE_TERMINATOR,
-                       0);
+    TestIOBuffers_init(
+        buffers, "schedule count=2 maxcount=8 list=s_a|s_b maxregimes=3" RESPONSE_TERMINATOR, 0);
 
     RBRGen4Error err = RBRGen4_getSchedulePool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED, err, RBRGen4Error);
@@ -1235,46 +1226,19 @@ TEST_LOGGER4(schedulelistTooSmall)
     return true;
 }
 
-TEST_LOGGER4(schedulelistEveryMode)
+TEST_LOGGER4(schedulelistEmpty)
 {
+    /* A `none` list yields an empty pool. */
     RBRGEN4_SCHEDULE_POOL_DECL(actual, POOL_SIZE);
 
-    TestIOBuffers_init(buffers,
-                       "schedule count=1 maxcount=8 list=s "
-                       "availablemodes=continuous|average|burst|tide|wave|ddsampling|regimes "
-                       "availablefastperiods=500|250|125|63 maxregimes=3" RESPONSE_TERMINATOR,
-                       0);
+    TestIOBuffers_init(
+        buffers, "schedule count=0 maxcount=8 list=none maxregimes=3" RESPONSE_TERMINATOR, 0);
 
     RBRGen4Error err = RBRGen4_getSchedulePool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
-    TEST_ASSERT_EQ(RBRGEN4_SCHEDULE_MODE_CONTINUOUS | RBRGEN4_SCHEDULE_MODE_AVERAGE |
-                       RBRGEN4_SCHEDULE_MODE_BURST | RBRGEN4_SCHEDULE_MODE_TIDE |
-                       RBRGEN4_SCHEDULE_MODE_WAVE | RBRGEN4_SCHEDULE_MODE_DDSAMPLING |
-                       RBRGEN4_SCHEDULE_MODE_REGIMES,
-                   actual.availableModes,
-                   "%d");
-    TEST_ASSERT_EQ(4, actual.availableFastPeriodCount, "%" PRIi32);
-    TEST_ASSERT_EQ(500, actual.availableFastPeriods[0], "%" PRIi32);
-    TEST_ASSERT_EQ(63, actual.availableFastPeriods[3], "%" PRIi32);
-
-    return true;
-}
-
-TEST_LOGGER4(schedulelistUnknownMode)
-{
-    /* An unrecognized mode drops out of the set. */
-    RBRGEN4_SCHEDULE_POOL_DECL(actual, POOL_SIZE);
-
-    TestIOBuffers_init(buffers,
-                       "schedule count=0 maxcount=8 list=none "
-                       "availablemodes=continuous|somethingnew "
-                       "availablefastperiods=none maxregimes=3" RESPONSE_TERMINATOR,
-                       0);
-
-    RBRGen4Error err = RBRGen4_getSchedulePool(conn, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
-    TEST_ASSERT_ENUM_EQ(
-        RBRGEN4_SCHEDULE_MODE_CONTINUOUS, actual.availableModes, RBRGen4ScheduleMode);
+    TEST_ASSERT_EQ(0, actual.count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("", actual.pool[0].label);
+    TEST_ASSERT_EQ(3, actual.maxRegimes, "%" PRIi32);
 
     return true;
 }
@@ -1298,6 +1262,25 @@ TEST_LOGGER4(schedule)
     TEST_ASSERT_EQ(false, actual.castDetection, "%d");
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SCHEDULE_MODE_CONTINUOUS, actual.mode, RBRGen4ScheduleMode);
     TEST_ASSERT_EQ(1000, actual.parameters.continuous.period, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(scheduleUnknownMode)
+{
+    /* A mode the library does not recognize parses to `NONE`. */
+    RBRGen4Schedule actual = {
+        .label = "s",
+    };
+
+    TestIOBuffers_init(buffers,
+                       "schedule s grouplist=none configlist=none stream=off "
+                       "castdetection=off mode=somethingnew period=1000" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRGen4Error err = RBRGen4_getSchedule(conn, &actual, NULL);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SCHEDULE_MODE_NONE, actual.mode, RBRGen4ScheduleMode);
 
     return true;
 }

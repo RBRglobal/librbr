@@ -903,9 +903,6 @@ RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedul
     schedulePool->count = 0;
     schedulePool->maxCount = 0;
     memset(schedulePool->pool, 0, schedulePool->size * sizeof(RBRGen4Schedule));
-    schedulePool->availableModes = RBRGEN4_SCHEDULE_MODE_NONE;
-    schedulePool->availableFastPeriodCount = 0;
-    memset(schedulePool->availableFastPeriods, 0, sizeof(schedulePool->availableFastPeriods));
     schedulePool->maxRegimes = 0;
 
     RBR_TRY(RBRGen4_converse(conn, "schedule"));
@@ -942,33 +939,6 @@ RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedul
 
                 snprintf(
                     schedulePool->pool[i].label, sizeof(schedulePool->pool[i].label), "%s", value);
-
-                value = nextValue;
-            }
-        } else if (strcmp(parameter.key, "availablemodes") == 0) {
-            char *value = parameter.value;
-            while (value != NULL) {
-                char *nextValue = RBRGen4_splitListValue(value);
-
-                /* An unrecognized mode parses to `NONE` and drops out. */
-                schedulePool->availableModes |= RBRGen4ScheduleMode_parse(value);
-
-                value = nextValue;
-            }
-        } else if (strcmp(parameter.key, "availablefastperiods") == 0) {
-            /* No fast periods reports `none`. */
-            if (strcmp(parameter.value, RBRGEN4_EMPTY_LIST) == 0) {
-                continue;
-            }
-
-            char *value = parameter.value;
-            while (value != NULL &&
-                   schedulePool->availableFastPeriodCount < RBRGEN4_AVAILABLE_FAST_PERIODS_MAX) {
-                char *nextValue = RBRGen4_splitListValue(value);
-
-                schedulePool->availableFastPeriods[schedulePool->availableFastPeriodCount] =
-                    strtol(value, NULL, 10);
-                schedulePool->availableFastPeriodCount++;
 
                 value = nextValue;
             }

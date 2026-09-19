@@ -37,9 +37,6 @@ extern "C" {
  */
 #define RBRGEN4_CALIBRATION_EQUATION_MAX 31
 
-/** \brief The maximum number of fast periods. */
-#define RBRGEN4_AVAILABLE_FAST_PERIODS_MAX 4
-
 /**
  * \brief `calibration <channel_label>` command parameters.
  *
@@ -723,12 +720,10 @@ RBRGen4Error RBRGen4_deleteGroupAll(RBRGen4 *conn);
 /**
  * \brief The modes of a schedule.
  *
- * Flags, so one type serves both a schedule's mode and the set of modes the
- * instrument offers. A schedule's mode must be a single flag;
- * RBRGen4_setSchedule() rejects any other value.
+ * Flags. A schedule's mode must be a single flag; RBRGen4_setSchedule()
+ * rejects any other value.
  *
  * \see RBRGen4Schedule.mode
- * \see RBRGen4SchedulePool.availableModes
  */
 typedef enum RBRGen4ScheduleMode {
     /** \brief No mode, and any mode the library does not recognize. */
@@ -988,28 +983,6 @@ typedef struct RBRGen4SchedulePool {
 
     /** \brief User provided buffer of the schedules defined. */
     RBRGen4Schedule *pool;
-
-    /** \brief The modes the instrument offers. */
-    RBRGen4ScheduleMode availableModes;
-
-    /**
-     * \brief The number of entries in #availableFastPeriods.
-     *
-     * \warning Use `min(availableFastPeriodCount,
-     * RBRGEN4_AVAILABLE_FAST_PERIODS_MAX)` to avoid an
-     * out-of-bounds error when accessing #availableFastPeriods if
-     * #availableFastPeriodCount >
-     * RBRGEN4_AVAILABLE_FAST_PERIODS_MAX.
-     */
-    int32_t availableFastPeriodCount;
-
-    /**
-     * \brief `availablefastperiods`, in the order reported.
-     *
-     * Entries past #RBRGEN4_AVAILABLE_FAST_PERIODS_MAX are
-     * discarded.
-     */
-    RBRGen4Period availableFastPeriods[RBRGEN4_AVAILABLE_FAST_PERIODS_MAX];
 
     /** \brief `maxregimes`. */
     int32_t maxRegimes;
