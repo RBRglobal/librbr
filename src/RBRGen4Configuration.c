@@ -303,13 +303,7 @@ RBRGen4Error RBRGen4_getDevice(RBRGen4 *conn, RBRGen4Device *device)
     memset(device, 0, sizeof(RBRGen4Device));
     device->deviceClass = RBRGEN4_UNKNOWN_DEVICE_CLASS;
 
-    /* `lock` is deliberately absent from the response to a bare
-     * `device <label>`, so name every parameter rather than take the
-     * defaults. */
-    RBR_TRY(RBRGen4_converse(conn,
-                             "device %s port class sn pn fwversion fwtype name channellist lock"
-                             " poweruptime cooldowntime powerdowntime inrushoffsettime",
-                             label));
+    RBR_TRY(RBRGen4_converse(conn, "device %s", label));
 
     snprintf(device->label, sizeof(device->label), "%s", label);
 
@@ -359,8 +353,6 @@ RBRGen4Error RBRGen4_getDevice(RBRGen4 *conn, RBRGen4Device *device)
 
                 value = nextValue;
             }
-        } else if (strcmp(parameter.key, "lock") == 0) {
-            device->lock = (strcmp(parameter.value, "on") == 0);
         } else if (strcmp(parameter.key, "poweruptime") == 0) {
             device->powerUpTime = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "cooldowntime") == 0) {

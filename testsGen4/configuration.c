@@ -302,10 +302,6 @@ TEST_LOGGER4(portSerial)
     return test_port(&expected, &actual);
 }
 
-#define DEVICE_KEYS                                                        \
-    " port class sn pn fwversion fwtype name channellist lock poweruptime" \
-    " cooldowntime powerdowntime inrushoffsettime"
-
 static bool test_device(RBRGen4Device *expected, RBRGen4Device *actual)
 {
     TEST_ASSERT_STR_EQ(expected->label, actual->label);
@@ -320,7 +316,6 @@ static bool test_device(RBRGen4Device *expected, RBRGen4Device *actual)
     for (int32_t channel = 0; channel < expected->channelCount; ++channel) {
         TEST_ASSERT_STR_EQ(expected->channelList[channel], actual->channelList[channel]);
     }
-    TEST_ASSERT_ENUM_EQ(expected->lock, actual->lock, bool);
     TEST_ASSERT_EQ(expected->powerUpTime, actual->powerUpTime, "%" PRIi32);
     TEST_ASSERT_EQ(expected->coolDownTime, actual->coolDownTime, "%" PRIi32);
     TEST_ASSERT_EQ(expected->powerDownTime, actual->powerDownTime, "%" PRIi32);
@@ -426,7 +421,6 @@ TEST_LOGGER4(device)
         .name = "thermistor",
         .channelCount = 1,
         .channelList = {"temperature_00"},
-        .lock = false,
         .powerUpTime = 12,
         .coolDownTime = 0,
         .powerDownTime = 0,
@@ -440,13 +434,13 @@ TEST_LOGGER4(device)
     TestIOBuffers_init(buffers,
                        "device thermistor_00 port=thermistor_00 class=sensor "
                        "sn=na pn=na fwversion=0.0.0 fwtype=na "
-                       "name=thermistor channellist=temperature_00 lock=off "
+                       "name=thermistor channellist=temperature_00 "
                        "poweruptime=12 cooldowntime=0 powerdowntime=0 "
                        "inrushoffsettime=10" RESPONSE_TERMINATOR,
                        0);
     RBRGen4Error err = RBRGen4_getDevice(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
-    TEST_ASSERT_STR_EQ("device thermistor_00" DEVICE_KEYS COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("device thermistor_00" COMMAND_TERMINATOR, buffers->writeBuffer);
 
     return test_device(&expected, &actual);
 }
@@ -471,7 +465,6 @@ TEST_LOGGER4(deviceIdentity)
         .name = "internal_adc",
         .channelCount = 1,
         .channelList = {"vmon_bat_input_00"},
-        .lock = true,
         .powerUpTime = 0,
         .coolDownTime = 0,
         .powerDownTime = 0,
@@ -486,13 +479,12 @@ TEST_LOGGER4(deviceIdentity)
                        "device internal_adc_00 port=internal_adc_00 "
                        "class=sensor sn=850032 pn=na fwversion=1.0.0 "
                        "fwtype=170 name=internal_adc "
-                       "channellist=vmon_bat_input_00 lock=on poweruptime=0 "
+                       "channellist=vmon_bat_input_00 poweruptime=0 "
                        "cooldowntime=0 powerdowntime=0 inrushoffsettime=0" RESPONSE_TERMINATOR,
                        0);
     RBRGen4Error err = RBRGen4_getDevice(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
-    TEST_ASSERT_STR_EQ("device internal_adc_00" DEVICE_KEYS COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("device internal_adc_00" COMMAND_TERMINATOR, buffers->writeBuffer);
 
     return test_device(&expected, &actual);
 }
@@ -516,7 +508,6 @@ TEST_LOGGER4(deviceWithUnlistedChannels)
         .name = "pres_sensor",
         .channelCount = 2,
         .channelList = {"pressure_00", "temperature_01"},
-        .lock = false,
         .powerUpTime = 0,
         .coolDownTime = 0,
         .powerDownTime = 0,
@@ -531,14 +522,13 @@ TEST_LOGGER4(deviceWithUnlistedChannels)
                        "device pres_sensor_00 port=pres_serial_00 "
                        "class=sensor sn=na pn=na fwversion=0.0.0 fwtype=na "
                        "name=pres_sensor "
-                       "channellist=pressure_00|temperature_01 lock=off "
+                       "channellist=pressure_00|temperature_01 "
                        "poweruptime=0 cooldowntime=0 powerdowntime=0 "
                        "inrushoffsettime=75" RESPONSE_TERMINATOR,
                        0);
     RBRGen4Error err = RBRGen4_getDevice(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
-    TEST_ASSERT_STR_EQ("device pres_sensor_00" DEVICE_KEYS COMMAND_TERMINATOR,
-                       buffers->writeBuffer);
+    TEST_ASSERT_STR_EQ("device pres_sensor_00" COMMAND_TERMINATOR, buffers->writeBuffer);
 
     return test_device(&expected, &actual);
 }
