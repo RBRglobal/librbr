@@ -712,6 +712,8 @@ const char *RBRGen4ScheduleStorage_name(RBRGen4ScheduleStorage storage)
         return "on";
     case RBRGEN4_SCHEDULE_STORAGE_COUNT:
         return "schedule storage count";
+    case RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE:
+        return "unavailable schedule storage";
     case RBRGEN4_UNKNOWN_SCHEDULE_STORAGE:
     default:
         return "unknown schedule storage";
@@ -733,6 +735,23 @@ static RBRGen4ScheduleStream RBRGen4ScheduleStream_parse(const char *value)
     }
 
     return RBRGEN4_UNKNOWN_SCHEDULE_STREAM;
+}
+
+/**
+ * \brief Find the storage state a response value names.
+ *
+ * \param [in] value the response value
+ * \return the state, or #RBRGEN4_UNKNOWN_SCHEDULE_STORAGE
+ */
+static RBRGen4ScheduleStorage RBRGen4ScheduleStorage_parse(const char *value)
+{
+    for (int i = 0; i < RBRGEN4_SCHEDULE_STORAGE_COUNT; i++) {
+        if (strcmp(RBRGen4ScheduleStorage_name(i), value) == 0) {
+            return i;
+        }
+    }
+
+    return RBRGEN4_UNKNOWN_SCHEDULE_STORAGE;
 }
 
 /**
@@ -760,15 +779,14 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
     }
 
     RBR_RESET_EXCEPT(schedule, label);
+    schedule->stream = RBRGEN4_UNKNOWN_SCHEDULE_STREAM;
+    schedule->storage = RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE;
+    schedule->mode = RBRGEN4_SCHEDULE_MODE_NONE;
     if (groupList != NULL) {
         groupList->len = 0;
     }
 
     RBR_TRY(RBRGen4_converse(conn, "schedule %s", schedule->label));
-
-    schedule->stream = RBRGEN4_UNKNOWN_SCHEDULE_STREAM;
-    schedule->storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE;
-    schedule->mode = RBRGEN4_SCHEDULE_MODE_NONE;
 
     RBRGen4Period period = 0;
     RBRGen4Period measurementPeriod = 0;
@@ -787,8 +805,7 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
         } else if (strcmp(parameter.key, "stream") == 0) {
             schedule->stream = RBRGen4ScheduleStream_parse(parameter.value);
         } else if (strcmp(parameter.key, "storage") == 0) {
-            schedule->storage = strcmp(parameter.value, "on") == 0 ? RBRGEN4_SCHEDULE_STORAGE_ON
-                                                                   : RBRGEN4_SCHEDULE_STORAGE_OFF;
+            schedule->storage = RBRGen4ScheduleStorage_parse(parameter.value);
         } else if (strcmp(parameter.key, "castdetection") == 0) {
             schedule->castDetection = strcmp(parameter.value, "on") == 0;
         } else if (strcmp(parameter.key, "mode") == 0) {
@@ -826,8 +843,8 @@ RBRGen4Error RBRGen4_setSchedule(RBRGen4 *conn, const RBRGen4Schedule *schedule,
 {
     /* A schedule runs in exactly one mode. */
     if (schedule->label[0] == '\0' || schedule->stream >= RBRGEN4_SCHEDULE_STREAM_COUNT ||
-        schedule->storage > RBRGEN4_UNKNOWN_SCHEDULE_STORAGE ||
-        schedule->storage == RBRGEN4_SCHEDULE_STORAGE_COUNT ||
+        (schedule->storage >= RBRGEN4_SCHEDULE_STORAGE_COUNT &&
+         schedule->storage != RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE) ||
         schedule->mode == RBRGEN4_SCHEDULE_MODE_NONE ||
         schedule->mode > RBRGEN4_SCHEDULE_MODE_MAX ||
         (schedule->mode & (schedule->mode - 1)) != 0) {
@@ -868,9 +885,9 @@ RBRGen4Error RBRGen4_setSchedule(RBRGen4 *conn, const RBRGen4Schedule *schedule,
         strcat(groups, " ");
     }
 
-    /* Sending a `storage` the getter never read would be an error. */
+    /* An unavailable `storage` is left out. */
     const char *storage = "";
-    if (schedule->storage != RBRGEN4_UNKNOWN_SCHEDULE_STORAGE) {
+    if (schedule->storage != RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE) {
         storage = schedule->storage == RBRGEN4_SCHEDULE_STORAGE_ON ? "storage=on " : "storage=off ";
     }
 

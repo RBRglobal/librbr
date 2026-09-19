@@ -765,7 +765,9 @@ typedef enum RBRGen4ScheduleStorage {
     RBRGEN4_SCHEDULE_STORAGE_ON,
     /** The number of specific storage states. */
     RBRGEN4_SCHEDULE_STORAGE_COUNT,
-    /** The parameter was not reported. */
+    /** The parameter is not available on this instrument. */
+    RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
+    /** The parameter was reported with a value the library does not know. */
     RBRGEN4_UNKNOWN_SCHEDULE_STORAGE
 } RBRGen4ScheduleStorage;
 
@@ -856,14 +858,7 @@ typedef struct RBRGen4Schedule {
     /** \brief Where the schedule's data is streamed in real time. */
     RBRGen4ScheduleStream stream;
 
-    /**
-     * \brief Whether the schedule's data is stored in memory.
-     *
-     * Some instrument configurations do not support data storage, in which case
-     * this field should be left as #RBRGEN4_UNKNOWN_SCHEDULE_STORAGE.
-     *
-     * \see RBRGen4ScheduleStorage
-     */
+    /** \brief Whether the schedule's data is stored in memory. */
     RBRGen4ScheduleStorage storage;
 
     /** \brief `castdetection`, which applies in every mode. */
@@ -903,8 +898,9 @@ typedef struct RBRGen4Schedule {
  * The labels of the groups the schedule samples are written to \a groupList
  * when it is given.
  *
- * \p schedule.storage is set to #RBRGEN4_UNKNOWN_SCHEDULE_STORAGE for
- * instruments that do not report the `storage` parameter
+ * `storage` is set to #RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE where the
+ * instrument does not report it, and a parameter reported with a value the
+ * library does not know is set to its `UNKNOWN` state.
  *
  * \note Issues the `schedule <schedule_label>` command.
  *
@@ -930,9 +926,10 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
 /**
  * \brief Set the parameters of a schedule.
  *
- * `storage` is only available on some instrument configurations. An empty
- * \a groupList sends `none`; a `NULL` \a groupList leaves the instrument's
- * group list unchanged.
+ * A `storage` of #RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE is left out of the
+ * command, so a schedule read back from an instrument can be written to it
+ * unchanged. An empty \a groupList sends `none`; a `NULL` \a groupList
+ * leaves the instrument's group list unchanged.
  *
  * \note Issues the `schedule <schedule_label>` command.
  *
@@ -944,13 +941,15 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the schedule cannot be written, or when
- *                                      `storage` is set where it is
- *                                      unavailable, or another hardware error
- *                                      occurs
+ *                                      a parameter is set where the instrument
+ *                                      does not offer it, or another hardware
+ *                                      error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
  *                                          the list's length does
  *                                          not fit its array, a
  *                                          group label is empty,
+ *                                          the stream destination or
+ *                                          storage state is unknown,
  *                                          or the mode is not a
  *                                          single known flag
  * \return #RBRGEN4_UNSUPPORTED when the mode is `ddsampling` or

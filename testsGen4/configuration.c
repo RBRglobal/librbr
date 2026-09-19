@@ -1392,7 +1392,8 @@ TEST_LOGGER4(schedule)
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("schedule s" COMMAND_TERMINATOR, buffers->writeBuffer);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SCHEDULE_STREAM_OFF, actual.stream, RBRGen4ScheduleStream);
-    TEST_ASSERT_ENUM_EQ(RBRGEN4_UNKNOWN_SCHEDULE_STORAGE, actual.storage, RBRGen4ScheduleStorage);
+    TEST_ASSERT_ENUM_EQ(
+        RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE, actual.storage, RBRGen4ScheduleStorage);
     TEST_ASSERT_EQ(false, actual.castDetection, "%d");
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SCHEDULE_MODE_CONTINUOUS, actual.mode, RBRGen4ScheduleMode);
     TEST_ASSERT_EQ(1000, actual.parameters.continuous.period, "%" PRIi32);
@@ -1484,6 +1485,44 @@ TEST_LOGGER4(scheduleWithStorage)
     return true;
 }
 
+TEST_LOGGER4(scheduleWithUnknownStream)
+{
+    RBRGen4Schedule actual = {
+        .label = "s",
+    };
+
+    TestIOBuffers_init(buffers,
+                       "schedule s grouplist=none configlist=none stream=wifi "
+                       "storage=on castdetection=off mode=continuous "
+                       "period=1000" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRGen4Error err = RBRGen4_getSchedule(conn, &actual, NULL);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_UNKNOWN_SCHEDULE_STREAM, actual.stream, RBRGen4ScheduleStream);
+
+    return true;
+}
+
+TEST_LOGGER4(scheduleWithUnknownStorage)
+{
+    RBRGen4Schedule actual = {
+        .label = "s",
+    };
+
+    TestIOBuffers_init(buffers,
+                       "schedule s grouplist=none configlist=none stream=off "
+                       "storage=maybe castdetection=off mode=continuous "
+                       "period=1000" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRGen4Error err = RBRGen4_getSchedule(conn, &actual, NULL);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_UNKNOWN_SCHEDULE_STORAGE, actual.storage, RBRGen4ScheduleStorage);
+
+    return true;
+}
+
 TEST_LOGGER4(scheduleBursting)
 {
     RBRGen4Schedule actual = {
@@ -1532,6 +1571,24 @@ TEST_LOGGER4(scheduleDeferredMode)
     return true;
 }
 
+TEST_LOGGER4(scheduleFailed)
+{
+    RBRGen4Schedule actual = {
+        .label = "s",
+    };
+
+    TestIOBuffers_init(buffers, "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getSchedule(conn, &actual, NULL);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_HARDWARE_ERROR, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_UNKNOWN_SCHEDULE_STREAM, actual.stream, RBRGen4ScheduleStream);
+    TEST_ASSERT_ENUM_EQ(
+        RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE, actual.storage, RBRGen4ScheduleStorage);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SCHEDULE_MODE_NONE, actual.mode, RBRGen4ScheduleMode);
+
+    return true;
+}
+
 TEST_LOGGER4(scheduleEmptyLabel)
 {
     /* An empty label is refused before the command. */
@@ -1553,7 +1610,7 @@ TEST_LOGGER4(scheduleSet)
     RBRGen4Schedule schedule = {
         .label = "s_cap",
         .stream = RBRGEN4_SCHEDULE_STREAM_OFF,
-        .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
+        .storage = RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
         .castDetection = true,
         .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS,
         .parameters =
@@ -1591,7 +1648,7 @@ TEST_LOGGER4(scheduleSetWithoutGroupList)
     RBRGen4Schedule schedule = {
         .label = "s_cap",
         .stream = RBRGEN4_SCHEDULE_STREAM_OFF,
-        .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
+        .storage = RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
         .castDetection = true,
         .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS,
         .parameters =
@@ -1659,12 +1716,113 @@ TEST_LOGGER4(scheduleSetWithStorage)
     return true;
 }
 
+TEST_LOGGER4(scheduleSetBurstingWithoutStorage)
+{
+    RBRGen4Schedule schedule = {
+        .label = "s_cap",
+        .stream = RBRGEN4_SCHEDULE_STREAM_OFF,
+        .storage = RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
+        .castDetection = false,
+        .mode = RBRGEN4_SCHEDULE_MODE_AVERAGE,
+        .parameters =
+            {
+                .bursting =
+                    {
+                        .period = 10000,
+                        .measurementCount = 8,
+                        .measurementPeriod = 1000,
+                    },
+            },
+    };
+
+    TestIOBuffers_init(buffers,
+                       "schedule s_cap stream=off castdetection=off mode=average period=10000 "
+                       "measurementcount=8 measurementperiod=1000" RESPONSE_TERMINATOR,
+                       0);
+
+    RBRGen4Error err = RBRGen4_setSchedule(conn, &schedule, NULL);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("schedule s_cap stream=off castdetection=off mode=average period=10000 "
+                       "measurementcount=8 measurementperiod=1000" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER4(scheduleSetStreamCount)
+{
+    RBRGen4Schedule schedule = {
+        .label = "s_cap",
+        .stream = RBRGEN4_SCHEDULE_STREAM_COUNT,
+        .storage = RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
+        .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS,
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRGen4Error err = RBRGen4_setSchedule(conn, &schedule, NULL);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+
+    return true;
+}
+
+TEST_LOGGER4(scheduleSetStorageCount)
+{
+    RBRGen4Schedule schedule = {
+        .label = "s_cap",
+        .stream = RBRGEN4_SCHEDULE_STREAM_OFF,
+        .storage = RBRGEN4_SCHEDULE_STORAGE_COUNT,
+        .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS,
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRGen4Error err = RBRGen4_setSchedule(conn, &schedule, NULL);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+
+    return true;
+}
+
+TEST_LOGGER4(scheduleSetUnknownStream)
+{
+    RBRGen4Schedule schedule = {
+        .label = "s_cap",
+        .stream = RBRGEN4_UNKNOWN_SCHEDULE_STREAM,
+        .storage = RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
+        .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS,
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRGen4Error err = RBRGen4_setSchedule(conn, &schedule, NULL);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+
+    return true;
+}
+
+TEST_LOGGER4(scheduleSetUnknownStorage)
+{
+    RBRGen4Schedule schedule = {
+        .label = "s_cap",
+        .stream = RBRGEN4_SCHEDULE_STREAM_OFF,
+        .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
+        .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS,
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+
+    RBRGen4Error err = RBRGen4_setSchedule(conn, &schedule, NULL);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+
+    return true;
+}
+
 TEST_LOGGER4(scheduleSetMultipleModes)
 {
     /* A multi-flag value compiles but cannot be sent. */
     RBRGen4Schedule schedule = {
         .label = "s_cap",
-        .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
+        .storage = RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
         .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS | RBRGEN4_SCHEDULE_MODE_AVERAGE,
     };
 
@@ -1687,7 +1845,7 @@ TEST_LOGGER4(scheduleSetNoMode)
 {
     RBRGen4Schedule schedule = {
         .label = "s_cap",
-        .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
+        .storage = RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
         .mode = RBRGEN4_SCHEDULE_MODE_NONE,
     };
 
@@ -1710,7 +1868,7 @@ TEST_LOGGER4(scheduleSetDeferredMode)
 {
     RBRGen4Schedule schedule = {
         .label = "s_cap",
-        .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
+        .storage = RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
         .mode = RBRGEN4_SCHEDULE_MODE_REGIMES,
     };
 
@@ -1733,7 +1891,7 @@ TEST_LOGGER4(scheduleSetEmptyGroupLabel)
 {
     RBRGen4Schedule schedule = {
         .label = "s_cap",
-        .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
+        .storage = RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
         .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS,
     };
 
@@ -1826,7 +1984,7 @@ TEST_LOGGER4(scheduleSetEveryBurstingMode)
 {
     RBRGen4Schedule schedule = {
         .label = "s_cap",
-        .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
+        .storage = RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
         .parameters =
             {
                 .bursting =
@@ -1886,7 +2044,7 @@ TEST_LOGGER4(scheduleSetLongParameters)
 {
     RBRGen4Schedule schedule = {
         .label = "s",
-        .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
+        .storage = RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
         .mode = RBRGEN4_SCHEDULE_MODE_AVERAGE,
         .parameters =
             {
@@ -1927,7 +2085,7 @@ TEST_LOGGER4(scheduleSetCommandTooLong)
     /* A command which cannot fit has to be reported, not truncated. */
     RBRGen4Schedule schedule = {
         .label = "s",
-        .storage = RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
+        .storage = RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
         .mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS,
         .parameters =
             {
