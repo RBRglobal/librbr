@@ -357,7 +357,7 @@ int main(int argc, char *argv[])
         logCmdError(&conn, err, "Failed to get deployment");
         goto instrumentCleanup;
     }
-    deployment.gate = RBRGEN4_GATE_NONE;
+    deployment.gate = RBRGEN4_DEPLOYMENT_GATE_NONE;
     err = RBRGen4_setDeployment(&conn, &deployment);
     if (err) {
         logCmdError(&conn, err, "Failed to set deployment");
