@@ -163,7 +163,8 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    printf("generation: %s, id: model=%s version=%s serial=%u fwtype=%u,"
+    printf("generation: %s, id: model=%s version=%s serial=%u fwtype=%u"
+           " apiversion=%s,"
            " outputformat: sn=%s schedulelabel=%s datetime=%s crc=%s"
            " encoding=%s datatype=%s\n",
            RBRGen4Generation_name(conn->generation),
@@ -171,6 +172,7 @@ int main(int argc, char *argv[])
            conn->id.fwversion,
            conn->id.sn,
            conn->id.fwtype,
+           conn->id.apiversion,
            conn->outputFormat.sn ? "on" : "off",
            conn->outputFormat.scheduleLabel ? "on" : "off",
            conn->outputFormat.dateTime ? "on" : "off",

@@ -96,12 +96,31 @@ TEST_LOGGER4(id4)
             "sn=999999 "
             "fwversion=2.0.0 "
             "semver=2.0.0-rc1-10-g148bc5eb1 "
+            "fwtype=150 "
+            "apiversion=2.1" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            {
+                .model = "L4",
+                .fwversion = "2.0.0",
+                .semver = "2.0.0-rc1-10-g148bc5eb1",
+                .apiversion = "2.1",
+                .sn = 999999,
+                .fwtype = 150,
+            },
+        },
+        /* A response without the parameter leaves it empty. */
+        {
+            "id4 model=L4 "
+            "sn=999999 "
+            "fwversion=2.0.0 "
+            "semver=2.0.0-rc1-10-g148bc5eb1 "
             "fwtype=150" RESPONSE_TERMINATOR,
             RBRGEN4_SUCCESS,
             {
                 .model = "L4",
                 .fwversion = "2.0.0",
                 .semver = "2.0.0-rc1-10-g148bc5eb1",
+                .apiversion = "",
                 .sn = 999999,
                 .fwtype = 150,
             },
@@ -114,6 +133,7 @@ TEST_LOGGER4(id4)
                 .model = "",
                 .fwversion = "",
                 .semver = "",
+                .apiversion = "",
                 .sn = 0,
                 .fwtype = 0,
             },
@@ -132,6 +152,7 @@ TEST_LOGGER4(id4)
         TEST_ASSERT_STR_EQ(tests[i].expected.model, actual.model);
         TEST_ASSERT_STR_EQ(tests[i].expected.fwversion, actual.fwversion);
         TEST_ASSERT_STR_EQ(tests[i].expected.semver, actual.semver);
+        TEST_ASSERT_STR_EQ(tests[i].expected.apiversion, actual.apiversion);
         TEST_ASSERT_EQ(tests[i].expected.sn, actual.sn, "%" PRIi32);
         TEST_ASSERT_EQ(tests[i].expected.fwtype, actual.fwtype, "%" PRIi32);
     }
@@ -363,7 +384,7 @@ TEST_LOGGER4(conn)
         {
             "instrument state=disabled sn=999999 model=L4 pn=9999999revA "
             "fwversion=2.0.0 semver=2.0.0-rc1-10-g148bc5eb1 fwtype=150 "
-            "fwlock=off datatype=float64 name=L4" RESPONSE_TERMINATOR,
+            "fwlock=off datatype=float64 name=L4 apiversion=2.1" RESPONSE_TERMINATOR,
             RBRGEN4_SUCCESS,
             {
                 .state = RBRGEN4_INSTRUMENT_STATE_DISABLED,
@@ -376,6 +397,7 @@ TEST_LOGGER4(conn)
                 .fwLock = false,
                 .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
                 .name = "L4",
+                .apiversion = "2.1",
             },
         },
         /* An enabled instrument with the firmware locked, and the extended
@@ -458,6 +480,7 @@ TEST_LOGGER4(conn)
         TEST_ASSERT_ENUM_EQ(tests[i].expected.fwLock, actual.fwLock, bool);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.dataType, actual.dataType, RBRGen4DataType);
         TEST_ASSERT_STR_EQ(tests[i].expected.name, actual.name);
+        TEST_ASSERT_STR_EQ(tests[i].expected.apiversion, actual.apiversion);
     }
     return true;
 }

@@ -147,6 +147,8 @@ RBRGen4Error RBRGen4_getId4(RBRGen4 *conn, RBRGen4Id4 *id)
             snprintf(id->fwversion, sizeof(id->fwversion), "%s", parameter.value);
         } else if (strcmp(parameter.key, "semver") == 0) {
             snprintf(id->semver, sizeof(id->semver), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "apiversion") == 0) {
+            snprintf(id->apiversion, sizeof(id->apiversion), "%s", parameter.value);
         } else if (strcmp(parameter.key, "sn") == 0) {
             id->sn = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "fwtype") == 0) {
@@ -467,6 +469,11 @@ RBRGen4Error RBRGen4_getInstrument(RBRGen4 *conn, RBRGen4Instrument *instrumentI
             instrumentInfo->dataType = RBRGen4DataType_parse(parameter.value);
         } else if (strcmp(parameter.key, "name") == 0) {
             snprintf(instrumentInfo->name, sizeof(instrumentInfo->name), "%s", parameter.value);
+        } else if (strcmp(parameter.key, "apiversion") == 0) {
+            snprintf(instrumentInfo->apiversion,
+                     sizeof(instrumentInfo->apiversion),
+                     "%s",
+                     parameter.value);
         }
     }
 

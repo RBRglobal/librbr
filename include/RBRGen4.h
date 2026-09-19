@@ -143,6 +143,13 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
 #define RBRGEN4_ID_SEMVER_MAX 35
 
 /**
+ * \brief The maximum number of characters in a Gen4 command API version.
+ *
+ * Does not include any null terminator.
+ */
+#define RBRGEN4_ID_APIVERSION_MAX 8
+
+/**
  * \brief The maximum number of characters in a label.
  *
  * Does not include any null terminator.
@@ -452,6 +459,14 @@ typedef struct RBRGen4Id4 {
      * \readonly
      */
     char semver[RBRGEN4_ID_SEMVER_MAX + 1];
+    /**
+     * \brief The version of the Gen4 command API implemented by the firmware.
+     *
+     * For example, `2.1`. Empty when the parameter is not reported.
+     *
+     * \readonly
+     */
+    char apiversion[RBRGEN4_ID_APIVERSION_MAX + 1];
     /** The serial number of the instrument. */
     int32_t sn;
     /** The firmware type of the instrument. */
