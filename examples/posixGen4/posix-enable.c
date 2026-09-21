@@ -176,13 +176,14 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    /* Clear any existing configuration state */
+    /* Clear any existing configuration state. An instrument which does not
+     * store data has no datasets to delete. */
     err = RBRGen4_deleteDatasetAll(&conn);
-    if (err) {
-        logCmdError(&conn,
-                    err,
-                    "Failed to delete all datasets -- does this instrument"
-                    " support storing data?");
+    if (err == RBRGEN4_HARDWARE_ERROR &&
+        RBRGen4_getLastHardwareError(&conn) == RBRGEN4_HARDWARE_ERROR_FEATURE_NOT_AVAILABLE) {
+        err = RBRGEN4_SUCCESS;
+    } else if (err) {
+        logCmdError(&conn, err, "Failed to delete all datasets");
         goto instrumentCleanup;
     }
     err = RBRGen4_deleteConfigAll(&conn);
@@ -283,6 +284,10 @@ int main(int argc, char *argv[])
     /* Set desired instrument schedule parameters */
     schedule.mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS;
     schedule.parameters.continuous.period = SCHEDULE_PT_PERIOD;
+    /* Store the schedule's data where the instrument offers to */
+    if (schedule.storage != RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE) {
+        schedule.storage = RBRGEN4_SCHEDULE_STORAGE_ON;
+    }
     const RBRGen4LabelList scheduleGroupList = {
         .size = SCHEDULE_PT_GROUP_COUNT,
         .len = SCHEDULE_PT_GROUP_COUNT,
@@ -344,9 +349,11 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    /* Verify instrument configuration for enablement */
-    err = RBRGen4_verify(
-        &conn, &config, NEW_DATASET_LABEL, RBRGEN4_STORAGE_MODE_NORMAL, &loggingState);
+    /* Verify instrument configuration for enablement. An instrument which
+     * does not store data takes no dataset label. */
+    const char *datasetLabel =
+        schedule.storage == RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE ? NULL : NEW_DATASET_LABEL;
+    err = RBRGen4_verify(&conn, &config, datasetLabel, RBRGEN4_STORAGE_MODE_NORMAL, &loggingState);
     if (err) {
         logCmdError(&conn, err, "Failed to verify instrument configuration");
         goto instrumentCleanup;
@@ -354,8 +361,7 @@ int main(int argc, char *argv[])
     printf("%s: Instrument configuration verified\n", programName);
 
     /* Enable the instrument */
-    err = RBRGen4_enable(
-        &conn, &config, NEW_DATASET_LABEL, RBRGEN4_STORAGE_MODE_NORMAL, &loggingState);
+    err = RBRGen4_enable(&conn, &config, datasetLabel, RBRGEN4_STORAGE_MODE_NORMAL, &loggingState);
     if (err) {
         logCmdError(&conn, err, "Failed to enable instrument");
         goto instrumentCleanup;

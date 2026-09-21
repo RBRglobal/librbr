@@ -169,6 +169,10 @@ RBRGen4Error createContinuousSchedule(RBRGen4 *conn, const char *label, const ch
     /* Set desired instrument schedule parameters */
     schedule.mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS;
     schedule.parameters.continuous.period = period;
+    /* Store the schedule's data where the instrument offers to */
+    if (schedule.storage != RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE) {
+        schedule.storage = RBRGEN4_SCHEDULE_STORAGE_ON;
+    }
     RBRGen4Label groups[1];
     snprintf(groups[0], sizeof(groups[0]), "%s", groupLabel);
     const RBRGen4LabelList groupList = {
@@ -262,13 +266,17 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    /* Clear any existing configuration state */
+    /* Clear any existing configuration state. An instrument which does not
+     * store data refuses every dataset command, which also tells us not to
+     * name a dataset when enabling. */
+    bool storesData = true;
     err = RBRGen4_deleteDatasetAll(&conn);
-    if (err) {
-        logCmdError(&conn,
-                    err,
-                    "Failed to delete all datasets -- does this instrument"
-                    " support storing data?");
+    if (err == RBRGEN4_HARDWARE_ERROR &&
+        RBRGen4_getLastHardwareError(&conn) == RBRGEN4_HARDWARE_ERROR_FEATURE_NOT_AVAILABLE) {
+        storesData = false;
+        err = RBRGEN4_SUCCESS;
+    } else if (err) {
+        logCmdError(&conn, err, "Failed to delete all datasets");
         goto instrumentCleanup;
     }
     err = RBRGen4_deleteConfigAll(&conn);
@@ -351,14 +359,16 @@ int main(int argc, char *argv[])
     const RBRGen4Config configPark = {
         .label = CONFIG_PARK_LABEL,
     };
+    /* An instrument which does not store data takes no dataset label. */
+    const char *datasetLabel = storesData ? NEW_DATASET_LABEL : NULL;
     err = RBRGen4_verify(
-        &conn, &configAscent, NEW_DATASET_LABEL, RBRGEN4_STORAGE_MODE_NORMAL, &loggingState);
+        &conn, &configAscent, datasetLabel, RBRGEN4_STORAGE_MODE_NORMAL, &loggingState);
     if (err) {
         logCmdError(&conn, err, "Failed to verify ascent configuration");
         goto instrumentCleanup;
     }
     err = RBRGen4_verify(
-        &conn, &configPark, NEW_DATASET_LABEL, RBRGEN4_STORAGE_MODE_NORMAL, &loggingState);
+        &conn, &configPark, datasetLabel, RBRGEN4_STORAGE_MODE_NORMAL, &loggingState);
     if (err) {
         logCmdError(&conn, err, "Failed to verify park configuration");
         goto instrumentCleanup;
@@ -367,7 +377,7 @@ int main(int argc, char *argv[])
 
     /* Enable the instrument with the ascent configuration */
     err = RBRGen4_enable(
-        &conn, &configAscent, NEW_DATASET_LABEL, RBRGEN4_STORAGE_MODE_NORMAL, &loggingState);
+        &conn, &configAscent, datasetLabel, RBRGEN4_STORAGE_MODE_NORMAL, &loggingState);
     if (err) {
         logCmdError(&conn, err, "Failed to enable instrument");
         goto instrumentCleanup;
