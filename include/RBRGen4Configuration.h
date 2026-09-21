@@ -219,34 +219,6 @@ typedef struct RBRGen4Channel {
      * \readonly
      */
     bool derived;
-
-    /**
-     * \brief The label of the node the channel is reached through.
-     *
-     * `self` for a channel of the instrument itself, and empty for a derived
-     * channel, which the instrument reports as `na`.
-     *
-     * \readonly
-     */
-    char node[RBRGEN4_LABEL_NAME_MAX + 1];
-
-    /**
-     * \brief The label of the port the channel is reached through.
-     *
-     * Empty for a derived channel, which the instrument reports as `na`.
-     *
-     * \readonly
-     */
-    char port[RBRGEN4_LABEL_NAME_MAX + 1];
-
-    /**
-     * \brief The label of the device the channel belongs to.
-     *
-     * Empty for a derived channel, which the instrument reports as `na`.
-     *
-     * \readonly
-     */
-    char device[RBRGEN4_LABEL_NAME_MAX + 1];
 } RBRGen4Channel;
 
 /**

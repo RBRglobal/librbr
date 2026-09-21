@@ -188,30 +188,13 @@ RBRGen4Error RBRGen4_getDataset(RBRGen4 *conn, RBRGen4Dataset *dataset,
     return err;
 }
 
-const char *RBRGen4Block_name(RBRGen4Block block)
-{
-    switch (block) {
-    case RBRGEN4_BLOCK_DATA:
-        return "data";
-    case RBRGEN4_BLOCK_EVENTS:
-        return "events";
-    case RBRGEN4_BLOCK_META:
-        return "meta";
-    case RBRGEN4_BLOCK_COUNT:
-        return "block count";
-    case RBRGEN4_BLOCK_UNKNOWN:
-    default:
-        return "unknown block";
-    }
-}
-
 /**
  * \brief Parse the counts out of a `dataset` block query response.
  *
  * A count the caller does not expect for the block type is passed as NULL
  * and left unparsed.
  */
-static void RBRGen4Dataset_parseBlockResponse(RBRGen4 *conn, int64_t *byteCount,
+static void RBRGen4_parseDatasetBlockResponse(RBRGen4 *conn, int64_t *byteCount,
                                               int64_t *sampleCount, int64_t *eventCount)
 {
     char *command = NULL;
@@ -231,7 +214,7 @@ static void RBRGen4Dataset_parseBlockResponse(RBRGen4 *conn, int64_t *byteCount,
     }
 }
 
-RBRGen4Error RBRGen4Dataset_getEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_getDatasetEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                            RBRGen4DatasetEventsBlock *block)
 {
     if (dataset->label[0] == '\0') {
@@ -242,12 +225,12 @@ RBRGen4Error RBRGen4Dataset_getEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *
 
     RBR_TRY(RBRGen4_converse(conn, "dataset %s/events", dataset->label));
 
-    RBRGen4Dataset_parseBlockResponse(conn, &block->byteCount, NULL, &block->eventCount);
+    RBRGen4_parseDatasetBlockResponse(conn, &block->byteCount, NULL, &block->eventCount);
 
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4Dataset_getMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_getDatasetMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                          RBRGen4DatasetMetaBlock *block)
 {
     if (dataset->label[0] == '\0') {
@@ -258,12 +241,12 @@ RBRGen4Error RBRGen4Dataset_getMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *da
 
     RBR_TRY(RBRGen4_converse(conn, "dataset %s/meta", dataset->label));
 
-    RBRGen4Dataset_parseBlockResponse(conn, &block->byteCount, NULL, NULL);
+    RBRGen4_parseDatasetBlockResponse(conn, &block->byteCount, NULL, NULL);
 
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4Dataset_getScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_getDatasetScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                              const char *scheduleLabel,
                                              RBRGen4DatasetScheduleBlock *block)
 {
@@ -275,12 +258,12 @@ RBRGen4Error RBRGen4Dataset_getScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset
 
     RBR_TRY(RBRGen4_converse(conn, "dataset %s/%s", dataset->label, scheduleLabel));
 
-    RBRGen4Dataset_parseBlockResponse(conn, &block->byteCount, NULL, NULL);
+    RBRGen4_parseDatasetBlockResponse(conn, &block->byteCount, NULL, NULL);
 
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_getDatasetScheduleEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                                    const char *scheduleLabel,
                                                    RBRGen4DatasetEventsBlock *block)
 {
@@ -292,12 +275,12 @@ RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(RBRGen4 *conn, const RBRGen4D
 
     RBR_TRY(RBRGen4_converse(conn, "dataset %s/%s/events", dataset->label, scheduleLabel));
 
-    RBRGen4Dataset_parseBlockResponse(conn, &block->byteCount, NULL, &block->eventCount);
+    RBRGen4_parseDatasetBlockResponse(conn, &block->byteCount, NULL, &block->eventCount);
 
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4Dataset_getScheduleDataBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_getDatasetScheduleDataBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                                  const char *scheduleLabel,
                                                  RBRGen4DatasetDataBlock *block)
 {
@@ -309,7 +292,7 @@ RBRGen4Error RBRGen4Dataset_getScheduleDataBlock(RBRGen4 *conn, const RBRGen4Dat
 
     RBR_TRY(RBRGen4_converse(conn, "dataset %s/%s/data", dataset->label, scheduleLabel));
 
-    RBRGen4Dataset_parseBlockResponse(conn, &block->byteCount, &block->sampleCount, NULL);
+    RBRGen4_parseDatasetBlockResponse(conn, &block->byteCount, &block->sampleCount, NULL);
 
     return RBRGEN4_SUCCESS;
 }
@@ -413,7 +396,7 @@ static RBRGen4Error RBRGen4_fixedRead(struct RBRGen4 *conn, void *data, int64_t 
  * \param [out] data the buffer receiving the transfer
  * \param [in] dataSize the capacity of \a data in bytes
  */
-static RBRGen4Error RBRGen4Dataset_downloadCommon(RBRGen4 *conn, const char *countKey,
+static RBRGen4Error RBRGen4_downloadDatasetCommon(RBRGen4 *conn, const char *countKey,
                                                   int64_t *count, int64_t *byteCount, void *data,
                                                   int64_t dataSize)
 {
@@ -465,7 +448,7 @@ static RBRGen4Error RBRGen4Dataset_downloadCommon(RBRGen4 *conn, const char *cou
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4Dataset_downloadScheduleData(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_downloadDatasetScheduleData(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                                  const char *scheduleLabel,
                                                  RBRGen4DownloadData *download)
 {
@@ -491,7 +474,7 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleData(RBRGen4 *conn, const RBRGen4Dat
                              bytes ? "bytestart" : "samplestart",
                              download->start));
 
-    RBR_TRY(RBRGen4Dataset_downloadCommon(conn,
+    RBR_TRY(RBRGen4_downloadDatasetCommon(conn,
                                           countKey,
                                           &download->count,
                                           &download->byteCount,
@@ -510,7 +493,7 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleData(RBRGen4 *conn, const RBRGen4Dat
  * \param [in] scheduleLabel the schedule, or NULL for the whole dataset
  * \param [in,out] download the download request and its result
  */
-static RBRGen4Error RBRGen4Dataset_downloadEventsCommon(RBRGen4 *conn,
+static RBRGen4Error RBRGen4_downloadDatasetEventsCommon(RBRGen4 *conn,
                                                         const RBRGen4Dataset *dataset,
                                                         const char *scheduleLabel,
                                                         RBRGen4DownloadEvents *download)
@@ -548,7 +531,7 @@ static RBRGen4Error RBRGen4Dataset_downloadEventsCommon(RBRGen4 *conn,
                                  download->start));
     }
 
-    RBR_TRY(RBRGen4Dataset_downloadCommon(conn,
+    RBR_TRY(RBRGen4_downloadDatasetCommon(conn,
                                           countKey,
                                           &download->count,
                                           &download->byteCount,
@@ -558,13 +541,13 @@ static RBRGen4Error RBRGen4Dataset_downloadEventsCommon(RBRGen4 *conn,
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4Dataset_downloadEvents(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_downloadDatasetEvents(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                            RBRGen4DownloadEvents *download)
 {
-    return RBRGen4Dataset_downloadEventsCommon(conn, dataset, NULL, download);
+    return RBRGen4_downloadDatasetEventsCommon(conn, dataset, NULL, download);
 }
 
-RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_downloadDatasetScheduleEvents(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                                    const char *scheduleLabel,
                                                    RBRGen4DownloadEvents *download)
 {
@@ -572,27 +555,32 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(RBRGen4 *conn, const RBRGen4D
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    return RBRGen4Dataset_downloadEventsCommon(conn, dataset, scheduleLabel, download);
+    return RBRGen4_downloadDatasetEventsCommon(conn, dataset, scheduleLabel, download);
 }
 
-RBRGen4Error RBRGen4Dataset_downloadMeta(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_downloadDatasetMeta(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                          RBRGen4DownloadMeta *download)
 {
-    if (dataset->label[0] == '\0' || download->byteCount < 0 || download->byteStart < 0 ||
+    if (dataset->label[0] == '\0' || download->count < 0 || download->start < 0 ||
         download->data == NULL) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
+
+    download->byteCount = 0;
 
     RBR_TRY(RBRGen4_converse(conn,
                              "download %s/meta"
                              " bytecount=%" PRId64 " bytestart=%" PRId64,
                              dataset->label,
-                             download->byteCount,
-                             download->byteStart));
+                             download->count,
+                             download->start));
 
-    int64_t byteCount = 0;
-    RBR_TRY(RBRGen4Dataset_downloadCommon(
-        conn, "bytecount", &download->byteCount, &byteCount, download->data, download->dataSize));
+    RBR_TRY(RBRGen4_downloadDatasetCommon(conn,
+                                          "bytecount",
+                                          &download->count,
+                                          &download->byteCount,
+                                          download->data,
+                                          download->dataSize));
 
     return RBRGEN4_SUCCESS;
 }

@@ -102,20 +102,20 @@ const char *RBRGen4DeploymentStatus_name(RBRGen4DeploymentStatus status);
  *
  * \see RBRGen4Deployment
  */
-typedef enum RBRGen4Gate {
+typedef enum RBRGen4DeploymentGate {
     /** No gating condition. */
-    RBRGEN4_GATE_NONE,
+    RBRGEN4_DEPLOYMENT_GATE_NONE,
     /** Gated on the deployment start time. */
-    RBRGEN4_GATE_TIME,
+    RBRGEN4_DEPLOYMENT_GATE_TIME,
     /** Gated on the end cap position. */
-    RBRGEN4_GATE_TWISTACTIVATION,
+    RBRGEN4_DEPLOYMENT_GATE_TWISTACTIVATION,
     /** Gated on the instrument being in the water. */
-    RBRGEN4_GATE_WETSWITCH,
+    RBRGEN4_DEPLOYMENT_GATE_WETSWITCH,
     /** The number of specific gating conditions. */
-    RBRGEN4_GATE_COUNT,
+    RBRGEN4_DEPLOYMENT_GATE_COUNT,
     /** An unknown or unrecognized gating condition. */
-    RBRGEN4_UNKNOWN_GATE
-} RBRGen4Gate;
+    RBRGEN4_UNKNOWN_DEPLOYMENT_GATE
+} RBRGen4DeploymentGate;
 
 /**
  * \brief Get a human-readable string name for a gating condition.
@@ -124,7 +124,7 @@ typedef enum RBRGen4Gate {
  * \return a string name for the gating condition
  * \see RBRGen4Error_name() for a description of the format of names
  */
-const char *RBRGen4Gate_name(RBRGen4Gate gate);
+const char *RBRGen4DeploymentGate_name(RBRGen4DeploymentGate gate);
 
 /**
  * \brief Instrument `deployment` command parameters.
@@ -137,7 +137,7 @@ typedef struct RBRGen4Deployment {
      * \brief The start date and time of the next deployment.
      *
      * Only available while RBRGen4Deployment.gate is
-     * #RBRGEN4_GATE_TIME.
+     * #RBRGEN4_DEPLOYMENT_GATE_TIME.
      */
     RBRGen4DateTime startTime;
 
@@ -149,7 +149,7 @@ typedef struct RBRGen4Deployment {
     RBRGen4DeploymentStatus status;
 
     /** \brief The gating condition of the next deployment. */
-    RBRGen4Gate gate;
+    RBRGen4DeploymentGate gate;
 
     /**
      * \brief Whether any of the instrument's channels are being simulated.
@@ -177,7 +177,7 @@ RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment)
  * \note Issues the `deployment` command.
  *
  * RBRGen4Deployment.startTime is sent only when
- * RBRGen4Deployment.gate is #RBRGEN4_GATE_TIME.
+ * RBRGen4Deployment.gate is #RBRGEN4_DEPLOYMENT_GATE_TIME.
  * RBRGen4Deployment.status and
  * RBRGen4Deployment.simulation are never sent.
  *

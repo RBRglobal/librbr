@@ -108,14 +108,27 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn)
  *                          labelled #RBRGEN4_POLL_SCHEDULE_LABEL
  * \param [in] parameter the list parameter to send, or `NULL` for a bare
  *                       `poll`
- * \param [in] list the value of \a parameter
+ * \param [in] list the labels to send as the value of \a parameter
  * \param [out] sample the polled sample
  */
 static RBRGen4Error RBRGen4_sendPoll(RBRGen4 *conn, bool requireLabel, const char *parameter,
-                                     const char *list, RBRGen4Sample *sample)
+                                     const RBRGen4LabelList *list, RBRGen4Sample *sample)
 {
     if (requireLabel && !conn->outputFormat.scheduleLabel) {
         return RBRGEN4_UNSUPPORTED;
+    }
+
+    /* Sized against the longest parameter so that a list which fits here also
+     * fits the command. */
+    char value[RBRGEN4_COMMAND_BUFFER_MAX -
+               sizeof("poll channellist=" RBRGEN4_SEND_COMMAND_TERMINATOR)] = "";
+    if (parameter != NULL) {
+        /* An empty list is invalid */
+        if (list == NULL || list->count == 0) {
+            return RBRGEN4_INVALID_PARAMETER_VALUE;
+        }
+
+        RBR_TRY(RBRGen4_formatLabelList(value, (int32_t) sizeof(value), list));
     }
 
     char *commandBuffer = (char *) conn->commandBuffer;
@@ -126,7 +139,7 @@ static RBRGen4Error RBRGen4_sendPoll(RBRGen4 *conn, bool requireLabel, const cha
                                     "poll%s%s%s%s",
                                     parameter != NULL ? " " : "",
                                     parameter != NULL ? parameter : "",
-                                    parameter != NULL ? list : "",
+                                    value,
                                     RBRGEN4_SEND_COMMAND_TERMINATOR);
     if ((size_t) *commandBufferLength >= sizeof(conn->commandBuffer)) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
@@ -168,13 +181,13 @@ RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sampl
     return RBRGen4_sendPoll(conn, requireLabel, NULL, NULL, sample);
 }
 
-RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel, const char *channelList,
-                                  RBRGen4Sample *sample)
+RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel,
+                                  const RBRGen4LabelList *channelList, RBRGen4Sample *sample)
 {
     return RBRGen4_sendPoll(conn, requireLabel, "channellist=", channelList, sample);
 }
 
-RBRGen4Error RBRGen4_pollGroups(RBRGen4 *conn, bool requireLabel, const char *groupList,
+RBRGen4Error RBRGen4_pollGroups(RBRGen4 *conn, bool requireLabel, const RBRGen4LabelList *groupList,
                                 RBRGen4Sample *sample)
 {
     return RBRGen4_sendPoll(conn, requireLabel, "grouplist=", groupList, sample);

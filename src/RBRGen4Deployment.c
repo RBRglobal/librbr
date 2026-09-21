@@ -100,22 +100,22 @@ static RBRGen4DeploymentStatus RBRGen4DeploymentStatus_parse(const char *value)
     return RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS;
 }
 
-const char *RBRGen4Gate_name(RBRGen4Gate gate)
+const char *RBRGen4DeploymentGate_name(RBRGen4DeploymentGate gate)
 {
     switch (gate) {
-    case RBRGEN4_GATE_NONE:
+    case RBRGEN4_DEPLOYMENT_GATE_NONE:
         return "none";
-    case RBRGEN4_GATE_TIME:
+    case RBRGEN4_DEPLOYMENT_GATE_TIME:
         return "time";
-    case RBRGEN4_GATE_TWISTACTIVATION:
+    case RBRGEN4_DEPLOYMENT_GATE_TWISTACTIVATION:
         return "twistactivation";
-    case RBRGEN4_GATE_WETSWITCH:
+    case RBRGEN4_DEPLOYMENT_GATE_WETSWITCH:
         return "wetswitch";
-    case RBRGEN4_GATE_COUNT:
-        return "gate count";
-    case RBRGEN4_UNKNOWN_GATE:
+    case RBRGEN4_DEPLOYMENT_GATE_COUNT:
+        return "deployment gate count";
+    case RBRGEN4_UNKNOWN_DEPLOYMENT_GATE:
     default:
-        return "unknown gate";
+        return "unknown deployment gate";
     }
 }
 
@@ -123,17 +123,17 @@ const char *RBRGen4Gate_name(RBRGen4Gate gate)
  * \brief Find the gating condition a response value names.
  *
  * \param [in] value the response value
- * \return the condition, or #RBRGEN4_UNKNOWN_GATE
+ * \return the condition, or #RBRGEN4_UNKNOWN_DEPLOYMENT_GATE
  */
-static RBRGen4Gate RBRGen4Gate_parse(const char *value)
+static RBRGen4DeploymentGate RBRGen4DeploymentGate_parse(const char *value)
 {
-    for (int i = 0; i < RBRGEN4_GATE_COUNT; i++) {
-        if (strcmp(RBRGen4Gate_name(i), value) == 0) {
+    for (int i = 0; i < RBRGEN4_DEPLOYMENT_GATE_COUNT; i++) {
+        if (strcmp(RBRGen4DeploymentGate_name(i), value) == 0) {
             return i;
         }
     }
 
-    return RBRGEN4_UNKNOWN_GATE;
+    return RBRGEN4_UNKNOWN_DEPLOYMENT_GATE;
 }
 
 RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment)
@@ -141,7 +141,7 @@ RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment)
     memset(deployment, 0, sizeof(RBRGen4Deployment));
 
     deployment->status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS;
-    deployment->gate = RBRGEN4_UNKNOWN_GATE;
+    deployment->gate = RBRGEN4_UNKNOWN_DEPLOYMENT_GATE;
 
     RBR_TRY(RBRGen4_converse(conn, "deployment"));
 
@@ -158,7 +158,7 @@ RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment)
         } else if (strcmp(parameter.key, "status") == 0) {
             deployment->status = RBRGen4DeploymentStatus_parse(parameter.value);
         } else if (strcmp(parameter.key, "gate") == 0) {
-            deployment->gate = RBRGen4Gate_parse(parameter.value);
+            deployment->gate = RBRGen4DeploymentGate_parse(parameter.value);
         } else if (strcmp(parameter.key, "simulation") == 0) {
             deployment->simulation = strcmp(parameter.value, "on") == 0;
         }
@@ -169,13 +169,14 @@ RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment)
 
 RBRGen4Error RBRGen4_setDeployment(RBRGen4 *conn, const RBRGen4Deployment *deployment)
 {
-    if (deployment->gate < 0 || deployment->gate >= RBRGEN4_GATE_COUNT) {
+    if (deployment->gate < 0 || deployment->gate >= RBRGEN4_DEPLOYMENT_GATE_COUNT) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     /* `starttime` is only available under time gating. */
-    if (deployment->gate != RBRGEN4_GATE_TIME) {
-        return RBRGen4_converse(conn, "deployment gate=%s", RBRGen4Gate_name(deployment->gate));
+    if (deployment->gate != RBRGEN4_DEPLOYMENT_GATE_TIME) {
+        return RBRGen4_converse(
+            conn, "deployment gate=%s", RBRGen4DeploymentGate_name(deployment->gate));
     }
 
     if (deployment->startTime < RBRGEN4_DATETIME_MIN ||
@@ -186,8 +187,10 @@ RBRGen4Error RBRGen4_setDeployment(RBRGen4 *conn, const RBRGen4Deployment *deplo
     char startTime[RBRGEN4_SCHEDULE_TIME_LEN + 1];
     RBRGen4DateTime_toScheduleTime(deployment->startTime, startTime);
 
-    return RBRGen4_converse(
-        conn, "deployment gate=%s starttime=%s", RBRGen4Gate_name(deployment->gate), startTime);
+    return RBRGen4_converse(conn,
+                            "deployment gate=%s starttime=%s",
+                            RBRGen4DeploymentGate_name(deployment->gate),
+                            startTime);
 }
 
 /**

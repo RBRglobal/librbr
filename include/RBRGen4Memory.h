@@ -234,8 +234,8 @@ RBRGen4Error RBRGen4_getDataset(RBRGen4 *conn, RBRGen4Dataset *dataset,
  * \brief `dataset <dataset_label>/[<schedule_label>/]events` command
  * parameters.
  *
- * \see RBRGen4Dataset_getEventsBlock()
- * \see RBRGen4Dataset_getScheduleEventsBlock()
+ * \see RBRGen4_getDatasetEventsBlock()
+ * \see RBRGen4_getDatasetScheduleEventsBlock()
  */
 typedef struct RBRGen4DatasetEventsBlock {
     /** \brief The memory usage of the events block in bytes. */
@@ -247,7 +247,7 @@ typedef struct RBRGen4DatasetEventsBlock {
 /**
  * \brief `dataset <dataset_label>/meta` command parameters.
  *
- * \see RBRGen4Dataset_getMetaBlock()
+ * \see RBRGen4_getDatasetMetaBlock()
  */
 typedef struct RBRGen4DatasetMetaBlock {
     /** \brief The memory usage of the metadata block in bytes. */
@@ -257,7 +257,7 @@ typedef struct RBRGen4DatasetMetaBlock {
 /**
  * \brief `dataset <dataset_label>/<schedule_label>` command parameters.
  *
- * \see RBRGen4Dataset_getScheduleBlock()
+ * \see RBRGen4_getDatasetScheduleBlock()
  */
 typedef struct RBRGen4DatasetScheduleBlock {
     /** \brief The memory usage of the schedule's blocks in bytes. */
@@ -267,7 +267,7 @@ typedef struct RBRGen4DatasetScheduleBlock {
 /**
  * \brief `dataset <dataset_label>/<schedule_label>/data` command parameters.
  *
- * \see RBRGen4Dataset_getScheduleDataBlock()
+ * \see RBRGen4_getDatasetScheduleDataBlock()
  */
 typedef struct RBRGen4DatasetDataBlock {
     /** \brief The memory usage of the sample data block in bytes. */
@@ -292,7 +292,7 @@ typedef struct RBRGen4DatasetDataBlock {
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
  *                                      hardware error occurs
  */
-RBRGen4Error RBRGen4Dataset_getEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_getDatasetEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                            RBRGen4DatasetEventsBlock *block);
 
 /**
@@ -310,7 +310,7 @@ RBRGen4Error RBRGen4Dataset_getEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
  *                                      hardware error occurs
  */
-RBRGen4Error RBRGen4Dataset_getMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_getDatasetMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                          RBRGen4DatasetMetaBlock *block);
 
 /**
@@ -332,7 +332,7 @@ RBRGen4Error RBRGen4Dataset_getMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *da
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
  *                                      or another hardware error occurs
  */
-RBRGen4Error RBRGen4Dataset_getScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_getDatasetScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                              const char *scheduleLabel,
                                              RBRGen4DatasetScheduleBlock *block);
 
@@ -355,7 +355,7 @@ RBRGen4Error RBRGen4Dataset_getScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
  *                                      or another hardware error occurs
  */
-RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_getDatasetScheduleEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                                    const char *scheduleLabel,
                                                    RBRGen4DatasetEventsBlock *block);
 
@@ -378,32 +378,9 @@ RBRGen4Error RBRGen4Dataset_getScheduleEventsBlock(RBRGen4 *conn, const RBRGen4D
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
  *                                      or another hardware error occurs
  */
-RBRGen4Error RBRGen4Dataset_getScheduleDataBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_getDatasetScheduleDataBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                                  const char *scheduleLabel,
                                                  RBRGen4DatasetDataBlock *block);
-
-/** \brief It determines the type of information retrieved for the specific schedule.
- * There are three keywoards: data|events|meta.
- */
-typedef enum RBRGen4Block {
-    /** Used to report memory usage for sample data. */
-    RBRGEN4_BLOCK_DATA,
-    /** Used to report memory usege for events. */
-    RBRGEN4_BLOCK_EVENTS,
-    /** Used to report this schedule's meory usage for metadata. */
-    RBRGEN4_BLOCK_META,
-    /** The number of specific type of blocks.*/
-    RBRGEN4_BLOCK_COUNT,
-    /** The unknown or unrecognized block. */
-    RBRGEN4_BLOCK_UNKNOWN
-} RBRGen4Block;
-
-/** \brief Get a human-readable block name.
- * \param [in] block the block.
- * \return a string name for the block.
- * \see RBRGen4Error_name() for a description of the format of names
- */
-const char *RBRGen4Block_name(RBRGen4Block block);
 
 /**
  * \brief Delete one dataset from the instrument's memory.
@@ -490,7 +467,7 @@ const char *RBRGen4DownloadEventsUnit_name(RBRGen4DownloadEventsUnit unit);
  * \brief `download <dataset_label>/<schedule_label>/data` command
  * parameters.
  *
- * \see RBRGen4Dataset_downloadScheduleData()
+ * \see RBRGen4_downloadDatasetScheduleData()
  */
 typedef struct RBRGen4DownloadData {
     /** \brief The unit for both #count and #start. */
@@ -525,8 +502,8 @@ typedef struct RBRGen4DownloadData {
  * \brief `download <dataset_label>[/<schedule_label>]/events` command
  * parameters.
  *
- * \see RBRGen4Dataset_downloadEvents()
- * \see RBRGen4Dataset_downloadScheduleEvents()
+ * \see RBRGen4_downloadDatasetEvents()
+ * \see RBRGen4_downloadDatasetScheduleEvents()
  */
 typedef struct RBRGen4DownloadEvents {
     /** \brief The unit for both #count and #start. */
@@ -560,18 +537,23 @@ typedef struct RBRGen4DownloadEvents {
 /**
  * \brief `download <dataset_label>/meta` command parameters.
  *
- * \see RBRGen4Dataset_downloadMeta()
+ * \see RBRGen4_downloadDatasetMeta()
  */
 typedef struct RBRGen4DownloadMeta {
     /**
-     * \brief The number of bytes to transfer: the requested amount,
-     * updated to the amount the instrument reports. Excludes the trailing
-     * CRC.
+     * \brief The amount of data to transfer, in bytes: the requested
+     * amount, updated to the amount the instrument reports.
      */
-    int64_t byteCount;
+    int64_t count;
 
     /** \brief The offset to begin reading from, in bytes, from 0. */
-    int64_t byteStart;
+    int64_t start;
+
+    /**
+     * \brief The number of bytes transferred, excluding the trailing CRC.
+     * \readonly
+     */
+    int64_t byteCount;
 
     /** \brief The caller-provided buffer receiving the transferred data. */
     void *data;
@@ -613,7 +595,7 @@ typedef struct RBRGen4DownloadMeta {
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
  *                                      or another hardware error occurs
  */
-RBRGen4Error RBRGen4Dataset_downloadScheduleData(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_downloadDatasetScheduleData(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                                  const char *scheduleLabel,
                                                  RBRGen4DownloadData *download);
 
@@ -642,9 +624,9 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleData(RBRGen4 *conn, const RBRGen4Dat
  *                                           check
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
  *                                      hardware error occurs
- * \see RBRGen4Dataset_downloadScheduleEvents()
+ * \see RBRGen4_downloadDatasetScheduleEvents()
  */
-RBRGen4Error RBRGen4Dataset_downloadEvents(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_downloadDatasetEvents(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                            RBRGen4DownloadEvents *download);
 
 /**
@@ -674,9 +656,9 @@ RBRGen4Error RBRGen4Dataset_downloadEvents(RBRGen4 *conn, const RBRGen4Dataset *
  *                                           check
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
  *                                      or another hardware error occurs
- * \see RBRGen4Dataset_downloadEvents()
+ * \see RBRGen4_downloadDatasetEvents()
  */
-RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_downloadDatasetScheduleEvents(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                                    const char *scheduleLabel,
                                                    RBRGen4DownloadEvents *download);
 
@@ -689,8 +671,8 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(RBRGen4 *conn, const RBRGen4D
  * \param [in] dataset the dataset, selected by its label
  * \param [in,out] download the download request: the caller populates the
  *                         count, offset, and buffer fields to say what to
- *                         transfer and where to put it; the count is updated
- *                         with what the instrument returned
+ *                         transfer and where to put it; the counts are
+ *                         updated with what the instrument returned
  * \return #RBRGEN4_SUCCESS when the data is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -704,7 +686,7 @@ RBRGen4Error RBRGen4Dataset_downloadScheduleEvents(RBRGen4 *conn, const RBRGen4D
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
  *                                      hardware error occurs
  */
-RBRGen4Error RBRGen4Dataset_downloadMeta(RBRGen4 *conn, const RBRGen4Dataset *dataset,
+RBRGen4Error RBRGen4_downloadDatasetMeta(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                          RBRGen4DownloadMeta *download);
 
 /**

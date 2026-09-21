@@ -243,7 +243,7 @@ TEST_LOGGER4(getDeployment)
             {
                 .startTime = 0,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_GATE_NONE,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
                 .simulation = false,
             },
         },
@@ -255,7 +255,7 @@ TEST_LOGGER4(getDeployment)
             {
                 .startTime = 1798761600000LL,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_GATE_TIME,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
                 .simulation = false,
             },
         },
@@ -265,7 +265,7 @@ TEST_LOGGER4(getDeployment)
             {
                 .startTime = 0,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
-                .gate = RBRGEN4_GATE_NONE,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
                 .simulation = false,
             },
         },
@@ -275,7 +275,7 @@ TEST_LOGGER4(getDeployment)
             {
                 .startTime = 0,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_PAUSED,
-                .gate = RBRGEN4_GATE_NONE,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
                 .simulation = false,
             },
         },
@@ -286,7 +286,7 @@ TEST_LOGGER4(getDeployment)
             {
                 .startTime = 1798761600000LL,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_GATED,
-                .gate = RBRGEN4_GATE_TIME,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
                 .simulation = false,
             },
         },
@@ -296,7 +296,7 @@ TEST_LOGGER4(getDeployment)
             {
                 .startTime = 0,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_GATE_TWISTACTIVATION,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_TWISTACTIVATION,
                 .simulation = true,
             },
         },
@@ -306,7 +306,7 @@ TEST_LOGGER4(getDeployment)
             {
                 .startTime = 0,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_GATE_WETSWITCH,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_WETSWITCH,
                 .simulation = false,
             },
         },
@@ -320,7 +320,7 @@ TEST_LOGGER4(getDeployment)
             {
                 .startTime = 0,
                 .status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
-                .gate = RBRGEN4_UNKNOWN_GATE,
+                .gate = RBRGEN4_UNKNOWN_DEPLOYMENT_GATE,
                 .simulation = false,
             },
         },
@@ -331,7 +331,7 @@ TEST_LOGGER4(getDeployment)
             {
                 .startTime = 0,
                 .status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
-                .gate = RBRGEN4_UNKNOWN_GATE,
+                .gate = RBRGEN4_UNKNOWN_DEPLOYMENT_GATE,
                 .simulation = false,
             },
         },
@@ -342,7 +342,7 @@ TEST_LOGGER4(getDeployment)
             {
                 .startTime = 0,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_GATE_NONE,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
                 .simulation = false,
             },
         },
@@ -359,7 +359,7 @@ TEST_LOGGER4(getDeployment)
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_EQ(tests[i].expected.startTime, actual.startTime, "%" PRIi64);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.status, actual.status, RBRGen4DeploymentStatus);
-        TEST_ASSERT_ENUM_EQ(tests[i].expected.gate, actual.gate, RBRGen4Gate);
+        TEST_ASSERT_ENUM_EQ(tests[i].expected.gate, actual.gate, RBRGen4DeploymentGate);
         TEST_ASSERT_EQ(tests[i].expected.simulation, actual.simulation, "%d");
     }
 
@@ -384,7 +384,7 @@ TEST_LOGGER4(setDeployment)
             {
                 .startTime = 0,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_GATE_NONE,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
                 .simulation = false,
             },
             "deployment gate=none" COMMAND_TERMINATOR,
@@ -396,7 +396,7 @@ TEST_LOGGER4(setDeployment)
             {
                 .startTime = 1798761600000LL,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_GATE_WETSWITCH,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_WETSWITCH,
                 .simulation = false,
             },
             "deployment gate=wetswitch" COMMAND_TERMINATOR,
@@ -407,7 +407,7 @@ TEST_LOGGER4(setDeployment)
             {
                 .startTime = 0,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_GATE_TWISTACTIVATION,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_TWISTACTIVATION,
                 .simulation = false,
             },
             "deployment gate=twistactivation" COMMAND_TERMINATOR,
@@ -419,7 +419,7 @@ TEST_LOGGER4(setDeployment)
             {
                 .startTime = 1798761600000LL,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_GATE_TIME,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
                 .simulation = false,
             },
             "deployment gate=time starttime=20270101000000" COMMAND_TERMINATOR,
@@ -435,7 +435,7 @@ TEST_LOGGER4(setDeployment)
             {
                 .startTime = RBRGEN4_DATETIME_MIN - 1,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_GATE_TIME,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
                 .simulation = false,
             },
             "",
@@ -446,7 +446,7 @@ TEST_LOGGER4(setDeployment)
             {
                 .startTime = RBRGEN4_DATETIME_MAX + 1,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_GATE_TIME,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
                 .simulation = false,
             },
             "",
@@ -457,7 +457,7 @@ TEST_LOGGER4(setDeployment)
             {
                 .startTime = RBRGEN4_DATETIME_MAX + 1,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_GATE_NONE,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
                 .simulation = false,
             },
             "deployment gate=none" COMMAND_TERMINATOR,
@@ -469,7 +469,7 @@ TEST_LOGGER4(setDeployment)
             {
                 .startTime = 0,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_UNKNOWN_GATE,
+                .gate = RBRGEN4_UNKNOWN_DEPLOYMENT_GATE,
                 .simulation = false,
             },
             "",
@@ -480,7 +480,7 @@ TEST_LOGGER4(setDeployment)
             {
                 .startTime = 0,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_GATE_COUNT,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_COUNT,
                 .simulation = false,
             },
             "",
@@ -492,7 +492,7 @@ TEST_LOGGER4(setDeployment)
             {
                 .startTime = 0,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
-                .gate = RBRGEN4_GATE_NONE,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
                 .simulation = false,
             },
             "deployment gate=none" COMMAND_TERMINATOR,
@@ -504,7 +504,7 @@ TEST_LOGGER4(setDeployment)
             {
                 .startTime = 0,
                 .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_GATE_WETSWITCH,
+                .gate = RBRGEN4_DEPLOYMENT_GATE_WETSWITCH,
                 .simulation = false,
             },
             "deployment gate=wetswitch" COMMAND_TERMINATOR,

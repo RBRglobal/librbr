@@ -39,8 +39,13 @@
 #define PRESSURE    "pressure_00"
 #define TEMPERATURE "temperature_00"
 
-/* The `poll channellist=` value: labels separated by `|`. */
-#define POLL_PT_CHANNELS PRESSURE "|" TEMPERATURE
+/* The channels to poll by list. */
+#define POLL_PT_CHANNELS      \
+    (RBRGen4Label[])          \
+    {                         \
+        PRESSURE, TEMPERATURE \
+    }
+#define POLL_PT_CHANNEL_COUNT 2
 
 /* How many times to poll each way. */
 #define POLL_COUNT 5
@@ -174,8 +179,13 @@ int main(int argc, char *argv[])
     /* Poll only the pressure and temperature channels. Readings are reported
      * in the order requested. */
     printf("timestamp, %s, %s\n", PRESSURE, TEMPERATURE);
+    const RBRGen4LabelList pollPtChannelList = {
+        .size = POLL_PT_CHANNEL_COUNT,
+        .count = POLL_PT_CHANNEL_COUNT,
+        .labels = POLL_PT_CHANNELS,
+    };
     for (int32_t i = 0; i < POLL_COUNT; i++) {
-        err = RBRGen4_pollChannels(&conn, requireLabel, POLL_PT_CHANNELS, &sample);
+        err = RBRGen4_pollChannels(&conn, requireLabel, &pollPtChannelList, &sample);
         if (err) {
             logCmdError(&conn, err, "Failed to poll channels");
             goto instrumentCleanup;

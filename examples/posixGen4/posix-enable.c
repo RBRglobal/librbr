@@ -319,7 +319,7 @@ int main(int argc, char *argv[])
         logCmdError(&conn, err, "Failed to get deployment");
         goto instrumentCleanup;
     }
-    deployment.gate = RBRGEN4_GATE_TIME;
+    deployment.gate = RBRGEN4_DEPLOYMENT_GATE_TIME;
     deployment.startTime = clock.dateTime + START_DELAY_MS;
     err = RBRGen4_setDeployment(&conn, &deployment);
     if (err) {

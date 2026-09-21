@@ -377,7 +377,7 @@ typedef struct GetBlockTest {
     int64_t expectedOtherCount;
 } GetBlockTest;
 
-TEST_LOGGER4(datasetGetEventsBlock)
+TEST_LOGGER4(getDatasetEventsBlock)
 {
     GetBlockTest tests[] = {
         {NULL,
@@ -410,7 +410,7 @@ TEST_LOGGER4(datasetGetEventsBlock)
 
     for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4Dataset_getEventsBlock(conn, &dataset, &block);
+        err = RBRGen4_getDatasetEventsBlock(conn, &dataset, &block);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
         TEST_ASSERT_EQ(tests[i].expectedByteCount, block.byteCount, "%" PRId64);
@@ -420,7 +420,7 @@ TEST_LOGGER4(datasetGetEventsBlock)
     return true;
 }
 
-TEST_LOGGER4(datasetGetMetaBlock)
+TEST_LOGGER4(getDatasetMetaBlock)
 {
     GetBlockTest tests[] = {
         {NULL,
@@ -446,7 +446,7 @@ TEST_LOGGER4(datasetGetMetaBlock)
 
     for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4Dataset_getMetaBlock(conn, &dataset, &block);
+        err = RBRGen4_getDatasetMetaBlock(conn, &dataset, &block);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
         TEST_ASSERT_EQ(tests[i].expectedByteCount, block.byteCount, "%" PRId64);
@@ -455,7 +455,7 @@ TEST_LOGGER4(datasetGetMetaBlock)
     return true;
 }
 
-TEST_LOGGER4(datasetGetScheduleBlock)
+TEST_LOGGER4(getDatasetScheduleBlock)
 {
     GetBlockTest tests[] = {
         {"s_cont",
@@ -485,7 +485,7 @@ TEST_LOGGER4(datasetGetScheduleBlock)
 
     for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4Dataset_getScheduleBlock(conn, &dataset, tests[i].scheduleLabel, &block);
+        err = RBRGen4_getDatasetScheduleBlock(conn, &dataset, tests[i].scheduleLabel, &block);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
         TEST_ASSERT_EQ(tests[i].expectedByteCount, block.byteCount, "%" PRId64);
@@ -493,14 +493,14 @@ TEST_LOGGER4(datasetGetScheduleBlock)
 
     /* An empty schedule label is refused before the command. */
     TestIOBuffers_init(buffers, "", 0);
-    err = RBRGen4Dataset_getScheduleBlock(conn, &dataset, "", &block);
+    err = RBRGen4_getDatasetScheduleBlock(conn, &dataset, "", &block);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
 }
 
-TEST_LOGGER4(datasetGetScheduleEventsBlock)
+TEST_LOGGER4(getDatasetScheduleEventsBlock)
 {
     GetBlockTest tests[] = {
         {"s_cont",
@@ -530,7 +530,7 @@ TEST_LOGGER4(datasetGetScheduleEventsBlock)
 
     for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4Dataset_getScheduleEventsBlock(conn, &dataset, tests[i].scheduleLabel, &block);
+        err = RBRGen4_getDatasetScheduleEventsBlock(conn, &dataset, tests[i].scheduleLabel, &block);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
         TEST_ASSERT_EQ(tests[i].expectedByteCount, block.byteCount, "%" PRId64);
@@ -540,7 +540,7 @@ TEST_LOGGER4(datasetGetScheduleEventsBlock)
     return true;
 }
 
-TEST_LOGGER4(datasetGetScheduleDataBlock)
+TEST_LOGGER4(getDatasetScheduleDataBlock)
 {
     GetBlockTest tests[] = {
         {"s_cont",
@@ -573,7 +573,7 @@ TEST_LOGGER4(datasetGetScheduleDataBlock)
 
     for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4Dataset_getScheduleDataBlock(conn, &dataset, tests[i].scheduleLabel, &block);
+        err = RBRGen4_getDatasetScheduleDataBlock(conn, &dataset, tests[i].scheduleLabel, &block);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].command, buffers->writeBuffer);
         TEST_ASSERT_EQ(tests[i].expectedByteCount, block.byteCount, "%" PRId64);
@@ -632,7 +632,7 @@ TEST_LOGGER4(deleteDatasetAll)
     return true;
 }
 
-TEST_LOGGER4(datasetDownloadScheduleData)
+TEST_LOGGER4(downloadDatasetScheduleData)
 {
     RBRGen4Error err;
     RBRGen4Dataset dataset = {
@@ -651,7 +651,7 @@ TEST_LOGGER4(datasetDownloadScheduleData)
         .dataSize = sizeof(data),
     };
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRGen4Dataset_downloadScheduleData(conn, &dataset, "s_cont", &download);
+    err = RBRGen4_downloadDatasetScheduleData(conn, &dataset, "s_cont", &download);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("download d1/s_cont/data bytecount=8 bytestart=0" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -671,7 +671,7 @@ TEST_LOGGER4(datasetDownloadScheduleData)
                                       .data = data,
                                       .dataSize = sizeof(data)};
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRGen4Dataset_downloadScheduleData(conn, &dataset, "s_cont", &download);
+    err = RBRGen4_downloadDatasetScheduleData(conn, &dataset, "s_cont", &download);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("download d1/s_cont/data samplecount=100 samplestart=0" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -687,7 +687,7 @@ TEST_LOGGER4(datasetDownloadScheduleData)
                                       .data = data,
                                       .dataSize = sizeof(data)};
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRGen4Dataset_downloadScheduleData(conn, &dataset, "s_cont", &download);
+    err = RBRGen4_downloadDatasetScheduleData(conn, &dataset, "s_cont", &download);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_CHECKSUM_ERROR, err, RBRGen4Error);
 
     /* A response larger than the buffer is refused before writing it. */
@@ -700,7 +700,7 @@ TEST_LOGGER4(datasetDownloadScheduleData)
                                       .data = small,
                                       .dataSize = sizeof(small)};
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRGen4Dataset_downloadScheduleData(conn, &dataset, "s_cont", &download);
+    err = RBRGen4_downloadDatasetScheduleData(conn, &dataset, "s_cont", &download);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_BUFFER_TOO_SMALL, err, RBRGen4Error);
 
     /* A dataset the instrument does not know is a hardware error. */
@@ -711,7 +711,7 @@ TEST_LOGGER4(datasetDownloadScheduleData)
                                       .data = data,
                                       .dataSize = sizeof(data)};
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRGen4Dataset_downloadScheduleData(conn, &dataset, "s_cont", &download);
+    err = RBRGen4_downloadDatasetScheduleData(conn, &dataset, "s_cont", &download);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_HARDWARE_ERROR, err, RBRGen4Error);
 
     /* An invalid request is refused before the command. */
@@ -721,14 +721,14 @@ TEST_LOGGER4(datasetDownloadScheduleData)
                                       .data = data,
                                       .dataSize = sizeof(data)};
     TestIOBuffers_init(buffers, "", 0);
-    err = RBRGen4Dataset_downloadScheduleData(conn, &dataset, "s_cont", &download);
+    err = RBRGen4_downloadDatasetScheduleData(conn, &dataset, "s_cont", &download);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
 }
 
-TEST_LOGGER4(datasetDownloadEvents)
+TEST_LOGGER4(downloadDatasetEvents)
 {
     RBRGen4Error err;
     RBRGen4Dataset dataset = {
@@ -748,7 +748,7 @@ TEST_LOGGER4(datasetDownloadEvents)
         .dataSize = sizeof(data),
     };
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRGen4Dataset_downloadEvents(conn, &dataset, &download);
+    err = RBRGen4_downloadDatasetEvents(conn, &dataset, &download);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("download d1/events eventcount=2 eventstart=0" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -759,7 +759,7 @@ TEST_LOGGER4(datasetDownloadEvents)
     return true;
 }
 
-TEST_LOGGER4(datasetDownloadScheduleEvents)
+TEST_LOGGER4(downloadDatasetScheduleEvents)
 {
     RBRGen4Error err;
     RBRGen4Dataset dataset = {
@@ -778,7 +778,7 @@ TEST_LOGGER4(datasetDownloadScheduleEvents)
         .dataSize = sizeof(data),
     };
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRGen4Dataset_downloadScheduleEvents(conn, &dataset, "s_cont", &download);
+    err = RBRGen4_downloadDatasetScheduleEvents(conn, &dataset, "s_cont", &download);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("download d1/s_cont/events eventcount=2 eventstart=0" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
@@ -788,7 +788,7 @@ TEST_LOGGER4(datasetDownloadScheduleEvents)
     return true;
 }
 
-TEST_LOGGER4(datasetDownloadMeta)
+TEST_LOGGER4(downloadDatasetMeta)
 {
     RBRGen4Error err;
     RBRGen4Dataset dataset = {
@@ -799,16 +799,17 @@ TEST_LOGGER4(datasetDownloadMeta)
     const char *response =
         "download d1/meta bytecount=8 bytestart=0" RESPONSE_TERMINATOR "METAMETA\xc3\x14";
     RBRGen4DownloadMeta download = {
-        .byteCount = 8,
-        .byteStart = 0,
+        .count = 8,
+        .start = 0,
         .data = data,
         .dataSize = sizeof(data),
     };
     TestIOBuffers_init(buffers, response, 0);
-    err = RBRGen4Dataset_downloadMeta(conn, &dataset, &download);
+    err = RBRGen4_downloadDatasetMeta(conn, &dataset, &download);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("download d1/meta bytecount=8 bytestart=0" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
+    TEST_ASSERT_EQ(INT64_C(8), download.count, "%" PRId64);
     TEST_ASSERT_EQ(INT64_C(8), download.byteCount, "%" PRId64);
     TEST_ASSERT(memcmp(data, "METAMETA", 8) == 0);
 
