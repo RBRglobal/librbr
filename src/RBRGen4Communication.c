@@ -135,7 +135,7 @@ RBRGen4Error RBRGen4_getLinkSerial(RBRGen4 *conn, RBRGen4LinkSerial *serial)
 {
     memset(serial, 0, sizeof(RBRGen4LinkSerial));
 
-    RBR_TRY(RBRGen4_converse(conn, "link serial baudrate mode availablebaudrates availablemodes"));
+    RBR_TRY(RBRGen4_converse(conn, "link serial"));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
@@ -148,22 +148,6 @@ RBRGen4Error RBRGen4_getLinkSerial(RBRGen4 *conn, RBRGen4LinkSerial *serial)
             serial->baudRate = RBRGen4LinkSerialBaudRate_parse(parameter.value);
         } else if (strcmp(parameter.key, "mode") == 0) {
             serial->mode = RBRGen4LinkSerialMode_parse(parameter.value);
-        } else if (strcmp(parameter.key, "availablebaudrates") == 0) {
-            char *value = parameter.value;
-            while (value != NULL) {
-                char *nextValue = RBRGen4_splitListValue(value);
-                serial->availableBaudRates |= RBRGen4LinkSerialBaudRate_parse(value);
-
-                value = nextValue;
-            }
-        } else if (strcmp(parameter.key, "availablemodes") == 0) {
-            char *value = parameter.value;
-            while (value != NULL) {
-                char *nextValue = RBRGen4_splitListValue(value);
-                serial->availableModes |= RBRGen4LinkSerialMode_parse(value);
-
-                value = nextValue;
-            }
         }
     }
     return RBRGEN4_SUCCESS;

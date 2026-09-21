@@ -61,8 +61,8 @@ const char *RBRGen4InstrumentState_name(RBRGen4InstrumentState state);
  *
  * `id` predates the Gen4 API and keeps its original grammar: parameters are
  * separated by commas and assignments are padded with spaces. It reports the
- * same information as `id4` less the Semantic Version; prefer
- * RBRGen4_getId4() unless the legacy command is specifically
+ * same information as `id4` less the Semantic Version and the API version;
+ * prefer RBRGen4_getId4() unless the legacy command is specifically
  * wanted.
  *
  * \param [in] conn the instrument connection
@@ -406,6 +406,12 @@ typedef struct RBRGen4Instrument {
      * For example, `RBRsolo^4_T.D!fast32`.
      */
     char name[RBRGEN4_INSTRUMENT_NAME_MAX + 1];
+    /**
+     * \brief The version of the Gen4 command API implemented by the firmware.
+     *
+     * For example, `2.1`. Empty when the parameter is not reported.
+     */
+    char apiversion[RBRGEN4_ID_APIVERSION_MAX + 1];
 } RBRGen4Instrument;
 
 /**
@@ -448,10 +454,6 @@ RBRGen4Error RBRGen4_getOutputFormat(RBRGen4 *conn, RBRGen4OutputFormat *outputF
  * populated: read the current format with RBRGen4_getOutputFormat()
  * and modify it if only some parameters are of interest.
  *
- * \warning This library reads only #RBRGEN4_ENCODING_ASCII. Selecting
- *          #RBRGEN4_ENCODING_BINARY will stop it from being able to
- *          interpret samples or command responses.
- *
  * On success, the library caches the output format and uses it to parse
  * subsequently received samples. On failure the cache is left unchanged and
  * may no longer match the instrument. Samples received while the cache is
@@ -464,8 +466,7 @@ RBRGen4Error RBRGen4_getOutputFormat(RBRGen4 *conn, RBRGen4OutputFormat *outputF
  * \return #RBRGEN4_SUCCESS when the settings are successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the encoding or
- *                                                   datatype is not a real
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the datatype is not a real
  *                                                   value
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument refuses a value, or
  *                                      another hardware error occurs

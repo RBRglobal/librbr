@@ -387,7 +387,7 @@ void RBRGen4DateTime_toScheduleTime(RBRGen4DateTime timestamp, char *s);
  * \brief Terminate the first value of a list, and find the next one.
  *
  * Instrument responses separate the values of a list-valued parameter with
- * vertical bars: `availablebaudrates=4800|9600`, `list=self|fe4_cond_00`.
+ * vertical bars: `list=temperature_00|pressure_00`.
  * Iterate over one by walking the value returned until it is `NULL`.
  *
  * \param [in,out] value the list, terminated after its first value

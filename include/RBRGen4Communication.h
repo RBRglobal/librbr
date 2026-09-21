@@ -67,10 +67,6 @@ RBRGen4Error RBRGen4_getLink(RBRGen4 *conn, RBRGen4Link *link);
 /**
  * \brief Instrument serial baud rates.
  *
- * Not every instrument supports every baud rate. Consult
- * RBRGen4LinkSerial.availableBaudRates for the rates a given
- * instrument can use.
- *
  * \see RBRGen4LinkSerial
  * \see RBRGen4_getLinkSerial()
  * \see RBRGen4_setLinkSerial()
@@ -150,37 +146,14 @@ typedef struct RBRGen4LinkSerial {
     RBRGen4LinkSerialBaudRate baudRate;
     /** \brief The serial mode of the instrument. */
     RBRGen4LinkSerialMode mode;
-    /**
-     * \brief Baud rates which the instrument can use.
-     *
-     * Treated as a bit field representation of available baud rates as
-     * defined by RBRGen4LinkSerialBaudRate. For details, consult
-     * the Working with Bit Fields page of the documentation.
-     *
-     * \readonly
-     */
-    RBRGen4LinkSerialBaudRate availableBaudRates;
-    /**
-     * \brief Serial modes which the instrument can use.
-     *
-     * Treated as a bit field representation of available modes as defined by
-     * RBRGen4LinkSerialMode. For details, consult
-     * the Working with Bit Fields page of the documentation.
-     *
-     * \readonly
-     */
-    RBRGen4LinkSerialMode availableModes;
 } RBRGen4LinkSerial;
 
 /**
- * \brief Retrieve the current and available serial baud rates and modes.
+ * \brief Retrieve the current serial baud rate and mode.
  * \note Issues the `link serial` command.
  *
- * The instrument reports the available baud rates and modes only when they are
- * requested by name, so all four parameters are requested explicitly.
- *
  * \param [in] conn the instrument connection
- * \param [out] serial the current and available serial parameters
+ * \param [out] serial the current serial parameters
  * \return #RBRGEN4_SUCCESS when the setting is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -198,9 +171,7 @@ RBRGen4Error RBRGen4_getLinkSerial(RBRGen4 *conn, RBRGen4LinkSerial *serial);
  * interest.
  *
  * A hardware error will occur if the baud rate or mode is unsupported by the
- * instrument. See RBRGen4LinkSerial.availableBaudRates and
- * RBRGen4LinkSerial.availableModes to determine supported
- * rates/modes.
+ * instrument.
  *
  * The new serial mode and/or baud rate will take effect immediately after the
  * response to this command has been produced. Make sure you alter the

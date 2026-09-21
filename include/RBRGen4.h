@@ -143,6 +143,13 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
 #define RBRGEN4_ID_SEMVER_MAX 35
 
 /**
+ * \brief The maximum number of characters in a Gen4 command API version.
+ *
+ * Does not include any null terminator.
+ */
+#define RBRGEN4_ID_APIVERSION_MAX 8
+
+/**
  * \brief The maximum number of characters in a label.
  *
  * Does not include any null terminator.
@@ -322,31 +329,6 @@ typedef enum RBRGen4DataType {
 const char *RBRGen4DataType_name(RBRGen4DataType dataType);
 
 /**
- * \brief Sample encodings reported by `instrument outputformat`.
- *
- * \see RBRGen4_getOutputFormat()
- */
-typedef enum RBRGen4Encoding {
-    /** Human-readable text. */
-    RBRGEN4_ENCODING_ASCII,
-    /** A more compact machine-readable form. */
-    RBRGEN4_ENCODING_BINARY,
-    /** The number of specific encodings. */
-    RBRGEN4_ENCODING_COUNT,
-    /** An unknown or unrecognized encoding. */
-    RBRGEN4_UNKNOWN_ENCODING
-} RBRGen4Encoding;
-
-/**
- * \brief Get a human-readable string name for an encoding.
- *
- * \param [in] encoding the encoding
- * \return a string name for the encoding
- * \see RBRGen4Error_name() for a description of the format of names
- */
-const char *RBRGen4Encoding_name(RBRGen4Encoding encoding);
-
-/**
  * \brief Instrument `instrument outputformat` command parameters.
  *
  * \see RBRGen4_getOutputFormat()
@@ -383,8 +365,6 @@ typedef struct RBRGen4OutputFormat {
      * report it.
      */
     bool crc;
-    /** \brief The encoding used to report samples. */
-    RBRGen4Encoding encoding;
     /** \brief The numeric format used to report data values. */
     RBRGen4DataType dataType;
 } RBRGen4OutputFormat;
@@ -394,12 +374,11 @@ typedef struct RBRGen4OutputFormat {
  *
  * \see RBRGen4_open()
  */
-#define RBRGEN4_DEFAULT_OUTPUT_FORMAT                           \
-    ((RBRGen4OutputFormat) {.sn = false,                        \
-                            .scheduleLabel = true,              \
-                            .dateTime = true,                   \
-                            .crc = false,                       \
-                            .encoding = RBRGEN4_ENCODING_ASCII, \
+#define RBRGEN4_DEFAULT_OUTPUT_FORMAT              \
+    ((RBRGen4OutputFormat) {.sn = false,           \
+                            .scheduleLabel = true, \
+                            .dateTime = true,      \
+                            .crc = false,          \
                             .dataType = RBRGEN4_DATA_TYPE_FLOAT32})
 
 /**
@@ -452,6 +431,14 @@ typedef struct RBRGen4Id4 {
      * \readonly
      */
     char semver[RBRGEN4_ID_SEMVER_MAX + 1];
+    /**
+     * \brief The version of the Gen4 command API implemented by the firmware.
+     *
+     * For example, `2.1`. Empty when the parameter is not reported.
+     *
+     * \readonly
+     */
+    char apiversion[RBRGEN4_ID_APIVERSION_MAX + 1];
     /** The serial number of the instrument. */
     int32_t sn;
     /** The firmware type of the instrument. */

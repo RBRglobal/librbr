@@ -1,7 +1,7 @@
 Working with Bit Fields
 =======================
 
-There are a few settings
+There are a few Gen3 settings
 where the instrument will self-report
 which options are available
 depending on the factory configuration

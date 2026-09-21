@@ -96,12 +96,31 @@ TEST_LOGGER4(id4)
             "sn=999999 "
             "fwversion=2.0.0 "
             "semver=2.0.0-rc1-10-g148bc5eb1 "
+            "fwtype=150 "
+            "apiversion=2.1" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            {
+                .model = "L4",
+                .fwversion = "2.0.0",
+                .semver = "2.0.0-rc1-10-g148bc5eb1",
+                .apiversion = "2.1",
+                .sn = 999999,
+                .fwtype = 150,
+            },
+        },
+        /* A response without the parameter leaves it empty. */
+        {
+            "id4 model=L4 "
+            "sn=999999 "
+            "fwversion=2.0.0 "
+            "semver=2.0.0-rc1-10-g148bc5eb1 "
             "fwtype=150" RESPONSE_TERMINATOR,
             RBRGEN4_SUCCESS,
             {
                 .model = "L4",
                 .fwversion = "2.0.0",
                 .semver = "2.0.0-rc1-10-g148bc5eb1",
+                .apiversion = "",
                 .sn = 999999,
                 .fwtype = 150,
             },
@@ -114,6 +133,7 @@ TEST_LOGGER4(id4)
                 .model = "",
                 .fwversion = "",
                 .semver = "",
+                .apiversion = "",
                 .sn = 0,
                 .fwtype = 0,
             },
@@ -132,6 +152,7 @@ TEST_LOGGER4(id4)
         TEST_ASSERT_STR_EQ(tests[i].expected.model, actual.model);
         TEST_ASSERT_STR_EQ(tests[i].expected.fwversion, actual.fwversion);
         TEST_ASSERT_STR_EQ(tests[i].expected.semver, actual.semver);
+        TEST_ASSERT_STR_EQ(tests[i].expected.apiversion, actual.apiversion);
         TEST_ASSERT_EQ(tests[i].expected.sn, actual.sn, "%" PRIi32);
         TEST_ASSERT_EQ(tests[i].expected.fwtype, actual.fwtype, "%" PRIi32);
     }
@@ -363,7 +384,7 @@ TEST_LOGGER4(conn)
         {
             "instrument state=disabled sn=999999 model=L4 pn=9999999revA "
             "fwversion=2.0.0 semver=2.0.0-rc1-10-g148bc5eb1 fwtype=150 "
-            "fwlock=off datatype=float64 name=L4" RESPONSE_TERMINATOR,
+            "fwlock=off datatype=float64 name=L4 apiversion=2.1" RESPONSE_TERMINATOR,
             RBRGEN4_SUCCESS,
             {
                 .state = RBRGEN4_INSTRUMENT_STATE_DISABLED,
@@ -376,6 +397,7 @@ TEST_LOGGER4(conn)
                 .fwLock = false,
                 .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
                 .name = "L4",
+                .apiversion = "2.1",
             },
         },
         /* An enabled instrument with the firmware locked, and the extended
@@ -458,6 +480,7 @@ TEST_LOGGER4(conn)
         TEST_ASSERT_ENUM_EQ(tests[i].expected.fwLock, actual.fwLock, bool);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.dataType, actual.dataType, RBRGen4DataType);
         TEST_ASSERT_STR_EQ(tests[i].expected.name, actual.name);
+        TEST_ASSERT_STR_EQ(tests[i].expected.apiversion, actual.apiversion);
     }
     return true;
 }
@@ -504,7 +527,6 @@ static bool test_outputformat(RBRGen4OutputFormat *expected, RBRGen4OutputFormat
     TEST_ASSERT_EQ(expected->scheduleLabel, actual->scheduleLabel, "%d");
     TEST_ASSERT_EQ(expected->dateTime, actual->dateTime, "%d");
     TEST_ASSERT_EQ(expected->crc, actual->crc, "%d");
-    TEST_ASSERT_ENUM_EQ(expected->encoding, actual->encoding, RBRGen4Encoding);
     TEST_ASSERT_ENUM_EQ(expected->dataType, actual->dataType, RBRGen4DataType);
 
     return true;
@@ -516,37 +538,34 @@ TEST_LOGGER4(outputformat)
         /* The format an L4 reports out of the box. */
         {
             "instrument outputformat sn=off schedulelabel=on datetime=on "
-            "crc=off encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
+            "crc=off datatype=float32" RESPONSE_TERMINATOR,
             {
                 .sn = false,
                 .scheduleLabel = true,
                 .dateTime = true,
                 .crc = false,
-                .encoding = RBRGEN4_ENCODING_ASCII,
                 .dataType = RBRGEN4_DATA_TYPE_FLOAT32,
             },
         },
         {
             "instrument outputformat sn=on schedulelabel=on datetime=off "
-            "crc=on encoding=binary datatype=float64" RESPONSE_TERMINATOR,
+            "crc=on datatype=float64" RESPONSE_TERMINATOR,
             {
                 .sn = true,
                 .scheduleLabel = true,
                 .dateTime = false,
                 .crc = true,
-                .encoding = RBRGEN4_ENCODING_BINARY,
                 .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
             },
         },
         {
             "instrument outputformat sn=off schedulelabel=off datetime=off "
-            "crc=off encoding=ascii datatype=calfloat64" RESPONSE_TERMINATOR,
+            "crc=off datatype=calfloat64" RESPONSE_TERMINATOR,
             {
                 .sn = false,
                 .scheduleLabel = false,
                 .dateTime = false,
                 .crc = false,
-                .encoding = RBRGEN4_ENCODING_ASCII,
                 .dataType = RBRGEN4_DATA_TYPE_CALFLOAT64,
             },
         },
@@ -579,19 +598,18 @@ TEST_LOGGER4(outputformat_set)
         .scheduleLabel = true,
         .dateTime = true,
         .crc = false,
-        .encoding = RBRGEN4_ENCODING_ASCII,
         .dataType = RBRGEN4_DATA_TYPE_FLOAT32,
     };
 
     /* Every parameter of the command is sent. */
     TestIOBuffers_init(buffers,
                        "instrument outputformat sn=off schedulelabel=on "
-                       "datetime=on crc=off encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
+                       "datetime=on crc=off datatype=float32" RESPONSE_TERMINATOR,
                        0);
     RBRGen4Error err = RBRGen4_setOutputFormat(conn, &outputformat);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("instrument outputformat sn=off schedulelabel=on "
-                       "datetime=on crc=off encoding=ascii datatype=float32" COMMAND_TERMINATOR,
+                       "datetime=on crc=off datatype=float32" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
     if (!test_outputformat(&outputformat, &conn->outputFormat)) {
         return false;
@@ -602,20 +620,20 @@ TEST_LOGGER4(outputformat_set)
     modified.crc = true;
     TestIOBuffers_init(buffers,
                        "instrument outputformat sn=off schedulelabel=on "
-                       "datetime=on crc=on encoding=ascii datatype=float32" RESPONSE_TERMINATOR,
+                       "datetime=on crc=on datatype=float32" RESPONSE_TERMINATOR,
                        0);
     err = RBRGen4_setOutputFormat(conn, &modified);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("instrument outputformat sn=off schedulelabel=on "
-                       "datetime=on crc=on encoding=ascii datatype=float32" COMMAND_TERMINATOR,
+                       "datetime=on crc=on datatype=float32" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
     if (!test_outputformat(&modified, &conn->outputFormat)) {
         return false;
     }
 
-    /* An encoding or datatype which is not a real value is not sent. */
+    /* A datatype which is not a real value is not sent. */
     RBRGen4OutputFormat unreported = modified;
-    unreported.encoding = RBRGEN4_UNKNOWN_ENCODING;
+    unreported.dataType = RBRGEN4_UNKNOWN_DATA_TYPE;
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen4_setOutputFormat(conn, &unreported);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);

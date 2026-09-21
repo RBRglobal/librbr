@@ -694,14 +694,15 @@ void RBRGen4_parseResponse(RBRGen4 *conn, char **command, RBRGen4ResponseParamet
      * L4 uses the pipe character as the separator for parameters returning
      * lists. E.g.,
      *
-     *     >> link serial availablebaudrates availablemodes
-     *     << link serial availablebaudrates=115200|19200|9600|4800|2400|1200|230400|460800
-     * availablemodes=rs232|rs485f|uart|uart_idlelow
+     *     >> channel
+     *     << channel count=2 list=temperature_00|pressure_00
      *
-     * This gets parsed into:
-     *     << link
-     * serial\0availablebaudrates\0115200|19200|9600|4800|2400|1200|230400|460800\0availablemodes=rs232|rs485f|uart|uart_idlelow\0
-     *        ^command     ^key               ^value ^nextKey ^instrument->response.response
+     * The whole pipe-joined string is a single value; parsing the list
+     * parameter gets to:
+     *     << channel\0count\02\0list\0temperature_00|pressure_00\0
+     *        ^command           ^key  ^value
+     *
+     * RBRGen4_splitListValue() then walks the values within it.
      *
      * At last, the next key seeks forward from the value until the parameter
      * separator (' ') or the end of the string.
