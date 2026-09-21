@@ -32,9 +32,8 @@
 #include "posix-shared.h"
 #include "RBRGen3Parser.h"
 
-RBRGen3Error parserSample(
-    const struct RBRGen3Parser *parser,
-    const struct RBRGen3Sample *const sample)
+RBRGen3Error parserSample(const struct RBRGen3Parser *parser,
+                          const struct RBRGen3Sample *const sample)
 {
     /* Unused. */
     (void) parser;
@@ -46,8 +45,7 @@ RBRGen3Error parserSample(
     strftime(ftime, sizeof(ftime), "%F %T", &sampleTime);
 
     printf("%s.%03" PRIi64, ftime, sample->timestamp % 1000);
-    for (int32_t i = 0; i < sample->channels; i++)
-    {
+    for (int32_t i = 0; i < sample->channels; i++) {
         printf(", %lf", sample->readings[i]);
     }
     printf("\n");
@@ -64,8 +62,7 @@ int main(int argc, char *argv[])
     int status = EXIT_SUCCESS;
     int datasetFd;
 
-    if (argc < 3)
-    {
+    if (argc < 3) {
         fprintf(stderr, "Usage: %s file channels\n", argv[0]);
         return EXIT_FAILURE;
     }
@@ -73,47 +70,31 @@ int main(int argc, char *argv[])
     filePath = argv[1];
     channels = strtol(argv[2], NULL, 10);
 
-    if ((datasetFd = open(filePath, O_RDONLY)) < 0)
-    {
-        fprintf(stderr, "%s: Failed to open file: %s!\n",
-                programName,
-                strerror(errno));
+    if ((datasetFd = open(filePath, O_RDONLY)) < 0) {
+        fprintf(stderr, "%s: Failed to open file: %s!\n", programName, strerror(errno));
         return EXIT_FAILURE;
     }
 
-    fprintf(stderr,
-            "%s: Using %s v%s.\n",
-            programName,
-            RBRGEN3_LIB_NAME,
-            RBRGEN3_LIB_VERSION);
+    fprintf(stderr, "%s: Using %s v%s.\n", programName, RBRGEN3_LIB_NAME, RBRGEN3_LIB_VERSION);
 
     RBRGen3Parser parser;
 
     RBRGen3Sample sampleBuffer;
     RBRGen3ParserCallbacks parserCallbacks = {
         .sample = parserSample,
-        .sampleBuffer = &sampleBuffer
+        .sampleBuffer = &sampleBuffer,
     };
 
-    RBRGen3ParserConfig parserConfig = {
-        .format = RBRGEN3_MEMFORMAT_CALBIN00,
-        .formatConfig = {
-            .easyParse = {
-                .channels = channels
-            }
-        }
-    };
+    RBRGen3ParserConfig parserConfig = {.format = RBRGEN3_MEMFORMAT_CALBIN00,
+                                        .formatConfig = {.easyParse = {
+                                                             .channels = channels,
+                                                         }}};
 
     RBRGen3Error err;
-    if ((err = RBRGen3Parser_init(
-             &parser,
-             &parserCallbacks,
-             &parserConfig,
-             NULL)) != RBRGEN3_SUCCESS)
-    {
-        fprintf(stderr, "%s: Failed to initialize parser: %s!\n",
-                programName,
-                RBRGen3Error_name(err));
+    if ((err = RBRGen3Parser_init(&parser, &parserCallbacks, &parserConfig, NULL)) !=
+        RBRGEN3_SUCCESS) {
+        fprintf(
+            stderr, "%s: Failed to initialize parser: %s!\n", programName, RBRGen3Error_name(err));
         status = EXIT_FAILURE;
         goto fileCleanup;
     }
@@ -123,30 +104,21 @@ int main(int argc, char *argv[])
     int32_t readSize;
     int32_t parsedSize;
 
-    while (true)
-    {
+    while (true) {
         readSize = read(datasetFd, buf + bufSize, sizeof(buf) - bufSize);
-        if (readSize < 0 && errno == EAGAIN)
-        {
+        if (readSize < 0 && errno == EAGAIN) {
             fprintf(stderr, "\nRetrying...\n");
             continue;
-        }
-        else if (readSize < 0)
-        {
+        } else if (readSize < 0) {
             printf("\nError: %s", strerror(errno));
             break;
-        }
-        else if (readSize == 0)
-        {
+        } else if (readSize == 0) {
             break;
         }
 
         bufSize += readSize;
         parsedSize = bufSize;
-        RBRGen3Parser_parse(&parser,
-                        RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
-                        buf,
-                        &parsedSize);
+        RBRGen3Parser_parse(&parser, RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA, buf, &parsedSize);
         bufSize -= parsedSize;
         memmove(buf, buf + parsedSize, bufSize);
     }

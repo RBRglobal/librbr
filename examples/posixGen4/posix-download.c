@@ -40,11 +40,11 @@
 /* == Customer defined parameters == */
 
 /* The dataset and schedule recorded by posix-enable. */
-#define DATASET_LABEL "ds_ascent"
+#define DATASET_LABEL  "ds_ascent"
 #define SCHEDULE_LABEL "sch_asc_pt"
 
 /* Tune these to your instrument. */
-#define DATASET_COUNT 16
+#define DATASET_COUNT  16
 #define SCHEDULE_COUNT 16
 
 /* The number of bytes requested per `download` command. */
@@ -56,13 +56,8 @@ const char *programName = "";
  * instrument's own message, which says what it objected to. */
 void logCmdError(const RBRGen4 *conn, RBRGen4Error err, const char *msg)
 {
-    fprintf(stderr,
-            "%s: %s (%s)\n",
-            programName,
-            msg,
-            RBRGen4Error_name(err));
-    if (err == RBRGEN4_HARDWARE_ERROR)
-    {
+    fprintf(stderr, "%s: %s (%s)\n", programName, msg, RBRGen4Error_name(err));
+    if (err == RBRGEN4_HARDWARE_ERROR) {
         fprintf(stderr,
                 "%s: Instrument reported: %s\n",
                 programName,
@@ -74,16 +69,14 @@ double elapsedSeconds(const struct timespec *start)
 {
     struct timespec now;
     clock_gettime(CLOCK_MONOTONIC, &now);
-    return (double) (now.tv_sec - start->tv_sec)
-        + (double) (now.tv_nsec - start->tv_nsec) / 1e9;
+    return (double) (now.tv_sec - start->tv_sec) + (double) (now.tv_nsec - start->tv_nsec) / 1e9;
 }
 
 int main(int argc, char *argv[])
 {
     programName = argv[0];
 
-    if (argc < 2)
-    {
+    if (argc < 2) {
         fprintf(stderr, "Usage: %s device\n", programName);
         return EXIT_FAILURE;
     }
@@ -91,12 +84,8 @@ int main(int argc, char *argv[])
     int instrumentFd;
     char *devicePath = argv[1];
 
-    if ((instrumentFd = openSerialFd(devicePath)) < 0)
-    {
-        fprintf(stderr,
-                "%s: Failed to open serial device: %s!\n",
-                programName,
-                strerror(errno));
+    if ((instrumentFd = openSerialFd(devicePath)) < 0) {
+        fprintf(stderr, "%s: Failed to open serial device: %s!\n", programName, strerror(errno));
         return EXIT_FAILURE;
     }
 
@@ -114,15 +103,11 @@ int main(int argc, char *argv[])
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
-        .write = instrumentWrite
+        .write = instrumentWrite,
     };
 
-    err = RBRGen4_open(&conn,
-                       &callbacks,
-                       INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-                       (void *) &instrumentFd);
-    if (err)
-    {
+    err = RBRGen4_open(&conn, &callbacks, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd);
+    if (err) {
         logCmdError(&conn, err, "Failed to establish instrument connection");
         goto fileCleanup;
     }
@@ -131,16 +116,13 @@ int main(int argc, char *argv[])
     RBRGen4Dataset datasetPoolBuf[DATASET_COUNT];
     RBRGen4DatasetPool datasetPool = {
         .size = DATASET_COUNT,
-        .pool = datasetPoolBuf
+        .pool = datasetPoolBuf,
     };
     int32_t datasetCount;
     err = RBRGen4_getDatasetPool(&conn, &datasetPool);
-    if (err == RBRGEN4_SUCCESS)
-    {
+    if (err == RBRGEN4_SUCCESS) {
         datasetCount = datasetPool.count;
-    }
-    else if (err == RBRGEN4_TRUNCATED)
-    {
+    } else if (err == RBRGEN4_TRUNCATED) {
         datasetCount = datasetPool.size;
         printf("%s: Warning: not enough space in dataset pool to store all"
                " datasets. Instrument reports %" PRId32 " but pool only has"
@@ -148,26 +130,22 @@ int main(int argc, char *argv[])
                programName,
                datasetPool.count,
                datasetPool.size);
-    }
-    else
-    {
-        logCmdError(&conn, err,
+    } else {
+        logCmdError(&conn,
+                    err,
                     "Failed to get dataset pool -- does this instrument"
                     " support storing data?");
         goto instrumentCleanup;
     }
 
     RBRGen4Dataset *dataset = NULL;
-    for (int32_t i = 0; i < datasetCount; i++)
-    {
-        if (strcmp(datasetPool.pool[i].label, DATASET_LABEL) == 0)
-        {
+    for (int32_t i = 0; i < datasetCount; i++) {
+        if (strcmp(datasetPool.pool[i].label, DATASET_LABEL) == 0) {
             dataset = &datasetPool.pool[i];
             break;
         }
     }
-    if (dataset == NULL)
-    {
+    if (dataset == NULL) {
         fprintf(stderr,
                 "%s: Dataset %s not found; run"
                 " posix-enable first\n",
@@ -181,16 +159,13 @@ int main(int argc, char *argv[])
     RBRGen4Label scheduleListBuf[SCHEDULE_COUNT];
     RBRGen4LabelList scheduleList = {
         .size = SCHEDULE_COUNT,
-        .labels = scheduleListBuf
+        .labels = scheduleListBuf,
     };
     int32_t scheduleCount;
     err = RBRGen4_getDataset(&conn, dataset, &scheduleList);
-    if (err == RBRGEN4_SUCCESS)
-    {
+    if (err == RBRGEN4_SUCCESS) {
         scheduleCount = scheduleList.count;
-    }
-    else if (err == RBRGEN4_TRUNCATED)
-    {
+    } else if (err == RBRGEN4_TRUNCATED) {
         scheduleCount = scheduleList.size;
         printf("%s: Warning: not enough space in schedule list to store all"
                " schedules. Instrument reports %" PRId32 " but list only has"
@@ -198,9 +173,7 @@ int main(int argc, char *argv[])
                programName,
                scheduleList.count,
                scheduleList.size);
-    }
-    else
-    {
+    } else {
         logCmdError(&conn, err, "Failed to get dataset");
         goto instrumentCleanup;
     }
@@ -210,8 +183,7 @@ int main(int argc, char *argv[])
            RBRGen4DatasetStatus_name(dataset->status),
            dataset->byteCount,
            RBRGen4DataType_name(dataset->dataType));
-    for (int32_t i = 0; i < scheduleCount; i++)
-    {
+    for (int32_t i = 0; i < scheduleCount; i++) {
         printf(" %s", scheduleList.labels[i]);
     }
     printf("\n");
@@ -219,12 +191,8 @@ int main(int argc, char *argv[])
     /* Get the size of the schedule's sample data. This fails if the schedule
      * is not in the dataset. */
     RBRGen4DatasetDataBlock dataBlock;
-    err = RBRGen4Dataset_getScheduleDataBlock(&conn,
-                                              dataset,
-                                              SCHEDULE_LABEL,
-                                              &dataBlock);
-    if (err)
-    {
+    err = RBRGen4Dataset_getScheduleDataBlock(&conn, dataset, SCHEDULE_LABEL, &dataBlock);
+    if (err) {
         logCmdError(&conn, err, "Failed to get schedule data block");
         goto instrumentCleanup;
     }
@@ -236,8 +204,7 @@ int main(int argc, char *argv[])
     /* Create the output file, e.g. 999999_ds_ascent_sch_asc_pt.bin */
     RBRGen4Id4 id;
     err = RBRGen4_getId4(&conn, &id);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get id");
         goto instrumentCleanup;
     }
@@ -249,8 +216,7 @@ int main(int argc, char *argv[])
              dataset->label,
              SCHEDULE_LABEL);
     int downloadFd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    if (downloadFd < 0)
-    {
+    if (downloadFd < 0) {
         fprintf(stderr,
                 "%s: Failed to open output file %s: %s!\n",
                 programName,
@@ -267,40 +233,26 @@ int main(int argc, char *argv[])
         .unit = RBRGEN4_DOWNLOAD_DATA_UNIT_BYTES,
         .start = 0,
         .data = buf,
-        .dataSize = sizeof(buf)
+        .dataSize = sizeof(buf),
     };
 
     struct timespec start;
     clock_gettime(CLOCK_MONOTONIC, &start);
-    while (download.start < dataBlock.byteCount)
-    {
+    while (download.start < dataBlock.byteCount) {
         download.count = sizeof(buf);
-        err = RBRGen4Dataset_downloadScheduleData(&conn,
-                                                  dataset,
-                                                  SCHEDULE_LABEL,
-                                                  &download);
-        if (err == RBRGEN4_TIMEOUT || err == RBRGEN4_CHECKSUM_ERROR)
-        {
+        err = RBRGen4Dataset_downloadScheduleData(&conn, dataset, SCHEDULE_LABEL, &download);
+        if (err == RBRGEN4_TIMEOUT || err == RBRGEN4_CHECKSUM_ERROR) {
             /* The chunk is requested again from the same offset. */
-            printf("\n%s: Warning: %s; retrying\n",
-                   programName,
-                   RBRGen4Error_name(err));
+            printf("\n%s: Warning: %s; retrying\n", programName, RBRGen4Error_name(err));
             continue;
-        }
-        else if (err)
-        {
+        } else if (err) {
             logCmdError(&conn, err, "Failed to download schedule data");
             goto downloadCleanup;
         }
 
         /* The count is updated to what the instrument actually sent. */
-        if (write(downloadFd, download.data, download.byteCount)
-            != download.byteCount)
-        {
-            fprintf(stderr,
-                    "%s: Failed to write output file: %s!\n",
-                    programName,
-                    strerror(errno));
+        if (write(downloadFd, download.data, download.byteCount) != download.byteCount) {
+            fprintf(stderr, "%s: Failed to write output file: %s!\n", programName, strerror(errno));
             status = EXIT_FAILURE;
             goto downloadCleanup;
         }

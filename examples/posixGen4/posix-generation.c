@@ -29,13 +29,8 @@ const char *programName = "";
  * instrument's own message, which says what it objected to. */
 void logCmdError(const RBRGen4 *conn, RBRGen4Error err, const char *msg)
 {
-    fprintf(stderr,
-            "%s: %s (%s)\n",
-            programName,
-            msg,
-            RBRGen4Error_name(err));
-    if (err == RBRGEN4_HARDWARE_ERROR)
-    {
+    fprintf(stderr, "%s: %s (%s)\n", programName, msg, RBRGen4Error_name(err));
+    if (err == RBRGEN4_HARDWARE_ERROR) {
         fprintf(stderr,
                 "%s: Instrument reported: %s\n",
                 programName,
@@ -47,8 +42,7 @@ int main(int argc, char *argv[])
 {
     programName = argv[0];
 
-    if (argc < 2)
-    {
+    if (argc < 2) {
         fprintf(stderr, "Usage: %s device\n", programName);
         return EXIT_FAILURE;
     }
@@ -56,12 +50,8 @@ int main(int argc, char *argv[])
     int instrumentFd;
     char *devicePath = argv[1];
 
-    if ((instrumentFd = openSerialFd(devicePath)) < 0)
-    {
-        fprintf(stderr,
-                "%s: Failed to open serial device: %s!\n",
-                programName,
-                strerror(errno));
+    if ((instrumentFd = openSerialFd(devicePath)) < 0) {
+        fprintf(stderr, "%s: Failed to open serial device: %s!\n", programName, strerror(errno));
         return EXIT_FAILURE;
     }
 
@@ -78,27 +68,20 @@ int main(int argc, char *argv[])
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
-        .write = instrumentWrite
+        .write = instrumentWrite,
     };
 
     /* Opening the connection identifies the instrument, so an instrument of
      * an unsupported generation is refused here with RBRGEN4_UNSUPPORTED. */
-    err = RBRGen4_open(&conn,
-                       &callbacks,
-                       INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-                       (void *) &instrumentFd);
-    if (err)
-    {
+    err = RBRGen4_open(&conn, &callbacks, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd);
+    if (err) {
         logCmdError(&conn, err, "Failed to establish instrument connection");
         goto fileCleanup;
     }
 
     RBRGen4Generation generation = RBRGen4_getGeneration(&conn);
-    printf("%s: Instrument generation is %s\n",
-           programName,
-           RBRGen4Generation_name(generation));
-    if (generation != RBRGEN4_LOGGER4)
-    {
+    printf("%s: Instrument generation is %s\n", programName, RBRGen4Generation_name(generation));
+    if (generation != RBRGEN4_LOGGER4) {
         err = RBRGEN4_UNSUPPORTED;
         logCmdError(&conn,
                     err,

@@ -31,8 +31,7 @@
 int openSerialFd(char *devicePath)
 {
     int instrumentFd;
-    if ((instrumentFd = open(devicePath, O_RDWR | O_NOCTTY)) < 0)
-    {
+    if ((instrumentFd = open(devicePath, O_RDWR | O_NOCTTY)) < 0) {
         return -1;
     }
 
@@ -58,7 +57,7 @@ int openSerialFd(char *devicePath)
  * doing so would break a vast number of existing applications). And this
  * approach is more platform-generic than an ioctl. */
 #define B115200 115200
-#define B9600 9600
+#define B9600   9600
 #endif
 
     /*important!!!
@@ -69,16 +68,14 @@ int openSerialFd(char *devicePath)
     /* Input baud rate of 0 causes the output baud rate to be used. */
     cfsetispeed(&portSettings, B0);
 
-    if (tcsetattr(instrumentFd, TCSANOW, &portSettings) < 0)
-    {
+    if (tcsetattr(instrumentFd, TCSANOW, &portSettings) < 0) {
         close(instrumentFd);
         return -1;
     }
     return instrumentFd;
 }
 
-RBRGen3Error instrumentTime(const struct RBRGen3 *conn,
-                                  RBRGen3DateTime *time)
+RBRGen3Error instrumentTime(const struct RBRGen3 *conn, RBRGen3DateTime *time)
 {
     /* Unused. */
     (void) conn;
@@ -89,23 +86,20 @@ RBRGen3Error instrumentTime(const struct RBRGen3 *conn,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error instrumentSleep(const struct RBRGen3 *conn,
-                                   RBRGen3DateTime time)
+RBRGen3Error instrumentSleep(const struct RBRGen3 *conn, RBRGen3DateTime time)
 {
     /* Unused. */
     (void) conn;
 
     struct timespec sleep = {
-        .tv_sec  =  time / 1000,
-        .tv_nsec = (time % 1000) * 1000000
+        .tv_sec = time / 1000,
+        .tv_nsec = (time % 1000) * 1000000,
     };
     nanosleep(&sleep, NULL);
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error instrumentRead(const struct RBRGen3 *conn,
-                                  void *data,
-                                  int32_t *size)
+RBRGen3Error instrumentRead(const struct RBRGen3 *conn, void *data, int32_t *size)
 {
     int *instrumentFd = (int *) RBRGen3_getUserData(conn);
 
@@ -115,26 +109,17 @@ RBRGen3Error instrumentRead(const struct RBRGen3 *conn,
      * read operations; on the other, it means timeouts can't conveniently be
      * changed based on context. For example, you might want to have a much
      * longer timeout for the `enable` or `memclear` commands than for `id`. */
-    *size = read(*instrumentFd,
-                 data,
-                 *size);
-    if (*size == 0)
-    {
+    *size = read(*instrumentFd, data, *size);
+    if (*size == 0) {
         return RBRGEN3_TIMEOUT;
-    }
-    else if (*size < 0)
-    {
+    } else if (*size < 0) {
         return RBRGEN3_CALLBACK_ERROR;
-    }
-    else
-    {
+    } else {
         return RBRGEN3_SUCCESS;
     }
 }
 
-RBRGen3Error instrumentWrite(const struct RBRGen3 *conn,
-                                   const void *const data,
-                                   int32_t size)
+RBRGen3Error instrumentWrite(const struct RBRGen3 *conn, const void *const data, int32_t size)
 {
     int *instrumentFd = (int *) RBRGen3_getUserData(conn);
     const uint8_t *const byteData = (const uint8_t *const) data;
@@ -149,40 +134,30 @@ RBRGen3Error instrumentWrite(const struct RBRGen3 *conn,
 
     struct timeval writeTimeout;
 
-    while (written < size)
-    {
+    while (written < size) {
         /* select() may (and on Linux, does) update the timeout argument with
          * how much of the timeout remained upon return. We want every check to
          * have the same timeout, so we'll reset it before each use. */
         writeTimeout = (struct timeval) {
-            .tv_sec  =  INSTRUMENT_CHARACTER_TIMEOUT_MSEC / 1000,
-            .tv_usec = (INSTRUMENT_CHARACTER_TIMEOUT_MSEC % 1000) * 1000
+            .tv_sec = INSTRUMENT_CHARACTER_TIMEOUT_MSEC / 1000,
+            .tv_usec = (INSTRUMENT_CHARACTER_TIMEOUT_MSEC % 1000) * 1000,
         };
 
         /* We could just loop on write(), but we want to enforce a timeout, so
          * select() kills two birds with one stone: making sure the output
          * device is ready to be written to, and handling the timeout. */
-        int instrumentReady = select(*instrumentFd + 1,
-                                     NULL,
-                                     &instrumentFdSet,
-                                     NULL,
-                                     &writeTimeout);
-        if (instrumentReady < 0)
-        {
+        int instrumentReady =
+            select(*instrumentFd + 1, NULL, &instrumentFdSet, NULL, &writeTimeout);
+        if (instrumentReady < 0) {
             return RBRGEN3_CALLBACK_ERROR;
-        }
-        else if (instrumentReady == 0)
-        {
+        } else if (instrumentReady == 0) {
             return RBRGEN3_TIMEOUT;
         }
 
-        int32_t chunkWritten = write(*instrumentFd,
-                                     byteData + written,
-                                     size - written);
+        int32_t chunkWritten = write(*instrumentFd, byteData + written, size - written);
         /* select() told us we were good to go, so a 0-byte write is probably
          * an error, not just an unready device. */
-        if (chunkWritten <= 0)
-        {
+        if (chunkWritten <= 0) {
             return RBRGEN3_CALLBACK_ERROR;
         }
 
@@ -197,63 +172,47 @@ RBRGen3Error instrumentStart(RBRGen3 *conn)
     RBRGen3Error err;
 
     RBRGen3DeploymentStatus status;
-    if ((err = RBRGen3_disable(conn, &status))
-        != RBRGEN3_SUCCESS)
-    {
+    if ((err = RBRGen3_disable(conn, &status)) != RBRGEN3_SUCCESS) {
         return err;
     }
 
     RBRGen3Sampling sampling;
-    if ((err = RBRGen3_getSampling(conn, &sampling))
-        != RBRGEN3_SUCCESS)
-    {
+    if ((err = RBRGen3_getSampling(conn, &sampling)) != RBRGEN3_SUCCESS) {
         return err;
     }
     sampling.mode = RBRGEN3_SAMPLING_CONTINUOUS;
     sampling.period = sampling.userPeriodLimit;
-    if ((err = RBRGen3_setSampling(conn, &sampling))
-        != RBRGEN3_SUCCESS)
-    {
+    if ((err = RBRGen3_setSampling(conn, &sampling)) != RBRGEN3_SUCCESS) {
         return err;
     }
 
     RBRGen3Deployment deployment = {
         .startTime = RBRGEN3_DATETIME_MIN,
-        .endTime = RBRGEN3_DATETIME_MAX
+        .endTime = RBRGEN3_DATETIME_MAX,
     };
-    if ((err = RBRGen3_setDeployment(conn, &deployment))
-        != RBRGEN3_SUCCESS)
-    {
+    if ((err = RBRGen3_setDeployment(conn, &deployment)) != RBRGEN3_SUCCESS) {
         return err;
     }
 
-    if ((err = RBRGen3_setNewMemoryFormat(
-             conn,
-             RBRGEN3_MEMFORMAT_CALBIN00))
-        != RBRGEN3_SUCCESS)
-    {
+    if ((err = RBRGen3_setNewMemoryFormat(conn, RBRGEN3_MEMFORMAT_CALBIN00)) != RBRGEN3_SUCCESS) {
         return err;
     }
 
     RBRGen3Thresholding thresholding;
     err = RBRGen3_getThresholding(conn, &thresholding);
-    if (err == RBRGEN3_SUCCESS && thresholding.enabled)
-    {
+    if (err == RBRGEN3_SUCCESS && thresholding.enabled) {
         thresholding.enabled = false;
         RBRGen3_setThresholding(conn, &thresholding);
     }
 
     RBRGen3TwistActivation twistActivation;
     err = RBRGen3_getTwistActivation(conn, &twistActivation);
-    if (err == RBRGEN3_SUCCESS && twistActivation.enabled)
-    {
+    if (err == RBRGEN3_SUCCESS && twistActivation.enabled) {
         twistActivation.enabled = false;
         RBRGen3_setTwistActivation(conn, &twistActivation);
     }
 
-    if ((err = RBRGen3_enable(conn, true, &status))
-        != RBRGEN3_SUCCESS)
-    {
+    if ((err = RBRGen3_enable(conn, true, &status)) != RBRGEN3_SUCCESS) {
         return err;
     }
 

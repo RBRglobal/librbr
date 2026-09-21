@@ -33,13 +33,8 @@ const char *programName = "";
  * instrument's own message, which says what it objected to. */
 void logCmdError(const RBRGen4 *conn, RBRGen4Error err, const char *msg)
 {
-    fprintf(stderr,
-            "%s: %s (%s)\n",
-            programName,
-            msg,
-            RBRGen4Error_name(err));
-    if (err == RBRGEN4_HARDWARE_ERROR)
-    {
+    fprintf(stderr, "%s: %s (%s)\n", programName, msg, RBRGen4Error_name(err));
+    if (err == RBRGEN4_HARDWARE_ERROR) {
         fprintf(stderr,
                 "%s: Instrument reported: %s\n",
                 programName,
@@ -51,8 +46,7 @@ int main(int argc, char *argv[])
 {
     programName = argv[0];
 
-    if (argc < 2)
-    {
+    if (argc < 2) {
         fprintf(stderr, "Usage: %s device\n", programName);
         return EXIT_FAILURE;
     }
@@ -60,12 +54,8 @@ int main(int argc, char *argv[])
     int instrumentFd;
     char *devicePath = argv[1];
 
-    if ((instrumentFd = openSerialFd(devicePath)) < 0)
-    {
-        fprintf(stderr,
-                "%s: Failed to open serial device: %s!\n",
-                programName,
-                strerror(errno));
+    if ((instrumentFd = openSerialFd(devicePath)) < 0) {
+        fprintf(stderr, "%s: Failed to open serial device: %s!\n", programName, strerror(errno));
         return EXIT_FAILURE;
     }
 
@@ -82,15 +72,11 @@ int main(int argc, char *argv[])
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
-        .write = instrumentWrite
+        .write = instrumentWrite,
     };
 
-    err = RBRGen4_open(&conn,
-                       &callbacks,
-                       INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-                       (void *) &instrumentFd);
-    if (err)
-    {
+    err = RBRGen4_open(&conn, &callbacks, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd);
+    if (err) {
         logCmdError(&conn, err, "Failed to establish instrument connection");
         goto fileCleanup;
     }
@@ -98,8 +84,7 @@ int main(int argc, char *argv[])
     /* Identify the instrument */
     RBRGen4Instrument instrument;
     err = RBRGen4_getInstrument(&conn, &instrument);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get instrument");
         goto instrumentCleanup;
     }
@@ -115,25 +100,20 @@ int main(int argc, char *argv[])
     /* Report how the instrument is connected */
     RBRGen4Link link;
     err = RBRGen4_getLink(&conn, &link);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get link");
         goto instrumentCleanup;
     }
-    printf("Connected to the instrument via %s.\n",
-           RBRGen4LinkType_name(link.type));
+    printf("Connected to the instrument via %s.\n", RBRGen4LinkType_name(link.type));
 
-    switch (link.type)
-    {
+    switch (link.type) {
     case RBRGEN4_LINK_TYPE_USB:
-    // case RBRGEN4_LINK_TYPE_WIFI:
+        // case RBRGEN4_LINK_TYPE_WIFI:
         break;
-    case RBRGEN4_LINK_TYPE_SERIAL:
-    {
+    case RBRGEN4_LINK_TYPE_SERIAL: {
         RBRGen4LinkSerial serial;
         err = RBRGen4_getLinkSerial(&conn, &serial);
-        if (err)
-        {
+        if (err) {
             logCmdError(&conn, err, "Failed to get link serial");
             goto instrumentCleanup;
         }
@@ -144,15 +124,13 @@ int main(int argc, char *argv[])
         break;
     }
     default:
-        fprintf(stderr,
-                "Warning: connection method to the instrument is unclear\n");
+        fprintf(stderr, "Warning: connection method to the instrument is unclear\n");
     }
 
     /* Report how the instrument is powered */
     RBRGen4PowerSource powerSource;
     err = RBRGen4_getPowerSource(&conn, &powerSource);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get power source");
         goto instrumentCleanup;
     }
@@ -160,8 +138,7 @@ int main(int argc, char *argv[])
 
     RBRGen4PowerInternal powerInternal;
     err = RBRGen4_getPowerInternal(&conn, &powerInternal);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get internal power");
         goto instrumentCleanup;
     }
@@ -172,8 +149,7 @@ int main(int argc, char *argv[])
 
     RBRGen4PowerExternal powerExternal;
     err = RBRGen4_getPowerExternal(&conn, &powerExternal);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to get external power");
         goto instrumentCleanup;
     }
@@ -184,8 +160,7 @@ int main(int argc, char *argv[])
 
     /* Put the instrument to sleep now that we are done with it */
     err = RBRGen4_sleep(&conn);
-    if (err)
-    {
+    if (err) {
         logCmdError(&conn, err, "Failed to put instrument to sleep");
         goto instrumentCleanup;
     }

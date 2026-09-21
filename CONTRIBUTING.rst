@@ -173,11 +173,19 @@ A short example:
 Formatting is enforced with `clang-format <https://clang.llvm.org/docs/ClangFormat.html>`__
 using the ``.clang-format`` file at the repository root,
 which follows the `Zephyr project's <https://docs.zephyrproject.org/latest/contribute/guidelines.html#coding-style>`__ configuration.
+Use clang-format 20:
+other major versions format some constructs differently
+(for example, the space after a compound literal's cast)
+and will disagree with the check in CI.
 Run ``clang-format -i`` on the files you changed before committing;
-``tools/format-check.sh`` lists any library, header, or test source
-which would be changed by the formatter,
-and the same check runs in CI.
-The example programs are not yet formatted this way.
+``tools/format-check.sh`` lists any library, header, test,
+or example source which would be changed by the formatter,
+and the same check runs in CI using the ``silkeh/clang:20`` image,
+which you can also use locally:
+
+.. code-block:: sh
+
+   docker run --rm -v "$PWD":/w -w /w docker.io/silkeh/clang:20 ./tools/format-check.sh
 
 Documentation
 ~~~~~~~~~~~~~
