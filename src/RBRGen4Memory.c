@@ -561,21 +561,26 @@ RBRGen4Error RBRGen4_downloadDatasetScheduleEvents(RBRGen4 *conn, const RBRGen4D
 RBRGen4Error RBRGen4_downloadDatasetMeta(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                          RBRGen4DownloadMeta *download)
 {
-    if (dataset->label[0] == '\0' || download->byteCount < 0 || download->byteStart < 0 ||
+    if (dataset->label[0] == '\0' || download->count < 0 || download->start < 0 ||
         download->data == NULL) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
+
+    download->byteCount = 0;
 
     RBR_TRY(RBRGen4_converse(conn,
                              "download %s/meta"
                              " bytecount=%" PRId64 " bytestart=%" PRId64,
                              dataset->label,
-                             download->byteCount,
-                             download->byteStart));
+                             download->count,
+                             download->start));
 
-    int64_t byteCount = 0;
-    RBR_TRY(RBRGen4_downloadDatasetCommon(
-        conn, "bytecount", &download->byteCount, &byteCount, download->data, download->dataSize));
+    RBR_TRY(RBRGen4_downloadDatasetCommon(conn,
+                                          "bytecount",
+                                          &download->count,
+                                          &download->byteCount,
+                                          download->data,
+                                          download->dataSize));
 
     return RBRGEN4_SUCCESS;
 }

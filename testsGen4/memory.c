@@ -799,8 +799,8 @@ TEST_LOGGER4(downloadDatasetMeta)
     const char *response =
         "download d1/meta bytecount=8 bytestart=0" RESPONSE_TERMINATOR "METAMETA\xc3\x14";
     RBRGen4DownloadMeta download = {
-        .byteCount = 8,
-        .byteStart = 0,
+        .count = 8,
+        .start = 0,
         .data = data,
         .dataSize = sizeof(data),
     };
@@ -809,6 +809,7 @@ TEST_LOGGER4(downloadDatasetMeta)
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("download d1/meta bytecount=8 bytestart=0" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
+    TEST_ASSERT_EQ(INT64_C(8), download.count, "%" PRId64);
     TEST_ASSERT_EQ(INT64_C(8), download.byteCount, "%" PRId64);
     TEST_ASSERT(memcmp(data, "METAMETA", 8) == 0);
 

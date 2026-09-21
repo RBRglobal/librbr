@@ -541,14 +541,19 @@ typedef struct RBRGen4DownloadEvents {
  */
 typedef struct RBRGen4DownloadMeta {
     /**
-     * \brief The number of bytes to transfer: the requested amount,
-     * updated to the amount the instrument reports. Excludes the trailing
-     * CRC.
+     * \brief The amount of data to transfer, in bytes: the requested
+     * amount, updated to the amount the instrument reports.
      */
-    int64_t byteCount;
+    int64_t count;
 
     /** \brief The offset to begin reading from, in bytes, from 0. */
-    int64_t byteStart;
+    int64_t start;
+
+    /**
+     * \brief The number of bytes transferred, excluding the trailing CRC.
+     * \readonly
+     */
+    int64_t byteCount;
 
     /** \brief The caller-provided buffer receiving the transferred data. */
     void *data;
@@ -666,8 +671,8 @@ RBRGen4Error RBRGen4_downloadDatasetScheduleEvents(RBRGen4 *conn, const RBRGen4D
  * \param [in] dataset the dataset, selected by its label
  * \param [in,out] download the download request: the caller populates the
  *                         count, offset, and buffer fields to say what to
- *                         transfer and where to put it; the count is updated
- *                         with what the instrument returned
+ *                         transfer and where to put it; the counts are
+ *                         updated with what the instrument returned
  * \return #RBRGEN4_SUCCESS when the data is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
