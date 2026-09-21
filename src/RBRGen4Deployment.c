@@ -269,24 +269,37 @@ static void RBRGen4_parseInstrumentState(RBRGen4 *conn, RBRGen4InstrumentState *
     }
 }
 
+/** \brief Room for `dataset=<label> ` and its terminator. */
+#define RBRGEN4_DATASET_PARAMETER_MAX (sizeof("dataset= ") + RBRGEN4_LABEL_NAME_MAX)
+
 /**
  * \brief Check the parameters `verify` and `enable` share.
  *
  * \param [in] config the configuration to deploy
- * \param [in] datasetLabel the label for the deployment's dataset
+ * \param [in] datasetLabel the label for the deployment's dataset, or `NULL`
  * \param [in] storageMode the data storage mode
+ * \param [out] dataset the `dataset` parameter to send, with its trailing
+ *                      space, or empty
  * \return #RBRGEN4_SUCCESS when the parameters are all in range
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE otherwise
  */
 static RBRGen4Error RBRGen4_checkDeploymentParameters(const RBRGen4Config *config,
                                                       const char *datasetLabel,
-                                                      RBRGen4DeploymentStorageMode storageMode)
+                                                      RBRGen4DeploymentStorageMode storageMode,
+                                                      char dataset[RBRGEN4_DATASET_PARAMETER_MAX])
 {
-    if (config == NULL || config->label[0] == '\0' || datasetLabel == NULL ||
-        datasetLabel[0] == '\0' || strlen(datasetLabel) > RBRGEN4_LABEL_NAME_MAX ||
+    if (config == NULL || config->label[0] == '\0' ||
+        (datasetLabel != NULL &&
+         (datasetLabel[0] == '\0' || strlen(datasetLabel) > RBRGEN4_LABEL_NAME_MAX)) ||
         (storageMode != RBRGEN4_STORAGE_MODE_NORMAL &&
          storageMode != RBRGEN4_STORAGE_MODE_CALIBRATION)) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    /* A `NULL` label leaves the parameter out. */
+    dataset[0] = '\0';
+    if (datasetLabel != NULL) {
+        snprintf(dataset, RBRGEN4_DATASET_PARAMETER_MAX, "dataset=%s ", datasetLabel);
     }
 
     return RBRGEN4_SUCCESS;
@@ -295,12 +308,13 @@ static RBRGen4Error RBRGen4_checkDeploymentParameters(const RBRGen4Config *confi
 RBRGen4Error RBRGen4_verify(RBRGen4 *conn, const RBRGen4Config *config, const char *datasetLabel,
                             RBRGen4DeploymentStorageMode storageMode, RBRGen4InstrumentState *state)
 {
-    RBR_TRY(RBRGen4_checkDeploymentParameters(config, datasetLabel, storageMode));
+    char dataset[RBRGEN4_DATASET_PARAMETER_MAX];
+    RBR_TRY(RBRGen4_checkDeploymentParameters(config, datasetLabel, storageMode, dataset));
 
     RBR_TRY(RBRGen4_converse(conn,
-                             "verify config=%s dataset=%s storagemode=%s",
+                             "verify config=%s %sstoragemode=%s",
                              config->label,
-                             datasetLabel,
+                             dataset,
                              RBRGen4DeploymentStorageMode_name(storageMode)));
 
     RBRGen4_parseInstrumentState(conn, state);
@@ -326,12 +340,13 @@ const char *RBRGen4DeploymentStorageMode_name(RBRGen4DeploymentStorageMode stora
 RBRGen4Error RBRGen4_enable(RBRGen4 *conn, const RBRGen4Config *config, const char *datasetLabel,
                             RBRGen4DeploymentStorageMode storageMode, RBRGen4InstrumentState *state)
 {
-    RBR_TRY(RBRGen4_checkDeploymentParameters(config, datasetLabel, storageMode));
+    char dataset[RBRGEN4_DATASET_PARAMETER_MAX];
+    RBR_TRY(RBRGen4_checkDeploymentParameters(config, datasetLabel, storageMode, dataset));
 
     RBR_TRY(RBRGen4_converse(conn,
-                             "enable config=%s dataset=%s storagemode=%s",
+                             "enable config=%s %sstoragemode=%s",
                              config->label,
-                             datasetLabel,
+                             dataset,
                              RBRGen4DeploymentStorageMode_name(storageMode)));
 
     RBRGen4_parseInstrumentState(conn, state);
