@@ -179,7 +179,7 @@ other major versions format some constructs differently
 and will disagree with the check in CI.
 Run ``clang-format -i`` on the files you changed before committing;
 ``tools/format-check.sh`` lists any library, header, test,
-or POSIX example source which would be changed by the formatter,
+or example source which would be changed by the formatter,
 and the same check runs in CI using the ``silkeh/clang:20`` image,
 which you can also use locally:
 
