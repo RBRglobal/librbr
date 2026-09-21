@@ -1,8 +1,12 @@
 /**
  * \file posix-poll.c
  *
- * \brief Example of using the library to poll instrument data in a POSIX
- * environment.
+ * \brief Example of using the library to poll an instrument for on-demand
+ * samples.
+ *
+ * Polls every channel, then just the pressure and temperature channels.
+ * Nothing is written to the instrument, and polling works whether or not a
+ * deployment is enabled.
  *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
@@ -11,9 +15,9 @@
 
 /* Required for errno. */
 #include <errno.h>
-/* Required for isnan. */
-#include <math.h>
-/* Required for fprintf, printf, snprintf. */
+/* Required for PRId32, PRId64. */
+#include <inttypes.h>
+/* Required for fprintf, printf. */
 #include <stdio.h>
 /* Required for EXIT_SUCCESS, etc. */
 #include <stdlib.h>
@@ -22,47 +26,83 @@
 /* Required for close. */
 #include <unistd.h>
 
+#include "RBRGen4.h"
 #include "posix-shared.h"
 
-//**************** customer defined parameters ******************************** //
+/* == Customer defined parameters == */
+
+/* Tune this value to your instrument. This example is intended to work with
+ * any instrument that has pressure and temperature channels, so a large
+ * channel count is used to be as compatible as possible off-the-shelf. */
+#define CHANNEL_COUNT 32
+
 #define PRESSURE "pressure_00"
 #define TEMPERATURE "temperature_00"
-#define SALINITY_DYNCORR "salinitydyncorr_00"
 
-#define GROUP_PTS_LABEL "gr_pts"
-#define GROUP_PTS_CHANNELS \
-(const RBRGen4Label[]) \
-{   \
-    PRESSURE, \
-        TEMPERATURE, \
-        SALINITY_DYNCORR \
+/* The `poll channellist=` value: labels separated by `|`. */
+#define POLL_PT_CHANNELS PRESSURE "|" TEMPERATURE
+
+/* How many times to poll each way. */
+#define POLL_COUNT 5
+
+const char *programName = "";
+
+/* Report a failed library call. A hardware error also carries the
+ * instrument's own message, which says what it objected to. */
+void logCmdError(const RBRGen4 *conn, RBRGen4Error err, const char *msg)
+{
+    fprintf(stderr,
+            "%s: %s (%s)\n",
+            programName,
+            msg,
+            RBRGen4Error_name(err));
+    if (err == RBRGEN4_HARDWARE_ERROR)
+    {
+        fprintf(stderr,
+                "%s: Instrument reported: %s\n",
+                programName,
+                RBRGen4_getLastHardwareErrorMessage(conn));
+    }
 }
 
+/* Print a sample's timestamp and readings on one line. Error readings are
+ * NaNs carrying an error code; report the code instead of the value. */
+void printSample(const RBRGen4Sample *sample)
+{
+    printf("%" PRId64, sample->timestamp);
+    for (int32_t i = 0; i < sample->channelCount; i++)
+    {
+        if (RBRGen4Reading_isError(sample->readings[i]))
+        {
+            printf(", error %d", RBRGen4Reading_getError(sample->readings[i]));
+        }
+        else
+        {
+            printf(", %f", sample->readings[i]);
+        }
+    }
+    printf("\n");
+}
 
 int main(int argc, char *argv[])
 {
-    // check all arguments are provided
-    char *programName = argv[0];
-    char *devicePath;
-
-    int status = EXIT_SUCCESS;
-    int instrumentFd;
-
-    RBRGen4Error err;
-    RBRGen4 instrumentSpace;
-    RBRGen4 *conn = &instrumentSpace;
+    programName = argv[0];
 
     if (argc < 2)
     {
-        fprintf(stderr, "Usage: %s device\n", argv[0]);
+        fprintf(stderr, "Usage: %s device\n", programName);
         return EXIT_FAILURE;
     }
 
-    // check port communication
-    devicePath = argv[1];
+    int instrumentFd;
+    char *devicePath = argv[1];
+
     if ((instrumentFd = openSerialFd(devicePath)) < 0)
     {
-        fprintf(stderr, "%s: Failed to open serial device: %s!\n", programName, strerror(errno));
+        fprintf(stderr,
+                "%s: Failed to open serial device: %s!\n",
+                programName,
+                strerror(errno));
         return EXIT_FAILURE;
     }
 
@@ -73,127 +113,114 @@ int main(int argc, char *argv[])
             RBRGEN4_LIB_VERSION,
             RBRGEN4_LIB_BUILD_DATE);
 
-    // check instrument communication is fine.
-    RBRGen4Callbacks callbacks = {
+    RBRGen4Error err = RBRGEN4_SUCCESS;
+    RBRGen4 conn;
+    const RBRGen4Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite
     };
 
-    if ((err = RBRGen4_open(
-             conn,
-             &callbacks,
-             INSTRUMENT_COMMAND_TIMEOUT_MSEC,
-             (void *) &instrumentFd)) != RBRGEN4_SUCCESS)
+    err = RBRGen4_open(&conn,
+                       &callbacks,
+                       INSTRUMENT_COMMAND_TIMEOUT_MSEC,
+                       (void *) &instrumentFd);
+    if (err)
     {
-        fprintf(stderr, "%s: Failed to establish instrument connection: %s!\n", programName, RBRGen4Error_name(err));
-        status = EXIT_FAILURE;
-        goto fileCleanup; // Failure case, memory allocated by this constructor is freed.
+        logCmdError(&conn, err, "Failed to establish instrument connection");
+        goto fileCleanup;
     }
 
-    //------(optional) get link type: USB/serial/wifi---------------------------------------------
-    RBRGen4Link link;
-    RBRGen4_getLink(conn, &link);
-    printf("Connected to the instrument via %s.\n",
-           RBRGen4LinkType_name(link.type));
-
-    RBRGen4LinkSerial serial;
-
-    switch (link.type)
+    /* Polled samples are only distinguishable from streamed samples when the
+     * output format includes the schedule label (polled samples are labelled
+     * `polling`). Read the format rather than change it, and only insist on
+     * the label when the instrument reports it. */
+    RBRGen4OutputFormat outputFormat;
+    err = RBRGen4_getOutputFormat(&conn, &outputFormat);
+    if (err)
     {
-    case RBRGEN4_LINK_TYPE_USB:
-        break;
-    case RBRGEN4_LINK_TYPE_SERIAL:
-    {
-        RBRGen4_getLinkSerial(conn, &serial);
-        printf("Connected in %s mode at %s baud.\n",
-               RBRGen4LinkSerialMode_name(serial.mode),
-               RBRGen4LinkSerialBaudRate_name(serial.baudRate));
-        break;
-    }
-    default:
-        fprintf(stderr,
-                "Warning: connection method to the instrument is unclear, so"
-                " poll can't be executed.\n");
+        logCmdError(&conn, err, "Failed to get output format");
         goto instrumentCleanup;
     }
+    const bool requireLabel = outputFormat.scheduleLabel;
+    if (!requireLabel)
+    {
+        printf("%s: Warning: schedule labels are off, so a streamed sample"
+               " may be returned in place of a polled one.\n",
+               programName);
+    }
 
-    // read the channel pool
-    RBRGen4Channel channelBuf[RBRGEN4_CHANNEL_MAX];
+    /* Read the channel pool so the readings can be labelled */
+    RBRGen4Channel channelPoolBuf[CHANNEL_COUNT];
     RBRGen4ChannelPool channelPool = {
-        .size = RBRGEN4_CHANNEL_MAX,
-        .pool = channelBuf
+        .size = CHANNEL_COUNT,
+        .pool = channelPoolBuf
     };
-    RBRGen4_getChannelPool(conn, &channelPool);
-
-    // Only the first group is polled, so only one label is kept; the pool
-    // reports that the rest were discarded, which is expected here.
-    RBRGen4Group groupBuf[1];
-    RBRGen4GroupPool groupPool = {
-        .size = 1,
-        .pool = groupBuf
-    };
-    err = RBRGen4_getGroupPool(conn, &groupPool);
-    if (err != RBRGEN4_SUCCESS
-        && err != RBRGEN4_TRUNCATED)
+    int32_t channelCount;
+    err = RBRGen4_getChannelPool(&conn, &channelPool);
+    if (err == RBRGEN4_SUCCESS)
     {
-        fprintf(stderr,
-                "%s: Failed to read the group pool: %s!\n",
-                programName,
-                RBRGen4Error_name(err));
-        status = EXIT_FAILURE;
+        channelCount = channelPool.count;
+    }
+    else if (err == RBRGEN4_TRUNCATED)
+    {
+        channelCount = channelPool.size;
+        printf("%s: Warning: not enough space in channel pool to store all"
+               " channels. Instrument reports %" PRId32 " but pool only has"
+               " room for %" PRId32 "\n",
+               programName,
+               channelPool.count,
+               channelPool.size);
+    }
+    else
+    {
+        logCmdError(&conn, err, "Failed to get channel pool");
         goto instrumentCleanup;
     }
 
-    // specify outputformat. The setter sends every parameter of the command,
-    // so read the current format and change only the sample fields.
-    RBRGen4OutputFormat outputformat;
-    RBRGen4_getOutputFormat(conn, &outputformat);
-    outputformat.sn = true;
-    outputformat.scheduleLabel = true;
-    outputformat.dateTime = true;
-    outputformat.crc = true;
-    RBRGen4_setOutputFormat(conn, &outputformat);
-
-    // poll data and print in console
-    RBRGen4Sample sample;
-    while (true)
+    /* Poll every channel. Readings are reported in channel pool order. */
+    printf("timestamp");
+    for (int32_t i = 0; i < channelCount; i++)
     {
-        // poll one group
-        err = RBRGen4_pollGroups(conn,
-                                           true,
-                                           groupPool.pool[0].label,
-                                           &sample);
-        if (err != RBRGEN4_SUCCESS)
-        {
-            fprintf(stderr, "Error: %s\n", RBRGen4Error_name(err));
-        }
-        else
-        {
-            printf("%" PRIi64, sample.timestamp);
-            for (int32_t i = 0; i < sample.channelCount; i++)
-            {
-                if (RBRGen4Reading_isError(sample.readings[i]))
-                {
-                    printf(", Error-%2d",
-                           RBRGen4Reading_getError(sample.readings[i]));
-                }
-                else
-                {
-                    printf(", %lf", sample.readings[i]);
-                }
-            }
-            printf("\n");
-        }
+        printf(", %s", channelPool.pool[i].label);
     }
-    goto instrumentCleanup;
+    printf("\n");
+
+    RBRGen4Sample sample;
+    for (int32_t i = 0; i < POLL_COUNT; i++)
+    {
+        err = RBRGen4_poll(&conn, requireLabel, &sample);
+        if (err)
+        {
+            logCmdError(&conn, err, "Failed to poll");
+            goto instrumentCleanup;
+        }
+        printSample(&sample);
+    }
+
+    /* Poll only the pressure and temperature channels. Readings are reported
+     * in the order requested. */
+    printf("timestamp, %s, %s\n", PRESSURE, TEMPERATURE);
+    for (int32_t i = 0; i < POLL_COUNT; i++)
+    {
+        err = RBRGen4_pollChannels(&conn,
+                                   requireLabel,
+                                   POLL_PT_CHANNELS,
+                                   &sample);
+        if (err)
+        {
+            logCmdError(&conn, err, "Failed to poll channels");
+            goto instrumentCleanup;
+        }
+        printSample(&sample);
+    }
 
 instrumentCleanup:
-    RBRGen4_close(conn);
+    RBRGen4_close(&conn);
 
 fileCleanup:
     close(instrumentFd);
 
-    return status;
+    return (err == RBRGEN4_SUCCESS) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

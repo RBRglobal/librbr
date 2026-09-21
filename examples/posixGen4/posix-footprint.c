@@ -1,47 +1,42 @@
 /**
  * \file posix-footprint.c
  *
- * \brief Get the footprint for different structures.
+ * \brief Print the memory footprint of the library's structures.
+ *
+ * No instrument is needed.
  *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.
  */
 
-/* Required for errno. */
-#include <errno.h>
-/* Required for isnan. */
-#include <math.h>
-/* Required for fprintf, printf, snprintf. */
+/* Required for printf. */
 #include <stdio.h>
-/* Required for strerror. */
-#include <string.h>
-/* Required for close. */
-#include <unistd.h>
+/* Required for EXIT_SUCCESS. */
+#include <stdlib.h>
 
-#include "posix-shared.h"
+#include "RBRGen4.h"
+
+#define PRINT_SIZE(type) printf("%-26s %6zu bytes\n", #type, sizeof(type))
 
 int main(void)
 {
-    RBRGen4 conn;
-    printf("%zu\n", sizeof(conn)); //in bytes
+    /* The instrument connection, including its command and response
+     * buffers. */
+    PRINT_SIZE(RBRGen4);
 
-    RBRGen4ConfigPool configPool;
-    printf("%zu, %zu\n", sizeof(configPool), sizeof(configPool.pool[0]));
+    /* One entry of each user-provided pool. The pool structures themselves
+     * hold only a pointer to the caller's buffer, so the footprint of a pool
+     * is the entry size multiplied by the number of entries allocated. */
+    PRINT_SIZE(RBRGen4Channel);
+    PRINT_SIZE(RBRGen4Group);
+    PRINT_SIZE(RBRGen4Schedule);
+    PRINT_SIZE(RBRGen4Config);
+    PRINT_SIZE(RBRGen4Dataset);
+    PRINT_SIZE(RBRGen4Label);
 
-    RBRGen4SchedulePool schedulePool;
-    printf("%zu, %zu\n", sizeof(schedulePool), sizeof(schedulePool.pool[0]));
+    PRINT_SIZE(RBRGen4Calibration);
+    PRINT_SIZE(RBRGen4Sample);
 
-    RBRGen4GroupPool groupPool;
-    printf("%zu, %zu\n", sizeof(groupPool), sizeof(groupPool.pool[0]));
-
-    RBRGen4ChannelPool channelPool;
-    printf("%zu, %zu\n", sizeof(channelPool), sizeof(channelPool.pool[0]));
-
-    RBRGen4Calibration calibration;
-    printf("%zu\n", sizeof(calibration));
-
-    RBRGen4DatasetPool datasetPool;
-    printf("%zu, %zu\n", sizeof(datasetPool), sizeof(datasetPool.pool[0]));
-
+    return EXIT_SUCCESS;
 }

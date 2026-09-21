@@ -1,35 +1,27 @@
 /**
- * \file posix-stream.c
+ * \file posix-enable.c
  *
- * \brief Example of using the library to configure an instrument to stream
- * pressure and temperature over the connected link, then receive the
- * streamed samples until interrupted.
+ * \brief Example of using the library to configure an instrument with a single
+ * schedule and a single configuration measuring temperature and pressure.
  *
- * \warning Clears all groups, schedules, configs, and datasets, then enables
- * the instrument. The instrument is disabled again on exit.
+ * \warning Clears all groups, schedules, configs, and datasets, then tries to
+ * enable the instrument.
  *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.
  */
 
-/* Prerequisite for gmtime_r in time.h. */
-#define _POSIX_C_SOURCE 200112L
-
 /* Required for errno. */
 #include <errno.h>
-/* Required for PRId32, PRId64. */
+/* Required for PRId32. */
 #include <inttypes.h>
-/* Required for signal, sig_atomic_t. */
-#include <signal.h>
-/* Required for fprintf, printf. */
+/* Required for fprintf, printf, snprintf. */
 #include <stdio.h>
 /* Required for EXIT_SUCCESS, etc. */
 #include <stdlib.h>
 /* Required for strerror. */
 #include <string.h>
-/* Required for gmtime_r, strftime, struct tm, time_t. */
-#include <time.h>
 /* Required for close. */
 #include <unistd.h>
 
@@ -38,6 +30,11 @@
 
 /* == Customer defined parameters == */
 
+/* Tune this value to your instrument. This example is intended to work with
+ * any instrument that has pressure and temperature channels, so a large
+ * channel count is used to be as compatible as possible off-the-shelf. */
+#define CHANNEL_COUNT 32
+
 #define PRESSURE "pressure_00"
 #define TEMPERATURE "temperature_00"
 
@@ -45,31 +42,21 @@
 #define GROUP_PT_CHANNELS (RBRGen4Label[]) {PRESSURE, TEMPERATURE}
 #define GROUP_PT_CHANNEL_COUNT 2
 
-#define SCHEDULE_PT_LABEL "sch_stream_pt"
+#define SCHEDULE_PT_LABEL "sch_asc_pt"
 #define SCHEDULE_PT_PERIOD 1000
 
 #define SCHEDULE_PT_GROUPS (RBRGen4Label[]) {GROUP_PT_LABEL}
 #define SCHEDULE_PT_GROUP_COUNT 1
 
-#define CONFIG_STREAM_LABEL "cf_stream"
-#define CONFIG_STREAM_SCHEDULES (RBRGen4Label[]) {SCHEDULE_PT_LABEL}
-#define CONFIG_STREAM_SCHEDULE_COUNT 1
+#define CONFIG_ASCENT_LABEL "cf_ascent"
+#define CONFIG_ASCENT_SCHEDULES (RBRGen4Label[]) {SCHEDULE_PT_LABEL}
+#define CONFIG_ASCENT_SCHEDULE_COUNT 1
 
-#define NEW_DATASET_LABEL "ds_stream"
+#define START_DELAY_MS ((RBRGen4DateTime) 5000)
+
+#define NEW_DATASET_LABEL "ds_ascent"
 
 const char *programName = "";
-
-/* The instrument's output format, which decides what each sample carries. */
-RBRGen4OutputFormat outputFormat;
-
-/* Set by the signal handler to stop the streaming loop. */
-volatile sig_atomic_t terminate = 0;
-
-void handleSignal(int signo)
-{
-    (void) signo;
-    terminate = 1;
-}
 
 /* Report a failed library call. A hardware error also carries the
  * instrument's own message, which says what it objected to. */
@@ -107,74 +94,6 @@ RBRGen4Error disableIgnoreWarning(RBRGen4 *conn, RBRGen4InstrumentState *state)
     return RBRGEN4_SUCCESS;
 }
 
-/* Print the column headers matching the output format and the streamed
- * group's channels. */
-void printHeader(void)
-{
-    const char *separator = "";
-    if (outputFormat.scheduleLabel)
-    {
-        printf("schedule");
-        separator = ", ";
-    }
-    if (outputFormat.dateTime)
-    {
-        printf("%stimestamp", separator);
-        separator = ", ";
-    }
-    for (int32_t i = 0; i < GROUP_PT_CHANNEL_COUNT; i++)
-    {
-        printf("%s%s", separator, GROUP_PT_CHANNELS[i]);
-        separator = ", ";
-    }
-    printf("\n");
-}
-
-/* Called by the library for every streamed sample it reads. The schedule
- * label and timestamp are only present when the output format includes them.
- * Error readings are NaNs carrying an error code; report the code instead of
- * the value. */
-RBRGen4Error instrumentSample(const struct RBRGen4 *conn,
-                              const struct RBRGen4Sample *const sample)
-{
-    /* Unused. */
-    (void) conn;
-
-    const char *separator = "";
-    if (outputFormat.scheduleLabel)
-    {
-        printf("%s", sample->scheduleLabel);
-        separator = ", ";
-    }
-    if (outputFormat.dateTime)
-    {
-        char ftime[32];
-        time_t sampleSeconds = (time_t) (sample->timestamp / 1000);
-        struct tm sampleTime;
-        gmtime_r(&sampleSeconds, &sampleTime);
-        strftime(ftime, sizeof(ftime), "%F %T", &sampleTime);
-        printf("%s%s.%03" PRId64, separator, ftime, sample->timestamp % 1000);
-        separator = ", ";
-    }
-    for (int32_t i = 0; i < sample->channelCount; i++)
-    {
-        if (RBRGen4Reading_isError(sample->readings[i]))
-        {
-            printf("%serror %d",
-                   separator,
-                   RBRGen4Reading_getError(sample->readings[i]));
-        }
-        else
-        {
-            printf("%s%f", separator, sample->readings[i]);
-        }
-        separator = ", ";
-    }
-    printf("\n");
-
-    return RBRGEN4_SUCCESS;
-}
-
 int main(int argc, char *argv[])
 {
     programName = argv[0];
@@ -206,16 +125,11 @@ int main(int argc, char *argv[])
 
     RBRGen4Error err = RBRGEN4_SUCCESS;
     RBRGen4 conn;
-    /* Streamed samples are parsed into this buffer before being passed to
-     * the sample callback. */
-    RBRGen4Sample sampleBuffer;
     const RBRGen4Callbacks callbacks = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
-        .write = instrumentWrite,
-        .sample = instrumentSample,
-        .sampleBuffer = &sampleBuffer
+        .write = instrumentWrite
     };
 
     err = RBRGen4_open(&conn,
@@ -228,15 +142,6 @@ int main(int argc, char *argv[])
         goto fileCleanup;
     }
 
-    /* Samples are printed according to the output format */
-    err = RBRGen4_getOutputFormat(&conn, &outputFormat);
-    if (err)
-    {
-        logCmdError(&conn, err, "Failed to get output format");
-        goto instrumentCleanup;
-    }
-
-    /* The schedule streams over whichever link we are connected by */
     RBRGen4Link link;
     err = RBRGen4_getLink(&conn, &link);
     if (err)
@@ -247,22 +152,28 @@ int main(int argc, char *argv[])
     printf("Connected to the instrument via %s.\n",
            RBRGen4LinkType_name(link.type));
 
-    RBRGen4ScheduleStream stream;
     switch (link.type)
     {
     case RBRGEN4_LINK_TYPE_USB:
-        stream = RBRGEN4_SCHEDULE_STREAM_USB;
+    // case RBRGEN4_LINK_TYPE_WIFI:
         break;
     case RBRGEN4_LINK_TYPE_SERIAL:
-        stream = RBRGEN4_SCHEDULE_STREAM_SERIAL;
+    {
+        RBRGen4LinkSerial serial;
+        err = RBRGen4_getLinkSerial(&conn, &serial);
+        if (err)
+        {
+            logCmdError(&conn, err, "Failed to get link serial");
+            goto instrumentCleanup;
+        }
+        printf("Connected in %s mode at %s baud.\n",
+               RBRGen4LinkSerialMode_name(serial.mode),
+               RBRGen4LinkSerialBaudRate_name(serial.baudRate));
         break;
+    }
     default:
         fprintf(stderr,
-                "%s: connection method to the instrument is unclear, so"
-                " streaming can't be enabled.\n",
-                programName);
-        err = RBRGEN4_UNSUPPORTED;
-        goto instrumentCleanup;
+                "Warning: connection method to the instrument is unclear\n");
     }
 
     /* Ensure instrument is disabled before trying to run Unsafe commands
@@ -303,6 +214,47 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
+    /* Read the channel pool */
+    RBRGen4Channel channelPoolBuf[CHANNEL_COUNT];
+    RBRGen4ChannelPool channelPool = {
+        .size = CHANNEL_COUNT,
+        .pool = channelPoolBuf
+    };
+    int32_t channelCount;
+    err = RBRGen4_getChannelPool(&conn, &channelPool);
+    if (err == RBRGEN4_SUCCESS)
+    {
+        channelCount = channelPool.count;
+    }
+    else if (err == RBRGEN4_TRUNCATED)
+    {
+        channelCount = channelPool.size;
+        printf("%s: Warning: not enough space in channel pool to store all"
+               " channels. Instrument reports %" PRId32 " but pool only has"
+               " room for %" PRId32 "\n",
+               programName,
+               channelPool.count,
+               channelPool.size);
+    }
+    else
+    {
+        logCmdError(&conn, err, "Failed to get channel pool");
+        goto instrumentCleanup;
+    }
+
+    /* Print the label and type of each channel */
+    for (int32_t i = 0; i < channelCount; i++)
+    {
+        RBRGen4Channel *channel = &channelPool.pool[i];
+        err = RBRGen4_getChannel(&conn, channel);
+        if (err)
+        {
+            logCmdError(&conn, err, "Failed to get channel");
+            goto instrumentCleanup;
+        }
+        printf("Channel %s has type %s\n", channel->label, channel->type);
+    }
+
     /* Create a group with our desired pressure and temperature channels */
     RBRGen4Group groupPt = {
         .label = GROUP_PT_LABEL,
@@ -325,7 +277,7 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    /* Create a schedule with our new group, streaming over our link */
+    /* Create a schedule with our new group */
     RBRGen4Schedule schedule = {
         .label = SCHEDULE_PT_LABEL,
     };
@@ -343,7 +295,6 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
     /* Set desired instrument schedule parameters */
-    schedule.stream = stream;
     schedule.mode = RBRGEN4_SCHEDULE_MODE_CONTINUOUS;
     schedule.parameters.continuous.period = SCHEDULE_PT_PERIOD;
     const RBRGen4LabelList scheduleGroupList = {
@@ -360,7 +311,7 @@ int main(int argc, char *argv[])
 
     /* Create a config with our new schedule */
     RBRGen4Config config = {
-        .label = CONFIG_STREAM_LABEL,
+        .label = CONFIG_ASCENT_LABEL,
     };
     err = RBRGen4_createConfig(&conn, config.label);
     if (err)
@@ -369,9 +320,9 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
     const RBRGen4LabelList configScheduleList = {
-        .size = CONFIG_STREAM_SCHEDULE_COUNT,
-        .count = CONFIG_STREAM_SCHEDULE_COUNT,
-        .labels = CONFIG_STREAM_SCHEDULES,
+        .size = CONFIG_ASCENT_SCHEDULE_COUNT,
+        .count = CONFIG_ASCENT_SCHEDULE_COUNT,
+        .labels = CONFIG_ASCENT_SCHEDULES,
     };
     err = RBRGen4_setConfig(&conn, &config, &configScheduleList);
     if (err)
@@ -380,7 +331,16 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    /* Start sampling as soon as the instrument is enabled */
+    /* Read instrument's clock */
+    RBRGen4Clock clock;
+    err = RBRGen4_getClock(&conn, &clock);
+    if (err)
+    {
+        logCmdError(&conn, err, "Failed to get clock");
+        goto instrumentCleanup;
+    }
+
+    /* Set a deployment start time */
     RBRGen4Deployment deployment;
     err = RBRGen4_getDeployment(&conn, &deployment);
     if (err)
@@ -388,13 +348,27 @@ int main(int argc, char *argv[])
         logCmdError(&conn, err, "Failed to get deployment");
         goto instrumentCleanup;
     }
-    deployment.gate = RBRGEN4_GATE_NONE;
+    deployment.gate = RBRGEN4_GATE_TIME;
+    deployment.startTime = clock.dateTime + START_DELAY_MS;
     err = RBRGen4_setDeployment(&conn, &deployment);
     if (err)
     {
         logCmdError(&conn, err, "Failed to set deployment");
         goto instrumentCleanup;
     }
+
+    /* Verify instrument configuration for enablement */
+    err = RBRGen4_verify(&conn,
+                         &config,
+                         NEW_DATASET_LABEL,
+                         RBRGEN4_STORAGE_MODE_NORMAL,
+                         &loggingState);
+    if (err)
+    {
+        logCmdError(&conn, err, "Failed to verify instrument configuration");
+        goto instrumentCleanup;
+    }
+    printf("%s: Instrument configuration verified\n", programName);
 
     /* Enable the instrument */
     err = RBRGen4_enable(&conn,
@@ -408,46 +382,22 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
     printf("%s: Instrument enablement state is: %s\n",
-           programName,
-           RBRGen4InstrumentState_name(loggingState));
+            programName,
+            RBRGen4InstrumentState_name(loggingState));
 
-    /* Receive streamed samples until interrupted. Each sample is delivered
-     * to instrumentSample(). */
-    signal(SIGINT, handleSignal);
-    signal(SIGTERM, handleSignal);
-    printf("%s: Streaming; press Ctrl-C to stop.\n", programName);
-    printHeader();
-    while (!terminate)
-    {
-        err = RBRGen4_readSample(&conn);
-        if (terminate)
-        {
-            /* The signal interrupted the read; that is not a failure. */
-            err = RBRGEN4_SUCCESS;
-        }
-        else if (err == RBRGEN4_TIMEOUT)
-        {
-            /* Nothing arrived within the command timeout; keep waiting. */
-            continue;
-        }
-        else if (err)
-        {
-            logCmdError(&conn, err, "Failed to read sample");
-            break;
-        }
-    }
 
-    /* Stop the deployment so the instrument is not left streaming */
-    RBRGen4Error disableErr = disableIgnoreWarning(&conn, &loggingState);
-    if (disableErr)
+    /* Check deployment status (depending on the value of deployment.startTime
+     * set above, we expect to either be gated or sampling). */
+    err = RBRGen4_getDeployment(&conn, &deployment);
+    if (err)
     {
-        logCmdError(&conn, disableErr, "Failed to disable instrument");
-        err = disableErr;
+        logCmdError(&conn, err, "Failed to get deployment");
         goto instrumentCleanup;
     }
-    printf("%s: Instrument enablement state is: %s\n",
+    printf("%s: deployment status=%s\n",
            programName,
-           RBRGen4InstrumentState_name(loggingState));
+           RBRGen4DeploymentStatus_name(deployment.status));
+
 
 instrumentCleanup:
     RBRGen4_close(&conn);
