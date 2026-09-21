@@ -37,7 +37,7 @@ RBRGen3Error instrumentStart(RBRGen3 *conn)
 
     RBRGen3Deployment deployment = {
         .startTime = RBRGEN3_DATETIME_MIN,
-        .endTime = RBRGEN3_DATETIME_MAX
+        .endTime = RBRGEN3_DATETIME_MAX,
     };
     if ((err = RBRGen3_setDeployment(conn, &deployment))
         != RBRGEN3_SUCCESS)
