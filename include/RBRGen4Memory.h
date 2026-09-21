@@ -382,29 +382,6 @@ RBRGen4Error RBRGen4_getDatasetScheduleDataBlock(RBRGen4 *conn, const RBRGen4Dat
                                                  const char *scheduleLabel,
                                                  RBRGen4DatasetDataBlock *block);
 
-/** \brief It determines the type of information retrieved for the specific schedule.
- * There are three keywoards: data|events|meta.
- */
-typedef enum RBRGen4Block {
-    /** Used to report memory usage for sample data. */
-    RBRGEN4_BLOCK_DATA,
-    /** Used to report memory usege for events. */
-    RBRGEN4_BLOCK_EVENTS,
-    /** Used to report this schedule's meory usage for metadata. */
-    RBRGEN4_BLOCK_META,
-    /** The number of specific type of blocks.*/
-    RBRGEN4_BLOCK_COUNT,
-    /** The unknown or unrecognized block. */
-    RBRGEN4_BLOCK_UNKNOWN
-} RBRGen4Block;
-
-/** \brief Get a human-readable block name.
- * \param [in] block the block.
- * \return a string name for the block.
- * \see RBRGen4Error_name() for a description of the format of names
- */
-const char *RBRGen4Block_name(RBRGen4Block block);
-
 /**
  * \brief Delete one dataset from the instrument's memory.
  * \note Issues the `dataset delete <dataset_label>` command.

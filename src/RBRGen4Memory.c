@@ -188,23 +188,6 @@ RBRGen4Error RBRGen4_getDataset(RBRGen4 *conn, RBRGen4Dataset *dataset,
     return err;
 }
 
-const char *RBRGen4Block_name(RBRGen4Block block)
-{
-    switch (block) {
-    case RBRGEN4_BLOCK_DATA:
-        return "data";
-    case RBRGEN4_BLOCK_EVENTS:
-        return "events";
-    case RBRGEN4_BLOCK_META:
-        return "meta";
-    case RBRGEN4_BLOCK_COUNT:
-        return "block count";
-    case RBRGEN4_BLOCK_UNKNOWN:
-    default:
-        return "unknown block";
-    }
-}
-
 /**
  * \brief Parse the counts out of a `dataset` block query response.
  *
