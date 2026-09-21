@@ -127,6 +127,13 @@ RBRGen4Error createGroup(RBRGen4 *conn, const char *label, RBRGen4Label channels
 
     RBRGen4Group group;
     snprintf(group.label, sizeof(group.label), "%s", label);
+    /* Reading the group first is unnecessary today, as its channel list is its only
+     * parameter, but is done for forward compatibility: read, modify, then write. */
+    err = RBRGen4_getGroup(conn, &group, NULL);
+    if (err) {
+        logCmdError(conn, err, "Failed to get new group");
+        return err;
+    }
     const RBRGen4LabelList channelList = {
         .size = channelCount,
         .len = channelCount,
@@ -188,6 +195,13 @@ RBRGen4Error createConfig(RBRGen4 *conn, const char *label, RBRGen4Label schedul
 
     RBRGen4Config config;
     snprintf(config.label, sizeof(config.label), "%s", label);
+    /* Reading the config first is unnecessary today, as its schedule list is its only
+     * parameter, but is done for forward compatibility: read, modify, then write. */
+    err = RBRGen4_getConfig(conn, &config, NULL);
+    if (err) {
+        logCmdError(conn, err, "Failed to get new config");
+        return err;
+    }
     const RBRGen4LabelList scheduleList = {
         .size = scheduleCount,
         .len = scheduleCount,

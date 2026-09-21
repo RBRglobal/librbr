@@ -247,6 +247,13 @@ int main(int argc, char *argv[])
         logCmdError(&conn, err, "Failed to create group");
         goto instrumentCleanup;
     }
+    /* Reading the group first is unnecessary today, as its channel list is its only
+     * parameter, but is done for forward compatibility: read, modify, then write. */
+    err = RBRGen4_getGroup(&conn, &groupPt, NULL);
+    if (err) {
+        logCmdError(&conn, err, "Failed to get new group");
+        goto instrumentCleanup;
+    }
     const RBRGen4LabelList groupPtChannelList = {
         .size = GROUP_PT_CHANNEL_COUNT,
         .len = GROUP_PT_CHANNEL_COUNT,
@@ -294,6 +301,13 @@ int main(int argc, char *argv[])
     err = RBRGen4_createConfig(&conn, config.label);
     if (err) {
         logCmdError(&conn, err, "Failed to create new config");
+        goto instrumentCleanup;
+    }
+    /* Reading the config first is unnecessary today, as its schedule list is its only
+     * parameter, but is done for forward compatibility: read, modify, then write. */
+    err = RBRGen4_getConfig(&conn, &config, NULL);
+    if (err) {
+        logCmdError(&conn, err, "Failed to get new config");
         goto instrumentCleanup;
     }
     const RBRGen4LabelList configScheduleList = {
