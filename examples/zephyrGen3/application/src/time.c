@@ -17,8 +17,7 @@
 
 LOG_MODULE_REGISTER(time, CONFIG_TIME_LOG_LEVEL);
 
-RBRGen3Error ZephyrRBRGen3Time_get(const struct RBRGen3 *conn,
-                                               RBRGen3DateTime *time)
+RBRGen3Error ZephyrRBRGen3Time_get(const struct RBRGen3 *conn, RBRGen3DateTime *time)
 {
     (void) conn;
 
@@ -28,8 +27,7 @@ RBRGen3Error ZephyrRBRGen3Time_get(const struct RBRGen3 *conn,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error ZephyrRBRGen3Time_sleep(const struct RBRGen3 *conn,
-                                                 RBRGen3DateTime time)
+RBRGen3Error ZephyrRBRGen3Time_sleep(const struct RBRGen3 *conn, RBRGen3DateTime time)
 {
     (void) conn;
 

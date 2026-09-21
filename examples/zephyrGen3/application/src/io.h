@@ -21,14 +21,12 @@ extern "C" {
 #include <RBRGen3.h>
 
 /** State for bindings from RBRGen3 callbacks to a Zephyr async UART. */
-typedef struct ZephyrRBRGen3IO
-{
+typedef struct ZephyrRBRGen3IO {
     /** The UART device. */
     const struct device *dev;
 
     /** Read state. */
-    struct
-    {
+    struct {
         /** Used to prevent mutual reads across threads. */
         struct k_mutex mut;
         /** Given when any data is available in the receive buffers. */
@@ -43,8 +41,7 @@ typedef struct ZephyrRBRGen3IO
     } rx;
 
     /** Write state. */
-    struct
-    {
+    struct {
         /** Used to prevent mutual reads across threads. */
         struct k_mutex mut;
         /** Given upon write completion. */
@@ -52,16 +49,12 @@ typedef struct ZephyrRBRGen3IO
     } tx;
 } ZephyrRBRGen3IO;
 
-RBRGen3Error ZephyrRBRGen3IO_init(ZephyrRBRGen3IO *io,
-                                              const struct device *dev);
+RBRGen3Error ZephyrRBRGen3IO_init(ZephyrRBRGen3IO *io, const struct device *dev);
 
-RBRGen3Error ZephyrRBRGen3IO_read(const struct RBRGen3 *conn,
-                                              void *data,
-                                              int32_t *size);
+RBRGen3Error ZephyrRBRGen3IO_read(const struct RBRGen3 *conn, void *data, int32_t *size);
 
-RBRGen3Error ZephyrRBRGen3IO_write(const struct RBRGen3 *conn,
-                                               const void *const data,
-                                               int32_t size);
+RBRGen3Error ZephyrRBRGen3IO_write(const struct RBRGen3 *conn, const void *const data,
+                                   int32_t size);
 
 #ifdef __cplusplus
 }
