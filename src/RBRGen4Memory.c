@@ -95,7 +95,7 @@ const char *RBRGen4DatasetStatus_name(RBRGen4DatasetStatus status)
 
 RBRGen4Error RBRGen4_getDatasetPool(RBRGen4 *conn, RBRGen4DatasetPool *datasetPool)
 {
-    datasetPool->count = 0;
+    datasetPool->len = 0;
     datasetPool->maxCount = 0;
     memset(datasetPool->pool, 0, datasetPool->size * sizeof(RBRGen4Dataset));
 
@@ -109,8 +109,6 @@ RBRGen4Error RBRGen4_getDatasetPool(RBRGen4 *conn, RBRGen4DatasetPool *datasetPo
 
         if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        } else if (strcmp(parameter.key, "count") == 0) {
-            datasetPool->count = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "maxcount") == 0) {
             datasetPool->maxCount = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "list") == 0) {
@@ -120,17 +118,21 @@ RBRGen4Error RBRGen4_getDatasetPool(RBRGen4 *conn, RBRGen4DatasetPool *datasetPo
             }
 
             /* Datasets past the pool's capacity are discarded. */
+            datasetPool->len = 0;
             char *value = parameter.value;
-            for (int32_t i = 0; value != NULL; i++) {
-                if (i >= datasetPool->size) {
+            while (value != NULL) {
+                if (datasetPool->len >= datasetPool->size) {
                     err = RBRGEN4_TRUNCATED;
                     break;
                 }
 
                 char *nextValue = RBRGen4_splitListValue(value);
 
-                snprintf(
-                    datasetPool->pool[i].label, sizeof(datasetPool->pool[i].label), "%s", value);
+                snprintf(datasetPool->pool[datasetPool->len].label,
+                         sizeof(datasetPool->pool[datasetPool->len].label),
+                         "%s",
+                         value);
+                datasetPool->len++;
 
                 value = nextValue;
             }
@@ -151,7 +153,7 @@ RBRGen4Error RBRGen4_getDataset(RBRGen4 *conn, RBRGen4Dataset *dataset,
     dataset->status = RBRGEN4_UNKNOWN_DATASET_STATUS;
     dataset->dataType = RBRGEN4_UNKNOWN_DATA_TYPE;
     if (scheduleList != NULL) {
-        scheduleList->count = 0;
+        scheduleList->len = 0;
     }
 
     RBR_TRY(RBRGen4_converse(conn, "dataset %s", dataset->label));

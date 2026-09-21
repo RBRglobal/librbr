@@ -218,6 +218,8 @@ static RBRGen4ChannelNature RBRGen4ChannelNature_parse(const char *value)
 
 /**
  * \brief Read the labels of a `channel` response into a pool.
+ *
+ * Sets RBRGen4ChannelPool.len; the caller resets the pool's contents.
  */
 static RBRGen4Error RBRGen4_parseChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPool)
 {
@@ -229,8 +231,6 @@ static RBRGen4Error RBRGen4_parseChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *
 
         if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        } else if (strcmp(parameter.key, "count") == 0) {
-            channelPool->count = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "list") == 0) {
             /* An instrument with no channels reports `none`, not an empty
              * list. */
@@ -239,17 +239,21 @@ static RBRGen4Error RBRGen4_parseChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *
             }
 
             /* Channels past the pool's capacity are discarded. */
+            channelPool->len = 0;
             char *value = parameter.value;
-            for (int32_t i = 0; value != NULL; i++) {
-                if (i >= channelPool->size) {
+            while (value != NULL) {
+                if (channelPool->len >= channelPool->size) {
                     err = RBRGEN4_TRUNCATED;
                     break;
                 }
 
                 char *nextValue = RBRGen4_splitListValue(value);
 
-                snprintf(
-                    channelPool->pool[i].label, sizeof(channelPool->pool[i].label), "%s", value);
+                snprintf(channelPool->pool[channelPool->len].label,
+                         sizeof(channelPool->pool[channelPool->len].label),
+                         "%s",
+                         value);
+                channelPool->len++;
 
                 value = nextValue;
             }
@@ -309,7 +313,7 @@ RBRGen4Error RBRGen4_setChannel(RBRGen4 *conn, const RBRGen4Channel *channel)
 
 RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPool)
 {
-    channelPool->count = 0;
+    channelPool->len = 0;
     memset(channelPool->pool, 0, channelPool->size * sizeof(RBRGen4Channel));
 
     RBR_TRY(RBRGen4_converse(conn, "channel"));
@@ -324,7 +328,7 @@ RBRGen4Error RBRGen4_getChannelPoolByNature(RBRGen4 *conn, RBRGen4ChannelNature 
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    channelPool->count = 0;
+    channelPool->len = 0;
     memset(channelPool->pool, 0, channelPool->size * sizeof(RBRGen4Channel));
 
     RBR_TRY(RBRGen4_converse(conn, "channel %s", RBRGen4ChannelNature_name(nature)));
@@ -437,7 +441,7 @@ RBRGen4Error RBRGen4_getGroup(RBRGen4 *conn, RBRGen4Group *group, RBRGen4LabelLi
 
     RBR_RESET_EXCEPT(group, label);
     if (channelList != NULL) {
-        channelList->count = 0;
+        channelList->len = 0;
     }
 
     RBR_TRY(RBRGen4_converse(conn, "group %s", group->label));
@@ -473,7 +477,7 @@ RBRGen4Error RBRGen4_setGroup(RBRGen4 *conn, const RBRGen4Group *group,
 
 RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool)
 {
-    groupPool->count = 0;
+    groupPool->len = 0;
     groupPool->maxCount = 0;
     memset(groupPool->pool, 0, groupPool->size * sizeof(RBRGen4Group));
 
@@ -487,8 +491,6 @@ RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool)
 
         if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        } else if (strcmp(parameter.key, "count") == 0) {
-            groupPool->count = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "maxcount") == 0) {
             groupPool->maxCount = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "list") == 0) {
@@ -498,16 +500,21 @@ RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool)
             }
 
             /* Groups past the pool's capacity are discarded. */
+            groupPool->len = 0;
             char *value = parameter.value;
-            for (int32_t i = 0; value != NULL; i++) {
-                if (i >= groupPool->size) {
+            while (value != NULL) {
+                if (groupPool->len >= groupPool->size) {
                     err = RBRGEN4_TRUNCATED;
                     break;
                 }
 
                 char *nextValue = RBRGen4_splitListValue(value);
 
-                snprintf(groupPool->pool[i].label, sizeof(groupPool->pool[i].label), "%s", value);
+                snprintf(groupPool->pool[groupPool->len].label,
+                         sizeof(groupPool->pool[groupPool->len].label),
+                         "%s",
+                         value);
+                groupPool->len++;
 
                 value = nextValue;
             }
@@ -548,7 +555,7 @@ RBRGen4Error RBRGen4_getConfig(RBRGen4 *conn, RBRGen4Config *config, RBRGen4Labe
 
     RBR_RESET_EXCEPT(config, label);
     if (scheduleList != NULL) {
-        scheduleList->count = 0;
+        scheduleList->len = 0;
     }
 
     RBR_TRY(RBRGen4_converse(conn, "config %s", config->label));
@@ -584,7 +591,7 @@ RBRGen4Error RBRGen4_setConfig(RBRGen4 *conn, const RBRGen4Config *config,
 
 RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool)
 {
-    configPool->count = 0;
+    configPool->len = 0;
     configPool->maxCount = 0;
     memset(configPool->pool, 0, configPool->size * sizeof(RBRGen4Config));
 
@@ -598,8 +605,6 @@ RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool)
 
         if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        } else if (strcmp(parameter.key, "count") == 0) {
-            configPool->count = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "maxcount") == 0) {
             configPool->maxCount = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "list") == 0) {
@@ -609,16 +614,21 @@ RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool)
             }
 
             /* Configurations past the pool's capacity are discarded. */
+            configPool->len = 0;
             char *value = parameter.value;
-            for (int32_t i = 0; value != NULL; i++) {
-                if (i >= configPool->size) {
+            while (value != NULL) {
+                if (configPool->len >= configPool->size) {
                     err = RBRGEN4_TRUNCATED;
                     break;
                 }
 
                 char *nextValue = RBRGen4_splitListValue(value);
 
-                snprintf(configPool->pool[i].label, sizeof(configPool->pool[i].label), "%s", value);
+                snprintf(configPool->pool[configPool->len].label,
+                         sizeof(configPool->pool[configPool->len].label),
+                         "%s",
+                         value);
+                configPool->len++;
 
                 value = nextValue;
             }
@@ -732,7 +742,7 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
 
     RBR_RESET_EXCEPT(schedule, label);
     if (groupList != NULL) {
-        groupList->count = 0;
+        groupList->len = 0;
     }
 
     RBR_TRY(RBRGen4_converse(conn, "schedule %s", schedule->label));
@@ -879,7 +889,7 @@ RBRGen4Error RBRGen4_setSchedule(RBRGen4 *conn, const RBRGen4Schedule *schedule,
 
 RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedulePool)
 {
-    schedulePool->count = 0;
+    schedulePool->len = 0;
     schedulePool->maxCount = 0;
     memset(schedulePool->pool, 0, schedulePool->size * sizeof(RBRGen4Schedule));
     schedulePool->maxRegimes = 0;
@@ -894,8 +904,6 @@ RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedul
 
         if (parameter.key == NULL || parameter.value == NULL) {
             break;
-        } else if (strcmp(parameter.key, "count") == 0) {
-            schedulePool->count = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "maxcount") == 0) {
             schedulePool->maxCount = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "maxregimes") == 0) {
@@ -907,17 +915,21 @@ RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedul
             }
 
             /* Schedules past the pool's capacity are discarded. */
+            schedulePool->len = 0;
             char *value = parameter.value;
-            for (int32_t i = 0; value != NULL; i++) {
-                if (i >= schedulePool->size) {
+            while (value != NULL) {
+                if (schedulePool->len >= schedulePool->size) {
                     err = RBRGEN4_TRUNCATED;
                     break;
                 }
 
                 char *nextValue = RBRGen4_splitListValue(value);
 
-                snprintf(
-                    schedulePool->pool[i].label, sizeof(schedulePool->pool[i].label), "%s", value);
+                snprintf(schedulePool->pool[schedulePool->len].label,
+                         sizeof(schedulePool->pool[schedulePool->len].label),
+                         "%s",
+                         value);
+                schedulePool->len++;
 
                 value = nextValue;
             }

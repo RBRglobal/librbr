@@ -118,19 +118,13 @@ int main(int argc, char *argv[])
         .size = DATASET_COUNT,
         .pool = datasetPoolBuf,
     };
-    int32_t datasetCount;
     err = RBRGen4_getDatasetPool(&conn, &datasetPool);
-    if (err == RBRGEN4_SUCCESS) {
-        datasetCount = datasetPool.count;
-    } else if (err == RBRGEN4_TRUNCATED) {
-        datasetCount = datasetPool.size;
+    if (err == RBRGEN4_TRUNCATED) {
         printf("%s: Warning: not enough space in dataset pool to store all"
-               " datasets. Instrument reports %" PRId32 " but pool only has"
-               " room for %" PRId32 "\n",
+               " datasets; only the first %" PRId32 " are stored\n",
                programName,
-               datasetPool.count,
-               datasetPool.size);
-    } else {
+               datasetPool.len);
+    } else if (err) {
         logCmdError(&conn,
                     err,
                     "Failed to get dataset pool -- does this instrument"
@@ -139,7 +133,7 @@ int main(int argc, char *argv[])
     }
 
     RBRGen4Dataset *dataset = NULL;
-    for (int32_t i = 0; i < datasetCount; i++) {
+    for (int32_t i = 0; i < datasetPool.len; i++) {
         if (strcmp(datasetPool.pool[i].label, DATASET_LABEL) == 0) {
             dataset = &datasetPool.pool[i];
             break;
@@ -161,19 +155,13 @@ int main(int argc, char *argv[])
         .size = SCHEDULE_COUNT,
         .labels = scheduleListBuf,
     };
-    int32_t scheduleCount;
     err = RBRGen4_getDataset(&conn, dataset, &scheduleList);
-    if (err == RBRGEN4_SUCCESS) {
-        scheduleCount = scheduleList.count;
-    } else if (err == RBRGEN4_TRUNCATED) {
-        scheduleCount = scheduleList.size;
+    if (err == RBRGEN4_TRUNCATED) {
         printf("%s: Warning: not enough space in schedule list to store all"
-               " schedules. Instrument reports %" PRId32 " but list only has"
-               " room for %" PRId32 "\n",
+               " schedules; only the first %" PRId32 " are stored\n",
                programName,
-               scheduleList.count,
-               scheduleList.size);
-    } else {
+               scheduleList.len);
+    } else if (err) {
         logCmdError(&conn, err, "Failed to get dataset");
         goto instrumentCleanup;
     }
@@ -183,7 +171,7 @@ int main(int argc, char *argv[])
            RBRGen4DatasetStatus_name(dataset->status),
            dataset->byteCount,
            RBRGen4DataType_name(dataset->dataType));
-    for (int32_t i = 0; i < scheduleCount; i++) {
+    for (int32_t i = 0; i < scheduleList.len; i++) {
         printf(" %s", scheduleList.labels[i]);
     }
     printf("\n");

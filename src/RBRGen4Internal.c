@@ -1088,18 +1088,18 @@ char *RBRGen4_splitListValue(char *value)
 
 RBRGen4Error RBRGen4_formatLabelList(char *value, int32_t size, const RBRGen4LabelList *labelList)
 {
-    if (labelList == NULL || labelList->count < 0 || labelList->count > labelList->size) {
+    if (labelList == NULL || labelList->len < 0 || labelList->len > labelList->size) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
     int32_t length = 0;
 
-    if (labelList->count == 0) {
+    if (labelList->len == 0) {
         length = snprintf(value, size, RBRGEN4_EMPTY_LIST);
         return length > 0 && length < size ? RBRGEN4_SUCCESS : RBRGEN4_BUFFER_TOO_SMALL;
     }
 
-    for (int32_t i = 0; i < labelList->count; ++i) {
+    for (int32_t i = 0; i < labelList->len; ++i) {
         if (labelList->labels[i][0] == '\0') {
             return RBRGEN4_INVALID_PARAMETER_VALUE;
         }
@@ -1119,31 +1119,24 @@ RBRGen4Error RBRGen4_formatLabelList(char *value, int32_t size, const RBRGen4Lab
 
 RBRGen4Error RBRGen4_copyLabelList(RBRGen4LabelList *labelList, char *value)
 {
-    labelList->count = 0;
+    labelList->len = 0;
 
     if (strcmp(value, RBRGEN4_EMPTY_LIST) == 0) {
         return RBRGEN4_SUCCESS;
     }
 
     while (value != NULL) {
-        if (labelList->count >= labelList->size) {
-            /* Count the rest of the labels without storing them. */
-            labelList->count++;
-            for (; *value != '\0'; value++) {
-                if (*value == ARRAY_SEPARATOR_L4) {
-                    labelList->count++;
-                }
-            }
+        if (labelList->len >= labelList->size) {
             return RBRGEN4_TRUNCATED;
         }
 
         char *nextValue = RBRGen4_splitListValue(value);
 
-        snprintf(labelList->labels[labelList->count],
-                 sizeof(labelList->labels[labelList->count]),
+        snprintf(labelList->labels[labelList->len],
+                 sizeof(labelList->labels[labelList->len]),
                  "%s",
                  value);
-        labelList->count++;
+        labelList->len++;
 
         value = nextValue;
     }

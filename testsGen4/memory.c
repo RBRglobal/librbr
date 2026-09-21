@@ -155,7 +155,7 @@ TEST_LOGGER4(setStorage)
 typedef struct GetDatasetPoolTest {
     const char *response;
     RBRGen4Error expectedError;
-    int32_t expectedCount;
+    int32_t expectedLen;
     int32_t expectedMaxCount;
     const char *expectedLabels[3];
 } GetDatasetPoolTest;
@@ -210,10 +210,9 @@ TEST_LOGGER4(getDatasetPool)
         err = RBRGen4_getDatasetPool(conn, &actual);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_STR_EQ("dataset" COMMAND_TERMINATOR, buffers->writeBuffer);
-        TEST_ASSERT_EQ(tests[i].expectedCount, actual.count, "%" PRId32);
+        TEST_ASSERT_EQ(tests[i].expectedLen, actual.len, "%" PRId32);
         TEST_ASSERT_EQ(tests[i].expectedMaxCount, actual.maxCount, "%" PRId32);
-        for (int32_t dataset = 0; dataset < actual.size && dataset < tests[i].expectedCount;
-             dataset++) {
+        for (int32_t dataset = 0; dataset < actual.len; dataset++) {
             TEST_ASSERT_STR_EQ(tests[i].expectedLabels[dataset], actual.pool[dataset].label);
         }
     }
@@ -226,7 +225,7 @@ TEST_LOGGER4(getDatasetPool)
     TestIOBuffers_init(buffers, "dataset count=3 maxcount=4 list=d1|d2|d5" RESPONSE_TERMINATOR, 0);
     err = RBRGen4_getDatasetPool(conn, &shortPool);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED, err, RBRGen4Error);
-    TEST_ASSERT_EQ(3, shortPool.count, "%" PRId32);
+    TEST_ASSERT_EQ(2, shortPool.len, "%" PRId32);
     TEST_ASSERT_STR_EQ("d1", shortPool.pool[0].label);
     TEST_ASSERT_STR_EQ("d2", shortPool.pool[1].label);
 
@@ -320,7 +319,7 @@ TEST_LOGGER4(getDataset)
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_STR_EQ("dataset d1" COMMAND_TERMINATOR, buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.status, actual.status, RBRGen4DatasetStatus);
-        TEST_ASSERT_EQ(tests[i].expectedScheduleCount, scheduleList.count, "%" PRId32);
+        TEST_ASSERT_EQ(tests[i].expectedScheduleCount, scheduleList.len, "%" PRId32);
         for (int32_t schedule = 0; schedule < tests[i].expectedScheduleCount; schedule++) {
             TEST_ASSERT_STR_EQ(tests[i].expectedScheduleList[schedule],
                                scheduleList.labels[schedule]);
@@ -362,7 +361,7 @@ TEST_LOGGER4(getDataset)
                        0);
     err = RBRGen4_getDataset(conn, &overfull, &shortList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED, err, RBRGen4Error);
-    TEST_ASSERT_EQ(2, shortList.count, "%" PRId32);
+    TEST_ASSERT_EQ(1, shortList.len, "%" PRId32);
     TEST_ASSERT_STR_EQ("tides_schedule", shortList.labels[0]);
 
     return true;

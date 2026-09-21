@@ -142,26 +142,20 @@ int main(int argc, char *argv[])
         .size = CHANNEL_COUNT,
         .pool = channelPoolBuf,
     };
-    int32_t channelCount;
     err = RBRGen4_getChannelPool(&conn, &channelPool);
-    if (err == RBRGEN4_SUCCESS) {
-        channelCount = channelPool.count;
-    } else if (err == RBRGEN4_TRUNCATED) {
-        channelCount = channelPool.size;
+    if (err == RBRGEN4_TRUNCATED) {
         printf("%s: Warning: not enough space in channel pool to store all"
-               " channels. Instrument reports %" PRId32 " but pool only has"
-               " room for %" PRId32 "\n",
+               " channels; only the first %" PRId32 " are stored\n",
                programName,
-               channelPool.count,
-               channelPool.size);
-    } else {
+               channelPool.len);
+    } else if (err) {
         logCmdError(&conn, err, "Failed to get channel pool");
         goto instrumentCleanup;
     }
 
     /* Poll every channel. Readings are reported in channel pool order. */
     printf("timestamp");
-    for (int32_t i = 0; i < channelCount; i++) {
+    for (int32_t i = 0; i < channelPool.len; i++) {
         printf(", %s", channelPool.pool[i].label);
     }
     printf("\n");
@@ -181,7 +175,7 @@ int main(int argc, char *argv[])
     printf("timestamp, %s, %s\n", PRESSURE, TEMPERATURE);
     const RBRGen4LabelList pollPtChannelList = {
         .size = POLL_PT_CHANNEL_COUNT,
-        .count = POLL_PT_CHANNEL_COUNT,
+        .len = POLL_PT_CHANNEL_COUNT,
         .labels = POLL_PT_CHANNELS,
     };
     for (int32_t i = 0; i < POLL_COUNT; i++) {

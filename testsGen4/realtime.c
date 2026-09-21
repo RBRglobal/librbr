@@ -36,16 +36,13 @@ typedef struct PollTest {
  */
 static void PollTest_labelList(const char *labels, RBRGen4LabelList *list)
 {
-    list->count = 0;
-    while (*labels != '\0' && list->count < list->size) {
+    list->len = 0;
+    while (*labels != '\0' && list->len < list->size) {
         const char *separator = strchr(labels, '|');
         size_t length = separator != NULL ? (size_t) (separator - labels) : strlen(labels);
-        snprintf(list->labels[list->count],
-                 sizeof(list->labels[list->count]),
-                 "%.*s",
-                 (int) length,
-                 labels);
-        list->count++;
+        snprintf(
+            list->labels[list->len], sizeof(list->labels[list->len]), "%.*s", (int) length, labels);
+        list->len++;
         labels += separator != NULL ? length + 1 : length;
     }
 }
@@ -644,9 +641,9 @@ TEST_LOGGER4(poll)
 
     /* A label list too long to send is refused before the command. */
     RBRGEN4_LABEL_LIST_DECL(longList, RBRGEN4_CHANNEL_MAX);
-    for (longList.count = 0; longList.count < longList.size; longList.count++) {
-        memset(longList.labels[longList.count], 'a', RBRGEN4_LABEL_NAME_MAX);
-        longList.labels[longList.count][RBRGEN4_LABEL_NAME_MAX] = '\0';
+    for (longList.len = 0; longList.len < longList.size; longList.len++) {
+        memset(longList.labels[longList.len], 'a', RBRGEN4_LABEL_NAME_MAX);
+        longList.labels[longList.len][RBRGEN4_LABEL_NAME_MAX] = '\0';
     }
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen4_pollChannels(conn, false, &longList, &actual);

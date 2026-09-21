@@ -129,7 +129,7 @@ RBRGen4Error createGroup(RBRGen4 *conn, const char *label, RBRGen4Label channels
     snprintf(group.label, sizeof(group.label), "%s", label);
     const RBRGen4LabelList channelList = {
         .size = channelCount,
-        .count = channelCount,
+        .len = channelCount,
         .labels = channels,
     };
     err = RBRGen4_setGroup(conn, &group, &channelList);
@@ -166,7 +166,7 @@ RBRGen4Error createContinuousSchedule(RBRGen4 *conn, const char *label, const ch
     snprintf(groups[0], sizeof(groups[0]), "%s", groupLabel);
     const RBRGen4LabelList groupList = {
         .size = 1,
-        .count = 1,
+        .len = 1,
         .labels = groups,
     };
     err = RBRGen4_setSchedule(conn, &schedule, &groupList);
@@ -190,7 +190,7 @@ RBRGen4Error createConfig(RBRGen4 *conn, const char *label, RBRGen4Label schedul
     snprintf(config.label, sizeof(config.label), "%s", label);
     const RBRGen4LabelList scheduleList = {
         .size = scheduleCount,
-        .count = scheduleCount,
+        .len = scheduleCount,
         .labels = schedules,
     };
     err = RBRGen4_setConfig(conn, &config, &scheduleList);

@@ -207,25 +207,19 @@ int main(int argc, char *argv[])
         .size = CHANNEL_COUNT,
         .pool = channelPoolBuf,
     };
-    int32_t channelCount;
     err = RBRGen4_getChannelPool(&conn, &channelPool);
-    if (err == RBRGEN4_SUCCESS) {
-        channelCount = channelPool.count;
-    } else if (err == RBRGEN4_TRUNCATED) {
-        channelCount = channelPool.size;
+    if (err == RBRGEN4_TRUNCATED) {
         printf("%s: Warning: not enough space in channel pool to store all"
-               " channels. Instrument reports %" PRId32 " but pool only has"
-               " room for %" PRId32 "\n",
+               " channels; only the first %" PRId32 " are stored\n",
                programName,
-               channelPool.count,
-               channelPool.size);
-    } else {
+               channelPool.len);
+    } else if (err) {
         logCmdError(&conn, err, "Failed to get channel pool");
         goto instrumentCleanup;
     }
 
     /* Print the label and type of each channel */
-    for (int32_t i = 0; i < channelCount; i++) {
+    for (int32_t i = 0; i < channelPool.len; i++) {
         RBRGen4Channel *channel = &channelPool.pool[i];
         err = RBRGen4_getChannel(&conn, channel);
         if (err) {
@@ -246,7 +240,7 @@ int main(int argc, char *argv[])
     }
     const RBRGen4LabelList groupPtChannelList = {
         .size = GROUP_PT_CHANNEL_COUNT,
-        .count = GROUP_PT_CHANNEL_COUNT,
+        .len = GROUP_PT_CHANNEL_COUNT,
         .labels = GROUP_PT_CHANNELS,
     };
     err = RBRGen4_setGroup(&conn, &groupPt, &groupPtChannelList);
@@ -275,7 +269,7 @@ int main(int argc, char *argv[])
     schedule.parameters.continuous.period = SCHEDULE_PT_PERIOD;
     const RBRGen4LabelList scheduleGroupList = {
         .size = SCHEDULE_PT_GROUP_COUNT,
-        .count = SCHEDULE_PT_GROUP_COUNT,
+        .len = SCHEDULE_PT_GROUP_COUNT,
         .labels = SCHEDULE_PT_GROUPS,
     };
     err = RBRGen4_setSchedule(&conn, &schedule, &scheduleGroupList);
@@ -295,7 +289,7 @@ int main(int argc, char *argv[])
     }
     const RBRGen4LabelList configScheduleList = {
         .size = CONFIG_ASCENT_SCHEDULE_COUNT,
-        .count = CONFIG_ASCENT_SCHEDULE_COUNT,
+        .len = CONFIG_ASCENT_SCHEDULE_COUNT,
         .labels = CONFIG_ASCENT_SCHEDULES,
     };
     err = RBRGen4_setConfig(&conn, &config, &configScheduleList);
