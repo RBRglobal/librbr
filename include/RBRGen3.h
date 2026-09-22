@@ -191,8 +191,13 @@ typedef int32_t RBRGen3Period;
 typedef enum RBRGen3Error {
     /** No error. */
     RBRGEN3_SUCCESS,
-    /** The command buffer was too small to hold the outbound command. */
+    /**
+     * A caller-supplied output buffer was too small. Unused by Gen3 today;
+     * kept for parity with #RBRGEN4_BUFFER_TOO_SMALL.
+     */
     RBRGEN3_BUFFER_TOO_SMALL,
+    /** The outbound command does not fit the command buffer. */
+    RBRGEN3_COMMAND_TOO_LONG,
     /** A required callback function was not provided. */
     RBRGEN3_MISSING_CALLBACK,
     /** An unrecoverable error from within a user callback function. */
@@ -439,7 +444,7 @@ typedef RBRGen3Error (*RBRGen3SampleCallback)(const struct RBRGen3 *conn,
  *
  * The two buffers must not overlap. The command buffer must have room for
  * the longest command, its terminator, and a trailing null byte; a command
- * which does not fit is refused with #RBRGEN3_BUFFER_TOO_SMALL. RBRGen3_fetch()
+ * which does not fit is refused with #RBRGEN3_COMMAND_TOO_LONG. RBRGen3_fetch()
  * and RBRGen3_setPostprocessing() send their channel lists in several writes
  * when they do not fit, so for them only a single label must fit.
  *

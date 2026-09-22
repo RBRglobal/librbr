@@ -581,7 +581,7 @@ RBRGen3Error RBRGen3_getPostprocessing(RBRGen3 *conn, RBRGen3Postprocessing *pos
  * \param [in] conn the instrument connection
  * \param [in] postprocessing the post-processing parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
- * \return #RBRGEN3_BUFFER_TOO_SMALL when a channel entry does not fit the
+ * \return #RBRGEN3_COMMAND_TOO_LONG when a channel entry does not fit the
  *         command buffer; the channel list itself may be longer than the
  *         buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs

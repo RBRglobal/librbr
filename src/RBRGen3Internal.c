@@ -189,7 +189,7 @@ RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *conn)
      * be. Refuse it before anything, including the wake sequence, goes out.
      */
     if (conn->commandBufferLength >= conn->environment.commandCapacity) {
-        return RBRGEN3_BUFFER_TOO_SMALL;
+        return RBRGEN3_COMMAND_TOO_LONG;
     }
 
     /* Wake the instrument if necessary. */
@@ -215,7 +215,7 @@ static RBRGen3Error RBRGen3_vSendCommand(RBRGen3 *conn, const char *command, va_
      * write is commandBufferCapacity - 1 bytes. */
     if (conn->commandBufferLength >= conn->environment.commandCapacity) {
         conn->commandBufferLength = conn->environment.commandCapacity;
-        return RBRGEN3_BUFFER_TOO_SMALL;
+        return RBRGEN3_COMMAND_TOO_LONG;
     }
 
     /* Make sure the command is LF-terminated. */
@@ -227,7 +227,7 @@ static RBRGen3Error RBRGen3_vSendCommand(RBRGen3 *conn, const char *command, va_
         /* It isn't. Make sure there's room before adding it. */
         if (conn->commandBufferLength + RBRGEN3_SEND_COMMAND_TERMINATOR_LEN >=
             conn->environment.commandCapacity) {
-            return RBRGEN3_BUFFER_TOO_SMALL;
+            return RBRGEN3_COMMAND_TOO_LONG;
         }
 
         memcpy(conn->environment.command + conn->commandBufferLength,

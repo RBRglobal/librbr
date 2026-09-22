@@ -55,7 +55,7 @@ extern "C" {
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when \a sample has no readings
  *         storage, or \a channels has a negative length, more labels than
  *         storage, or labels but no label storage
- * \return #RBRGEN3_BUFFER_TOO_SMALL when a channel label does not fit the
+ * \return #RBRGEN3_COMMAND_TOO_LONG when a channel label does not fit the
  *         command buffer; the command itself may be longer than the buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback

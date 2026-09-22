@@ -652,7 +652,7 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
             RBRGen3PostprocessingAggregate_name(channelsList->channels[channel].function);
         if (3 + strlen(functionName) + strlen(channelsList->channels[channel].label) >=
             (size_t) conn->environment.commandCapacity) {
-            return RBRGEN3_BUFFER_TOO_SMALL;
+            return RBRGEN3_COMMAND_TOO_LONG;
         }
     }
 

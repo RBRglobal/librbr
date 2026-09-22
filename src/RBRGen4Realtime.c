@@ -164,7 +164,7 @@ static RBRGen4Error RBRGen4_sendPoll(RBRGen4 *conn, bool requireLabel, const cha
                                     value,
                                     RBRGEN4_SEND_COMMAND_TERMINATOR);
     if (*commandBufferLength >= conn->environment.commandCapacity) {
-        return RBRGEN4_BUFFER_TOO_SMALL;
+        return RBRGEN4_COMMAND_TOO_LONG;
     }
 
     RBRGen4DateTime start;

@@ -95,7 +95,7 @@ extern "C" {
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the command is successfully written
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the buffer is full
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the buffer is full
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_sendCommand() to send a string command
@@ -118,7 +118,7 @@ RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *conn);
  * \param [in] conn the instrument connection
  * \param [in] command the command to send as a printf-style format string
  * \return #RBRGEN4_SUCCESS when the command is successfully written
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the formatted command is too
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the formatted command is too
  *                                         large for the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -397,7 +397,7 @@ char *RBRGen4_splitListValue(char *value);
  *                                          `NULL`, its length does
  *                                          not fit its array, or a
  *                                          label is empty
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit
  */
 RBRGen4Error RBRGen4_formatLabelList(char *value, int32_t size, const RBRGen4LabelList *labelList);
 

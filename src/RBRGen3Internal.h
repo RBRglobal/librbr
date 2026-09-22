@@ -78,7 +78,7 @@ extern "C" {
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the command is successfully written
- * \return #RBRGEN3_BUFFER_TOO_SMALL when the buffer is full
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the buffer is full
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_sendCommand() to send a string command
@@ -101,7 +101,7 @@ RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *conn);
  * \param [in] conn the instrument connection
  * \param [in] command the command to send as a printf-style format string
  * \return #RBRGEN3_SUCCESS when the command is successfully written
- * \return #RBRGEN3_BUFFER_TOO_SMALL when the formatted command is too
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the formatted command is too
  *                                         large for the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback

@@ -60,7 +60,7 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
  * command varies widely with the number and length of the labels it carries,
  * so an application which configures many channels, groups, or schedules may
  * need considerably more, and one which only polls may need much less. A
- * command which does not fit is refused with #RBRGEN4_BUFFER_TOO_SMALL.
+ * command which does not fit is refused with #RBRGEN4_COMMAND_TOO_LONG.
  *
  * The label lists sent by the configuration setters and the poll functions
  * are currently assembled in library storage of this size before being placed
@@ -216,8 +216,10 @@ typedef int32_t RBRGen4Period;
 typedef enum RBRGen4Error {
     /** No error. */
     RBRGEN4_SUCCESS,
-    /** The command buffer was too small to hold the outbound command. */
+    /** A caller-supplied output buffer, such as a download buffer, was too small. */
     RBRGEN4_BUFFER_TOO_SMALL,
+    /** The outbound command does not fit the command buffer. */
+    RBRGEN4_COMMAND_TOO_LONG,
     /** A required callback function was not provided. */
     RBRGEN4_MISSING_CALLBACK,
     /** An unrecoverable error from within a user callback function. */
@@ -571,7 +573,7 @@ typedef RBRGen4Error (*RBRGen4SampleCallback)(const struct RBRGen4 *conn,
  *
  * The two buffers must not overlap. The command buffer must have room for
  * the longest command, its terminator, and a trailing null byte; a command
- * which does not fit is refused with #RBRGEN4_BUFFER_TOO_SMALL.
+ * which does not fit is refused with #RBRGEN4_COMMAND_TOO_LONG.
  *
  * The command buffer holds nothing between commands and may be shared freely
  * between connections which are never used at the same time.
@@ -826,8 +828,8 @@ typedef struct RBRGen4 {
  * \a environment. If either buffer is
  * `NULL`, the command buffer has a capacity of zero or less, or the response
  * buffer cannot hold more than a line terminator, the connection is not
- * opened and #RBRGEN4_INVALID_PARAMETER_VALUE is returned. A buffer too small for the
- * opening exchange yields #RBRGEN4_BUFFER_TOO_SMALL.
+ * opened and #RBRGEN4_INVALID_PARAMETER_VALUE is returned. A command buffer
+ * too small for the opening command yields #RBRGEN4_COMMAND_TOO_LONG.
  *
  * The \a environment structure will be copied into the RBRGen4 structure;
  * no reference to it is retained, so any subsequent modifications will not
@@ -873,8 +875,8 @@ typedef struct RBRGen4 {
  *         provided
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE if a buffer is missing or empty,
  *         or RBRGen4Environment.sampleBuffer has no readings storage
- * \return #RBRGEN4_BUFFER_TOO_SMALL if a buffer cannot hold the opening
- *         exchange
+ * \return #RBRGEN4_COMMAND_TOO_LONG if the command buffer cannot hold the
+ *         opening command
  * \return #RBRGEN4_TIMEOUT if an instrument communication timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR if the instrument rejects the opening

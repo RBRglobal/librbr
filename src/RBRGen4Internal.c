@@ -156,7 +156,7 @@ RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *conn)
      * be. Refuse it before anything, including the wake sequence, goes out.
      */
     if (conn->commandBufferLength >= conn->environment.commandCapacity) {
-        return RBRGEN4_BUFFER_TOO_SMALL;
+        return RBRGEN4_COMMAND_TOO_LONG;
     }
 
     /* Wake the instrument if necessary. */
@@ -183,7 +183,7 @@ static RBRGen4Error RBRGen4_vSendCommand(RBRGen4 *conn, const char *command, va_
      * write is commandBufferCapacity - 1 bytes. */
     if (conn->commandBufferLength >= conn->environment.commandCapacity) {
         conn->commandBufferLength = conn->environment.commandCapacity;
-        return RBRGEN4_BUFFER_TOO_SMALL;
+        return RBRGEN4_COMMAND_TOO_LONG;
     }
 
     /* Make sure the command is LF-terminated. */
@@ -195,7 +195,7 @@ static RBRGen4Error RBRGen4_vSendCommand(RBRGen4 *conn, const char *command, va_
         /* It isn't. Make sure there's room before adding it. */
         if (conn->commandBufferLength + RBRGEN4_SEND_COMMAND_TERMINATOR_LEN >=
             conn->environment.commandCapacity) {
-            return RBRGEN4_BUFFER_TOO_SMALL;
+            return RBRGEN4_COMMAND_TOO_LONG;
         }
 
         memcpy(conn->environment.command + conn->commandBufferLength,
@@ -1113,7 +1113,7 @@ RBRGen4Error RBRGen4_formatLabelList(char *value, int32_t size, const RBRGen4Lab
 
     if (labelList->len == 0) {
         length = snprintf(value, size, RBRGEN4_EMPTY_LIST);
-        return length > 0 && length < size ? RBRGEN4_SUCCESS : RBRGEN4_BUFFER_TOO_SMALL;
+        return length > 0 && length < size ? RBRGEN4_SUCCESS : RBRGEN4_COMMAND_TOO_LONG;
     }
 
     for (int32_t i = 0; i < labelList->len; ++i) {
@@ -1125,7 +1125,7 @@ RBRGen4Error RBRGen4_formatLabelList(char *value, int32_t size, const RBRGen4Lab
             value + length, size - length, "%s%s", i == 0 ? "" : "|", labelList->labels[i]);
 
         if (written < 0 || length + written >= size) {
-            return RBRGEN4_BUFFER_TOO_SMALL;
+            return RBRGEN4_COMMAND_TOO_LONG;
         }
 
         length += written;

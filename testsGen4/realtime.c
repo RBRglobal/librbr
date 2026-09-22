@@ -650,7 +650,7 @@ TEST_LOGGER4(poll)
     }
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen4_pollChannels(conn, false, &longList, &actual);
-    TEST_ASSERT_ENUM_EQ(RBRGEN4_BUFFER_TOO_SMALL, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_COMMAND_TOO_LONG, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
@@ -684,7 +684,7 @@ TEST_LOGGER4(pollCommandBufferTooSmall)
 
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen4_poll(conn, false, &sample);
-    TEST_ASSERT_ENUM_EQ(RBRGEN4_BUFFER_TOO_SMALL, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_COMMAND_TOO_LONG, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     err = RBRGen4_setCommandBuffer(conn, before.command, before.commandCapacity);

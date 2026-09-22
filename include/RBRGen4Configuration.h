@@ -643,7 +643,7 @@ RBRGen4Error RBRGen4_getGroup(RBRGen4 *conn, RBRGen4Group *group, RBRGen4LabelLi
  *                                          its length does not fit
  *                                          its array, or a channel
  *                                          label is empty
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the
  *                                            command
  * \see RBRGen4_getGroup()
  */
@@ -1006,7 +1006,7 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
  *                                          single known flag
  * \return #RBRGEN4_UNSUPPORTED when the mode is `ddsampling` or
  *                                        `regimes`
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the command does not fit
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit
  * \see RBRGen4_getSchedule()
  */
 RBRGen4Error RBRGen4_setSchedule(RBRGen4 *conn, const RBRGen4Schedule *schedule,
@@ -1215,7 +1215,7 @@ RBRGen4Error RBRGen4_getConfig(RBRGen4 *conn, RBRGen4Config *config,
  *                                          `NULL`, its length does
  *                                          not fit its array, or a
  *                                          schedule label is empty
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the
  *                                            command
  * \see RBRGen4_getConfig()
  */

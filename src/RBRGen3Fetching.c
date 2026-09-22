@@ -60,7 +60,7 @@ RBRGen3Error RBRGen3_fetch(RBRGen3 *conn, RBRGen3LabelsList *channels, bool slee
         for (int32_t channel = 0; channel < channels->len; ++channel) {
             if (1 + strlen(channels->labels[channel]) >=
                 (size_t) conn->environment.commandCapacity) {
-                return RBRGEN3_BUFFER_TOO_SMALL;
+                return RBRGEN3_COMMAND_TOO_LONG;
             }
         }
 
