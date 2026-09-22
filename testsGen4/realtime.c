@@ -667,6 +667,29 @@ static RBRGen4Error pollTimeoutTime(const struct RBRGen4 *conn, RBRGen4DateTime 
     return RBRGEN4_SUCCESS;
 }
 
+/* The caller sizes the command buffer, so a poll command which does not fit
+ * is refused before anything reaches the instrument. */
+TEST_LOGGER4(pollCommandBufferTooSmall)
+{
+    RBRGen4Error err;
+    RBRGen4Sample sample;
+    const RBRGen4Environment before = conn->environment;
+    uint8_t commandBuffer[5];
+
+    err = RBRGen4_setCommandBuffer(conn, commandBuffer, sizeof(commandBuffer));
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen4_poll(conn, false, &sample);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_BUFFER_TOO_SMALL, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    err = RBRGen4_setCommandBuffer(conn, before.command, before.commandCapacity);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+
+    return true;
+}
+
 TEST_LOGGER4(pollTimeout)
 {
     RBRGen4Error err;

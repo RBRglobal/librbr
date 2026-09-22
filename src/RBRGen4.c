@@ -133,14 +133,11 @@ RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Environment *environment,
         return RBRGEN4_MISSING_CALLBACK;
     }
 
-    if (environment->command == NULL || environment->commandCapacity <= 0 ||
-        environment->response == NULL ||
-        environment->responseCapacity <= RBRGEN4_RESPONSE_TERMINATOR_LEN) {
-        return RBRGEN4_INVALID_PARAMETER_VALUE;
-    }
-
     memset(conn, 0, sizeof(RBRGen4));
+    conn->generation = RBRCOMMON_UNKNOWN_GENERATION;
     memcpy(&conn->environment, environment, sizeof(RBRGen4Environment));
+    RBR_TRY(RBRGen4_setCommandBuffer(conn, environment->command, environment->commandCapacity));
+    RBR_TRY(RBRGen4_setResponseBuffer(conn, environment->response, environment->responseCapacity));
     /* We don't want the streaming sample data callback to be called before the
      * constructor has finished. */
     conn->environment.sample = NULL;
@@ -187,6 +184,40 @@ RBRGen4Error RBRGen4_close(RBRGen4 *conn)
     memset(conn, 0, sizeof(RBRGen4));
     return RBRGEN4_SUCCESS;
 }
+
+void RBRGen4_resetResponseBuffer(RBRGen4 *conn)
+{
+    conn->responseBufferLength = 0;
+    conn->lastResponseLength = 0;
+    conn->response.type = RBRGEN4_RESPONSE_UNKNOWN_TYPE;
+    conn->response.error = RBRGEN4_HARDWARE_ERROR_NONE;
+    conn->response.response = NULL;
+}
+
+RBRGen4Error RBRGen4_setCommandBuffer(RBRGen4 *conn, uint8_t *command, int32_t capacity)
+{
+    if (command == NULL || capacity <= 0) {
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    conn->environment.command = command;
+    conn->environment.commandCapacity = capacity;
+    conn->commandBufferLength = 0;
+    return RBRGEN4_SUCCESS;
+}
+
+RBRGen4Error RBRGen4_setResponseBuffer(RBRGen4 *conn, uint8_t *response, int32_t capacity)
+{
+    if (response == NULL || capacity <= RBRGEN4_RESPONSE_TERMINATOR_LEN) {
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
+    }
+
+    conn->environment.response = response;
+    conn->environment.responseCapacity = capacity;
+    RBRGen4_resetResponseBuffer(conn);
+    return RBRGEN4_SUCCESS;
+}
+
 RBRCommonGeneration RBRGen4_getGeneration(const RBRGen4 *conn)
 {
     return conn->generation;

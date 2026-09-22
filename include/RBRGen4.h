@@ -576,7 +576,8 @@ typedef RBRGen4Error (*RBRGen4SampleCallback)(const struct RBRGen4 *conn,
  *
  * The library never allocates memory. The command and response buffers used
  * by a connection are provided by the caller when the connection is opened
- * and must remain valid until it is closed.
+ * and must remain valid until it is closed or they are replaced with
+ * RBRGen4_setCommandBuffer() or RBRGen4_setResponseBuffer().
  *
  * The two buffers must not overlap. The command buffer must have room for
  * the longest command, its terminator, and a trailing null byte; a command
@@ -595,6 +596,8 @@ typedef RBRGen4Error (*RBRGen4SampleCallback)(const struct RBRGen4 *conn,
  * sample matters should own its response buffer.
  *
  * \see RBRGen4_open()
+ * \see RBRGen4_setCommandBuffer()
+ * \see RBRGen4_setResponseBuffer()
  * \see RBRGEN4_COMMAND_BUFFER_DEFAULT for a starting command buffer size
  * \see RBRGEN4_RESPONSE_BUFFER_DEFAULT for a starting response buffer size
  */
@@ -836,10 +839,10 @@ typedef struct RBRGen4 {
  *
  * The \a environment structure will be copied into the RBRGen4 structure;
  * no reference to it is retained, so any subsequent modifications will not
- * affect the connection. The buffers it points to are not copied: the
- * connection works in them directly, so they must remain valid until the
- * connection is closed. The same applies to
- * RBRGen4Environment.sampleBuffer.
+ * affect the connection. The buffers it points to, however, must remain valid
+ * until the connection is closed or they are replaced with
+ * RBRGen4_setCommandBuffer() or RBRGen4_setResponseBuffer(). The same
+ * applies to RBRGen4Environment.sampleBuffer.
  *
  * All callbacks must be given except for RBRGen4Environment.sample.
  * If any others are given as null pointers, the instrument connection will
@@ -900,6 +903,73 @@ RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Environment *environment,
  * \see RBRGen4_open()
  */
 RBRGen4Error RBRGen4_close(RBRGen4 *conn);
+
+/**
+ * \brief Replace the command buffer of a connection.
+ *
+ * The command buffer given to RBRGen4_open() is used until this function
+ * replaces it. Nothing is carried over, so this function should be called
+ * only between commands. The sizing rules of RBRGen4Environment apply, and
+ * the connection keeps its current buffer when the new one is refused.
+ *
+ * Does not communicate with the instrument.
+ *
+ * \param [in,out] conn the instrument connection
+ * \param [in] command storage for commands destined for the instrument
+ * \param [in] capacity the capacity of \a command in bytes
+ * \return #RBRGEN4_SUCCESS when the buffer is replaced
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE if the buffer is missing or empty
+ * \see RBRGen4Environment for the rules on sizing and sharing buffers
+ * \see RBRGen4_setResponseBuffer()
+ */
+RBRGen4Error RBRGen4_setCommandBuffer(RBRGen4 *conn, uint8_t *command, int32_t capacity);
+
+/**
+ * \brief Replace the response buffer of a connection.
+ *
+ * The response buffer given to RBRGen4_open() is used until this function
+ * replaces it. Nothing is carried over: any buffered response data is
+ * discarded as by RBRGen4_resetResponseBuffer(), so this function should be
+ * called only between commands. The sizing rules of RBRGen4Environment
+ * apply, and the connection keeps its current buffer when the new one is
+ * refused.
+ *
+ * Does not communicate with the instrument.
+ *
+ * \param [in,out] conn the instrument connection
+ * \param [in] response storage for data received from the instrument
+ * \param [in] capacity the capacity of \a response in bytes
+ * \return #RBRGEN4_SUCCESS when the buffer is replaced
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE if the buffer is missing or cannot
+ *         hold more than a line terminator
+ * \see RBRGen4Environment for the rules on sizing and sharing buffers
+ * \see RBRGen4_setCommandBuffer()
+ */
+RBRGen4Error RBRGen4_setResponseBuffer(RBRGen4 *conn, uint8_t *response, int32_t capacity);
+
+/**
+ * \brief Discard any buffered instrument response data.
+ *
+ * This function must be called after a response buffer has been shared with
+ * another RBRGenX connection instance.
+ *
+ * The response buffer is not always fully consumed during a command-response
+ * interaction with an instrument. Unread data can include the prompt or
+ * terminator after the last response, data read past the end
+ * of that response, and, on a streaming instrument, samples not yet delivered
+ * to RBRGen4Environment.sample. Once a response buffer has been shared with
+ * another connection, that data may be overwritten, so the response state of
+ * the original connection must be reset with this function before trying to
+ * converse with an instrument. Otherwise, the next command would parse the
+ * other connection's output as its own reply, its own sample, or its own
+ * hardware error.
+ *
+ * Does not communicate with the instrument.
+ *
+ * \param [in,out] conn the instrument connection
+ * \see RBRGen4Environment for the rules on sharing buffers between connections
+ */
+void RBRGen4_resetResponseBuffer(RBRGen4 *conn);
 
 /**
  * \brief Get the generation of an instrument.
