@@ -1,0 +1,4 @@
+# Generated artifacts.
+posix-shared-buffers
+*.exe
+*.o
