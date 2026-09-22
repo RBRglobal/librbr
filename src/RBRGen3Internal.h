@@ -139,15 +139,21 @@ RBRGen3Error RBRGen3_sendCommand(RBRGen3 *conn, const char *command, ...);
  * \param [in] conn the instrument connection
  * \param [in] breakOnSample whether to return early when a sample is parsed
  * \param [out] sample where to put a parsed sample
+ * \param [in] startTime when the wait began; the command timeout is measured
+ *                       from here, so a caller which loops over this function
+ *                       to skip unrelated lines bounds the whole wait by
+ *                       passing the same value each time
  * \return #RBRGEN3_SUCCESS when a response was successfully read
  * \return #RBRGEN3_SAMPLE when a sample is read and \a sample is given
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when the response exceeds the buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
  * \see RBRGen3_sendCommand() to send a command
  * \see RBRGen3_converse() for a send/receive shortcut
  */
-RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Sample *sample);
+RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Sample *sample,
+                                  RBRGen3DateTime startTime);
 
 /**
  * \brief Send a command to the instrument and await an appropriate response.
@@ -160,11 +166,18 @@ RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Samp
  * from this function means that a timeout was reached waiting for the
  * _correct_ response, not just _any_ response.
  *
+ * A line too long for the response buffer met while waiting is drained and
+ * skipped, since it may be a streamed sample rather than the reply. If the
+ * correct response then never arrives, the oversized line most likely was
+ * it, and #RBRGEN3_RESPONSE_TOO_LONG is returned in place of the timeout.
+ *
  * \param [in] conn the instrument connection
  * \param [in] command the command to send as a printf-style format string
  * \return #RBRGEN3_SUCCESS when the command was successfully sent and a
  *                                response was read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a line too long for the response
+ *         buffer was met and the correct response never arrived
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
  * \see RBRGen3_sendCommand() to send a command

@@ -49,6 +49,8 @@ const char *RBRGen3Error_name(RBRGen3Error error)
         return "buffer too small";
     case RBRGEN3_COMMAND_TOO_LONG:
         return "command too long";
+    case RBRGEN3_RESPONSE_TOO_LONG:
+        return "response too long";
     case RBRGEN3_MISSING_CALLBACK:
         return "missing callback";
     case RBRGEN3_CALLBACK_ERROR:

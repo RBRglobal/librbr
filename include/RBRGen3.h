@@ -198,6 +198,8 @@ typedef enum RBRGen3Error {
     RBRGEN3_BUFFER_TOO_SMALL,
     /** The outbound command does not fit the command buffer. */
     RBRGEN3_COMMAND_TOO_LONG,
+    /** A response from the instrument did not fit the response buffer. */
+    RBRGEN3_RESPONSE_TOO_LONG,
     /** A required callback function was not provided. */
     RBRGEN3_MISSING_CALLBACK,
     /** An unrecoverable error from within a user callback function. */
