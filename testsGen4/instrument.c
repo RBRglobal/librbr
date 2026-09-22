@@ -615,6 +615,241 @@ TEST_LOGGER4(resetResponseBuffer)
     return true;
 }
 
+/* A line longer than the buffer met while waiting for a reply is drained and
+ * skipped; the reply behind it still answers the command. */
+TEST_LOGGER4(responseBufferOverflow)
+{
+    RBRGen4Error err;
+    RBRGen4PowerSource actual;
+
+    /* One line longer than the buffer, followed by the reply. */
+    static char response[RBRGEN4_RESPONSE_BUFFER_DEFAULT + 64];
+    const char *rest = "instrument power source=int" RESPONSE_TERMINATOR;
+    size_t overlong = sizeof(response) - strlen(RESPONSE_TERMINATOR) - strlen(rest) - 1;
+    memset(response, 'a', overlong);
+    strcpy(response + overlong, RESPONSE_TERMINATOR);
+    strcat(response, rest);
+
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRGen4_getPowerSource(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_POWER_SOURCE_INTERNAL, actual, RBRGen4PowerSource);
+
+    return true;
+}
+
+/** \brief A clock which stands still until the fixture has been read, then
+ * steps past the command timeout on every call. */
+static RBRGen4Error overflowReplyTime(const struct RBRGen4 *conn, RBRGen4DateTime *time)
+{
+    TestIOBuffers *buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
+    static RBRGen4DateTime clock;
+    if (buffers->readBufferPos < buffers->readBufferSize) {
+        clock = 0;
+    } else {
+        clock += conn->commandTimeout + 1;
+    }
+    *time = clock;
+    return RBRGEN4_SUCCESS;
+}
+
+/* When the oversized line was the reply itself, nothing else arrives; the
+ * wait ends as RESPONSE_TOO_LONG rather than a bare timeout. */
+TEST_LOGGER4(responseBufferOverflowReply)
+{
+    RBRGen4Error err;
+    RBRGen4PowerSource actual;
+    RBRGen4TimeCallback savedTime = conn->environment.time;
+
+    static char response[RBRGEN4_RESPONSE_BUFFER_DEFAULT + 64];
+    memset(response, 'a', sizeof(response) - strlen(RESPONSE_TERMINATOR) - 1);
+    strcpy(response + sizeof(response) - strlen(RESPONSE_TERMINATOR) - 1, RESPONSE_TERMINATOR);
+
+    TestIOBuffers_init(buffers, response, 0);
+    conn->environment.time = overflowReplyTime;
+    err = RBRGen4_getPowerSource(conn, &actual);
+    conn->environment.time = savedTime;
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_RESPONSE_TOO_LONG, err, RBRGen4Error);
+
+    /* Nothing of the oversized line lingers. */
+    TestIOBuffers_init(buffers, "instrument power source=int" RESPONSE_TERMINATOR, 0);
+    err = RBRGen4_getPowerSource(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_POWER_SOURCE_INTERNAL, actual, RBRGen4PowerSource);
+
+    return true;
+}
+
+/** \brief A clock which advances by a second on every call, whatever has been
+ * read. */
+static RBRGen4DateTime tickingClock;
+static RBRGen4Error tickingTime(const struct RBRGen4 *conn, RBRGen4DateTime *time)
+{
+    (void) conn;
+    tickingClock += 1000;
+    *time = tickingClock;
+    return RBRGEN4_SUCCESS;
+}
+
+/* The command timeout bounds the whole wait for a reply. An instrument
+ * streaming lines too long for the buffer must not keep the wait alive one
+ * line at a time: once the timeout has elapsed the command fails, and as an
+ * oversized line was met, it fails with RESPONSE_TOO_LONG. */
+TEST_LOGGER4(responseBufferOverflowStream)
+{
+    RBRGen4Error err;
+    RBRGen4PowerSource actual;
+    RBRGen4TimeCallback savedTime = conn->environment.time;
+
+    /* Eight oversized lines, each needing several reads and clock checks, so
+     * the timeout elapses long before the fixture runs dry. Relies on the
+     * harness handing over at least a hundred or so bytes per read; smaller
+     * reads spend the timeout before the first line overflows and the test
+     * fails with TIMEOUT. */
+    static char line[RBRGEN4_RESPONSE_BUFFER_DEFAULT + 16];
+    memset(line, 'a', sizeof(line) - strlen(RESPONSE_TERMINATOR) - 1);
+    strcpy(line + sizeof(line) - strlen(RESPONSE_TERMINATOR) - 1, RESPONSE_TERMINATOR);
+    static char stream[8 * sizeof(line)];
+    stream[0] = '\0';
+    for (int i = 0; i < 8; i++) {
+        strcat(stream, line);
+    }
+
+    /* The harness opens its connections with no command timeout; give this
+     * one a few ticks' worth. */
+    RBRGen4DateTime savedTimeout = RBRGen4_getCommandTimeout(conn);
+    RBRGen4_setCommandTimeout(conn, 8000);
+    TestIOBuffers_init(buffers, stream, 0);
+    tickingClock = 0;
+    conn->environment.time = tickingTime;
+    err = RBRGen4_getPowerSource(conn, &actual);
+    conn->environment.time = savedTime;
+    RBRGen4_setCommandTimeout(conn, savedTimeout);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_RESPONSE_TOO_LONG, err, RBRGen4Error);
+
+    return true;
+}
+
+/* An oversized line met before a retry belongs to the first attempt. When
+ * the resent command times out, that is a timeout, not a buffer problem. */
+TEST_LOGGER4(responseBufferOverflowRetry)
+{
+    RBRGen4Error err;
+    RBRGen4PowerSource actual;
+    RBRGen4TimeCallback savedTime = conn->environment.time;
+
+    static char response[RBRGEN4_RESPONSE_BUFFER_DEFAULT + 64];
+    memset(response, 'a', sizeof(response) - strlen(RESPONSE_TERMINATOR) - 1);
+    strcpy(response + sizeof(response) - strlen(RESPONSE_TERMINATOR) - 1, RESPONSE_TERMINATOR);
+    static char fixture[sizeof(response) + 64];
+    /* The oversized line, then an invalid-command error which ends with our
+     * command: garbage was ahead of it on the link, so it is resent. */
+    snprintf(fixture,
+             sizeof(fixture),
+             "%sERR-102 invalid command 'xinstrument'" RESPONSE_TERMINATOR,
+             response);
+
+    TestIOBuffers_init(buffers, fixture, 0);
+    conn->environment.time = overflowReplyTime;
+    err = RBRGen4_getPowerSource(conn, &actual);
+    conn->environment.time = savedTime;
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_TIMEOUT, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("instrument power" COMMAND_TERMINATOR "instrument power" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+/* An oversized line whose body exactly fills the buffer puts the first byte
+ * of its terminator in the last slot. The discard must still stop at that
+ * terminator rather than run on into the reply behind it. */
+TEST_LOGGER4(responseBufferOverflowAtBoundary)
+{
+    RBRGen4Error err;
+    RBRGen4PowerSource actual;
+
+    static char response[RBRGEN4_RESPONSE_BUFFER_DEFAULT + 64];
+    const char *rest = "instrument power source=int" RESPONSE_TERMINATOR;
+    memset(response, 'a', RBRGEN4_RESPONSE_BUFFER_DEFAULT - 1);
+    strcpy(response + RBRGEN4_RESPONSE_BUFFER_DEFAULT - 1, RESPONSE_TERMINATOR);
+    strcat(response, rest);
+
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRGen4_getPowerSource(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_POWER_SOURCE_INTERNAL, actual, RBRGen4PowerSource);
+
+    return true;
+}
+
+/* Losing the link part-way through an oversized line forgets the fragment
+ * read so far, so a reply arriving once the link comes back is not glued to
+ * it and lost. */
+TEST_LOGGER4(responseBufferOverflowInterrupted)
+{
+    RBRGen4Error err;
+    RBRGen4PowerSource actual;
+
+    /* More than a buffer's worth of the line arrives, then the link goes
+     * quiet: the read callback running dry stands in for a lost link. */
+    static char head[RBRGEN4_RESPONSE_BUFFER_DEFAULT + 16];
+    memset(head, 'a', sizeof(head) - 1);
+    head[sizeof(head) - 1] = '\0';
+    TestIOBuffers_init(buffers, head, 0);
+    err = RBRGen4_getPowerSource(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_CALLBACK_ERROR, err, RBRGen4Error);
+
+    /* Nothing of the oversized line ever follows; the next reply is whole. */
+    TestIOBuffers_init(buffers, "instrument power source=int" RESPONSE_TERMINATOR, 0);
+    err = RBRGen4_getPowerSource(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_POWER_SOURCE_INTERNAL, actual, RBRGen4PowerSource);
+
+    return true;
+}
+
+/** \brief A clock which jumps past any command timeout as soon as anything
+ * has been read, so the deadline lands right after the read which fills the
+ * response buffer. */
+static RBRGen4Error overflowTimeoutTime(const struct RBRGen4 *conn, RBRGen4DateTime *time)
+{
+    TestIOBuffers *buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
+    *time = buffers->readBufferPos > 0 ? INT64_MAX / 2 : 0;
+    return RBRGEN4_SUCCESS;
+}
+
+/* The read which fills the buffer may also be the one which crosses the
+ * deadline. The buffer was too small regardless, and that is what is
+ * reported, without waiting out a second timeout. Should the tail of the
+ * line turn up later, it is skipped like any other unrelated line. */
+TEST_LOGGER4(responseBufferOverflowTimeout)
+{
+    RBRGen4Error err;
+    RBRGen4PowerSource actual;
+    RBRGen4TimeCallback savedTime = conn->environment.time;
+
+    /* More than a buffer's worth, so the first read fills the buffer without
+     * running the fixture dry. */
+    static char head[RBRGEN4_RESPONSE_BUFFER_DEFAULT + 16];
+    memset(head, 'a', sizeof(head) - 1);
+    head[sizeof(head) - 1] = '\0';
+    TestIOBuffers_init(buffers, head, 0);
+    conn->environment.time = overflowTimeoutTime;
+    err = RBRGen4_getPowerSource(conn, &actual);
+    conn->environment.time = savedTime;
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_RESPONSE_TOO_LONG, err, RBRGen4Error);
+
+    TestIOBuffers_init(buffers,
+                       "aaaaaaaa" RESPONSE_TERMINATOR
+                       "instrument power source=int" RESPONSE_TERMINATOR,
+                       0);
+    err = RBRGen4_getPowerSource(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_POWER_SOURCE_INTERNAL, actual, RBRGen4PowerSource);
+
+    return true;
+}
+
 TEST_LOGGER4(reboot)
 {
     TestIOBuffers_init(buffers, "", 0);

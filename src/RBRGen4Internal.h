@@ -161,6 +161,7 @@ RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn, const char *command, ...);
  * \return #RBRGEN4_SUCCESS when a response was successfully read
  * \return #RBRGEN4_SAMPLE when a sample is read and \a sample is given
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when the response exceeds the buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR if the instrument indicated an error
  * \see RBRGen4_sendCommand() to send a command
@@ -180,11 +181,18 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn, bool breakOnSample, RBRGen4Samp
  * from this function means that a timeout was reached waiting for the
  * _correct_ response, not just _any_ response.
  *
+ * A line too long for the response buffer met while waiting is drained and
+ * skipped, since it may be a streamed sample rather than the reply. If the
+ * correct response then never arrives, the oversized line most likely was
+ * it, and #RBRGEN4_RESPONSE_TOO_LONG is returned in place of the timeout.
+ *
  * \param [in] conn the instrument connection
  * \param [in] command the command to send as a printf-style format string
  * \return #RBRGEN4_SUCCESS when the command was successfully sent and a
  *                                response was read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a line too long for the response
+ *         buffer was met and the correct response never arrived
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR if the instrument indicated an error
  * \see RBRGen4_sendCommand() to send a command
