@@ -183,14 +183,25 @@ int main(int argc, char *argv[])
 
     RBRGen3Error err;
     TestIOBuffers ioBuffers;
-    RBRGen3Callbacks instrumentCallbacks = {
-        .time = TestIOBuffers_time,
-        .sleep = TestIOBuffers_sleep,
-        .read = TestIOBuffers_read,
-        .write = TestIOBuffers_write,
-        .sample = TestIOBuffers_sample,
-        .sampleBuffer = &ioBuffers.streamSample,
-    };
+    /* The three test connections are open at once, so each one needs its own
+     * buffers: a response buffer belongs to a single live connection. */
+    static uint8_t commandBuffers[3][RBRGEN3_COMMAND_BUFFER_DEFAULT];
+    static uint8_t responseBuffers[3][RBRGEN3_RESPONSE_BUFFER_DEFAULT];
+    RBRGen3Environment instrumentEnvironment[3];
+    for (size_t i = 0; i < 3; ++i) {
+        instrumentEnvironment[i] = (RBRGen3Environment) {
+            .time = TestIOBuffers_time,
+            .sleep = TestIOBuffers_sleep,
+            .read = TestIOBuffers_read,
+            .write = TestIOBuffers_write,
+            .sample = TestIOBuffers_sample,
+            .sampleBuffer = &ioBuffers.streamSample,
+            .command = commandBuffers[i],
+            .commandCapacity = sizeof(commandBuffers[i]),
+            .response = responseBuffers[i],
+            .responseCapacity = sizeof(responseBuffers[i]),
+        };
+    }
 
     RBRGen3 instrumentL2Buffer;
     RBRGen3 *instrumentL2 = &instrumentL2Buffer;
@@ -200,7 +211,7 @@ int main(int argc, char *argv[])
         "id model = RBRoem, version = 1.430, serial = 999999, fwtype = 103" RESPONSE_TERMINATOR,
         0);
     err = RBRGen3_open(instrumentL2,
-                       &instrumentCallbacks,
+                       &instrumentEnvironment[0],
                        /* command timeout */ 0,
                        &ioBuffers);
     if (err != RBRGEN3_SUCCESS) {
@@ -219,7 +230,7 @@ int main(int argc, char *argv[])
         "id model = RBRoem3, version = 1.134, serial = 999999, fwtype = 104" RESPONSE_TERMINATOR,
         0);
     err = RBRGen3_open(instrumentL3,
-                       &instrumentCallbacks,
+                       &instrumentEnvironment[1],
                        /* command timeout */ 0,
                        &ioBuffers);
     if (err != RBRGEN3_SUCCESS) {
@@ -237,7 +248,7 @@ int main(int argc, char *argv[])
         "id model = RBRduet4, version = 1.0.0, serial = 999999, fwtype = 131" RESPONSE_TERMINATOR,
         0);
     err = RBRGen3_open(instrumentL4,
-                       &instrumentCallbacks,
+                       &instrumentEnvironment[2],
                        /* command timeout */ 0,
                        &ioBuffers);
     if (err == RBRGEN3_SUCCESS) {

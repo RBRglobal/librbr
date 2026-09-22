@@ -353,6 +353,91 @@ TEST_LOGGER3(postprocessing)
     return true;
 }
 
+/* The channel list is flushed in pieces when it does not fit the command
+ * buffer, and a piece which exactly fills the buffer goes into the next write
+ * rather than being truncated. */
+TEST_LOGGER3(postprocessingSetSplitsChannels)
+{
+    /* Large enough for the fixed-format lines; "postprocessing channels =
+     * mean(pressure_01)|std(temperature_01)|mean(conductivity_a1234567890)"
+     * is 94 characters, exactly filling the buffer with no room for
+     * snprintf()'s null. */
+    uint8_t commandBuffer[94];
+    uint8_t responseBuffer[RBRGEN3_RESPONSE_BUFFER_DEFAULT];
+    RBRGen3Environment small = conn->environment;
+    small.command = commandBuffer;
+    small.commandCapacity = sizeof(commandBuffer);
+    small.response = responseBuffer;
+    small.responseCapacity = sizeof(responseBuffer);
+    RBRGen3 tiny;
+    RBRGen3Error err;
+
+    TestIOBuffers_init(
+        buffers,
+        "RBR RBRduo3 1.090 999999" RESPONSE_TERMINATOR
+        "id model = RBRoem3, version = 1.134, serial = 999999, fwtype = 104" RESPONSE_TERMINATOR,
+        0);
+    err = RBRGen3_open(&tiny, &small, 0, buffers);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+
+    RBRGen3Postprocessing postprocessing = {
+        .status = RBRGEN3_UNKNOWN_POSTPROCESSING_STATUS,
+        .channels =
+            {
+                .count = 3,
+                .channels =
+                    {
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
+                            .label = "pressure_01",
+                        },
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_STD,
+                            .label = "temperature_01",
+                        },
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
+                            .label = "conductivity_a1234567890",
+                        },
+                    },
+            },
+        .binReference = "pressure_01",
+        .binFilter = RBRGEN3_POSTPROCESSING_BINFILTER_NONE,
+        .binSize = 50.0,
+        .tstampMin = RBRGEN3_DATETIME_MIN,
+        .tstampMax = RBRGEN3_DATETIME_MAX,
+        .depthMin = 10.0,
+        .depthMax = 1000.0,
+    };
+    const char *expectedCommand =
+        "postprocessing binreference = pressure_01, "
+        "binfilter = none, binsize = 50.0" COMMAND_TERMINATOR
+        "postprocessing tstamp_min = 20000101000000" COMMAND_TERMINATOR
+        "postprocessing tstamp_max = 20991231235959" COMMAND_TERMINATOR
+        "postprocessing depth_min = 10.0, depth_max = 1000.0" COMMAND_TERMINATOR
+        "postprocessing dc_alpha = 0.000, dc_tau = 0.000, dc_tdelay = 0.000, dc_ctcoeff = "
+        "0.0000e+00" COMMAND_TERMINATOR
+        "postprocessing channels = mean(pressure_01)|std(temperature_01)"
+        "|mean(conductivity_a1234567890)" COMMAND_TERMINATOR;
+    const char *response =
+        "postprocessing binreference = pressure_01, "
+        "binfilter = none, binsize = 50.0" RESPONSE_TERMINATOR
+        "postprocessing tstamp_min = 20000101000000" RESPONSE_TERMINATOR
+        "postprocessing tstamp_max = 20991231235959" RESPONSE_TERMINATOR
+        "postprocessing depth_min = 10.0, depth_max = 1000.0" RESPONSE_TERMINATOR
+        "postprocessing dc_alpha = 0.000, dc_tau = 0.000, dc_tdelay = 0.000, dc_ctcoeff = "
+        "0.0000e+00" RESPONSE_TERMINATOR
+        "postprocessing channels = mean(pressure_01)|std(temperature_01)"
+        "|mean(conductivity_a1234567890)" RESPONSE_TERMINATOR;
+
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRGen3_setPostprocessing(&tiny, &postprocessing);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
+
+    return true;
+}
+
 TEST_LOGGER3(postprocessing_set)
 {
     RBRGen3Postprocessing postprocessing = {

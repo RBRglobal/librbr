@@ -56,6 +56,150 @@ static bool test_fetching(RBRGen3 *conn, TestIOBuffers *buffers, FetchingTest *t
     return true;
 }
 
+/* The caller sizes the command buffer, so a fetch whose fixed prefix does not
+ * fit has to be refused before anything reaches the instrument rather than
+ * sent truncated. */
+TEST_LOGGER3(fetchCommandBufferTooSmall)
+{
+    uint8_t commandBuffer[20];
+    uint8_t responseBuffer[RBRGEN3_RESPONSE_BUFFER_DEFAULT];
+    RBRGen3Environment small = conn->environment;
+    small.command = commandBuffer;
+    small.commandCapacity = sizeof(commandBuffer);
+    small.response = responseBuffer;
+    small.responseCapacity = sizeof(responseBuffer);
+    RBRGen3 tiny;
+    RBRGen3Error err;
+
+    TestIOBuffers_init(
+        buffers,
+        "RBR RBRduo3 1.090 999999" RESPONSE_TERMINATOR
+        "id model = RBRoem3, version = 1.134, serial = 999999, fwtype = 104" RESPONSE_TERMINATOR,
+        0);
+    err = RBRGen3_open(&tiny, &small, 0, buffers);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+
+    RBRGen3LabelsList channels = {.count = 1, .labels = {"temperature_00"}};
+    RBRGen3Sample sample;
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen3_fetch(&tiny, &channels, false, &sample);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_BUFFER_TOO_SMALL, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    /* An idle connection would normally be woken first; a refused command
+     * must not even do that. */
+    tiny.lastActivityTime = -1;
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen3_fetch(&tiny, &channels, false, &sample);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_BUFFER_TOO_SMALL, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+/* A fetch whose channel list exactly fills the buffer leaves no room for
+ * snprintf()'s null, so the last label is flushed into a second write rather
+ * than truncated or refused. */
+TEST_LOGGER3(fetchCommandExactlyFull)
+{
+    /* "fetch sleepafter = false, channels = temp" is 41 characters; with a
+     * capacity of 41 snprintf() has room for 40 of them plus its null. */
+    uint8_t commandBuffer[41];
+    uint8_t responseBuffer[RBRGEN3_RESPONSE_BUFFER_DEFAULT];
+    RBRGen3Environment exact = conn->environment;
+    exact.command = commandBuffer;
+    exact.commandCapacity = sizeof(commandBuffer);
+    exact.response = responseBuffer;
+    exact.responseCapacity = sizeof(responseBuffer);
+    RBRGen3 tiny;
+    RBRGen3Error err;
+
+    TestIOBuffers_init(
+        buffers,
+        "RBR RBRduo3 1.090 999999" RESPONSE_TERMINATOR
+        "id model = RBRoem3, version = 1.134, serial = 999999, fwtype = 104" RESPONSE_TERMINATOR,
+        0);
+    err = RBRGen3_open(&tiny, &exact, 0, buffers);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+
+    RBRGen3LabelsList channels = {.count = 1, .labels = {"temp"}};
+    RBRGen3Sample sample;
+    TestIOBuffers_init(buffers, "2000-01-01 03:22:42.000, -129.993424e+000" RESPONSE_TERMINATOR, 0);
+    err = RBRGen3_fetch(&tiny, &channels, false, &sample);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("fetch sleepafter = false, channels = temp" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+/* A label which cannot fit even an empty buffer is refused before any part
+ * of the command has been written. */
+TEST_LOGGER3(fetchLabelTooLongForBuffer)
+{
+    uint8_t commandBuffer[30];
+    uint8_t responseBuffer[RBRGEN3_RESPONSE_BUFFER_DEFAULT];
+    RBRGen3Environment small = conn->environment;
+    small.command = commandBuffer;
+    small.commandCapacity = sizeof(commandBuffer);
+    small.response = responseBuffer;
+    small.responseCapacity = sizeof(responseBuffer);
+    RBRGen3 tiny;
+    RBRGen3Error err;
+
+    TestIOBuffers_init(
+        buffers,
+        "RBR RBRduo3 1.090 999999" RESPONSE_TERMINATOR
+        "id model = RBRoem3, version = 1.134, serial = 999999, fwtype = 104" RESPONSE_TERMINATOR,
+        0);
+    err = RBRGen3_open(&tiny, &small, 0, buffers);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+
+    /* 31 characters: the longest label the instrument allows. */
+    RBRGen3LabelsList channels = {.count = 2,
+                                  .labels = {"temp", "abcdefghijklmnopqrstuvwxyz01234"}};
+    RBRGen3Sample sample;
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen3_fetch(&tiny, &channels, false, &sample);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_BUFFER_TOO_SMALL, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+/* When the fixed prefix fits but the channels parameter does not, the prefix
+ * is flushed on its own and the command continues in the next write. */
+TEST_LOGGER3(fetchSplitsBeforeChannels)
+{
+    uint8_t commandBuffer[30];
+    uint8_t responseBuffer[RBRGEN3_RESPONSE_BUFFER_DEFAULT];
+    RBRGen3Environment small = conn->environment;
+    small.command = commandBuffer;
+    small.commandCapacity = sizeof(commandBuffer);
+    small.response = responseBuffer;
+    small.responseCapacity = sizeof(responseBuffer);
+    RBRGen3 tiny;
+    RBRGen3Error err;
+
+    TestIOBuffers_init(
+        buffers,
+        "RBR RBRduo3 1.090 999999" RESPONSE_TERMINATOR
+        "id model = RBRoem3, version = 1.134, serial = 999999, fwtype = 104" RESPONSE_TERMINATOR,
+        0);
+    err = RBRGen3_open(&tiny, &small, 0, buffers);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+
+    RBRGen3LabelsList channels = {.count = 1, .labels = {"temp"}};
+    RBRGen3Sample sample;
+    TestIOBuffers_init(buffers, "2000-01-01 03:22:42.000, -129.993424e+000" RESPONSE_TERMINATOR, 0);
+    err = RBRGen3_fetch(&tiny, &channels, false, &sample);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("fetch sleepafter = false, channels = temp" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
 TEST_LOGGER3(fetch)
 {
     FetchingTest tests[] = {

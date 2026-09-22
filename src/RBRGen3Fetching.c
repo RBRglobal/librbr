@@ -19,11 +19,11 @@
 RBRGen3Error RBRGen3_fetch(RBRGen3 *conn, RBRGen3LabelsList *channels, bool sleepAfter,
                            RBRGen3Sample *sample)
 {
-    char *commandBuffer = (char *) conn->commandBuffer;
+    char *commandBuffer = (char *) conn->environment.command;
     int32_t *commandBufferLength = &conn->commandBufferLength;
 
     *commandBufferLength = snprintf(commandBuffer,
-                                    sizeof(conn->commandBuffer),
+                                    (size_t) conn->environment.commandCapacity,
                                     "fetch sleepafter = %s",
                                     sleepAfter ? "true" : "false");
 
@@ -41,36 +41,57 @@ RBRGen3Error RBRGen3_fetch(RBRGen3 *conn, RBRGen3LabelsList *channels, bool slee
      * command across multiple callbacks.
      */
     if (channels != NULL && channels->count > 0 && conn->generation != RBRCOMMON_LOGGER2) {
-        *commandBufferLength += snprintf(commandBuffer + *commandBufferLength,
-                                         sizeof(conn->commandBuffer) - *commandBufferLength,
-                                         ", channels =");
+        /* Each label is written with its separator in one piece, so a label
+         * which cannot fit an empty buffer must be refused before any part of
+         * the command has gone out. */
+        for (int32_t channel = 0; channel < channels->count; ++channel) {
+            if (1 + strlen(channels->labels[channel]) >=
+                (size_t) conn->environment.commandCapacity) {
+                return RBRGEN3_BUFFER_TOO_SMALL;
+            }
+        }
+
+        const char channelsParameter[] = ", channels =";
+        if (*commandBufferLength + (int32_t) sizeof(channelsParameter) >
+            conn->environment.commandCapacity) {
+            RBR_TRY(RBRGen3_sendBuffer(conn));
+            *commandBufferLength = 0;
+        }
+        *commandBufferLength +=
+            snprintf(commandBuffer + *commandBufferLength,
+                     (size_t) (conn->environment.commandCapacity - *commandBufferLength),
+                     "%s",
+                     channelsParameter);
 
         char separator = ' ';
         for (int32_t channel = 0; channel < channels->count; ++channel) {
-            if (*commandBufferLength + 1 + strlen(channels->labels[channel]) >
-                sizeof(conn->commandBuffer)) {
+            /* snprintf() needs a byte for its null beyond the piece. */
+            if ((size_t) *commandBufferLength + 1 + strlen(channels->labels[channel]) >=
+                (size_t) conn->environment.commandCapacity) {
                 RBR_TRY(RBRGen3_sendBuffer(conn));
                 *commandBufferLength = 0;
             }
 
-            *commandBufferLength += snprintf(commandBuffer + *commandBufferLength,
-                                             sizeof(conn->commandBuffer) - *commandBufferLength,
-                                             "%c%s",
-                                             separator,
-                                             channels->labels[channel]);
+            *commandBufferLength +=
+                snprintf(commandBuffer + *commandBufferLength,
+                         (size_t) (conn->environment.commandCapacity - *commandBufferLength),
+                         "%c%s",
+                         separator,
+                         channels->labels[channel]);
             separator = '|';
         }
     }
 
-    if ((size_t) *commandBufferLength + RBRGEN3_SEND_COMMAND_TERMINATOR_LEN >
-        sizeof(conn->commandBuffer)) {
+    if ((size_t) *commandBufferLength + RBRGEN3_SEND_COMMAND_TERMINATOR_LEN >=
+        (size_t) conn->environment.commandCapacity) {
         RBR_TRY(RBRGen3_sendBuffer(conn));
         *commandBufferLength = 0;
     }
 
-    *commandBufferLength += snprintf(commandBuffer + *commandBufferLength,
-                                     sizeof(conn->commandBuffer) - *commandBufferLength,
-                                     RBRGEN3_SEND_COMMAND_TERMINATOR);
+    *commandBufferLength +=
+        snprintf(commandBuffer + *commandBufferLength,
+                 (size_t) (conn->environment.commandCapacity - *commandBufferLength),
+                 RBRGEN3_SEND_COMMAND_TERMINATOR);
 
     RBR_TRY(RBRGen3_sendBuffer(conn));
 

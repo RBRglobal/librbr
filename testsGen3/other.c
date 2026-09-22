@@ -226,6 +226,77 @@ TEST_LOGGER3(power)
     return true;
 }
 
+/* The connection's buffers are supplied by the caller, so a missing or empty
+ * buffer has to be refused before any instrument communication happens. */
+TEST_LOGGER3(openRejectsInvalidBuffers)
+{
+    uint8_t commandBuffer[RBRGEN3_COMMAND_BUFFER_DEFAULT];
+    uint8_t responseBuffer[RBRGEN3_RESPONSE_BUFFER_DEFAULT];
+
+    struct {
+        uint8_t *command;
+        int32_t commandCapacity;
+        uint8_t *response;
+        int32_t responseCapacity;
+    } tests[] = {
+        {NULL, sizeof(commandBuffer), responseBuffer, sizeof(responseBuffer)},
+        {commandBuffer, 0, responseBuffer, sizeof(responseBuffer)},
+        {commandBuffer, sizeof(commandBuffer), NULL, sizeof(responseBuffer)},
+        {commandBuffer, sizeof(commandBuffer), responseBuffer, 0},
+        {commandBuffer, sizeof(commandBuffer), responseBuffer, -1},
+        /* Room for a line terminator and nothing else can never hold a
+         * response. */
+        {commandBuffer, sizeof(commandBuffer), responseBuffer, 2},
+    };
+
+    RBRGen3 unopened;
+    RBRGen3Error err;
+
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen3_open(&unopened, NULL, 0, NULL);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_MISSING_CALLBACK, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    for (size_t i = 0; i < sizeof(tests) / sizeof(tests[0]); ++i) {
+        RBRGen3Environment environment = conn->environment;
+        environment.command = tests[i].command;
+        environment.commandCapacity = tests[i].commandCapacity;
+        environment.response = tests[i].response;
+        environment.responseCapacity = tests[i].responseCapacity;
+
+        TestIOBuffers_init(buffers, "", 0);
+        err = RBRGen3_open(&unopened, &environment, 0, NULL);
+        TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+        TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+    }
+
+    return true;
+}
+
+/* An instrument of another generation answers `id` with an error line, and a
+ * device which is not an instrument answers with nothing useful; both are
+ * reported as an unsupported instrument. A failing callback is the caller's
+ * problem and is reported as itself. */
+TEST_LOGGER3(openUnsupportedVersusCallbackError)
+{
+    RBRGen3 unopened;
+    RBRGen3Error err;
+
+    TestIOBuffers_init(buffers, "E0102 invalid command 'id'" RESPONSE_TERMINATOR, 0);
+    err = RBRGen3_open(&unopened, &conn->environment, 0, buffers);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_UNSUPPORTED, err, RBRGen3Error);
+    TEST_ASSERT_ENUM_EQ(
+        RBRCOMMON_UNKNOWN_GENERATION, RBRGen3_getGeneration(&unopened), RBRCommonGeneration);
+
+    /* The harness reports a read past its scripted data as a callback
+     * error. */
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen3_open(&unopened, &conn->environment, 0, buffers);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_CALLBACK_ERROR, err, RBRGen3Error);
+
+    return true;
+}
+
 TEST_LOGGER2(powerinternal)
 {
     RBRGen3PowerInternal actual;

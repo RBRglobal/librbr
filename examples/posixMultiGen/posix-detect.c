@@ -73,16 +73,22 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    const RBRGen3Callbacks gen3Callbacks = {
+    uint8_t gen3CommandBuffer[RBRGEN3_COMMAND_BUFFER_DEFAULT];
+    uint8_t gen3ResponseBuffer[RBRGEN3_RESPONSE_BUFFER_DEFAULT];
+    const RBRGen3Environment gen3Environment = {
         .time = gen3InstrumentTime,
         .sleep = gen3InstrumentSleep,
         .read = gen3InstrumentRead,
         .write = gen3InstrumentWrite,
+        .command = gen3CommandBuffer,
+        .commandCapacity = sizeof(gen3CommandBuffer),
+        .response = gen3ResponseBuffer,
+        .responseCapacity = sizeof(gen3ResponseBuffer),
     };
 
     RBRGen3 gen3Conn;
     RBRGen3Error err3 = RBRGen3_open(
-        &gen3Conn, &gen3Callbacks, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd);
+        &gen3Conn, &gen3Environment, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd);
     if (err3 == RBRGEN3_SUCCESS) {
         RBRGen3Id id;
         err3 = RBRGen3_getId(&gen3Conn, &id);
