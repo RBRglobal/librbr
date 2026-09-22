@@ -671,11 +671,11 @@ TEST_LOGGER4(pollTimeout)
 {
     RBRGen4Error err;
     RBRGen4Sample actual;
-    RBRGen4TimeCallback savedTime = conn->callbacks.time;
+    RBRGen4TimeCallback savedTime = conn->environment.time;
     RBRGen4DateTime savedPollTimeout = conn->pollTimeout;
 
     pollTimeoutClock = 0;
-    conn->callbacks.time = pollTimeoutTime;
+    conn->environment.time = pollTimeoutTime;
     conn->pollTimeout = 10000;
 
     conn->outputFormat =
@@ -697,7 +697,7 @@ TEST_LOGGER4(pollTimeout)
     PollTest_labelList("pressure_00", &channelList);
     err = RBRGen4_pollChannels(conn, true, &channelList, &actual);
 
-    conn->callbacks.time = savedTime;
+    conn->environment.time = savedTime;
     conn->pollTimeout = savedPollTimeout;
 
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TIMEOUT, err, RBRGen4Error);
@@ -727,12 +727,12 @@ TEST_LOGGER4(pollSlowResponse)
 {
     RBRGen4Error err;
     RBRGen4Sample actual;
-    RBRGen4TimeCallback savedTime = conn->callbacks.time;
+    RBRGen4TimeCallback savedTime = conn->environment.time;
     RBRGen4DateTime savedCommandTimeout = conn->commandTimeout;
     RBRGen4DateTime savedPollTimeout = conn->pollTimeout;
 
     pollSlowResponseClock = 0;
-    conn->callbacks.time = pollSlowResponseTime;
+    conn->environment.time = pollSlowResponseTime;
     /* commandTimeout is small enough that it would trip on its own between
      * clock ticks; only pollTimeout is large enough to bound the wait. */
     conn->commandTimeout = 100;
@@ -746,7 +746,7 @@ TEST_LOGGER4(pollSlowResponse)
 
     err = RBRGen4_poll(conn, true, &actual);
 
-    conn->callbacks.time = savedTime;
+    conn->environment.time = savedTime;
     conn->commandTimeout = savedCommandTimeout;
     conn->pollTimeout = savedPollTimeout;
 
@@ -911,9 +911,9 @@ TEST_LOGGER4(readSampleBadCrc)
 TEST_LOGGER4(readSampleWithoutCallback)
 {
     RBRGen4Error err;
-    RBRGen4SampleCallback savedCallback = conn->callbacks.sample;
+    RBRGen4SampleCallback savedCallback = conn->environment.sample;
 
-    conn->callbacks.sample = NULL;
+    conn->environment.sample = NULL;
 
     conn->outputFormat = (RBRGen4OutputFormat) {
         .sn = false, .scheduleLabel = false, .dateTime = false, .crc = false};
@@ -923,7 +923,7 @@ TEST_LOGGER4(readSampleWithoutCallback)
     TEST_ASSERT_ENUM_EQ(RBRGEN4_MISSING_CALLBACK, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
-    conn->callbacks.sample = savedCallback;
+    conn->environment.sample = savedCallback;
 
     return true;
 }

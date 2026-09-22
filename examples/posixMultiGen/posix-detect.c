@@ -125,16 +125,22 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    const RBRGen4Callbacks gen4Callbacks = {
+    uint8_t gen4CommandBuffer[RBRGEN4_COMMAND_BUFFER_DEFAULT];
+    uint8_t gen4ResponseBuffer[RBRGEN4_RESPONSE_BUFFER_DEFAULT];
+    const RBRGen4Environment gen4Environment = {
         .time = gen4InstrumentTime,
         .sleep = gen4InstrumentSleep,
         .read = gen4InstrumentRead,
         .write = gen4InstrumentWrite,
+        .command = gen4CommandBuffer,
+        .commandCapacity = sizeof(gen4CommandBuffer),
+        .response = gen4ResponseBuffer,
+        .responseCapacity = sizeof(gen4ResponseBuffer),
     };
 
     RBRGen4 gen4Conn;
     RBRGen4Error err4 = RBRGen4_open(
-        &gen4Conn, &gen4Callbacks, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd);
+        &gen4Conn, &gen4Environment, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd);
     if (err4 != RBRGEN4_SUCCESS) {
         logGen4Error(&gen4Conn, err4, "Failed to open Gen4 connection");
         close(instrumentFd);

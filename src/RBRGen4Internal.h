@@ -83,8 +83,9 @@ extern "C" {
 
 /**
  * Send the first RBRGen4.commandBufferLength bytes of
- * RBRGen4.commandBuffer to the instrument. No formatting or validation
- * of the contents of the buffer will be performed.
+ * RBRGen4Environment.command to the instrument. No formatting of the contents of
+ * the buffer is performed; a buffer with no room left for a null byte is
+ * refused, since it holds a command truncated by snprintf().
  *
  * You almost certainly want to use RBRGen4_sendCommand() instead unless
  * you have a specific requirement for custom buffer management (like sending
@@ -92,6 +93,7 @@ extern "C" {
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the command is successfully written
+ * \return #RBRGEN4_BUFFER_TOO_SMALL when the buffer is full
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_sendCommand() to send a string command
@@ -100,7 +102,7 @@ RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *conn);
 
 /**
  * Send a command to the instrument. The command will be formatted into
- * RBRGen4.commandBuffer and RBRGen4.commandBufferLength will be
+ * RBRGen4Environment.command and RBRGen4.commandBufferLength will be
  * updated accordingly. If the command does not include a terminating `\r\n`,
  * it will be added for you.
  *
@@ -129,7 +131,7 @@ RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn, const char *command, ...);
  * complete response is read, or until the callback returns
  * #RBRGEN4_TIMEOUT or #RBRGEN4_CALLBACK_ERROR.
  *
- * The response will be returned via RBRGen4.responseBuffer. The previous
+ * The response will be returned via RBRGen4Environment.response. The previous
  * complete response, if any, will be removed, and newly-read data will be
  * appended to any trailing incomplete response. Some minor parsing of the
  * response will be performed: any leading prompt will be stripped off; the
@@ -144,7 +146,7 @@ RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn, const char *command, ...);
  * If \a sample is given as a non-`NULL` pointer and a sample response (either
  * streamed or fetched) is found, that sample will be written to \a sample.
  * Otherwise, sample data will be sent to the RBRGen4SampleCallback set
- * via RBRGen4Callbacks.sample, if populated. It doesn't make much sense
+ * via RBRGen4Environment.sample, if populated. It doesn't make much sense
  * to set this without also passing \a breakOnSample as true; if
  * \a breakOnSample is false then \a sample will be populated with the most
  * recent sample incidentally encountered while parsing other responses.
@@ -167,8 +169,8 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn, bool breakOnSample, RBRGen4Samp
 
 /**
  * Deliver a sample to the RBRGen4SampleCallback set via
- * RBRGen4Callbacks.sample, if any. If \a sample is not already
- * RBRGen4Callbacks.sampleBuffer, it will be copied there first;
+ * RBRGen4Environment.sample, if any. If \a sample is not already
+ * RBRGen4Environment.sampleBuffer, it will be copied there first;
  * RBRGen4_open() guarantees that sampleBuffer is non-`NULL`
  * whenever the callback is set.
  *

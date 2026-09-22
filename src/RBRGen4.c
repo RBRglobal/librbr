@@ -108,32 +108,42 @@ static RBRGen4Error RBRGen4_populateGeneration(RBRGen4 *conn)
 {
     conn->generation = RBRCOMMON_UNKNOWN_GENERATION;
 
-    /* If this isn't an RBR instrument, it'll just time out or the response
-     * won't match. */
+    /* If this isn't an RBR instrument, the exchange times out or the
+     * response won't match: an instrument of another generation answers with
+     * an error line it can produce, and anything else answers with nothing
+     * this parser recognises. Both mean "not one of ours". A failing callback
+     * or a buffer too small for the exchange is the caller's problem, though,
+     * and is reported as itself. */
     RBRGen4Error err = RBRGen4_getId4(conn, &conn->id);
-
-    if (err != RBRGEN4_SUCCESS) {
+    if (err == RBRGEN4_TIMEOUT || err == RBRGEN4_HARDWARE_ERROR) {
         return RBRGEN4_UNSUPPORTED;
     }
+    RBR_TRY(err);
 
     conn->generation = RBRCommonGeneration_fromFwtype(conn->id.fwtype);
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Callbacks *callbacks,
+RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Environment *environment,
                           const RBRGen4DateTime commandTimeout, void *userData)
 {
-    if (callbacks == NULL || callbacks->time == NULL || callbacks->sleep == NULL ||
-        callbacks->read == NULL || callbacks->write == NULL ||
-        (callbacks->sample != NULL && callbacks->sampleBuffer == NULL)) {
+    if (environment == NULL || environment->time == NULL || environment->sleep == NULL ||
+        environment->read == NULL || environment->write == NULL ||
+        (environment->sample != NULL && environment->sampleBuffer == NULL)) {
         return RBRGEN4_MISSING_CALLBACK;
     }
 
+    if (environment->command == NULL || environment->commandCapacity <= 0 ||
+        environment->response == NULL ||
+        environment->responseCapacity <= RBRGEN4_RESPONSE_TERMINATOR_LEN) {
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
+    }
+
     memset(conn, 0, sizeof(RBRGen4));
-    memcpy(&conn->callbacks, callbacks, sizeof(RBRGen4Callbacks));
+    memcpy(&conn->environment, environment, sizeof(RBRGen4Environment));
     /* We don't want the streaming sample data callback to be called before the
      * constructor has finished. */
-    conn->callbacks.sample = NULL;
+    conn->environment.sample = NULL;
     conn->commandTimeout = commandTimeout;
     conn->pollTimeout = 2 * commandTimeout;
     conn->userData = userData;
@@ -163,8 +173,8 @@ RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Callbacks *callbacks,
     }
 
     /* Enable the streaming callback, if applicable. */
-    conn->callbacks.sample = callbacks->sample;
-    conn->callbacks.sampleBuffer = callbacks->sampleBuffer;
+    conn->environment.sample = environment->sample;
+    conn->environment.sampleBuffer = environment->sampleBuffer;
 
     return RBRGEN4_SUCCESS;
 }

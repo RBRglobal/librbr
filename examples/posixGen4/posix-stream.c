@@ -195,19 +195,26 @@ int main(int argc, char *argv[])
 
     RBRGen4Error err = RBRGEN4_SUCCESS;
     RBRGen4 conn;
+    uint8_t commandBuffer[RBRGEN4_COMMAND_BUFFER_DEFAULT];
+    uint8_t responseBuffer[RBRGEN4_RESPONSE_BUFFER_DEFAULT];
     /* Streamed samples are parsed into this buffer before being passed to
      * the sample callback. */
     RBRGen4Sample sampleBuffer;
-    const RBRGen4Callbacks callbacks = {
+    const RBRGen4Environment environment = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite,
         .sample = instrumentSample,
         .sampleBuffer = &sampleBuffer,
+        .command = commandBuffer,
+        .commandCapacity = sizeof(commandBuffer),
+        .response = responseBuffer,
+        .responseCapacity = sizeof(responseBuffer),
     };
 
-    err = RBRGen4_open(&conn, &callbacks, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd);
+    err =
+        RBRGen4_open(&conn, &environment, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd);
     if (err) {
         logCmdError(&conn, err, "Failed to establish instrument connection");
         goto fileCleanup;

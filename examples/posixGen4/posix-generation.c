@@ -64,16 +64,23 @@ int main(int argc, char *argv[])
 
     RBRGen4Error err = RBRGEN4_SUCCESS;
     RBRGen4 conn;
-    const RBRGen4Callbacks callbacks = {
+    uint8_t commandBuffer[RBRGEN4_COMMAND_BUFFER_DEFAULT];
+    uint8_t responseBuffer[RBRGEN4_RESPONSE_BUFFER_DEFAULT];
+    const RBRGen4Environment environment = {
         .time = instrumentTime,
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite,
+        .command = commandBuffer,
+        .commandCapacity = sizeof(commandBuffer),
+        .response = responseBuffer,
+        .responseCapacity = sizeof(responseBuffer),
     };
 
     /* Opening the connection identifies the instrument, so an instrument of
      * an unsupported generation is refused here with RBRGEN4_UNSUPPORTED. */
-    err = RBRGen4_open(&conn, &callbacks, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd);
+    err =
+        RBRGen4_open(&conn, &environment, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd);
     if (err) {
         logCmdError(&conn, err, "Failed to establish instrument connection");
         goto fileCleanup;

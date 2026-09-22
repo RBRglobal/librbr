@@ -77,7 +77,7 @@ inline double RBRGen4Reading_setError(RBRGen4ReadingError error)
 
 RBRGen4Error RBRGen4_readSample(RBRGen4 *conn)
 {
-    if (conn->callbacks.sample == NULL) {
+    if (conn->environment.sample == NULL) {
         return RBRGEN4_MISSING_CALLBACK;
     }
 
@@ -88,7 +88,7 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn)
      * means that it found some other command response instead, so we'll loop
      * until we get a “failure” value (which we hope is SAMPLE). */
     do {
-        RBR_TRY(conn->callbacks.time(conn, &now));
+        RBR_TRY(conn->environment.time(conn, &now));
         err = RBRGen4_readResponse(conn, true, NULL, now, conn->commandTimeout);
     } while (err == RBRGEN4_SUCCESS);
     /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any
@@ -120,7 +120,7 @@ static RBRGen4Error RBRGen4_sendPoll(RBRGen4 *conn, bool requireLabel, const cha
 
     /* Sized against the longest parameter so that a list which fits here also
      * fits the command. */
-    char value[RBRGEN4_COMMAND_BUFFER_MAX -
+    char value[RBRGEN4_COMMAND_BUFFER_DEFAULT -
                sizeof("poll channellist=" RBRGEN4_SEND_COMMAND_TERMINATOR)] = "";
     if (parameter != NULL) {
         /* An empty list is invalid */
@@ -131,22 +131,22 @@ static RBRGen4Error RBRGen4_sendPoll(RBRGen4 *conn, bool requireLabel, const cha
         RBR_TRY(RBRGen4_formatLabelList(value, (int32_t) sizeof(value), list));
     }
 
-    char *commandBuffer = (char *) conn->commandBuffer;
+    char *commandBuffer = (char *) conn->environment.command;
     int32_t *commandBufferLength = &conn->commandBufferLength;
 
     *commandBufferLength = snprintf(commandBuffer,
-                                    sizeof(conn->commandBuffer),
+                                    (size_t) conn->environment.commandCapacity,
                                     "poll%s%s%s%s",
                                     parameter != NULL ? " " : "",
                                     parameter != NULL ? parameter : "",
                                     value,
                                     RBRGEN4_SEND_COMMAND_TERMINATOR);
-    if ((size_t) *commandBufferLength >= sizeof(conn->commandBuffer)) {
-        return RBRGEN4_INVALID_PARAMETER_VALUE;
+    if (*commandBufferLength >= conn->environment.commandCapacity) {
+        return RBRGEN4_BUFFER_TOO_SMALL;
     }
 
     RBRGen4DateTime start;
-    RBR_TRY(conn->callbacks.time(conn, &start));
+    RBR_TRY(conn->environment.time(conn, &start));
 
     RBR_TRY(RBRGen4_sendBuffer(conn));
 
