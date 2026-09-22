@@ -114,14 +114,11 @@ RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Environment *environment,
         return RBRGEN3_MISSING_CALLBACK;
     }
 
-    if (environment->command == NULL || environment->commandCapacity <= 0 ||
-        environment->response == NULL ||
-        environment->responseCapacity <= RBRGEN3_COMMAND_TERMINATOR_LEN) {
-        return RBRGEN3_INVALID_PARAMETER_VALUE;
-    }
-
     memset(conn, 0, sizeof(RBRGen3));
+    conn->generation = RBRCOMMON_UNKNOWN_GENERATION;
     memcpy(&conn->environment, environment, sizeof(RBRGen3Environment));
+    RBR_TRY(RBRGen3_setCommandBuffer(conn, environment->command, environment->commandCapacity));
+    RBR_TRY(RBRGen3_setResponseBuffer(conn, environment->response, environment->responseCapacity));
     /* We don't want the streaming sample data callback to be called before the
      * constructor has finished. */
     conn->environment.sample = NULL;
@@ -153,6 +150,39 @@ RBRGen3Error RBRGen3_close(RBRGen3 *conn)
      * function is kept so that callers pair every open with a close and so
      * that resource management can be added later without an API change. */
     memset(conn, 0, sizeof(RBRGen3));
+    return RBRGEN3_SUCCESS;
+}
+
+void RBRGen3_resetResponseBuffer(RBRGen3 *conn)
+{
+    conn->responseBufferLength = 0;
+    conn->lastResponseLength = 0;
+    conn->response.type = RBRGEN3_RESPONSE_UNKNOWN_TYPE;
+    conn->response.error = RBRGEN3_HARDWARE_ERROR_NONE;
+    conn->response.response = NULL;
+}
+
+RBRGen3Error RBRGen3_setCommandBuffer(RBRGen3 *conn, uint8_t *command, int32_t capacity)
+{
+    if (command == NULL || capacity <= 0) {
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
+    }
+
+    conn->environment.command = command;
+    conn->environment.commandCapacity = capacity;
+    conn->commandBufferLength = 0;
+    return RBRGEN3_SUCCESS;
+}
+
+RBRGen3Error RBRGen3_setResponseBuffer(RBRGen3 *conn, uint8_t *response, int32_t capacity)
+{
+    if (response == NULL || capacity <= RBRGEN3_COMMAND_TERMINATOR_LEN) {
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
+    }
+
+    conn->environment.response = response;
+    conn->environment.responseCapacity = capacity;
+    RBRGen3_resetResponseBuffer(conn);
     return RBRGEN3_SUCCESS;
 }
 
