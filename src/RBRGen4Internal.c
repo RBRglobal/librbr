@@ -245,6 +245,7 @@ static void RBRGen4_removeLastResponse(RBRGen4 *conn)
  * \param [in] timeout the longest to wait, in milliseconds, from \a startTime
  * \param [out] end the end of the response within the response buffer
  * \return #RBRGEN4_SUCCESS when data is successfully read
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when the response exceeds the buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
  */

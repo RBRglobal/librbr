@@ -96,6 +96,10 @@ const char *RBRGen3ResumeStatus_name(RBRGen3ResumeStatus status);
  * "n/a", "paused", or "running".
  * \return #RBRGEN3_UNSUPPORTED when the current firmware doesn't support
  * pauseresume feature, or pauseresume is not allowed.
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
 RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *conn, RBRGen3PauseresumeState *state);
@@ -108,6 +112,10 @@ RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *conn, RBRGen3PauseresumeState *stat
  * \return #RBRGEN3_SUCCESS when the status is "paused".
  * \return #RBRGEN3_UNSUPPORTED when the current firmware doesn't support
  * pauseresume feature, or pauseresume is not allowed.
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
 RBRGen3Error RBRGen3_pause(RBRGen3 *conn, RBRGen3PauseStatus *status);
@@ -121,6 +129,10 @@ RBRGen3Error RBRGen3_pause(RBRGen3 *conn, RBRGen3PauseStatus *status);
  * "pending", "logging".
  * \return #RBRGEN3_UNSUPPORTED when the current firmware doesn't support
  * pauseresume feature, or pauseresume is not allowed.
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
 RBRGen3Error RBRGen3_resume(RBRGen3 *conn, RBRGen3ResumeStatus *status);

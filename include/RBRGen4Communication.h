@@ -64,6 +64,8 @@ typedef struct RBRGen4Link {
  * \param [out] link the link parameters
  * \return #RBRGEN4_SUCCESS when the setting is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  */
 RBRGen4Error RBRGen4_getLink(RBRGen4 *conn, RBRGen4Link *link);
@@ -160,6 +162,8 @@ typedef struct RBRGen4LinkSerial {
  * \param [out] serial the current serial parameters
  * \return #RBRGEN4_SUCCESS when the setting is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_setLinkSerial()
  */
@@ -185,6 +189,8 @@ RBRGen4Error RBRGen4_getLinkSerial(RBRGen4 *conn, RBRGen4LinkSerial *serial);
  * \param [in] serial the new serial parameters
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when a value is not supported, or another
  *                                      hardware error occurs

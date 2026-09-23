@@ -58,6 +58,8 @@ extern "C" {
  * \return #RBRGEN3_COMMAND_TOO_LONG when a channel label does not fit the
  *         command buffer; the command itself may be longer than the buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when an invalid channel is requested, or
  *                                 another hardware error occurs

@@ -55,6 +55,8 @@ int RBRGen3Version_compare(const char *a, const char *b);
  * \param [out] id the instrument information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  */
 RBRGen3Error RBRGen3_getId(RBRGen3 *conn, RBRGen3Id *id);
@@ -80,6 +82,8 @@ typedef struct RBRGen3HardwareRevision {
  * \param [out] hwrev the hardware revision information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  */
 RBRGen3Error RBRGen3_getHardwareRevision(RBRGen3 *conn, RBRGen3HardwareRevision *hwrev);
@@ -143,6 +147,8 @@ typedef struct RBRGen3Power {
  * \param [out] power the power information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if an error occurs reading voltages, or
  *                                 another hardware error occurs
@@ -226,6 +232,8 @@ typedef struct RBRGen3PowerInternal {
  * \param [out] power the power information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setPowerInternalBatteryType()
  * \see RBRGen3_resetPowerInternalUsed()
@@ -241,6 +249,8 @@ RBRGen3Error RBRGen3_getPowerInternal(RBRGen3 *conn, RBRGen3PowerInternal *power
  * \param [in] type the battery type
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging, or another
  *                                 hardware error occurs
@@ -256,6 +266,8 @@ RBRGen3Error RBRGen3_setPowerInternalBatteryType(RBRGen3 *conn, RBRGen3InternalB
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging, or another
  *                                 hardware error occurs
@@ -348,6 +360,8 @@ typedef struct RBRGen3PowerExternal {
  * \param [out] power the power information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setPowerExternalBatteryType()
  * \see RBRGen3_resetPowerExternalUsed()
@@ -363,6 +377,8 @@ RBRGen3Error RBRGen3_getPowerExternal(RBRGen3 *conn, RBRGen3PowerExternal *power
  * \param [in] type the battery type
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_getPowerExternal()
  */
@@ -376,6 +392,8 @@ RBRGen3Error RBRGen3_setPowerExternalBatteryType(RBRGen3 *conn, RBRGen3ExternalB
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_getPowerExternal()
  */
@@ -403,6 +421,8 @@ typedef struct RBRGen3Info {
  * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  */
 RBRGen3Error RBRGen3_getInfo(RBRGen3 *conn, RBRGen3Info *info);
