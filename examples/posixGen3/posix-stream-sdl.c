@@ -43,8 +43,10 @@ static int PLOT_COLORS[][3] = {
     {0x40, 0xFF, 0x40}, {0xFF, 0x40, 0xFF}};
 #define PLOT_COLORS_LEN (sizeof(PLOT_COLORS) / sizeof(PLOT_COLORS[0]))
 
-static RBRGen3Sample callbackSample;
+static double callbackReadings[RBRGEN3_CHANNEL_MAX];
+static RBRGen3Sample callbackSample = {.size = RBRGEN3_CHANNEL_MAX, .readings = callbackReadings};
 static RBRGen3Sample *samples = NULL;
+static double (*samplesReadings)[RBRGEN3_CHANNEL_MAX] = NULL;
 static SDL_Point *samplePoints[RBRGEN3_CHANNEL_MAX] = {NULL};
 static int sampleCount = 0;
 static int samplePointChannelCount = 0;
@@ -59,10 +61,20 @@ RBRGen3Error instrumentSample(const struct RBRGen3 *conn, const struct RBRGen3Sa
     (void) conn;
 
     if (sampleCount == SAMPLE_SIZE) {
-        memmove(&samples[0], &samples[1], (sampleCount-- * sizeof(RBRGen3Sample)));
+        --sampleCount;
+        memmove(&samples[0], &samples[1], sampleCount * sizeof(RBRGen3Sample));
+        memmove(&samplesReadings[0], &samplesReadings[1], sampleCount * sizeof(samplesReadings[0]));
+        for (int i = 0; i < sampleCount; i++) {
+            samples[i].readings = samplesReadings[i];
+        }
     }
 
-    memcpy(&samples[sampleCount++], sample, sizeof(RBRGen3Sample));
+    /* Each stored sample keeps its own readings; the callback's are reused. */
+    samples[sampleCount] = *sample;
+    samples[sampleCount].readings = samplesReadings[sampleCount];
+    samples[sampleCount].size = RBRGEN3_CHANNEL_MAX;
+    memcpy(samplesReadings[sampleCount], sample->readings, sample->channelCount * sizeof(double));
+    ++sampleCount;
 
     return RBRGEN3_SUCCESS;
 }
@@ -81,7 +93,7 @@ static void recalculatePoints(void)
     double minVal[RBRGEN3_CHANNEL_MAX] = {DBL_MAX};
     double maxVal[RBRGEN3_CHANNEL_MAX] = {DBL_MIN};
     for (int i = 0; i < sampleCount; i++) {
-        samplePointChannelCount = MIN(samples[i].channels, samplePointChannelCount);
+        samplePointChannelCount = MIN(samples[i].channelCount, samplePointChannelCount);
         for (int channel = 0; channel < samplePointChannelCount; channel++) {
             minVal[channel] = MIN(samples[i].readings[channel], minVal[channel]);
             maxVal[channel] = MAX(samples[i].readings[channel], maxVal[channel]);
@@ -116,7 +128,8 @@ int main(int argc, char *argv[])
     uint8_t commandBuffer[RBRGEN3_COMMAND_BUFFER_DEFAULT];
     uint8_t responseBuffer[RBRGEN3_RESPONSE_BUFFER_DEFAULT];
 
-    if ((samples = malloc(sizeof(RBRGen3Sample) * SAMPLE_SIZE)) == NULL) {
+    if ((samples = malloc(sizeof(RBRGen3Sample) * SAMPLE_SIZE)) == NULL ||
+        (samplesReadings = malloc(sizeof(samplesReadings[0]) * SAMPLE_SIZE)) == NULL) {
         fprintf(stderr, "%s: Failed to allocate sample buffer!\n", programName);
         return EXIT_FAILURE;
     }

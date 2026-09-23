@@ -29,6 +29,9 @@
 #include "RBRGen3Parser.h"
 #include "RBRGen3Commands.h"
 
+/* Readings storage for as many channels as this application expects. */
+#define CHANNEL_MAX 32
+
 RBRGen3Error parserSample(const struct RBRGen3Parser *parser,
                           const struct RBRGen3Sample *const sample)
 {
@@ -40,7 +43,7 @@ RBRGen3Error parserSample(const struct RBRGen3Parser *parser,
     gmtime_r(&sampleSeconds, &sampleTime);
     strftime(ftime, sizeof(ftime), "%F %T", &sampleTime);
     printf("%s.%03" PRIi64, ftime, sample->timestamp % 1000);
-    for (int32_t i = 0; i < sample->channels; i++) {
+    for (int32_t i = 0; i < sample->channelCount; i++) {
         printf(", %lf", sample->readings[i]);
     }
     printf("\n");
@@ -129,7 +132,8 @@ int main(int argc, char *argv[])
 
     RBRGen3Parser parser;
 
-    RBRGen3Sample sampleBuffer;
+    double sampleReadings[CHANNEL_MAX];
+    RBRGen3Sample sampleBuffer = {.size = CHANNEL_MAX, .readings = sampleReadings};
     RBRGen3ParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer,

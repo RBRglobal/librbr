@@ -21,6 +21,9 @@
 RBRGen3Error RBRGen3_fetch(RBRGen3 *conn, RBRGen3LabelsList *channels, bool sleepAfter,
                            RBRGen3Sample *sample)
 {
+    if (sample->readings == NULL || sample->size <= 0) {
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
+    }
     char *commandBuffer = (char *) conn->environment.command;
     int32_t *commandBufferLength = &conn->commandBufferLength;
 

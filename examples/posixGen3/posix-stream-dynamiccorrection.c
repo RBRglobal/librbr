@@ -31,10 +31,14 @@
 #include "RBRDynamicCorrection.h"
 #include "RBRGen3Commands.h"
 
+/* Readings storage for as many channels as this application expects. */
+#define CHANNEL_MAX 32
+
 #define _AbsP_To_SeaP 10.132507
 
 static RBRGen3DateTime g_timeReference = 0;
-static RBRGen3Sample g_sample;
+static double g_sampleReadings[CHANNEL_MAX];
+static RBRGen3Sample g_sample = {.size = CHANNEL_MAX, .readings = g_sampleReadings};
 
 RBRGen3Error instrumentSample(const struct RBRGen3 *conn, const struct RBRGen3Sample *const sample)
 {
@@ -48,7 +52,7 @@ RBRGen3Error instrumentSample(const struct RBRGen3 *conn, const struct RBRGen3Sa
     strftime(ftime, sizeof(ftime), "%F %T", &sampleTime);
 
     printf("%s.%03" PRIi64, ftime, sample->timestamp % 1000);
-    for (int32_t i = 0; i < sample->channels; i++) {
+    for (int32_t i = 0; i < sample->channelCount; i++) {
         printf(", %lf", sample->readings[i]);
     }
     printf("\n");

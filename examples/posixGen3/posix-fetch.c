@@ -25,6 +25,9 @@
 #include "posix-shared.h"
 #include "RBRGen3Commands.h"
 
+/* Readings storage for as many channels as this application expects. */
+#define CHANNEL_MAX 32
+
 int main(int argc, char *argv[])
 {
     char *programName = argv[0];
@@ -100,14 +103,15 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    RBRGen3Sample sample;
+    double sampleReadings[CHANNEL_MAX];
+    RBRGen3Sample sample = {.size = CHANNEL_MAX, .readings = sampleReadings};
     while (true) {
         err = RBRGen3_fetch(&conn, NULL, false, &sample);
         if (err != RBRGEN3_SUCCESS) {
             fprintf(stderr, "Error: %s\n", RBRGen3Error_name(err));
         } else {
             printf("%" PRIi64, sample.timestamp);
-            for (int32_t i = 0; i < sample.channels; i++) {
+            for (int32_t i = 0; i < sample.channelCount; i++) {
                 switch (RBRGen3Reading_getFlag(sample.readings[i])) {
                 case RBRGEN3_READING_FLAG_UNCALIBRATED:
                     printf(", ###");

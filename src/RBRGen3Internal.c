@@ -390,7 +390,13 @@ static void RBRGen3_terminateResponse(RBRGen3 *conn, char **beginning, char *end
  */
 static RBRGen3Error RBRGen3Sample_parse(RBRGen3Sample *sample, char *response)
 {
+    /* The readings storage belongs to the caller; clear it, not the pointer. */
+    double *readings = sample->readings;
+    int32_t size = sample->size;
+    memset(readings, 0, (size_t) size * sizeof(*readings));
     memset(sample, 0, sizeof(RBRGen3Sample));
+    sample->readings = readings;
+    sample->size = size;
 
     char *values;
     int32_t _serialNum;
@@ -427,7 +433,7 @@ static RBRGen3Error RBRGen3Sample_parse(RBRGen3Sample *sample, char *response)
     char *token;
 
     double reading;
-    while ((token = strtok(values, ",")) != NULL && sample->channels < RBRGEN3_CHANNEL_MAX) {
+    while ((token = strtok(values, ",")) != NULL) {
         /* strtok wants NULL on all but the first pass. */
         values = NULL;
         /* The token will always have a leading space. */
@@ -453,7 +459,12 @@ static RBRGen3Error RBRGen3Sample_parse(RBRGen3Sample *sample, char *response)
             reading = strtod(token, NULL);
         }
 
-        sample->readings[sample->channels++] = reading;
+        /* Readings past the caller's storage are dropped and flagged. */
+        if (sample->channelCount < sample->size) {
+            sample->readings[sample->channelCount++] = reading;
+        } else {
+            sample->readingsDropped = true;
+        }
     }
 
     return RBRGEN3_SUCCESS;

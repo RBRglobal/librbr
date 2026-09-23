@@ -91,10 +91,10 @@ extern const char *RBRGEN3_LIB_BUILD_DATE;
  *
  * The default maximum of 32 channels is reflective of the maximum number of
  * channels supported by RBR instruments, but most instruments have far fewer.
- * Adjusting this value will dramatically affect the size of some structures;
- * notably RBRGen3Sample, but also RBRGen3Channels (used by
- * RBRGen3_getChannels()) and RBRGen3ChannelsList (used by
- * RBRGen3_getChannelsList()).
+ * Adjusting this value will dramatically affect the size of some structures,
+ * notably RBRGen3Channels (used by RBRGen3_getChannels()) and
+ * RBRGen3ChannelsList (used by RBRGen3_getChannelsList()). RBRGen3Sample
+ * readings storage is supplied by the caller and is not sized by this value.
  */
 #ifndef RBRGEN3_CHANNEL_MAX
 #define RBRGEN3_CHANNEL_MAX 32
@@ -496,7 +496,9 @@ typedef struct RBRGen3Environment {
     /**
      * \brief Where to put sample data for consumption by the sample callback.
      *
-     * Required only when RBRGen3Environment.sample is populated.
+     * Required only when RBRGen3Environment.sample is populated. Its
+     * RBRGen3Sample.readings and RBRGen3Sample.size must be set by the
+     * caller.
      */
     struct RBRGen3Sample *sampleBuffer;
 
@@ -727,7 +729,8 @@ typedef struct RBRGen3 {
  * \return #RBRGEN3_SUCCESS if the instrument was opened successfully
  * \return #RBRGEN3_MISSING_CALLBACK if \a environment or a callback was not
  *         provided
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE if a buffer is missing or empty
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE if a buffer is missing or empty,
+ *         or RBRGen3Environment.sampleBuffer has no readings storage
  * \return #RBRGEN3_TIMEOUT if an instrument communication timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the instrument rejects the opening

@@ -370,7 +370,7 @@ TEST_LOGGER3(stream_sample_parse)
     TestIOBuffers_init(buffers, "2018-07-26 14:56:24.000, 10.1325" RESPONSE_TERMINATOR, 0);
     err = RBRGen3_readSample(conn);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-    TEST_ASSERT_EQ(1, buffers->streamSample.channels, "%" PRIi32);
+    TEST_ASSERT_EQ(1, buffers->streamSample.channelCount, "%" PRIi32);
     TEST_ASSERT_EQ(10.1325, buffers->streamSample.readings[0], "%lf");
 
     return true;

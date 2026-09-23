@@ -458,13 +458,37 @@ double RBRGen3Reading_setError(RBRGen3ReadingFlag flag, uint8_t value);
 typedef struct RBRGen3Sample {
     /** \brief The timestamp of the sample. */
     RBRGen3DateTime timestamp;
-    /** \brief The number of populated sample readings. */
-    int32_t channels;
     /**
-     * \brief The sample readings.
+     * \brief The number of populated sample readings.
      *
-     * Only the first RBRGen3Sample.channels readings will be populated.
-     * Other readings will be set to 0.
+     * Set by the library. Never exceeds RBRGen3Sample.size.
+     */
+    int32_t channelCount;
+    /**
+     * \brief Whether the instrument reported more readings than
+     * RBRGen3Sample.readings can hold.
+     *
+     * Set by the library. When `true`, the first RBRGen3Sample.size readings
+     * were stored and the rest were dropped.
+     */
+    bool readingsDropped;
+    /**
+     * \brief The capacity of RBRGen3Sample.readings.
+     *
+     * Set by the caller, along with RBRGen3Sample.readings, before the sample
+     * is passed to the library. Never changed by the library.
+     */
+    int32_t size;
+    /**
+     * \brief The sample readings, in caller-supplied storage.
+     *
+     * The library populates the first RBRGen3Sample.channelCount entries and
+     * sets any remaining entries up to RBRGen3Sample.size to 0.
+     *
+     * Copying the sample copies this pointer, not the readings, and the
+     * library reuses the storage for the next sample it parses. A copy that
+     * must outlive that, such as one queued by a sample callback, must also
+     * copy the first RBRGen3Sample.channelCount readings.
      *
      * Readings are represented as double-precision floating point. If they
      * need to encode an error, it's stored in the trailing bits of a NaN, and
@@ -474,7 +498,7 @@ typedef struct RBRGen3Sample {
      * \see RBRGen3Reading_getError() to get the error value, if present
      * \see RBRGen3Reading_setError() to synthesize a error reading
      */
-    double readings[RBRGEN3_CHANNEL_MAX];
+    double *readings;
 } RBRGen3Sample;
 
 /**

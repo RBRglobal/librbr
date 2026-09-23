@@ -114,6 +114,10 @@ RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Environment *environment,
         (environment->sample != NULL && environment->sampleBuffer == NULL)) {
         return RBRGEN3_MISSING_CALLBACK;
     }
+    if (environment->sampleBuffer != NULL &&
+        (environment->sampleBuffer->readings == NULL || environment->sampleBuffer->size <= 0)) {
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
+    }
 
     memset(conn, 0, sizeof(RBRGen3));
     conn->generation = RBRCOMMON_UNKNOWN_GENERATION;

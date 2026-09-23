@@ -179,6 +179,20 @@ extern "C" {
 /** \brief The maximum number of parsed samples to buffer. */
 #define TESTPARSERBUFFERS_SAMPLES_MAX 64
 
+/** \brief Channel capacity given to test samples. */
+#define TESTS_CHANNEL_MAX 32
+
+/**
+ * \brief Declare a sample named \a name with readings storage for \a size_
+ *        channels.
+ */
+#define RBRGEN3_SAMPLE_DECL(name, size_)                               \
+    double name##Readings[size_];                                      \
+    RBRGen3Sample name = (RBRGen3Sample)                               \
+    {                                                                  \
+        .size = (size_), .channelCount = 0, .readings = name##Readings \
+    }
+
 /** \brief The maximum number of parsed events to buffer. */
 #define TESTPARSERBUFFERS_EVENTS_MAX 64
 
@@ -236,6 +250,8 @@ typedef struct TestIOBuffers {
     int32_t writeBufferPos;
     /** \brief The last sample received from the test instrument. */
     RBRGen3Sample streamSample;
+    /** \brief Readings storage for TestIOBuffers.streamSample. */
+    double streamReadings[TESTS_CHANNEL_MAX];
 } TestIOBuffers;
 
 /**
@@ -335,6 +351,8 @@ typedef struct TestParserBuffers {
     int32_t samplesLength;
     /** \brief Parsed samples. */
     RBRGen3Sample samples[TESTPARSERBUFFERS_SAMPLES_MAX];
+    /** \brief Readings storage for TestParserBuffers.samples. */
+    double samplesReadings[TESTPARSERBUFFERS_SAMPLES_MAX][TESTS_CHANNEL_MAX];
     /** \brief The length of TestParserBuffers.events. */
     int32_t eventsLength;
     /** \brief Parsed events. */

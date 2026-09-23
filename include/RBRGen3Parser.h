@@ -158,7 +158,9 @@ typedef struct RBRGen3ParserCallbacks {
     /**
      * \brief Where to put sample data for consumption by the sample callback.
      *
-     * Required only when RBRGen3ParserCallbacks.sample is populated.
+     * Required only when RBRGen3ParserCallbacks.sample is populated. Its
+     * RBRGen3Sample.readings and RBRGen3Sample.size must be set by the
+     * caller.
      */
     RBRGen3Sample *sampleBuffer;
 
@@ -178,6 +180,12 @@ typedef struct RBRGen3ParserCallbacks {
 } RBRGen3ParserCallbacks;
 
 /**
+ * \brief The most channels RBRGen3Parser_init() accepts for an EasyParse
+ * sample.
+ */
+#define RBRGEN3_EASYPARSE_CHANNELS_MAX 32
+
+/**
  * \brief EasyParse-specific parser configuration.
  *
  * \see RBRGen3ParserConfig
@@ -187,8 +195,9 @@ typedef struct RBRGen3ParserEasyParseConfig {
      * \brief The number of instrument channels in each sample.
      *
      * If the value is less than or equal to 0 or exceeds
-     * #RBRGEN3_CHANNEL_MAX, then RBRGen3Parser_init() will return
-     * #RBRGEN3_INVALID_PARAMETER_VALUE.
+     * #RBRGEN3_EASYPARSE_CHANNELS_MAX, then RBRGen3Parser_init() will return
+     * #RBRGEN3_INVALID_PARAMETER_VALUE. Readings beyond RBRGen3Sample.size
+     * of the sample buffer are dropped and flagged.
      */
     int32_t channels;
 } RBRGen3ParserEasyParseConfig;
@@ -262,7 +271,8 @@ typedef struct RBRGen3Parser {
  * \return #RBRGEN3_SUCCESS if the parser was instantiated successfully
  * \return #RBRGEN3_MISSING_CALLBACK if no callbacks were provided
  * \return #RBRGEN3_UNSUPPORTED if the memory format is unsupported
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE if the config is invalid
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE if the config is invalid, or the
+ *         sample buffer has no readings storage
  * \see RBRGen3Parser_destroy()
  */
 RBRGen3Error RBRGen3Parser_init(RBRGen3Parser *parser, const RBRGen3ParserCallbacks *callbacks,
