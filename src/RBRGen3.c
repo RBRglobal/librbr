@@ -59,6 +59,8 @@ const char *RBRGen3Error_name(RBRGen3Error error)
         return "checksum error";
     case RBRGEN3_INVALID_PARAMETER_VALUE:
         return "invalid parameter value";
+    case RBRGEN3_TRUNCATED:
+        return "truncated";
     case RBRGEN3_SAMPLE:
         return "sample";
     case RBRGEN3_ERROR_COUNT:

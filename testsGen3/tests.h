@@ -182,6 +182,30 @@ extern "C" {
 /** \brief Channel capacity given to test samples. */
 #define TESTS_CHANNEL_MAX 32
 
+/** \brief Declare an empty RBRGen3Channels named \a name over \a size_ entries. */
+#define RBRGEN3_CHANNELS_DECL(name, size_)                  \
+    RBRGen3Channel name##Buffer[size_];                     \
+    RBRGen3Channels name = (RBRGen3Channels)                \
+    {                                                       \
+        .size = (size_), .len = 0, .channels = name##Buffer \
+    }
+
+/** \brief Declare an empty RBRGen3ChannelsList named \a name over \a size_ entries. */
+#define RBRGEN3_CHANNELS_LIST_DECL(name, size_)             \
+    RBRGen3ChannelsListEntry name##Buffer[size_];           \
+    RBRGen3ChannelsList name = (RBRGen3ChannelsList)        \
+    {                                                       \
+        .size = (size_), .len = 0, .channels = name##Buffer \
+    }
+
+/** \brief Declare an empty RBRGen3LabelsList named \a name over \a size_ labels. */
+#define RBRGEN3_LABELS_LIST_DECL(name, size_)             \
+    RBRGen3Label name##Buffer[size_];                     \
+    RBRGen3LabelsList name = (RBRGen3LabelsList)          \
+    {                                                     \
+        .size = (size_), .len = 0, .labels = name##Buffer \
+    }
+
 /**
  * \brief Declare a sample named \a name with readings storage for \a size_
  *        channels.

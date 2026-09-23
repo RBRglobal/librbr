@@ -86,7 +86,8 @@ TEST_LOGGER3(fetchCommandBufferTooSmall)
     err = RBRGen3_open(&tiny, &small, 0, buffers);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
 
-    RBRGen3LabelsList channels = {.count = 1, .labels = {"temperature_00"}};
+    RBRGen3LabelsList channels = {
+        .size = 1, .len = 1, .labels = (RBRGen3Label[]) {"temperature_00"}};
     RBRGEN3_SAMPLE_DECL(sample, TESTS_CHANNEL_MAX);
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen3_fetch(&tiny, &channels, false, &sample);
@@ -129,7 +130,7 @@ TEST_LOGGER3(fetchCommandExactlyFull)
     err = RBRGen3_open(&tiny, &exact, 0, buffers);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
 
-    RBRGen3LabelsList channels = {.count = 1, .labels = {"temp"}};
+    RBRGen3LabelsList channels = {.size = 1, .len = 1, .labels = (RBRGen3Label[]) {"temp"}};
     RBRGEN3_SAMPLE_DECL(sample, TESTS_CHANNEL_MAX);
     TestIOBuffers_init(buffers, "2000-01-01 03:22:42.000, -129.993424e+000" RESPONSE_TERMINATOR, 0);
     err = RBRGen3_fetch(&tiny, &channels, false, &sample);
@@ -163,8 +164,10 @@ TEST_LOGGER3(fetchLabelTooLongForBuffer)
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
 
     /* 31 characters: the longest label the instrument allows. */
-    RBRGen3LabelsList channels = {.count = 2,
-                                  .labels = {"temp", "abcdefghijklmnopqrstuvwxyz01234"}};
+    RBRGen3LabelsList channels = {.size = 2,
+                                  .len = 2,
+                                  .labels =
+                                      (RBRGen3Label[]) {"temp", "abcdefghijklmnopqrstuvwxyz01234"}};
     RBRGEN3_SAMPLE_DECL(sample, TESTS_CHANNEL_MAX);
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen3_fetch(&tiny, &channels, false, &sample);
@@ -213,6 +216,70 @@ TEST_LOGGER3(fetchRejectsSampleWithoutReadings)
     return true;
 }
 
+/* A label list which claims more labels than it has storage for is refused
+ * before anything is sent, not even a wake: only its first size labels
+ * exist. */
+TEST_LOGGER3(fetchRejectsBadLabelList)
+{
+    RBRGen3Error err;
+    RBRGEN3_SAMPLE_DECL(sample, TESTS_CHANNEL_MAX);
+    RBRGen3LabelsList overfull = {.size = 1, .len = 2, .labels = (RBRGen3Label[]) {"temp"}};
+    RBRGen3LabelsList noStorage = {.size = 2, .len = 1, .labels = NULL};
+    RBRGen3LabelsList negative = {.size = 2, .len = -1, .labels = (RBRGen3Label[]) {"temp"}};
+    RBRGen3DateTime savedActivity = conn->lastActivityTime;
+
+    /* An idle connection would normally be woken first. */
+    conn->lastActivityTime = -1;
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen3_fetch(conn, &overfull, false, &sample);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    err = RBRGen3_fetch(conn, &noStorage, false, &sample);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    err = RBRGen3_fetch(conn, &negative, false, &sample);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+    conn->lastActivityTime = savedActivity;
+
+    return true;
+}
+
+/* An empty list, storage or not, means every channel. */
+TEST_LOGGER3(fetchEmptyLabelList)
+{
+    RBRGen3Error err;
+    RBRGEN3_SAMPLE_DECL(sample, TESTS_CHANNEL_MAX);
+    RBRGen3LabelsList empty = {0};
+
+    TestIOBuffers_init(buffers, "2000-01-01 03:22:42.000, -129.993424e+000" RESPONSE_TERMINATOR, 0);
+    err = RBRGen3_fetch(conn, &empty, false, &sample);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("fetch sleepafter = false" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(1, sample.channelCount, "%" PRIi32);
+
+    return true;
+}
+
+/* Logger2 ignores the label list but still holds it to the same contract. */
+TEST_LOGGER2(fetchLabelList)
+{
+    RBRGen3Error err;
+    RBRGEN3_SAMPLE_DECL(sample, TESTS_CHANNEL_MAX);
+    RBRGen3LabelsList channels = {.size = 1, .len = 1, .labels = (RBRGen3Label[]) {"temp"}};
+    RBRGen3LabelsList overfull = {.size = 1, .len = 2, .labels = (RBRGen3Label[]) {"temp"}};
+
+    TestIOBuffers_init(buffers, "2000-01-01 03:22:42.000, -129.993424e+000" RESPONSE_TERMINATOR, 0);
+    err = RBRGen3_fetch(conn, &channels, false, &sample);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("fetch sleepafter = false" COMMAND_TERMINATOR, buffers->writeBuffer);
+
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen3_fetch(conn, &overfull, false, &sample);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
 /* When the fixed prefix fits but the channels parameter does not, the prefix
  * is flushed on its own and the command continues in the next write. */
 TEST_LOGGER3(fetchSplitsBeforeChannels)
@@ -235,7 +302,7 @@ TEST_LOGGER3(fetchSplitsBeforeChannels)
     err = RBRGen3_open(&tiny, &small, 0, buffers);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
 
-    RBRGen3LabelsList channels = {.count = 1, .labels = {"temp"}};
+    RBRGen3LabelsList channels = {.size = 1, .len = 1, .labels = (RBRGen3Label[]) {"temp"}};
     RBRGEN3_SAMPLE_DECL(sample, TESTS_CHANNEL_MAX);
     TestIOBuffers_init(buffers, "2000-01-01 03:22:42.000, -129.993424e+000" RESPONSE_TERMINATOR, 0);
     err = RBRGen3_fetch(&tiny, &channels, false, &sample);
@@ -293,9 +360,10 @@ TEST_LOGGER3(fetch)
             "2000-01-01 00:00:00.000, 0.0, 1.0, 2.0, 3.0, 4.0" RESPONSE_TERMINATOR,
             true,
             {
-                .count = 5,
+                .size = 5,
+                .len = 5,
                 .labels =
-                    {
+                    (RBRGen3Label[]) {
                         "temperature_00",
                         "temperature_01",
                         "temperature_02",
@@ -357,9 +425,10 @@ TEST_LOGGER3(fetch)
             "29.0, 30.0, 31.0" RESPONSE_TERMINATOR,
             true,
             {
-                .count = 32,
+                .size = 32,
+                .len = 32,
                 .labels =
-                    {
+                    (RBRGen3Label[]) {
                         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
                         "ccccccccccccccccccccccccccccccc", "ddddddddddddddddddddddddddddddd",
                         "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", "fffffffffffffffffffffffffffffff",

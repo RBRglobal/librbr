@@ -14,7 +14,7 @@
 TEST_LOGGER2(outputformat_channelslist)
 {
     RBRGen3Error err;
-    RBRGen3ChannelsList channelsList;
+    RBRGEN3_CHANNELS_LIST_DECL(channelsList, TESTS_CHANNEL_MAX);
 
     err = RBRGen3_getChannelsList(conn, &channelsList);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_UNSUPPORTED, err, RBRGen3Error);
@@ -25,9 +25,9 @@ TEST_LOGGER2(outputformat_channelslist)
 TEST_LOGGER3(outputformat_channelslist)
 {
     RBRGen3ChannelsList expected = {
-        .count = 5,
+        .len = 5,
         .channels =
-            {
+            (RBRGen3ChannelsListEntry[]) {
                 {
                     .name = "temperature",
                     .unit = "C",
@@ -52,7 +52,7 @@ TEST_LOGGER3(outputformat_channelslist)
     };
 
     RBRGen3Error err;
-    RBRGen3ChannelsList actual;
+    RBRGEN3_CHANNELS_LIST_DECL(actual, TESTS_CHANNEL_MAX);
 
     TestIOBuffers_init(buffers,
                        "outputformat channelslist = temperature(C)|pressure(dbar)"
@@ -60,11 +60,16 @@ TEST_LOGGER3(outputformat_channelslist)
                        0);
     err = RBRGen3_getChannelsList(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-    TEST_ASSERT_EQ(expected.count, actual.count, "%" PRIi32);
+    TEST_ASSERT_EQ(expected.len, actual.len, "%" PRIi32);
 
-    for (int32_t channel = 0; channel < RBRGEN3_CHANNEL_MAX; channel++) {
+    for (int32_t channel = 0; channel < expected.len; channel++) {
         TEST_ASSERT_STR_EQ(expected.channels[channel].name, actual.channels[channel].name);
         TEST_ASSERT_STR_EQ(expected.channels[channel].unit, actual.channels[channel].unit);
+    }
+    /* Entries past the length are cleared. */
+    for (int32_t channel = expected.len; channel < actual.size; channel++) {
+        TEST_ASSERT_STR_EQ("", actual.channels[channel].name);
+        TEST_ASSERT_STR_EQ("", actual.channels[channel].unit);
     }
 
     return true;
@@ -73,7 +78,7 @@ TEST_LOGGER3(outputformat_channelslist)
 TEST_LOGGER2(outputformat_labelslist)
 {
     RBRGen3Error err;
-    RBRGen3LabelsList labelsList;
+    RBRGEN3_LABELS_LIST_DECL(labelsList, TESTS_CHANNEL_MAX);
 
     err = RBRGen3_getLabelsList(conn, &labelsList);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_UNSUPPORTED, err, RBRGen3Error);
@@ -84,9 +89,9 @@ TEST_LOGGER2(outputformat_labelslist)
 TEST_LOGGER3(outputformat_labelslist)
 {
     RBRGen3LabelsList expected = {
-        .count = 5,
+        .len = 5,
         .labels =
-            {
+            (RBRGen3Label[]) {
                 "temperature_00",
                 "pressure_00",
                 "seapressure_00",
@@ -96,7 +101,7 @@ TEST_LOGGER3(outputformat_labelslist)
     };
 
     RBRGen3Error err;
-    RBRGen3LabelsList actual;
+    RBRGEN3_LABELS_LIST_DECL(actual, TESTS_CHANNEL_MAX);
 
     TestIOBuffers_init(buffers,
                        "outputformat labelslist = temperature_00|pressure_00|seapressure_00"
@@ -104,11 +109,84 @@ TEST_LOGGER3(outputformat_labelslist)
                        0);
     err = RBRGen3_getLabelsList(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-    TEST_ASSERT_EQ(expected.count, actual.count, "%" PRIi32);
+    TEST_ASSERT_EQ(expected.len, actual.len, "%" PRIi32);
 
-    for (int32_t label = 0; label < RBRGEN3_CHANNEL_MAX; label++) {
+    for (int32_t label = 0; label < expected.len; label++) {
         TEST_ASSERT_STR_EQ(expected.labels[label], actual.labels[label]);
     }
+    /* Entries past the length are cleared. */
+    for (int32_t label = expected.len; label < actual.size; label++) {
+        TEST_ASSERT_STR_EQ("", actual.labels[label]);
+    }
+
+    return true;
+}
+
+/* Lists shorter than the instrument's channel count keep what fits, report
+ * the true count, and are flagged. Nothing is written past the storage. */
+TEST_LOGGER3(outputformat_channelslist_truncated)
+{
+    RBRGen3Error err;
+    /* Two entries of storage with a guard entry behind them. */
+    RBRGen3ChannelsListEntry storage[3] = {{"", ""}, {"", ""}, {"guard", "g"}};
+    RBRGen3ChannelsList actual = {.size = 2, .channels = storage};
+
+    TestIOBuffers_init(buffers,
+                       "outputformat channelslist = temperature(C)|pressure(dbar)"
+                       "|depth(m)" RESPONSE_TERMINATOR,
+                       0);
+    err = RBRGen3_getChannelsList(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_TRUNCATED, err, RBRGen3Error);
+    TEST_ASSERT_EQ(2, actual.len, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("temperature", actual.channels[0].name);
+    TEST_ASSERT_STR_EQ("pressure", actual.channels[1].name);
+    TEST_ASSERT_STR_EQ("dbar", actual.channels[1].unit);
+    TEST_ASSERT_STR_EQ("guard", storage[2].name);
+
+    return true;
+}
+
+TEST_LOGGER3(outputformat_labelslist_truncated)
+{
+    RBRGen3Error err;
+    /* Two labels of storage with a guard label behind them. */
+    RBRGen3Label storage[3] = {"", "", "guard"};
+    RBRGen3LabelsList actual = {.size = 2, .labels = storage};
+
+    TestIOBuffers_init(buffers,
+                       "outputformat labelslist = temperature_00|pressure_00"
+                       "|depth_00" RESPONSE_TERMINATOR,
+                       0);
+    err = RBRGen3_getLabelsList(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_TRUNCATED, err, RBRGen3Error);
+    TEST_ASSERT_EQ(2, actual.len, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("temperature_00", actual.labels[0]);
+    TEST_ASSERT_STR_EQ("pressure_00", actual.labels[1]);
+    TEST_ASSERT_STR_EQ("guard", storage[2]);
+
+    return true;
+}
+
+/* A list without storage is refused before anything is sent. */
+TEST_LOGGER3(outputformat_lists_reject_missing_storage)
+{
+    RBRGen3Error err;
+    RBRGen3ChannelsListEntry entry;
+    RBRGen3ChannelsList noChannels = {.size = 4, .channels = NULL};
+    RBRGen3ChannelsList noChannelsSize = {.size = 0, .channels = &entry};
+    RBRGen3LabelsList noLabels = {.size = 4, .labels = NULL};
+    RBRGen3LabelsList noLabelsSize = {.size = 0, .labels = (RBRGen3Label[]) {"x"}};
+
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen3_getChannelsList(conn, &noChannels);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    err = RBRGen3_getChannelsList(conn, &noChannelsSize);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    err = RBRGen3_getLabelsList(conn, &noLabels);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    err = RBRGen3_getLabelsList(conn, &noLabelsSize);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
 }

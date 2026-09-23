@@ -31,6 +31,9 @@
 #define MIN(a, b) ((a < b) ? (a) : (b))
 
 #define SAMPLE_SIZE (60 * 12)
+/* Plotting and readings storage for as many channels as this application
+ * expects. */
+#define CHANNEL_MAX 32
 
 #define VER_PAD 32
 
@@ -43,11 +46,11 @@ static int PLOT_COLORS[][3] = {
     {0x40, 0xFF, 0x40}, {0xFF, 0x40, 0xFF}};
 #define PLOT_COLORS_LEN (sizeof(PLOT_COLORS) / sizeof(PLOT_COLORS[0]))
 
-static double callbackReadings[RBRGEN3_CHANNEL_MAX];
-static RBRGen3Sample callbackSample = {.size = RBRGEN3_CHANNEL_MAX, .readings = callbackReadings};
+static double callbackReadings[CHANNEL_MAX];
+static RBRGen3Sample callbackSample = {.size = CHANNEL_MAX, .readings = callbackReadings};
 static RBRGen3Sample *samples = NULL;
-static double (*samplesReadings)[RBRGEN3_CHANNEL_MAX] = NULL;
-static SDL_Point *samplePoints[RBRGEN3_CHANNEL_MAX] = {NULL};
+static double (*samplesReadings)[CHANNEL_MAX] = NULL;
+static SDL_Point *samplePoints[CHANNEL_MAX] = {NULL};
 static int sampleCount = 0;
 static int samplePointChannelCount = 0;
 static int samplePointCount = 0;
@@ -72,7 +75,7 @@ RBRGen3Error instrumentSample(const struct RBRGen3 *conn, const struct RBRGen3Sa
     /* Each stored sample keeps its own readings; the callback's are reused. */
     samples[sampleCount] = *sample;
     samples[sampleCount].readings = samplesReadings[sampleCount];
-    samples[sampleCount].size = RBRGEN3_CHANNEL_MAX;
+    samples[sampleCount].size = CHANNEL_MAX;
     memcpy(samplesReadings[sampleCount], sample->readings, sample->channelCount * sizeof(double));
     ++sampleCount;
 
@@ -89,9 +92,9 @@ static void recalculatePoints(void)
     RBRGen3DateTime duration = maxTime - minTime;
     double horScale = ((double) width) / duration;
 
-    samplePointChannelCount = RBRGEN3_CHANNEL_MAX;
-    double minVal[RBRGEN3_CHANNEL_MAX] = {DBL_MAX};
-    double maxVal[RBRGEN3_CHANNEL_MAX] = {DBL_MIN};
+    samplePointChannelCount = CHANNEL_MAX;
+    double minVal[CHANNEL_MAX] = {DBL_MAX};
+    double maxVal[CHANNEL_MAX] = {DBL_MIN};
     for (int i = 0; i < sampleCount; i++) {
         samplePointChannelCount = MIN(samples[i].channelCount, samplePointChannelCount);
         for (int channel = 0; channel < samplePointChannelCount; channel++) {
@@ -99,7 +102,7 @@ static void recalculatePoints(void)
             maxVal[channel] = MAX(samples[i].readings[channel], maxVal[channel]);
         }
     }
-    double verScale[RBRGEN3_CHANNEL_MAX];
+    double verScale[CHANNEL_MAX];
     for (int channel = 0; channel < samplePointChannelCount; channel++) {
         verScale[channel] = ((double) (height - 2 * VER_PAD)) / (maxVal[channel] - minVal[channel]);
     }
@@ -134,7 +137,7 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    for (int channel = 0; channel < RBRGEN3_CHANNEL_MAX; channel++) {
+    for (int channel = 0; channel < CHANNEL_MAX; channel++) {
         if ((samplePoints[channel] = malloc(sizeof(SDL_Point) * SAMPLE_SIZE)) == NULL) {
             fprintf(stderr, "%s: Failed to allocate point buffer %d!\n", programName, channel + 1);
             return EXIT_FAILURE;

@@ -33,8 +33,8 @@ const static struct device *instrumentUart = DEVICE_DT_GET(DT_CHOSEN(rbr_instrum
 RBRGen3 instrumentBuffer;
 static uint8_t instrumentCommandBuffer[RBRGEN3_COMMAND_BUFFER_DEFAULT];
 static uint8_t instrumentResponseBuffer[RBRGEN3_RESPONSE_BUFFER_DEFAULT];
-static double sampleReadings[RBRGEN3_CHANNEL_MAX];
-RBRGen3Sample sampleBuffer = {.size = RBRGEN3_CHANNEL_MAX, .readings = sampleReadings};
+static double sampleReadings[CHANNEL_MAX];
+RBRGen3Sample sampleBuffer = {.size = CHANNEL_MAX, .readings = sampleReadings};
 
 ZephyrRBRGen3IO io;
 

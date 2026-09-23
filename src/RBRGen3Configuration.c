@@ -186,12 +186,7 @@ typedef enum RBRGen3ChannelDensity {
 static RBRGen3Error RBRGen3_getChannelAll(RBRGen3 *conn, RBRGen3Channels *channels,
                                           RBRGen3ChannelDensity density)
 {
-    int32_t channel_count = channels->count;
-    if (channel_count > RBRGEN3_CHANNEL_MAX) {
-        channel_count = RBRGEN3_CHANNEL_MAX;
-    }
-
-    for (int32_t idx = 0; idx < channel_count; ++idx) {
+    for (int32_t idx = 0; idx < channels->len; ++idx) {
         RBRGen3Channel *channel = &channels->channels[idx];
         RBRGen3_clearChannel(channel);
         RBR_TRY(RBRGen3_getChannel(conn, idx, channel));
@@ -207,10 +202,22 @@ static RBRGen3Error RBRGen3_getChannelAll(RBRGen3 *conn, RBRGen3Channels *channe
 static RBRGen3Error RBRGen3_getChannelsWithDensity(RBRGen3 *conn, RBRGen3Channels *channels,
                                                    RBRGen3ChannelDensity density)
 {
+    if (channels->channels == NULL || channels->size <= 0) {
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
+    }
+    /* The channel storage belongs to the caller; clear it, not the pointer. */
+    RBRGen3Channel *storage = channels->channels;
+    int32_t size = channels->size;
+    memset(storage, 0, (size_t) size * sizeof(*storage));
     memset(channels, 0, sizeof(RBRGen3Channels));
+    channels->channels = storage;
+    channels->size = size;
 
     RBR_TRY(RBRGen3_converse(conn, "channels"));
 
+    /* Channels past the caller's storage are not fetched; the count reported
+     * by the instrument decides whether the result is truncated. */
+    int32_t count = 0;
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true) {
@@ -221,9 +228,10 @@ static RBRGen3Error RBRGen3_getChannelsWithDensity(RBRGen3 *conn, RBRGen3Channel
         }
 
         if (strcmp(parameter.key, "count") == 0) {
-            channels->count = strtol(parameter.value, NULL, 10);
-        } else if (strcmp(parameter.key, "on") == 0) {
-            channels->on = strtol(parameter.value, NULL, 10);
+            count = strtol(parameter.value, NULL, 10);
+            if (count < 0) {
+                count = 0;
+            }
         } else if (strcmp(parameter.key, "settlingtime") == 0 ||
                    strcmp(parameter.key, "latency") == 0) {
             channels->settlingTime = strtol(parameter.value, NULL, 10);
@@ -234,9 +242,19 @@ static RBRGen3Error RBRGen3_getChannelsWithDensity(RBRGen3 *conn, RBRGen3Channel
         }
     }
 
+    channels->len = count > channels->size ? channels->size : count;
     RBR_TRY(RBRGen3_getChannelAll(conn, channels, density));
+    return count > channels->size ? RBRGEN3_TRUNCATED : RBRGEN3_SUCCESS;
+}
 
-    return RBRGEN3_SUCCESS;
+RBRGen3Error RBRGen3_getChannelCount(RBRGen3 *conn, int32_t *count)
+{
+    return RBRGen3_getInt(conn, "channels", "count", count);
+}
+
+RBRGen3Error RBRGen3_getEnabledChannelCount(RBRGen3 *conn, int32_t *count)
+{
+    return RBRGen3_getInt(conn, "channels", "on", count);
 }
 
 RBRGen3Error RBRGen3_getChannels(RBRGen3 *conn, RBRGen3Channels *channels)
@@ -470,7 +488,7 @@ RBRGen3Error RBRGen3_getSensorParameters(RBRGen3 *conn, RBRGen3ChannelIndex chan
     int32_t maxSize = *size;
     *size = 0;
 
-    if (channel < 1 || channel > RBRGEN3_CHANNEL_MAX) {
+    if (channel < 1) {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
@@ -490,7 +508,8 @@ RBRGen3Error RBRGen3_getSensorParameters(RBRGen3 *conn, RBRGen3ChannelIndex chan
         return err;
     }
 
-    char channelStr[RBRGEN3_CHANNEL_MAX_LEN];
+    /* Room for any RBRGen3ChannelIndex in decimal. */
+    char channelStr[sizeof("255")];
     snprintf(channelStr, sizeof(channelStr), "%i", channel);
 
     char *command = NULL;

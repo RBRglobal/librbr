@@ -208,7 +208,8 @@ int main(int argc, char *argv[])
     }
 
     /* query labels to check for CTD */
-    RBRGen3LabelsList labelList;
+    RBRGen3Label labelBuf[CHANNEL_MAX];
+    RBRGen3LabelsList labelList = {.size = CHANNEL_MAX, .labels = labelBuf};
     err = RBRGen3_getLabelsList(&conn, &labelList);
     if (err != RBRGEN3_SUCCESS) {
         fprintf(
@@ -228,14 +229,14 @@ int main(int argc, char *argv[])
 
     /* if total channels are less than 4, then it's impossible to have all 4 channels below.
      * this will cause a warning message below */
-    if (labelList.count < 4) {
+    if (labelList.len < 4) {
         isCtd = false;
     }
     /* otherwise channels list will be scanned to find C,T,D, T_for_cond_corr
      * and store channel index in an array dynamicCorrection_channel[]
      */
-    else if (labelList.count >= 4) {
-        for (int ch_id = 0; ch_id < labelList.count; ch_id++) {
+    else if (labelList.len >= 4) {
+        for (int ch_id = 0; ch_id < labelList.len; ch_id++) {
             if (strcmp(labelList.labels[ch_id], "conductivity_00") == 0) {
                 dynamicCorrection_channel[0] = ch_id;
                 i++;

@@ -114,8 +114,9 @@ int main(int argc, char *argv[])
         goto instrumentCleanup;
     }
 
-    RBRGen3Channels channels;
-    RBRGen3_getChannels(&conn, &channels);
+    /* The parser needs to know how many channels each sample holds. */
+    int32_t enabledChannels = 0;
+    RBRGen3_getEnabledChannelCount(&conn, &enabledChannels);
 
     RBRGen3Parser parser;
 
@@ -126,10 +127,16 @@ int main(int argc, char *argv[])
         .sampleBuffer = &sampleBuffer,
     };
 
-    RBRGen3ParserConfig parserConfig = {.format = RBRGEN3_MEMFORMAT_CALBIN00,
-                                        .formatConfig = {.easyParse = {
-                                                             .channels = channels.on,
-                                                         }}};
+    RBRGen3ParserConfig parserConfig = {
+        .format = RBRGEN3_MEMFORMAT_CALBIN00,
+        .formatConfig =
+            {
+                .easyParse =
+                    {
+                        .channels = enabledChannels,
+                    },
+            },
+    };
 
     if ((err = RBRGen3Parser_init(&parser, &parserCallbacks, &parserConfig, NULL)) !=
         RBRGEN3_SUCCESS) {

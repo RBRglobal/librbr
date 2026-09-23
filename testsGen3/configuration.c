@@ -20,19 +20,18 @@ typedef struct ChannelsTest {
 static bool test_channels(RBRGen3 *conn, TestIOBuffers *buffers, ChannelsTest *tests)
 {
     RBRGen3Error err;
-    RBRGen3Channels actual;
+    RBRGEN3_CHANNELS_DECL(actual, TESTS_CHANNEL_MAX);
 
     for (int i = 0; tests[i].response != NULL; ++i) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
         err = RBRGen3_getChannels(conn, &actual);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-        TEST_ASSERT_EQ(tests[i].expected.count, actual.count, "%" PRIi32);
-        TEST_ASSERT_EQ(tests[i].expected.on, actual.on, "%" PRIi32);
+        TEST_ASSERT_EQ(tests[i].expected.len, actual.len, "%" PRIi32);
         TEST_ASSERT_EQ(tests[i].expected.settlingTime, actual.settlingTime, "%" PRIi32);
         TEST_ASSERT_EQ(tests[i].expected.readTime, actual.readTime, "%" PRIi32);
         TEST_ASSERT_EQ(tests[i].expected.minimumPeriod, actual.minimumPeriod, "%" PRIi32);
 
-        for (int channel = 0; channel < actual.count; ++channel) {
+        for (int channel = 0; channel < actual.len; ++channel) {
             RBRGen3Channel *expectedChannel = &tests[i].expected.channels[channel];
             RBRGen3Channel *actualChannel = &actual.channels[channel];
 
@@ -133,13 +132,12 @@ TEST_LOGGER2(channels)
             "c0 = 0.0000000e+000, c1 = 1.0000000e+000" RESPONSE_TERMINATOR,
 
             {
-                .count = 3,
-                .on = 3,
+                .len = 3,
                 .settlingTime = 300,
                 .readTime = 350,
                 .minimumPeriod = 480,
                 .channels =
-                    {
+                    (RBRGen3Channel[]) {
                         {
                             .type = "temp09",
                             .module = 1,
@@ -250,13 +248,12 @@ TEST_LOGGER2(channels)
             "calibration 1 type = fluo01, datetime = 20000401000000, "
             "c0 = 203.47984e+000, c1 = -277.72070e+000" RESPONSE_TERMINATOR,
             {
-                .count = 1,
-                .on = 1,
+                .len = 1,
                 .settlingTime = 600,
                 .readTime = 1700,
                 .minimumPeriod = 1910,
                 .channels =
-                    {
+                    (RBRGen3Channel[]) {
                         {
                             .type = "fluo01",
                             .module = 40,
@@ -346,13 +343,12 @@ TEST_LOGGER3(channels)
             "n0 = value" RESPONSE_TERMINATOR,
 
             {
-                .count = 5,
-                .on = 5,
+                .len = 5,
                 .settlingTime = 50,
                 .readTime = 290,
                 .minimumPeriod = 450,
                 .channels =
-                    {
+                    (RBRGen3Channel[]) {
                         {
                             .type = "temp09",
                             .module = 1,
@@ -505,13 +501,12 @@ TEST_LOGGER3(channels)
             "calibration 1 label = chlorophyll_00, datetime = 20000401000000, "
             "c0 = 678.26611e+000, c1 = -925.73568e+000" RESPONSE_TERMINATOR,
             {
-                .count = 1,
-                .on = 1,
+                .len = 1,
                 .settlingTime = 5000,
                 .readTime = 10500,
                 .minimumPeriod = 10670,
                 .channels =
-                    {
+                    (RBRGen3Channel[]) {
                         {
                             .type = "fluo10",
                             .module = 40,
@@ -553,13 +548,12 @@ TEST_LOGGER3(channels)
             "calibration 1 label = turbidity_00, datetime = 20000401000000, "
             "c0 = 3.3910000e+003, c1 = -4.6280000e+003" RESPONSE_TERMINATOR,
             {
-                .count = 1,
-                .on = 1,
+                .len = 1,
                 .settlingTime = 5000,
                 .readTime = 10500,
                 .minimumPeriod = 10670,
                 .channels =
-                    {
+                    (RBRGen3Channel[]) {
                         {
                             .type = "turb00",
                             .module = 40,
@@ -610,13 +604,12 @@ TEST_LOGGER3(channels_calibration_indices)
             "c1 = 2.0000000e+000, c0 = 1.0000000e+000, x2 = 3.0000000e+000, "
             "cfoo = 9.0000000e+000, x = 8.0000000e+000, n1 = 4" RESPONSE_TERMINATOR,
             {
-                .count = 1,
-                .on = 1,
+                .len = 1,
                 .settlingTime = 5000,
                 .readTime = 10500,
                 .minimumPeriod = 10670,
                 .channels =
-                    {
+                    (RBRGen3Channel[]) {
                         {
                             .type = "fluo10",
                             .module = 40,
@@ -651,6 +644,119 @@ TEST_LOGGER3(channels_calibration_indices)
     };
 
     return test_channels(conn, buffers, tests);
+}
+
+/* The caller sizes the channel storage, so an instrument with more channels
+ * than it holds fills what fits, reports the true count, and is flagged. */
+TEST_LOGGER3(channelsTruncated)
+{
+    RBRGen3Error err;
+    RBRGEN3_CHANNELS_DECL(actual, 2);
+
+    TestIOBuffers_init(buffers,
+                       "channels count = 3, on = 3, settlingtime = 50, readtime = 290, "
+                       "minperiod = 450" RESPONSE_TERMINATOR
+                       "channel 1 type = temp09, module = 1, status = on, "
+                       "settlingtime = 50, readtime = 260, equation = tmp, "
+                       "userunits = C, gain = none, availablegains = none, "
+                       "derived = off, label = temperature_00" RESPONSE_TERMINATOR
+                       "channel 2 type = pres24, module = 2, status = on, "
+                       "settlingtime = 50, readtime = 290, equation = corr_pres2, "
+                       "userunits = dbar, gain = none, availablegains = none, "
+                       "derived = off, label = pressure_00" RESPONSE_TERMINATOR,
+                       0);
+    err = RBRGen3_getChannelsWithoutCalibrations(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_TRUNCATED, err, RBRGen3Error);
+    TEST_ASSERT_EQ(2, actual.len, "%" PRIi32);
+    TEST_ASSERT_EQ(2, actual.size, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("temp09", actual.channels[0].type);
+    TEST_ASSERT_STR_EQ("pres24", actual.channels[1].type);
+    /* Only the channels which fit were requested. */
+    TEST_ASSERT_STR_EQ("channels" COMMAND_TERMINATOR "channel 1 all" COMMAND_TERMINATOR
+                       "channel 2 all" COMMAND_TERMINATOR,
+                       buffers->writeBuffer);
+
+    return true;
+}
+
+/* A nonsensical negative count from the instrument is reported as zero rather
+ * than handed to the caller as a loop bound. */
+TEST_LOGGER3(channelsNegativeCount)
+{
+    RBRGen3Error err;
+    RBRGEN3_CHANNELS_DECL(actual, 2);
+
+    TestIOBuffers_init(buffers,
+                       "channels count = -5, on = 0, settlingtime = 50, readtime = 290, "
+                       "minperiod = 450" RESPONSE_TERMINATOR,
+                       0);
+    err = RBRGen3_getChannelsWithoutCalibrations(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+    TEST_ASSERT_EQ(0, actual.len, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("channels" COMMAND_TERMINATOR, buffers->writeBuffer);
+
+    return true;
+}
+
+/* The instrument's own channel counts come from dedicated getters, so a
+ * caller can learn how many channels exist without storage for them. */
+TEST_LOGGER3(channelCounts)
+{
+    RBRGen3Error err;
+    int32_t count;
+
+    TestIOBuffers_init(buffers, "channels count = 3" RESPONSE_TERMINATOR, 0);
+    err = RBRGen3_getChannelCount(conn, &count);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+    TEST_ASSERT_EQ(3, count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("channels count" COMMAND_TERMINATOR, buffers->writeBuffer);
+
+    TestIOBuffers_init(buffers, "channels on = 2" RESPONSE_TERMINATOR, 0);
+    err = RBRGen3_getEnabledChannelCount(conn, &count);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+    TEST_ASSERT_EQ(2, count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("channels on" COMMAND_TERMINATOR, buffers->writeBuffer);
+
+    return true;
+}
+
+/* Logger2 answers the same single-parameter queries. */
+TEST_LOGGER2(channelCounts)
+{
+    RBRGen3Error err;
+    int32_t count;
+
+    TestIOBuffers_init(buffers, "channels count = 3" RESPONSE_TERMINATOR, 0);
+    err = RBRGen3_getChannelCount(conn, &count);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+    TEST_ASSERT_EQ(3, count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("channels count" COMMAND_TERMINATOR, buffers->writeBuffer);
+
+    TestIOBuffers_init(buffers, "channels on = 2" RESPONSE_TERMINATOR, 0);
+    err = RBRGen3_getEnabledChannelCount(conn, &count);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+    TEST_ASSERT_EQ(2, count, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("channels on" COMMAND_TERMINATOR, buffers->writeBuffer);
+
+    return true;
+}
+
+/* A channel list without storage is refused before anything is sent. */
+TEST_LOGGER3(channelsRejectsListWithoutStorage)
+{
+    RBRGen3Error err;
+    RBRGen3Channel entry;
+    RBRGen3Channels noStorage = {.size = 4, .channels = NULL};
+    RBRGen3Channels noSize = {.size = 0, .channels = &entry};
+
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen3_getChannels(conn, &noStorage);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    err = RBRGen3_getChannels(conn, &noSize);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
 }
 
 TEST_LOGGER3(channel_gain_set_auto)

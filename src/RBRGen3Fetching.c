@@ -24,6 +24,12 @@ RBRGen3Error RBRGen3_fetch(RBRGen3 *conn, RBRGen3LabelsList *channels, bool slee
     if (sample->readings == NULL || sample->size <= 0) {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
+    /* Only the first size labels exist. An empty list needs no storage and
+     * means every channel. */
+    if (channels != NULL && (channels->len < 0 || channels->len > channels->size ||
+                             (channels->len > 0 && channels->labels == NULL))) {
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
+    }
     char *commandBuffer = (char *) conn->environment.command;
     int32_t *commandBufferLength = &conn->commandBufferLength;
 
@@ -45,11 +51,11 @@ RBRGen3Error RBRGen3_fetch(RBRGen3 *conn, RBRGen3LabelsList *channels, bool slee
      * This function is currently the only case where we have to split a single
      * command across multiple callbacks.
      */
-    if (channels != NULL && channels->count > 0 && conn->generation != RBRCOMMON_LOGGER2) {
+    if (channels != NULL && channels->len > 0 && conn->generation != RBRCOMMON_LOGGER2) {
         /* Each label is written with its separator in one piece, so a label
          * which cannot fit an empty buffer must be refused before any part of
          * the command has gone out. */
-        for (int32_t channel = 0; channel < channels->count; ++channel) {
+        for (int32_t channel = 0; channel < channels->len; ++channel) {
             if (1 + strlen(channels->labels[channel]) >=
                 (size_t) conn->environment.commandCapacity) {
                 return RBRGEN3_BUFFER_TOO_SMALL;
@@ -69,7 +75,7 @@ RBRGen3Error RBRGen3_fetch(RBRGen3 *conn, RBRGen3LabelsList *channels, bool slee
                      channelsParameter);
 
         char separator = ' ';
-        for (int32_t channel = 0; channel < channels->count; ++channel) {
+        for (int32_t channel = 0; channel < channels->len; ++channel) {
             /* snprintf() needs a byte for its null beyond the piece. */
             if ((size_t) *commandBufferLength + 1 + strlen(channels->labels[channel]) >=
                 (size_t) conn->environment.commandCapacity) {
