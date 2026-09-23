@@ -570,7 +570,7 @@ TEST_LOGGER4(channellist)
         "seapressure_00",
         "depth_00",
     };
-    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, TESTS_CHANNEL_MAX);
 
     TestIOBuffers_init(
         buffers,
@@ -630,7 +630,7 @@ TEST_LOGGER4(channellistExactFit)
 TEST_LOGGER4(channellistRepeated)
 {
     /* A repeated list replaces the pool rather than extending it. */
-    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, TESTS_CHANNEL_MAX);
 
     TestIOBuffers_init(
         buffers, "channel count=1 list=temperature_00 list=pressure_00" RESPONSE_TERMINATOR, 0);
@@ -645,7 +645,7 @@ TEST_LOGGER4(channellistRepeated)
 
 TEST_LOGGER4(channellistScientific)
 {
-    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, TESTS_CHANNEL_MAX);
 
     TestIOBuffers_init(
         buffers,
@@ -665,7 +665,7 @@ TEST_LOGGER4(channellistScientific)
 
 TEST_LOGGER4(channellistWithoutChannels)
 {
-    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, TESTS_CHANNEL_MAX);
 
     TestIOBuffers_init(buffers, "channel system count=0 list=none" RESPONSE_TERMINATOR, 0);
 
@@ -707,7 +707,7 @@ TEST_LOGGER4(channelCountWithoutChannels)
 
 TEST_LOGGER4(channellistUnknownNature)
 {
-    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, TESTS_CHANNEL_MAX);
 
     TestIOBuffers_init(buffers, "", 0);
 

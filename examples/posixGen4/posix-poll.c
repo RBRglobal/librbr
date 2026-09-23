@@ -177,7 +177,12 @@ int main(int argc, char *argv[])
     }
     printf("\n");
 
-    RBRGen4Sample sample;
+    /* Size the readings storage for the channels the instrument reports. */
+    double sampleReadings[CHANNEL_COUNT];
+    RBRGen4Sample sample = {
+        .size = CHANNEL_COUNT,
+        .readings = sampleReadings,
+    };
     for (int32_t i = 0; i < POLL_COUNT; i++) {
         err = RBRGen4_poll(&conn, requireLabel, &sample);
         if (err) {

@@ -59,10 +59,6 @@ if(CONFIG_LIBRBR)
     endif()
 
     if(CONFIG_LIBRBR_GEN4)
-        zephyr_compile_definitions(
-            RBRGEN4_CHANNEL_MAX=CONFIG_RBRGEN4_CHANNEL_MAX
-        )
-
         zephyr_library_sources(
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen4Communication.c
