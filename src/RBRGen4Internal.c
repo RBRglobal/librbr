@@ -551,19 +551,6 @@ RBRGen4Error RBRGen4_errorCheckResponse(RBRGen4 *conn, char *beginning, char *en
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_deliverSample(RBRGen4 *conn, const RBRGen4Sample *sample)
-{
-    if (conn->environment.sample == NULL) {
-        return RBRGEN4_SUCCESS;
-    }
-
-    if (sample != conn->environment.sampleBuffer) {
-        *conn->environment.sampleBuffer = *sample;
-    }
-
-    return conn->environment.sample(conn, conn->environment.sampleBuffer);
-}
-
 RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn, bool breakOnSample, RBRGen4Sample *sample,
                                   RBRGen4DateTime startTime, RBRGen4DateTime timeout)
 {
@@ -591,8 +578,8 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn, bool breakOnSample, RBRGen4Samp
 
         if (sampleTarget != NULL &&
             RBRGen4Sample_parse(sampleTarget, &conn->outputFormat, beginning) == RBRGEN4_SUCCESS) {
-            if (sample == NULL) {
-                RBR_TRY(RBRGen4_deliverSample(conn, sampleTarget));
+            if (conn->environment.sample != NULL && sample == NULL) {
+                RBR_TRY(conn->environment.sample(conn, sampleTarget));
             }
             if (breakOnSample) {
                 return RBRGEN4_SAMPLE;

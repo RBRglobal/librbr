@@ -163,7 +163,10 @@ static RBRGen4Error RBRGen4_sendPoll(RBRGen4 *conn, bool requireLabel, const cha
             /* This is a streamed sample, not the polled one we're waiting
              * for. Forward it to the sample callback, if any, and keep
              * looking. */
-            RBR_TRY(RBRGen4_deliverSample(conn, sample));
+            if (conn->environment.sample != NULL) {
+                *conn->environment.sampleBuffer = *sample;
+                RBR_TRY(conn->environment.sample(conn, conn->environment.sampleBuffer));
+            }
             err = RBRGEN4_SUCCESS;
         }
     } while (err == RBRGEN4_SUCCESS);
