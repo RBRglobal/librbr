@@ -56,25 +56,6 @@ const char *RBRGen4InstrumentState_name(RBRGen4InstrumentState state);
 #define RBRGEN4_INSTRUMENT_NAME_MAX 32
 
 /**
- * \brief Get identification information using the legacy `id` command.
- * \note Issues the `id` command.
- *
- * `id` predates the Gen4 API and keeps its original grammar: parameters are
- * separated by commas and assignments are padded with spaces. It reports the
- * same information as `id4` less the Semantic Version and the API version;
- * prefer RBRGen4_getId4() unless the legacy command is specifically
- * wanted.
- *
- * \param [in] conn the instrument connection
- * \param [out] id the instrument information
- * \return #RBRGEN4_SUCCESS when the information is successfully read
- * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \see RBRGen4_getId4()
- */
-RBRGen4Error RBRGen4_getId(RBRGen4 *conn, RBRGen4Id *id);
-
-/**
  * \brief Get identification information from the instrument.
  * \note Issues the `id4` command.
  *

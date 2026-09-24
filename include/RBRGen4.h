@@ -23,6 +23,7 @@ extern "C" {
 #include <inttypes.h>
 #include <stdbool.h>
 
+#include "RBRCommon.h"
 #include "RBRGen4HardwareErrors.h"
 
 /**
@@ -382,30 +383,6 @@ typedef struct RBRGen4OutputFormat {
                             .dataType = RBRGEN4_DATA_TYPE_FLOAT32})
 
 /**
- * \brief Instrument `id` command parameters.
- *
- * \see RBRGen4_getId()
- */
-typedef struct RBRGen4Id {
-    /**
-     * \brief The instrument model.
-     *
-     * \readonly
-     */
-    char model[RBRGEN4_ID_MODEL_MAX + 1];
-    /**
-     * \brief The instrument firmware version.
-     *
-     * \readonly
-     */
-    char fwversion[RBRGEN4_ID_VERSION_MAX + 1];
-    /** The serial number of the instrument. */
-    int32_t sn;
-    /** The firmware type of the instrument. */
-    int32_t fwtype;
-} RBRGen4Id;
-
-/**
  * \brief Instrument `id4` command parameters.
  *
  * \see RBRGen4_getId4()
@@ -444,38 +421,6 @@ typedef struct RBRGen4Id4 {
     /** The firmware type of the instrument. */
     int32_t fwtype;
 } RBRGen4Id4;
-
-/**
- * \brief Generations of RBR instruments.
- * \see RBRGen4_getGeneration()
- */
-typedef enum RBRGen4Generation {
-    /** Logger1 (XR/XRX/TR/DR/TDR/HT). */
-    RBRGEN4_LOGGER1,
-    /** Logger2 (RBRvirtuoso/duo/concerto/maestro/solo/duet/coda). */
-    RBRGEN4_LOGGER2,
-    /** Logger3 (RBRvirtuoso³/duo³/concerto³/maestro³/solo³/duet³/coda³). */
-    RBRGEN4_LOGGER3,
-    /** Logger4 (GEN4). */
-    RBRGEN4_LOGGER4,
-    /** The number of known generations. */
-    RBRGEN4_GENERATION_COUNT,
-    /** An unknown or unrecognized instrument generation. */
-    RBRGEN4_UNKNOWN_GENERATION
-} RBRGen4Generation;
-
-/**
- * \brief Get a human-readable string name for a generation.
- *
- * Contrary to convention for values returned by other enum `_name` functions,
- * the generation names returned by this function are capitalized: “Logger3”
- * instead of “logger3”.
- *
- * \param [in] generation the generation
- * \return a string name for the generation
- * \see RBRGen4Error_name() for a description of the format of names
- */
-const char *RBRGen4Generation_name(RBRGen4Generation generation);
 
 struct RBRGen4;
 
@@ -746,10 +691,9 @@ typedef struct RBRGen4 {
      * \brief The generation of the instrument.
      *
      * \note Detected while establishing the instrument connection.
-     * \note Cached every time RBRGen4_getGeneration() is called.
      * \see RBRGen4_getGeneration()
      */
-    RBRGen4Generation generation;
+    RBRCommonGeneration generation;
 
     /** \brief The set of callbacks to be used by the connection. */
     RBRGen4Callbacks callbacks;
@@ -915,7 +859,7 @@ RBRGen4Error RBRGen4_close(RBRGen4 *conn);
  * \param [in] conn the instrument connection
  * \return the instrument generation
  */
-RBRGen4Generation RBRGen4_getGeneration(const RBRGen4 *conn);
+RBRCommonGeneration RBRGen4_getGeneration(const RBRGen4 *conn);
 
 /**
  * \brief Get the command timeout.

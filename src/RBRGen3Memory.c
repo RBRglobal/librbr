@@ -194,7 +194,7 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *conn, RBRGen3Data *data)
      *     << readdata dataset = <dataset>, size = <size>, offset = <offset>
      */
     const char *generationCommand;
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         generationCommand = "read data %d %" PRId32 " %" PRId32;
     } else {
         generationCommand = "readdata dataset = %d"
@@ -206,7 +206,7 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *conn, RBRGen3Data *data)
 
     /* Because the response format for L2 is so nonstandard, we'll have to
      * parse it with sscanf. We can just do things the normal way for L3. */
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         RBR_TRY(RBRGen3L2_parseDataResponse(conn, &workingData));
     } else {
         RBR_TRY(RBRGen3L3_parseDataResponse(conn, &workingData));
@@ -288,7 +288,7 @@ RBRGen3Error RBRGen3_getAvailableMemoryFormats(RBRGen3 *conn, RBRGen3MemoryForma
     const char *generationCommand;
     const char *separator;
     int32_t separatorLen;
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         generationCommand = "memformat support";
         separator = ", ";
         separatorLen = 2;

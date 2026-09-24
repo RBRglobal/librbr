@@ -196,7 +196,7 @@ int main(void)
     int32_t testsTotal = 0;
     int32_t testsPassed = 0;
     for (int32_t i = 0; instrumentTests[i].function != NULL; i++) {
-        if (instrumentTests[i].generation == RBRGEN4_LOGGER4) {
+        if (instrumentTests[i].generation == RBRCOMMON_LOGGER4) {
             testInstrument = instrumentL4;
         } else {
             printf("Error: only Logger4 test is covered!");
@@ -210,7 +210,7 @@ int main(void)
         testInstrument->lastActivityTime = 0;
 
         printf("Running %s test \"%s\"...",
-               RBRGen4Generation_name(instrumentTests[i].generation),
+               RBRCommonGeneration_name(instrumentTests[i].generation),
                instrumentTests[i].name);
         ++testsTotal;
         if (instrumentTests[i].function(testInstrument, &ioBuffers)) {

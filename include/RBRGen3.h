@@ -23,6 +23,7 @@ extern "C" {
 #include <inttypes.h>
 #include <stdbool.h>
 
+#include "RBRCommon.h"
 #include "RBRGen3HardwareErrors.h"
 
 /**
@@ -288,35 +289,6 @@ typedef struct RBRGen3Id {
     /** The instrument mode. */
     char mode[RBRGEN3_ID_MODE_MAX + 1];
 } RBRGen3Id;
-
-/** \brief Generations of RBR instruments. */
-typedef enum RBRGen3Generation {
-    /** Logger1 (XR/XRX/TR/DR/TDR/HT). */
-    RBRGEN3_LOGGER1,
-    /** Logger2 (RBRvirtuoso/duo/concerto/maestro/solo/duet/coda). */
-    RBRGEN3_LOGGER2,
-    /** Logger3 (RBRvirtuoso³/duo³/concerto³/maestro³/solo³/duet³/coda³). */
-    RBRGEN3_LOGGER3,
-    /** 4th generation instruments (RBRsolo⁴/duet⁴/coda⁴, etc.). */
-    RBRGEN3_LOGGER4,
-    /** The number of known generations. */
-    RBRGEN3_GENERATION_COUNT,
-    /** An unknown or unrecognized instrument generation. */
-    RBRGEN3_UNKNOWN_GENERATION
-} RBRGen3Generation;
-
-/**
- * \brief Get a human-readable string name for a generation.
- *
- * Contrary to convention for values returned by other enum `_name` functions,
- * the generation names returned by this function are capitalized: “Logger3”
- * instead of “logger3”.
- *
- * \param [in] generation the generation
- * \return a string name for the generation
- * \see RBRGen3Error_name() for a description of the format of names
- */
-const char *RBRGen3Generation_name(RBRGen3Generation generation);
 
 struct RBRGen3;
 
@@ -587,7 +559,7 @@ typedef struct RBRGen3 {
      *
      * Detected while establishing the instrument connection.
      */
-    RBRGen3Generation generation;
+    RBRCommonGeneration generation;
 
     /** \brief The set of callbacks to be used by the connection. */
     RBRGen3Callbacks callbacks;
@@ -689,6 +661,15 @@ typedef struct RBRGen3 {
  * library resources is required. In the event of a successful result,
  * RBRGen3_close() should be used to terminate the instrument connection.
  *
+ * \note When #RBRGEN3_UNSUPPORTED is returned, the connection is not open,
+ *       but RBRGen3_getGeneration() reports the generation that was
+ *       detected (e.g., #RBRCOMMON_LOGGER4 for a 4th-generation instrument,
+ *       or #RBRCOMMON_UNKNOWN_GENERATION if none could be identified).
+ *       Applications built with both APIs can therefore call
+ *       RBRGen3_open() and fall back to RBRGen4_open() on
+ *       #RBRGEN3_UNSUPPORTED. Only RBRGen3_getGeneration() and
+ *       RBRGen3_close() may be used on the connection in that state.
+ *
  * \param [out] conn the context object to populate
  * \param [in] callbacks the set of callbacks to be used by the connection
  * \param [in] commandTimeout the command timeout in milliseconds
@@ -718,10 +699,13 @@ RBRGen3Error RBRGen3_close(RBRGen3 *conn);
 /**
  * \brief Get the generation of an instrument.
  *
+ * \note Also reports the detected generation after RBRGen3_open() returns
+ *       #RBRGEN3_UNSUPPORTED.
+ *
  * \param [in] conn the instrument connection
  * \return the instrument generation
  */
-RBRGen3Generation RBRGen3_getGeneration(const RBRGen3 *conn);
+RBRCommonGeneration RBRGen3_getGeneration(const RBRGen3 *conn);
 
 /**
  * \brief Get the command timeout.

@@ -79,9 +79,9 @@ int main(int argc, char *argv[])
         goto fileCleanup;
     }
 
-    RBRGen4Generation generation = RBRGen4_getGeneration(&conn);
-    printf("%s: Instrument generation is %s\n", programName, RBRGen4Generation_name(generation));
-    if (generation != RBRGEN4_LOGGER4) {
+    RBRCommonGeneration generation = RBRGen4_getGeneration(&conn);
+    printf("%s: Instrument generation is %s\n", programName, RBRCommonGeneration_name(generation));
+    if (generation != RBRCOMMON_LOGGER4) {
         err = RBRGEN4_UNSUPPORTED;
         logCmdError(&conn,
                     err,

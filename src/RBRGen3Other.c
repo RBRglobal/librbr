@@ -186,7 +186,7 @@ RBRGen3Error RBRGen3_getPower(RBRGen3 *conn, RBRGen3Power *power)
     power->internal = NAN;
     power->regulator = NAN;
 
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         RBR_TRY(RBRGen3_converse(conn, "powerstatus"));
     } else {
         RBR_TRY(RBRGen3_converse(conn, "power"));
@@ -272,7 +272,7 @@ const char *RBRGen3InternalBatteryType_displayName(RBRGen3InternalBatteryType ty
 
 RBRGen3Error RBRGen3_getPowerInternal(RBRGen3 *conn, RBRGen3PowerInternal *power)
 {
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         return RBRGEN3_UNSUPPORTED;
     }
 
@@ -380,7 +380,7 @@ const char *RBRGen3ExternalBatteryType_displayName(RBRGen3ExternalBatteryType ty
 
 RBRGen3Error RBRGen3_getPowerExternal(RBRGen3 *conn, RBRGen3PowerExternal *power)
 {
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         return RBRGEN3_UNSUPPORTED;
     }
 
@@ -430,7 +430,7 @@ RBRGen3Error RBRGen3_resetPowerExternalUsed(RBRGen3 *conn)
 
 RBRGen3Error RBRGen3_getInfo(RBRGen3 *conn, RBRGen3Info *info)
 {
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         return RBRGEN3_UNSUPPORTED;
     }
 

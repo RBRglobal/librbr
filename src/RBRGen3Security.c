@@ -17,7 +17,7 @@
 RBRGen3Error RBRGen3_permit(RBRGen3 *conn, const char *command)
 {
     const char *permitCommand;
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         permitCommand = "permit = %s";
     } else {
         permitCommand = "permit command = %s";

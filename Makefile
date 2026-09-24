@@ -49,7 +49,8 @@ export LIB_VERSION ?= $(shell ./tools/version.sh)
 ##
 ## Both are enabled (`1`) by default and both land in the same
 ## `bin/libRBR.a`; disable one by passing `GEN3=0` or `GEN4=0` to `make(1)`.
-## At least one generation must be enabled.
+## At least one generation must be enabled. The generation-independent
+## `RBRCommon` helpers are always compiled.
 GEN3 ?= 1
 GEN4 ?= 1
 
@@ -112,6 +113,9 @@ libdynamiccorrection: bin/libRBRDynamicCorrection.a
 
 lib: bin/libRBR.a
 
+## \brief Objects compiled regardless of generation selection.
+COMMON_OBJECTS := src/RBRCommon.o
+
 ## \brief Objects for the Gen3 (Logger2/Logger3) API.
 GEN3_OBJECTS := src/RBRGen3.o \
                 src/RBRGen3Communication.o \
@@ -141,7 +145,7 @@ GEN4_OBJECTS := src/RBRGen4.o \
                 src/RBRGen4Memory.o \
                 src/RBRGen4Realtime.o
 
-LIB_OBJECTS :=
+LIB_OBJECTS := $(COMMON_OBJECTS)
 DYNAMICCORRECTION_OBJECTS :=
 ifeq ($(GEN3),1)
 LIB_OBJECTS += $(GEN3_OBJECTS)
@@ -246,7 +250,7 @@ testsGen3/tests.c: $(foreach module,$(GEN3_TEST_MODULES),testsGen3/$(module).c)
 		| sed -e 's/$$/;/' >>$@
 	@echo "InstrumentTest instrumentTests[] = {" >>$@
 	@grep -ho 'TEST_LOGGER[23]([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRGEN3_LOGGER\1, test_\2_l\1},/' \
+		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRCOMMON_LOGGER\1, test_\2_l\1},/' \
 		>>$@
 	@echo "    {0}" >>$@
 	@echo "};" >>$@
@@ -276,7 +280,7 @@ testsGen4/tests.c: $(foreach module,$(GEN4_TEST_MODULES),testsGen4/$(module).c)
 		| sed -e 's/$$/;/' >>$@
 	@echo "InstrumentTest instrumentTests[] = {" >>$@
 	@grep -ho 'TEST_LOGGER[4]([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRGEN4_LOGGER\1, test_\2_l\1},/' \
+		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRCOMMON_LOGGER\1, test_\2_l\1},/' \
 		>>$@
 	@echo "    {0}" >>$@
 	@echo "};" >>$@

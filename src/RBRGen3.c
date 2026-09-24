@@ -68,25 +68,6 @@ const char *RBRGen3Error_name(RBRGen3Error error)
     }
 }
 
-const char *RBRGen3Generation_name(RBRGen3Generation generation)
-{
-    switch (generation) {
-    case RBRGEN3_LOGGER1:
-        return "Logger1";
-    case RBRGEN3_LOGGER2:
-        return "Logger2";
-    case RBRGEN3_LOGGER3:
-        return "Logger3";
-    case RBRGEN3_LOGGER4:
-        return "Logger4";
-    case RBRGEN3_GENERATION_COUNT:
-        return "generation count";
-    case RBRGEN3_UNKNOWN_GENERATION:
-    default:
-        return "unknown generation";
-    }
-}
-
 const char *RBRGen3ResponseType_name(RBRGen3ResponseType type)
 {
     switch (type) {
@@ -106,7 +87,7 @@ const char *RBRGen3ResponseType_name(RBRGen3ResponseType type)
 
 static RBRGen3Error RBRGen3_populateGeneration(RBRGen3 *conn)
 {
-    conn->generation = RBRGEN3_UNKNOWN_GENERATION;
+    conn->generation = RBRCOMMON_UNKNOWN_GENERATION;
 
     /* If this isn't an RBR instrument, it'll just time out or the response
      * won't match. */
@@ -115,20 +96,7 @@ static RBRGen3Error RBRGen3_populateGeneration(RBRGen3 *conn)
         return RBRGEN3_UNSUPPORTED;
     }
 
-    /* The concept of firmware type was introduced part-way through Logger2, so
-     * early instruments with very old firmware won't report a firmware type.
-     * Newer firmware versions and newer instruments within the generation will
-     * report a firmware type of 100–103 (compact and standard loggers) or 200
-     * (the RBRcoda T.ODO). */
-    if (conn->id.fwtype == 0 || (conn->id.fwtype >= 100 && conn->id.fwtype <= 103) ||
-        conn->id.fwtype == 200) {
-        conn->generation = RBRGEN3_LOGGER2;
-    } else if ((conn->id.fwtype >= 104 && conn->id.fwtype <= 110) ||
-               (conn->id.fwtype >= 202 && conn->id.fwtype <= 205)) {
-        conn->generation = RBRGEN3_LOGGER3;
-    } else {
-        conn->generation = RBRGEN3_LOGGER4;
-    }
+    conn->generation = RBRCommonGeneration_fromFwtype(conn->id.fwtype);
     return RBRGEN3_SUCCESS;
 }
 
@@ -157,7 +125,7 @@ RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Callbacks *callbacks,
         return err;
     }
 
-    if (conn->generation != RBRGEN3_LOGGER2 && conn->generation != RBRGEN3_LOGGER3) {
+    if (conn->generation != RBRCOMMON_LOGGER2 && conn->generation != RBRCOMMON_LOGGER3) {
         return RBRGEN3_UNSUPPORTED;
     }
 
@@ -177,7 +145,7 @@ RBRGen3Error RBRGen3_close(RBRGen3 *conn)
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Generation RBRGen3_getGeneration(const RBRGen3 *conn)
+RBRCommonGeneration RBRGen3_getGeneration(const RBRGen3 *conn)
 {
     return conn->generation;
 }

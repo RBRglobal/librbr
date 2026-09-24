@@ -40,7 +40,7 @@ RBRGen3Error RBRGen3_fetch(RBRGen3 *conn, RBRGen3LabelsList *channels, bool slee
      * This function is currently the only case where we have to split a single
      * command across multiple callbacks.
      */
-    if (channels != NULL && channels->count > 0 && conn->generation != RBRGEN3_LOGGER2) {
+    if (channels != NULL && channels->count > 0 && conn->generation != RBRCOMMON_LOGGER2) {
         *commandBufferLength += snprintf(commandBuffer + *commandBufferLength,
                                          sizeof(conn->commandBuffer) - *commandBufferLength,
                                          ", channels =");

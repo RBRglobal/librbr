@@ -27,7 +27,7 @@
 
 RBRGen3Error RBRGen3_getChannelsList(RBRGen3 *conn, RBRGen3ChannelsList *channelsList)
 {
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         return RBRGEN3_UNSUPPORTED;
     }
 
@@ -80,7 +80,7 @@ RBRGen3Error RBRGen3_getChannelsList(RBRGen3 *conn, RBRGen3ChannelsList *channel
 
 RBRGen3Error RBRGen3_getLabelsList(RBRGen3 *conn, RBRGen3LabelsList *labelsList)
 {
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         return RBRGEN3_UNSUPPORTED;
     }
 
@@ -144,7 +144,7 @@ RBRGen3Error RBRGen3_getAvailableOutputFormats(RBRGen3 *conn, RBRGen3OutputForma
     const char *separator;
     int32_t separatorLength;
 
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         command = "outputformat support";
         searchKey = "support";
         separator = ", ";
@@ -349,7 +349,7 @@ RBRGen3Error RBRGen3_setAuxOutput(RBRGen3 *conn, const RBRGen3AuxOutput *auxOutp
 {
     const char *enabledParameter;
     const char *enabledValue;
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         enabledParameter = "state";
         enabledValue = auxOutput->enabled ? "on" : "off";
     } else {

@@ -480,7 +480,7 @@ RBRGen3Error RBRGen3_errorCheckResponse(RBRGen3 *conn, char *beginning, char *en
         /* Logger2 instruments don't distinguish between warnings and errors,
          * so if we get an error response, we'll check whether it needs to be
          * translated into a warning. */
-        if (conn->generation == RBRGEN3_LOGGER2) {
+        if (conn->generation == RBRCOMMON_LOGGER2) {
             for (int i = 0; i < WARNING_NUMBER_COUNT; ++i) {
                 if (conn->response.error != WARNING_NUMBERS[i]) {
                     continue;
@@ -705,7 +705,7 @@ void RBRGen3_parseResponse(RBRGen3 *conn, char **command, RBRGen3ResponseParamet
     while (parameter->nextKey > parameter->value && separatorLength < 0) {
         if (memcmp(parameter->nextKey, PARAMETER_SEPARATOR, PARAMETER_SEPARATOR_LEN) == 0) {
             separatorLength = PARAMETER_SEPARATOR_LEN;
-        } else if (conn->generation == RBRGEN3_LOGGER2 &&
+        } else if (conn->generation == RBRCOMMON_LOGGER2 &&
                    memcmp(parameter->nextKey, ARRAY_SEPARATOR_L2, ARRAY_SEPARATOR_LEN_L2) == 0) {
             separatorLength = ARRAY_SEPARATOR_LEN_L2;
         } else if (memcmp(parameter->nextKey, ARRAY_SEPARATOR_L3, ARRAY_SEPARATOR_LEN_L3) == 0) {
