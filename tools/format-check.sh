@@ -5,6 +5,7 @@ status=0
 for f in src/*.c src/*.h include/*.h testsGen3/*.c testsGen3/*.h \
          examples/posixGen3/*.c examples/posixGen3/*.h \
          examples/posixGen4/*.c examples/posixGen4/*.h \
+         examples/posixMultiGen/*.c examples/posixMultiGen/*.h \
          examples/zephyrGen3/application/src/*.c examples/zephyrGen3/application/src/*.h \
          examples/dynamicCorrectionGen3/*.c \
          testsGen4/*.c testsGen4/*.h

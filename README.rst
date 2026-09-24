@@ -42,7 +42,8 @@ Applications with the Gen3 API compiled
 can call ``RBRGen3_open()``
 and check ``RBRGen3_getGeneration()``
 on ``RBRGEN3_UNSUPPORTED``
-to detect a Gen4 instrument.
+to detect a Gen4 instrument
+(see ``examples/posixMultiGen/posix-detect.c``).
 
 For example:
 
