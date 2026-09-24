@@ -249,10 +249,10 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     } else /* RBRGEN3_UNSUPPORTED */
     {
-        if (instrumentL4->generation != RBRCOMMON_LOGGER4) {
+        if (RBRGen3_getGeneration(instrumentL4) != RBRCOMMON_LOGGER4) {
             fprintf(stderr,
                     "Unexpected generation Logger4 generation: %s.\n",
-                    RBRCommonGeneration_name(instrumentL4->generation));
+                    RBRCommonGeneration_name(RBRGen3_getGeneration(instrumentL4)));
             return EXIT_FAILURE;
         } else {
             printf("Successfully rejected Logger4 test instrument.\n");

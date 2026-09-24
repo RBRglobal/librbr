@@ -661,6 +661,15 @@ typedef struct RBRGen3 {
  * library resources is required. In the event of a successful result,
  * RBRGen3_close() should be used to terminate the instrument connection.
  *
+ * \note When #RBRGEN3_UNSUPPORTED is returned, the connection is not open,
+ *       but RBRGen3_getGeneration() reports the generation that was
+ *       detected (e.g., #RBRCOMMON_LOGGER4 for a 4th-generation instrument,
+ *       or #RBRCOMMON_UNKNOWN_GENERATION if none could be identified).
+ *       Applications built with both APIs can therefore call
+ *       RBRGen3_open() and fall back to RBRGen4_open() on
+ *       #RBRGEN3_UNSUPPORTED. Only RBRGen3_getGeneration() and
+ *       RBRGen3_close() may be used on the connection in that state.
+ *
  * \param [out] conn the context object to populate
  * \param [in] callbacks the set of callbacks to be used by the connection
  * \param [in] commandTimeout the command timeout in milliseconds
@@ -689,6 +698,9 @@ RBRGen3Error RBRGen3_close(RBRGen3 *conn);
 
 /**
  * \brief Get the generation of an instrument.
+ *
+ * \note Also reports the detected generation after RBRGen3_open() returns
+ *       #RBRGEN3_UNSUPPORTED.
  *
  * \param [in] conn the instrument connection
  * \return the instrument generation
