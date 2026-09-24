@@ -382,30 +382,6 @@ typedef struct RBRGen4OutputFormat {
                             .dataType = RBRGEN4_DATA_TYPE_FLOAT32})
 
 /**
- * \brief Instrument `id` command parameters.
- *
- * \see RBRGen4_getId()
- */
-typedef struct RBRGen4Id {
-    /**
-     * \brief The instrument model.
-     *
-     * \readonly
-     */
-    char model[RBRGEN4_ID_MODEL_MAX + 1];
-    /**
-     * \brief The instrument firmware version.
-     *
-     * \readonly
-     */
-    char fwversion[RBRGEN4_ID_VERSION_MAX + 1];
-    /** The serial number of the instrument. */
-    int32_t sn;
-    /** The firmware type of the instrument. */
-    int32_t fwtype;
-} RBRGen4Id;
-
-/**
  * \brief Instrument `id4` command parameters.
  *
  * \see RBRGen4_getId4()

@@ -13,80 +13,11 @@
 
 #include "tests.h"
 
-typedef struct LegacyIdTest {
-    const char *response;
-    RBRGen4Error expectedError;
-    RBRGen4Id expected;
-} LegacyIdTest;
-
 typedef struct IdTest {
     const char *response;
     RBRGen4Error expectedError;
     RBRGen4Id4 expected;
 } IdTest;
-
-TEST_LOGGER4(id)
-{
-    LegacyIdTest tests[] = {
-        {
-            "id model = L4, "
-            "version = 2.0.0, "
-            "serial = 999999, "
-            "fwtype = 150" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .model = "L4",
-                .fwversion = "2.0.0",
-                .sn = 999999,
-                .fwtype = 150,
-            },
-        },
-        /* A response carrying no parameters leaves the struct zeroed. */
-        {
-            "id" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .model = "",
-                .fwversion = "",
-                .sn = 0,
-                .fwtype = 0,
-            },
-        },
-        /*
-         * A name too long for the key buffer must not truncate onto one of
-         * the names we look for: `versionfoo` would become `version` in a
-         * buffer sized to the longest name exactly. Only `model` is read
-         * here.
-         */
-        {
-            "id model = L4, "
-            "versionfoo = 9.9.9" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .model = "L4",
-                .fwversion = "",
-                .sn = 0,
-                .fwtype = 0,
-            },
-        },
-        {0},
-    };
-
-    RBRGen4Error err;
-    RBRGen4Id actual;
-
-    for (int i = 0; tests[i].response != NULL; i++) {
-        TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen4_getId(conn, &actual);
-        TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
-        TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
-        TEST_ASSERT_STR_EQ(tests[i].expected.model, actual.model);
-        TEST_ASSERT_STR_EQ(tests[i].expected.fwversion, actual.fwversion);
-        TEST_ASSERT_EQ(tests[i].expected.sn, actual.sn, "%" PRIi32);
-        TEST_ASSERT_EQ(tests[i].expected.fwtype, actual.fwtype, "%" PRIi32);
-    }
-    return true;
-}
 
 TEST_LOGGER4(id4)
 {
