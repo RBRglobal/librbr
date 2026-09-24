@@ -78,7 +78,6 @@ Firmware Type           Generation Version
 103 (Logger2, standard) Early 2015 v1.440
 104 (Logger3, standard) Late 2017  v1.102 and up
 130/131 (RBRsolo⁴)      Gen4       in development
-140 (SEN⁴)              Gen4       in development
 150 (Logger4, standard) Gen4       in development
 ======================= ========== ==============
 
@@ -115,7 +114,8 @@ select the generations to include:
    # Gen4 only:
    $ make GEN3=0 lib
 
-At least one generation must be enabled.
+At least one generation must be enabled;
+``RBRCommon.h`` is compiled regardless.
 Coming from libRBR 1.2.x?
 The Gen3 API is the 1.x API
 with every file name and identifier

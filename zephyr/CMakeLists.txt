@@ -21,6 +21,8 @@ if(CONFIG_LIBRBR)
 
     zephyr_system_include_directories(${ZEPHYR_CURRENT_MODULE_DIR}/include)
 
+    zephyr_library_sources(${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRCommon.c)
+
     if(CONFIG_LIBRBR_GEN3)
         zephyr_compile_definitions(
             RBRGEN3_COMMAND_BUFFER_MAX=CONFIG_RBRGEN3_COMMAND_BUFFER_MAX
