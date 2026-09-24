@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
         goto serialCleanup;
     }
     printf("Looks like I'm connected to a %s instrument.\n",
-           RBRGen3Generation_name(RBRGen3_getGeneration(&conn)));
+           RBRCommonGeneration_name(RBRGen3_getGeneration(&conn)));
 
     RBRGen3Id id;
     RBRGen3_getId(&conn, &id);

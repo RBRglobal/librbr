@@ -125,7 +125,7 @@ RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn, RBRGen3Serial *serial)
         (RBRGen3SerialBaudRate *) &serial->availableBaudRates;
     RBRGen3SerialMode *availableModes = (RBRGen3SerialMode *) &serial->availableModes;
 
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         *availableBaudRates = RBRGEN3_SERIAL_BAUD_1200 | RBRGEN3_SERIAL_BAUD_2400 |
                               RBRGEN3_SERIAL_BAUD_4800 | RBRGEN3_SERIAL_BAUD_9600 |
                               RBRGEN3_SERIAL_BAUD_19200 | RBRGEN3_SERIAL_BAUD_115200;
@@ -287,7 +287,7 @@ RBRGen3Error RBRGen3_setWiFi(RBRGen3 *conn, const RBRGen3WiFi *wifi)
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         return RBRGen3_converse(conn,
                                 "wifi timeout = %d, commandtimeout = %d",
                                 wifi->powerTimeout / 1000,

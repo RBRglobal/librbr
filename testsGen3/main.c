@@ -249,10 +249,10 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     } else /* RBRGEN3_UNSUPPORTED */
     {
-        if (instrumentL4->generation != RBRGEN3_LOGGER4) {
+        if (instrumentL4->generation != RBRCOMMON_LOGGER4) {
             fprintf(stderr,
                     "Unexpected generation Logger4 generation: %s.\n",
-                    RBRGen3Generation_name(instrumentL4->generation));
+                    RBRCommonGeneration_name(instrumentL4->generation));
             return EXIT_FAILURE;
         } else {
             printf("Successfully rejected Logger4 test instrument.\n");
@@ -278,14 +278,14 @@ int main(int argc, char *argv[])
     int32_t testsTotal = 0;
     int32_t testsPassed = 0;
     for (int32_t i = 0; instrumentTests[i].function != NULL; i++) {
-        if (instrumentTests[i].generation == RBRGEN3_LOGGER2) {
+        if (instrumentTests[i].generation == RBRCOMMON_LOGGER2) {
             testInstrument = instrumentL2;
         } else {
             testInstrument = instrumentL3;
         }
 
         printf("Running %s test \"%s\"...",
-               RBRGen3Generation_name(instrumentTests[i].generation),
+               RBRCommonGeneration_name(instrumentTests[i].generation),
                instrumentTests[i].name);
         ++testsTotal;
         if (instrumentTests[i].function(testInstrument, &ioBuffers)) {

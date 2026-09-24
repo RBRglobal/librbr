@@ -87,25 +87,6 @@ const char *RBRGen4DataType_name(RBRGen4DataType dataType)
     }
 }
 
-const char *RBRGen4Generation_name(RBRGen4Generation generation)
-{
-    switch (generation) {
-    case RBRGEN4_LOGGER1:
-        return "Logger1";
-    case RBRGEN4_LOGGER2:
-        return "Logger2";
-    case RBRGEN4_LOGGER3:
-        return "Logger3";
-    case RBRGEN4_LOGGER4:
-        return "Logger4";
-    case RBRGEN4_GENERATION_COUNT:
-        return "generation count";
-    case RBRGEN4_UNKNOWN_GENERATION:
-    default:
-        return "unknown generation";
-    }
-}
-
 const char *RBRGen4ResponseType_name(RBRGen4ResponseType type)
 {
     switch (type) {
@@ -125,7 +106,7 @@ const char *RBRGen4ResponseType_name(RBRGen4ResponseType type)
 
 static RBRGen4Error RBRGen4_populateGeneration(RBRGen4 *conn)
 {
-    conn->generation = RBRGEN4_UNKNOWN_GENERATION;
+    conn->generation = RBRCOMMON_UNKNOWN_GENERATION;
 
     /* If this isn't an RBR instrument, it'll just time out or the response
      * won't match. */
@@ -135,22 +116,7 @@ static RBRGen4Error RBRGen4_populateGeneration(RBRGen4 *conn)
         return RBRGEN4_UNSUPPORTED;
     }
 
-    /* The concept of firmware type was introduced part-way through Logger2, so
-     * early instruments with very old firmware won't report a firmware type.
-     * Newer firmware versions and newer instruments within the generation will
-     * report a firmware type of 100–103 (compact and standard loggers) or 200
-     * (the RBRcoda T.ODO). This classification mirrors the Gen3 library's
-     * (see RBRGen3.c) so the two APIs always agree on an instrument's
-     * generation. */
-    if (conn->id.fwtype == 0 || (conn->id.fwtype >= 100 && conn->id.fwtype <= 103) ||
-        conn->id.fwtype == 200) {
-        conn->generation = RBRGEN4_LOGGER2;
-    } else if ((conn->id.fwtype >= 104 && conn->id.fwtype <= 110) ||
-               (conn->id.fwtype >= 202 && conn->id.fwtype <= 205)) {
-        conn->generation = RBRGEN4_LOGGER3;
-    } else {
-        conn->generation = RBRGEN4_LOGGER4;
-    }
+    conn->generation = RBRCommonGeneration_fromFwtype(conn->id.fwtype);
     return RBRGEN4_SUCCESS;
 }
 
@@ -185,7 +151,7 @@ RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Callbacks *callbacks,
         return err;
     }
 
-    if (conn->generation != RBRGEN4_LOGGER4) {
+    if (conn->generation != RBRCOMMON_LOGGER4) {
         return RBRGEN4_UNSUPPORTED;
     }
 
@@ -211,7 +177,7 @@ RBRGen4Error RBRGen4_close(RBRGen4 *conn)
     memset(conn, 0, sizeof(RBRGen4));
     return RBRGEN4_SUCCESS;
 }
-RBRGen4Generation RBRGen4_getGeneration(const RBRGen4 *conn)
+RBRCommonGeneration RBRGen4_getGeneration(const RBRGen4 *conn)
 {
     return conn->generation;
 }

@@ -85,7 +85,7 @@ RBRGen3Error RBRGen3_getThresholding(RBRGen3 *conn, RBRGen3Thresholding *thresho
         } else if (strcmp(parameter.key, "enabled") == 0) {
             threshold->enabled = (strcmp(parameter.value, "true") == 0);
         } else if (strcmp(parameter.key, "state") == 0) {
-            if (conn->generation == RBRGEN3_LOGGER2) {
+            if (conn->generation == RBRCOMMON_LOGGER2) {
                 threshold->enabled = (strcmp(parameter.value, "on") == 0);
             } else {
                 for (int i = RBRGEN3_GATING_NA; i < RBRGEN3_GATING_COUNT; i++) {
@@ -125,7 +125,7 @@ RBRGen3Error RBRGen3_setThresholding(RBRGen3 *conn, const RBRGen3Thresholding *t
         (threshold->channelSelection == RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX &&
          (threshold->channelIndex < 1 || threshold->channelIndex > RBRGEN3_CHANNEL_MAX)) ||
         (threshold->channelSelection == RBRGEN3_THRESHOLD_CHANNEL_BY_LABEL &&
-         (conn->generation == RBRGEN3_LOGGER2 || strlen(threshold->channelLabel) == 0)) ||
+         (conn->generation == RBRCOMMON_LOGGER2 || strlen(threshold->channelLabel) == 0)) ||
         threshold->condition < RBRGEN3_THRESHOLDING_ABOVE ||
         threshold->condition > RBRGEN3_THRESHOLDING_BELOW || threshold->interval <= 0 ||
         threshold->interval > RBRGEN3_SAMPLING_PERIOD_MAX ||
@@ -138,7 +138,7 @@ RBRGen3Error RBRGen3_setThresholding(RBRGen3 *conn, const RBRGen3Thresholding *t
     const char *channelParameter;
     char channelValue[RBRGEN3_CHANNEL_LABEL_MAX + 1];
 
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         enabledParameter = "state";
         enabledValue = (threshold->enabled) ? "on" : "off";
         channelParameter = "channel";
@@ -186,7 +186,7 @@ RBRGen3Error RBRGen3_getTwistActivation(RBRGen3 *conn, RBRGen3TwistActivation *t
         } else if (strcmp(parameter.key, "enabled") == 0) {
             twistActivation->enabled = (strcmp(parameter.value, "true") == 0);
         } else if (strcmp(parameter.key, "state") == 0) {
-            if (conn->generation == RBRGEN3_LOGGER2) {
+            if (conn->generation == RBRCOMMON_LOGGER2) {
                 twistActivation->enabled = (strcmp(parameter.value, "on") == 0);
             } else {
                 for (int i = RBRGEN3_GATING_NA; i < RBRGEN3_GATING_COUNT; i++) {
@@ -208,7 +208,7 @@ RBRGen3Error RBRGen3_setTwistActivation(RBRGen3 *conn,
     const char *enabledParameter;
     const char *enabledValue;
 
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         enabledParameter = "state";
         enabledValue = (twistActivation->enabled) ? "on" : "off";
     } else {

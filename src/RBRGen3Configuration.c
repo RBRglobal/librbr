@@ -104,7 +104,7 @@ static RBRGen3Error RBRGen3_getChannelCoefficients(RBRGen3 *conn, int32_t channe
 
 static RBRGen3Error RBRGen3_getChannel(RBRGen3 *conn, int32_t channelIndex, RBRGen3Channel *channel)
 {
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         RBR_TRY(
             RBRGen3_converse(conn, "channel %d all derived gain gainsavailable", channelIndex + 1));
     } else {
@@ -430,7 +430,7 @@ RBRGen3Error RBRGen3_getSensorParameter(RBRGen3 *conn, RBRGen3ChannelIndex chann
      * because we need to suppress that error. */
     err = RBRGen3_converse(conn, "sensor %d %s", channel, parameter->key);
 
-    if (conn->generation == RBRGEN3_LOGGER2 && err == RBRGEN3_HARDWARE_ERROR &&
+    if (conn->generation == RBRCOMMON_LOGGER2 && err == RBRGEN3_HARDWARE_ERROR &&
         (conn->response.error == RBRGEN3_HARDWARE_ERROR_ITEM_IS_NOT_CONFIGURED)) {
         snprintf(parameter->value, sizeof(parameter->value), "n/a");
         conn->response.type = RBRGEN3_RESPONSE_INFO;
@@ -474,7 +474,7 @@ RBRGen3Error RBRGen3_getSensorParameters(RBRGen3 *conn, RBRGen3ChannelIndex chan
      * we need to suppress that error. */
     err = RBRGen3_converse(conn, "sensor %d", channel);
 
-    if (conn->generation == RBRGEN3_LOGGER2 && err == RBRGEN3_HARDWARE_ERROR &&
+    if (conn->generation == RBRCOMMON_LOGGER2 && err == RBRGEN3_HARDWARE_ERROR &&
         (conn->response.error == RBRGEN3_HARDWARE_ERROR_FEATURE_NOT_AVAILABLE)) {
         conn->response.type = RBRGEN3_RESPONSE_INFO;
         return RBRGEN3_SUCCESS;

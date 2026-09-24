@@ -67,7 +67,7 @@ RBRGen3Error RBRGen3_disable(RBRGen3 *conn, RBRGen3DeploymentStatus *status)
     *status = RBRGEN3_UNKNOWN_STATUS;
 
     const char *disableCommand;
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         disableCommand = "stop";
     } else {
         disableCommand = "disable";

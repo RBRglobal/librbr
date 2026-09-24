@@ -349,7 +349,7 @@ typedef struct InstrumentTest {
     /** \brief The name of the test. */
     const char *name;
     /** \brief The instrument generation to which this test applies. */
-    RBRGen4Generation generation;
+    RBRCommonGeneration generation;
     /** \brief The test to be run. */
     InstrumentTestFunction *function;
 } InstrumentTest;

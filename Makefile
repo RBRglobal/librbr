@@ -250,7 +250,7 @@ testsGen3/tests.c: $(foreach module,$(GEN3_TEST_MODULES),testsGen3/$(module).c)
 		| sed -e 's/$$/;/' >>$@
 	@echo "InstrumentTest instrumentTests[] = {" >>$@
 	@grep -ho 'TEST_LOGGER[23]([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRGEN3_LOGGER\1, test_\2_l\1},/' \
+		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRCOMMON_LOGGER\1, test_\2_l\1},/' \
 		>>$@
 	@echo "    {0}" >>$@
 	@echo "};" >>$@
@@ -280,7 +280,7 @@ testsGen4/tests.c: $(foreach module,$(GEN4_TEST_MODULES),testsGen4/$(module).c)
 		| sed -e 's/$$/;/' >>$@
 	@echo "InstrumentTest instrumentTests[] = {" >>$@
 	@grep -ho 'TEST_LOGGER[4]([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRGEN4_LOGGER\1, test_\2_l\1},/' \
+		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRCOMMON_LOGGER\1, test_\2_l\1},/' \
 		>>$@
 	@echo "    {0}" >>$@
 	@echo "};" >>$@

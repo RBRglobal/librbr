@@ -95,7 +95,7 @@ RBRGen3Error RBRGen3_getClock(RBRGen3 *conn, RBRGen3Clock *clock)
     clock->dateTime = 0;
     clock->offsetFromUtc = NAN;
 
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         return RBRGen3_getClockL2(conn, clock);
     } else {
         return RBRGen3_getClockL3(conn, clock);
@@ -144,7 +144,7 @@ RBRGen3Error RBRGen3_setClock(RBRGen3 *conn, const RBRGen3Clock *clock)
     char dateTime[RBRGEN3_SCHEDULE_TIME_LEN + 1];
     RBRGen3DateTime_toScheduleTime(clock->dateTime, dateTime);
 
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         return RBRGen3_setClockL2(conn, dateTime, clock->offsetFromUtc);
     } else {
         return RBRGen3_setClockL3(conn, dateTime, clock->offsetFromUtc);
@@ -226,7 +226,7 @@ RBRGen3Error RBRGen3_getSampling(RBRGen3 *conn, RBRGen3Sampling *sampling)
      * = none, userperiodlimit = 63, availablefastperiods = 500|250|125|63
      */
     const char *generationCommand;
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         generationCommand = "sampling";
     } else {
         generationCommand = "sampling all";
@@ -266,7 +266,7 @@ RBRGen3Error RBRGen3_getSampling(RBRGen3 *conn, RBRGen3Sampling *sampling)
 
             /* Logger3 will tell us available sampling rates, so we don't have
              * to guess them. */
-            if (conn->generation != RBRGEN3_LOGGER2) {
+            if (conn->generation != RBRCOMMON_LOGGER2) {
                 continue;
             }
 
@@ -510,7 +510,7 @@ RBRGen3Error RBRGen3_getDeployment(RBRGen3 *conn, RBRGen3Deployment *deployment)
 
     *(RBRGen3DeploymentStatus *) &deployment->status = RBRGEN3_UNKNOWN_STATUS;
 
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         return RBRGen3_getDeploymentL2(conn, deployment);
     } else {
         return RBRGen3_getDeploymentL3(conn, deployment);
@@ -534,7 +534,7 @@ RBRGen3Error RBRGen3_setDeployment(RBRGen3 *conn, const RBRGen3Deployment *deplo
 
     /* As with reading deployment details, we'll have to call the starttime/
      * endtime commands each in turn for Logger2. */
-    if (conn->generation == RBRGEN3_LOGGER2) {
+    if (conn->generation == RBRCOMMON_LOGGER2) {
         RBR_TRY(RBRGen3_converse(conn, "starttime = %s", startTime));
         RBR_TRY(RBRGen3_converse(conn, "endtime = %s", endTime));
     } else {
