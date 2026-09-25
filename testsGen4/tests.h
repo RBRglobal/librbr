@@ -78,7 +78,7 @@ extern "C" {
  * name and line number on which the macro invocation occurs and the expected
  * and actual values, and the surrounding function will `return false;`.
  *
- * Because \a _expected, \a _actual, and \a _type will be evaluated multiple
+ * Because \a _expected, \a _actual, and \a _eps will be evaluated multiple
  * times by the macro, do not pass expressions having side effects.
  *
  * \param [in] _expected the expected value
@@ -105,8 +105,8 @@ extern "C" {
  * name and line number on which the macro invocation occurs and the expected
  * and actual members, and the surrounding function will `return false;`.
  *
- * Because \a _expected, \a _actual, and \a _type will be evaluated multiple
- * times by the macro, do not pass expressions having side effects.
+ * Because \a _expected and \a _actual will be evaluated multiple times by
+ * the macro, do not pass expressions having side effects.
  *
  * \param [in] _expected the expected enum member
  * \param [in] _actual the actual enum member
@@ -132,8 +132,8 @@ extern "C" {
  * name and line number on which the macro invocation occurs and the expected
  * and actual strings, and the surrounding function will `return false;`.
  *
- * Because \a _expected, \a _actual, and \a _type will be evaluated multiple
- * times by the macro, do not pass expressions having side effects.
+ * Because \a _expected and \a _actual will be evaluated multiple times by
+ * the macro, do not pass expressions having side effects.
  *
  * \param [in] _expected the expected string
  * \param [in] _actual the actual string
