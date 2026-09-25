@@ -22,6 +22,8 @@
 #include "RBRGen4.h"
 #include "RBRGen4Internal.h"
 #include "RBRGen4Deployment.h"
+#include "RBRGen4Configuration.h"
+#include "RBRGen4Instrument.h"
 
 RBRGen4Error RBRGen4_getClock(RBRGen4 *conn, RBRGen4Clock *clock)
 {

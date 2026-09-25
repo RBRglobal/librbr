@@ -28,6 +28,7 @@
 
 #include "posix-shared.h"
 #include "RBRGen3Commands.h"
+#include "RBRGen4Commands.h"
 
 const char *programName = "";
 

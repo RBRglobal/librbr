@@ -12,6 +12,7 @@
 #include <inttypes.h>
 
 #include "tests.h"
+#include "RBRGen4Memory.h"
 
 typedef struct GetStorageTest {
     const char *response;

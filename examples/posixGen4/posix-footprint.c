@@ -16,6 +16,7 @@
 #include <stdlib.h>
 
 #include "RBRGen4.h"
+#include "RBRGen4Commands.h"
 
 #define PRINT_SIZE(type) printf("%-26s %6zu bytes\n", #type, sizeof(type))
 

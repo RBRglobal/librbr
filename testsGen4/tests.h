@@ -26,6 +26,11 @@ extern "C" {
 #include <string.h>
 
 #include "RBRGen4.h"
+/* Required for the pool types in the *_POOL_DECL macros. */
+#include "RBRGen4Configuration.h"
+#include "RBRGen4Memory.h"
+/* Required for RBRGen4Sample. */
+#include "RBRGen4Realtime.h"
 
 /**
  * \brief Assert that a condition is true.

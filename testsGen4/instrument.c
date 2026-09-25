@@ -12,6 +12,7 @@
 #include <math.h>
 
 #include "tests.h"
+#include "RBRGen4Instrument.h"
 
 typedef struct IdTest {
     const char *response;

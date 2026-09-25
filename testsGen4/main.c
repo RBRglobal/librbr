@@ -13,6 +13,7 @@
 
 #include "RBRGen4.h"
 #include "tests.h"
+#include "RBRGen4Realtime.h"
 
 char *rbr_strnesccntrl(char *destination, const char *source, size_t num)
 {
