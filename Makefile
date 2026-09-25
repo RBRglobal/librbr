@@ -146,10 +146,9 @@ GEN4_OBJECTS := src/RBRGen4.o \
                 src/RBRGen4Realtime.o
 
 LIB_OBJECTS := $(COMMON_OBJECTS)
-DYNAMICCORRECTION_OBJECTS :=
+DYNAMICCORRECTION_OBJECTS := src/RBRDynamicCorrection.o
 ifeq ($(GEN3),1)
 LIB_OBJECTS += $(GEN3_OBJECTS)
-DYNAMICCORRECTION_OBJECTS += src/RBRDynamicCorrection.o
 endif
 ifeq ($(GEN4),1)
 LIB_OBJECTS += $(GEN4_OBJECTS)

@@ -111,7 +111,8 @@ pipelines:
                                 --board=$board \
                                 --build-dir=build-$board/ \
                                 -- \
-                                -DEXTRA_CONF_FILE=debug.conf;
+                                -DEXTRA_CONF_FILE=debug.conf \
+                                -DCONFIG_LIBRBR_DYNAMIC_CORRECTION=y;
                         done
 
             # To save time, and under the assumption that the quality and

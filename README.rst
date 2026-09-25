@@ -139,7 +139,8 @@ but its error constants now carry the ``RBRDYNAMICCORRECTION_`` prefix
 and ``DYN_CORR_BAD_PARAMS`` is now ``RBRDYNAMICCORRECTION_BAD_PARAMS``).
 When building as a Zephyr module,
 the equivalent Kconfig options are
-``CONFIG_LIBRBR_GEN3`` and ``CONFIG_LIBRBR_GEN4``.
+``CONFIG_LIBRBR_GEN3`` and ``CONFIG_LIBRBR_GEN4``;
+dynamic correction is opt-in with ``CONFIG_LIBRBR_DYNAMIC_CORRECTION``.
 
 Library compilation requires a C99-compliant C compiler;
 The library makes a few assumptions

@@ -27,6 +27,15 @@ config LIBRBR_GEN4
         Compile the RBRGen4-prefixed API for Generation 4
         (SL4/SEN4/L4) instruments.
 
+# Dynamic correction is independent of the generation options above.
+config LIBRBR_DYNAMIC_CORRECTION
+    bool "Dynamic correction"
+    default n
+    help
+        Compile the RBRDynamicCorrection module, which is independent of
+        instrument generation. Mirrors the libdynamiccorrection target of
+        the standalone Makefile build.
+
 if LIBRBR_GEN3
 
 # The following settings are reproduced from RBRGen3.h. See
