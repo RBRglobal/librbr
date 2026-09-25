@@ -8,7 +8,6 @@ Gen3 API
    RBRGen3Communication
    RBRGen3Configuration
    RBRGen3Deployment
-   RBRGen3DynamicCorrection
    RBRGen3Fetching
    RBRGen3Gating
    RBRGen3HardwareErrors

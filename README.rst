@@ -126,13 +126,17 @@ Coming from libRBR 1.2.x?
 The Gen3 API is the 1.x API
 with every file name and identifier
 carrying the ``RBRGen3`` prefix:
-``RBRInstrument`` became ``RBRGen3``,
-``RBRParser`` became ``RBRGen3Parser``,
-and ``RBRDynamicCorrection`` became ``RBRGen3DynamicCorrection``
+``RBRInstrument`` became ``RBRGen3``
+and ``RBRParser`` became ``RBRGen3Parser``
 (``RBRInstrument_open()`` is now ``RBRGen3_open()``,
 ``RBRINSTRUMENT_SUCCESS`` is now ``RBRGEN3_SUCCESS``,
 and ``RBRInstrument.h`` is now ``RBRGen3.h``);
 the behaviour is unchanged.
+``RBRDynamicCorrection`` is not generation-specific
+and keeps its 1.x name,
+but its error constants now carry the ``RBRDYNAMICCORRECTION_`` prefix
+(``RBR_DCORR_SUCCESS`` is now ``RBRDYNAMICCORRECTION_SUCCESS``,
+and ``DYN_CORR_BAD_PARAMS`` is now ``RBRDYNAMICCORRECTION_BAD_PARAMS``).
 When building as a Zephyr module,
 the equivalent Kconfig options are
 ``CONFIG_LIBRBR_GEN3`` and ``CONFIG_LIBRBR_GEN4``.
@@ -206,7 +210,7 @@ or test with .csv file:
 
 .. code-block:: sh
 
-   $ cd <PATH>/librbr/examples/dynamicCorrectionGen3
+   $ cd <PATH>/librbr/examples/dynamicCorrection
    # Build the example:
    $ make
    # Test with the example file:
@@ -223,7 +227,7 @@ Assuming cygwin is used, and current path is ``<PATH>/librbr``:
    $ make libdynamiccorrection
 
    # Continue with commands below if one wants to use the example provided:
-   $ cd <PATH>/librbr/examples/dynamiccorrection
+   $ cd <PATH>/librbr/examples/dynamicCorrection
    # Build the example:
    $ make
    # Test with the example file:

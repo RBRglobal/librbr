@@ -1,5 +1,5 @@
 /**
- * \file RBRGen3DynamicCorrection.c
+ * \file RBRDynamicCorrection.c
  *
  * \brief Library for salinity dynamic correction
  *
@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "RBRGen3DynamicCorrection.h"
+#include "RBRDynamicCorrection.h"
 
 /* need to using C99 standard to get NAN and isnan().
  * (some alternative definition otherwise) */
@@ -66,7 +66,7 @@
  * \param [in] P Sea Pressure
  * \return Salinity
  */
-float RBRGen3DynamicCorrection_PSS78(float C, float T, float P)
+float RBRDynamicCorrection_PSS78(float C, float T, float P)
 {
     float pressure;
     float T_its68;
@@ -131,8 +131,7 @@ float RBRGen3DynamicCorrection_PSS78(float C, float T, float P)
 }
 
 /* Precalculate some factors/index used for temperature interpolation */
-static int RBRGen3DynamicCorrection_initCorrectionCoeff(RBRGen3DynamicCorrectionParams *params,
-                                                        float Fs)
+static int RBRDynamicCorrection_initCorrectionCoeff(RBRDynamicCorrectionParams *params, float Fs)
 {
     params->_lagIndex = (int) (Fs * params->t_delay);
     params->_phi = (params->t_delay - params->_lagIndex / Fs) * Fs;
@@ -149,7 +148,7 @@ static int RBRGen3DynamicCorrection_initCorrectionCoeff(RBRGen3DynamicCorrection
 }
 
 /* initial arrays */
-static void RBRGen3DynamicCorrection_initLagArray(RBRGen3DynamicCorrectionParams *params)
+static void RBRDynamicCorrection_initLagArray(RBRDynamicCorrectionParams *params)
 {
     int k;
 
@@ -164,8 +163,7 @@ static void RBRGen3DynamicCorrection_initLagArray(RBRGen3DynamicCorrectionParams
 }
 
 /* apply temperature interpolation */
-static float RBRGen3DynamicCorrection_applyTempCorr(RBRGen3DynamicCorrectionParams *params,
-                                                    float T_meas)
+static float RBRDynamicCorrection_applyTempCorr(RBRDynamicCorrectionParams *params, float T_meas)
 {
     float T_cor;
 
@@ -176,7 +174,7 @@ static float RBRGen3DynamicCorrection_applyTempCorr(RBRGen3DynamicCorrectionPara
 }
 
 /* sanity check on data */
-static int32_t RBRGen3DynamicCorrection_checkData(RBRGen3DynamicCorrectionMeasurement *measIn)
+static int32_t RBRDynamicCorrection_checkData(RBRDynamicCorrectionMeasurement *measIn)
 {
     int32_t isError = 0;
 
@@ -194,8 +192,8 @@ static int32_t RBRGen3DynamicCorrection_checkData(RBRGen3DynamicCorrectionMeasur
 }
 
 /* resample all lagged variables using new sampling rate */
-static void RBRGen3DynamicCorrection_resampleLag(RBRGen3DynamicCorrectionParams *params,
-                                                 int64_t timestamp, float Fs)
+static void RBRDynamicCorrection_resampleLag(RBRDynamicCorrectionParams *params, int64_t timestamp,
+                                             float Fs)
 {
     int64_t timestamp_array[DCORR_MAX_LAG_ARRAY];
     float C_meas_array[DCORR_MAX_LAG_ARRAY];
@@ -249,9 +247,9 @@ static void RBRGen3DynamicCorrection_resampleLag(RBRGen3DynamicCorrectionParams 
 }
 
 /* update all lagged variables */
-static int32_t RBRGen3DynamicCorrection_updateLag(RBRGen3DynamicCorrectionParams *params,
-                                                  const RBRGen3DynamicCorrectionMeasurement *measIn,
-                                                  RBRGen3DynamicCorrectionMeasurement *meas_out)
+static int32_t RBRDynamicCorrection_updateLag(RBRDynamicCorrectionParams *params,
+                                              const RBRDynamicCorrectionMeasurement *measIn,
+                                              RBRDynamicCorrectionMeasurement *meas_out)
 {
     int32_t lagIndex;
     int32_t isValid;
@@ -288,12 +286,12 @@ static int32_t RBRGen3DynamicCorrection_updateLag(RBRGen3DynamicCorrectionParams
     return isValid;
 }
 
-RBRGen3DynamicCorrectionError
-RBRGen3DynamicCorrection_update_Fs(RBRGen3DynamicCorrectionParams *params, float Fs)
+RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionParams *params,
+                                                         float Fs)
 {
     /* sanity check */
     if (DCORR_MAX_LAG_ARRAY / Fs < DCORR_T_DELAY) {
-        return RBRGEN3DYNAMICCORRECTION_INVALID_SAMPLING_RATE;
+        return RBRDYNAMICCORRECTION_INVALID_SAMPLING_RATE;
     }
 
     /* parameters _cte_a and _cte_b no longer valid.
@@ -304,16 +302,16 @@ RBRGen3DynamicCorrection_update_Fs(RBRGen3DynamicCorrectionParams *params, float
     /* not enough info to update, keep unchanged */
     params->_T_short_lag = params->_T_short_lag;
 
-    RBRGen3DynamicCorrection_initCorrectionCoeff(params, Fs);
-    RBRGen3DynamicCorrection_resampleLag(params, params->_timestamp_lagArray[0], Fs);
+    RBRDynamicCorrection_initCorrectionCoeff(params, Fs);
+    RBRDynamicCorrection_resampleLag(params, params->_timestamp_lagArray[0], Fs);
 
-    return RBRGEN3DYNAMICCORRECTION_SUCCESS;
+    return RBRDYNAMICCORRECTION_SUCCESS;
 }
 
 /* calculate the ascent rate (in our case, using the pressure as unit).
  * return Vp (positive for ascent, negative for descent)*/
-float RBRGen3DynamicCorrection_calcAscentRate(RBRGen3DynamicCorrectionParams *params,
-                                              int64_t timestamp, float pressure)
+float RBRDynamicCorrection_calcAscentRate(RBRDynamicCorrectionParams *params, int64_t timestamp,
+                                          float pressure)
 {
     float Vp = params->_ascentRate;
 
@@ -346,7 +344,7 @@ float RBRGen3DynamicCorrection_calcAscentRate(RBRGen3DynamicCorrectionParams *pa
     return Vp;
 }
 
-void RBRGen3DynamicCorrection_updateVariables(RBRGen3DynamicCorrectionParams *params, float Vp)
+void RBRDynamicCorrection_updateVariables(RBRDynamicCorrectionParams *params, float Vp)
 {
 
     /* for evaluation of 'alpha', 'tau' and 'CT_coeff',
@@ -369,29 +367,29 @@ void RBRGen3DynamicCorrection_updateVariables(RBRGen3DynamicCorrectionParams *pa
     params->_cte_b = 1.0f - 2.0f * factor;
 }
 
-static void RBRGen3DynamicCorrection_updatePressure(RBRGen3DynamicCorrectionParams *params,
-                                                    int64_t timestamp, float pressure)
+static void RBRDynamicCorrection_updatePressure(RBRDynamicCorrectionParams *params,
+                                                int64_t timestamp, float pressure)
 {
-    float Vp = RBRGen3DynamicCorrection_calcAscentRate(params, timestamp, pressure);
+    float Vp = RBRDynamicCorrection_calcAscentRate(params, timestamp, pressure);
 
-    RBRGen3DynamicCorrection_updateVariables(params, Vp);
+    RBRDynamicCorrection_updateVariables(params, Vp);
 }
 
-RBRGen3DynamicCorrectionError RBRGen3DynamicCorrection_init(RBRGen3DynamicCorrectionParams *params,
-                                                            float Fs, float t_delay, float alpha_a,
-                                                            float alpha_e, float tau_a, float tau_e,
-                                                            float ctcoeff_a, float ctcoeff_e,
-                                                            float Vp_min, float Vp_max, float Vp_fc)
+RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *params, float Fs,
+                                                    float t_delay, float alpha_a, float alpha_e,
+                                                    float tau_a, float tau_e, float ctcoeff_a,
+                                                    float ctcoeff_e, float Vp_min, float Vp_max,
+                                                    float Vp_fc)
 {
     /* sanity check */
     if (DCORR_MAX_LAG_ARRAY / Fs < DCORR_T_DELAY) {
-        return RBRGEN3DYNAMICCORRECTION_BAD_PARAMS;
+        return RBRDYNAMICCORRECTION_BAD_PARAMS;
     }
     if (Vp_min < 0.0f || Vp_max < 0.0f) {
-        return RBRGEN3DYNAMICCORRECTION_BAD_PARAMS;
+        return RBRDYNAMICCORRECTION_BAD_PARAMS;
     }
     if (Vp_max < Vp_min) {
-        return RBRGEN3DYNAMICCORRECTION_BAD_PARAMS;
+        return RBRDYNAMICCORRECTION_BAD_PARAMS;
     }
 
     params->Fs = Fs;
@@ -420,20 +418,20 @@ RBRGen3DynamicCorrectionError RBRGen3DynamicCorrection_init(RBRGen3DynamicCorrec
     /* we don't want uninitialiazed values, but we don't know
      * the ascent rate yet.  Let just use the mid-point for now,
      * this will get re-evaluated in _addMeasurement() anyway */
-    RBRGen3DynamicCorrection_updateVariables(params, 0.5f * (Vp_min + Vp_max));
+    RBRDynamicCorrection_updateVariables(params, 0.5f * (Vp_min + Vp_max));
 
-    RBRGen3DynamicCorrection_initCorrectionCoeff(params, Fs);
-    RBRGen3DynamicCorrection_initLagArray(params);
+    RBRDynamicCorrection_initCorrectionCoeff(params, Fs);
+    RBRDynamicCorrection_initLagArray(params);
 
-    return RBRGEN3DYNAMICCORRECTION_SUCCESS;
+    return RBRDYNAMICCORRECTION_SUCCESS;
 }
 
-RBRGen3DynamicCorrectionError
-RBRGen3DynamicCorrection_addMeasurement(RBRGen3DynamicCorrectionParams *params,
-                                        const RBRGen3DynamicCorrectionMeasurement *measIn,
-                                        RBRGen3DynamicCorrectionResult *corrMeasOut)
+RBRDynamicCorrectionError
+RBRDynamicCorrection_addMeasurement(RBRDynamicCorrectionParams *params,
+                                    const RBRDynamicCorrectionMeasurement *measIn,
+                                    RBRDynamicCorrectionResult *corrMeasOut)
 {
-    RBRGen3DynamicCorrectionMeasurement measLagged;
+    RBRDynamicCorrectionMeasurement measLagged;
     float T_cor, T_cell;
     float T_short, T_long;
     int64_t timestamp;
@@ -441,7 +439,7 @@ RBRGen3DynamicCorrection_addMeasurement(RBRGen3DynamicCorrectionParams *params,
     float S_cor;
     int isValid = 0;
     int isDataError = 0;
-    RBRGen3DynamicCorrectionError statusCode = RBRGEN3DYNAMICCORRECTION_UNKNOWN_ERROR;
+    RBRDynamicCorrectionError statusCode = RBRDYNAMICCORRECTION_UNKNOWN_ERROR;
 
     /* flag to indicate 'fast sampling (>= 1Hz)'.
      * In this case, the data won't go through the 0.35s lag and
@@ -458,7 +456,7 @@ RBRGen3DynamicCorrection_addMeasurement(RBRGen3DynamicCorrectionParams *params,
     /* Interpolate the temperature with time offset 't_delay'.
      * (only for >= 1Hz data rate) */
     if (params->_isFasterSampling) {
-        T_cor = RBRGen3DynamicCorrection_applyTempCorr(params, T_meas);
+        T_cor = RBRDynamicCorrection_applyTempCorr(params, T_meas);
     } else {
         T_cor = T_meas;
     }
@@ -468,23 +466,23 @@ RBRGen3DynamicCorrection_addMeasurement(RBRGen3DynamicCorrectionParams *params,
      * got a lag delay of 0.35s.  Since the first pass of the filter need to
      * be initialiazed anyway, this will do the trick since the data will need to feed
      * multiple time before reaching the 0.35s mark */
-    RBRGen3DynamicCorrection_updatePressure(params, measIn->timestamp, measIn->pressure);
+    RBRDynamicCorrection_updatePressure(params, measIn->timestamp, measIn->pressure);
 
     /* the variables need to be delayed until all samples are available for calculation
      * (only when rate >= 1Hz) */
-    isValid = RBRGen3DynamicCorrection_updateLag(params, measIn, &measLagged);
+    isValid = RBRDynamicCorrection_updateLag(params, measIn, &measLagged);
 
     if (!params->_isFasterSampling) {
         /* ignore the lag, just copy the data to the variable */
         isValid = 1;
-        memcpy(&measLagged, measIn, sizeof(RBRGen3DynamicCorrectionMeasurement));
+        memcpy(&measLagged, measIn, sizeof(RBRDynamicCorrectionMeasurement));
     }
 
     if (!isValid) {
-        statusCode = RBRGEN3DYNAMICCORRECTION_NOT_VALID_YET;
+        statusCode = RBRDYNAMICCORRECTION_NOT_VALID_YET;
     } else {
         /* check input */
-        isDataError = RBRGen3DynamicCorrection_checkData(&measLagged);
+        isDataError = RBRDynamicCorrection_checkData(&measLagged);
 
         /* if T_cor ever become NAN, it will not recover
          * (all other variables will eventually cleared once correct data is available) */
@@ -514,7 +512,7 @@ RBRGen3DynamicCorrection_addMeasurement(RBRGen3DynamicCorrectionParams *params,
         T_cell = T_cor + T_long - T_short;
 
         /* calculate salinity based on corrected values */
-        S_cor = RBRGen3DynamicCorrection_PSS78(C_meas, T_cell, P_meas);
+        S_cor = RBRDynamicCorrection_PSS78(C_meas, T_cell, P_meas);
 
         /* update lagged variables */
         params->_T_short_lag = T_short;
@@ -527,12 +525,12 @@ RBRGen3DynamicCorrection_addMeasurement(RBRGen3DynamicCorrectionParams *params,
         corrMeasOut->pressure = P_meas;
         corrMeasOut->corrSalinity = S_cor;
 
-        statusCode = RBRGEN3DYNAMICCORRECTION_SUCCESS;
+        statusCode = RBRDYNAMICCORRECTION_SUCCESS;
     }
 
     /* flag the data with potential issue */
     if (isDataError) {
-        statusCode = RBRGEN3DYNAMICCORRECTION_CORRUPTED;
+        statusCode = RBRDYNAMICCORRECTION_CORRUPTED;
     }
 
     return statusCode;

@@ -14,7 +14,7 @@
 #include <math.h>
 
 #define _DEBUG 1
-#include "RBRGen3DynamicCorrection.h"
+#include "RBRDynamicCorrection.h"
 
 /* ---- retrieve data from CSV ----- */
 
@@ -44,29 +44,29 @@ typedef struct {
 
 /* just replay data all the data from CSV file and store
  * back result into another csv file for analysis */
-void RBRGen3DynamicCorrection_replayData(FILE *file, csvData_t *data, float Fs)
+void RBRDynamicCorrection_replayData(FILE *file, csvData_t *data, float Fs)
 {
-    RBRGen3DynamicCorrectionParams params;
-    RBRGen3DynamicCorrectionError status;
-    RBRGen3DynamicCorrectionMeasurement meas;
-    RBRGen3DynamicCorrectionResult corrResult;
+    RBRDynamicCorrectionParams params;
+    RBRDynamicCorrectionError status;
+    RBRDynamicCorrectionMeasurement meas;
+    RBRDynamicCorrectionResult corrResult;
     int index;
 
     /* first step, initialiaze the algorithm */
-    status = RBRGen3DynamicCorrection_init(&params,
-                                           Fs,
-                                           DCORR_T_DELAY,
-                                           DCORR_ALPHA_A,
-                                           DCORR_ALPHA_E,
-                                           DCORR_TAU_A,
-                                           DCORR_TAU_E,
-                                           DCORR_CT_COEFF_A,
-                                           DCORR_CT_COEFF_E,
-                                           DCORR_VP_MIN,
-                                           DCORR_VP_MAX,
-                                           DCORR_VP_FC);
-    if (status != RBRGEN3DYNAMICCORRECTION_SUCCESS) {
-        fprintf(stderr, "RBRGen3DynamicCorrection_init() return error code %u", status);
+    status = RBRDynamicCorrection_init(&params,
+                                       Fs,
+                                       DCORR_T_DELAY,
+                                       DCORR_ALPHA_A,
+                                       DCORR_ALPHA_E,
+                                       DCORR_TAU_A,
+                                       DCORR_TAU_E,
+                                       DCORR_CT_COEFF_A,
+                                       DCORR_CT_COEFF_E,
+                                       DCORR_VP_MIN,
+                                       DCORR_VP_MAX,
+                                       DCORR_VP_FC);
+    if (status != RBRDYNAMICCORRECTION_SUCCESS) {
+        fprintf(stderr, "RBRDynamicCorrection_init() return error code %u", status);
         return;
     }
 
@@ -83,14 +83,14 @@ void RBRGen3DynamicCorrection_replayData(FILE *file, csvData_t *data, float Fs)
         meas.condTemperature = data->T_cond[index];
         meas.pressure = data->P_meas[index];
 
-        status = RBRGen3DynamicCorrection_addMeasurement(&params, &meas, &corrResult);
+        status = RBRDynamicCorrection_addMeasurement(&params, &meas, &corrResult);
 
         /* wait until sufficient sample feed into algorithm */
-        if (status == RBRGEN3DYNAMICCORRECTION_NOT_VALID_YET) {
+        if (status == RBRDYNAMICCORRECTION_NOT_VALID_YET) {
             continue;
         }
 
-        if (status != RBRGEN3DYNAMICCORRECTION_SUCCESS) {
+        if (status != RBRDYNAMICCORRECTION_SUCCESS) {
             /* timestamp and pressure, conductivity are not corrected,
              * so they should still be valid
              * here the pressure is sea pressure.
@@ -112,7 +112,7 @@ void RBRGen3DynamicCorrection_replayData(FILE *file, csvData_t *data, float Fs)
 
 /* parse a .csv with the following format
  *  # timestamp (s), C_meas (mS/cm), T_meas (°C), P_meas (sea pressure, dbar), T_cond (°C) */
-int RBRGen3DynamicCorrection_parseCsv(const char *filename, csvData_t *data)
+int RBRDynamicCorrection_parseCsv(const char *filename, csvData_t *data)
 {
     char line[MAX_LINE_SIZE];
     char entry[MAX_LINE_SIZE];
@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
     strncpy(filename, argv[1], sizeof(filename) - 1);
     filename[sizeof(filename) - 1] = '\0';
 
-    if (RBRGen3DynamicCorrection_parseCsv(filename, &data) < 0) {
+    if (RBRDynamicCorrection_parseCsv(filename, &data) < 0) {
         fprintf(stderr, "ERROR: unable to parse csv %s\r\n", filename);
         exit(-1);
     }
@@ -268,7 +268,7 @@ int main(int argc, char *argv[])
         printf("sampling rate is %.3f\n", (double) Fs);
 
         printf("Correction written to %s\n", filenameOut);
-        RBRGen3DynamicCorrection_replayData(file, &data, Fs);
+        RBRDynamicCorrection_replayData(file, &data, Fs);
     } else {
         fprintf(stderr, "Unable to write file %s\n", filenameOut);
     }

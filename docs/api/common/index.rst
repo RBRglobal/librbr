@@ -5,3 +5,4 @@ Common API
    :maxdepth: 1
 
    RBRCommon
+   RBRDynamicCorrection
