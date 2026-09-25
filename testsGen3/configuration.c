@@ -74,37 +74,26 @@ static bool test_channels(RBRGen3 *conn, TestIOBuffers *buffers, ChannelsTest *t
                            actualChannel->calibration.dateTime,
                            "%" PRIi64);
 
-            i = 0;
-            while (true) {
-                if (isnan(expectedChannel->calibration.c[i])) {
-                    TEST_ASSERT(isnan(actualChannel->calibration.c[i]));
-                    break;
-                } else {
-                    TEST_ASSERT_FLOAT_EQ(
-                        expectedChannel->calibration.c[i], actualChannel->calibration.c[i], 0.0f);
-                }
-
-                ++i;
+            TEST_ASSERT_EQ(
+                expectedChannel->calibration.cCount, actualChannel->calibration.cCount, "%" PRIi32);
+            for (int32_t i = 0; i < expectedChannel->calibration.cCount; ++i) {
+                TEST_ASSERT_FLOAT_EQ(
+                    expectedChannel->calibration.c[i], actualChannel->calibration.c[i], 0.0f);
             }
 
-            i = 0;
-            while (true) {
-                if (isnan(expectedChannel->calibration.x[i])) {
-                    TEST_ASSERT(isnan(actualChannel->calibration.x[i]));
-                    break;
-                } else {
-                    TEST_ASSERT_FLOAT_EQ(
-                        expectedChannel->calibration.x[i], actualChannel->calibration.x[i], 0.0f);
-                }
-
-                ++i;
+            TEST_ASSERT_EQ(
+                expectedChannel->calibration.xCount, actualChannel->calibration.xCount, "%" PRIi32);
+            for (int32_t i = 0; i < expectedChannel->calibration.xCount; ++i) {
+                TEST_ASSERT_FLOAT_EQ(
+                    expectedChannel->calibration.x[i], actualChannel->calibration.x[i], 0.0f);
             }
 
-            i = 0;
-            do {
+            TEST_ASSERT_EQ(
+                expectedChannel->calibration.nCount, actualChannel->calibration.nCount, "%" PRIi32);
+            for (int32_t i = 0; i < expectedChannel->calibration.nCount; ++i) {
                 TEST_ASSERT_EQ(
                     expectedChannel->calibration.n[i], actualChannel->calibration.n[i], "%" PRIi8);
-            } while (expectedChannel->calibration.n[i++] != 0);
+            }
         }
     }
 
@@ -170,16 +159,14 @@ TEST_LOGGER2(channels)
                             .calibration =
                                 {
                                     .dateTime = 954547200000LL,
+                                    .cCount = 4,
                                     .c =
                                         {
                                             3.5000000e-003,
                                             -250.00002e-006,
                                             2.7000000e-006,
                                             23.000000e-009,
-                                            NAN,
                                         },
-                                    .x = {NAN},
-                                    .n = {0},
                                 },
                         },
                         {
@@ -201,14 +188,15 @@ TEST_LOGGER2(channels)
                             .calibration =
                                 {
                                     .dateTime = 954547200000LL,
+                                    .cCount = 4,
                                     .c =
                                         {
                                             0.0000000e+000,
                                             1.0000000e+000,
                                             0.0000000e+000,
                                             0.0000000e+000,
-                                            NAN,
                                         },
+                                    .xCount = 6,
                                     .x =
                                         {
                                             0.0000000e+000,
@@ -217,13 +205,9 @@ TEST_LOGGER2(channels)
                                             0.0000000e+000,
                                             0.0000000e+000,
                                             0.0000000e+000,
-                                            NAN,
                                         },
-                                    .n =
-                                        {
-                                            RBRGEN3_VALUE_COEFFICIENT,
-                                            0,
-                                        },
+                                    .nCount = 1,
+                                    .n = {RBRGEN3_VALUE_COEFFICIENT},
                                 },
                         },
                         {
@@ -245,14 +229,12 @@ TEST_LOGGER2(channels)
                             .calibration =
                                 {
                                     .dateTime = 954547200000LL,
+                                    .cCount = 2,
                                     .c =
                                         {
                                             0.0000000e+000,
                                             1.0000000e+000,
-                                            NAN,
                                         },
-                                    .x = {NAN},
-                                    .n = {0},
                                 },
                         },
                     },
@@ -294,14 +276,12 @@ TEST_LOGGER2(channels)
                             .calibration =
                                 {
                                     .dateTime = 954547200000LL,
+                                    .cCount = 2,
                                     .c =
                                         {
                                             203.47984e+000,
                                             -277.72070e+000,
-                                            NAN,
                                         },
-                                    .x = {NAN},
-                                    .n = {0},
                                 },
                         },
                     },
@@ -392,16 +372,14 @@ TEST_LOGGER3(channels)
                             .calibration =
                                 {
                                     .dateTime = 954547200000LL,
+                                    .cCount = 4,
                                     .c =
                                         {
                                             3.5000000e-003,
                                             -250.00002e-006,
                                             2.7000000e-006,
                                             23.000000e-009,
-                                            NAN,
                                         },
-                                    .x = {NAN},
-                                    .n = {0},
                                 },
                         },
                         {
@@ -423,14 +401,15 @@ TEST_LOGGER3(channels)
                             .calibration =
                                 {
                                     .dateTime = 954547200000LL,
+                                    .cCount = 4,
                                     .c =
                                         {
                                             0.0000000e+000,
                                             1.0000000e+000,
                                             0.0000000e+000,
                                             0.0000000e+000,
-                                            NAN,
                                         },
+                                    .xCount = 6,
                                     .x =
                                         {
                                             0.0000000e+000,
@@ -439,13 +418,9 @@ TEST_LOGGER3(channels)
                                             0.0000000e+000,
                                             0.0000000e+000,
                                             0.0000000e+000,
-                                            NAN,
                                         },
-                                    .n =
-                                        {
-                                            6,
-                                            0,
-                                        },
+                                    .nCount = 1,
+                                    .n = {6},
                                 },
                         },
                         {
@@ -467,14 +442,8 @@ TEST_LOGGER3(channels)
                             .calibration =
                                 {
                                     .dateTime = 954547200000LL,
-                                    .c = {NAN},
-                                    .x = {NAN},
-                                    .n =
-                                        {
-                                            2,
-                                            RBRGEN3_VALUE_COEFFICIENT,
-                                            0,
-                                        },
+                                    .nCount = 2,
+                                    .n = {2, RBRGEN3_VALUE_COEFFICIENT},
                                 },
                         },
                         {
@@ -496,14 +465,8 @@ TEST_LOGGER3(channels)
                             .calibration =
                                 {
                                     .dateTime = 954547200000LL,
-                                    .c = {NAN},
-                                    .x = {NAN},
-                                    .n =
-                                        {
-                                            2,
-                                            RBRGEN3_VALUE_COEFFICIENT,
-                                            0,
-                                        },
+                                    .nCount = 2,
+                                    .n = {2, RBRGEN3_VALUE_COEFFICIENT},
                                 },
                         },
                         {
@@ -525,13 +488,8 @@ TEST_LOGGER3(channels)
                             .calibration =
                                 {
                                     .dateTime = 954547200000LL,
-                                    .c = {NAN},
-                                    .x = {NAN},
-                                    .n =
-                                        {
-                                            RBRGEN3_VALUE_COEFFICIENT,
-                                            0,
-                                        },
+                                    .nCount = 1,
+                                    .n = {RBRGEN3_VALUE_COEFFICIENT},
                                 },
                         },
                     },
@@ -573,14 +531,12 @@ TEST_LOGGER3(channels)
                             .calibration =
                                 {
                                     .dateTime = 954547200000LL,
+                                    .cCount = 2,
                                     .c =
                                         {
                                             678.26611e+000,
                                             -925.73568e+000,
-                                            NAN,
                                         },
-                                    .x = {NAN},
-                                    .n = {0},
                                 },
                         },
                     },
@@ -623,14 +579,69 @@ TEST_LOGGER3(channels)
                             .calibration =
                                 {
                                     .dateTime = 954547200000LL,
+                                    .cCount = 2,
                                     .c =
                                         {
                                             3.3910000e+003,
                                             -4.6280000e+003,
-                                            NAN,
                                         },
-                                    .x = {NAN},
-                                    .n = {0},
+                                },
+                        },
+                    },
+            },
+        },
+        {0},
+    };
+
+    return test_channels(conn, buffers, tests);
+}
+
+TEST_LOGGER3(channels_calibration_indices)
+{
+    ChannelsTest tests[] = {
+        {
+            "channels count = 1, on = 1, settlingtime = 5000, "
+            "readtime = 10500, minperiod = 10670" RESPONSE_TERMINATOR
+            "channel 1 type = fluo10, module = 40, status = on, "
+            "settlingtime = 5000, readtime = 10500, equation = lin, "
+            "userunits = ug/L, gain = none, availablegains = none, "
+            "derived = off, label = chlorophyll_00" RESPONSE_TERMINATOR
+            "calibration 1 label = chlorophyll_00, datetime = 20000401000000, "
+            "c1 = 2.0000000e+000, c0 = 1.0000000e+000, x2 = 3.0000000e+000, "
+            "cfoo = 9.0000000e+000, x = 8.0000000e+000, n1 = 4" RESPONSE_TERMINATOR,
+            {
+                .count = 1,
+                .on = 1,
+                .settlingTime = 5000,
+                .readTime = 10500,
+                .minimumPeriod = 10670,
+                .channels =
+                    {
+                        {
+                            .type = "fluo10",
+                            .module = 40,
+                            .status = true,
+                            .settlingTime = 5000,
+                            .readTime = 10500,
+                            .equation = "lin",
+                            .userUnits = "ug/L",
+                            .gain =
+                                {
+                                    .rangingMode = RBRGEN3_RANGING_NONE,
+                                    .currentGain = NAN,
+                                    .availableGains = {NAN},
+                                },
+                            .derived = false,
+                            .label = "chlorophyll_00",
+                            .calibration =
+                                {
+                                    .dateTime = 954547200000LL,
+                                    .cCount = 2,
+                                    .c = {1.0000000e+000, 2.0000000e+000},
+                                    .xCount = 3,
+                                    .x = {0.0f, 0.0f, 3.0000000e+000},
+                                    .nCount = 2,
+                                    .n = {0, 4},
                                 },
                         },
                     },
@@ -686,16 +697,14 @@ TEST_LOGGER3(calibration_set)
 {
     RBRGen3Calibration calibration = {
         .dateTime = 1537380975000LL,
+        .cCount = 4,
         .c =
             {
                 3.5000000e-003,
                 -250.00002e-006,
                 2.7000000e-006,
                 23.000000e-009,
-                NAN,
             },
-        .x = {NAN},
-        .n = {0},
     };
     const char *expectedCommand =
         "calibration 1 datetime = 20180919181615, "
@@ -715,6 +724,120 @@ TEST_LOGGER3(calibration_set)
     RBRGen3Error err = RBRGen3_setCalibration(conn, 1, &calibration);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER3(calibration_set_x)
+{
+    RBRGen3Calibration calibration = {
+        .dateTime = 1537380975000LL,
+        .xCount = 2,
+        .x = {1.0000000e+000, -1.0000000e+000},
+    };
+    const char *expectedCommand =
+        "calibration 1 datetime = 20180919181615, "
+        "x0 = 1" COMMAND_TERMINATOR "calibration 1 datetime = 20180919181615, "
+        "x1 = -1" COMMAND_TERMINATOR;
+
+    const char *response = "calibration 1 datetime = 20180919181615, "
+                           "x0 = 1" RESPONSE_TERMINATOR "calibration 1 datetime = 20180919181615, "
+                           "x1 = -1" RESPONSE_TERMINATOR;
+
+    TestIOBuffers_init(buffers, response, 0);
+    RBRGen3Error err = RBRGen3_setCalibration(conn, 1, &calibration);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER3(calibration_set_invalid_c_count)
+{
+    RBRGen3Calibration calibration = {
+        .dateTime = 1537380975000LL,
+        .cCount = RBRGEN3_CALIBRATION_C_COEFFICIENT_MAX + 1,
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+    RBRGen3Error err = RBRGen3_setCalibration(conn, 1, &calibration);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER3(calibration_set_negative_c_count)
+{
+    RBRGen3Calibration calibration = {
+        .dateTime = 1537380975000LL,
+        .cCount = -1,
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+    RBRGen3Error err = RBRGen3_setCalibration(conn, 1, &calibration);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER3(calibration_set_invalid_x_count)
+{
+    RBRGen3Calibration calibration = {
+        .dateTime = 1537380975000LL,
+        .xCount = RBRGEN3_CALIBRATION_X_COEFFICIENT_MAX + 1,
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+    RBRGen3Error err = RBRGen3_setCalibration(conn, 1, &calibration);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER3(calibration_set_negative_x_count)
+{
+    RBRGen3Calibration calibration = {
+        .dateTime = 1537380975000LL,
+        .xCount = -1,
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+    RBRGen3Error err = RBRGen3_setCalibration(conn, 1, &calibration);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER3(calibration_set_empty)
+{
+    RBRGen3Calibration calibration = {
+        .dateTime = 1537380975000LL,
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+    RBRGen3Error err = RBRGen3_setCalibration(conn, 1, &calibration);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+TEST_LOGGER3(calibration_set_n_only)
+{
+    RBRGen3Calibration calibration = {
+        .dateTime = 1537380975000LL,
+        .nCount = 2,
+        .n = {3, RBRGEN3_VALUE_COEFFICIENT},
+    };
+
+    TestIOBuffers_init(buffers, "", 0);
+    RBRGen3Error err = RBRGen3_setCalibration(conn, 1, &calibration);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
 }
