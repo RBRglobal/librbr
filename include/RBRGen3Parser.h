@@ -19,6 +19,10 @@ extern "C" {
 #include <stdbool.h>
 
 #include "RBRGen3.h"
+/* Required for RBRGen3Dataset, RBRGen3MemoryFormat. */
+#include "RBRGen3Memory.h"
+/* Required for RBRGen3Sample. */
+#include "RBRGen3Streaming.h"
 
 /** \brief The maximum number of pieces of auxiliary data in an event. */
 #define RBRGEN3_EVENT_AUXILIARY_DATA_MAX 4

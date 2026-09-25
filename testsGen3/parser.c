@@ -12,6 +12,9 @@
 #include <math.h>
 
 #include "tests.h"
+#include "RBRGen3Memory.h"
+#include "RBRGen3Parser.h"
+#include "RBRGen3Streaming.h"
 
 TEST_PARSER_CONFIG(two_channels) = {
     .format = RBRGEN3_MEMFORMAT_CALBIN00,

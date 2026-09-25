@@ -9,6 +9,7 @@
  */
 
 #include "tests.h"
+#include "RBRGen3Streaming.h"
 
 TEST_LOGGER2(outputformat_channelslist)
 {

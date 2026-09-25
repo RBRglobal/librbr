@@ -12,6 +12,9 @@
 #include <math.h>
 
 #include "tests.h"
+#include "RBRGen4Deployment.h"
+#include "RBRGen4Configuration.h"
+#include "RBRGen4Instrument.h"
 
 typedef struct GetClockTest {
     const char *response;

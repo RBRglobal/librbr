@@ -19,6 +19,9 @@
 
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
+#include "RBRGen3Streaming.h"
+#include "RBRGen3Memory.h"
+#include "RBRGen3Other.h"
 
 #define READING_FLAG_MASK    0x00FF0000
 #define READING_FLAG_OFFSET  (2 * 8)

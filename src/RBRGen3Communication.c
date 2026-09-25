@@ -15,6 +15,7 @@
 
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
+#include "RBRGen3Communication.h"
 
 const char *RBRGen3Link_name(RBRGen3Link link)
 {

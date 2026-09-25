@@ -3,6 +3,9 @@
  *
  * \brief Entry point for instrument command declarations.
  *
+ * Each command header can also be included on its own; this file simply
+ * includes all of them.
+ *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
  * Licensed under the Apache License, Version 2.0.

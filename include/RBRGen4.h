@@ -4,9 +4,9 @@
  * \brief Interface for simplified communication with RBR instruments.
  *
  * This file contains declarations and constants relevant throughout the
- * library. Command-specific declarations are stored in categorical headers
- * which are included by this one. As the end user, your include directives
- * need reference only this file.
+ * library. Command-specific declarations are stored in categorical headers,
+ * each of which includes this one and can be included on its own. To include
+ * every command header at once, include RBRGen4Commands.h.
  *
  * \copyright
  * Copyright (c) 2018 RBR Ltd.
@@ -1094,11 +1094,6 @@ RBRGen4HardwareError RBRGen4_getLastHardwareError(const RBRGen4 *conn);
  * \see RBRGen4_getLastHardwareError() for the error number/presence
  */
 const char *RBRGen4_getLastHardwareErrorMessage(const RBRGen4 *conn);
-
-/* To help keep declarations and documentation organized and discoverable,
- * instrument commands and structures are broken out into individual
- * categorical headers. */
-#include "RBRGen4Commands.h"
 
 #ifdef __cplusplus
 }

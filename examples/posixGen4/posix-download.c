@@ -35,6 +35,7 @@
 #include <unistd.h>
 
 #include "RBRGen4.h"
+#include "RBRGen4Commands.h"
 #include "posix-shared.h"
 
 /* == Customer defined parameters == */

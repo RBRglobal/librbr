@@ -9,6 +9,7 @@
  */
 
 #include "tests.h"
+#include "RBRGen4Communication.h"
 
 typedef struct LinkTest {
     const char *response;

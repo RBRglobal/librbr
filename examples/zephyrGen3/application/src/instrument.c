@@ -8,6 +8,8 @@
  * Licensed under the Apache License, Version 2.0.
  */
 
+#include <RBRGen3Commands.h>
+
 #include "instrument.h"
 
 RBRGen3Error instrumentStart(RBRGen3 *conn)

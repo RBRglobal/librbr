@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+#include "RBRGen3.h"
+
 /**
  * \brief The maximum number of characters in the type and revision of the CPU.
  *

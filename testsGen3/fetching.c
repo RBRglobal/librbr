@@ -10,6 +10,8 @@
 
 #include <math.h>
 #include "tests.h"
+#include "RBRGen3Fetching.h"
+#include "RBRGen3Streaming.h"
 
 typedef struct FetchingTest {
     const char *command;

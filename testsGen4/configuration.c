@@ -10,6 +10,7 @@
 
 #include <math.h>
 #include "tests.h"
+#include "RBRGen4Configuration.h"
 
 /** \brief Room for the pools and lists the fixtures report. */
 #define POOL_SIZE 16

@@ -17,6 +17,7 @@
 #include <zephyr/logging/log.h>
 
 #include <RBRGen3.h>
+#include <RBRGen3Commands.h>
 
 #include "instrument.h"
 #include "io.h"

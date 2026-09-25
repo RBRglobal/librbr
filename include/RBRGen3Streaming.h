@@ -16,6 +16,8 @@
 extern "C" {
 #endif
 
+#include "RBRGen3.h"
+
 /**
  * \brief The maximum number of characters in an output format name (e.g.,
  * “caltext01”).

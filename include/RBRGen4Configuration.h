@@ -16,6 +16,8 @@
 extern "C" {
 #endif
 
+#include "RBRGen4.h"
+
 /**
  * \brief The maximum number of coefficients in a calibration group.
  *

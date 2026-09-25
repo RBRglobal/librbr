@@ -23,6 +23,7 @@
 #include <unistd.h>
 
 #include "posix-shared.h"
+#include "RBRGen3Commands.h"
 
 int main(int argc, char *argv[])
 {

@@ -9,6 +9,7 @@
  */
 
 #include "tests.h"
+#include "RBRGen3Gating.h"
 
 typedef struct ThresholdingTest {
     const char *response;

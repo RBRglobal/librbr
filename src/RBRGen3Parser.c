@@ -19,6 +19,8 @@
 #include "RBRGen3Parser.h"
 /* Required for RBR_TRY. */
 #include "RBRGen3Internal.h"
+#include "RBRGen3Memory.h"
+#include "RBRGen3Streaming.h"
 
 const char *RBRGen3EventType_name(RBRGen3EventType type)
 {

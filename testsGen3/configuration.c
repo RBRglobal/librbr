@@ -10,6 +10,7 @@
 
 #include <math.h>
 #include "tests.h"
+#include "RBRGen3Configuration.h"
 
 typedef struct ChannelsTest {
     const char *response;

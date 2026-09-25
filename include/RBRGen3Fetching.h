@@ -16,6 +16,10 @@
 extern "C" {
 #endif
 
+#include "RBRGen3.h"
+/* Required for RBRGen3LabelsList, RBRGen3Sample. */
+#include "RBRGen3Streaming.h"
+
 /**
  * \brief Requests an “on-demand” sample set from the logger.
  *

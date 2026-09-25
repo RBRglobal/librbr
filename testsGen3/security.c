@@ -9,6 +9,7 @@
  */
 
 #include "tests.h"
+#include "RBRGen3Security.h"
 
 TEST_LOGGER2(permit)
 {

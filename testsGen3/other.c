@@ -11,6 +11,7 @@
 /* Required for NAN. */
 #include <math.h>
 #include "tests.h"
+#include "RBRGen3Other.h"
 
 TEST_LOGGER3(version_comparison)
 {

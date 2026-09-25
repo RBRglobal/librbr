@@ -45,6 +45,7 @@
 #include <netinet/tcp.h>
 
 #include "posix-shared.h"
+#include "RBRGen3Commands.h"
 
 /* Note: Using a larger chunk size (e.g. 34000 or 68000) can improve download
  * throughput significantly on a good connection. */

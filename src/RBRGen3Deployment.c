@@ -15,6 +15,9 @@
 
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
+#include "RBRGen3Deployment.h"
+#include "RBRGen3Schedule.h"
+#include "RBRGen3Security.h"
 
 static RBRGen3Error RBRGen3_parseDeploymentResponse(RBRGen3 *conn, const char *deploymentCommand,
                                                     RBRGen3DeploymentStatus *status)

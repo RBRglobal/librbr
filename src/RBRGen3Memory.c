@@ -17,6 +17,9 @@
 
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
+#include "RBRGen3Memory.h"
+#include "RBRGen3Other.h"
+#include "RBRGen3Security.h"
 
 const char *RBRGen3Dataset_name(RBRGen3Dataset dataset)
 {
