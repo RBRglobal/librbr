@@ -15,6 +15,8 @@
 
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
+#include "RBRGen3Fetching.h"
+#include "RBRGen3Streaming.h"
 
 RBRGen3Error RBRGen3_fetch(RBRGen3 *conn, RBRGen3LabelsList *channels, bool sleepAfter,
                            RBRGen3Sample *sample)

@@ -19,6 +19,7 @@
 
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
+#include "RBRGen3Other.h"
 
 /* The minimum length of a version string. */
 #define VERSION_MIN 3

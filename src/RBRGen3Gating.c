@@ -17,6 +17,8 @@
 
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
+#include "RBRGen3Gating.h"
+#include "RBRGen3Schedule.h"
 
 const char *RBRGen3GatingState_name(RBRGen3GatingState state)
 {

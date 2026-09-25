@@ -137,6 +137,10 @@ and keeps its 1.x name,
 but its error constants now carry the ``RBRDYNAMICCORRECTION_`` prefix
 (``RBR_DCORR_SUCCESS`` is now ``RBRDYNAMICCORRECTION_SUCCESS``,
 and ``DYN_CORR_BAD_PARAMS`` is now ``RBRDYNAMICCORRECTION_BAD_PARAMS``).
+``RBRGen3.h`` (and so ``RBRGen3Parser.h``)
+no longer includes the command headers:
+include the ones you use (such as ``RBRGen3Schedule.h``),
+or ``RBRGen3Commands.h`` for all of them.
 When building as a Zephyr module,
 the equivalent Kconfig options are
 ``CONFIG_LIBRBR_GEN3`` and ``CONFIG_LIBRBR_GEN4``;

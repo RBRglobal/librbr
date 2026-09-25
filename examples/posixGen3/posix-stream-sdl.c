@@ -25,6 +25,7 @@
 #include <unistd.h>
 
 #include "posix-shared.h"
+#include "RBRGen3Commands.h"
 
 #define MAX(a, b) ((a > b) ? (a) : (b))
 #define MIN(a, b) ((a < b) ? (a) : (b))

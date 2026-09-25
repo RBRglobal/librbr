@@ -19,6 +19,8 @@
 
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
+#include "RBRGen3Configuration.h"
+#include "RBRGen3Security.h"
 
 const char *RBRGen3ChannelRangingMode_name(RBRGen3ChannelRangingMode mode)
 {

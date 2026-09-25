@@ -9,6 +9,7 @@
  */
 
 #include "tests.h"
+#include "RBRGen3Pauseresume.h"
 
 typedef struct PauseresumeTest {
     const char *command;

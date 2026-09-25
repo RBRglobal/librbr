@@ -13,6 +13,7 @@
 
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
+#include "RBRGen3Security.h"
 
 RBRGen3Error RBRGen3_permit(RBRGen3 *conn, const char *command)
 {

@@ -9,6 +9,7 @@
  */
 
 #include "tests.h"
+#include "RBRGen3Memory.h"
 
 TEST_LOGGER3(meminfo)
 {

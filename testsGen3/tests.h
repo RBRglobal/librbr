@@ -27,6 +27,8 @@ extern "C" {
 
 #include "RBRGen3.h"
 #include "RBRGen3Parser.h"
+/* Required for RBRGen3Sample. */
+#include "RBRGen3Streaming.h"
 
 /**
  * \brief Assert that a condition is true.

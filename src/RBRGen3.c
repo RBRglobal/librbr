@@ -12,6 +12,7 @@
 #include <string.h>
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
+#include "RBRGen3Other.h"
 
 const char *RBRGEN3_LIB_NAME =
 #ifdef RBR_LIB_NAME

@@ -11,6 +11,7 @@
 /* Required for isnan, NAN. */
 #include <math.h>
 #include "tests.h"
+#include "RBRGen3Schedule.h"
 
 typedef struct ClockTest {
     const char *command;

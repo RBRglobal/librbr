@@ -27,6 +27,7 @@
 
 #include "posix-shared.h"
 #include "RBRGen3Parser.h"
+#include "RBRGen3Commands.h"
 
 #define CHUNK_SIZE 1024
 

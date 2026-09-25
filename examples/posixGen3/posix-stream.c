@@ -26,6 +26,7 @@
 #include <unistd.h>
 
 #include "posix-shared.h"
+#include "RBRGen3Commands.h"
 
 RBRGen3Error instrumentSample(const struct RBRGen3 *conn, const struct RBRGen3Sample *const sample)
 {

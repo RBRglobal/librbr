@@ -28,6 +28,7 @@
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
 #include "RBRGen3Memory.h"
+#include "RBRGen3Streaming.h"
 
 /** \brief 10-second command timeout. */
 #define COMMAND_TIMEOUT (10 * 1000)

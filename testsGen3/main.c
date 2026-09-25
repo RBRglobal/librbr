@@ -13,6 +13,8 @@
 
 #include "RBRGen3.h"
 #include "tests.h"
+#include "RBRGen3Parser.h"
+#include "RBRGen3Streaming.h"
 
 char *rbr_strnesccntrl(char *destination, const char *source, size_t num)
 {

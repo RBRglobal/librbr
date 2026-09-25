@@ -17,6 +17,9 @@
 
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
+#include "RBRGen3Schedule.h"
+#include "RBRGen3Other.h"
+#include "RBRGen3Security.h"
 
 static RBRGen3Error RBRGen3_getClockL2(RBRGen3 *conn, RBRGen3Clock *clock)
 {

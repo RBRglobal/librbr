@@ -27,6 +27,7 @@
 
 #include "posix-shared.h"
 #include "RBRGen3Parser.h"
+#include "RBRGen3Commands.h"
 
 RBRGen3Error parserSample(const struct RBRGen3Parser *parser,
                           const struct RBRGen3Sample *const sample)

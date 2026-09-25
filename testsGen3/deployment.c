@@ -9,6 +9,8 @@
  */
 
 #include "tests.h"
+#include "RBRGen3Deployment.h"
+#include "RBRGen3Schedule.h"
 
 typedef struct StatusTest {
     const char *response;

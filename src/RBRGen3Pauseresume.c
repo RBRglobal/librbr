@@ -15,6 +15,7 @@
 
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
+#include "RBRGen3Pauseresume.h"
 
 const char *RBRGen3PauseresumeState_name(RBRGen3PauseresumeState state)
 {

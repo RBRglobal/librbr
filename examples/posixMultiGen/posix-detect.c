@@ -27,6 +27,7 @@
 #include <unistd.h>
 
 #include "posix-shared.h"
+#include "RBRGen3Commands.h"
 
 const char *programName = "";
 

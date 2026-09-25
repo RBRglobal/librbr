@@ -9,6 +9,7 @@
  */
 
 #include "tests.h"
+#include "RBRGen3Vehicle.h"
 
 typedef struct RegimesTest {
     const char *response;

@@ -29,6 +29,7 @@
 
 #include "posix-shared.h"
 #include "RBRDynamicCorrection.h"
+#include "RBRGen3Commands.h"
 
 #define _AbsP_To_SeaP 10.132507
 

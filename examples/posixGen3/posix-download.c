@@ -32,6 +32,7 @@
 #include <unistd.h>
 
 #include "posix-shared.h"
+#include "RBRGen3Commands.h"
 
 #define CHUNK_SIZE 4096
 
