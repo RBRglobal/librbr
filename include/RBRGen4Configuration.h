@@ -403,6 +403,34 @@ RBRGen4Error RBRGen4_getCalibration(RBRGen4 *conn, RBRGen4Calibration *calibrati
 RBRGen4Error RBRGen4_setCalibration(RBRGen4 *conn, const RBRGen4Calibration *calibration);
 
 /**
+ * \brief The state of a `settings` parameter the instrument may not offer.
+ *
+ * \see RBRGen4Settings.prompt
+ * \see RBRGen4Settings.confirmation
+ */
+typedef enum RBRGen4SettingsState {
+    /** The setting is off. */
+    RBRGEN4_SETTINGS_STATE_OFF,
+    /** The setting is on. */
+    RBRGEN4_SETTINGS_STATE_ON,
+    /** The number of specific setting states. */
+    RBRGEN4_SETTINGS_STATE_COUNT,
+    /** The parameter is not available on this instrument. */
+    RBRGEN4_SETTINGS_STATE_UNAVAILABLE,
+    /** The parameter was reported with a value the library does not know. */
+    RBRGEN4_UNKNOWN_SETTINGS_STATE
+} RBRGen4SettingsState;
+
+/**
+ * \brief Get a human-readable string name for a setting state.
+ *
+ * \param [in] state the setting state
+ * \return a string name for the setting state
+ * \see RBRGen4Error_name() for a description of the format of names
+ */
+const char *RBRGen4SettingsState_name(RBRGen4SettingsState state);
+
+/**
  * \brief Instrument `settings` command parameters.
  *
  * \see RBRGen4_getSettings()
@@ -413,13 +441,13 @@ typedef struct RBRGen4Settings {
      * \brief Whether the instrument returns the “Ready:” prompt following a
      * response.
      */
-    bool prompt;
+    RBRGen4SettingsState prompt;
 
     /**
      * \brief Whether the instrument returns a response from a create or
      * set/modify operation to verify the new state.
      */
-    bool confirmation;
+    RBRGen4SettingsState confirmation;
 
     /**
      * \brief The delay in milliseconds between the completion of a poll and
@@ -430,6 +458,11 @@ typedef struct RBRGen4Settings {
 
 /**
  * \brief Get miscellaneous logger settings
+ *
+ * A parameter the instrument does not report is set to
+ * #RBRGEN4_SETTINGS_STATE_UNAVAILABLE, and one reported with a value the
+ * library does not know to #RBRGEN4_UNKNOWN_SETTINGS_STATE.
+ *
  * \note Issues the `settings` command.
  *
  * \param [in] conn the instrument connection
@@ -443,6 +476,11 @@ RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings);
 
 /**
  * \brief Set the miscellaneous logger settings.
+ *
+ * A parameter in #RBRGEN4_SETTINGS_STATE_UNAVAILABLE is left out of the
+ * command, so settings read back from an instrument can be written to it
+ * unchanged.
+ *
  * \note Issues the `settings` command.
  *
  * \param [in] conn the instrument connection
@@ -450,13 +488,17 @@ RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings);
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the settings cannot be changed, or
- *                                      another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the settings cannot be changed, or when
+ *                                      a parameter is set where the instrument
+ *                                      does not offer it, or another hardware
+ *                                      error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the power-off delay
- *                                                    is negative
- * \warning The library expects both \a prompt and \a confirmation to be on.
- *          With \a confirmation off the instrument answers a set with nothing
- *          at all, and every later setter blocks until the command timeout.
+ *                                                    is negative, or a setting
+ *                                                    state is unknown
+ * \warning The library expects \a prompt and \a confirmation to be on, or
+ *          unavailable. With \a confirmation explicitly off the instrument
+ *          answers a set with nothing at all, and every later setter blocks
+ *          until the command timeout.
  * \see RBRGen4_getSettings()
  */
 RBRGen4Error RBRGen4_setSettings(RBRGen4 *conn, const RBRGen4Settings *settings);
@@ -765,7 +807,9 @@ typedef enum RBRGen4ScheduleStorage {
     RBRGEN4_SCHEDULE_STORAGE_ON,
     /** The number of specific storage states. */
     RBRGEN4_SCHEDULE_STORAGE_COUNT,
-    /** The parameter was not reported. */
+    /** The parameter is not available on this instrument. */
+    RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
+    /** The parameter was reported with a value the library does not know. */
     RBRGEN4_UNKNOWN_SCHEDULE_STORAGE
 } RBRGen4ScheduleStorage;
 
@@ -856,14 +900,7 @@ typedef struct RBRGen4Schedule {
     /** \brief Where the schedule's data is streamed in real time. */
     RBRGen4ScheduleStream stream;
 
-    /**
-     * \brief Whether the schedule's data is stored in memory.
-     *
-     * Some instrument configurations do not support data storage, in which case
-     * this field should be left as #RBRGEN4_UNKNOWN_SCHEDULE_STORAGE.
-     *
-     * \see RBRGen4ScheduleStorage
-     */
+    /** \brief Whether the schedule's data is stored in memory. */
     RBRGen4ScheduleStorage storage;
 
     /** \brief `castdetection`, which applies in every mode. */
@@ -903,8 +940,9 @@ typedef struct RBRGen4Schedule {
  * The labels of the groups the schedule samples are written to \a groupList
  * when it is given.
  *
- * \p schedule.storage is set to #RBRGEN4_UNKNOWN_SCHEDULE_STORAGE for
- * instruments that do not report the `storage` parameter
+ * `storage` is set to #RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE where the
+ * instrument does not report it, and a parameter reported with a value the
+ * library does not know is set to its `UNKNOWN` state.
  *
  * \note Issues the `schedule <schedule_label>` command.
  *
@@ -930,9 +968,10 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
 /**
  * \brief Set the parameters of a schedule.
  *
- * `storage` is only available on some instrument configurations. An empty
- * \a groupList sends `none`; a `NULL` \a groupList leaves the instrument's
- * group list unchanged.
+ * A `storage` of #RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE is left out of the
+ * command, so a schedule read back from an instrument can be written to it
+ * unchanged. An empty \a groupList sends `none`; a `NULL` \a groupList
+ * leaves the instrument's group list unchanged.
  *
  * \note Issues the `schedule <schedule_label>` command.
  *
@@ -944,13 +983,15 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the schedule cannot be written, or when
- *                                      `storage` is set where it is
- *                                      unavailable, or another hardware error
- *                                      occurs
+ *                                      a parameter is set where the instrument
+ *                                      does not offer it, or another hardware
+ *                                      error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
  *                                          the list's length does
  *                                          not fit its array, a
  *                                          group label is empty,
+ *                                          the stream destination or
+ *                                          storage state is unknown,
  *                                          or the mode is not a
  *                                          single known flag
  * \return #RBRGEN4_UNSUPPORTED when the mode is `ddsampling` or

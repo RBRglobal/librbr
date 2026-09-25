@@ -260,12 +260,14 @@ const char *RBRGen4DeploymentStorageMode_name(RBRGen4DeploymentStorageMode stora
  * without enabling the instrument (a dry run).
  * \note Issues the `verify` command.
  *
- * All three parameters of the command are sent.
+ * A `NULL` \a datasetLabel leaves the `dataset` parameter out. Only an
+ * instrument which does not store data accepts that; one which does needs
+ * a label even when no schedule stores its data.
  *
  * \param [in] conn the instrument connection
  * \param [in] config the configuration which would define this deployment
  * \param [in] datasetLabel the label which would be given to the deployment's
- *                          dataset
+ *                          dataset, or `NULL`
  * \param [in] storageMode the data storage mode which would be used
  * \param [out] state the state the instrument would assume; untouched unless
  *                    the command succeeds
@@ -274,9 +276,9 @@ const char *RBRGen4DeploymentStorageMode_name(RBRGen4DeploymentStorageMode stora
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when a check fails, or another hardware
  *                                      error occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the configuration or
- *         dataset label is empty or too long, or the storage mode is not a
- *         specific mode
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the configuration or a
+ *         given dataset label is empty or too long, or the storage mode is
+ *         not a specific mode
  * \see RBRGen4_enable()
  */
 RBRGen4Error RBRGen4_verify(RBRGen4 *conn, const RBRGen4Config *config, const char *datasetLabel,
@@ -287,13 +289,15 @@ RBRGen4Error RBRGen4_verify(RBRGen4 *conn, const RBRGen4Config *config, const ch
  * \brief Enable the instrument to sample for a new deployment.
  * \note Issues the `enable` command.
  *
- * All three parameters of the command are sent. The command reports no
+ * A `NULL` \a datasetLabel leaves the `dataset` parameter out. Only an
+ * instrument which does not store data accepts that; one which does needs
+ * a label even when no schedule stores its data. The command reports no
  * dataset, so read the deployment's dataset back with
  * RBRGen4_getDatasetPool().
  *
  * \param [in] conn the instrument connection
  * \param [in] config the configuration which defines this deployment
- * \param [in] datasetLabel the label for the deployment's dataset
+ * \param [in] datasetLabel the label for the deployment's dataset, or `NULL`
  * \param [in] storageMode the data storage mode for this deployment
  * \param [out] state the state of the instrument; untouched unless the command
  *                    succeeds
@@ -302,9 +306,9 @@ RBRGen4Error RBRGen4_verify(RBRGen4 *conn, const RBRGen4Config *config, const ch
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument cannot be enabled, or
  *                                      another hardware error occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the configuration or
- *         dataset label is empty or too long, or the storage mode is not a
- *         specific mode
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the configuration or a
+ *         given dataset label is empty or too long, or the storage mode is
+ *         not a specific mode
  * \see RBRGen4_verify()
  * \see RBRGen4_disable()
  */

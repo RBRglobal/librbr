@@ -544,7 +544,6 @@ typedef struct VerifyTest {
 TEST_LOGGER4(verify)
 {
     VerifyTest tests[] = {
-        /* All three parameters are always sent. */
         {
             {
                 .label = "c_test",
@@ -566,6 +565,18 @@ TEST_LOGGER4(verify)
             "storagemode=calibration" COMMAND_TERMINATOR,
             "verify config=pH_cal dataset=d_pHcal_20260824 "
             "storagemode=calibration state=enabled" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            RBRGEN4_INSTRUMENT_STATE_ENABLED,
+        },
+        /* A `NULL` dataset label leaves the parameter out. */
+        {
+            {
+                .label = "c_test",
+            },
+            NULL,
+            RBRGEN4_STORAGE_MODE_NORMAL,
+            "verify config=c_test storagemode=normal" COMMAND_TERMINATOR,
+            "verify config=c_test storagemode=normal state=enabled" RESPONSE_TERMINATOR,
             RBRGEN4_SUCCESS,
             RBRGEN4_INSTRUMENT_STATE_ENABLED,
         },
@@ -630,6 +641,20 @@ TEST_LOGGER4(verify)
             "",
             RBRGEN4_INVALID_PARAMETER_VALUE,
             RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+        },
+        /* The longest label the field holds is sent. */
+        {
+            {
+                .label = "c_test",
+            },
+            "0123456789012345678901234567890",
+            RBRGEN4_STORAGE_MODE_NORMAL,
+            "verify config=c_test dataset=0123456789012345678901234567890 "
+            "storagemode=normal" COMMAND_TERMINATOR,
+            "verify config=c_test dataset=0123456789012345678901234567890 storagemode=normal "
+            "state=enabled" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            RBRGEN4_INSTRUMENT_STATE_ENABLED,
         },
         {
             {
@@ -787,6 +812,18 @@ TEST_LOGGER4(enable)
             RBRGEN4_SUCCESS,
             RBRGEN4_INSTRUMENT_STATE_ENABLED,
         },
+        /* A `NULL` dataset label leaves the parameter out. */
+        {
+            {
+                .label = "c_test",
+            },
+            NULL,
+            RBRGEN4_STORAGE_MODE_NORMAL,
+            "enable config=c_test storagemode=normal" COMMAND_TERMINATOR,
+            "enable config=c_test storagemode=normal state=enabled" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            RBRGEN4_INSTRUMENT_STATE_ENABLED,
+        },
         /* Out-of-range parameters never reach the instrument. */
         {
             {
@@ -809,6 +846,20 @@ TEST_LOGGER4(enable)
             "",
             RBRGEN4_INVALID_PARAMETER_VALUE,
             RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+        },
+        /* The longest label the field holds is sent. */
+        {
+            {
+                .label = "c_test",
+            },
+            "0123456789012345678901234567890",
+            RBRGEN4_STORAGE_MODE_NORMAL,
+            "enable config=c_test dataset=0123456789012345678901234567890 "
+            "storagemode=normal" COMMAND_TERMINATOR,
+            "enable config=c_test dataset=0123456789012345678901234567890 storagemode=normal "
+            "state=enabled" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            RBRGEN4_INSTRUMENT_STATE_ENABLED,
         },
         /*
          * A label one character past the field is refused rather than
