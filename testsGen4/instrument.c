@@ -416,6 +416,192 @@ TEST_LOGGER4(conn)
     return true;
 }
 
+/* The connection's buffers are supplied by the caller, so a missing or empty
+ * buffer has to be refused before any instrument communication happens, both
+ * when the connection is opened and when the buffers are replaced later. */
+TEST_LOGGER4(openRejectsInvalidBuffers)
+{
+    uint8_t commandBuffer[RBRGEN4_COMMAND_BUFFER_DEFAULT];
+    uint8_t responseBuffer[RBRGEN4_RESPONSE_BUFFER_DEFAULT];
+
+    struct {
+        uint8_t *command;
+        int32_t commandCapacity;
+        uint8_t *response;
+        int32_t responseCapacity;
+    } tests[] = {
+        {NULL, sizeof(commandBuffer), responseBuffer, sizeof(responseBuffer)},
+        {commandBuffer, 0, responseBuffer, sizeof(responseBuffer)},
+        {commandBuffer, sizeof(commandBuffer), NULL, sizeof(responseBuffer)},
+        {commandBuffer, sizeof(commandBuffer), responseBuffer, 0},
+        {commandBuffer, sizeof(commandBuffer), responseBuffer, -1},
+        /* Room for a line terminator and nothing else can never hold a
+         * response. */
+        {commandBuffer, sizeof(commandBuffer), responseBuffer, 2},
+    };
+
+    RBRGen4 unopened;
+    RBRGen4Error err;
+
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen4_open(&unopened, NULL, 0, NULL);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_MISSING_CALLBACK, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    const RBRGen4Environment before = conn->environment;
+    for (size_t i = 0; i < sizeof(tests) / sizeof(tests[0]); ++i) {
+        RBRGen4Environment environment = conn->environment;
+        environment.command = tests[i].command;
+        environment.commandCapacity = tests[i].commandCapacity;
+        environment.response = tests[i].response;
+        environment.responseCapacity = tests[i].responseCapacity;
+
+        TestIOBuffers_init(buffers, "", 0);
+        err = RBRGen4_open(&unopened, &environment, 0, NULL);
+        TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+        TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+        TEST_ASSERT_ENUM_EQ(
+            RBRCOMMON_UNKNOWN_GENERATION, RBRGen4_getGeneration(&unopened), RBRCommonGeneration);
+
+        /* A refused replacement leaves the connection on its current
+         * buffer. Exactly one of the two buffers is bad in each case, and
+         * only its setter is tried, so the good one never displaces the
+         * shared connection's own. */
+        if (tests[i].command == NULL || tests[i].commandCapacity <= 0) {
+            err = RBRGen4_setCommandBuffer(conn, tests[i].command, tests[i].commandCapacity);
+        } else {
+            err = RBRGen4_setResponseBuffer(conn, tests[i].response, tests[i].responseCapacity);
+        }
+        TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+        TEST_ASSERT(conn->environment.command == before.command);
+        TEST_ASSERT(conn->environment.commandCapacity == before.commandCapacity);
+        TEST_ASSERT(conn->environment.response == before.response);
+        TEST_ASSERT(conn->environment.responseCapacity == before.responseCapacity);
+    }
+
+    return true;
+}
+
+/* An instrument of another generation answers `id4` with an error line, and a
+ * device which is not an instrument answers with nothing useful; both are
+ * reported as an unsupported instrument. A failing callback is the caller's
+ * problem and is reported as itself. */
+TEST_LOGGER4(openUnsupportedVersusCallbackError)
+{
+    RBRGen4 unopened;
+    RBRGen4Error err;
+    uint8_t commandBuffer[RBRGEN4_COMMAND_BUFFER_DEFAULT];
+    uint8_t responseBuffer[RBRGEN4_RESPONSE_BUFFER_DEFAULT];
+    RBRGen4Environment environment = conn->environment;
+    environment.command = commandBuffer;
+    environment.commandCapacity = sizeof(commandBuffer);
+    environment.response = responseBuffer;
+    environment.responseCapacity = sizeof(responseBuffer);
+
+    TestIOBuffers_init(buffers, "ERR-102 invalid command 'id4'" RESPONSE_TERMINATOR, 0);
+    err = RBRGen4_open(&unopened, &environment, 0, buffers);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_UNSUPPORTED, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(
+        RBRCOMMON_UNKNOWN_GENERATION, RBRGen4_getGeneration(&unopened), RBRCommonGeneration);
+
+    /* The harness reports a read past its scripted data as a callback
+     * error. */
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen4_open(&unopened, &environment, 0, buffers);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_CALLBACK_ERROR, err, RBRGen4Error);
+
+    return true;
+}
+
+/* Replacing the buffers carries nothing over from the old ones: the response
+ * state is reset as by RBRGen4_resetResponseBuffer() when the response buffer
+ * changes, and the next command goes out through the new command buffer. */
+TEST_LOGGER4(setCommandAndResponseBuffers)
+{
+    RBRGen4Error err;
+    RBRGen4PowerSource actual;
+    const RBRGen4Environment before = conn->environment;
+    uint8_t commandBuffer[RBRGEN4_COMMAND_BUFFER_DEFAULT];
+    uint8_t responseBuffer[RBRGEN4_RESPONSE_BUFFER_DEFAULT];
+
+    /* Leave a second response buffered behind a hardware error. */
+    TestIOBuffers_init(buffers,
+                       "ERR-108 invalid argument to command: 'bogus'" RESPONSE_TERMINATOR
+                       "instrument power source=ext" RESPONSE_TERMINATOR,
+                       0);
+    err = RBRGen4_getPowerSource(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_HARDWARE_ERROR, err, RBRGen4Error);
+    TEST_ASSERT(RBRGen4_getLastHardwareErrorMessage(conn) != NULL);
+
+    /* Replacing the command buffer leaves the response state alone. */
+    err = RBRGen4_setCommandBuffer(conn, commandBuffer, sizeof(commandBuffer));
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT(conn->environment.command == commandBuffer);
+    TEST_ASSERT(conn->environment.commandCapacity == sizeof(commandBuffer));
+    TEST_ASSERT_EQ(0, conn->commandBufferLength, "%" PRIi32);
+    TEST_ASSERT(RBRGen4_getLastHardwareErrorMessage(conn) != NULL);
+
+    err = RBRGen4_setResponseBuffer(conn, responseBuffer, sizeof(responseBuffer));
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT(conn->environment.response == responseBuffer);
+    TEST_ASSERT(conn->environment.responseCapacity == sizeof(responseBuffer));
+    TEST_ASSERT_EQ(0, conn->responseBufferLength, "%" PRIi32);
+    TEST_ASSERT(RBRGen4_getLastHardwareErrorMessage(conn) == NULL);
+
+    /* The buffered second response is gone with the old buffer, so the reply
+     * the instrument sends now answers this command; it was built in the new
+     * command buffer. */
+    TestIOBuffers_init(buffers, "instrument power source=int" RESPONSE_TERMINATOR, 0);
+    err = RBRGen4_getPowerSource(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_POWER_SOURCE_INTERNAL, actual, RBRGen4PowerSource);
+    TEST_ASSERT(memcmp(commandBuffer, "instrument power", sizeof("instrument power") - 1) == 0);
+
+    /* Put the shared connection back on its own buffers. */
+    err = RBRGen4_setCommandBuffer(conn, before.command, before.commandCapacity);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    err = RBRGen4_setResponseBuffer(conn, before.response, before.responseCapacity);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+
+    return true;
+}
+
+/* A response buffer handed between connections carries whatever the previous
+ * one left in it, so the reset has to discard the leftovers rather than let
+ * the next command parse them as its own. */
+TEST_LOGGER4(resetResponseBuffer)
+{
+    RBRGen4Error err;
+    RBRGen4PowerSource actual;
+
+    /* Two responses arrive together: the error satisfies the command and
+     * leaves a message pointing into the buffer; the second response stays
+     * buffered behind it. */
+    TestIOBuffers_init(buffers,
+                       "ERR-108 invalid argument to command: 'bogus'" RESPONSE_TERMINATOR
+                       "instrument power source=ext" RESPONSE_TERMINATOR,
+                       0);
+    err = RBRGen4_getPowerSource(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_HARDWARE_ERROR, err, RBRGen4Error);
+    TEST_ASSERT(RBRGen4_getLastHardwareErrorMessage(conn) != NULL);
+
+    RBRGen4_resetResponseBuffer(conn);
+
+    /* The reset drops the message view along with the buffered data. */
+    TEST_ASSERT_ENUM_EQ(
+        RBRGEN4_HARDWARE_ERROR_NONE, RBRGen4_getLastHardwareError(conn), RBRGen4HardwareError);
+    TEST_ASSERT(RBRGen4_getLastHardwareErrorMessage(conn) == NULL);
+
+    /* Without the reset, the buffered second response would answer this
+     * command instead of the one the instrument sends now. */
+    TestIOBuffers_init(buffers, "instrument power source=int" RESPONSE_TERMINATOR, 0);
+    err = RBRGen4_getPowerSource(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_POWER_SOURCE_INTERNAL, actual, RBRGen4PowerSource);
+
+    return true;
+}
+
 TEST_LOGGER4(reboot)
 {
     TestIOBuffers_init(buffers, "", 0);

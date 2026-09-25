@@ -59,29 +59,32 @@ extern const char *RBRGEN3_LIB_VERSION;
 extern const char *RBRGEN3_LIB_BUILD_DATE;
 
 /**
- * \brief The size of the buffer storing commands destined for the instrument.
+ * \brief The recommended size of the buffer storing commands destined for the
+ *        instrument.
  *
- * Must be large enough to hold the largest command you will want to send to
- * the instrument plus the trailing line termination (`\r\n\0`).
+ * The buffer must be large enough to hold the largest command you will want
+ * to send to the instrument, its terminator (`\r`), and a trailing null byte.
  *
- * A buffer of this size is included in RBRGen3.
+ * The library does not depend on this value: the caller supplies the command
+ * buffer and its capacity through RBRGen3Environment. This constant is a
+ * recommended size for that buffer.
  */
-#ifndef RBRGEN3_COMMAND_BUFFER_MAX
-#define RBRGEN3_COMMAND_BUFFER_MAX 120
-#endif
+#define RBRGEN3_COMMAND_BUFFER_DEFAULT 120
 
 /**
- * \brief The size of the buffer storing instrument responses.
+ * \brief The recommended size of the buffer storing instrument responses.
  *
- * Must be large enough to hold the largest command response you will want to
- * receive. This does not include download data, which is read directly into a
- * user-managed buffer.
+ * The buffer must be large enough to hold the largest command response you
+ * will want to receive, and the longest streamed sample line if the
+ * instrument streams: a line which does not fit is discarded without being
+ * reported. This does not include download data, which is read directly into
+ * a user-managed buffer.
  *
- * A buffer of this size is included in RBRGen3.
+ * The library does not depend on this value: the caller supplies the response
+ * buffer and its capacity through RBRGen3Environment. This constant is a
+ * recommended size for that buffer.
  */
-#ifndef RBRGEN3_RESPONSE_BUFFER_MAX
-#define RBRGEN3_RESPONSE_BUFFER_MAX 1024
-#endif
+#define RBRGEN3_RESPONSE_BUFFER_DEFAULT 1024
 
 /**
  * \brief The maximum number of channels present on an instrument.
@@ -415,7 +418,7 @@ struct RBRGen3Sample;
  * received.
  *
  * The \a sample pointer will be the same as given via
- * RBRGen3Callbacks.sampleBuffer. The sample value will be overwritten
+ * RBRGen3Environment.sampleBuffer. The sample value will be overwritten
  * every time sample parsing is attempted, which will be at least once per
  * command exchanged with the instrument. If you want to use the sample after
  * your callback has returned, make a copy of it.
@@ -435,12 +438,41 @@ typedef RBRGen3Error (*RBRGen3SampleCallback)(const struct RBRGen3 *conn,
                                               const struct RBRGen3Sample *const sample);
 
 /**
- * \brief A set of callbacks from library to user code.
+ * \brief The caller-supplied callbacks and working buffers of a connection.
  *
  * RBRGen3_open() requires all callbacks to be populated except for
- * RBRGen3Callbacks.sample, which may be `NULL` when undesired.
+ * RBRGen3Environment.sample, which may be `NULL` when undesired.
+ *
+ * The library never allocates memory. The command and response buffers used
+ * by a connection are provided by the caller when the connection is opened
+ * and must remain valid until it is closed or they are replaced with
+ * RBRGen3_setCommandBuffer() or RBRGen3_setResponseBuffer().
+ *
+ * The two buffers must not overlap. The command buffer must have room for
+ * the longest command, its terminator, and a trailing null byte; a command
+ * which does not fit is refused with #RBRGEN3_BUFFER_TOO_SMALL. RBRGen3_fetch()
+ * and RBRGen3_setPostprocessing() send their channel lists in several writes
+ * when they do not fit, so for them only a single label must fit.
+ *
+ * The command buffer holds nothing between commands and may be shared freely
+ * between connections which are never used at the same time.
+ *
+ * The response buffer carries state between commands, so it belongs to one
+ * connection at a time. Connections used one at a time may still share it,
+ * provided each one calls RBRGen3_resetResponseBuffer() before its first
+ * command after another connection has used the buffer. Sharing costs
+ * nothing for a connection which only exchanges commands. It does cost a
+ * connection which streams: any samples received but not yet delivered when
+ * the buffer changes hands are lost. A streaming connection whose every
+ * sample matters should own its response buffer.
+ *
+ * \see RBRGen3_open()
+ * \see RBRGen3_setCommandBuffer()
+ * \see RBRGen3_setResponseBuffer()
+ * \see RBRGEN3_COMMAND_BUFFER_DEFAULT
+ * \see RBRGEN3_RESPONSE_BUFFER_DEFAULT
  */
-typedef struct RBRGen3Callbacks {
+typedef struct RBRGen3Environment {
     /** \brief Callback to get the current platform time in milliseconds. */
     RBRGen3TimeCallback time;
 
@@ -456,7 +488,7 @@ typedef struct RBRGen3Callbacks {
     /**
      * \brief Called when streaming sample data has been received.
      *
-     * Optional, but requires that RBRGen3Callbacks.sampleBuffer also be
+     * Optional, but requires that RBRGen3Environment.sampleBuffer also be
      * populated.
      */
     RBRGen3SampleCallback sample;
@@ -464,10 +496,35 @@ typedef struct RBRGen3Callbacks {
     /**
      * \brief Where to put sample data for consumption by the sample callback.
      *
-     * Required only when RBRGen3Callbacks.sample is populated.
+     * Required only when RBRGen3Environment.sample is populated.
      */
     struct RBRGen3Sample *sampleBuffer;
-} RBRGen3Callbacks;
+
+    /**
+     * \brief Storage for commands destined for the instrument.
+     *
+     * Intentionally not a `char` pointer to discourage the use of `str`
+     * functions. Commands may contain binary data and should not be assumed
+     * to be null-terminated.
+     */
+    uint8_t *command;
+
+    /** \brief The capacity of RBRGen3Environment.command in bytes. */
+    int32_t commandCapacity;
+
+    /**
+     * \brief Storage for data received from the instrument.
+     *
+     * Intentionally not a `char` pointer to discourage the use of `str`
+     * functions. Responses may contain binary data and should not be
+     * assumed to be null-terminated. \ref RBRGen3Response.response, when
+     * non-`NULL`, provides null-terminated, C-string access to the response.
+     */
+    uint8_t *response;
+
+    /** \brief The capacity of RBRGen3Environment.response in bytes. */
+    int32_t responseCapacity;
+} RBRGen3Environment;
 
 /**
  * \brief The types of responses returned by the instrument.
@@ -561,8 +618,8 @@ typedef struct RBRGen3 {
      */
     RBRCommonGeneration generation;
 
-    /** \brief The set of callbacks to be used by the connection. */
-    RBRGen3Callbacks callbacks;
+    /** \brief The callbacks and buffers used by the connection. */
+    RBRGen3Environment environment;
 
     /**
      * \brief The command timeout in milliseconds.
@@ -598,25 +655,6 @@ typedef struct RBRGen3 {
     int32_t lastResponseLength;
 
     /**
-     * \brief The next command to be sent to the instrument.
-     *
-     * Intentionally not a `char` array to discourage the use of `str`
-     * functions. Commands may contain binary data and should not be assumed to
-     * be null-terminated.
-     */
-    uint8_t commandBuffer[RBRGEN3_COMMAND_BUFFER_MAX];
-
-    /**
-     * \brief Data received from the instrument.
-     *
-     * Intentionally not a `char` array to discourage the use of `str`
-     * functions. Responses may contain binary data and should not be assumed
-     * to be null-terminated. \ref RBRGen3Response.response, when
-     * non-`NULL`, provides null-terminated, C-string access to the response.
-     */
-    uint8_t responseBuffer[RBRGEN3_RESPONSE_BUFFER_MAX];
-
-    /**
      * \brief The most recent response received from the instrument.
      *
      * After the response parser identifies and terminates a command response,
@@ -636,26 +674,37 @@ typedef struct RBRGen3 {
  *
  * The library never allocates memory: the caller provides the RBRGen3
  * instance (statically, on the stack, or from a heap of its choosing) and the
- * constructor initializes it in place. Any prior contents are discarded.
+ * constructor initializes it in place. Any prior contents are discarded. The
+ * caller likewise provides the command and response buffers via \a buffers;
+ * they must remain valid until RBRGen3_close() is called. If either buffer is
+ * `NULL`, the command buffer has a capacity of zero or less, or the response
+ * buffer cannot hold more than a line terminator, the connection is not
+ * opened and #RBRGEN3_INVALID_PARAMETER_VALUE is returned.
  *
- * The \a callbacks structure will be copied into the RBRGen3 structure;
+ * The \a environment structure will be copied into the RBRGen3 structure;
  * no reference to it is retained, so any subsequent modifications will not
- * affect the connection. All callbacks must be given except for
- * RBRGen3Callbacks.sample. If any others are given as null pointers,
+ * affect the connection. The buffers it points to, however, must remain valid
+ * until the connection is closed or they are replaced with
+ * RBRGen3_setCommandBuffer() or RBRGen3_setResponseBuffer(). The same
+ * applies to RBRGen3Environment.sampleBuffer.
+ * All callbacks must be given except for
+ * RBRGen3Environment.sample. If any others are given as null pointers,
  * #RBRGEN3_MISSING_CALLBACK is returned and the instrument connection
- * will not be opened. RBRGen3Callbacks.sample is given, then
- * RBRGen3Callbacks.sampleBuffer must also be given; if it is not,
+ * will not be opened. RBRGen3Environment.sample is given, then
+ * RBRGen3Environment.sampleBuffer must also be given; if it is not,
  * #RBRGEN3_MISSING_CALLBACK is returned.
  *
  * Whenever callbacks are called, the data passed to them should be handled
- * immediately. The pointers passed will coincide with buffers within the
- * RBRGen3 instance, and may be overwritten as soon as the callback
- * returns.
+ * immediately. The pointers passed will coincide with the caller-supplied
+ * buffers, and may be overwritten as soon as the callback returns.
  *
- * This library supports 3rd-generation RBR instruments and, to a lesser
+ * This constructor supports 3rd-generation RBR instruments and, to a lesser
  * extent, 2nd-generation instruments. 1st-generation and third-party
- * instruments are not supported. If the library detects an unsupported
- * instrument during connection, #RBRGEN3_UNSUPPORTED is returned.
+ * instruments are not supported. 4th-generation instruments can be identified,
+ * but full support is left to the Gen4 side of the library; see the note below.
+ * If the constructor detects an unsupported instrument during connection,
+ * #RBRGEN3_UNSUPPORTED is returned; a callback failure or a buffer too small
+ * for the identification exchange is reported as itself.
  *
  * In the event of any return value other than #RBRGEN3_SUCCESS, no cleanup of
  * library resources is required. In the event of a successful result,
@@ -671,17 +720,22 @@ typedef struct RBRGen3 {
  *       RBRGen3_close() may be used on the connection in that state.
  *
  * \param [out] conn the context object to populate
- * \param [in] callbacks the set of callbacks to be used by the connection
+ * \param [in] environment the callbacks and buffers to be used by the
+ *                         connection
  * \param [in] commandTimeout the command timeout in milliseconds
  * \param [in] userData arbitrary user data; useful in callbacks
  * \return #RBRGEN3_SUCCESS if the instrument was opened successfully
- * \return #RBRGEN3_MISSING_CALLBACK if a callback was not provided
+ * \return #RBRGEN3_MISSING_CALLBACK if \a environment or a callback was not
+ *         provided
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE if a buffer is missing or empty
  * \return #RBRGEN3_TIMEOUT if an instrument communication timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR if the instrument rejects the opening
+ *         command
  * \return #RBRGEN3_UNSUPPORTED if the instrument is unsupported
  * \see RBRGen3_close()
  */
-RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Callbacks *callbacks,
+RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Environment *environment,
                           RBRGen3DateTime commandTimeout, void *userData);
 
 /**
@@ -695,6 +749,73 @@ RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Callbacks *callbacks,
  * \see RBRGen3_open()
  */
 RBRGen3Error RBRGen3_close(RBRGen3 *conn);
+
+/**
+ * \brief Replace the command buffer of a connection.
+ *
+ * The command buffer given to RBRGen3_open() is used until this function
+ * replaces it. Nothing is carried over, so this function should be called
+ * only between commands. The sizing rules of RBRGen3Environment apply, and
+ * the connection keeps its current buffer when the new one is refused.
+ *
+ * Does not communicate with the instrument.
+ *
+ * \param [in,out] conn the instrument connection
+ * \param [in] command storage for commands destined for the instrument
+ * \param [in] capacity the capacity of \a command in bytes
+ * \return #RBRGEN3_SUCCESS when the buffer is replaced
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE if the buffer is missing or empty
+ * \see RBRGen3Environment for the rules on sizing and sharing buffers
+ * \see RBRGen3_setResponseBuffer()
+ */
+RBRGen3Error RBRGen3_setCommandBuffer(RBRGen3 *conn, uint8_t *command, int32_t capacity);
+
+/**
+ * \brief Replace the response buffer of a connection.
+ *
+ * The response buffer given to RBRGen3_open() is used until this function
+ * replaces it. Nothing is carried over: any buffered response data is
+ * discarded as by RBRGen3_resetResponseBuffer(), so this function should be
+ * called only between commands. The sizing rules of RBRGen3Environment
+ * apply, and the connection keeps its current buffer when the new one is
+ * refused.
+ *
+ * Does not communicate with the instrument.
+ *
+ * \param [in,out] conn the instrument connection
+ * \param [in] response storage for data received from the instrument
+ * \param [in] capacity the capacity of \a response in bytes
+ * \return #RBRGEN3_SUCCESS when the buffer is replaced
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE if the buffer is missing or cannot
+ *         hold more than a line terminator
+ * \see RBRGen3Environment for the rules on sizing and sharing buffers
+ * \see RBRGen3_setCommandBuffer()
+ */
+RBRGen3Error RBRGen3_setResponseBuffer(RBRGen3 *conn, uint8_t *response, int32_t capacity);
+
+/**
+ * \brief Discard any buffered instrument response data.
+ *
+ * This function must be called after a response buffer has been shared with
+ * another RBRGenX connection instance.
+ *
+ * The response buffer is not always fully consumed during a command-response
+ * interaction with an instrument. Unread data can include the prompt or
+ * terminator after the last response, data read past the end
+ * of that response, and, on a streaming instrument, samples not yet delivered
+ * to RBRGen3Environment.sample. Once a response buffer has been shared with
+ * another connection, that data may be overwritten, so the response state of
+ * the original connection must be reset with this function before trying to
+ * converse with an instrument. Otherwise, the next command would parse the
+ * other connection's output as its own reply, its own sample, or its own
+ * hardware error.
+ *
+ * Does not communicate with the instrument.
+ *
+ * \param [in,out] conn the instrument connection
+ * \see RBRGen3Environment for the rules on sharing buffers between connections
+ */
+void RBRGen3_resetResponseBuffer(RBRGen3 *conn);
 
 /**
  * \brief Get the generation of an instrument.

@@ -148,11 +148,11 @@ typedef struct RBRGen4Sample {
  *
  * This function waits for a streamed sample to arrive, parses it, then calls
  * the RBRGen4SampleCallback provided to the instrument via
- * RBRGen4Callbacks.sample, delivering the sample into
- * RBRGen4Callbacks.sampleBuffer.
+ * RBRGen4Environment.sample, delivering the sample into
+ * RBRGen4Environment.sampleBuffer.
  *
- * This requires RBRGen4Callbacks.sample and
- * RBRGen4Callbacks.sampleBuffer to be populated.
+ * This requires RBRGen4Environment.sample and
+ * RBRGen4Environment.sampleBuffer to be populated.
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when a streaming sample has been read
@@ -171,11 +171,11 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
  * Unlike streaming data/RBRGen4_readSample(), polled data is
  * returned directly to the caller (independent of any
  * RBRGen4SampleCallback defined in
- * RBRGen4Callbacks.sample).
+ * RBRGen4Environment.sample).
  *
  * With \a requireLabel set, only a sample labelled `polling` is returned;
  * any streamed samples read while waiting for it are passed to
- * RBRGen4Callbacks.sample instead. With \a requireLabel unset, the
+ * RBRGen4Environment.sample instead. With \a requireLabel unset, the
  * first sample read is returned, which may be a streamed sample, not a
  * polled sample, if the instrument is streaming over this link.
  *
@@ -189,6 +189,8 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
  *         polled sample arrives within RBRGen4.pollTimeout
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_BUFFER_TOO_SMALL when the command does not fit the
+ *         command buffer
  */
 RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sample);
 
@@ -202,11 +204,11 @@ RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sampl
  * Unlike streaming data/RBRGen4_readSample(), polled data is
  * returned directly to the caller (independent of any
  * RBRGen4SampleCallback defined in
- * RBRGen4Callbacks.sample).
+ * RBRGen4Environment.sample).
  *
  * With \a requireLabel set, only a sample labelled `polling` is returned;
  * any streamed samples read while waiting for it are passed to
- * RBRGen4Callbacks.sample instead. With \a requireLabel unset, the
+ * RBRGen4Environment.sample instead. With \a requireLabel unset, the
  * first sample read is returned, which may be a streamed sample, not a
  * polled sample, if the instrument is streaming over this link.
  *
@@ -241,11 +243,11 @@ RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel,
  * Unlike streaming data/RBRGen4_readSample(), polled data is
  * returned directly to the caller (independent of any
  * RBRGen4SampleCallback defined in
- * RBRGen4Callbacks.sample).
+ * RBRGen4Environment.sample).
  *
  * With \a requireLabel set, only a sample labelled `polling` is returned;
  * any streamed samples read while waiting for it are passed to
- * RBRGen4Callbacks.sample instead. With \a requireLabel unset, the
+ * RBRGen4Environment.sample instead. With \a requireLabel unset, the
  * first sample read is returned, which may be a streamed sample, not a
  * polled sample, if the instrument is streaming over this link.
  *

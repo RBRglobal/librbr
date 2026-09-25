@@ -27,6 +27,8 @@ LOG_MODULE_REGISTER(main, CONFIG_MAIN_LOG_LEVEL);
 const static struct device *instrumentUart = DEVICE_DT_GET(DT_CHOSEN(rbr_instrument));
 
 RBRGen3 instrumentBuffer;
+static uint8_t instrumentCommandBuffer[RBRGEN3_COMMAND_BUFFER_DEFAULT];
+static uint8_t instrumentResponseBuffer[RBRGEN3_RESPONSE_BUFFER_DEFAULT];
 RBRGen3Sample sampleBuffer;
 
 ZephyrRBRGen3IO io;
@@ -63,16 +65,20 @@ int main(void)
 
     LOG_INF("using %s v%s", RBRGEN3_LIB_NAME, RBRGEN3_LIB_VERSION);
 
-    RBRGen3Callbacks callbacks = {
+    RBRGen3Environment environment = {
         .time = ZephyrRBRGen3Time_get,
         .sleep = ZephyrRBRGen3Time_sleep,
         .read = ZephyrRBRGen3IO_read,
         .write = ZephyrRBRGen3IO_write,
         .sample = instrumentSample,
         .sampleBuffer = &sampleBuffer,
+        .command = instrumentCommandBuffer,
+        .commandCapacity = sizeof(instrumentCommandBuffer),
+        .response = instrumentResponseBuffer,
+        .responseCapacity = sizeof(instrumentResponseBuffer),
     };
 
-    err = RBRGen3_open(conn, &callbacks, CONFIG_INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &io);
+    err = RBRGen3_open(conn, &environment, CONFIG_INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &io);
     if (err != RBRGEN3_SUCCESS) {
         LOG_ERR("opening instrument: %s", RBRGen3Error_name(err));
         return 0;

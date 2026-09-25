@@ -89,31 +89,39 @@ static RBRGen3Error RBRGen3_populateGeneration(RBRGen3 *conn)
 {
     conn->generation = RBRCOMMON_UNKNOWN_GENERATION;
 
-    /* If this isn't an RBR instrument, it'll just time out or the response
-     * won't match. */
+    /* If this isn't an RBR instrument, the exchange times out or the
+     * response won't match: an instrument of another generation answers with
+     * an error line it can produce, and anything else answers with nothing
+     * this parser recognises. Both mean "not one of ours". A failing callback
+     * or a buffer too small for the exchange is the caller's problem, though,
+     * and is reported as itself. */
     RBRGen3Error err = RBRGen3_getId(conn, &conn->id);
-    if (err != RBRGEN3_SUCCESS) {
+    if (err == RBRGEN3_TIMEOUT || err == RBRGEN3_HARDWARE_ERROR) {
         return RBRGEN3_UNSUPPORTED;
     }
+    RBR_TRY(err);
 
     conn->generation = RBRCommonGeneration_fromFwtype(conn->id.fwtype);
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Callbacks *callbacks,
+RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Environment *environment,
                           RBRGen3DateTime commandTimeout, void *userData)
 {
-    if (callbacks == NULL || callbacks->time == NULL || callbacks->sleep == NULL ||
-        callbacks->read == NULL || callbacks->write == NULL ||
-        (callbacks->sample != NULL && callbacks->sampleBuffer == NULL)) {
+    if (environment == NULL || environment->time == NULL || environment->sleep == NULL ||
+        environment->read == NULL || environment->write == NULL ||
+        (environment->sample != NULL && environment->sampleBuffer == NULL)) {
         return RBRGEN3_MISSING_CALLBACK;
     }
 
     memset(conn, 0, sizeof(RBRGen3));
-    memcpy(&conn->callbacks, callbacks, sizeof(RBRGen3Callbacks));
+    conn->generation = RBRCOMMON_UNKNOWN_GENERATION;
+    memcpy(&conn->environment, environment, sizeof(RBRGen3Environment));
+    RBR_TRY(RBRGen3_setCommandBuffer(conn, environment->command, environment->commandCapacity));
+    RBR_TRY(RBRGen3_setResponseBuffer(conn, environment->response, environment->responseCapacity));
     /* We don't want the streaming sample data callback to be called before the
      * constructor has finished. */
-    conn->callbacks.sample = NULL;
+    conn->environment.sample = NULL;
     conn->commandTimeout = commandTimeout;
     conn->userData = userData;
     conn->lastActivityTime = RBRGEN3_NO_ACTIVITY;
@@ -130,8 +138,8 @@ RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Callbacks *callbacks,
     }
 
     /* Enable the streaming callback, if applicable. */
-    conn->callbacks.sample = callbacks->sample;
-    conn->callbacks.sampleBuffer = callbacks->sampleBuffer;
+    conn->environment.sample = environment->sample;
+    conn->environment.sampleBuffer = environment->sampleBuffer;
 
     return RBRGEN3_SUCCESS;
 }
@@ -142,6 +150,39 @@ RBRGen3Error RBRGen3_close(RBRGen3 *conn)
      * function is kept so that callers pair every open with a close and so
      * that resource management can be added later without an API change. */
     memset(conn, 0, sizeof(RBRGen3));
+    return RBRGEN3_SUCCESS;
+}
+
+void RBRGen3_resetResponseBuffer(RBRGen3 *conn)
+{
+    conn->responseBufferLength = 0;
+    conn->lastResponseLength = 0;
+    conn->response.type = RBRGEN3_RESPONSE_UNKNOWN_TYPE;
+    conn->response.error = RBRGEN3_HARDWARE_ERROR_NONE;
+    conn->response.response = NULL;
+}
+
+RBRGen3Error RBRGen3_setCommandBuffer(RBRGen3 *conn, uint8_t *command, int32_t capacity)
+{
+    if (command == NULL || capacity <= 0) {
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
+    }
+
+    conn->environment.command = command;
+    conn->environment.commandCapacity = capacity;
+    conn->commandBufferLength = 0;
+    return RBRGEN3_SUCCESS;
+}
+
+RBRGen3Error RBRGen3_setResponseBuffer(RBRGen3 *conn, uint8_t *response, int32_t capacity)
+{
+    if (response == NULL || capacity <= RBRGEN3_COMMAND_TERMINATOR_LEN) {
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
+    }
+
+    conn->environment.response = response;
+    conn->environment.responseCapacity = capacity;
+    RBRGen3_resetResponseBuffer(conn);
     return RBRGEN3_SUCCESS;
 }
 

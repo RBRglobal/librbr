@@ -159,13 +159,19 @@ int main(void)
 {
     RBRGen4Error err;
     TestIOBuffers ioBuffers;
-    RBRGen4Callbacks instrumentCallbacks = {
+    static uint8_t commandBuffer[RBRGEN4_COMMAND_BUFFER_DEFAULT];
+    static uint8_t responseBuffer[RBRGEN4_RESPONSE_BUFFER_DEFAULT];
+    RBRGen4Environment instrumentEnvironment = {
         .time = TestIOBuffers_time,
         .sleep = TestIOBuffers_sleep,
         .read = TestIOBuffers_read,
         .write = TestIOBuffers_write,
         .sample = TestIOBuffers_sample,
         .sampleBuffer = &ioBuffers.streamSample,
+        .command = commandBuffer,
+        .commandCapacity = sizeof(commandBuffer),
+        .response = responseBuffer,
+        .responseCapacity = sizeof(responseBuffer),
     };
 
     RBRGen4 instrumentL4Buffer;
@@ -179,7 +185,7 @@ int main(void)
                        "datatype=float32" RESPONSE_TERMINATOR,
                        0);
     err = RBRGen4_open(instrumentL4,
-                       &instrumentCallbacks,
+                       &instrumentEnvironment,
                        /* command timeout */ 0,
                        &ioBuffers);
     if (err != RBRGEN4_SUCCESS) {

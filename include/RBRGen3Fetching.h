@@ -21,7 +21,7 @@ extern "C" {
  *
  * Unlike streaming data/RBRGen3_readSample(), fetched data is returned
  * directly to the caller (independent of any RBRGen3SampleCallback
- * defined in RBRGen3Callbacks.sample).
+ * defined in RBRGen3Environment.sample).
  *
  * Because fetched samples are indistinguishable from streamed samples, this
  * function may return a streamed sample, _not_ a fetched sample, if the
@@ -43,6 +43,8 @@ extern "C" {
  * \return #RBRGEN3_SUCCESS when a sample is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_BUFFER_TOO_SMALL when a channel label cannot fit the
+ *         command buffer
  * \return #RBRGEN3_HARDWARE_ERROR when an invalid channel is requested, or
  *                                 another hardware error occurs
  */

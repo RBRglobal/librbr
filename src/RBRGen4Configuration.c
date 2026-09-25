@@ -148,7 +148,7 @@ RBRGen4Error RBRGen4_setCalibration(RBRGen4 *conn, const RBRGen4Calibration *cal
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    char coefficients[RBRGEN4_COMMAND_BUFFER_MAX] = "";
+    char coefficients[RBRGEN4_COMMAND_BUFFER_DEFAULT] = "";
     int32_t length = 0;
 
     for (int32_t a = 0; a < calibration->aCount; ++a) {
@@ -530,7 +530,7 @@ RBRGen4Error RBRGen4_setGroup(RBRGen4 *conn, const RBRGen4Group *group,
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    char value[RBRGEN4_COMMAND_BUFFER_MAX];
+    char value[RBRGEN4_COMMAND_BUFFER_DEFAULT];
     RBR_TRY(RBRGen4_formatLabelList(value, (int32_t) sizeof(value), channelList));
 
     return RBRGen4_converse(conn, "group %s channellist=%s", group->label, value);
@@ -651,7 +651,7 @@ RBRGen4Error RBRGen4_setConfig(RBRGen4 *conn, const RBRGen4Config *config,
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    char value[RBRGEN4_COMMAND_BUFFER_MAX];
+    char value[RBRGEN4_COMMAND_BUFFER_DEFAULT];
     RBR_TRY(RBRGen4_formatLabelList(value, (int32_t) sizeof(value), scheduleList));
 
     return RBRGen4_converse(conn, "config %s schedulelist=%s", config->label, value);
@@ -930,7 +930,7 @@ RBRGen4Error RBRGen4_setSchedule(RBRGen4 *conn, const RBRGen4Schedule *schedule,
     }
 
     /* A NULL list leaves the instrument's group list unchanged. */
-    char groups[RBRGEN4_COMMAND_BUFFER_MAX] = "";
+    char groups[RBRGEN4_COMMAND_BUFFER_DEFAULT] = "";
     if (groupList != NULL) {
         const char prefix[] = "grouplist=";
         memcpy(groups, prefix, sizeof(prefix));

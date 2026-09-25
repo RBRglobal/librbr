@@ -353,9 +353,9 @@ const char *RBRGen4DownloadEventsUnit_name(RBRGen4DownloadEventsUnit unit)
 /**
  * \brief Keep retrying reads until we retrieve a fixed amount of data.
  *
- * This function first drains data out of RBRGen4.responseBuffer,
+ * This function first drains data out of RBRGen4Environment.response,
  * then begins to read from the instrument. As a result, \a data must not be
- * RBRGen4.responseBuffer!
+ * RBRGen4Environment.response!
  *
  * \param [in] conn the instrument connection
  * \param [out] data the buffer to write into
@@ -373,7 +373,8 @@ static RBRGen4Error RBRGen4_fixedRead(struct RBRGen4 *conn, void *data, int64_t 
             readLength = (int32_t) size;
         }
 
-        memcpy(data, ((uint8_t *) conn->responseBuffer) + conn->lastResponseLength, readLength);
+        memcpy(
+            data, ((uint8_t *) conn->environment.response) + conn->lastResponseLength, readLength);
 
         bufferLength = readLength;
         conn->lastResponseLength += readLength;
@@ -383,7 +384,7 @@ static RBRGen4Error RBRGen4_fixedRead(struct RBRGen4 *conn, void *data, int64_t 
     while (bufferLength < size) {
         readLength = size - bufferLength > INT32_MAX ? INT32_MAX : (int32_t) (size - bufferLength);
 
-        RBR_TRY(conn->callbacks.read(conn, ((uint8_t *) data) + bufferLength, &readLength));
+        RBR_TRY(conn->environment.read(conn, ((uint8_t *) data) + bufferLength, &readLength));
 
         bufferLength += readLength;
     }
@@ -434,10 +435,9 @@ static RBRGen4Error RBRGen4_downloadDatasetCommon(RBRGen4 *conn, const char *cou
          */
         int64_t rest = *byteCount + (int64_t) sizeof(uint16_t);
         while (rest > 0) {
-            int64_t chunk = rest > (int64_t) sizeof(conn->commandBuffer)
-                                ? (int64_t) sizeof(conn->commandBuffer)
-                                : rest;
-            RBR_TRY(RBRGen4_fixedRead(conn, conn->commandBuffer, chunk));
+            int64_t chunk =
+                rest > conn->environment.commandCapacity ? conn->environment.commandCapacity : rest;
+            RBR_TRY(RBRGen4_fixedRead(conn, conn->environment.command, chunk));
             rest -= chunk;
         }
         return RBRGEN4_BUFFER_TOO_SMALL;

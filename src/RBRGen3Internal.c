@@ -159,7 +159,7 @@ static int rbr_strncasecmp(const char *s1, const char *s2, size_t n)
 static RBRGen3Error RBRGen3_wake(const RBRGen3 *conn)
 {
     RBRGen3DateTime now;
-    RBR_TRY(conn->callbacks.time(conn, &now));
+    RBR_TRY(conn->environment.time(conn, &now));
 
     if (conn->lastActivityTime >= 0 && now - conn->lastActivityTime < COMMAND_TIMEOUT) {
         return RBRGEN3_SUCCESS;
@@ -167,8 +167,8 @@ static RBRGen3Error RBRGen3_wake(const RBRGen3 *conn)
 
     /* Send the wake sequence twice to make sure it gets noticed. */
     for (int pass = 0; pass < 2; ++pass) {
-        RBR_TRY(conn->callbacks.write(conn, WAKE_COMMAND, WAKE_COMMAND_LEN));
-        RBR_TRY(conn->callbacks.sleep(conn, WAKE_COMMAND_WAIT));
+        RBR_TRY(conn->environment.write(conn, WAKE_COMMAND, WAKE_COMMAND_LEN));
+        RBR_TRY(conn->environment.sleep(conn, WAKE_COMMAND_WAIT));
     }
 
     return RBRGEN3_SUCCESS;
@@ -176,47 +176,58 @@ static RBRGen3Error RBRGen3_wake(const RBRGen3 *conn)
 
 RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *conn)
 {
+    /*
+     * The command builders accumulate snprintf()'s return value, which is the
+     * number of characters it would have written given unlimited room, not
+     * the number it actually wrote, and snprintf() always spends one byte of
+     * the buffer on a terminating null. A length at or beyond the capacity
+     * therefore means some snprintf() call ran out of room and the buffer
+     * holds an incomplete command with a null where its last character should
+     * be. Refuse it before anything, including the wake sequence, goes out.
+     */
+    if (conn->commandBufferLength >= conn->environment.commandCapacity) {
+        return RBRGEN3_BUFFER_TOO_SMALL;
+    }
+
     /* Wake the instrument if necessary. */
     RBR_TRY(RBRGen3_wake(conn));
 
-    if (conn->commandBufferLength > RBRGEN3_COMMAND_BUFFER_MAX) {
-        conn->commandBufferLength = RBRGEN3_COMMAND_BUFFER_MAX;
-    }
-
     /* Send the command to the instrument. */
-    RBR_TRY(conn->callbacks.write(conn, conn->commandBuffer, conn->commandBufferLength));
-    RBR_TRY(conn->callbacks.time(conn, &conn->lastActivityTime));
+    RBR_TRY(conn->environment.write(conn, conn->environment.command, conn->commandBufferLength));
+    RBR_TRY(conn->environment.time(conn, &conn->lastActivityTime));
     return RBRGEN3_SUCCESS;
 }
 
 static RBRGen3Error RBRGen3_vSendCommand(RBRGen3 *conn, const char *command, va_list format)
 {
     /* Prepare the command. */
-    conn->commandBufferLength =
-        vsnprintf((char *) conn->commandBuffer, sizeof(conn->commandBuffer), command, format);
+    conn->commandBufferLength = vsnprintf((char *) conn->environment.command,
+                                          (size_t) conn->environment.commandCapacity,
+                                          command,
+                                          format);
 
     /* Make sure we're within buffer bounds. This is a greater-or-equal check,
      * not just a greater-than check, because vsnprintf doesn't include the
      * null terminator in its return value. The longest value vsnprintf can
-     * write is RBRGEN3_COMMAND_BUFFER_MAX - 1 bytes. */
-    if (conn->commandBufferLength >= RBRGEN3_COMMAND_BUFFER_MAX) {
-        conn->commandBufferLength = RBRGEN3_COMMAND_BUFFER_MAX;
+     * write is commandBufferCapacity - 1 bytes. */
+    if (conn->commandBufferLength >= conn->environment.commandCapacity) {
+        conn->commandBufferLength = conn->environment.commandCapacity;
         return RBRGEN3_BUFFER_TOO_SMALL;
     }
 
     /* Make sure the command is LF-terminated. */
     if (conn->commandBufferLength < RBRGEN3_SEND_COMMAND_TERMINATOR_LEN ||
-        memcmp(conn->commandBuffer + conn->commandBufferLength -
+        memcmp(conn->environment.command + conn->commandBufferLength -
                    RBRGEN3_SEND_COMMAND_TERMINATOR_LEN,
                RBRGEN3_SEND_COMMAND_TERMINATOR,
                RBRGEN3_SEND_COMMAND_TERMINATOR_LEN) != 0) {
         /* It isn't. Make sure there's room before adding it. */
-        if (conn->commandBufferLength + RBRGEN3_SEND_COMMAND_TERMINATOR_LEN >
-            RBRGEN3_COMMAND_BUFFER_MAX) {
+        if (conn->commandBufferLength + RBRGEN3_SEND_COMMAND_TERMINATOR_LEN >=
+            conn->environment.commandCapacity) {
             return RBRGEN3_BUFFER_TOO_SMALL;
         }
 
-        memcpy(conn->commandBuffer + conn->commandBufferLength,
+        memcpy(conn->environment.command + conn->commandBufferLength,
                RBRGEN3_SEND_COMMAND_TERMINATOR,
                RBRGEN3_SEND_COMMAND_TERMINATOR_LEN);
         conn->commandBufferLength += RBRGEN3_SEND_COMMAND_TERMINATOR_LEN;
@@ -248,8 +259,8 @@ static void RBRGen3_removeLastResponse(RBRGen3 *conn)
         return;
     }
 
-    memmove(conn->responseBuffer,
-            conn->responseBuffer + conn->lastResponseLength,
+    memmove(conn->environment.response,
+            conn->environment.response + conn->lastResponseLength,
             conn->responseBufferLength - conn->lastResponseLength);
     conn->responseBufferLength -= conn->lastResponseLength;
     conn->lastResponseLength = 0;
@@ -270,7 +281,7 @@ static RBRGen3Error RBRGen3_readSingleResponse(RBRGen3 *conn, RBRGen3DateTime st
 {
     RBRGen3DateTime now;
     int32_t readLength;
-    while ((*end = (char *) rbr_memmem(conn->responseBuffer,
+    while ((*end = (char *) rbr_memmem(conn->environment.response,
                                        conn->responseBufferLength,
                                        RBRGEN3_COMMAND_TERMINATOR,
                                        RBRGEN3_COMMAND_TERMINATOR_LEN)) == NULL) {
@@ -294,7 +305,7 @@ static RBRGen3Error RBRGen3_readSingleResponse(RBRGen3 *conn, RBRGen3DateTime st
          * In either of these cases, we want to give up and indicate a timeout
          * to the caller.
          */
-        RBR_TRY(conn->callbacks.time(conn, &now));
+        RBR_TRY(conn->environment.time(conn, &now));
         if (now - startTime > conn->commandTimeout) {
 
             return RBRGEN3_TIMEOUT;
@@ -303,14 +314,14 @@ static RBRGen3Error RBRGen3_readSingleResponse(RBRGen3 *conn, RBRGen3DateTime st
         /* If the buffer is full but doesn't contain a terminator, there's
          * not much we can do about it: throw out the buffer, then keep
          * trying to fill it. */
-        if (conn->responseBufferLength == RBRGEN3_RESPONSE_BUFFER_MAX) {
+        if (conn->responseBufferLength == conn->environment.responseCapacity) {
             conn->responseBufferLength = 0;
             conn->lastResponseLength = 0;
         }
 
-        readLength = RBRGEN3_RESPONSE_BUFFER_MAX - conn->responseBufferLength;
-        RBR_TRY(conn->callbacks.read(
-            conn, conn->responseBuffer + conn->responseBufferLength, &readLength));
+        readLength = conn->environment.responseCapacity - conn->responseBufferLength;
+        RBR_TRY(conn->environment.read(
+            conn, conn->environment.response + conn->responseBufferLength, &readLength));
 
         conn->responseBufferLength += readLength;
     }
@@ -347,7 +358,7 @@ static void RBRGen3_terminateResponse(RBRGen3 *conn, char **beginning, char *end
      * leaving a trailing linefeed character in the buffer.
      */
 
-    *beginning = (char *) conn->responseBuffer;
+    *beginning = (char *) conn->environment.response;
     *end = '\0';
     conn->lastResponseLength = end + RBRGEN3_COMMAND_TERMINATOR_LEN - *beginning;
 
@@ -549,7 +560,7 @@ RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Samp
 
     RBRGen3Sample *sampleTarget;
     if (sample == NULL) {
-        sampleTarget = conn->callbacks.sampleBuffer;
+        sampleTarget = conn->environment.sampleBuffer;
     } else {
         sampleTarget = sample;
     }
@@ -557,7 +568,7 @@ RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Samp
     /* Skip over streaming samples until we find a real command response, or
      * until we exceed the command timeout. */
     RBRGen3DateTime startTime;
-    RBR_TRY(conn->callbacks.time(conn, &startTime));
+    RBR_TRY(conn->environment.time(conn, &startTime));
     while (true) {
         RBRGen3_removeLastResponse(conn);
 
@@ -568,8 +579,8 @@ RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Samp
 
         if (sampleTarget != NULL &&
             RBRGen3Sample_parse(sampleTarget, beginning) == RBRGEN3_SUCCESS) {
-            if (conn->callbacks.sample != NULL && sample == NULL) {
-                RBR_TRY(conn->callbacks.sample(conn, sampleTarget));
+            if (conn->environment.sample != NULL && sample == NULL) {
+                RBR_TRY(conn->environment.sample(conn, sampleTarget));
             }
             if (breakOnSample) {
                 return RBRGEN3_SAMPLE;
@@ -759,8 +770,8 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...)
          * its command word matches what we sent. To match that, we'll find the
          * first word of the command. */
         int32_t commandLength = 0;
-        while (!isspace(conn->commandBuffer[commandLength]) &&
-               conn->commandBuffer[commandLength] != '\0') {
+        while (!isspace(conn->environment.command[commandLength]) &&
+               conn->environment.command[commandLength] != '\0') {
             ++commandLength;
         }
 
@@ -769,8 +780,8 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...)
          * rather than add another parameter to the function to indicate the
          * expected response, or to specialize the command handling function
          * to include error checking/retry. */
-        uint8_t *commandResponse = conn->commandBuffer;
-        if (commandLength == 4 && memcmp("read", conn->commandBuffer, 4) == 0) {
+        uint8_t *commandResponse = conn->environment.command;
+        if (commandLength == 4 && memcmp("read", conn->environment.command, 4) == 0) {
             commandResponse = (uint8_t *) "data";
         }
 
@@ -823,14 +834,14 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...)
 
                 /* The command was actually invalid. Whoops. */
                 if (invalidCommandLength == commandLength &&
-                    memcmp(invalidCommand, conn->commandBuffer, commandLength) == 0) {
+                    memcmp(invalidCommand, conn->environment.command, commandLength) == 0) {
                     break;
                 }
                 /* We were on the right track, but there was garbage in the
                  * buffer. Retry. */
                 else if (invalidCommandLength > commandLength &&
                          memcmp(invalidCommand + invalidCommandLength - commandLength,
-                                conn->commandBuffer,
+                                conn->environment.command,
                                 commandLength) == 0) {
                     retry = true;
                     break;
@@ -843,8 +854,9 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...)
             } else if (err != RBRGEN3_SUCCESS) {
                 break;
             }
-        } while ((conn->response.response == NULL ||
-                  memcmp(conn->response.response, commandResponse, commandLength) != 0));
+        } while (
+            (conn->response.response == NULL ||
+             strncmp(conn->response.response, (const char *) commandResponse, commandLength) != 0));
     } while (retry);
 
     va_end(format);

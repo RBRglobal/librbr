@@ -480,7 +480,7 @@ typedef struct RBRGen3Sample {
  *
  * This function waits for a streamed sample to arrive, parses it, then calls
  * the RBRGen3SampleCallback provided to the instrument via
- * RBRGen3Callbacks.sample.
+ * RBRGen3Environment.sample.
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when a streaming sample has been read

@@ -104,9 +104,9 @@ static RBRGen3Error RBRGen3L3_parseDataResponse(RBRGen3 *conn, RBRGen3Data *data
 /**
  * \brief Keep retrying reads until we retrieve a fixed amount of data.
  *
- * This function first drains data out of RBRGen3.responseBuffer, then
+ * This function first drains data out of RBRGen3Environment.response, then
  * begins to read from the instrument. As a result, \a data must not be
- * RBRGen3.responseBuffer!
+ * RBRGen3Environment.response!
  *
  * \param [in] conn the instrument connection
  * \param [out] data the buffer to write into
@@ -124,7 +124,8 @@ static RBRGen3Error RBRGen3_fixedRead(struct RBRGen3 *conn, void *data, int32_t 
             readLength = size;
         }
 
-        memcpy(data, ((uint8_t *) conn->responseBuffer) + conn->lastResponseLength, readLength);
+        memcpy(
+            data, ((uint8_t *) conn->environment.response) + conn->lastResponseLength, readLength);
 
         bufferLength = readLength;
         conn->lastResponseLength += readLength;
@@ -134,7 +135,7 @@ static RBRGen3Error RBRGen3_fixedRead(struct RBRGen3 *conn, void *data, int32_t 
     while (bufferLength < size) {
         readLength = size - bufferLength;
 
-        RBR_TRY(conn->callbacks.read(conn, ((uint8_t *) data) + bufferLength, &readLength));
+        RBR_TRY(conn->environment.read(conn, ((uint8_t *) data) + bufferLength, &readLength));
 
         bufferLength += readLength;
     }
@@ -218,7 +219,7 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *conn, RBRGen3Data *data)
     }
 
     /* Fill the user-provided buffer. RBRGen3_fixedRead() will first pull
-     * leftover data from RBRGen3.responseBuffer, then read from the
+     * leftover data from RBRGen3Environment.response, then read from the
      * instrument. */
     RBR_TRY(RBRGen3_fixedRead(conn, data->data, workingData.size));
 
@@ -624,46 +625,60 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
             (double) postprocessing->dcCtCoeff));
     }
 
-    char *commandBuffer = (char *) conn->commandBuffer;
+    char *commandBuffer = (char *) conn->environment.command;
     int32_t *commandBufferLength = &conn->commandBufferLength;
 
-    *commandBufferLength =
-        snprintf(commandBuffer, sizeof(conn->commandBuffer), "postprocessing channels =");
+    *commandBufferLength = snprintf(
+        commandBuffer, (size_t) conn->environment.commandCapacity, "postprocessing channels =");
 
     /* As with fetching, we want to be cautious that we don't exceed the length
      * of the command buffer when configuring many channels. We'll defensively
      * add each to the buffer, flushing as necessary. */
-    char separator = ' ';
+    /* A piece which cannot fit an empty buffer is refused before any part of
+     * the command has gone out. */
     const char *functionName;
     for (int channel = 0; channel < channelsList->count; ++channel) {
         functionName =
             RBRGen3PostprocessingAggregate_name(channelsList->channels[channel].function);
+        if (3 + strlen(functionName) + strlen(channelsList->channels[channel].label) >=
+            (size_t) conn->environment.commandCapacity) {
+            return RBRGEN3_BUFFER_TOO_SMALL;
+        }
+    }
 
-        if (*commandBufferLength + 3 /* separator + paren pair */
-                + strlen(functionName) + strlen(channelsList->channels[channel].label) >
-            sizeof(conn->commandBuffer)) {
+    char separator = ' ';
+    for (int channel = 0; channel < channelsList->count; ++channel) {
+        functionName =
+            RBRGen3PostprocessingAggregate_name(channelsList->channels[channel].function);
+
+        /* snprintf() needs a byte for its null beyond the piece. */
+        if ((size_t) *commandBufferLength + 3 /* separator + paren pair */
+                + strlen(functionName) + strlen(channelsList->channels[channel].label) >=
+            (size_t) conn->environment.commandCapacity) {
             RBR_TRY(RBRGen3_sendBuffer(conn));
             *commandBufferLength = 0;
         }
 
-        *commandBufferLength += snprintf(commandBuffer + *commandBufferLength,
-                                         sizeof(conn->commandBuffer) - *commandBufferLength,
-                                         "%c%s(%s)",
-                                         separator,
-                                         functionName,
-                                         channelsList->channels[channel].label);
+        *commandBufferLength +=
+            snprintf(commandBuffer + *commandBufferLength,
+                     (size_t) (conn->environment.commandCapacity - *commandBufferLength),
+                     "%c%s(%s)",
+                     separator,
+                     functionName,
+                     channelsList->channels[channel].label);
         separator = '|';
     }
 
-    if ((size_t) *commandBufferLength + RBRGEN3_SEND_COMMAND_TERMINATOR_LEN >
-        sizeof(conn->commandBuffer)) {
+    if ((size_t) *commandBufferLength + RBRGEN3_SEND_COMMAND_TERMINATOR_LEN >=
+        (size_t) conn->environment.commandCapacity) {
         RBR_TRY(RBRGen3_sendBuffer(conn));
         *commandBufferLength = 0;
     }
 
-    *commandBufferLength += snprintf(commandBuffer + *commandBufferLength,
-                                     sizeof(conn->commandBuffer) - *commandBufferLength,
-                                     RBRGEN3_SEND_COMMAND_TERMINATOR);
+    *commandBufferLength +=
+        snprintf(commandBuffer + *commandBufferLength,
+                 (size_t) (conn->environment.commandCapacity - *commandBufferLength),
+                 RBRGEN3_SEND_COMMAND_TERMINATOR);
 
     RBR_TRY(RBRGen3_sendBuffer(conn));
 

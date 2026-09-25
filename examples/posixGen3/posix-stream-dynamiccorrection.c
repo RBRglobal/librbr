@@ -161,6 +161,8 @@ int main(int argc, char *argv[])
 
     RBRGen3Error err;
     RBRGen3 conn;
+    uint8_t commandBuffer[RBRGEN3_COMMAND_BUFFER_DEFAULT];
+    uint8_t responseBuffer[RBRGEN3_RESPONSE_BUFFER_DEFAULT];
 
     if (argc < 2) {
         fprintf(stderr, "Usage: %s device\n", argv[0]);
@@ -176,17 +178,21 @@ int main(int argc, char *argv[])
 
     fprintf(stderr, "%s: Using %s v%s.\n", programName, RBRGEN3_LIB_NAME, RBRGEN3_LIB_VERSION);
 
-    RBRGen3Callbacks callbacks = {
+    RBRGen3Environment environment = {
         .time = instrumentTime, // in millisecond
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite,
         .sample = instrumentSample,
         .sampleBuffer = &g_sample,
+        .command = commandBuffer,
+        .commandCapacity = sizeof(commandBuffer),
+        .response = responseBuffer,
+        .responseCapacity = sizeof(responseBuffer),
     };
 
     if ((err = RBRGen3_open(
-             &conn, &callbacks, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd)) !=
+             &conn, &environment, INSTRUMENT_COMMAND_TIMEOUT_MSEC, (void *) &instrumentFd)) !=
         RBRGEN3_SUCCESS) {
         fprintf(stderr,
                 "%s: Failed to establish instrument connection: %s!\n",

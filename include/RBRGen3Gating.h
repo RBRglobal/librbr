@@ -179,6 +179,8 @@ RBRGen3Error RBRGen3_getThresholding(RBRGen3 *conn, RBRGen3Thresholding *thresho
  * \param [in] conn the instrument connection
  * \param [in] threshold the thresholding parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_BUFFER_TOO_SMALL when the command does not fit the
+ *         command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
