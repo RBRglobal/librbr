@@ -15,6 +15,12 @@
 extern "C" {
 #endif
 
+#include "RBRGen4.h"
+/* Required for RBRGen4Config. */
+#include "RBRGen4Configuration.h"
+/* Required for RBRGen4InstrumentState. */
+#include "RBRGen4Instrument.h"
+
 /**
  * \brief Instrument `clock` command parameters.
  *

@@ -15,6 +15,10 @@
 extern "C" {
 #endif
 
+#include "RBRGen3.h"
+/* Required for RBRGen3ChannelIndex. */
+#include "RBRGen3Configuration.h"
+
 /** \brief The state of a gating condition. */
 typedef enum RBRGen3GatingState {
     /** \brief The gating condition is disabled. */

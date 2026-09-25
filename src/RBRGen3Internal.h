@@ -20,6 +20,9 @@
 extern "C" {
 #endif
 
+#include "RBRGen3.h"
+#include "RBRGen3Streaming.h"
+
 /** \brief Timestamp indicating that no instrument activity has occurred. */
 #define RBRGEN3_NO_ACTIVITY ((RBRGen3DateTime) - 1)
 

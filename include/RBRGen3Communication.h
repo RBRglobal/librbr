@@ -16,6 +16,8 @@
 extern "C" {
 #endif
 
+#include "RBRGen3.h"
+
 /**
  * \brief Instrument link types.
  *

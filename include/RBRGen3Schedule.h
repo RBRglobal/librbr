@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+#include "RBRGen3.h"
+
 /**
  * \brief The maximum number of available fast sampling periods to parse from
  * the instrument.

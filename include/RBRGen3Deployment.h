@@ -15,6 +15,10 @@
 extern "C" {
 #endif
 
+#include "RBRGen3.h"
+/* Required for RBRGen3DeploymentStatus. */
+#include "RBRGen3Schedule.h"
+
 /**
  * \brief Perform a “dry run” of the `enable` command.
  *

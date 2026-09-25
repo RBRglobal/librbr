@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+#include "RBRGen3.h"
+
 /** \brief The maximum number of regimes configurable on an instrument. */
 #define RBRGEN3_REGIME_MAX 3
 

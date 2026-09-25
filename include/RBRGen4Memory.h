@@ -16,6 +16,8 @@
 extern "C" {
 #endif
 
+#include "RBRGen4.h"
+
 /**
  * \brief Possible storage access modes for the instrument's data memory.
  *

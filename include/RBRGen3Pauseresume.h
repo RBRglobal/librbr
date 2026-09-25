@@ -16,6 +16,8 @@
 extern "C" {
 #endif
 
+#include "RBRGen3.h"
+
 /** \brief The state of a pauseresume condition. */
 typedef enum RBRGen3PauseresumeState {
     /** \brief The pauseresuming condition is disabled, or sampling mode is regimes. */
