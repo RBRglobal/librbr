@@ -111,23 +111,27 @@ typedef struct RBRGen3Calibration {
      * Unused entries should be set to 0.
      */
     RBRGen3DateTime dateTime;
-    /**
-     *\brief Calibration C coefficients.
-     *
-     * Unused entries should be set to NaN.
-     */
+
+    /** \brief The number of c coefficients the equation uses. */
+    int32_t cCount;
+
+    /** \brief Calibration C coefficients. */
     float c[RBRGEN3_CALIBRATION_C_COEFFICIENT_MAX];
-    /**
-     *\brief Calibration X coefficients.
-     *
-     * Unused entries should be set to NaN.
-     */
+
+    /** \brief The number of x coefficients the equation uses. */
+    int32_t xCount;
+
+    /** \brief Calibration X coefficients. */
     float x[RBRGEN3_CALIBRATION_X_COEFFICIENT_MAX];
+
+    /** \brief The number of input channel indices the equation uses. */
+    int32_t nCount;
+
     /**
-     *\brief Input channel indices.
+     * \brief Input channel indices.
      *
-     * Unused entries should be set to 0. Entries corresponding to the special
-     * “value” value are set to #RBRGEN3_VALUE_COEFFICIENT.
+     * Entries corresponding to the special “value” value are set to
+     * #RBRGEN3_VALUE_COEFFICIENT.
      */
     RBRGen3ChannelIndex n[RBRGEN3_CALIBRATION_N_COEFFICIENT_MAX];
 } RBRGen3Calibration;
@@ -406,8 +410,9 @@ RBRGen3Error RBRGen3_setChannelGain(RBRGen3 *conn, RBRGen3ChannelIndex channel,
  * RBRGen3_getChannels() after updating coefficients to confirm the
  * values written.
  *
- * Values of in the _n_ coefficient group (RBRGen3Calibration.n) are
- * ignored.
+ * Sends RBRGen3Calibration.cCount c and RBRGen3Calibration.xCount x
+ * coefficients. The _n_ coefficient group (RBRGen3Calibration.nCount and
+ * RBRGen3Calibration.n) is ignored.
  *
  * \param [in] conn the instrument connection
  * \param [in] channel the index of the channel to update
@@ -419,8 +424,9 @@ RBRGen3Error RBRGen3_setChannelGain(RBRGen3 *conn, RBRGen3ChannelIndex channel,
  *                                 another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the date/time of the
  *                                                calibration is out of range,
+ *                                                when a count is out of range,
  *                                                or when no coefficients are
- *                                                populated
+ *                                                given
  * \see RBRGen3_getChannels()
  */
 RBRGen3Error RBRGen3_setCalibration(RBRGen3 *conn, RBRGen3ChannelIndex channel,

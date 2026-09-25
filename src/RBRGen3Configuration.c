@@ -49,13 +49,6 @@ static RBRGen3Error RBRGen3_clearChannel(RBRGen3Channel *channel)
 
     snprintf(channel->label, sizeof(channel->label), "%s", "none");
 
-    for (int32_t c = 0; c < RBRGEN3_CALIBRATION_C_COEFFICIENT_MAX; ++c) {
-        channel->calibration.c[c] = NAN;
-    }
-    for (int32_t x = 0; x < RBRGEN3_CALIBRATION_X_COEFFICIENT_MAX; ++x) {
-        channel->calibration.x[x] = NAN;
-    }
-
     return RBRGEN3_SUCCESS;
 }
 
@@ -80,14 +73,25 @@ static RBRGen3Error RBRGen3_getChannelCoefficients(RBRGen3 *conn, int32_t channe
             continue;
         }
 
-        int32_t index = strtol(&parameter.key[1], NULL, 10);
+        /* A coefficient key is a group letter and an index: `c0`, `x15`. */
+        char *end = NULL;
+        int32_t index = strtol(&parameter.key[1], &end, 10);
+        if (parameter.key[1] == '\0' || *end != '\0') {
+            continue;
+        }
 
         if (parameter.key[0] == 'c' && index >= 0 &&
             index < RBRGEN3_CALIBRATION_C_COEFFICIENT_MAX) {
             channel->calibration.c[index] = strtod(parameter.value, NULL);
+            if (index >= channel->calibration.cCount) {
+                channel->calibration.cCount = index + 1;
+            }
         } else if (parameter.key[0] == 'x' && index >= 0 &&
                    index < RBRGEN3_CALIBRATION_X_COEFFICIENT_MAX) {
             channel->calibration.x[index] = strtod(parameter.value, NULL);
+            if (index >= channel->calibration.xCount) {
+                channel->calibration.xCount = index + 1;
+            }
         } else if (parameter.key[0] == 'n' && index >= 0 &&
                    index < RBRGEN3_CALIBRATION_N_COEFFICIENT_MAX) {
             RBRGen3ChannelIndex coefficient;
@@ -98,6 +102,9 @@ static RBRGen3Error RBRGen3_getChannelCoefficients(RBRGen3 *conn, int32_t channe
             }
 
             channel->calibration.n[index] = coefficient;
+            if (index >= channel->calibration.nCount) {
+                channel->calibration.nCount = index + 1;
+            }
         }
     }
 
@@ -281,16 +288,21 @@ RBRGen3Error RBRGen3_setCalibration(RBRGen3 *conn, RBRGen3ChannelIndex channel,
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
+    if (calibration->cCount < 0 || calibration->cCount > RBRGEN3_CALIBRATION_C_COEFFICIENT_MAX ||
+        calibration->xCount < 0 || calibration->xCount > RBRGEN3_CALIBRATION_X_COEFFICIENT_MAX) {
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
+    }
+
+    if (calibration->cCount == 0 && calibration->xCount == 0) {
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
+    }
+
     char calibrationDateTime[RBRGEN3_SCHEDULE_TIME_LEN + 1];
     RBRGen3DateTime_toScheduleTime(calibration->dateTime, calibrationDateTime);
 
     const char *calibrationCommand = "calibration %d datetime = %s, %c%d = %g";
 
-    bool populated = false;
-
-    for (int32_t c = 0; c < RBRGEN3_CALIBRATION_C_COEFFICIENT_MAX && !isnan(calibration->c[c]);
-         ++c) {
-        populated = true;
+    for (int32_t c = 0; c < calibration->cCount; ++c) {
         RBR_TRY(RBRGen3_converse(conn,
                                  calibrationCommand,
                                  channel,
@@ -299,9 +311,7 @@ RBRGen3Error RBRGen3_setCalibration(RBRGen3 *conn, RBRGen3ChannelIndex channel,
                                  c,
                                  (double) calibration->c[c]));
     }
-    for (int32_t x = 0; x < RBRGEN3_CALIBRATION_X_COEFFICIENT_MAX && !isnan(calibration->x[x]);
-         ++x) {
-        populated = true;
+    for (int32_t x = 0; x < calibration->xCount; ++x) {
         RBR_TRY(RBRGen3_converse(conn,
                                  calibrationCommand,
                                  channel,
@@ -309,10 +319,6 @@ RBRGen3Error RBRGen3_setCalibration(RBRGen3 *conn, RBRGen3ChannelIndex channel,
                                  'x',
                                  x,
                                  (double) calibration->x[x]));
-    }
-
-    if (!populated) {
-        return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
     return RBRGEN3_SUCCESS;
