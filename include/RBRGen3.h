@@ -698,12 +698,13 @@ typedef struct RBRGen3 {
  * immediately. The pointers passed will coincide with the caller-supplied
  * buffers, and may be overwritten as soon as the callback returns.
  *
- * This library supports 3rd-generation RBR instruments and, to a lesser
+ * This constructor supports 3rd-generation RBR instruments and, to a lesser
  * extent, 2nd-generation instruments. 1st-generation and third-party
- * instruments are not supported. If the library detects an unsupported
- * instrument during connection, #RBRGEN3_UNSUPPORTED is returned; a callback
- * failure or a buffer too small for the identification exchange is reported
- * as itself.
+ * instruments are not supported. 4th-generation instruments can be identified,
+ * but full support is left to the Gen4 side of the library; see the note below.
+ * If the constructor detects an unsupported instrument during connection,
+ * #RBRGEN3_UNSUPPORTED is returned; a callback failure or a buffer too small
+ * for the identification exchange is reported as itself.
  *
  * In the event of any return value other than #RBRGEN3_SUCCESS, no cleanup of
  * library resources is required. In the event of a successful result,
