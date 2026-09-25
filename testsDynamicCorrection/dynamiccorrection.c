@@ -186,7 +186,7 @@ static bool test_dynamic_correction(float *dataset, float Fs)
     return true;
 }
 
-TEST_LOGGER3(verify_pss78)
+TEST(verify_pss78)
 {
     Pss78Test tests[] = {
         {110.0f, 5.0f, 2500.0f, 138.626f},
@@ -199,12 +199,12 @@ TEST_LOGGER3(verify_pss78)
     return test_verify_pss78(tests);
 }
 
-TEST_LOGGER3(verify_ascent_rate)
+TEST(verify_ascent_rate)
 {
     return test_verify_ascent_rate();
 }
 
-TEST_LOGGER3(verify_coeff_alpha_tau_ctcoeff)
+TEST(verify_coeff_alpha_tau_ctcoeff)
 {
     DCorrCoeffTest tests[] = {
         {0.02f, 0.120f, 12.26f, 0.046f},
@@ -229,7 +229,7 @@ TEST_LOGGER3(verify_coeff_alpha_tau_ctcoeff)
     return test_verify_coeff_alpha_tau_ctcoeff(tests);
 }
 
-TEST_LOGGER3(verify_dynamic_correction)
+TEST(verify_dynamic_correction)
 {
     /* Expect timestamp,C,T,P,Tcond,Tcor,Scor */
     float dataset[][TEST_DYNCORR_DATASET_SIZE] = {
@@ -350,3 +350,11 @@ TEST_LOGGER3(verify_dynamic_correction)
 
     return test_dynamic_correction(dataset[0], 4.0f);
 }
+
+const DynamicCorrectionTest dynamicCorrectionTests[] = {
+    {"verify_pss78", verify_pss78},
+    {"verify_ascent_rate", verify_ascent_rate},
+    {"verify_coeff_alpha_tau_ctcoeff", verify_coeff_alpha_tau_ctcoeff},
+    {"verify_dynamic_correction", verify_dynamic_correction},
+    {0},
+};
