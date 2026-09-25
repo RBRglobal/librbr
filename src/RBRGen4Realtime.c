@@ -124,7 +124,7 @@ static RBRGen4Error RBRGen4_sendPoll(RBRGen4 *conn, bool requireLabel, const cha
                sizeof("poll channellist=" RBRGEN4_SEND_COMMAND_TERMINATOR)] = "";
     if (parameter != NULL) {
         /* An empty list is invalid */
-        if (list == NULL || list->count == 0) {
+        if (list == NULL || list->len == 0) {
             return RBRGEN4_INVALID_PARAMETER_VALUE;
         }
 

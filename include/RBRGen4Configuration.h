@@ -233,13 +233,11 @@ typedef struct RBRGen4ChannelPool {
     int32_t size;
 
     /**
-     * \brief The number of channels reported.
+     * \brief The number of channels stored in #pool. Never exceeds #size.
      *
-     * \warning This field will be larger than #size when
-     * #RBRGEN4_TRUNCATED is returned by the getter. Care should be
-     * taken to avoid out-of-bounds access when iterating over #pool.
+     * \see RBRGen4_getChannelCount() for the number the instrument has.
      */
-    int32_t count;
+    int32_t len;
 
     /**
      * \brief User provided buffer of the channels reported.
@@ -307,10 +305,8 @@ RBRGen4Error RBRGen4_setChannel(RBRGen4 *conn, const RBRGen4Channel *channel);
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_TRUNCATED when \a channelPool cannot hold every
- *                                      reported channel; the first `size` are
- *                                      stored, and `count` is set to the value
- *                                      reported by the instrument which WILL
- *                                      exceed `size`
+ *                            reported channel; the first `size` are
+ *                            stored
  * \return #RBRGEN4_HARDWARE_ERROR when the channel pool cannot be read, or
  *                                      another hardware error occurs
  * \see RBRGen4_getChannelPoolByNature()
@@ -332,10 +328,8 @@ RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPo
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_TRUNCATED when \a channelPool cannot hold every
- *                                      reported channel; the first `size` are
- *                                      stored, and `count` is set to the value
- *                                      reported by the instrument which WILL
- *                                      exceed `size`
+ *                            reported channel; the first `size` are
+ *                            stored
  * \return #RBRGEN4_HARDWARE_ERROR when the channel pool cannot be read, or
  *                                      another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the nature is not
@@ -344,6 +338,22 @@ RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPo
  */
 RBRGen4Error RBRGen4_getChannelPoolByNature(RBRGen4 *conn, RBRGen4ChannelNature nature,
                                             RBRGen4ChannelPool *channelPool);
+
+/**
+ * \brief Read the number of channels present on the instrument.
+ *
+ * \note Issues the `channel count` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] count the number of channels present
+ * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getChannelPool()
+ */
+RBRGen4Error RBRGen4_getChannelCount(RBRGen4 *conn, int32_t *count);
 
 /**
  * \brief Read a channel's calibration.
@@ -553,10 +563,8 @@ typedef struct RBRGen4Group {
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \return #RBRGEN4_TRUNCATED when \a channelList cannot hold every
- *                                      reported channel; the first `size` are
- *                                      stored, and `count` is set to the value
- *                                      reported by the instrument which WILL
- *                                      exceed `size`
+ *                            reported channel; the first `size` are
+ *                            stored
  * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist, or another
  *                                      hardware error occurs
  * \see RBRGen4_getGroupPool()
@@ -581,10 +589,10 @@ RBRGen4Error RBRGen4_getGroup(RBRGen4 *conn, RBRGen4Group *group, RBRGen4LabelLi
  * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be written, or another
  *                                      hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
- *                                                    \a channelList is `NULL`,
- *                                                    its count does not fit
- *                                                    its array, or a channel
- *                                                    label is empty
+ *                                          \a channelList is `NULL`,
+ *                                          its length does not fit
+ *                                          its array, or a channel
+ *                                          label is empty
  * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
  *                                            command
  * \see RBRGen4_getGroup()
@@ -603,16 +611,12 @@ typedef struct RBRGen4GroupPool {
     int32_t size;
 
     /**
-     * \brief The number of groups defined on the instrument.
+     * \brief The number of groups stored in #pool. Never exceeds #size.
      *
-     * \warning This field will be larger than #size when
-     * #RBRGEN4_TRUNCATED is returned by the getter. Care should be
-     * taken to avoid out-of-bounds access when iterating over #pool.
+     * \see RBRGen4_getGroupCount() for the number the instrument has.
+     * \see RBRGen4_getGroupMaxCount() for the number it can hold.
      */
-    int32_t count;
-
-    /** \brief The maximum number of groups that can exist on the instrument. */
-    int32_t maxCount;
+    int32_t len;
 
     /** \brief User provided buffer of the groups defined. */
     RBRGen4Group *pool;
@@ -632,13 +636,44 @@ typedef struct RBRGen4GroupPool {
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_TRUNCATED when \a groupPool cannot hold every
- *                                      reported group; the first `size` are
- *                                      stored, and `count` is set to the value
- *                                      reported by the instrument which WILL
- *                                      exceed `size`
+ *                            reported group; the first `size` are
+ *                            stored
  * \see RBRGen4_getGroup()
  */
 RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool);
+
+/**
+ * \brief Read the number of groups defined on the instrument.
+ *
+ * \note Issues the `group count` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] count the number of groups defined
+ * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getGroupPool()
+ * \see RBRGen4_getGroupMaxCount()
+ */
+RBRGen4Error RBRGen4_getGroupCount(RBRGen4 *conn, int32_t *count);
+
+/**
+ * \brief Read the maximum number of groups the instrument can hold.
+ *
+ * \note Issues the `group maxcount` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] maxCount the maximum number of groups
+ * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getGroupCount()
+ */
+RBRGen4Error RBRGen4_getGroupMaxCount(RBRGen4 *conn, int32_t *maxCount);
 
 /**
  * \brief Create an empty group.
@@ -882,10 +917,8 @@ typedef struct RBRGen4Schedule {
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \return #RBRGEN4_TRUNCATED when \a groupList cannot hold every
- *                                      reported group; the first `size` are
- *                                      stored, and `count` is set to the value
- *                                      reported by the instrument which WILL
- *                                      exceed `size`
+ *                            reported group; the first `size` are
+ *                            stored
  * \return #RBRGEN4_HARDWARE_ERROR when the schedule does not exist, or another
  *                                      hardware error occurs
  * \see RBRGen4_getSchedulePool()
@@ -915,11 +948,11 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
  *                                      unavailable, or another hardware error
  *                                      occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
- *                                                    the list's count does
- *                                                    not fit its array, a
- *                                                    group label is empty,
- *                                                    or the mode is not a
- *                                                    single known flag
+ *                                          the list's length does
+ *                                          not fit its array, a
+ *                                          group label is empty,
+ *                                          or the mode is not a
+ *                                          single known flag
  * \return #RBRGEN4_UNSUPPORTED when the mode is `ddsampling` or
  *                                        `regimes`
  * \return #RBRGEN4_BUFFER_TOO_SMALL when the command does not fit
@@ -939,19 +972,12 @@ typedef struct RBRGen4SchedulePool {
     int32_t size;
 
     /**
-     * \brief The number of schedules defined on the instrument.
+     * \brief The number of schedules stored in #pool. Never exceeds #size.
      *
-     * \warning This field will be larger than #size when
-     * #RBRGEN4_TRUNCATED is returned by the getter. Care should be
-     * taken to avoid out-of-bounds access when iterating over #pool.
+     * \see RBRGen4_getScheduleCount() for the number the instrument has.
+     * \see RBRGen4_getScheduleMaxCount() for the number it can hold.
      */
-    int32_t count;
-
-    /**
-     * \brief The maximum number of schedules that can exist on the
-     * instrument.
-     */
-    int32_t maxCount;
+    int32_t len;
 
     /** \brief User provided buffer of the schedules defined. */
     RBRGen4Schedule *pool;
@@ -983,13 +1009,44 @@ const char *RBRGen4ScheduleMode_name(RBRGen4ScheduleMode mode);
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_TRUNCATED when \a schedulePool cannot hold every
- *                                      reported schedule; the first `size` are
- *                                      stored, and `count` is set to the value
- *                                      reported by the instrument which WILL
- *                                      exceed `size`
+ *                            reported schedule; the first `size` are
+ *                            stored
  * \see RBRGen4_getSchedule()
  */
 RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedulePool);
+
+/**
+ * \brief Read the number of schedules defined on the instrument.
+ *
+ * \note Issues the `schedule count` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] count the number of schedules defined
+ * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getSchedulePool()
+ * \see RBRGen4_getScheduleMaxCount()
+ */
+RBRGen4Error RBRGen4_getScheduleCount(RBRGen4 *conn, int32_t *count);
+
+/**
+ * \brief Read the maximum number of schedules the instrument can hold.
+ *
+ * \note Issues the `schedule maxcount` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] maxCount the maximum number of schedules
+ * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getScheduleCount()
+ */
+RBRGen4Error RBRGen4_getScheduleMaxCount(RBRGen4 *conn, int32_t *maxCount);
 
 /**
  * \brief Create a schedule with default parameters.
@@ -1074,10 +1131,8 @@ typedef struct RBRGen4Config {
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \return #RBRGEN4_TRUNCATED when \a scheduleList cannot hold every
- *                                      reported schedule; the first `size` are
- *                                      stored, and `count` is set to the value
- *                                      reported by the instrument which WILL
- *                                      exceed `size`
+ *                            reported schedule; the first `size` are
+ *                            stored
  * \return #RBRGEN4_HARDWARE_ERROR when the configuration does not exist, or
  *                                      another hardware error occurs
  * \see RBRGen4_getConfigPool()
@@ -1103,10 +1158,10 @@ RBRGen4Error RBRGen4_getConfig(RBRGen4 *conn, RBRGen4Config *config,
  * \return #RBRGEN4_HARDWARE_ERROR when the configuration cannot be written, or
  *                                      another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
- *                                                    \a scheduleList is
- *                                                    `NULL`, its count does
- *                                                    not fit its array, or a
- *                                                    schedule label is empty
+ *                                          \a scheduleList is
+ *                                          `NULL`, its length does
+ *                                          not fit its array, or a
+ *                                          schedule label is empty
  * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
  *                                            command
  * \see RBRGen4_getConfig()
@@ -1125,19 +1180,13 @@ typedef struct RBRGen4ConfigPool {
     int32_t size;
 
     /**
-     * \brief The number of configurations defined on the instrument.
+     * \brief The number of configurations stored in #pool. Never exceeds
+     * #size.
      *
-     * \warning This field will be larger than #size when
-     * #RBRGEN4_TRUNCATED is returned by the getter. Care should be
-     * taken to avoid out-of-bounds access when iterating over #pool.
+     * \see RBRGen4_getConfigCount() for the number the instrument has.
+     * \see RBRGen4_getConfigMaxCount() for the number it can hold.
      */
-    int32_t count;
-
-    /**
-     * \brief The maximum number of configurations that can exist on the
-     * instrument.
-     */
-    int32_t maxCount;
+    int32_t len;
 
     /** \brief User provided buffer of the configurations defined. */
     RBRGen4Config *pool;
@@ -1157,13 +1206,44 @@ typedef struct RBRGen4ConfigPool {
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_TRUNCATED when \a configPool cannot hold every
- *                                      reported configuration; the first
- *                                      `size` are stored, and `count` is set
- *                                      to the value reported by the instrument
- *                                      which WILL exceed `size`
+ *                            reported configuration; the first
+ *                            `size` are stored
  * \see RBRGen4_getConfig()
  */
 RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool);
+
+/**
+ * \brief Read the number of configurations defined on the instrument.
+ *
+ * \note Issues the `config count` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] count the number of configurations defined
+ * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getConfigPool()
+ * \see RBRGen4_getConfigMaxCount()
+ */
+RBRGen4Error RBRGen4_getConfigCount(RBRGen4 *conn, int32_t *count);
+
+/**
+ * \brief Read the maximum number of configurations the instrument can hold.
+ *
+ * \note Issues the `config maxcount` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] maxCount the maximum number of configurations
+ * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getConfigCount()
+ */
+RBRGen4Error RBRGen4_getConfigMaxCount(RBRGen4 *conn, int32_t *maxCount);
 
 /**
  * \brief Create an empty configuration.

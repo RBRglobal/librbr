@@ -405,9 +405,9 @@ char *RBRGen4_splitListValue(char *value);
  * \param [in] labelList the labels to write
  * \return #RBRGEN4_SUCCESS when the list is formatted
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a labelList is
- *                                                    `NULL`, its count does
- *                                                    not fit its array, or a
- *                                                    label is empty
+ *                                          `NULL`, its length does
+ *                                          not fit its array, or a
+ *                                          label is empty
  * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit
  */
 RBRGen4Error RBRGen4_formatLabelList(char *value, int32_t size, const RBRGen4LabelList *labelList);
@@ -415,8 +415,8 @@ RBRGen4Error RBRGen4_formatLabelList(char *value, int32_t size, const RBRGen4Lab
 /**
  * \brief Copy a pipe-separated parameter value into a label list.
  *
- * `none` yields a zero count. The count is the number of labels reported;
- * labels past the list's capacity are discarded.
+ * `none` yields a zero length. Labels past the list's capacity are
+ * discarded.
  *
  * \param [out] labelList the caller-provided label list
  * \param [in,out] value the response value, consumed in place

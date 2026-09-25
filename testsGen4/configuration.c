@@ -416,8 +416,8 @@ TEST_LOGGER4(channellist)
     RBRGen4Error err = RBRGen4_getChannelPool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("channel" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_EQ(4, actual.count, "%" PRIi32);
-    for (int32_t channel = 0; channel < actual.count; ++channel) {
+    TEST_ASSERT_EQ(4, actual.len, "%" PRIi32);
+    for (int32_t channel = 0; channel < actual.len; ++channel) {
         TEST_ASSERT_STR_EQ(expected[channel], actual.pool[channel].label);
     }
 
@@ -436,9 +436,44 @@ TEST_LOGGER4(channellistTooSmall)
 
     RBRGen4Error err = RBRGen4_getChannelPool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED, err, RBRGen4Error);
-    TEST_ASSERT_EQ(4, actual.count, "%" PRIi32);
+    TEST_ASSERT_EQ(2, actual.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("temperature_00", actual.pool[0].label);
     TEST_ASSERT_STR_EQ("pressure_00", actual.pool[1].label);
+
+    return true;
+}
+
+TEST_LOGGER4(channellistExactFit)
+{
+    /* A pool the reported channels exactly fill is not truncated. */
+    RBRGEN4_CHANNEL_POOL_DECL(actual, 4);
+
+    TestIOBuffers_init(
+        buffers,
+        "channel count=4 "
+        "list=temperature_00|pressure_00|seapressure_00|depth_00" RESPONSE_TERMINATOR,
+        0);
+
+    RBRGen4Error err = RBRGen4_getChannelPool(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_EQ(4, actual.len, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("depth_00", actual.pool[3].label);
+
+    return true;
+}
+
+TEST_LOGGER4(channellistRepeated)
+{
+    /* A repeated list replaces the pool rather than extending it. */
+    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+
+    TestIOBuffers_init(
+        buffers, "channel count=1 list=temperature_00 list=pressure_00" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getChannelPool(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_EQ(1, actual.len, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("pressure_00", actual.pool[0].label);
 
     return true;
 }
@@ -457,7 +492,7 @@ TEST_LOGGER4(channellistScientific)
         RBRGen4_getChannelPoolByNature(conn, RBRGEN4_CHANNEL_NATURE_SCIENTIFIC, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("channel scientific" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_EQ(4, actual.count, "%" PRIi32);
+    TEST_ASSERT_EQ(4, actual.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("temperature_00", actual.pool[0].label);
 
     return true;
@@ -472,7 +507,35 @@ TEST_LOGGER4(channellistWithoutChannels)
     RBRGen4Error err = RBRGen4_getChannelPoolByNature(conn, RBRGEN4_CHANNEL_NATURE_SYSTEM, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("channel system" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_EQ(0, actual.count, "%" PRIi32);
+    TEST_ASSERT_EQ(0, actual.len, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(channelCount)
+{
+    int32_t count = -1;
+
+    TestIOBuffers_init(buffers, "channel count=6" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getChannelCount(conn, &count);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("channel count" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(6, count, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(channelCountWithoutChannels)
+{
+    int32_t count = -1;
+
+    TestIOBuffers_init(buffers, "channel count=0" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getChannelCount(conn, &count);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("channel count" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(0, count, "%" PRIi32);
 
     return true;
 }
@@ -630,8 +693,7 @@ TEST_LOGGER4(grouplist)
     RBRGen4Error err = RBRGen4_getGroupPool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("group" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_EQ(2, actual.count, "%" PRIi32);
-    TEST_ASSERT_EQ(16, actual.maxCount, "%" PRIi32);
+    TEST_ASSERT_EQ(2, actual.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("g_a", actual.pool[0].label);
     TEST_ASSERT_STR_EQ("g_b", actual.pool[1].label);
 
@@ -646,7 +708,7 @@ TEST_LOGGER4(grouplistTooSmall)
 
     RBRGen4Error err = RBRGen4_getGroupPool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED, err, RBRGen4Error);
-    TEST_ASSERT_EQ(2, actual.count, "%" PRIi32);
+    TEST_ASSERT_EQ(1, actual.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("g_a", actual.pool[0].label);
 
     return true;
@@ -660,9 +722,36 @@ TEST_LOGGER4(grouplistWithoutGroups)
 
     RBRGen4Error err = RBRGen4_getGroupPool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
-    TEST_ASSERT_EQ(0, actual.count, "%" PRIi32);
-    TEST_ASSERT_EQ(16, actual.maxCount, "%" PRIi32);
+    TEST_ASSERT_EQ(0, actual.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("", actual.pool[0].label);
+
+    return true;
+}
+
+TEST_LOGGER4(groupCount)
+{
+    int32_t count = -1;
+
+    TestIOBuffers_init(buffers, "group count=3" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getGroupCount(conn, &count);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("group count" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(3, count, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(groupMaxCount)
+{
+    int32_t maxCount = -1;
+
+    TestIOBuffers_init(buffers, "group maxcount=16" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getGroupMaxCount(conn, &maxCount);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("group maxcount" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(16, maxCount, "%" PRIi32);
 
     return true;
 }
@@ -684,7 +773,7 @@ TEST_LOGGER4(group)
     RBRGen4Error err = RBRGen4_getGroup(conn, &group, &channelList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("group g_a" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_EQ(2, channelList.count, "%" PRIi32);
+    TEST_ASSERT_EQ(2, channelList.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("temperature_00", channelList.labels[0]);
     TEST_ASSERT_STR_EQ("pressure_00", channelList.labels[1]);
 
@@ -703,7 +792,7 @@ TEST_LOGGER4(groupWithoutChannels)
 
     RBRGen4Error err = RBRGen4_getGroup(conn, &group, &channelList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
-    TEST_ASSERT_EQ(0, channelList.count, "%" PRIi32);
+    TEST_ASSERT_EQ(0, channelList.len, "%" PRIi32);
 
     return true;
 }
@@ -740,7 +829,7 @@ TEST_LOGGER4(groupChannelListTooSmall)
 
     RBRGen4Error err = RBRGen4_getGroup(conn, &group, &channelList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED, err, RBRGen4Error);
-    TEST_ASSERT_EQ(2, channelList.count, "%" PRIi32);
+    TEST_ASSERT_EQ(1, channelList.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("temperature_00", channelList.labels[0]);
 
     return true;
@@ -770,7 +859,7 @@ TEST_LOGGER4(groupSet)
     RBRGen4Label labelBuf[] = {"temperature_00", "pressure_00"};
     RBRGen4LabelList channelList = {
         .size = 2,
-        .count = 2,
+        .len = 2,
         .labels = labelBuf,
     };
 
@@ -809,7 +898,7 @@ TEST_LOGGER4(groupSetClearingChannels)
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList channelList = {
         .size = 1,
-        .count = 0,
+        .len = 0,
         .labels = labelBuf,
     };
 
@@ -830,7 +919,7 @@ TEST_LOGGER4(groupSetEmptyLabel)
     RBRGen4Label labelBuf[] = {"temperature_00"};
     RBRGen4LabelList channelList = {
         .size = 1,
-        .count = 1,
+        .len = 1,
         .labels = labelBuf,
     };
 
@@ -851,7 +940,7 @@ TEST_LOGGER4(groupSetInvalidChannelCount)
     RBRGen4Label labelBuf[] = {"temperature_00", "pressure_00"};
     RBRGen4LabelList channelList = {
         .size = 2,
-        .count = 3,
+        .len = 3,
         .labels = labelBuf,
     };
 
@@ -872,7 +961,7 @@ TEST_LOGGER4(groupSetEmptyChannelLabel)
     RBRGen4Label labelBuf[] = {"temperature_00", ""};
     RBRGen4LabelList channelList = {
         .size = 2,
-        .count = 2,
+        .len = 2,
         .labels = labelBuf,
     };
 
@@ -936,8 +1025,7 @@ TEST_LOGGER4(configlist)
     RBRGen4Error err = RBRGen4_getConfigPool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("config" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_EQ(1, actual.count, "%" PRIi32);
-    TEST_ASSERT_EQ(2, actual.maxCount, "%" PRIi32);
+    TEST_ASSERT_EQ(1, actual.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("c_a", actual.pool[0].label);
 
     return true;
@@ -951,7 +1039,7 @@ TEST_LOGGER4(configlistTooSmall)
 
     RBRGen4Error err = RBRGen4_getConfigPool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED, err, RBRGen4Error);
-    TEST_ASSERT_EQ(2, actual.count, "%" PRIi32);
+    TEST_ASSERT_EQ(1, actual.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("c_a", actual.pool[0].label);
 
     return true;
@@ -965,9 +1053,36 @@ TEST_LOGGER4(configlistWithoutConfigs)
 
     RBRGen4Error err = RBRGen4_getConfigPool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
-    TEST_ASSERT_EQ(0, actual.count, "%" PRIi32);
-    TEST_ASSERT_EQ(2, actual.maxCount, "%" PRIi32);
+    TEST_ASSERT_EQ(0, actual.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("", actual.pool[0].label);
+
+    return true;
+}
+
+TEST_LOGGER4(configCount)
+{
+    int32_t count = -1;
+
+    TestIOBuffers_init(buffers, "config count=5" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getConfigCount(conn, &count);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("config count" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(5, count, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(configMaxCount)
+{
+    int32_t maxCount = -1;
+
+    TestIOBuffers_init(buffers, "config maxcount=16" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getConfigMaxCount(conn, &maxCount);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("config maxcount" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(16, maxCount, "%" PRIi32);
 
     return true;
 }
@@ -984,7 +1099,7 @@ TEST_LOGGER4(config)
     RBRGen4Error err = RBRGen4_getConfig(conn, &config, &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("config c_a" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_EQ(1, scheduleList.count, "%" PRIi32);
+    TEST_ASSERT_EQ(1, scheduleList.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("s_a", scheduleList.labels[0]);
 
     return true;
@@ -1001,7 +1116,7 @@ TEST_LOGGER4(configWithoutSchedules)
 
     RBRGen4Error err = RBRGen4_getConfig(conn, &config, &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
-    TEST_ASSERT_EQ(0, scheduleList.count, "%" PRIi32);
+    TEST_ASSERT_EQ(0, scheduleList.len, "%" PRIi32);
 
     return true;
 }
@@ -1032,7 +1147,7 @@ TEST_LOGGER4(configScheduleListTooSmall)
 
     RBRGen4Error err = RBRGen4_getConfig(conn, &config, &scheduleList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED, err, RBRGen4Error);
-    TEST_ASSERT_EQ(2, scheduleList.count, "%" PRIi32);
+    TEST_ASSERT_EQ(1, scheduleList.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("s_a", scheduleList.labels[0]);
 
     return true;
@@ -1062,7 +1177,7 @@ TEST_LOGGER4(configSet)
     RBRGen4Label labelBuf[] = {"schedule_fast", "schedule_burst"};
     RBRGen4LabelList scheduleList = {
         .size = 2,
-        .count = 2,
+        .len = 2,
         .labels = labelBuf,
     };
 
@@ -1088,7 +1203,7 @@ TEST_LOGGER4(configSetClearingSchedules)
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList scheduleList = {
         .size = 1,
-        .count = 0,
+        .len = 0,
         .labels = labelBuf,
     };
 
@@ -1109,7 +1224,7 @@ TEST_LOGGER4(configSetEmptyLabel)
     RBRGen4Label labelBuf[] = {"s_a"};
     RBRGen4LabelList scheduleList = {
         .size = 1,
-        .count = 1,
+        .len = 1,
         .labels = labelBuf,
     };
 
@@ -1129,7 +1244,7 @@ TEST_LOGGER4(configSetEmptyScheduleLabel)
     RBRGen4Label labelBuf[] = {"s_a", ""};
     RBRGen4LabelList scheduleList = {
         .size = 2,
-        .count = 2,
+        .len = 2,
         .labels = labelBuf,
     };
 
@@ -1194,8 +1309,7 @@ TEST_LOGGER4(schedulelist)
     RBRGen4Error err = RBRGen4_getSchedulePool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("schedule" COMMAND_TERMINATOR, buffers->writeBuffer);
-    TEST_ASSERT_EQ(1, actual.count, "%" PRIi32);
-    TEST_ASSERT_EQ(8, actual.maxCount, "%" PRIi32);
+    TEST_ASSERT_EQ(1, actual.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("s", actual.pool[0].label);
     TEST_ASSERT_EQ(3, actual.maxRegimes, "%" PRIi32);
 
@@ -1211,9 +1325,37 @@ TEST_LOGGER4(schedulelistTooSmall)
 
     RBRGen4Error err = RBRGen4_getSchedulePool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED, err, RBRGen4Error);
-    TEST_ASSERT_EQ(2, actual.count, "%" PRIi32);
+    TEST_ASSERT_EQ(1, actual.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("s_a", actual.pool[0].label);
     TEST_ASSERT_EQ(3, actual.maxRegimes, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(scheduleCount)
+{
+    int32_t count = -1;
+
+    TestIOBuffers_init(buffers, "schedule count=3" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getScheduleCount(conn, &count);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("schedule count" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(3, count, "%" PRIi32);
+
+    return true;
+}
+
+TEST_LOGGER4(scheduleMaxCount)
+{
+    int32_t maxCount = -1;
+
+    TestIOBuffers_init(buffers, "schedule maxcount=16" RESPONSE_TERMINATOR, 0);
+
+    RBRGen4Error err = RBRGen4_getScheduleMaxCount(conn, &maxCount);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("schedule maxcount" COMMAND_TERMINATOR, buffers->writeBuffer);
+    TEST_ASSERT_EQ(16, maxCount, "%" PRIi32);
 
     return true;
 }
@@ -1228,7 +1370,7 @@ TEST_LOGGER4(schedulelistEmpty)
 
     RBRGen4Error err = RBRGen4_getSchedulePool(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
-    TEST_ASSERT_EQ(0, actual.count, "%" PRIi32);
+    TEST_ASSERT_EQ(0, actual.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("", actual.pool[0].label);
     TEST_ASSERT_EQ(3, actual.maxRegimes, "%" PRIi32);
 
@@ -1294,7 +1436,7 @@ TEST_LOGGER4(scheduleWithGroupsAndConfigs)
 
     RBRGen4Error err = RBRGen4_getSchedule(conn, &actual, &groupList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
-    TEST_ASSERT_EQ(2, groupList.count, "%" PRIi32);
+    TEST_ASSERT_EQ(2, groupList.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("g_a", groupList.labels[0]);
     TEST_ASSERT_STR_EQ("g_b", groupList.labels[1]);
 
@@ -1316,7 +1458,7 @@ TEST_LOGGER4(scheduleGroupListTooSmall)
 
     RBRGen4Error err = RBRGen4_getSchedule(conn, &actual, &groupList);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_TRUNCATED, err, RBRGen4Error);
-    TEST_ASSERT_EQ(2, groupList.count, "%" PRIi32);
+    TEST_ASSERT_EQ(1, groupList.len, "%" PRIi32);
     TEST_ASSERT_STR_EQ("g_a", groupList.labels[0]);
     TEST_ASSERT_EQ(1000, actual.parameters.continuous.period, "%" PRIi32);
 
@@ -1426,7 +1568,7 @@ TEST_LOGGER4(scheduleSet)
     RBRGen4Label labelBuf[] = {"g_test"};
     RBRGen4LabelList groupList = {
         .size = sizeof(labelBuf) / sizeof(labelBuf[0]),
-        .count = 1,
+        .len = 1,
         .labels = labelBuf,
     };
 
@@ -1497,7 +1639,7 @@ TEST_LOGGER4(scheduleSetWithStorage)
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList groupList = {
         .size = 1,
-        .count = 0,
+        .len = 0,
         .labels = labelBuf,
     };
 
@@ -1529,7 +1671,7 @@ TEST_LOGGER4(scheduleSetMultipleModes)
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList groupList = {
         .size = 1,
-        .count = 0,
+        .len = 0,
         .labels = labelBuf,
     };
 
@@ -1552,7 +1694,7 @@ TEST_LOGGER4(scheduleSetNoMode)
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList groupList = {
         .size = 1,
-        .count = 0,
+        .len = 0,
         .labels = labelBuf,
     };
 
@@ -1575,7 +1717,7 @@ TEST_LOGGER4(scheduleSetDeferredMode)
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList groupList = {
         .size = 1,
-        .count = 0,
+        .len = 0,
         .labels = labelBuf,
     };
 
@@ -1598,7 +1740,7 @@ TEST_LOGGER4(scheduleSetEmptyGroupLabel)
     RBRGen4Label labelBuf[] = {"g_test", ""};
     RBRGen4LabelList groupList = {
         .size = sizeof(labelBuf) / sizeof(labelBuf[0]),
-        .count = 2,
+        .len = 2,
         .labels = labelBuf,
     };
 
@@ -1706,7 +1848,7 @@ TEST_LOGGER4(scheduleSetEveryBurstingMode)
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList groupList = {
         .size = 1,
-        .count = 0,
+        .len = 0,
         .labels = labelBuf,
     };
 
@@ -1760,7 +1902,7 @@ TEST_LOGGER4(scheduleSetLongParameters)
     RBRGen4Label labelBuf[1];
     RBRGen4LabelList groupList = {
         .size = 1,
-        .count = 0,
+        .len = 0,
         .labels = labelBuf,
     };
 
@@ -1799,10 +1941,10 @@ TEST_LOGGER4(scheduleSetCommandTooLong)
     RBRGen4Label labelBuf[POOL_SIZE];
     RBRGen4LabelList groupList = {
         .size = POOL_SIZE,
-        .count = POOL_SIZE,
+        .len = POOL_SIZE,
         .labels = labelBuf,
     };
-    for (int32_t i = 0; i < groupList.count; ++i) {
+    for (int32_t i = 0; i < groupList.len; ++i) {
         memset(labelBuf[i], 'g', RBRGEN4_LABEL_NAME_MAX);
         labelBuf[i][RBRGEN4_LABEL_NAME_MAX] = '\0';
     }

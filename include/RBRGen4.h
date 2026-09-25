@@ -178,14 +178,8 @@ typedef struct RBRGen4LabelList {
     /** \brief The number of labels #labels can hold. */
     int32_t size;
 
-    /**
-     * \brief The number of labels in the list.
-     *
-     * \warning This field will be larger than #size when
-     * #RBRGEN4_TRUNCATED is returned by the getter. Care should be
-     * taken to avoid out-of-bounds access when iterating over #labels.
-     */
-    int32_t count;
+    /** \brief The number of labels stored in #labels. Never exceeds #size. */
+    int32_t len;
 
     /** \brief User provided array of labels. */
     RBRGen4Label *labels;

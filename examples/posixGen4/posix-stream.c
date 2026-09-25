@@ -289,9 +289,16 @@ int main(int argc, char *argv[])
         logCmdError(&conn, err, "Failed to create group");
         goto instrumentCleanup;
     }
+    /* Reading the group first is unnecessary today, as its channel list is its only
+     * parameter, but is done for forward compatibility: read, modify, then write. */
+    err = RBRGen4_getGroup(&conn, &groupPt, NULL);
+    if (err) {
+        logCmdError(&conn, err, "Failed to get new group");
+        goto instrumentCleanup;
+    }
     const RBRGen4LabelList groupPtChannelList = {
         .size = GROUP_PT_CHANNEL_COUNT,
-        .count = GROUP_PT_CHANNEL_COUNT,
+        .len = GROUP_PT_CHANNEL_COUNT,
         .labels = GROUP_PT_CHANNELS,
     };
     err = RBRGen4_setGroup(&conn, &groupPt, &groupPtChannelList);
@@ -321,7 +328,7 @@ int main(int argc, char *argv[])
     schedule.parameters.continuous.period = SCHEDULE_PT_PERIOD;
     const RBRGen4LabelList scheduleGroupList = {
         .size = SCHEDULE_PT_GROUP_COUNT,
-        .count = SCHEDULE_PT_GROUP_COUNT,
+        .len = SCHEDULE_PT_GROUP_COUNT,
         .labels = SCHEDULE_PT_GROUPS,
     };
     err = RBRGen4_setSchedule(&conn, &schedule, &scheduleGroupList);
@@ -339,9 +346,16 @@ int main(int argc, char *argv[])
         logCmdError(&conn, err, "Failed to create new config");
         goto instrumentCleanup;
     }
+    /* Reading the config first is unnecessary today, as its schedule list is its only
+     * parameter, but is done for forward compatibility: read, modify, then write. */
+    err = RBRGen4_getConfig(&conn, &config, NULL);
+    if (err) {
+        logCmdError(&conn, err, "Failed to get new config");
+        goto instrumentCleanup;
+    }
     const RBRGen4LabelList configScheduleList = {
         .size = CONFIG_STREAM_SCHEDULE_COUNT,
-        .count = CONFIG_STREAM_SCHEDULE_COUNT,
+        .len = CONFIG_STREAM_SCHEDULE_COUNT,
         .labels = CONFIG_STREAM_SCHEDULES,
     };
     err = RBRGen4_setConfig(&conn, &config, &configScheduleList);

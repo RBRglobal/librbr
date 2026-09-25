@@ -162,19 +162,12 @@ typedef struct RBRGen4DatasetPool {
     int32_t size;
 
     /**
-     * \brief The number of datasets stored in the instrument's memory.
+     * \brief The number of datasets stored in #pool. Never exceeds #size.
      *
-     * \warning This field will be larger than #size when
-     * #RBRGEN4_TRUNCATED is returned by the getter. Care should be
-     * taken to avoid out-of-bounds access when iterating over #pool.
+     * \see RBRGen4_getDatasetCount() for the number the instrument has.
+     * \see RBRGen4_getDatasetMaxCount() for the number it can hold.
      */
-    int32_t count;
-
-    /**
-     * \brief The maximum number of datasets that the instrument can store
-     * in its memory.
-     */
-    int32_t maxCount;
+    int32_t len;
 
     /** \brief User provided buffer of the datasets stored. */
     RBRGen4Dataset *pool;
@@ -195,13 +188,44 @@ typedef struct RBRGen4DatasetPool {
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_TRUNCATED when \a datasetPool cannot hold every
- *                                      reported dataset; the first `size` are
- *                                      stored, and `count` is set to the value
- *                                      reported by the instrument which WILL
- *                                      exceed `size`
+ *                            reported dataset; the first `size` are
+ *                            stored
  * \see RBRGen4_getDataset()
  */
 RBRGen4Error RBRGen4_getDatasetPool(RBRGen4 *conn, RBRGen4DatasetPool *datasetPool);
+
+/**
+ * \brief Read the number of datasets stored in the instrument's memory.
+ *
+ * \note Issues the `dataset count` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] count the number of datasets stored
+ * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getDatasetPool()
+ * \see RBRGen4_getDatasetMaxCount()
+ */
+RBRGen4Error RBRGen4_getDatasetCount(RBRGen4 *conn, int32_t *count);
+
+/**
+ * \brief Read the maximum number of datasets the instrument can store.
+ *
+ * \note Issues the `dataset maxcount` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] maxCount the maximum number of datasets
+ * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another
+ *                                 hardware error occurs
+ * \see RBRGen4_getDatasetCount()
+ */
+RBRGen4Error RBRGen4_getDatasetMaxCount(RBRGen4 *conn, int32_t *maxCount);
 
 /**
  * \brief Populate the parameters of a dataset.
@@ -219,10 +243,8 @@ RBRGen4Error RBRGen4_getDatasetPool(RBRGen4 *conn, RBRGen4DatasetPool *datasetPo
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \return #RBRGEN4_TRUNCATED when \a scheduleList cannot hold every
- *                                      reported schedule; the first `size` are
- *                                      stored, and `count` is set to the value
- *                                      reported by the instrument which WILL
- *                                      exceed `size`
+ *                            reported schedule; the first `size` are
+ *                            stored
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
  *                                      hardware error occurs
  * \see RBRGen4_getDatasetPool()
