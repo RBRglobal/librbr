@@ -23,6 +23,10 @@ if(CONFIG_LIBRBR)
 
     zephyr_library_sources(${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRCommon.c)
 
+    zephyr_library_sources_ifdef(CONFIG_LIBRBR_DYNAMIC_CORRECTION
+        ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRDynamicCorrection.c
+    )
+
     if(CONFIG_LIBRBR_GEN3)
         zephyr_compile_definitions(
             RBRGEN3_CHANNEL_MAX=CONFIG_RBRGEN3_CHANNEL_MAX
@@ -34,7 +38,6 @@ if(CONFIG_LIBRBR)
         )
 
         zephyr_library_sources(
-            ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3DynamicCorrection.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Communication.c
             ${ZEPHYR_CURRENT_MODULE_DIR}/src/RBRGen3Configuration.c

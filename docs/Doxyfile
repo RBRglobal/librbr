@@ -9,6 +9,7 @@ TYPEDEF_HIDES_STRUCT   = YES
 INPUT                  = ../include \
                          ../src/RBRGen3Internal.h \
                          ../src/RBRGen4Internal.h \
+                         ../testsDynamicCorrection/tests.h \
                          ../testsGen3/tests.h \
                          ../testsGen4/tests.h
 FILE_PATTERNS          = *.h

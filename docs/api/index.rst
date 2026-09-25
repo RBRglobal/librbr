@@ -7,5 +7,6 @@ API reference
    common/index
    gen3/index
    gen4/index
+   internal-common/index
    internal-gen3/index
    internal-gen4/index

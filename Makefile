@@ -6,7 +6,7 @@
 ##
 ## - `lib` will build the library (`bin/libRBR.a`)
 ## - `docs` will generate the documentation via Sphinx (in `docs/_build/html/`)
-## - `tests` will run library tests (from `testsGen3/` and `testsGen4/`)
+## - `tests` will run library tests (from `testsDynamicCorrection/`, `testsGen3/`, and `testsGen4/`)
 ##
 ## Additional targets may be useful to developers:
 ##
@@ -146,10 +146,9 @@ GEN4_OBJECTS := src/RBRGen4.o \
                 src/RBRGen4Realtime.o
 
 LIB_OBJECTS := $(COMMON_OBJECTS)
-DYNAMICCORRECTION_OBJECTS :=
+DYNAMICCORRECTION_OBJECTS := src/RBRDynamicCorrection.o
 ifeq ($(GEN3),1)
 LIB_OBJECTS += $(GEN3_OBJECTS)
-DYNAMICCORRECTION_OBJECTS += src/RBRGen3DynamicCorrection.o
 endif
 ifeq ($(GEN4),1)
 LIB_OBJECTS += $(GEN4_OBJECTS)
@@ -175,7 +174,7 @@ bin/libRBRDynamicCorrection.a: $(DYNAMICCORRECTION_OBJECTS) | bin
 docs:
 	$(MAKE) -C docs html
 
-TEST_BINARIES :=
+TEST_BINARIES := bin/testsDynamicCorrection
 ifeq ($(GEN3),1)
 TEST_BINARIES += bin/testsGen3
 endif
@@ -185,7 +184,7 @@ endif
 
 tests: CFLAGS += -Wno-error=unused-parameter -Wno-unused-parameter
 tests: LDFLAGS += -Lbin
-tests: LDLIBS += -lRBR -lRBRDynamicCorrection -lm
+tests: LDLIBS += -lRBR -lm
 .PHONY: tests
 tests: bin $(TEST_BINARIES)
 	$(foreach test,$(TEST_BINARIES),./$(test) &&) true
@@ -212,7 +211,6 @@ checknoalloc: bin/libRBR.a bin/libRBRDynamicCorrection.a
 GEN3_TEST_MODULES := communication \
                      configuration \
                      deployment \
-                     dynamiccorrection \
                      fetching \
                      gating \
                      memory \
@@ -236,7 +234,6 @@ GEN4_TEST_MODULES := communication \
                      realtime
 
 bin/testsGen3: bin/libRBR.a \
-           bin/libRBRDynamicCorrection.a \
            testsGen3/main.o \
            testsGen3/tests.o \
            $(foreach module,$(GEN3_TEST_MODULES),testsGen3/$(module).o)
@@ -266,6 +263,11 @@ testsGen3/tests.c: $(foreach module,$(GEN3_TEST_MODULES),testsGen3/$(module).c)
 	@echo "    {0}" >>$@
 	@echo "};" >>$@
 
+bin/testsDynamicCorrection: testsDynamicCorrection/main.o \
+                           testsDynamicCorrection/dynamiccorrection.o \
+                           bin/libRBRDynamicCorrection.a
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -lm -o $@
+
 bin/testsGen4: bin/libRBR.a \
                bin/libRBRDynamicCorrection.a \
                testsGen4/main.o \
@@ -290,8 +292,8 @@ bin:
 
 .PHONY: clean
 clean:
-	rm -Rf src/*.o src/*.d bin/ testsGen3/tests.c testsGen3/*.o testsGen3/*.d testsGen4/tests.c testsGen4/*.o testsGen4/*.d docs/_build/
+	rm -Rf src/*.o src/*.d bin/ testsGen3/tests.c testsGen3/*.o testsGen3/*.d testsGen4/tests.c testsGen4/*.o testsGen4/*.d testsDynamicCorrection/*.o testsDynamicCorrection/*.d docs/_build/
 
 ## The dependency files are only ever a side effect of compilation, so a
 ## clean tree has none to include yet.
--include $(wildcard src/*.d testsGen3/*.d testsGen4/*.d)
+-include $(wildcard src/*.d testsGen3/*.d testsGen4/*.d testsDynamicCorrection/*.d)

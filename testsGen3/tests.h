@@ -26,7 +26,6 @@ extern "C" {
 #include <string.h>
 
 #include "RBRGen3.h"
-#include "RBRGen3DynamicCorrection.h"
 #include "RBRGen3Parser.h"
 
 /**
@@ -80,24 +79,24 @@ extern "C" {
  * name and line number on which the macro invocation occurs and the expected
  * and actual values, and the surrounding function will `return false;`.
  *
- * Because \a _expected, \a _actual, and \a _type will be evaluated multiple
+ * Because \a _expected, \a _actual, and \a _eps will be evaluated multiple
  * times by the macro, do not pass expressions having side effects.
  *
  * \param [in] _expected the expected value
  * \param [in] _actual the actual value
  * \param [in] _eps the precision range for comparison
  */
-#define TEST_ASSERT_FLOAT_EQ(_expected, _actual, _eps)                              \
-    do {                                                                            \
-        if (((_expected) < (_actual - _eps)) || ((_expected) > (_actual + _eps))) { \
-            printf(" assertion failure at %s:%d:"                                   \
-                   " expected %f ; actual %f",                                      \
-                   __FILE__,                                                        \
-                   __LINE__,                                                        \
-                   (double) _expected,                                              \
-                   (double) _actual);                                               \
-            return false;                                                           \
-        }                                                                           \
+#define TEST_ASSERT_FLOAT_EQ(_expected, _actual, _eps)                                      \
+    do {                                                                                    \
+        if (((_expected) < ((_actual) - (_eps))) || ((_expected) > ((_actual) + (_eps)))) { \
+            printf(" assertion failure at %s:%d:"                                           \
+                   " expected %f ; actual %f",                                              \
+                   __FILE__,                                                                \
+                   __LINE__,                                                                \
+                   (double) (_expected),                                                    \
+                   (double) (_actual));                                                     \
+            return false;                                                                   \
+        }                                                                                   \
     } while (0)
 
 /**
@@ -107,8 +106,8 @@ extern "C" {
  * name and line number on which the macro invocation occurs and the expected
  * and actual members, and the surrounding function will `return false;`.
  *
- * Because \a _expected, \a _actual, and \a _type will be evaluated multiple
- * times by the macro, do not pass expressions having side effects.
+ * Because \a _expected and \a _actual will be evaluated multiple times by
+ * the macro, do not pass expressions having side effects.
  *
  * \param [in] _expected the expected enum member
  * \param [in] _actual the actual enum member
@@ -134,8 +133,8 @@ extern "C" {
  * name and line number on which the macro invocation occurs and the expected
  * and actual strings, and the surrounding function will `return false;`.
  *
- * Because \a _expected, \a _actual, and \a _type will be evaluated multiple
- * times by the macro, do not pass expressions having side effects.
+ * Because \a _expected and \a _actual will be evaluated multiple times by
+ * the macro, do not pass expressions having side effects.
  *
  * \param [in] _expected the expected string
  * \param [in] _actual the actual string

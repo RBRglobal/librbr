@@ -15,12 +15,12 @@
 #define TEST_DYNCORR_DATASET_SIZE 7
 
 /* declaration of private functions */
-float RBRGen3DynamicCorrection_PSS78(float C, float T, float P);
+float RBRDynamicCorrection_PSS78(float C, float T, float P);
 
-float RBRGen3DynamicCorrection_calcAscentRate(RBRGen3DynamicCorrectionParams *params,
-                                              int64_t timestamp, float pressure);
+float RBRDynamicCorrection_calcAscentRate(RBRDynamicCorrectionParams *params, int64_t timestamp,
+                                          float pressure);
 
-void RBRGen3DynamicCorrection_updateVariables(RBRGen3DynamicCorrectionParams *params, float Vp);
+void RBRDynamicCorrection_updateVariables(RBRDynamicCorrectionParams *params, float Vp);
 
 typedef struct Pss78Test {
     float C_value;
@@ -41,8 +41,7 @@ static bool test_verify_pss78(Pss78Test *tests)
     float S_result;
 
     for (int i = 0; tests[i].C_value > 0.0f; i++) {
-        S_result =
-            RBRGen3DynamicCorrection_PSS78(tests[i].C_value, tests[i].T_value, tests[i].P_value);
+        S_result = RBRDynamicCorrection_PSS78(tests[i].C_value, tests[i].T_value, tests[i].P_value);
 
         TEST_ASSERT_FLOAT_EQ(tests[i].S_expected, S_result, 1e-3f);
     }
@@ -52,7 +51,7 @@ static bool test_verify_pss78(Pss78Test *tests)
 
 static bool test_verify_ascent_rate(void)
 {
-    RBRGen3DynamicCorrectionParams params;
+    RBRDynamicCorrectionParams params;
     float pressure;
     int64_t t;
     float Vp;
@@ -84,7 +83,7 @@ static bool test_verify_ascent_rate(void)
             pressure = (3000.0f - 3.0f) - 0.1f * ((t - 60000) / 1000.0f) + noise;
         }
 
-        Vp = RBRGen3DynamicCorrection_calcAscentRate(&params, t + 9000000, pressure);
+        Vp = RBRDynamicCorrection_calcAscentRate(&params, t + 9000000, pressure);
 
         /* since the filter is dynamic, it is difficult to make
          * a condition for each time step.  In this case, just wait until
@@ -102,30 +101,30 @@ static bool test_verify_ascent_rate(void)
 
 static bool test_verify_coeff_alpha_tau_ctcoeff(DCorrCoeffTest *tests)
 {
-    RBRGen3DynamicCorrectionParams params;
-    RBRGen3DynamicCorrectionError status;
+    RBRDynamicCorrectionParams params;
+    RBRDynamicCorrectionError status;
     float Vp;
 
     /* using Fs = 1.0f.  This parameter is not affecting the test result */
-    status = RBRGen3DynamicCorrection_init(&params,
-                                           1.0f,
-                                           DCORR_T_DELAY,
-                                           DCORR_ALPHA_A,
-                                           DCORR_ALPHA_E,
-                                           DCORR_TAU_A,
-                                           DCORR_TAU_E,
-                                           DCORR_CT_COEFF_A,
-                                           DCORR_CT_COEFF_E,
-                                           DCORR_VP_MIN,
-                                           DCORR_VP_MAX,
-                                           DCORR_VP_FC);
+    status = RBRDynamicCorrection_init(&params,
+                                       1.0f,
+                                       DCORR_T_DELAY,
+                                       DCORR_ALPHA_A,
+                                       DCORR_ALPHA_E,
+                                       DCORR_TAU_A,
+                                       DCORR_TAU_E,
+                                       DCORR_CT_COEFF_A,
+                                       DCORR_CT_COEFF_E,
+                                       DCORR_VP_MIN,
+                                       DCORR_VP_MAX,
+                                       DCORR_VP_FC);
 
-    TEST_ASSERT(status == RBRGEN3DYNAMICCORRECTION_SUCCESS);
+    TEST_ASSERT(status == RBRDYNAMICCORRECTION_SUCCESS);
 
     for (int i = 0; tests[i].Vp > 0.0f; i++) {
         Vp = tests[i].Vp;
 
-        RBRGen3DynamicCorrection_updateVariables(&params, Vp);
+        RBRDynamicCorrection_updateVariables(&params, Vp);
 
         /* the data is fitted.  Check we are within 5% of value */
         TEST_ASSERT_FLOAT_EQ(tests[i].alpha_expected, params.alpha, params.alpha * 5e-2f);
@@ -139,28 +138,28 @@ static bool test_verify_coeff_alpha_tau_ctcoeff(DCorrCoeffTest *tests)
 /* run the dynamic correction test */
 static bool test_dynamic_correction(float *dataset, float Fs)
 {
-    RBRGen3DynamicCorrectionError status;
-    RBRGen3DynamicCorrectionParams params;
-    RBRGen3DynamicCorrectionMeasurement measIn;
-    RBRGen3DynamicCorrectionResult corrResult;
+    RBRDynamicCorrectionError status;
+    RBRDynamicCorrectionParams params;
+    RBRDynamicCorrectionMeasurement measIn;
+    RBRDynamicCorrectionResult corrResult;
     float *datasetPtr = dataset;
     float *resultPtr = dataset;
     float target_Tcor, target_Scor;
 
-    status = RBRGen3DynamicCorrection_init(&params,
-                                           Fs,
-                                           DCORR_T_DELAY,
-                                           DCORR_ALPHA_A,
-                                           DCORR_ALPHA_E,
-                                           DCORR_TAU_A,
-                                           DCORR_TAU_E,
-                                           DCORR_CT_COEFF_A,
-                                           DCORR_CT_COEFF_E,
-                                           DCORR_VP_MIN,
-                                           DCORR_VP_MAX,
-                                           DCORR_VP_FC);
+    status = RBRDynamicCorrection_init(&params,
+                                       Fs,
+                                       DCORR_T_DELAY,
+                                       DCORR_ALPHA_A,
+                                       DCORR_ALPHA_E,
+                                       DCORR_TAU_A,
+                                       DCORR_TAU_E,
+                                       DCORR_CT_COEFF_A,
+                                       DCORR_CT_COEFF_E,
+                                       DCORR_VP_MIN,
+                                       DCORR_VP_MAX,
+                                       DCORR_VP_FC);
 
-    TEST_ASSERT_EQ(RBRGEN3DYNAMICCORRECTION_SUCCESS, status, "%d");
+    TEST_ASSERT_EQ(RBRDYNAMICCORRECTION_SUCCESS, status, "%d");
 
     while (datasetPtr[0] >= 0.0f) {
         measIn.timestamp = (int64_t) llroundf(datasetPtr[0] * 1000.0f); /* time in millisecond */
@@ -169,9 +168,9 @@ static bool test_dynamic_correction(float *dataset, float Fs)
         measIn.pressure = datasetPtr[3];
         measIn.condTemperature = datasetPtr[4];
 
-        status = RBRGen3DynamicCorrection_addMeasurement(&params, &measIn, &corrResult);
+        status = RBRDynamicCorrection_addMeasurement(&params, &measIn, &corrResult);
 
-        if (status != RBRGEN3DYNAMICCORRECTION_NOT_VALID_YET) {
+        if (status != RBRDYNAMICCORRECTION_NOT_VALID_YET) {
             /* check the result */
             target_Tcor = resultPtr[5];
             target_Scor = resultPtr[6];
@@ -187,7 +186,7 @@ static bool test_dynamic_correction(float *dataset, float Fs)
     return true;
 }
 
-TEST_LOGGER3(verify_pss78)
+TEST(verify_pss78)
 {
     Pss78Test tests[] = {
         {110.0f, 5.0f, 2500.0f, 138.626f},
@@ -200,12 +199,12 @@ TEST_LOGGER3(verify_pss78)
     return test_verify_pss78(tests);
 }
 
-TEST_LOGGER3(verify_ascent_rate)
+TEST(verify_ascent_rate)
 {
     return test_verify_ascent_rate();
 }
 
-TEST_LOGGER3(verify_coeff_alpha_tau_ctcoeff)
+TEST(verify_coeff_alpha_tau_ctcoeff)
 {
     DCorrCoeffTest tests[] = {
         {0.02f, 0.120f, 12.26f, 0.046f},
@@ -230,7 +229,7 @@ TEST_LOGGER3(verify_coeff_alpha_tau_ctcoeff)
     return test_verify_coeff_alpha_tau_ctcoeff(tests);
 }
 
-TEST_LOGGER3(verify_dynamic_correction)
+TEST(verify_dynamic_correction)
 {
     /* Expect timestamp,C,T,P,Tcond,Tcor,Scor */
     float dataset[][TEST_DYNCORR_DATASET_SIZE] = {
@@ -351,3 +350,11 @@ TEST_LOGGER3(verify_dynamic_correction)
 
     return test_dynamic_correction(dataset[0], 4.0f);
 }
+
+const DynamicCorrectionTest dynamicCorrectionTests[] = {
+    {"verify_pss78", verify_pss78},
+    {"verify_ascent_rate", verify_ascent_rate},
+    {"verify_coeff_alpha_tau_ctcoeff", verify_coeff_alpha_tau_ctcoeff},
+    {"verify_dynamic_correction", verify_dynamic_correction},
+    {0},
+};

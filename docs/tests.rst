@@ -4,6 +4,14 @@ Writing Tests
 Unit tests are found
 in the ``testsGen3/`` subdirectory.
 
+The dynamic correction tests are a separate suite
+in the ``testsDynamicCorrection/`` subdirectory.
+Declare a test there with the ``TEST`` macro
+and add it to the ``dynamicCorrectionTests`` list
+in ``testsDynamicCorrection/dynamiccorrection.c``;
+unlike instrument tests,
+they are not detected automatically.
+
 Adding an Instrument Test
 -------------------------
 
