@@ -485,6 +485,7 @@ RBRGen3Error RBRGen3_getPostprocessing(RBRGen3 *conn, RBRGen3Postprocessing *pos
 
     RBR_TRY(RBRGen3_converse(conn, "postprocessing all"));
 
+    bool truncated = false;
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
     while (true) {
@@ -517,21 +518,25 @@ RBRGen3Error RBRGen3_getPostprocessing(RBRGen3 *conn, RBRGen3Postprocessing *pos
                     break;
                 }
 
-                for (int i = 0; i < RBRGEN3_POSTPROCESSING_AGGREGATE_COUNT; ++i) {
-                    if (strcmp(RBRGen3PostprocessingAggregate_name(i), functionStart) == 0) {
-                        channelsList->channels[channel].function = i;
-                        break;
+                /* Channels past the list's storage are dropped. */
+                if (channel < RBRGEN3_POSTPROCESSING_CHANNEL_MAX) {
+                    for (int i = 0; i < RBRGEN3_POSTPROCESSING_AGGREGATE_COUNT; ++i) {
+                        if (strcmp(RBRGen3PostprocessingAggregate_name(i), functionStart) == 0) {
+                            channelsList->channels[channel].function = i;
+                            break;
+                        }
                     }
-                }
 
-                snprintf(channelsList->channels[channel].label,
-                         sizeof(channelsList->channels[channel].label),
-                         "%s",
-                         labelStart);
+                    snprintf(channelsList->channels[channel].label,
+                             sizeof(channelsList->channels[channel].label),
+                             "%s",
+                             labelStart);
+                }
 
                 next = strtok(NULL, "(");
             }
-            channelsList->count = channel;
+            truncated = channel > RBRGEN3_POSTPROCESSING_CHANNEL_MAX;
+            channelsList->len = truncated ? RBRGEN3_POSTPROCESSING_CHANNEL_MAX : channel;
         } else if (strcmp(parameter.key, "binreference") == 0) {
             snprintf(postprocessing->binReference,
                      sizeof(postprocessing->binReference),
@@ -565,15 +570,15 @@ RBRGen3Error RBRGen3_getPostprocessing(RBRGen3 *conn, RBRGen3Postprocessing *pos
         }
     }
 
-    return RBRGEN3_SUCCESS;
+    return truncated ? RBRGEN3_TRUNCATED : RBRGEN3_SUCCESS;
 }
 
 RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessing *postprocessing)
 {
     bool timeBinning = strcmp(postprocessing->binReference, "tstamp") == 0;
 
-    if (postprocessing->channels.count < 0 ||
-        postprocessing->channels.count >= RBRGEN3_POSTPROCESSING_CHANNEL_MAX ||
+    if (postprocessing->channels.len < 0 ||
+        postprocessing->channels.len > RBRGEN3_POSTPROCESSING_CHANNEL_MAX ||
         postprocessing->binFilter < RBRGEN3_POSTPROCESSING_BINFILTER_NONE ||
         postprocessing->binFilter >= RBRGEN3_POSTPROCESSING_BINFILTER_COUNT ||
         postprocessing->binSize < 0 || postprocessing->tstampMin < RBRGEN3_DATETIME_MIN ||
@@ -588,7 +593,7 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
 
     const RBRGen3PostprocessingChannelsList *channelsList = &postprocessing->channels;
 
-    for (int channel = 0; channel < channelsList->count; ++channel) {
+    for (int channel = 0; channel < channelsList->len; ++channel) {
         if (channelsList->channels[channel].function < RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN ||
             channelsList->channels[channel].function >= RBRGEN3_POSTPROCESSING_AGGREGATE_COUNT) {
             return RBRGEN3_INVALID_PARAMETER_VALUE;
@@ -640,7 +645,7 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
     /* A piece which cannot fit an empty buffer is refused before any part of
      * the command has gone out. */
     const char *functionName;
-    for (int channel = 0; channel < channelsList->count; ++channel) {
+    for (int channel = 0; channel < channelsList->len; ++channel) {
         functionName =
             RBRGen3PostprocessingAggregate_name(channelsList->channels[channel].function);
         if (3 + strlen(functionName) + strlen(channelsList->channels[channel].label) >=
@@ -650,7 +655,7 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
     }
 
     char separator = ' ';
-    for (int channel = 0; channel < channelsList->count; ++channel) {
+    for (int channel = 0; channel < channelsList->len; ++channel) {
         functionName =
             RBRGen3PostprocessingAggregate_name(channelsList->channels[channel].function);
 

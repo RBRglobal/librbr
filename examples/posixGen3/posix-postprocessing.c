@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
     now *= 1000;
 
     postprocessing = (RBRGen3Postprocessing) {
-        .channels = {.count = 3,
+        .channels = {.len = 3,
                      .channels = {{.function = RBRGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
                                    .label = "pressure_00"},
                                   {.function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,

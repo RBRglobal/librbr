@@ -277,7 +277,7 @@ TEST_LOGGER3(postprocessing)
         .status = RBRGEN3_POSTPROCESSING_STATUS_IDLE,
         .channels =
             {
-                .count = 5,
+                .len = 5,
                 .channels =
                     {
                         {
@@ -331,8 +331,8 @@ TEST_LOGGER3(postprocessing)
     RBRGen3Error err = RBRGen3_getPostprocessing(conn, &actual);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_ENUM_EQ(expected.status, actual.status, RBRGen3PostprocessingStatus);
-    TEST_ASSERT_EQ(expected.channels.count, actual.channels.count, "%" PRIi32);
-    for (int i = 0; i < expected.channels.count; i++) {
+    TEST_ASSERT_EQ(expected.channels.len, actual.channels.len, "%" PRIi32);
+    for (int i = 0; i < expected.channels.len; i++) {
         TEST_ASSERT_ENUM_EQ(expected.channels.channels[i].function,
                             actual.channels.channels[i].function,
                             RBRGen3PostprocessingAggregate);
@@ -385,7 +385,7 @@ TEST_LOGGER3(postprocessingSetSplitsChannels)
         .status = RBRGEN3_UNKNOWN_POSTPROCESSING_STATUS,
         .channels =
             {
-                .count = 3,
+                .len = 3,
                 .channels =
                     {
                         {
@@ -445,7 +445,7 @@ TEST_LOGGER3(postprocessing_set)
         .status = RBRGEN3_UNKNOWN_POSTPROCESSING_STATUS,
         .channels =
             {
-                .count = 5,
+                .len = 5,
                 .channels =
                     {
                         {
@@ -509,6 +509,103 @@ TEST_LOGGER3(postprocessing_set)
     RBRGen3Error err = RBRGen3_setPostprocessing(conn, &postprocessing);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
+
+    return true;
+}
+
+/* A channel list of exactly RBRGEN3_POSTPROCESSING_CHANNEL_MAX entries is
+ * sent; one more is refused before anything is sent. */
+TEST_LOGGER3(postprocessingSetChannelsMax)
+{
+    RBRGen3Postprocessing postprocessing = {
+        .status = RBRGEN3_UNKNOWN_POSTPROCESSING_STATUS,
+        .binReference = "pressure_01",
+        .binFilter = RBRGEN3_POSTPROCESSING_BINFILTER_NONE,
+        .binSize = 50.0,
+        .tstampMin = RBRGEN3_DATETIME_MIN,
+        .tstampMax = RBRGEN3_DATETIME_MAX,
+        .depthMin = 10.0,
+        .depthMax = 1000.0,
+    };
+    const char *fixedLines = "postprocessing binreference = pressure_01, "
+                             "binfilter = none, binsize = 50.0\n"
+                             "postprocessing tstamp_min = 20000101000000\n"
+                             "postprocessing tstamp_max = 20991231235959\n"
+                             "postprocessing depth_min = 10.0, depth_max = 1000.0\n"
+                             "postprocessing dc_alpha = 0.000, dc_tau = 0.000, "
+                             "dc_tdelay = 0.000, dc_ctcoeff = 0.0000e+00\n";
+    char channels[512] = "postprocessing channels =";
+    for (int32_t i = 0; i < RBRGEN3_POSTPROCESSING_CHANNEL_MAX; i++) {
+        postprocessing.channels.channels[i].function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN;
+        snprintf(postprocessing.channels.channels[i].label,
+                 sizeof(postprocessing.channels.channels[i].label),
+                 "c%02" PRIi32,
+                 i);
+        snprintf(channels + strlen(channels),
+                 sizeof(channels) - strlen(channels),
+                 "%cmean(c%02" PRIi32 ")",
+                 i == 0 ? ' ' : '|',
+                 i);
+    }
+    postprocessing.channels.len = RBRGEN3_POSTPROCESSING_CHANNEL_MAX;
+
+    /* The same lines, terminated for the command and for the response. */
+    char expectedCommand[1024] = "";
+    char response[1024] = "";
+    char lines[1024];
+    snprintf(lines, sizeof(lines), "%s%s\n", fixedLines, channels);
+    for (char *line = strtok(lines, "\n"); line != NULL; line = strtok(NULL, "\n")) {
+        snprintf(expectedCommand + strlen(expectedCommand),
+                 sizeof(expectedCommand) - strlen(expectedCommand),
+                 "%s" COMMAND_TERMINATOR,
+                 line);
+        snprintf(response + strlen(response),
+                 sizeof(response) - strlen(response),
+                 "%s" RESPONSE_TERMINATOR,
+                 line);
+    }
+
+    TestIOBuffers_init(buffers, response, 0);
+    RBRGen3Error err = RBRGen3_setPostprocessing(conn, &postprocessing);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ(expectedCommand, buffers->writeBuffer);
+
+    postprocessing.channels.len = RBRGEN3_POSTPROCESSING_CHANNEL_MAX + 1;
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen3_setPostprocessing(conn, &postprocessing);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+/* Channels past RBRGEN3_POSTPROCESSING_CHANNEL_MAX are dropped, not written
+ * past the list over the fields which follow it, and parameters after the
+ * channel list are still read. */
+TEST_LOGGER3(postprocessingChannelsTruncated)
+{
+    char response[1024] = "postprocessing status = idle, binreference = pressure_01, channels =";
+    for (int32_t i = 0; i <= RBRGEN3_POSTPROCESSING_CHANNEL_MAX; i++) {
+        snprintf(response + strlen(response),
+                 sizeof(response) - strlen(response),
+                 "%cmean(c%02" PRIi32 ")",
+                 i == 0 ? ' ' : '|',
+                 i);
+    }
+    snprintf(response + strlen(response),
+             sizeof(response) - strlen(response),
+             ", binsize = 50.0" RESPONSE_TERMINATOR);
+    RBRGen3Postprocessing actual;
+
+    TestIOBuffers_init(buffers, response, 0);
+    RBRGen3Error err = RBRGen3_getPostprocessing(conn, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_TRUNCATED, err, RBRGen3Error);
+    TEST_ASSERT_EQ(RBRGEN3_POSTPROCESSING_CHANNEL_MAX, actual.channels.len, "%" PRIi32);
+    TEST_ASSERT_STR_EQ("c00", actual.channels.channels[0].label);
+    TEST_ASSERT_STR_EQ("c23",
+                       actual.channels.channels[RBRGEN3_POSTPROCESSING_CHANNEL_MAX - 1].label);
+    TEST_ASSERT_STR_EQ("pressure_01", actual.binReference);
+    TEST_ASSERT_FLOAT_EQ(50.0f, actual.binSize, 0.0f);
 
     return true;
 }
