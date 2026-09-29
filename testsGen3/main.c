@@ -65,6 +65,8 @@ void rbr_prepareCommandResponse(const char *text, char *expectedCommand, char *r
 void TestIOBuffers_init(TestIOBuffers *buffers, const char *readBuffer, int32_t readBufferSize)
 {
     memset(buffers, 0, sizeof(TestIOBuffers));
+    buffers->streamSample.readings = buffers->streamReadings;
+    buffers->streamSample.size = TESTS_CHANNEL_MAX;
     buffers->readBuffer = readBuffer;
     if (readBufferSize == 0) {
         buffers->readBufferSize = strlen(readBuffer);
@@ -153,7 +155,14 @@ RBRGen3Error TestParserBuffers_sample(const struct RBRGen3Parser *parser,
     if (buffers->samplesLength >= TESTPARSERBUFFERS_SAMPLES_MAX) {
         return RBRGEN3_CALLBACK_ERROR;
     }
-    memcpy(&buffers->samples[buffers->samplesLength++], sample, sizeof(RBRGen3Sample));
+    RBRGen3Sample *copy = &buffers->samples[buffers->samplesLength];
+    *copy = *sample;
+    copy->readings = buffers->samplesReadings[buffers->samplesLength];
+    copy->size = TESTS_CHANNEL_MAX;
+    int32_t stored =
+        sample->channelCount < TESTS_CHANNEL_MAX ? sample->channelCount : TESTS_CHANNEL_MAX;
+    memcpy(copy->readings, sample->readings, (size_t) stored * sizeof(*copy->readings));
+    ++buffers->samplesLength;
     return RBRGEN3_SUCCESS;
 }
 
@@ -273,7 +282,7 @@ int main(int argc, char *argv[])
     }
 
     TestParserBuffers parserBuffers;
-    RBRGen3Sample parserSample;
+    RBRGEN3_SAMPLE_DECL(parserSample, TESTS_CHANNEL_MAX);
     RBRGen3Event parserEvent;
     RBRGen3ParserCallbacks parserCallbacks = {
         .sample = TestParserBuffers_sample,

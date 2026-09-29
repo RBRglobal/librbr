@@ -82,18 +82,6 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
 #define RBRGEN4_RESPONSE_BUFFER_DEFAULT 1024
 
 /**
- * \brief The maximum number of channels present on an instrument.
- *
- * The default maximum of 32 channels is reflective of the maximum number of
- * channels supported by RBR instruments, but most instruments have far fewer.
- * Adjusting this value will dramatically affect the size of some structures,
- * notably RBRGen4Sample.
- */
-#ifndef RBRGEN4_CHANNEL_MAX
-#define RBRGEN4_CHANNEL_MAX 32
-#endif
-
-/**
  * \brief The maximum number of characters in a channel type (e.g., “temp09”).
  *
  * Does not include any null terminator.
@@ -625,7 +613,9 @@ typedef struct RBRGen4Environment {
     /**
      * \brief Where to put sample data for consumption by the sample callback.
      *
-     * Required only when RBRGen4Environment.sample is populated.
+     * Required only when RBRGen4Environment.sample is populated. The sample's
+     * RBRGen4Sample.readings and RBRGen4Sample.size must be set by the
+     * caller; they are never changed by the library.
      */
     struct RBRGen4Sample *sampleBuffer;
 
@@ -879,7 +869,8 @@ typedef struct RBRGen4 {
  * \return #RBRGEN4_SUCCESS if the instrument was opened successfully
  * \return #RBRGEN4_MISSING_CALLBACK if \a environment or a callback was not
  *         provided
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE if a buffer is missing or empty
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE if a buffer is missing or empty,
+ *         or RBRGen4Environment.sampleBuffer has no readings storage
  * \return #RBRGEN4_BUFFER_TOO_SMALL if a buffer cannot hold the opening
  *         exchange
  * \return #RBRGEN4_TIMEOUT if an instrument communication timeout occurs

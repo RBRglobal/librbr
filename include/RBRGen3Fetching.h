@@ -37,18 +37,26 @@ extern "C" {
  * which channels are fetched. This can be useful to limit the use of
  * power-hungry sensors. If \a channels is not given as `NULL`, then readings
  * will be requested from channels corresponding to the first
- * RBRGen3LabelsList.count labels from the list. Otherwise, and for
+ * RBRGen3LabelsList.len labels from the list. Otherwise, and for
  * Logger2 instruments, readings will be fetched from all enabled channels.
  *
  * \param [in] conn the instrument connection
- * \param [in] channels the list of channels to be acquired (may be `NULL`)
+ * \param [in] channels the list of channels to be acquired (may be `NULL`);
+ *                      its length must not exceed its size; an empty list
+ *                      selects every channel, and a list
+ *                      RBRGen3_getLabelsList() returned as truncated
+ *                      selects only the labels it holds
  * \param [in] sleepAfter whether the instrument should sleep after fetching
- * \param [in,out] sample the fetched sample
+ * \param [in,out] sample the fetched sample; RBRGen3Sample.readings and
+ *                        RBRGen3Sample.size must be set by the caller
  * \return #RBRGEN3_SUCCESS when a sample is successfully read
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when \a sample has no readings
+ *         storage, or \a channels has a negative length, more labels than
+ *         storage, or labels but no label storage
+ * \return #RBRGEN3_BUFFER_TOO_SMALL when a channel label does not fit the
+ *         command buffer; the command itself may be longer than the buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_BUFFER_TOO_SMALL when a channel label cannot fit the
- *         command buffer
  * \return #RBRGEN3_HARDWARE_ERROR when an invalid channel is requested, or
  *                                 another hardware error occurs
  */

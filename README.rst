@@ -130,8 +130,12 @@ carrying the ``RBRGen3`` prefix:
 and ``RBRParser`` became ``RBRGen3Parser``
 (``RBRInstrument_open()`` is now ``RBRGen3_open()``,
 ``RBRINSTRUMENT_SUCCESS`` is now ``RBRGEN3_SUCCESS``,
-and ``RBRInstrument.h`` is now ``RBRGen3.h``);
-the behaviour is unchanged.
+and ``RBRInstrument.h`` is now ``RBRGen3.h``).
+The behaviour is unchanged,
+but the library no longer owns any storage:
+``RBRGen3_open()`` takes the command and response buffers,
+and samples, channel lists and label lists
+carry a caller-supplied array and its size.
 ``RBRDynamicCorrection`` is not generation-specific
 and keeps its 1.x name,
 but its error constants now carry the ``RBRDYNAMICCORRECTION_`` prefix

@@ -64,6 +64,8 @@ void rbr_prepareCommandResponse(const char *text, char *expectedCommand, char *r
 void TestIOBuffers_init(TestIOBuffers *buffers, const char *readBuffer, int32_t readBufferSize)
 {
     memset(buffers, 0, sizeof(TestIOBuffers));
+    buffers->streamSample.readings = buffers->streamReadings;
+    buffers->streamSample.size = TESTS_CHANNEL_MAX;
     buffers->readBuffer = readBuffer;
     if (readBufferSize == 0) {
         buffers->readBufferSize = strlen(readBuffer);
@@ -144,6 +146,11 @@ RBRGen4Error TestIOBuffers_sample(const struct RBRGen4 *conn,
     if (sample != &buffers->streamSample) {
         return RBRGEN4_CALLBACK_ERROR;
     }
+    buffers->deliveredSample = *sample;
+    buffers->deliveredSample.readings = buffers->deliveredReadings;
+    memcpy(buffers->deliveredReadings,
+           sample->readings,
+           (size_t) sample->channelCount * sizeof(*sample->readings));
     return RBRGEN4_SUCCESS;
 }
 

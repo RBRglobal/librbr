@@ -127,13 +127,37 @@ typedef struct RBRGen4Sample {
      * An empty string when the output format omits the schedule label.
      */
     char scheduleLabel[RBRGEN4_LABEL_NAME_MAX + 1];
-    /** \brief The number of populated sample readings. */
+    /**
+     * \brief The number of populated sample readings.
+     *
+     * Set by the library. Never exceeds RBRGen4Sample.size.
+     */
     int32_t channelCount;
     /**
-     * \brief The sample readings.
+     * \brief Whether the instrument reported more readings than
+     * RBRGen4Sample.readings can hold.
      *
-     * Only the first RBRGen4Sample.channelCount readings will be populated.
-     * Other readings will be set to 0.
+     * Set by the library. When `true`, the first RBRGen4Sample.size readings
+     * were stored and the rest were dropped.
+     */
+    bool readingsDropped;
+    /**
+     * \brief The capacity of RBRGen4Sample.readings.
+     *
+     * Set by the caller, along with RBRGen4Sample.readings, before the sample
+     * is passed to the library. Never changed by the library.
+     */
+    int32_t size;
+    /**
+     * \brief The sample readings, in caller-supplied storage.
+     *
+     * The library populates the first RBRGen4Sample.channelCount entries and
+     * sets any remaining entries up to RBRGen4Sample.size to 0.
+     *
+     * Copying the sample copies this pointer, not the readings, and the
+     * library reuses the storage for the next sample it parses. A copy that
+     * must outlive that, such as one queued by a sample callback, must also
+     * copy the first RBRGen4Sample.channelCount readings.
      *
      * Readings are represented as double-precision floating point. If they
      * need to encode an error, it's stored in the trailing bits of a NaN.
@@ -142,7 +166,7 @@ typedef struct RBRGen4Sample {
      * \see RBRGen4Reading_getError() to get the error code
      * \see RBRGen4Reading_setError() to synthesize an error reading
      */
-    double readings[RBRGEN4_CHANNEL_MAX];
+    double *readings;
 } RBRGen4Sample;
 
 /**
@@ -184,8 +208,11 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
  * \param [in] conn the instrument connection
  * \param [in] requireLabel whether to require and wait for a sample
  *                          labelled `polling`
- * \param [out] sample the polled sample
+ * \param [out] sample the polled sample; RBRGen4Sample.readings and
+ *                     RBRGen4Sample.size must be set by the caller
  * \return #RBRGEN4_SUCCESS when a sample is successfully read
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings
+ *         storage
  * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but
  *         instrument.outputformat.scheduleLabel is false
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
@@ -218,9 +245,11 @@ RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sampl
  * \param [in] requireLabel whether to require and wait for a sample
  *                          labelled `polling`
  * \param [in] channelList the channels to sample
- * \param [out] sample the polled sample
+ * \param [out] sample the polled sample; RBRGen4Sample.readings and
+ *                     RBRGen4Sample.size must be set by the caller
  * \return #RBRGEN4_SUCCESS when a sample is successfully read
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a channelList is `NULL`,
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings
+ *         storage, or when \a channelList is `NULL`,
  *         empty, its count is out of range, or a channel label is empty
  * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
  *         command
@@ -257,9 +286,11 @@ RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel,
  * \param [in] requireLabel whether to require and wait for a sample
  *                          labelled `polling`
  * \param [in] groupList the groups of channels to sample
- * \param [out] sample the polled sample
+ * \param [out] sample the polled sample; RBRGen4Sample.readings and
+ *                     RBRGen4Sample.size must be set by the caller
  * \return #RBRGEN4_SUCCESS when a sample is successfully read
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a groupList is `NULL`,
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings
+ *         storage, or when \a groupList is `NULL`,
  *         empty, its count is out of range, or a group label is empty
  * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
  *         command

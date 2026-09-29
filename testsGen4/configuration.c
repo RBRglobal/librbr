@@ -570,7 +570,7 @@ TEST_LOGGER4(channellist)
         "seapressure_00",
         "depth_00",
     };
-    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, TESTS_CHANNEL_MAX);
 
     TestIOBuffers_init(
         buffers,
@@ -608,6 +608,70 @@ TEST_LOGGER4(channellistTooSmall)
     return true;
 }
 
+/* A pool without storage is refused before anything is sent: a NULL pool, or
+ * a size that is zero or negative. */
+TEST_LOGGER4(poolsRejectMissingStorage)
+{
+    RBRGen4Channel channels[1];
+    RBRGen4Group groups[1];
+    RBRGen4Config configs[1];
+    RBRGen4Schedule schedules[1];
+    const int32_t sizes[] = {1, 0, -1};
+    RBRGen4Error err;
+
+    for (int32_t i = 0; i < 3; ++i) {
+        /* The first case pairs a valid size with a NULL pool. */
+        bool noPool = i == 0;
+        RBRGen4ChannelPool channelPool = {.size = sizes[i], .pool = noPool ? NULL : channels};
+        RBRGen4GroupPool groupPool = {.size = sizes[i], .pool = noPool ? NULL : groups};
+        RBRGen4ConfigPool configPool = {.size = sizes[i], .pool = noPool ? NULL : configs};
+        RBRGen4SchedulePool schedulePool = {.size = sizes[i], .pool = noPool ? NULL : schedules};
+
+        TestIOBuffers_init(buffers, "", 0);
+        err = RBRGen4_getChannelPool(conn, &channelPool);
+        TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+        err = RBRGen4_getChannelPoolByNature(conn, RBRGEN4_CHANNEL_NATURE_SCIENTIFIC, &channelPool);
+        TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+        err = RBRGen4_getGroupPool(conn, &groupPool);
+        TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+        err = RBRGen4_getConfigPool(conn, &configPool);
+        TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+        err = RBRGen4_getSchedulePool(conn, &schedulePool);
+        TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+        TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+    }
+
+    return true;
+}
+
+/* A label list given without storage is refused before anything is sent; a
+ * NULL list still skips the labels. */
+TEST_LOGGER4(labelListsRejectMissingStorage)
+{
+    RBRGen4Label labels[1];
+    const int32_t sizes[] = {1, 0, -1};
+    RBRGen4Error err;
+
+    for (int32_t i = 0; i < 3; ++i) {
+        /* The first case pairs a valid size with NULL storage. */
+        RBRGen4LabelList list = {.size = sizes[i], .labels = i == 0 ? NULL : labels};
+        RBRGen4Group group = {.label = "group1"};
+        RBRGen4Config config = {.label = "config1"};
+        RBRGen4Schedule schedule = {.label = "schedule1"};
+
+        TestIOBuffers_init(buffers, "", 0);
+        err = RBRGen4_getGroup(conn, &group, &list);
+        TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+        err = RBRGen4_getConfig(conn, &config, &list);
+        TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+        err = RBRGen4_getSchedule(conn, &schedule, &list);
+        TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+        TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+    }
+
+    return true;
+}
+
 TEST_LOGGER4(channellistExactFit)
 {
     /* A pool the reported channels exactly fill is not truncated. */
@@ -630,7 +694,7 @@ TEST_LOGGER4(channellistExactFit)
 TEST_LOGGER4(channellistRepeated)
 {
     /* A repeated list replaces the pool rather than extending it. */
-    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, TESTS_CHANNEL_MAX);
 
     TestIOBuffers_init(
         buffers, "channel count=1 list=temperature_00 list=pressure_00" RESPONSE_TERMINATOR, 0);
@@ -645,7 +709,7 @@ TEST_LOGGER4(channellistRepeated)
 
 TEST_LOGGER4(channellistScientific)
 {
-    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, TESTS_CHANNEL_MAX);
 
     TestIOBuffers_init(
         buffers,
@@ -665,7 +729,7 @@ TEST_LOGGER4(channellistScientific)
 
 TEST_LOGGER4(channellistWithoutChannels)
 {
-    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, TESTS_CHANNEL_MAX);
 
     TestIOBuffers_init(buffers, "channel system count=0 list=none" RESPONSE_TERMINATOR, 0);
 
@@ -707,7 +771,7 @@ TEST_LOGGER4(channelCountWithoutChannels)
 
 TEST_LOGGER4(channellistUnknownNature)
 {
-    RBRGEN4_CHANNEL_POOL_DECL(actual, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_CHANNEL_POOL_DECL(actual, TESTS_CHANNEL_MAX);
 
     TestIOBuffers_init(buffers, "", 0);
 

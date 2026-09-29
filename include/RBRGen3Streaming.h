@@ -25,20 +25,32 @@ extern "C" {
 #define RBRGEN3_OUTPUT_FORMAT_NAME_MAX 15
 
 /**
+ * \brief The name and unit of one active channel.
+ *
+ * \see RBRGen3ChannelsList
+ */
+typedef struct RBRGen3ChannelsListEntry {
+    /** \brief The name of the channel as a null-terminated C string. */
+    char name[RBRGEN3_CHANNEL_NAME_MAX + 1];
+    /** \brief The unit of the channel as a null-terminated C string. */
+    char unit[RBRGEN3_CHANNEL_UNIT_MAX + 1];
+} RBRGen3ChannelsListEntry;
+
+/**
  * \brief Response to the `outputformat channelslist` command.
  *
  * \see RBRGen3_getChannelsList()
  */
 typedef struct RBRGen3ChannelsList {
-    /** \brief The number of active channels. */
-    int32_t count;
-    /** \brief The name and unit of each active channel. */
-    struct {
-        /** \brief The name of the channel as a null-terminated C string. */
-        char name[RBRGEN3_CHANNEL_NAME_MAX + 1];
-        /** \brief The unit of the channel as a null-terminated C string. */
-        char unit[RBRGEN3_CHANNEL_UNIT_MAX + 1];
-    } channels[RBRGEN3_CHANNEL_MAX];
+    /** \brief The number of entries RBRGen3ChannelsList.channels can hold. */
+    int32_t size;
+    /**
+     * \brief The number of entries stored in RBRGen3ChannelsList.channels. Never
+     * exceeds RBRGen3ChannelsList.size.
+     */
+    int32_t len;
+    /** \brief The name and unit of each active channel, in caller-supplied storage. */
+    RBRGen3ChannelsListEntry *channels;
 } RBRGen3ChannelsList;
 
 /**
@@ -48,15 +60,20 @@ typedef struct RBRGen3ChannelsList {
  * transmitted data.
  *
  * RBRGen3ChannelsList.channels will be populated in the order reported
- * by the instrument. Unpopulated entries will have zero-length name and unit
- * members.
+ * by the instrument, up to RBRGen3ChannelsList.size entries. Unpopulated
+ * entries will have zero-length name and unit members.
  *
  * \nol2 Use RBRGen3_getChannels() and RBRGen3_getChannel().
  *
  * \param [in] conn the instrument connection
- * \param [out] channelsList the channels list
+ * \param [out] channelsList the channels list; RBRGen3ChannelsList.channels
+ *                          and RBRGen3ChannelsList.size must be set by the
+ *                          caller
  * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TRUNCATED when the instrument reported more channels than
+ *         the list holds; the first RBRGen3ChannelsList.size are populated
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the command is unavailable, or another
@@ -71,12 +88,18 @@ RBRGen3Error RBRGen3_getChannelsList(RBRGen3 *conn, RBRGen3ChannelsList *channel
  * \see RBRGen3_getLabelsList()
  */
 typedef struct RBRGen3LabelsList {
-    /** \brief The number of active channels. */
-    int32_t count;
+    /** \brief The number of labels RBRGen3LabelsList.labels can hold. */
+    int32_t size;
     /**
-     * \brief The label for each active channel as null-terminated C strings.
+     * \brief The number of labels stored in RBRGen3LabelsList.labels. Never
+     * exceeds RBRGen3LabelsList.size.
      */
-    char labels[RBRGEN3_CHANNEL_MAX][RBRGEN3_CHANNEL_LABEL_MAX + 1];
+    int32_t len;
+    /**
+     * \brief The label for each active channel as null-terminated C strings,
+     * in caller-supplied storage.
+     */
+    RBRGen3Label *labels;
 } RBRGen3LabelsList;
 
 /**
@@ -85,15 +108,20 @@ typedef struct RBRGen3LabelsList {
  * Helpful for identifying the channel corresponding to each value in the
  * transmitted data.
  *
- * RBRGen3LabelsList.channels will be populated in the order reported
- * by the instrument. Unpopulated entries will be zero-length.
+ * RBRGen3LabelsList.labels will be populated in the order reported by the
+ * instrument, up to RBRGen3LabelsList.size entries. Unpopulated entries will
+ * be zero-length.
  *
  * \nol2 Use RBRGen3_getChannels() and RBRGen3_getChannel().
  *
  * \param [in] conn the instrument connection
- * \param [out] labelsList the channel labels list
+ * \param [out] labelsList the channel labels list; RBRGen3LabelsList.labels
+ *                        and RBRGen3LabelsList.size must be set by the caller
  * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TRUNCATED when the instrument reported more labels than
+ *         the list holds; the first RBRGen3LabelsList.size are populated
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the command is unavailable, or another
@@ -458,13 +486,37 @@ double RBRGen3Reading_setError(RBRGen3ReadingFlag flag, uint8_t value);
 typedef struct RBRGen3Sample {
     /** \brief The timestamp of the sample. */
     RBRGen3DateTime timestamp;
-    /** \brief The number of populated sample readings. */
-    int32_t channels;
     /**
-     * \brief The sample readings.
+     * \brief The number of populated sample readings.
      *
-     * Only the first RBRGen3Sample.channels readings will be populated.
-     * Other readings will be set to 0.
+     * Set by the library. Never exceeds RBRGen3Sample.size.
+     */
+    int32_t channelCount;
+    /**
+     * \brief Whether the instrument reported more readings than
+     * RBRGen3Sample.readings can hold.
+     *
+     * Set by the library. When `true`, the first RBRGen3Sample.size readings
+     * were stored and the rest were dropped.
+     */
+    bool readingsDropped;
+    /**
+     * \brief The capacity of RBRGen3Sample.readings.
+     *
+     * Set by the caller, along with RBRGen3Sample.readings, before the sample
+     * is passed to the library. Never changed by the library.
+     */
+    int32_t size;
+    /**
+     * \brief The sample readings, in caller-supplied storage.
+     *
+     * The library populates the first RBRGen3Sample.channelCount entries and
+     * sets any remaining entries up to RBRGen3Sample.size to 0.
+     *
+     * Copying the sample copies this pointer, not the readings, and the
+     * library reuses the storage for the next sample it parses. A copy that
+     * must outlive that, such as one queued by a sample callback, must also
+     * copy the first RBRGen3Sample.channelCount readings.
      *
      * Readings are represented as double-precision floating point. If they
      * need to encode an error, it's stored in the trailing bits of a NaN, and
@@ -474,7 +526,7 @@ typedef struct RBRGen3Sample {
      * \see RBRGen3Reading_getError() to get the error value, if present
      * \see RBRGen3Reading_setError() to synthesize a error reading
      */
-    double readings[RBRGEN3_CHANNEL_MAX];
+    double *readings;
 } RBRGen3Sample;
 
 /**

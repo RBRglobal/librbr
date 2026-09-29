@@ -313,6 +313,9 @@ RBRGen4Error RBRGen4_setChannel(RBRGen4 *conn, const RBRGen4Channel *channel)
 
 RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPool)
 {
+    if (channelPool->pool == NULL || channelPool->size <= 0) {
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
+    }
     channelPool->len = 0;
     memset(channelPool->pool, 0, channelPool->size * sizeof(RBRGen4Channel));
 
@@ -328,6 +331,9 @@ RBRGen4Error RBRGen4_getChannelPoolByNature(RBRGen4 *conn, RBRGen4ChannelNature 
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
+    if (channelPool->pool == NULL || channelPool->size <= 0) {
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
+    }
     channelPool->len = 0;
     memset(channelPool->pool, 0, channelPool->size * sizeof(RBRGen4Channel));
 
@@ -496,7 +502,8 @@ RBRGen4Error RBRGen4_setParameters(RBRGen4 *conn, const RBRGen4Parameters *param
 
 RBRGen4Error RBRGen4_getGroup(RBRGen4 *conn, RBRGen4Group *group, RBRGen4LabelList *channelList)
 {
-    if (group->label[0] == '\0') {
+    if (group->label[0] == '\0' ||
+        (channelList != NULL && (channelList->labels == NULL || channelList->size <= 0))) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
@@ -538,6 +545,9 @@ RBRGen4Error RBRGen4_setGroup(RBRGen4 *conn, const RBRGen4Group *group,
 
 RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool)
 {
+    if (groupPool->pool == NULL || groupPool->size <= 0) {
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
+    }
     groupPool->len = 0;
     memset(groupPool->pool, 0, groupPool->size * sizeof(RBRGen4Group));
 
@@ -617,7 +627,8 @@ RBRGen4Error RBRGen4_deleteGroupAll(RBRGen4 *conn)
 
 RBRGen4Error RBRGen4_getConfig(RBRGen4 *conn, RBRGen4Config *config, RBRGen4LabelList *scheduleList)
 {
-    if (config->label[0] == '\0') {
+    if (config->label[0] == '\0' ||
+        (scheduleList != NULL && (scheduleList->labels == NULL || scheduleList->size <= 0))) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
@@ -659,6 +670,9 @@ RBRGen4Error RBRGen4_setConfig(RBRGen4 *conn, const RBRGen4Config *config,
 
 RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool)
 {
+    if (configPool->pool == NULL || configPool->size <= 0) {
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
+    }
     configPool->len = 0;
     memset(configPool->pool, 0, configPool->size * sizeof(RBRGen4Config));
 
@@ -830,7 +844,8 @@ static RBRGen4ScheduleMode RBRGen4ScheduleMode_parse(const char *value)
 RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
                                  RBRGen4LabelList *groupList)
 {
-    if (schedule->label[0] == '\0') {
+    if (schedule->label[0] == '\0' ||
+        (groupList != NULL && (groupList->labels == NULL || groupList->size <= 0))) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
@@ -981,6 +996,9 @@ RBRGen4Error RBRGen4_setSchedule(RBRGen4 *conn, const RBRGen4Schedule *schedule,
 
 RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedulePool)
 {
+    if (schedulePool->pool == NULL || schedulePool->size <= 0) {
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
+    }
     schedulePool->len = 0;
     memset(schedulePool->pool, 0, schedulePool->size * sizeof(RBRGen4Schedule));
     schedulePool->maxRegimes = 0;

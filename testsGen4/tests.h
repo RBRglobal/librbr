@@ -173,6 +173,9 @@ extern "C" {
 #define TESTIOBUFFERS_WRITE_BUFFER_SIZE 4096
 
 /** \brief The characters terminating an instrument command. */
+/** \brief Channel capacity given to test samples, lists and pools. */
+#define TESTS_CHANNEL_MAX 32
+
 #define COMMAND_TERMINATOR "\r"
 
 /** \brief The characters terminating an instrument command response. */
@@ -196,6 +199,17 @@ extern "C" {
  * \brief Declare an empty RBRGen4ChannelPool named \a name over a
  * buffer of \a size_ entries declared alongside it as `name##Buffer`.
  */
+/**
+ * \brief Declare a sample named \a name with readings storage for \a size_
+ *        channels.
+ */
+#define RBRGEN4_SAMPLE_DECL(name, size_)                               \
+    double name##Readings[size_];                                      \
+    RBRGen4Sample name = (RBRGen4Sample)                               \
+    {                                                                  \
+        .size = (size_), .channelCount = 0, .readings = name##Readings \
+    }
+
 #define RBRGEN4_CHANNEL_POOL_DECL(name, size_)          \
     RBRGen4Channel name##Buffer[size_];                 \
     RBRGen4ChannelPool name = (RBRGen4ChannelPool)      \
@@ -298,6 +312,15 @@ typedef struct TestIOBuffers {
     int32_t writeBufferPos;
     /** \brief The last sample received from the test instrument. */
     RBRGen4Sample streamSample;
+    /** \brief Readings storage for TestIOBuffers.streamSample. */
+    double streamReadings[TESTS_CHANNEL_MAX];
+    /**
+     * \brief A snapshot of TestIOBuffers.streamSample taken by the sample
+     * callback, for when the library reuses that sample afterwards.
+     */
+    RBRGen4Sample deliveredSample;
+    /** \brief Readings storage for TestIOBuffers.deliveredSample. */
+    double deliveredReadings[TESTS_CHANNEL_MAX];
 } TestIOBuffers;
 
 /**

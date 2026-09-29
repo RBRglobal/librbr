@@ -39,6 +39,8 @@
 
 /* == Customer defined parameters == */
 
+#define CHANNEL_COUNT 32
+
 #define PRESSURE    "pressure_00"
 #define TEMPERATURE "temperature_00"
 
@@ -199,8 +201,13 @@ int main(int argc, char *argv[])
     uint8_t commandBuffer[RBRGEN4_COMMAND_BUFFER_DEFAULT];
     uint8_t responseBuffer[RBRGEN4_RESPONSE_BUFFER_DEFAULT];
     /* Streamed samples are parsed into this buffer before being passed to
-     * the sample callback. */
-    RBRGen4Sample sampleBuffer;
+     * the sample callback. Size the readings storage for the channels the
+     * instrument will report. */
+    double sampleReadings[CHANNEL_COUNT];
+    RBRGen4Sample sampleBuffer = {
+        .size = CHANNEL_COUNT,
+        .readings = sampleReadings,
+    };
     const RBRGen4Environment environment = {
         .time = instrumentTime,
         .sleep = instrumentSleep,

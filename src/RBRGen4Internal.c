@@ -391,17 +391,28 @@ static char *seek(const char *str, char delimiter)
 /**
  * \brief Attempt to parse a sample from a response.
  *
- * \param [out] sample the sample
+ * \param [out] sample the sample; RBRGen4Sample.readings and
+ *                     RBRGen4Sample.size must be set by the caller
  * \param [in] outputFormat the format of the response to parse
  * \param [in] response the response to parse
  * \return RBRGEN4_SUCCESS if the response is a sample
  * \return RBRGEN4_INVALID_PARAMETER_VALUE if the response does not
  *         follow the specified output format
+ * \return RBRGEN4_CHECKSUM_ERROR if the CRC does not match
  */
 static RBRGen4Error RBRGen4Sample_parse(RBRGen4Sample *sample, RBRGen4OutputFormat *outputFormat,
                                         char *response)
 {
+    /* Store the readings buffer and its size before zeroing it and the
+     * sample struct */
+    int32_t size = sample->size;
+    double *readings = sample->readings;
+    memset(readings, 0, (size_t) size * sizeof(*readings));
     memset(sample, 0, sizeof(RBRGen4Sample));
+
+    /* Restore the readings buffer */
+    sample->readings = readings;
+    sample->size = size;
 
     double reading;
     sample->channelCount = 0;
@@ -451,7 +462,7 @@ static RBRGen4Error RBRGen4Sample_parse(RBRGen4Sample *sample, RBRGen4OutputForm
         }
     }
 
-    while (token != NULL && sample->channelCount < RBRGEN4_CHANNEL_MAX) {
+    while (token != NULL) {
         char *readingEnd = token;
         if (memcmp(token, SAMPLE_NAN, 3) == 0) {
             reading = (double) NAN;
@@ -491,7 +502,12 @@ static RBRGen4Error RBRGen4Sample_parse(RBRGen4Sample *sample, RBRGen4OutputForm
             }
         }
 
-        sample->readings[sample->channelCount++] = reading;
+        /* Readings past the caller's storage are dropped and flagged. */
+        if (sample->channelCount < sample->size) {
+            sample->readings[sample->channelCount++] = reading;
+        } else {
+            sample->readingsDropped = true;
+        }
         token = seek(token, PARAMETER_SEPARATOR_L4);
     }
     return RBRGEN4_SUCCESS;
@@ -551,19 +567,6 @@ RBRGen4Error RBRGen4_errorCheckResponse(RBRGen4 *conn, char *beginning, char *en
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error RBRGen4_deliverSample(RBRGen4 *conn, const RBRGen4Sample *sample)
-{
-    if (conn->environment.sample == NULL) {
-        return RBRGEN4_SUCCESS;
-    }
-
-    if (sample != conn->environment.sampleBuffer) {
-        *conn->environment.sampleBuffer = *sample;
-    }
-
-    return conn->environment.sample(conn, conn->environment.sampleBuffer);
-}
-
 RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn, bool breakOnSample, RBRGen4Sample *sample,
                                   RBRGen4DateTime startTime, RBRGen4DateTime timeout)
 {
@@ -591,8 +594,8 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn, bool breakOnSample, RBRGen4Samp
 
         if (sampleTarget != NULL &&
             RBRGen4Sample_parse(sampleTarget, &conn->outputFormat, beginning) == RBRGEN4_SUCCESS) {
-            if (sample == NULL) {
-                RBR_TRY(RBRGen4_deliverSample(conn, sampleTarget));
+            if (conn->environment.sample != NULL && sample == NULL) {
+                RBR_TRY(conn->environment.sample(conn, sampleTarget));
             }
             if (breakOnSample) {
                 return RBRGEN4_SAMPLE;

@@ -29,6 +29,9 @@
 #include "RBRGen3Parser.h"
 #include "RBRGen3Commands.h"
 
+/* Readings storage for as many channels as this application expects. */
+#define CHANNEL_MAX 32
+
 RBRGen3Error parserSample(const struct RBRGen3Parser *parser,
                           const struct RBRGen3Sample *const sample)
 {
@@ -40,7 +43,7 @@ RBRGen3Error parserSample(const struct RBRGen3Parser *parser,
     gmtime_r(&sampleSeconds, &sampleTime);
     strftime(ftime, sizeof(ftime), "%F %T", &sampleTime);
     printf("%s.%03" PRIi64, ftime, sample->timestamp % 1000);
-    for (int32_t i = 0; i < sample->channels; i++) {
+    for (int32_t i = 0; i < sample->channelCount; i++) {
         printf(", %lf", sample->readings[i]);
     }
     printf("\n");
@@ -82,8 +85,8 @@ int main(int argc, char *argv[])
     }
     if (_downloadFrom == 4) {
         fprintf(stderr,
-                "Warning: this code requires 5 channels' output. Please modify \"channels.count\" "
-                "and \"channels.on\" to match your settings.\n");
+                "Warning: this code requires 5 channels' output. Please modify "
+                "\"enabledChannels\" to match your settings.\n");
     }
 
     fprintf(stderr, "%s: Using %s v%s.\n", programName, RBRGEN3_LIB_NAME, RBRGEN3_LIB_VERSION);
@@ -114,31 +117,35 @@ int main(int argc, char *argv[])
     RBRGen3_setUSBStreamingState(&conn, false);
     RBRGen3_setSerialStreamingState(&conn, false);
 
-    RBRGen3Channels channels;
+    /* The parser needs to know how many channels each sample holds. */
+    int32_t enabledChannels = 0;
     if (_downloadFrom == 1) {
-        RBRGen3_getChannels(&conn, &channels);
+        RBRGen3_getEnabledChannelCount(&conn, &enabledChannels);
     } else if (_downloadFrom == 4) {
-        // important!!!
-        // channels should be set the same number with output channels.
-        channels.count = 5;
-        channels.on = 5;
-        channels.settlingTime = 60;
-        channels.readTime = 290;
-        channels.minimumPeriod = 480;
+        // Important! This must match the postprocessing channels configured
+        // in the instrument.
+        enabledChannels = 5;
     }
 
     RBRGen3Parser parser;
 
-    RBRGen3Sample sampleBuffer;
+    double sampleReadings[CHANNEL_MAX];
+    RBRGen3Sample sampleBuffer = {.size = CHANNEL_MAX, .readings = sampleReadings};
     RBRGen3ParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer,
     };
 
-    RBRGen3ParserConfig parserConfig = {.format = RBRGEN3_MEMFORMAT_CALBIN00,
-                                        .formatConfig = {.easyParse = {
-                                                             .channels = channels.on,
-                                                         }}};
+    RBRGen3ParserConfig parserConfig = {
+        .format = RBRGEN3_MEMFORMAT_CALBIN00,
+        .formatConfig =
+            {
+                .easyParse =
+                    {
+                        .channels = enabledChannels,
+                    },
+            },
+    };
 
     if ((err = RBRGen3Parser_init(&parser, &parserCallbacks, &parserConfig, NULL)) !=
         RBRGEN3_SUCCESS) {

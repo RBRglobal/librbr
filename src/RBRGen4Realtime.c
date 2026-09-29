@@ -101,6 +101,23 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn)
 }
 
 /**
+ * \brief Copy a sample into another with its own readings storage.
+ *
+ * Readings which do not fit the destination are dropped and flagged.
+ */
+static void RBRGen4Sample_copy(RBRGen4Sample *to, const RBRGen4Sample *from)
+{
+    to->timestamp = from->timestamp;
+    memcpy(to->scheduleLabel, from->scheduleLabel, sizeof(to->scheduleLabel));
+    to->channelCount = from->channelCount < to->size ? from->channelCount : to->size;
+    to->readingsDropped = from->readingsDropped || to->channelCount < from->channelCount;
+    memcpy(to->readings, from->readings, (size_t) to->channelCount * sizeof(*to->readings));
+    memset(to->readings + to->channelCount,
+           0,
+           (size_t) (to->size - to->channelCount) * sizeof(*to->readings));
+}
+
+/**
  * \brief Send a poll command and read the resulting sample.
  *
  * \param [in] conn the instrument connection
@@ -114,6 +131,9 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn)
 static RBRGen4Error RBRGen4_sendPoll(RBRGen4 *conn, bool requireLabel, const char *parameter,
                                      const RBRGen4LabelList *list, RBRGen4Sample *sample)
 {
+    if (sample->readings == NULL || sample->size <= 0) {
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
+    }
     if (requireLabel && !conn->outputFormat.scheduleLabel) {
         return RBRGEN4_UNSUPPORTED;
     }
@@ -156,15 +176,33 @@ static RBRGen4Error RBRGen4_sendPoll(RBRGen4 *conn, bool requireLabel, const cha
      * #RBRGEN4_SUCCESS means that it found some other command
      * response instead, so we'll loop until we get a “failure” value (which
      * we hope is SAMPLE). */
+    /* Streamed samples met while waiting are forwarded to the sample
+     * callback. Parse into whichever of the two samples has the larger
+     * readings storage, then copy into the other, so that neither loses
+     * readings the other had room for. */
+    RBRGen4Sample *callbackSample = conn->environment.sampleBuffer;
+    RBRGen4Sample *target = sample;
+    if (conn->environment.sample != NULL && callbackSample->size > sample->size) {
+        target = callbackSample;
+    }
     do {
-        err = RBRGen4_readResponse(conn, true, sample, start, conn->pollTimeout);
-        if (err == RBRGEN4_SAMPLE && requireLabel &&
-            0 != strcmp(sample->scheduleLabel, RBRGEN4_POLL_SCHEDULE_LABEL)) {
+        err = RBRGen4_readResponse(conn, true, target, start, conn->pollTimeout);
+        if (err != RBRGEN4_SAMPLE) {
+            continue;
+        }
+        if (requireLabel && 0 != strcmp(target->scheduleLabel, RBRGEN4_POLL_SCHEDULE_LABEL)) {
             /* This is a streamed sample, not the polled one we're waiting
              * for. Forward it to the sample callback, if any, and keep
              * looking. */
-            RBR_TRY(RBRGen4_deliverSample(conn, sample));
+            if (conn->environment.sample != NULL) {
+                if (target != callbackSample) {
+                    RBRGen4Sample_copy(callbackSample, target);
+                }
+                RBR_TRY(conn->environment.sample(conn, callbackSample));
+            }
             err = RBRGEN4_SUCCESS;
+        } else if (target != sample) {
+            RBRGen4Sample_copy(sample, target);
         }
     } while (err == RBRGEN4_SUCCESS);
     /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any

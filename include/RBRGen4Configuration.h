@@ -309,6 +309,7 @@ RBRGen4Error RBRGen4_setChannel(RBRGen4 *conn, const RBRGen4Channel *channel);
  * \return #RBRGEN4_TRUNCATED when \a channelPool cannot hold every
  *                            reported channel; the first `size` are
  *                            stored
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a channelPool has no storage
  * \return #RBRGEN4_HARDWARE_ERROR when the channel pool cannot be read, or
  *                                      another hardware error occurs
  * \see RBRGen4_getChannelPoolByNature()
@@ -335,7 +336,9 @@ RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPo
  * \return #RBRGEN4_HARDWARE_ERROR when the channel pool cannot be read, or
  *                                      another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the nature is not
- *                                                    one the command accepts
+ *                                                    one the command accepts,
+ *                                                    or \a channelPool has no
+ *                                                    storage
  * \see RBRGen4_getChannelPool()
  */
 RBRGen4Error RBRGen4_getChannelPoolByNature(RBRGen4 *conn, RBRGen4ChannelNature nature,
@@ -605,7 +608,8 @@ typedef struct RBRGen4Group {
  * \return #RBRGEN4_SUCCESS when the group is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
+ *         \a channelList is given without storage
  * \return #RBRGEN4_TRUNCATED when \a channelList cannot hold every
  *                            reported channel; the first `size` are
  *                            stored
@@ -682,6 +686,7 @@ typedef struct RBRGen4GroupPool {
  * \return #RBRGEN4_TRUNCATED when \a groupPool cannot hold every
  *                            reported group; the first `size` are
  *                            stored
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a groupPool has no storage
  * \see RBRGen4_getGroup()
  */
 RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool);
@@ -955,7 +960,8 @@ typedef struct RBRGen4Schedule {
  * \return #RBRGEN4_SUCCESS when the schedule is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
+ *         \a groupList is given without storage
  * \return #RBRGEN4_TRUNCATED when \a groupList cannot hold every
  *                            reported group; the first `size` are
  *                            stored
@@ -1054,6 +1060,7 @@ const char *RBRGen4ScheduleMode_name(RBRGen4ScheduleMode mode);
  * \return #RBRGEN4_TRUNCATED when \a schedulePool cannot hold every
  *                            reported schedule; the first `size` are
  *                            stored
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a schedulePool has no storage
  * \see RBRGen4_getSchedule()
  */
 RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedulePool);
@@ -1172,7 +1179,8 @@ typedef struct RBRGen4Config {
  * \return #RBRGEN4_SUCCESS when the configuration is read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
+ *         \a scheduleList is given without storage
  * \return #RBRGEN4_TRUNCATED when \a scheduleList cannot hold every
  *                            reported schedule; the first `size` are
  *                            stored
@@ -1251,6 +1259,7 @@ typedef struct RBRGen4ConfigPool {
  * \return #RBRGEN4_TRUNCATED when \a configPool cannot hold every
  *                            reported configuration; the first
  *                            `size` are stored
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a configPool has no storage
  * \see RBRGen4_getConfig()
  */
 RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool);

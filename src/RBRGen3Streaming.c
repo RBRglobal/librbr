@@ -34,7 +34,13 @@ RBRGen3Error RBRGen3_getChannelsList(RBRGen3 *conn, RBRGen3ChannelsList *channel
         return RBRGEN3_UNSUPPORTED;
     }
 
-    memset(channelsList, 0, sizeof(RBRGen3ChannelsList));
+    if (channelsList->channels == NULL || channelsList->size <= 0) {
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
+    }
+    /* The entry storage belongs to the caller; clear it, not the pointer. */
+    memset(
+        channelsList->channels, 0, (size_t) channelsList->size * sizeof(*channelsList->channels));
+    channelsList->len = 0;
 
     RBR_TRY(RBRGen3_converse(conn, "outputformat channelslist"));
 
@@ -61,19 +67,25 @@ RBRGen3Error RBRGen3_getChannelsList(RBRGen3 *conn, RBRGen3ChannelsList *channel
                 break;
             }
 
-            snprintf(channelsList->channels[channel].name,
-                     sizeof(channelsList->channels[channel].name),
-                     "%s",
-                     nameStart);
+            /* Channels past the caller's storage are dropped. */
+            if (channel < channelsList->size) {
+                snprintf(channelsList->channels[channel].name,
+                         sizeof(channelsList->channels[channel].name),
+                         "%s",
+                         nameStart);
 
-            snprintf(channelsList->channels[channel].unit,
-                     sizeof(channelsList->channels[channel].unit),
-                     "%s",
-                     unitStart);
+                snprintf(channelsList->channels[channel].unit,
+                         sizeof(channelsList->channels[channel].unit),
+                         "%s",
+                         unitStart);
+            }
 
             next = strtok(NULL, "(");
         }
-        channelsList->count = channel;
+        channelsList->len = channel > channelsList->size ? channelsList->size : channel;
+        if (channel > channelsList->size) {
+            return RBRGEN3_TRUNCATED;
+        }
 
         break;
     }
@@ -87,7 +99,12 @@ RBRGen3Error RBRGen3_getLabelsList(RBRGen3 *conn, RBRGen3LabelsList *labelsList)
         return RBRGEN3_UNSUPPORTED;
     }
 
-    memset(labelsList, 0, sizeof(RBRGen3LabelsList));
+    if (labelsList->labels == NULL || labelsList->size <= 0) {
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
+    }
+    /* The label storage belongs to the caller; clear it, not the pointer. */
+    memset(labelsList->labels, 0, (size_t) labelsList->size * sizeof(*labelsList->labels));
+    labelsList->len = 0;
 
     RBR_TRY(RBRGen3_converse(conn, "outputformat labelslist"));
 
@@ -105,12 +122,18 @@ RBRGen3Error RBRGen3_getLabelsList(RBRGen3 *conn, RBRGen3LabelsList *labelsList)
         int32_t label;
         char *labelStart = strtok(parameter.value, "|");
         for (label = 0; labelStart != NULL; label++) {
-            snprintf(
-                labelsList->labels[label], sizeof(labelsList->labels[label]), "%s", labelStart);
+            /* Labels past the caller's storage are dropped. */
+            if (label < labelsList->size) {
+                snprintf(
+                    labelsList->labels[label], sizeof(labelsList->labels[label]), "%s", labelStart);
+            }
 
             labelStart = strtok(NULL, "|");
         }
-        labelsList->count = label;
+        labelsList->len = label > labelsList->size ? labelsList->size : label;
+        if (label > labelsList->size) {
+            return RBRGEN3_TRUNCATED;
+        }
 
         break;
     }

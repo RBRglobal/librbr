@@ -63,10 +63,10 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 1710054066000LL,
                 .channelCount = 4,
-                .readings = {RBRGen4Reading_setError(1),
-                             RBRGen4Reading_setError(9),
-                             RBRGen4Reading_setError(9),
-                             RBRGen4Reading_setError(9)},
+                .readings = (double[]) {RBRGen4Reading_setError(1),
+                                        RBRGen4Reading_setError(9),
+                                        RBRGen4Reading_setError(9),
+                                        RBRGen4Reading_setError(9)},
             },
             {0},
         },
@@ -81,7 +81,7 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 1710054067000LL,
                 .channelCount = 1,
-                .readings = {RBRGen4Reading_setError(1)},
+                .readings = (double[]) {RBRGen4Reading_setError(1)},
             },
             {0},
         },
@@ -97,7 +97,7 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 12345LL,
                 .channelCount = 2,
-                .readings = {12.5364470, 9.91695000},
+                .readings = (double[]) {12.5364470, 9.91695000},
             },
             {0},
         },
@@ -127,9 +127,9 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 1710054069000LL,
                 .channelCount = 3,
-                .readings = {RBRGen4Reading_setError(9),
-                             RBRGen4Reading_setError(1),
-                             RBRGen4Reading_setError(9)},
+                .readings = (double[]) {RBRGen4Reading_setError(9),
+                                        RBRGen4Reading_setError(1),
+                                        RBRGen4Reading_setError(9)},
             },
             {0},
         },
@@ -144,7 +144,7 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 1710054070000LL,
                 .channelCount = 1,
-                .readings = {RBRGen4Reading_setError(9)},
+                .readings = (double[]) {RBRGen4Reading_setError(9)},
             },
             {0},
         },
@@ -160,7 +160,7 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 1729511449000LL,
                 .channelCount = 3,
-                .readings = {18.1745130, 12.7052970, 2.69308210},
+                .readings = (double[]) {18.1745130, 12.7052970, 2.69308210},
             },
             {0},
         },
@@ -182,7 +182,7 @@ TEST_LOGGER4(poll)
                 .timestamp = 1710054091000LL,
                 .scheduleLabel = "polling",
                 .channelCount = 1,
-                .readings = {RBRGen4Reading_setError(1)},
+                .readings = (double[]) {RBRGen4Reading_setError(1)},
             },
             {0},
         },
@@ -202,7 +202,7 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 1710054093000LL,
                 .channelCount = 1,
-                .readings = {RBRGen4Reading_setError(1)},
+                .readings = (double[]) {RBRGen4Reading_setError(1)},
             },
             {0},
         },
@@ -222,7 +222,7 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 1710054095000LL,
                 .channelCount = 1,
-                .readings = {RBRGen4Reading_setError(1)},
+                .readings = (double[]) {RBRGen4Reading_setError(1)},
             },
             {0},
         },
@@ -243,7 +243,7 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 0,
                 .channelCount = 1,
-                .readings = {9.85289000},
+                .readings = (double[]) {9.85289000},
             },
             {0},
         },
@@ -263,7 +263,7 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 0,
                 .channelCount = 1,
-                .readings = {9.80449000},
+                .readings = (double[]) {9.80449000},
             },
             {0},
         },
@@ -286,7 +286,7 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 0,
                 .channelCount = 4,
-                .readings = {12.5363015, 9.82848000, -0.304020648, -0.302152465},
+                .readings = (double[]) {12.5363015, 9.82848000, -0.304020648, -0.302152465},
             },
             {0},
         },
@@ -307,7 +307,7 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 0,
                 .channelCount = 4,
-                .readings = {12.5361167, 9.82034000, -0.312160648, -0.310242445},
+                .readings = (double[]) {12.5361167, 9.82034000, -0.312160648, -0.310242445},
             },
             {0},
         },
@@ -329,7 +329,7 @@ TEST_LOGGER4(poll)
                 .timestamp = 0,
                 .scheduleLabel = "polling",
                 .channelCount = 4,
-                .readings = {12.5356691, 9.81261000, -0.319890648, -0.317924945},
+                .readings = (double[]) {12.5356691, 9.81261000, -0.319890648, -0.317924945},
             },
             {0},
         },
@@ -351,7 +351,7 @@ TEST_LOGGER4(poll)
                 .timestamp = 0,
                 .scheduleLabel = "polling",
                 .channelCount = 4,
-                .readings = {12.5356399, 9.79543000, -0.337070648, -0.334999375},
+                .readings = (double[]) {12.5356399, 9.79543000, -0.337070648, -0.334999375},
             },
             {0},
         },
@@ -372,7 +372,7 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 0,
                 .channelCount = 4,
-                .readings = {12.5360777, 9.80820000, -0.324300648, -0.322307846},
+                .readings = (double[]) {12.5360777, 9.80820000, -0.324300648, -0.322307846},
             },
             {0},
         },
@@ -393,7 +393,7 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 0,
                 .channelCount = 4,
-                .readings = {12.5362042, 9.81825000, -0.314250648, -0.312319602},
+                .readings = (double[]) {12.5362042, 9.81825000, -0.314250648, -0.312319602},
             },
             {0},
         },
@@ -415,7 +415,7 @@ TEST_LOGGER4(poll)
                 .timestamp = 0,
                 .scheduleLabel = "polling",
                 .channelCount = 4,
-                .readings = {12.5369048, 9.81109000, -0.321410648, -0.319435605},
+                .readings = (double[]) {12.5369048, 9.81109000, -0.321410648, -0.319435605},
             },
             {0},
         },
@@ -437,7 +437,7 @@ TEST_LOGGER4(poll)
                 .timestamp = 0,
                 .scheduleLabel = "polling",
                 .channelCount = 4,
-                .readings = {12.5369632, 9.80959000, -0.322910648, -0.320926387},
+                .readings = (double[]) {12.5369632, 9.80959000, -0.322910648, -0.320926387},
             },
             {0},
         },
@@ -464,7 +464,8 @@ TEST_LOGGER4(poll)
                 .scheduleLabel = "polling",
                 .channelCount = 4,
                 .readings =
-                    {12.5369242316864, 9.80062000000000, -0.331880648498535, -0.329841267502290},
+                    (double[]) {
+                        12.5369242316864, 9.80062000000000, -0.331880648498535, -0.329841267502290},
             },
             {0},
         },
@@ -504,12 +505,12 @@ TEST_LOGGER4(poll)
             {
                 .scheduleLabel = "polling",
                 .channelCount = 1,
-                .readings = {9.83602000},
+                .readings = (double[]) {9.83602000},
             },
             {
                 .scheduleLabel = "sch_asc_pts",
                 .channelCount = 2,
-                .readings = {9.84050000, 12.5362918},
+                .readings = (double[]) {9.84050000, 12.5362918},
             },
         },
         /* Without requireLabel, the first sample read wins, even if it's a
@@ -531,7 +532,7 @@ TEST_LOGGER4(poll)
             {
                 .scheduleLabel = "sch_asc_pts",
                 .channelCount = 2,
-                .readings = {9.84050000, 12.5362918},
+                .readings = (double[]) {9.84050000, 12.5362918},
             },
             {0},
         },
@@ -585,13 +586,12 @@ TEST_LOGGER4(poll)
     };
 
     RBRGen4Error err;
-    RBRGen4Sample actual;
+    RBRGEN4_SAMPLE_DECL(actual, TESTS_CHANNEL_MAX);
 
     for (int i = 0; tests[i].expectedCommand != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        memset(&buffers->streamSample, 0, sizeof(buffers->streamSample));
         conn->outputFormat = tests[i].outputFormat;
-        RBRGEN4_LABEL_LIST_DECL(list, RBRGEN4_CHANNEL_MAX);
+        RBRGEN4_LABEL_LIST_DECL(list, TESTS_CHANNEL_MAX);
         if (tests[i].channelList != NULL) {
             PollTest_labelList(tests[i].channelList, &list);
             err = RBRGen4_pollChannels(conn, tests[i].requireLabel, &list, &actual);
@@ -641,7 +641,7 @@ TEST_LOGGER4(poll)
     }
 
     /* A label list too long to send is refused before the command. */
-    RBRGEN4_LABEL_LIST_DECL(longList, RBRGEN4_CHANNEL_MAX);
+    RBRGEN4_LABEL_LIST_DECL(longList, TESTS_CHANNEL_MAX);
     for (longList.len = 0; longList.len < longList.size; longList.len++) {
         memset(longList.labels[longList.len], 'a', RBRGEN4_LABEL_NAME_MAX);
         longList.labels[longList.len][RBRGEN4_LABEL_NAME_MAX] = '\0';
@@ -673,7 +673,7 @@ static RBRGen4Error pollTimeoutTime(const struct RBRGen4 *conn, RBRGen4DateTime 
 TEST_LOGGER4(pollCommandBufferTooSmall)
 {
     RBRGen4Error err;
-    RBRGen4Sample sample;
+    RBRGEN4_SAMPLE_DECL(sample, TESTS_CHANNEL_MAX);
     const RBRGen4Environment before = conn->environment;
     uint8_t commandBuffer[5];
 
@@ -694,7 +694,7 @@ TEST_LOGGER4(pollCommandBufferTooSmall)
 TEST_LOGGER4(pollTimeout)
 {
     RBRGen4Error err;
-    RBRGen4Sample actual;
+    RBRGEN4_SAMPLE_DECL(actual, TESTS_CHANNEL_MAX);
     RBRGen4TimeCallback savedTime = conn->environment.time;
     RBRGen4DateTime savedPollTimeout = conn->pollTimeout;
 
@@ -715,7 +715,6 @@ TEST_LOGGER4(pollTimeout)
                        "sch_asc_pts 9.84050000e+000 12.5362918e+000" RESPONSE_TERMINATOR
                        "sch_asc_pts 9.84050000e+000 12.5362918e+000" RESPONSE_TERMINATOR,
                        0);
-    memset(&buffers->streamSample, 0, sizeof(buffers->streamSample));
 
     RBRGEN4_LABEL_LIST_DECL(channelList, 1);
     PollTest_labelList("pressure_00", &channelList);
@@ -750,7 +749,7 @@ static RBRGen4Error pollSlowResponseTime(const struct RBRGen4 *conn, RBRGen4Date
 TEST_LOGGER4(pollSlowResponse)
 {
     RBRGen4Error err;
-    RBRGen4Sample actual;
+    RBRGEN4_SAMPLE_DECL(actual, TESTS_CHANNEL_MAX);
     RBRGen4TimeCallback savedTime = conn->environment.time;
     RBRGen4DateTime savedCommandTimeout = conn->commandTimeout;
     RBRGen4DateTime savedPollTimeout = conn->pollTimeout;
@@ -803,7 +802,7 @@ TEST_LOGGER4(readSample)
                 .timestamp = 1710333953000LL,
                 .scheduleLabel = "sch_asc_pts",
                 .channelCount = 2,
-                .readings = {9.84033000, 12.5358150},
+                .readings = (double[]) {9.84033000, 12.5358150},
             },
         },
         /* sn, scheduleLabel, dateTime, and crc all off. */
@@ -819,7 +818,7 @@ TEST_LOGGER4(readSample)
                 .timestamp = 0,
                 .scheduleLabel = "",
                 .channelCount = 2,
-                .readings = {9.85054000, 12.5359318},
+                .readings = (double[]) {9.85054000, 12.5359318},
             },
         },
         /* Only scheduleLabel and crc on. */
@@ -835,7 +834,7 @@ TEST_LOGGER4(readSample)
                 .timestamp = 0,
                 .scheduleLabel = "sch_asc_pts",
                 .channelCount = 2,
-                .readings = {9.83676000, 12.5361556},
+                .readings = (double[]) {9.83676000, 12.5361556},
             },
         },
         /* Only sn on, with a float64-encoded sample. */
@@ -852,7 +851,7 @@ TEST_LOGGER4(readSample)
                 .timestamp = 0,
                 .scheduleLabel = "",
                 .channelCount = 2,
-                .readings = {9.84050000000000, 12.5362917963016},
+                .readings = (double[]) {9.84050000000000, 12.5362917963016},
             },
         },
         /* The same as the first row, but preceded by the command prompt,
@@ -870,7 +869,7 @@ TEST_LOGGER4(readSample)
                 .timestamp = 1710333949000LL,
                 .scheduleLabel = "sch_asc_pts",
                 .channelCount = 2,
-                .readings = {9.83297000, 12.5356886},
+                .readings = (double[]) {9.83297000, 12.5356886},
             },
         },
     };
@@ -879,7 +878,6 @@ TEST_LOGGER4(readSample)
 
     for (size_t i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        memset(&buffers->streamSample, 0, sizeof(buffers->streamSample));
         conn->outputFormat = tests[i].outputFormat;
 
         err = RBRGen4_readSample(conn);
@@ -919,7 +917,6 @@ TEST_LOGGER4(readSampleBadCrc)
      * checksum won't match. */
     TestIOBuffers_init(
         buffers, "sch_asc_pts 9.83676000e+000 12.5361556e+000 0xC4ED" RESPONSE_TERMINATOR, 0);
-    memset(&buffers->streamSample, 0, sizeof(buffers->streamSample));
 
     err = RBRGen4_readSample(conn);
     /* The checksum failure makes the parser reject the line as a sample;
@@ -928,6 +925,113 @@ TEST_LOGGER4(readSampleBadCrc)
      * response and, finding no more data, fails with a callback error
      * rather than a checksum or timeout error. */
     TEST_ASSERT_ENUM_EQ(RBRGEN4_CALLBACK_ERROR, err, RBRGen4Error);
+
+    return true;
+}
+
+/* The caller sizes the readings storage, so a sample with more readings than
+ * it holds keeps the first ones and flags the rest as dropped. */
+TEST_LOGGER4(pollReadingsTruncated)
+{
+    RBRGen4Error err;
+    RBRGEN4_SAMPLE_DECL(actual, 1);
+
+    conn->outputFormat = (RBRGen4OutputFormat) OUTPUTFORMAT_DEFAULT;
+    TestIOBuffers_init(
+        buffers, "2024-03-10 07:01:06.000 12.5364470e+000 9.91695000e+000" RESPONSE_TERMINATOR, 0);
+    err = RBRGen4_poll(conn, false, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_EQ(1, actual.channelCount, "%" PRIi32);
+    TEST_ASSERT_EQ(true, actual.readingsDropped, "%d");
+    TEST_ASSERT_EQ(1, actual.size, "%" PRIi32);
+    TEST_ASSERT_EQ(12.5364470, actual.readings[0], "%lf");
+
+    return true;
+}
+
+/* A sample without readings storage is refused before anything is sent. */
+TEST_LOGGER4(pollRejectsSampleWithoutReadings)
+{
+    RBRGen4Error err;
+    RBRGen4Sample noStorage = {.size = 4, .readings = NULL};
+    RBRGEN4_SAMPLE_DECL(noCapacity, 1);
+    noCapacity.size = 0;
+
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen4_poll(conn, false, &noStorage);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+    err = RBRGen4_poll(conn, false, &noCapacity);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
+    return true;
+}
+
+/* A streamed sample forwarded to the callback fills the callback sample's
+ * own storage even when the polled sample has less. */
+TEST_LOGGER4(streamedSampleFillsLargerCallbackStorage)
+{
+    RBRGen4Error err;
+    RBRGEN4_SAMPLE_DECL(actual, 1);
+
+    conn->outputFormat =
+        (RBRGen4OutputFormat) {.sn = true, .scheduleLabel = true, .dateTime = false, .crc = false};
+    TestIOBuffers_init(
+        buffers,
+        "ready: RBR 999999 sch_asc_pts 9.84050000e+000 12.5362918e+000" RESPONSE_TERMINATOR
+        "RBR 999999 polling 9.83602000e+000" RESPONSE_TERMINATOR,
+        0);
+
+    RBRGEN4_LABEL_LIST_DECL(channelList, 1);
+    PollTest_labelList("pressure_00", &channelList);
+    err = RBRGen4_pollChannels(conn, true, &channelList, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("polling", actual.scheduleLabel);
+    TEST_ASSERT_EQ(1, actual.channelCount, "%" PRIi32);
+    TEST_ASSERT_EQ(false, actual.readingsDropped, "%d");
+    TEST_ASSERT_EQ(9.83602000, actual.readings[0], "%lf");
+
+    TEST_ASSERT_STR_EQ("sch_asc_pts", buffers->deliveredSample.scheduleLabel);
+    TEST_ASSERT_EQ(2, buffers->deliveredSample.channelCount, "%" PRIi32);
+    TEST_ASSERT_EQ(false, buffers->deliveredSample.readingsDropped, "%d");
+    TEST_ASSERT_EQ(9.84050000, buffers->deliveredSample.readings[0], "%lf");
+    TEST_ASSERT_EQ(12.5362918, buffers->deliveredSample.readings[1], "%lf");
+
+    return true;
+}
+
+/* When the callback sample is the smaller one, it receives what fits and is
+ * flagged, while the polled sample keeps everything. */
+TEST_LOGGER4(streamedSampleTruncatedToSmallerCallbackStorage)
+{
+    RBRGen4Error err;
+    RBRGEN4_SAMPLE_DECL(actual, TESTS_CHANNEL_MAX);
+
+    conn->outputFormat =
+        (RBRGen4OutputFormat) {.sn = true, .scheduleLabel = true, .dateTime = false, .crc = false};
+    TestIOBuffers_init(buffers,
+                       "RBR 999999 sch_asc_pts 9.84050000e+000 12.5362918e+000" RESPONSE_TERMINATOR
+                       "RBR 999999 polling 9.83602000e+000 1.5e+000" RESPONSE_TERMINATOR,
+                       0);
+    buffers->streamSample.size = 1;
+    buffers->streamReadings[1] = -1.0;
+
+    RBRGEN4_LABEL_LIST_DECL(channelList, 1);
+    PollTest_labelList("pressure_00", &channelList);
+    err = RBRGen4_pollChannels(conn, true, &channelList, &actual);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("polling", actual.scheduleLabel);
+    TEST_ASSERT_EQ(2, actual.channelCount, "%" PRIi32);
+    TEST_ASSERT_EQ(false, actual.readingsDropped, "%d");
+    TEST_ASSERT_EQ(9.83602000, actual.readings[0], "%lf");
+    TEST_ASSERT_EQ(1.5, actual.readings[1], "%lf");
+
+    TEST_ASSERT_STR_EQ("sch_asc_pts", buffers->deliveredSample.scheduleLabel);
+    TEST_ASSERT_EQ(1, buffers->deliveredSample.channelCount, "%" PRIi32);
+    TEST_ASSERT_EQ(true, buffers->deliveredSample.readingsDropped, "%d");
+    TEST_ASSERT_EQ(9.84050000, buffers->deliveredSample.readings[0], "%lf");
+    /* Untouched: the copy stops at the callback sample's own size. */
+    TEST_ASSERT_EQ(-1.0, buffers->streamReadings[1], "%lf");
 
     return true;
 }

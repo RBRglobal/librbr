@@ -111,6 +111,9 @@ const char *RBRGen3EventType_name(RBRGen3EventType type)
     }
 }
 
+#define EP_SAMPLE_TIMESTAMP_SIZE ((int32_t) sizeof(RBRGen3DateTime))
+#define EP_SAMPLE_READING_SIZE   ((int32_t) sizeof(float))
+
 RBRGen3Error RBRGen3Parser_init(RBRGen3Parser *parser, const RBRGen3ParserCallbacks *callbacks,
                                 const RBRGen3ParserConfig *config, void *userData)
 {
@@ -124,7 +127,11 @@ RBRGen3Error RBRGen3Parser_init(RBRGen3Parser *parser, const RBRGen3ParserCallba
     }
 
     if (config->formatConfig.easyParse.channels <= 0 ||
-        config->formatConfig.easyParse.channels > RBRGEN3_CHANNEL_MAX) {
+        config->formatConfig.easyParse.channels > RBRGEN3_EASYPARSE_CHANNELS_MAX) {
+        return RBRGEN3_INVALID_PARAMETER_VALUE;
+    }
+    if (callbacks->sampleBuffer != NULL &&
+        (callbacks->sampleBuffer->readings == NULL || callbacks->sampleBuffer->size <= 0)) {
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
@@ -178,7 +185,7 @@ static RBRGen3Error RBRGen3Parser_parseEPEvents(RBRGen3Parser *parser, const uin
         return RBRGEN3_SUCCESS;
     }
 
-    for (; *size + EP_EVENT_SIZE <= maxSize; *size += EP_EVENT_SIZE) {
+    for (; EP_EVENT_SIZE <= maxSize - *size; *size += EP_EVENT_SIZE) {
         memset(event, 0, sizeof(RBRGen3Event));
 
         event->type = *(uint8_t *) (data + *size + EP_EVENT_TYPE_OFFSET);
@@ -203,9 +210,6 @@ static RBRGen3Error RBRGen3Parser_parseEPEvents(RBRGen3Parser *parser, const uin
     return RBRGEN3_SUCCESS;
 }
 
-#define EP_SAMPLE_TIMESTAMP_SIZE ((int32_t) sizeof(RBRGen3DateTime))
-#define EP_SAMPLE_READING_SIZE   ((int32_t) sizeof(float))
-
 static RBRGen3Error RBRGen3Parser_parseEPSamples(RBRGen3Parser *parser, const uint8_t *const data,
                                                  int32_t *size)
 {
@@ -219,12 +223,15 @@ static RBRGen3Error RBRGen3Parser_parseEPSamples(RBRGen3Parser *parser, const ui
 
     int32_t channels = parser->config.formatConfig.easyParse.channels;
     int32_t sampleSize = EP_SAMPLE_TIMESTAMP_SIZE + EP_SAMPLE_READING_SIZE * channels;
-    for (; *size + sampleSize <= maxSize; *size += sampleSize) {
-        memset(sample, 0, sizeof(RBRGen3Sample));
+    /* Readings past the caller's storage are dropped and flagged. */
+    int32_t stored = channels < sample->size ? channels : sample->size;
+    for (; sampleSize <= maxSize - *size; *size += sampleSize) {
+        memset(sample->readings, 0, (size_t) sample->size * sizeof(*sample->readings));
 
         sample->timestamp = *(RBRGen3DateTime *) (data + *size);
-        sample->channels = channels;
-        for (int32_t channel = 0; channel < channels; ++channel) {
+        sample->channelCount = stored;
+        sample->readingsDropped = stored < channels;
+        for (int32_t channel = 0; channel < stored; ++channel) {
             sample->readings[channel] =
                 (double) *(float *) (data + *size + EP_SAMPLE_TIMESTAMP_SIZE +
                                      channel * EP_SAMPLE_READING_SIZE);

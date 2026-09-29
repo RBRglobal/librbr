@@ -87,27 +87,6 @@ extern const char *RBRGEN3_LIB_BUILD_DATE;
 #define RBRGEN3_RESPONSE_BUFFER_DEFAULT 1024
 
 /**
- * \brief The maximum number of channels present on an instrument.
- *
- * The default maximum of 32 channels is reflective of the maximum number of
- * channels supported by RBR instruments, but most instruments have far fewer.
- * Adjusting this value will dramatically affect the size of some structures;
- * notably RBRGen3Sample, but also RBRGen3Channels (used by
- * RBRGen3_getChannels()) and RBRGen3ChannelsList (used by
- * RBRGen3_getChannelsList()).
- */
-#ifndef RBRGEN3_CHANNEL_MAX
-#define RBRGEN3_CHANNEL_MAX 32
-#endif
-
-/** \brief Stringize the result of macro expansion. */
-#define xstr(s)                 str(s)
-/** \brief Stringize the macro argument. */
-#define str(s)                  #s
-/** \brief The string length of the maximum number of instrument channels. */
-#define RBRGEN3_CHANNEL_MAX_LEN sizeof(xstr(RBRGEN3_CHANNEL_MAX))
-
-/**
  * \brief The maximum number of characters in a channel name (e.g.,
  * “Temperature”).
  *
@@ -136,6 +115,9 @@ extern const char *RBRGEN3_LIB_BUILD_DATE;
  * the default value).
  */
 #define RBRGEN3_CHANNEL_LABEL_MAX 31
+
+/** \brief A channel label as a null-terminated C string. */
+typedef char RBRGen3Label[RBRGEN3_CHANNEL_LABEL_MAX + 1];
 
 /**
  * \brief The minimum date and time which the instrument can handle.
@@ -227,6 +209,11 @@ typedef enum RBRGen3Error {
     RBRGEN3_CHECKSUM_ERROR,
     /** The given value is out of bounds or otherwise unsuitable. */
     RBRGEN3_INVALID_PARAMETER_VALUE,
+    /**
+     * A caller-supplied list was too small to hold everything the instrument
+     * reported; only what fits was stored.
+     */
+    RBRGEN3_TRUNCATED,
     /**
      * Used internally when the parser encounters a sample.
      *
@@ -496,7 +483,9 @@ typedef struct RBRGen3Environment {
     /**
      * \brief Where to put sample data for consumption by the sample callback.
      *
-     * Required only when RBRGen3Environment.sample is populated.
+     * Required only when RBRGen3Environment.sample is populated. Its
+     * RBRGen3Sample.readings and RBRGen3Sample.size must be set by the
+     * caller.
      */
     struct RBRGen3Sample *sampleBuffer;
 
@@ -727,7 +716,8 @@ typedef struct RBRGen3 {
  * \return #RBRGEN3_SUCCESS if the instrument was opened successfully
  * \return #RBRGEN3_MISSING_CALLBACK if \a environment or a callback was not
  *         provided
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE if a buffer is missing or empty
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE if a buffer is missing or empty,
+ *         or RBRGen3Environment.sampleBuffer has no readings storage
  * \return #RBRGEN3_TIMEOUT if an instrument communication timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the instrument rejects the opening

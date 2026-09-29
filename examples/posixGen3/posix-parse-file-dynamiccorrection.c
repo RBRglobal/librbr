@@ -42,6 +42,9 @@
 #include "RBRGen3Parser.h"
 #include "RBRDynamicCorrection.h"
 
+/* Readings storage for as many channels as this application expects. */
+#define CHANNEL_MAX 32
+
 /* CSV column assignement */
 /* channel id from 1 to 4 corresponds to C(mS/cm), T meas(°C), P meas(dbar), T cond(°C) */
 #define CHANNEL_COND   1
@@ -148,7 +151,8 @@ int main(int argc, char *argv[])
 
     RBRGen3Parser parser;
 
-    RBRGen3Sample sampleBuffer;
+    double sampleReadings[CHANNEL_MAX];
+    RBRGen3Sample sampleBuffer = {.size = CHANNEL_MAX, .readings = sampleReadings};
     RBRGen3ParserCallbacks parserCallbacks = {
         .sample = parserSample,
         .sampleBuffer = &sampleBuffer,

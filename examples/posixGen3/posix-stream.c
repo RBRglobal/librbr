@@ -28,6 +28,9 @@
 #include "posix-shared.h"
 #include "RBRGen3Commands.h"
 
+/* Readings storage for as many channels as this application expects. */
+#define CHANNEL_MAX 32
+
 RBRGen3Error instrumentSample(const struct RBRGen3 *conn, const struct RBRGen3Sample *const sample)
 {
     /* Unused. */
@@ -40,7 +43,7 @@ RBRGen3Error instrumentSample(const struct RBRGen3 *conn, const struct RBRGen3Sa
     strftime(ftime, sizeof(ftime), "%F %T", &sampleTime);
 
     printf("%s.%03" PRIi64, ftime, sample->timestamp % 1000);
-    for (int32_t i = 0; i < sample->channels; i++) {
+    for (int32_t i = 0; i < sample->channelCount; i++) {
         printf(", %lf", sample->readings[i]);
     }
     printf("\n");
@@ -75,7 +78,8 @@ int main(int argc, char *argv[])
 
     fprintf(stderr, "%s: Using %s v%s.\n", programName, RBRGEN3_LIB_NAME, RBRGEN3_LIB_VERSION);
 
-    RBRGen3Sample sampleBuffer;
+    double sampleReadings[CHANNEL_MAX];
+    RBRGen3Sample sampleBuffer = {.size = CHANNEL_MAX, .readings = sampleReadings};
     RBRGen3Environment environment = {
         .time = instrumentTime,
         .sleep = instrumentSleep,

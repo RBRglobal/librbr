@@ -168,21 +168,6 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn, bool breakOnSample, RBRGen4Samp
                                   RBRGen4DateTime startTime, RBRGen4DateTime timeout);
 
 /**
- * Deliver a sample to the RBRGen4SampleCallback set via
- * RBRGen4Environment.sample, if any. If \a sample is not already
- * RBRGen4Environment.sampleBuffer, it will be copied there first;
- * RBRGen4_open() guarantees that sampleBuffer is non-`NULL`
- * whenever the callback is set.
- *
- * \param [in] conn the instrument connection
- * \param [in] sample the sample to deliver
- * \return #RBRGEN4_SUCCESS when no callback is set, or the value
- *         returned by the callback otherwise
- * \see RBRGen4_open() for the sampleBuffer guarantee
- */
-RBRGen4Error RBRGen4_deliverSample(RBRGen4 *conn, const RBRGen4Sample *sample);
-
-/**
  * \brief Send a command to the instrument and await an appropriate response.
  *
  * This function is more than just a combination of RBRGen4_sendCommand()

@@ -450,6 +450,16 @@ TEST_LOGGER4(openRejectsInvalidBuffers)
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     const RBRGen4Environment before = conn->environment;
+
+    /* A sample callback whose sample has no readings storage is refused too. */
+    RBRGen4Sample noStorage = {.size = 4, .readings = NULL};
+    RBRGen4Environment noStorageEnvironment = conn->environment;
+    noStorageEnvironment.sampleBuffer = &noStorage;
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen4_open(&unopened, &noStorageEnvironment, 0, NULL);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
     for (size_t i = 0; i < sizeof(tests) / sizeof(tests[0]); ++i) {
         RBRGen4Environment environment = conn->environment;
         environment.command = tests[i].command;

@@ -273,15 +273,15 @@ typedef struct RBRGen3Channel {
  * \see RBRGen3_getChannelsWithoutCalibrations()
  */
 typedef struct RBRGen3Channels {
-    /** \brief The number of installed and configured instrument channels. */
-    int32_t count;
+    /** \brief The number of channels RBRGen3Channels.channels can hold. */
+    int32_t size;
     /**
-     * \brief The number of active channels, which excludes any turned off by
-     * the user.
+     * \brief The number of channels stored in RBRGen3Channels.channels. Never
+     * exceeds RBRGen3Channels.size.
      *
-     * \see RBRGen3Channel.status
+     * \see RBRGen3_getChannelCount() for the number the instrument has
      */
-    int32_t on;
+    int32_t len;
     /**
      * \brief The maximum power-on settling settling time across all enabled
      * channels.
@@ -302,12 +302,45 @@ typedef struct RBRGen3Channels {
      */
     RBRGen3Period minimumPeriod;
     /**
-     * \brief Specific channel details.
+     * \brief Specific channel details, in caller-supplied storage.
      *
-     * The first RBRGen3Channel.count entries will be populated.
+     * The first RBRGen3Channels.len entries are populated.
      */
-    RBRGen3Channel channels[RBRGEN3_CHANNEL_MAX];
+    RBRGen3Channel *channels;
 } RBRGen3Channels;
+
+/**
+ * \brief Get the number of channels installed in the instrument.
+ *
+ * \note Issues the `channels count` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] count the number of installed and configured channels
+ * \return #RBRGEN3_SUCCESS when the count is successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \see RBRGen3_getEnabledChannelCount()
+ * \see RBRGen3_getChannels()
+ */
+RBRGen3Error RBRGen3_getChannelCount(RBRGen3 *conn, int32_t *count);
+
+/**
+ * \brief Get the number of enabled channels, which excludes any turned off by
+ * the user.
+ *
+ * \note Issues the `channels on` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [out] count the number of enabled channels
+ * \return #RBRGEN3_SUCCESS when the count is successfully read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \see RBRGen3_getChannelCount()
+ * \see RBRGen3Channel.status
+ */
+RBRGen3Error RBRGen3_getEnabledChannelCount(RBRGen3 *conn, int32_t *count);
 
 /**
  * \brief Get channel information for the instrument.
@@ -317,8 +350,13 @@ typedef struct RBRGen3Channels {
  * function should comprise a complete model of an instrument's channels.
  *
  * \param [in] conn the instrument connection
- * \param [out] channels the channel information
+ * \param [out] channels the channel information; RBRGen3Channels.channels
+ *                       and RBRGen3Channels.size must be set by the caller
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TRUNCATED when the instrument has more channels than the
+ *         list holds; the first RBRGen3Channels.size are populated and
+ *         RBRGen3_getChannelCount() reports how many there are
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_getChannelsWithoutCalibrations()
@@ -335,8 +373,13 @@ RBRGen3Error RBRGen3_getChannels(RBRGen3 *conn, RBRGen3Channels *channels);
  * instrument when calibration information is unnecessary.
  *
  * \param [in] conn the instrument connection
- * \param [out] channels the channel information
+ * \param [out] channels the channel information; RBRGen3Channels.channels
+ *                       and RBRGen3Channels.size must be set by the caller
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_TRUNCATED when the instrument has more channels than the
+ *         list holds; the first RBRGen3Channels.size are populated and
+ *         RBRGen3_getChannelCount() reports how many there are
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_getChannels()

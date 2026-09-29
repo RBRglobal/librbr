@@ -260,6 +260,22 @@ TEST_LOGGER3(openRejectsInvalidBuffers)
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     const RBRGen3Environment before = conn->environment;
+
+    /* A sample callback whose sample has no readings storage is refused too. */
+    RBRGen3Sample noStorage = {.size = 4, .readings = NULL};
+    RBRGen3Environment noStorageEnvironment = conn->environment;
+    noStorageEnvironment.sampleBuffer = &noStorage;
+    TestIOBuffers_init(buffers, "", 0);
+    err = RBRGen3_open(&unopened, &noStorageEnvironment, 0, NULL);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+    double reading;
+    RBRGen3Sample noCapacity = {.size = 0, .readings = &reading};
+    noStorageEnvironment.sampleBuffer = &noCapacity;
+    err = RBRGen3_open(&unopened, &noStorageEnvironment, 0, NULL);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_INVALID_PARAMETER_VALUE, err, RBRGen3Error);
+    TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+
     for (size_t i = 0; i < sizeof(tests) / sizeof(tests[0]); ++i) {
         RBRGen3Environment environment = conn->environment;
         environment.command = tests[i].command;

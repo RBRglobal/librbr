@@ -234,6 +234,47 @@ typedef struct GetDatasetTest {
     const char *expectedScheduleList[2];
 } GetDatasetTest;
 
+/* A schedule list given without storage is refused before anything is sent. */
+TEST_LOGGER4(datasetScheduleListRejectsMissingStorage)
+{
+    RBRGen4Label labels[1];
+    RBRGen4LabelList lists[] = {
+        {.size = 1, .labels = NULL},
+        {.size = 0, .labels = labels},
+        {.size = -1, .labels = labels},
+    };
+
+    for (int32_t i = 0; i < 3; ++i) {
+        RBRGen4Dataset dataset = {.label = "d1"};
+        TestIOBuffers_init(buffers, "", 0);
+        RBRGen4Error err = RBRGen4_getDataset(conn, &dataset, &lists[i]);
+        TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+        TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+    }
+
+    return true;
+}
+
+/* A dataset pool without storage is refused before anything is sent. */
+TEST_LOGGER4(datasetPoolRejectsMissingStorage)
+{
+    RBRGen4Dataset datasets[1];
+    RBRGen4DatasetPool pools[] = {
+        {.size = 1, .pool = NULL},
+        {.size = 0, .pool = datasets},
+        {.size = -1, .pool = datasets},
+    };
+
+    for (int32_t i = 0; i < 3; ++i) {
+        TestIOBuffers_init(buffers, "", 0);
+        RBRGen4Error err = RBRGen4_getDatasetPool(conn, &pools[i]);
+        TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);
+        TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
+    }
+
+    return true;
+}
+
 TEST_LOGGER4(getDatasetCount)
 {
     int32_t count = -1;

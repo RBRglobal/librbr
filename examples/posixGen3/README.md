@@ -120,11 +120,10 @@ in the instrument:
 The example source must also expect five channels:
 
 ~~~{.c}
-// posix-parse-download-dataset.c:127-130:
-        //important!!!
-        //channels should be set the same number with output channels.
-        channels.count = 5;
-        channels.on = 5;
+// posix-parse-download-dataset.c:
+        // Important! This must match the postprocessing channels configured
+        // in the instrument.
+        enabledChannels = 5;
 ~~~
 
 ## Usage for each example

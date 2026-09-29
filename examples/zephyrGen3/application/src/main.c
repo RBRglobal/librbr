@@ -23,6 +23,9 @@
 #include "io.h"
 #include "time.h"
 
+/* Readings storage for as many channels as this application expects. */
+#define CHANNEL_MAX 32
+
 LOG_MODULE_REGISTER(main, CONFIG_MAIN_LOG_LEVEL);
 
 const static struct device *instrumentUart = DEVICE_DT_GET(DT_CHOSEN(rbr_instrument));
@@ -30,7 +33,8 @@ const static struct device *instrumentUart = DEVICE_DT_GET(DT_CHOSEN(rbr_instrum
 RBRGen3 instrumentBuffer;
 static uint8_t instrumentCommandBuffer[RBRGEN3_COMMAND_BUFFER_DEFAULT];
 static uint8_t instrumentResponseBuffer[RBRGEN3_RESPONSE_BUFFER_DEFAULT];
-RBRGen3Sample sampleBuffer;
+static double sampleReadings[CHANNEL_MAX];
+RBRGen3Sample sampleBuffer = {.size = CHANNEL_MAX, .readings = sampleReadings};
 
 ZephyrRBRGen3IO io;
 
@@ -45,7 +49,7 @@ RBRGen3Error instrumentSample(const struct RBRGen3 *conn, const struct RBRGen3Sa
     strftime(ftime, sizeof(ftime), "%F %T", sampleTime);
 
     printf("%s.%03" PRIi64, ftime, sample->timestamp % 1000);
-    for (int32_t i = 0; i < sample->channels; i++) {
+    for (int32_t i = 0; i < sample->channelCount; i++) {
         printf(", %lf", sample->readings[i]);
     }
     printf("\n");

@@ -125,7 +125,7 @@ RBRGen3Error RBRGen3_setThresholding(RBRGen3 *conn, const RBRGen3Thresholding *t
     if (threshold->channelSelection < RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX ||
         threshold->channelSelection > RBRGEN3_THRESHOLD_CHANNEL_BY_LABEL ||
         (threshold->channelSelection == RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX &&
-         (threshold->channelIndex < 1 || threshold->channelIndex > RBRGEN3_CHANNEL_MAX)) ||
+         threshold->channelIndex < 1) ||
         (threshold->channelSelection == RBRGEN3_THRESHOLD_CHANNEL_BY_LABEL &&
          (conn->generation == RBRCOMMON_LOGGER2 || strlen(threshold->channelLabel) == 0)) ||
         threshold->condition < RBRGEN3_THRESHOLDING_ABOVE ||

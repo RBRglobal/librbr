@@ -41,17 +41,6 @@ if LIBRBR_GEN3
 # The following settings are reproduced from RBRGen3.h. See
 # CMakeLists.txt for the Kconfig-to-precompiler-macro bindings.
 
-config RBRGEN3_CHANNEL_MAX
-    int "The maximum number of channels present on an instrument."
-    default 32
-    help
-        The default maximum of 32 channels is reflective of the maximum number
-        of channels supported by RBR instruments, but most instruments have far
-        fewer. Adjusting this value will dramatically affect the size of some
-        structures; notably RBRGen3Sample, but also RBRGen3Channels
-        (used by RBRGen3_getChannels()) and RBRGen3ChannelsList
-        (used by RBRGen3_getChannelsList()).
-
 config RBRGEN3_CALIBRATION_C_COEFFICIENT_MAX
     int "The maximum number of C calibration coefficients per channel."
     default 8
@@ -69,21 +58,5 @@ config RBRGEN3_CHANNEL_GAINS_MAX
     default 8
 
 endif # LIBRBR_GEN3
-
-if LIBRBR_GEN4
-
-# The following settings are reproduced from RBRGen4.h. See
-# CMakeLists.txt for the Kconfig-to-precompiler-macro bindings.
-
-config RBRGEN4_CHANNEL_MAX
-    int "The maximum number of channels present on an instrument."
-    default 32
-    help
-        The default maximum of 32 channels is reflective of the maximum number
-        of channels supported by RBR instruments, but most instruments have far
-        fewer. Adjusting this value will affect the size of some structures,
-        notably RBRGen4Sample.
-
-endif # LIBRBR_GEN4
 
 endif # LIBRBR
