@@ -95,6 +95,9 @@ const char *RBRGen4DatasetStatus_name(RBRGen4DatasetStatus status)
 
 RBRGen4Error RBRGen4_getDatasetPool(RBRGen4 *conn, RBRGen4DatasetPool *datasetPool)
 {
+    if (datasetPool->pool == NULL || datasetPool->size <= 0) {
+        return RBRGEN4_INVALID_PARAMETER_VALUE;
+    }
     datasetPool->len = 0;
     memset(datasetPool->pool, 0, datasetPool->size * sizeof(RBRGen4Dataset));
 
@@ -152,7 +155,8 @@ RBRGen4Error RBRGen4_getDatasetMaxCount(RBRGen4 *conn, int32_t *maxCount)
 RBRGen4Error RBRGen4_getDataset(RBRGen4 *conn, RBRGen4Dataset *dataset,
                                 RBRGen4LabelList *scheduleList)
 {
-    if (dataset->label[0] == '\0') {
+    if (dataset->label[0] == '\0' ||
+        (scheduleList != NULL && (scheduleList->labels == NULL || scheduleList->size <= 0))) {
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
