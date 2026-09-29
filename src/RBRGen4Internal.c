@@ -829,16 +829,6 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn, const char *command, ...)
             ++commandLength;
         }
 
-        /* The Logger2 “read” command response don't start with the command
-         * itself. It's the only such command, so we'll just handle it here
-         * rather than add another parameter to the function to indicate the
-         * expected response, or to specialize the command handling function
-         * to include error checking/retry. */
-        uint8_t *commandResponse = conn->environment.command;
-        if (commandLength == 4 && memcmp("read", conn->environment.command, 4) == 0) {
-            commandResponse = (uint8_t *) "data";
-        }
-
         /* The command timeout bounds the whole wait for the reply, however
          * many unrelated lines are skipped on the way. */
         RBRGen4DateTime startTime;
@@ -924,8 +914,9 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn, const char *command, ...)
                 break;
             }
         } while (
-            (conn->response.response == NULL ||
-             strncmp(conn->response.response, (const char *) commandResponse, commandLength) != 0));
+            (conn->response.response == NULL || strncmp(conn->response.response,
+                                                        (const char *) conn->environment.command,
+                                                        commandLength) != 0));
         if (err == RBRGEN4_TIMEOUT && responseTooLong) {
             err = RBRGEN4_RESPONSE_TOO_LONG;
         }
