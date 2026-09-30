@@ -1,3 +1,6 @@
+<!-- Copyright (c) 2026 RBR Ltd. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # Examples using both instrument generations
 
 These examples use the Gen3 (`RBRGen3…`) and Gen4 (`RBRGen4…`) APIs in one

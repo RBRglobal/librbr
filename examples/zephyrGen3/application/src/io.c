@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2025 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file io.c
  *
  * \brief I/O callback implementations using the Zephyr async UART API.
- *
- * \copyright
- * Copyright (c) 2025 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #include <stddef.h>

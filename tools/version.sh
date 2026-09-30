@@ -1,5 +1,8 @@
 #! /bin/sh
 
+# Copyright (c) 2026 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
 ## \file version.sh
 ##
 ## \brief Determine the version number used for builds.
@@ -11,10 +14,6 @@
 ## Tries to use the output of `git describe --dirty --always`. If that fails
 ## (e.g., Git unavailable, or no/invalid .git metadata), uses the contents of
 ## the VERSION file.
-##
-## \copyright
-## Copyright (c) 2026 RBR Ltd.
-## Licensed under the Apache License, Version 2.0.
 
 # Do we have Git, and do we have repository metadata for libRBR (not for some
 # parent Git repository vendoring it)?

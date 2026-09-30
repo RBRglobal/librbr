@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file posix-enable-multiconfig.c
  *
@@ -11,10 +17,6 @@
  *
  * \warning Clears all groups, schedules, configs, and datasets, then tries to
  * enable the instrument.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 /* Required for errno. */

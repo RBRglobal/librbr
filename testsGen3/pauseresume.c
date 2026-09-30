@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2022 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file pauseresume.c
  *
  * \brief Tests for instrument pauseresume commands.
- *
- * \copyright
- * Copyright (c) 2022 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #include "tests.h"

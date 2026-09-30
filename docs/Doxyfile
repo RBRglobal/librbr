@@ -1,3 +1,6 @@
+# Copyright (c) 2026 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
 # Doxygen configuration for the Sphinx documentation build. Doxygen emits only
 # XML here; Breathe renders it into the Sphinx pages under api/.
 DOXYFILE_ENCODING      = UTF-8

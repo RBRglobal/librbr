@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2024 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file RBRGen4Instrument.h
  *
  * \brief Instrument commands and structures for miscellaneous commands.
- *
- * \copyright
- * Copyright (c) 2024 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #ifndef LIBRBR_RBRGEN4INSTRUMENT_H

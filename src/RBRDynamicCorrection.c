@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2021 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file RBRDynamicCorrection.c
  *
  * \brief Library for salinity dynamic correction
- *
- * \copyright
- * Copyright (c) 2021 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #include <math.h>

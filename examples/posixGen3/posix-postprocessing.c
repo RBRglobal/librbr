@@ -1,12 +1,14 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file posix-postprocessing.c
  *
  * \brief Example of using the library to invoke the post-processing
  * functionality introduced in 3rd-generation instruments in firmware v1.102.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 /* Required for errno. */

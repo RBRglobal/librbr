@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2025 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file time.h
  *
  * \brief Time callback declarations.
- *
- * \copyright
- * Copyright (c) 2025 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #ifndef LIBRBR_ZEPHYR_TIME_H

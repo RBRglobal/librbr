@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file RBRCommon.h
  *
@@ -6,10 +12,6 @@
  * Everything declared here is compiled into every build of the library,
  * whichever instrument generations are enabled, and depends on neither
  * generation API.
- *
- * \copyright
- * Copyright (c) 2026 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #ifndef LIBRBR_RBRCOMMON_H

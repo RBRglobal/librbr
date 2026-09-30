@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file posix-download-wifi.c
  *
@@ -5,10 +11,6 @@
  * environment over a TCP socket. User must connect to the Logger's Wi-Fi first,
  * this is accomplished by connecting to SSID "RBR ######" where '######' is the 0
  * padded serial number of the device. Once connected this program can be run.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 /* Prerequisite for PATH_MAX in limits.h. */

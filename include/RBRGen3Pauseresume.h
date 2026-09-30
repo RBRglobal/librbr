@@ -1,12 +1,14 @@
+/*
+ * Copyright (c) 2022 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file RBRGen3Pauseresume.h
  *
  * \brief Instrument commands and structures pertaining to pauseresume.
  * This feature is available in firmware versions 1.116 or later.
- *
- * \copyright
- * Copyright (c) 2022 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #ifndef LIBRBR_RBRGEN3PAUSERESUME_H

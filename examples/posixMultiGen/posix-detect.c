@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file posix-detect.c
  *
@@ -9,10 +15,6 @@
  * that was detected in the process; if it is Logger4, the connection is
  * reopened with RBRGen4_open(). This is the pattern an application built with
  * both generation APIs follows to pick one per instrument.
- *
- * \copyright
- * Copyright (c) 2026 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 /* Required for errno. */
