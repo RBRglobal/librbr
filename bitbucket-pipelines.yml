@@ -151,6 +151,14 @@ pipelines:
                     - ./tools/format-check.sh
 
             - step:
+                name: License header check
+                image: docker.io/library/alpine:3
+                script:
+                    - apk add --no-cache git
+                    - git config --global --add safe.directory "$BITBUCKET_CLONE_DIR"
+                    - ./tools/license-check.sh
+
+            - step:
                 name: Documentation compilation
                 image: docker.io/library/gcc:15
                 script:

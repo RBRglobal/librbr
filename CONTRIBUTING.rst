@@ -1,3 +1,6 @@
+.. Copyright (c) 2026 RBR Ltd.
+.. SPDX-License-Identifier: Apache-2.0
+
 Contributing
 ============
 
@@ -186,6 +189,43 @@ which you can also use locally:
 .. code-block:: sh
 
    docker run --rm -v "$PWD":/w -w /w docker.io/silkeh/clang:20 ./tools/format-check.sh
+
+License Headers
+~~~~~~~~~~~~~~~
+
+Every file in the repository
+(other than the ``LICENSE`` and ``VERSION`` files and binary or CSV sample data)
+begins with RBR's copyright line
+and an `SPDX <https://spdx.dev/learn/handling-license-info/>`__ license identifier,
+following the `Zephyr project's <https://docs.zephyrproject.org/latest/contribute/guidelines.html#licensing>`__ convention.
+In C sources, headers, and devicetree overlays,
+the header is a plain block comment
+placed before the Doxygen ``\file`` comment:
+
+.. code-block:: c
+
+   /*
+    * Copyright (c) 2026 RBR Ltd.
+    *
+    * SPDX-License-Identifier: Apache-2.0
+    */
+
+In files with ``#`` comments
+(makefiles, CMake, Kconfig, shell, Python, YAML),
+it follows the shebang line, if any:
+
+.. code-block:: sh
+
+   # Copyright (c) 2026 RBR Ltd.
+   # SPDX-License-Identifier: Apache-2.0
+
+Other formats use their own comment syntax
+(``..`` for reStructuredText, ``<!-- -->`` for Markdown and SVG,
+``{# #}`` for Jinja templates).
+The year is the one the file was first published
+and is not updated on later edits.
+``tools/license-check.sh`` lists any tracked file missing the header,
+and the same check runs in CI.
 
 Documentation
 ~~~~~~~~~~~~~
