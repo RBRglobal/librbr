@@ -245,7 +245,7 @@ typedef struct RBRGen3Sampling {
      * constrained by the sampling period (RBRGen3Sampling.period) and
      * burst length (RBRGen3Sampling.burstLength):
      *
-     *     burst interval > (burst length × sampling period)
+     *     burst interval > (burst length * sampling period)
      */
     RBRGen3Period burstInterval;
     /** \brief The sampling gating condition. */

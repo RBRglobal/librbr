@@ -2,5 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 sphinx>=8.1
-breathe>=4.36
+# Breathe 5.0 matches doxygenfile names against the bare file name only, so
+# it cannot tell the three tests.h headers apart.
+breathe>=4.36,<5
 sphinx_rtd_theme>=3.0.2

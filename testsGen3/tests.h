@@ -330,7 +330,7 @@ const char *bool_name(bool value);
  * \param buffers the test I/O buffers
  * \return whether the test passed
  */
-typedef bool(InstrumentTestFunction)(RBRGen3 *conn, TestIOBuffers *buffers);
+typedef bool InstrumentTestFunction(RBRGen3 *conn, TestIOBuffers *buffers);
 
 /**
  * \brief Declaration of an instrument test.
@@ -392,7 +392,7 @@ typedef struct TestParserBuffers {
  * \param buffers the parser result buffers
  * \return whether the test passed
  */
-typedef bool(ParserTestFunction)(RBRGen3Parser *parser, TestParserBuffers *buffers);
+typedef bool ParserTestFunction(RBRGen3Parser *parser, TestParserBuffers *buffers);
 
 /**
  * \brief Declaration of a parser test.
