@@ -826,7 +826,8 @@ typedef struct RBRGen4 {
 
 /**
  * \brief Establish a connection with an instrument and initialize the context.
- * \note Issues the `id4` and `instrument outputformat` commands.
+ *
+ * \command{id4,instrument outputformat}
  *
  * “connection” in this library means purely the state tracking
  * and management of an instrument: the underlying physical communication with

@@ -61,7 +61,8 @@ const char *RBRGen4InstrumentState_name(RBRGen4InstrumentState state);
 
 /**
  * \brief Get identification information from the instrument.
- * \note Issues the `id4` command.
+ *
+ * \command{id4}
  *
  * \param [in] conn the instrument connection
  * \param [out] id the instrument information
@@ -103,7 +104,8 @@ const char *RBRGen4PowerSource_name(RBRGen4PowerSource source);
 
 /**
  * \brief Get instrument power information.
- * \note Issues the `instrument power` command.
+ *
+ * \command{instrument power}
  *
  * \param [in] conn the instrument connection
  * \param [out] powerSource the power source from which the instrument is running
@@ -187,7 +189,8 @@ typedef struct RBRGen4PowerInternal {
 
 /**
  * \brief Get instrument internal power information.
- * \note Issues the `instrument power internal` command.
+ *
+ * \command{instrument power internal}
  *
  * \param [in] conn the instrument connection
  * \param [out] power the power information
@@ -205,7 +208,8 @@ RBRGen4Error RBRGen4_getPowerInternal(RBRGen4 *conn, RBRGen4PowerInternal *power
 
 /**
  * \brief Set the internal power battery type.
- * \note Issues the `instrument power internal` command.
+ *
+ * \command{instrument power internal}
  *
  * \param [in] conn the instrument connection
  * \param [in] type the battery type
@@ -224,7 +228,8 @@ RBRGen4Error RBRGen4_setPowerInternalBatteryType(RBRGen4 *conn,
 
 /**
  * \brief Reset the counter of energy used from the internal battery.
- * \note Issues the `instrument power internal` command.
+ *
+ * \command{instrument power internal}
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
@@ -321,7 +326,8 @@ typedef struct RBRGen4PowerExternal {
 
 /**
  * \brief Get instrument external power information.
- * \note Issues the `instrument power external` command.
+ *
+ * \command{instrument power external}
  *
  * \param [in] conn the instrument connection
  * \param [out] power the power information
@@ -337,7 +343,8 @@ RBRGen4Error RBRGen4_getPowerExternal(RBRGen4 *conn, RBRGen4PowerExternal *power
 
 /**
  * \brief Set the external power battery type.
- * \note Issues the `instrument power external` command.
+ *
+ * \command{instrument power external}
  *
  * \param [in] conn the instrument connection
  * \param [in] type the battery type
@@ -356,7 +363,8 @@ RBRGen4Error RBRGen4_setPowerExternalBatteryType(RBRGen4 *conn,
 
 /**
  * \brief Reset the counter of energy used from the external battery.
- * \note Issues the `instrument power external` command.
+ *
+ * \command{instrument power external}
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
@@ -417,7 +425,8 @@ typedef struct RBRGen4Instrument {
 
 /**
  * \brief Get the instrument's identity and state.
- * \note Issues the `instrument` command.
+ *
+ * \command{instrument}
  *
  * All of the parameters the command reports are returned. They are read-only,
  * so there is no corresponding setter.
@@ -435,7 +444,8 @@ RBRGen4Error RBRGen4_getInstrument(RBRGen4 *conn, RBRGen4Instrument *instrumentI
 
 /**
  * \brief Get the current output format.
- * \note Issues the `instrument outputformat` command.
+ *
+ * \command{instrument outputformat}
  *
  * On success, the library caches the output format and uses it to parse
  * subsequently received samples.
@@ -453,7 +463,8 @@ RBRGen4Error RBRGen4_getOutputFormat(RBRGen4 *conn, RBRGen4OutputFormat *outputF
 
 /**
  * \brief Set the current output format.
- * \note Issues the `instrument outputformat` command.
+ *
+ * \command{instrument outputformat}
  *
  * Every parameter of the command is sent, so \a outputFormat must be fully
  * populated: read the current format with RBRGen4_getOutputFormat()
@@ -483,7 +494,8 @@ RBRGen4Error RBRGen4_setOutputFormat(RBRGen4 *conn, const RBRGen4OutputFormat *o
 
 /**
  * \brief Return the instrument's configuration to its factory state.
- * \note Issues the `instrument factory reset` command.
+ *
+ * \command{instrument factory reset}
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the instrument has been reset
@@ -498,7 +510,8 @@ RBRGen4Error RBRGen4_factoryReset(RBRGen4 *conn);
 
 /**
  * \brief Reset the instrument CPU.
- * \note Issues the `instrument reboot` command.
+ *
+ * \command{instrument reboot}
  *
  * \param [in] conn the instrument connection
  * \param [in] delay time in milliseconds to wait before rebooting; zero omits

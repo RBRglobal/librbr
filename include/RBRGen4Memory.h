@@ -77,7 +77,7 @@ typedef struct RBRGen4Storage {
 /**
  * \brief Get information about the usage and characteristics of data memory.
  *
- * \note Issues the `storage` command.
+ * \command{storage}
  *
  * \param [in] conn the instrument connection
  * \param [out] storage data memory information
@@ -93,9 +93,9 @@ RBRGen4Error RBRGen4_getStorage(RBRGen4 *conn, RBRGen4Storage *storage);
 /**
  * \brief Set the instrument storage parameters.
  *
- * Sends `access`, the command's only writable parameter.
+ * \command{storage}
  *
- * \note Issues the `storage` command.
+ * Sends `access`, the command's only writable parameter.
  *
  * \param [in] conn the instrument connection
  * \param [in] storage the storage parameters to write
@@ -185,10 +185,10 @@ typedef struct RBRGen4DatasetPool {
  * \brief Populate the pool of datasets with the labels of the datasets
  * stored in the instrument's memory.
  *
+ * \command{dataset}
+ *
  * Only the labels are populated: read the remaining parameters of a pool
  * entry with RBRGen4_getDataset().
- *
- * \note Issues the `dataset` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] datasetPool the datasets in storage, labels only
@@ -208,7 +208,7 @@ RBRGen4Error RBRGen4_getDatasetPool(RBRGen4 *conn, RBRGen4DatasetPool *datasetPo
 /**
  * \brief Read the number of datasets stored in the instrument's memory.
  *
- * \note Issues the `dataset count` command.
+ * \command{dataset count}
  *
  * \param [in] conn the instrument connection
  * \param [out] count the number of datasets stored
@@ -227,7 +227,7 @@ RBRGen4Error RBRGen4_getDatasetCount(RBRGen4 *conn, int32_t *count);
 /**
  * \brief Read the maximum number of datasets the instrument can store.
  *
- * \note Issues the `dataset maxcount` command.
+ * \command{dataset maxcount}
  *
  * \param [in] conn the instrument connection
  * \param [out] maxCount the maximum number of datasets
@@ -245,9 +245,9 @@ RBRGen4Error RBRGen4_getDatasetMaxCount(RBRGen4 *conn, int32_t *maxCount);
 /**
  * \brief Populate the parameters of a dataset.
  *
- * The caller sets RBRGen4Dataset.label to select the dataset.
+ * \command{dataset <dataset_label>}
  *
- * \note Issues the `dataset <dataset_label>` command.
+ * The caller sets RBRGen4Dataset.label to select the dataset.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] dataset the dataset to read, selected by its label
@@ -320,7 +320,7 @@ typedef struct RBRGen4DatasetDataBlock {
  * \brief Get the memory usage of all of a dataset's events, including
  * those not tied to any schedule.
  *
- * \note Issues the `dataset <dataset_label>/events` command.
+ * \command{dataset <dataset_label>/events}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
@@ -340,7 +340,7 @@ RBRGen4Error RBRGen4_getDatasetEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *
 /**
  * \brief Get the memory usage of all of a dataset's metadata.
  *
- * \note Issues the `dataset <dataset_label>/meta` command.
+ * \command{dataset <dataset_label>/meta}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
@@ -361,7 +361,7 @@ RBRGen4Error RBRGen4_getDatasetMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *da
  * \brief Get the memory usage of one of a dataset's schedules, summed over
  * all of its block types.
  *
- * \note Issues the `dataset <dataset_label>/<schedule_label>` command.
+ * \command{dataset <dataset_label>/<schedule_label>}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
@@ -385,8 +385,7 @@ RBRGen4Error RBRGen4_getDatasetScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset
 /**
  * \brief Get the memory usage of one schedule's events within a dataset.
  *
- * \note Issues the `dataset <dataset_label>/<schedule_label>/events`
- * command.
+ * \command{dataset <dataset_label>/<schedule_label>/events}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
@@ -411,7 +410,7 @@ RBRGen4Error RBRGen4_getDatasetScheduleEventsBlock(RBRGen4 *conn, const RBRGen4D
  * \brief Get the memory usage of one schedule's sample data within a
  * dataset.
  *
- * \note Issues the `dataset <dataset_label>/<schedule_label>/data` command.
+ * \command{dataset <dataset_label>/<schedule_label>/data}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
@@ -434,7 +433,8 @@ RBRGen4Error RBRGen4_getDatasetScheduleDataBlock(RBRGen4 *conn, const RBRGen4Dat
 
 /**
  * \brief Delete one dataset from the instrument's memory.
- * \note Issues the `dataset delete <dataset_label>` command.
+ *
+ * \command{dataset delete <dataset_label>}
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label of the dataset to delete
@@ -453,7 +453,7 @@ RBRGen4Error RBRGen4_deleteDataset(RBRGen4 *conn, const char *label);
 /**
  * \brief Delete every dataset from the instrument's memory.
  *
- * \note Issues the `dataset delete all` command.
+ * \command{dataset delete all}
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the datasets are deleted
@@ -622,10 +622,9 @@ typedef struct RBRGen4DownloadMeta {
 /**
  * \brief Download part of one schedule's sample data within a dataset.
  *
- * The transfer is checked against its trailing CRC before returning.
+ * \command{download <dataset_label>/<schedule_label>/data}
  *
- * \note Issues the `download <dataset_label>/<schedule_label>/data`
- * command.
+ * The transfer is checked against its trailing CRC before returning.
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
@@ -659,7 +658,7 @@ RBRGen4Error RBRGen4_downloadDatasetScheduleData(RBRGen4 *conn, const RBRGen4Dat
  * \brief Download a dataset's events, including those not tied to any
  * schedule.
  *
- * \note Issues the `download <dataset_label>/events` command.
+ * \command{download <dataset_label>/events}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
@@ -690,8 +689,7 @@ RBRGen4Error RBRGen4_downloadDatasetEvents(RBRGen4 *conn, const RBRGen4Dataset *
 /**
  * \brief Download part of one schedule's events within a dataset.
  *
- * \note Issues the `download <dataset_label>/<schedule_label>/events`
- * command.
+ * \command{download <dataset_label>/<schedule_label>/events}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
@@ -725,7 +723,7 @@ RBRGen4Error RBRGen4_downloadDatasetScheduleEvents(RBRGen4 *conn, const RBRGen4D
 /**
  * \brief Download a dataset's metadata.
  *
- * \note Issues the `download <dataset_label>/meta` command.
+ * \command{download <dataset_label>/meta}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label

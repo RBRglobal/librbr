@@ -58,7 +58,8 @@ typedef struct RBRGen4Link {
 
 /**
  * \brief Get the connectivity of the instrument connection.
- * \note Issues the `link` command.
+ *
+ * \command{link}
  *
  * \param [in] conn the instrument connection
  * \param [out] link the link parameters
@@ -156,7 +157,8 @@ typedef struct RBRGen4LinkSerial {
 
 /**
  * \brief Retrieve the current serial baud rate and mode.
- * \note Issues the `link serial` command.
+ *
+ * \command{link serial}
  *
  * \param [in] conn the instrument connection
  * \param [out] serial the current serial parameters
@@ -171,7 +173,8 @@ RBRGen4Error RBRGen4_getLinkSerial(RBRGen4 *conn, RBRGen4LinkSerial *serial);
 
 /**
  * \brief Reconfigure the instrument serial baud rate and mode.
- * \note Issues the `link serial` command.
+ *
+ * \command{link serial}
  *
  * Every parameter of the command is sent, so \a serial must be fully
  * populated: read the current parameters with
@@ -203,7 +206,8 @@ RBRGen4Error RBRGen4_setLinkSerial(RBRGen4 *conn, const RBRGen4LinkSerial *seria
 /**
  * \brief Immediately shut down communications and implement any possible
  * power-saving measures.
- * \note Issues the `sleep` command.
+ *
+ * \command{sleep}
  *
  * Any scheduled sampling activity is not affected.
  * The `sleep` command does not attempt to power down a USB link, because there

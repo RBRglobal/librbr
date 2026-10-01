@@ -255,10 +255,10 @@ typedef struct RBRGen4ChannelPool {
 /**
  * \brief Populate the parameters of a channel.
  *
+ * \command{channel <channel_label>}
+ *
  * The caller sets RBRGen4Channel.label to select the channel to
  * read.
- *
- * \note Issues the `channel <channel_label>` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] channel the channel to read, selected by its label
@@ -278,12 +278,12 @@ RBRGen4Error RBRGen4_getChannel(RBRGen4 *conn, RBRGen4Channel *channel);
 /**
  * \brief Update a channel's user units.
  *
+ * \command{channel <channel_label>}
+ *
  * RBRGen4Channel.userUnits is the only parameter of the command a
  * caller may change; every other field of the structure is read-only. Read
  * the channel with RBRGen4_getChannel(), change the units, and write
  * the structure back.
- *
- * \note Issues the `channel <channel_label>` command.
  *
  * \param [in] conn the instrument connection
  * \param [in] channel the channel to write, selected by its label
@@ -302,10 +302,10 @@ RBRGen4Error RBRGen4_setChannel(RBRGen4 *conn, const RBRGen4Channel *channel);
 /**
  * \brief Read the labels of the channels configured on the instrument.
  *
+ * \command{channel}
+ *
  * Reports nothing but the labels; read a channel's parameters with
  * RBRGen4_getChannel().
- *
- * \note Issues the `channel` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] channelPool the channels present, labels only
@@ -330,7 +330,8 @@ RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPo
  * Reports nothing but the labels; read a channel's parameters with
  * RBRGen4_getChannel().
  *
- * \note Issues the `channel scientific` or `channel system` command.
+ * \par Command:
+ * `channel scientific` or `channel system`
  *
  * \param [in] conn the instrument connection
  * \param [in] nature the nature of the channels to report
@@ -357,7 +358,7 @@ RBRGen4Error RBRGen4_getChannelPoolByNature(RBRGen4 *conn, RBRGen4ChannelNature 
 /**
  * \brief Read the number of channels present on the instrument.
  *
- * \note Issues the `channel count` command.
+ * \command{channel count}
  *
  * \param [in] conn the instrument connection
  * \param [out] count the number of channels present
@@ -375,9 +376,9 @@ RBRGen4Error RBRGen4_getChannelCount(RBRGen4 *conn, int32_t *count);
 /**
  * \brief Read a channel's calibration.
  *
- * The caller sets RBRGen4Calibration.label to select the channel.
+ * \command{calibration <channel_label>}
  *
- * \note Issues the `calibration <channel_label>` command.
+ * The caller sets RBRGen4Calibration.label to select the channel.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] calibration the calibration to read, selected by its label
@@ -394,6 +395,8 @@ RBRGen4Error RBRGen4_getCalibration(RBRGen4 *conn, RBRGen4Calibration *calibrati
 
 /**
  * \brief Update a channel's calibration.
+ *
+ * \command{calibration <channel_label>}
  *
  * Sends the date, the offset and slope, and every a, b, and m coefficient the
  * equation uses. Read the calibration with RBRGen4_getCalibration(),
@@ -480,11 +483,11 @@ typedef struct RBRGen4Settings {
 /**
  * \brief Get miscellaneous logger settings
  *
+ * \command{settings}
+ *
  * A parameter the instrument does not report is set to
  * #RBRGEN4_SETTINGS_STATE_UNAVAILABLE, and one reported with a value the
  * library does not know to #RBRGEN4_UNKNOWN_SETTINGS_STATE.
- *
- * \note Issues the `settings` command.
  *
  * \param [in] conn the instrument connection
  * \param [out] settings the logger settings
@@ -500,11 +503,11 @@ RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings);
 /**
  * \brief Set the miscellaneous logger settings.
  *
+ * \command{settings}
+ *
  * A parameter in #RBRGEN4_SETTINGS_STATE_UNAVAILABLE is left out of the
  * command, so settings read back from an instrument can be written to it
  * unchanged.
- *
- * \note Issues the `settings` command.
  *
  * \param [in] conn the instrument connection
  * \param [in] settings the values for the settings in the logger
@@ -568,7 +571,8 @@ typedef struct RBRGen4Parameters {
 
 /**
  * \brief Get parameters which may be required when computing calibrated output.
- * \note Issues the `parameters` command.
+ *
+ * \command{parameters}
  *
  * \param [in] conn the instrument connection
  * \param [out] parameters the parameters in the logger
@@ -583,7 +587,8 @@ RBRGen4Error RBRGen4_getParameters(RBRGen4 *conn, RBRGen4Parameters *parameters)
 
 /**
  * \brief Set parameters which may be required when computing calibrated output.
- * \note Issues the `parameters` command.
+ *
+ * \command{parameters}
  *
  * \warning Hardware errors may occur if the instrument is logging.
  *
@@ -620,11 +625,11 @@ typedef struct RBRGen4Group {
 /**
  * \brief Read the channels in a group.
  *
+ * \command{group <group_label>}
+ *
  * The caller sets RBRGen4Group.label to select the group to read.
  * The labels of the group's channels are written to \a channelList when it
  * is given.
- *
- * \note Issues the `group <group_label>` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] group the group to read, selected by its label
@@ -649,10 +654,10 @@ RBRGen4Error RBRGen4_getGroup(RBRGen4 *conn, RBRGen4Group *group, RBRGen4LabelLi
 /**
  * \brief Set the channels in a group.
  *
+ * \command{group <group_label>}
+ *
  * Sends `channellist`, the only writable parameter. An empty \a channelList
  * sends `none`.
- *
- * \note Issues the `group <group_label>` command.
  *
  * \param [in] conn the instrument connection
  * \param [in] group the group to write, selected by its label
@@ -701,10 +706,10 @@ typedef struct RBRGen4GroupPool {
 /**
  * \brief Populate the pool of the instrument's groups.
  *
+ * \command{group}
+ *
  * Only the labels are reported; read a group's parameters with
  * RBRGen4_getGroup().
- *
- * \note Issues the `group` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] groupPool the groups defined, labels only
@@ -724,7 +729,7 @@ RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool);
 /**
  * \brief Read the number of groups defined on the instrument.
  *
- * \note Issues the `group count` command.
+ * \command{group count}
  *
  * \param [in] conn the instrument connection
  * \param [out] count the number of groups defined
@@ -743,7 +748,7 @@ RBRGen4Error RBRGen4_getGroupCount(RBRGen4 *conn, int32_t *count);
 /**
  * \brief Read the maximum number of groups the instrument can hold.
  *
- * \note Issues the `group maxcount` command.
+ * \command{group maxcount}
  *
  * \param [in] conn the instrument connection
  * \param [out] maxCount the maximum number of groups
@@ -761,9 +766,9 @@ RBRGen4Error RBRGen4_getGroupMaxCount(RBRGen4 *conn, int32_t *maxCount);
 /**
  * \brief Create an empty group.
  *
- * Add channels with RBRGen4_setGroup().
+ * \command{group create <group_label>}
  *
- * \note Issues the `group create <group_label>` command.
+ * Add channels with RBRGen4_setGroup().
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label to give the new group
@@ -782,7 +787,7 @@ RBRGen4Error RBRGen4_createGroup(RBRGen4 *conn, const char *label);
 /**
  * \brief Delete a group.
  *
- * \note Issues the `group delete <group_label>` command.
+ * \command{group delete <group_label>}
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label of the group to delete
@@ -801,7 +806,7 @@ RBRGen4Error RBRGen4_deleteGroup(RBRGen4 *conn, const char *label);
 /**
  * \brief Delete every group.
  *
- * \note Issues the `group delete all` command.
+ * \command{group delete all}
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the groups are successfully deleted
@@ -983,6 +988,8 @@ typedef struct RBRGen4Schedule {
 /**
  * \brief Populate the parameters of a schedule.
  *
+ * \command{schedule <schedule_label>}
+ *
  * The caller sets RBRGen4Schedule.label to select the schedule.
  * The labels of the groups the schedule samples are written to \a groupList
  * when it is given.
@@ -990,8 +997,6 @@ typedef struct RBRGen4Schedule {
  * `storage` is set to #RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE where the
  * instrument does not report it, and a parameter reported with a value the
  * library does not know is set to its `UNKNOWN` state.
- *
- * \note Issues the `schedule <schedule_label>` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] schedule the schedule to read, selected by its label
@@ -1018,12 +1023,12 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
 /**
  * \brief Set the parameters of a schedule.
  *
+ * \command{schedule <schedule_label>}
+ *
  * A `storage` of #RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE is left out of the
  * command, so a schedule read back from an instrument can be written to it
  * unchanged. An empty \a groupList sends `none`; a `NULL` \a groupList
  * leaves the instrument's group list unchanged.
- *
- * \note Issues the `schedule <schedule_label>` command.
  *
  * \param [in] conn the instrument connection
  * \param [in] schedule the schedule to write
@@ -1091,10 +1096,10 @@ const char *RBRGen4ScheduleMode_name(RBRGen4ScheduleMode mode);
 /**
  * \brief Populate the pool of the instrument's schedules.
  *
+ * \command{schedule}
+ *
  * Only the labels are reported; read a schedule's parameters with
  * RBRGen4_getSchedule().
- *
- * \note Issues the `schedule` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] schedulePool the schedules defined, labels only
@@ -1114,7 +1119,7 @@ RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedul
 /**
  * \brief Read the number of schedules defined on the instrument.
  *
- * \note Issues the `schedule count` command.
+ * \command{schedule count}
  *
  * \param [in] conn the instrument connection
  * \param [out] count the number of schedules defined
@@ -1133,7 +1138,7 @@ RBRGen4Error RBRGen4_getScheduleCount(RBRGen4 *conn, int32_t *count);
 /**
  * \brief Read the maximum number of schedules the instrument can hold.
  *
- * \note Issues the `schedule maxcount` command.
+ * \command{schedule maxcount}
  *
  * \param [in] conn the instrument connection
  * \param [out] maxCount the maximum number of schedules
@@ -1151,9 +1156,9 @@ RBRGen4Error RBRGen4_getScheduleMaxCount(RBRGen4 *conn, int32_t *maxCount);
 /**
  * \brief Create a schedule with default parameters.
  *
- * Configure it with RBRGen4_setSchedule().
+ * \command{schedule create <schedule_label>}
  *
- * \note Issues the `schedule create <schedule_label>` command.
+ * Configure it with RBRGen4_setSchedule().
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label to give the new schedule
@@ -1172,7 +1177,7 @@ RBRGen4Error RBRGen4_createSchedule(RBRGen4 *conn, const char *label);
 /**
  * \brief Delete a schedule.
  *
- * \note Issues the `schedule delete <schedule_label>` command.
+ * \command{schedule delete <schedule_label>}
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label of the schedule to delete
@@ -1191,7 +1196,7 @@ RBRGen4Error RBRGen4_deleteSchedule(RBRGen4 *conn, const char *label);
 /**
  * \brief Delete every schedule.
  *
- * \note Issues the `schedule delete all` command.
+ * \command{schedule delete all}
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the schedules are deleted
@@ -1222,11 +1227,11 @@ typedef struct RBRGen4Config {
 /**
  * \brief Read the schedules in a configuration.
  *
+ * \command{config <config_label>}
+ *
  * The caller sets RBRGen4Config.label to select the configuration.
  * The labels of the configuration's schedules are written to
  * \a scheduleList when it is given.
- *
- * \note Issues the `config <config_label>` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] config the configuration to read, selected by its label
@@ -1253,10 +1258,10 @@ RBRGen4Error RBRGen4_getConfig(RBRGen4 *conn, RBRGen4Config *config,
 /**
  * \brief Set the schedules in a configuration.
  *
+ * \command{config <config_label>}
+ *
  * Sends `schedulelist`, the command's only parameter. An empty
  * \a scheduleList sends `none`.
- *
- * \note Issues the `config <config_label>` command.
  *
  * \param [in] conn the instrument connection
  * \param [in] config the configuration to write, selected by its label
@@ -1306,10 +1311,10 @@ typedef struct RBRGen4ConfigPool {
 /**
  * \brief Populate the pool of the instrument's configurations.
  *
+ * \command{config}
+ *
  * Only the labels are reported; read a configuration's parameters with
  * RBRGen4_getConfig().
- *
- * \note Issues the `config` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] configPool the configurations defined, labels only
@@ -1329,7 +1334,7 @@ RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool)
 /**
  * \brief Read the number of configurations defined on the instrument.
  *
- * \note Issues the `config count` command.
+ * \command{config count}
  *
  * \param [in] conn the instrument connection
  * \param [out] count the number of configurations defined
@@ -1348,7 +1353,7 @@ RBRGen4Error RBRGen4_getConfigCount(RBRGen4 *conn, int32_t *count);
 /**
  * \brief Read the maximum number of configurations the instrument can hold.
  *
- * \note Issues the `config maxcount` command.
+ * \command{config maxcount}
  *
  * \param [in] conn the instrument connection
  * \param [out] maxCount the maximum number of configurations
@@ -1366,9 +1371,9 @@ RBRGen4Error RBRGen4_getConfigMaxCount(RBRGen4 *conn, int32_t *maxCount);
 /**
  * \brief Create an empty configuration.
  *
- * Add schedules with RBRGen4_setConfig().
+ * \command{config create <config_label>}
  *
- * \note Issues the `config create <config_label>` command.
+ * Add schedules with RBRGen4_setConfig().
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label to give the new configuration
@@ -1387,7 +1392,7 @@ RBRGen4Error RBRGen4_createConfig(RBRGen4 *conn, const char *label);
 /**
  * \brief Delete a configuration.
  *
- * \note Issues the `config delete <config_label>` command.
+ * \command{config delete <config_label>}
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label of the configuration to delete
@@ -1406,7 +1411,7 @@ RBRGen4Error RBRGen4_deleteConfig(RBRGen4 *conn, const char *label);
 /**
  * \brief Delete every configuration.
  *
- * \note Issues the `config delete all` command.
+ * \command{config delete all}
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the configurations are deleted
