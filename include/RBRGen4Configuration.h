@@ -612,7 +612,7 @@ typedef struct RBRGen4Group {
  *
  * \param [in] conn the instrument connection
  * \param [in,out] group the group to read, selected by its label
- * \param [out] channelList the channels in the group, or `NULL` to skip them
+ * \param [in,out] channelList the channels in the group, or `NULL` to skip them
  * \return #RBRGEN4_SUCCESS when the group is successfully read
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -969,7 +969,7 @@ typedef struct RBRGen4Schedule {
  *
  * \param [in] conn the instrument connection
  * \param [in,out] schedule the schedule to read, selected by its label
- * \param [out] groupList the groups the schedule samples, or `NULL` to skip them
+ * \param [in,out] groupList the groups the schedule samples, or `NULL` to skip them
  * \return #RBRGEN4_SUCCESS when the schedule is successfully read
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -1192,7 +1192,7 @@ typedef struct RBRGen4Config {
  *
  * \param [in] conn the instrument connection
  * \param [in,out] config the configuration to read, selected by its label
- * \param [out] scheduleList the schedules in the configuration, or `NULL` to skip them
+ * \param [in,out] scheduleList the schedules in the configuration, or `NULL` to skip them
  * \return #RBRGEN4_SUCCESS when the configuration is read
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs

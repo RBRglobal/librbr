@@ -249,7 +249,7 @@ RBRGen4Error RBRGen4_getDatasetMaxCount(RBRGen4 *conn, int32_t *maxCount);
  *
  * \param [in] conn the instrument connection
  * \param [in,out] dataset the dataset to read, selected by its label
- * \param [out] scheduleList the schedules run by the dataset, or `NULL` to skip them
+ * \param [in,out] scheduleList the schedules run by the dataset, or `NULL` to skip them
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs

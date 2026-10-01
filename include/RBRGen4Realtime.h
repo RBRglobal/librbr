@@ -211,8 +211,8 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
  *
  * \param [in] conn the instrument connection
  * \param [in] requireLabel whether to require and wait for a sample labelled `polling`
- * \param [out] sample the polled sample; RBRGen4Sample.readings and RBRGen4Sample.size must be set
- *                     by the caller
+ * \param [in,out] sample the polled sample; RBRGen4Sample.readings and RBRGen4Sample.size must be
+ *                        set by the caller
  * \return #RBRGEN4_SUCCESS when a sample is successfully read
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings storage
  * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but RBRGen4OutputFormat.scheduleLabel is
@@ -250,8 +250,8 @@ RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sampl
  * \param [in] conn the instrument connection
  * \param [in] requireLabel whether to require and wait for a sample labelled `polling`
  * \param [in] channelList the channels to sample
- * \param [out] sample the polled sample; RBRGen4Sample.readings and RBRGen4Sample.size must be set
- *                     by the caller
+ * \param [in,out] sample the polled sample; RBRGen4Sample.readings and RBRGen4Sample.size must be
+ *                        set by the caller
  * \return #RBRGEN4_SUCCESS when a sample is successfully read
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings storage, or when
  *         \a channelList is `NULL`, empty, its count is out of range, or a channel label is empty
@@ -292,8 +292,8 @@ RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel,
  * \param [in] conn the instrument connection
  * \param [in] requireLabel whether to require and wait for a sample labelled `polling`
  * \param [in] groupList the groups of channels to sample
- * \param [out] sample the polled sample; RBRGen4Sample.readings and RBRGen4Sample.size must be set
- *                     by the caller
+ * \param [in,out] sample the polled sample; RBRGen4Sample.readings and RBRGen4Sample.size must be
+ *                        set by the caller
  * \return #RBRGEN4_SUCCESS when a sample is successfully read
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings storage, or when
  *         \a groupList is `NULL`, empty, its count is out of range, or a group label is empty
