@@ -43,7 +43,7 @@ static RBRGen3DateTime g_timeReference = 0;
 static double g_sampleReadings[CHANNEL_MAX];
 static RBRGen3Sample g_sample = {.size = CHANNEL_MAX, .readings = g_sampleReadings};
 
-RBRGen3Error instrumentSample(const struct RBRGen3 *conn, const struct RBRGen3Sample *const sample)
+RBRGen3Error instrumentSample(const RBRGen3 *conn, const RBRGen3Sample *const sample)
 {
     /* Unused. */
     (void) conn;

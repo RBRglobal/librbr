@@ -121,53 +121,53 @@ static int writeFd(int fd, const void *data, int32_t size)
     return 0;
 }
 
-static RBRGen3Error gen3Time(const struct RBRGen3 *conn, RBRGen3DateTime *time)
+static RBRGen3Error gen3Time(const RBRGen3 *conn, RBRGen3DateTime *time)
 {
     (void) conn;
     *time = nowMsec();
     return RBRGEN3_SUCCESS;
 }
 
-static RBRGen3Error gen3Sleep(const struct RBRGen3 *conn, RBRGen3DateTime time)
+static RBRGen3Error gen3Sleep(const RBRGen3 *conn, RBRGen3DateTime time)
 {
     (void) conn;
     sleepMsec(time);
     return RBRGEN3_SUCCESS;
 }
 
-static RBRGen3Error gen3Read(const struct RBRGen3 *conn, void *data, int32_t *size)
+static RBRGen3Error gen3Read(const RBRGen3 *conn, void *data, int32_t *size)
 {
     *size = readFd(*(int *) RBRGen3_getUserData(conn), data, *size);
     return *size == 0 ? RBRGEN3_TIMEOUT : *size < 0 ? RBRGEN3_CALLBACK_ERROR : RBRGEN3_SUCCESS;
 }
 
-static RBRGen3Error gen3Write(const struct RBRGen3 *conn, const void *const data, int32_t size)
+static RBRGen3Error gen3Write(const RBRGen3 *conn, const void *const data, int32_t size)
 {
     return writeFd(*(int *) RBRGen3_getUserData(conn), data, size) < 0 ? RBRGEN3_CALLBACK_ERROR
                                                                        : RBRGEN3_SUCCESS;
 }
 
-static RBRGen4Error gen4Time(const struct RBRGen4 *conn, RBRGen4DateTime *time)
+static RBRGen4Error gen4Time(const RBRGen4 *conn, RBRGen4DateTime *time)
 {
     (void) conn;
     *time = nowMsec();
     return RBRGEN4_SUCCESS;
 }
 
-static RBRGen4Error gen4Sleep(const struct RBRGen4 *conn, RBRGen4DateTime time)
+static RBRGen4Error gen4Sleep(const RBRGen4 *conn, RBRGen4DateTime time)
 {
     (void) conn;
     sleepMsec(time);
     return RBRGEN4_SUCCESS;
 }
 
-static RBRGen4Error gen4Read(const struct RBRGen4 *conn, void *data, int32_t *size)
+static RBRGen4Error gen4Read(const RBRGen4 *conn, void *data, int32_t *size)
 {
     *size = readFd(*(int *) RBRGen4_getUserData(conn), data, *size);
     return *size == 0 ? RBRGEN4_TIMEOUT : *size < 0 ? RBRGEN4_CALLBACK_ERROR : RBRGEN4_SUCCESS;
 }
 
-static RBRGen4Error gen4Write(const struct RBRGen4 *conn, const void *const data, int32_t size)
+static RBRGen4Error gen4Write(const RBRGen4 *conn, const void *const data, int32_t size)
 {
     return writeFd(*(int *) RBRGen4_getUserData(conn), data, size) < 0 ? RBRGEN4_CALLBACK_ERROR
                                                                        : RBRGEN4_SUCCESS;

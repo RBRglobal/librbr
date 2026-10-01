@@ -61,7 +61,7 @@ static int samplePointCount = 0;
 static SDL_Window *window;
 static SDL_Renderer *renderer;
 
-RBRGen3Error instrumentSample(const struct RBRGen3 *conn, const struct RBRGen3Sample *const sample)
+RBRGen3Error instrumentSample(const RBRGen3 *conn, const RBRGen3Sample *const sample)
 {
     /* Unused. */
     (void) conn;

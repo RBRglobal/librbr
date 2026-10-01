@@ -60,8 +60,7 @@ RBRGen3DateTime g_timeReference = 0;
 
 RBRDynamicCorrectionParams dynamicCorrParams;
 
-RBRGen3Error parserSample(const struct RBRGen3Parser *parser,
-                          const struct RBRGen3Sample *const sample)
+RBRGen3Error parserSample(const RBRGen3Parser *parser, const RBRGen3Sample *const sample)
 {
     /* struct for dynamic correction */
     RBRDynamicCorrectionError status;

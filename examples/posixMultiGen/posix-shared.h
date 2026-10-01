@@ -25,21 +25,21 @@ extern "C" {
 
 int openSerialFd(const char *devicePath);
 
-RBRGen3Error gen3InstrumentTime(const struct RBRGen3 *conn, RBRGen3DateTime *time);
+RBRGen3Error gen3InstrumentTime(const RBRGen3 *conn, RBRGen3DateTime *time);
 
-RBRGen3Error gen3InstrumentSleep(const struct RBRGen3 *conn, RBRGen3DateTime time);
+RBRGen3Error gen3InstrumentSleep(const RBRGen3 *conn, RBRGen3DateTime time);
 
-RBRGen3Error gen3InstrumentRead(const struct RBRGen3 *conn, void *data, int32_t *size);
+RBRGen3Error gen3InstrumentRead(const RBRGen3 *conn, void *data, int32_t *size);
 
-RBRGen3Error gen3InstrumentWrite(const struct RBRGen3 *conn, const void *const data, int32_t size);
+RBRGen3Error gen3InstrumentWrite(const RBRGen3 *conn, const void *const data, int32_t size);
 
-RBRGen4Error gen4InstrumentTime(const struct RBRGen4 *conn, RBRGen4DateTime *time);
+RBRGen4Error gen4InstrumentTime(const RBRGen4 *conn, RBRGen4DateTime *time);
 
-RBRGen4Error gen4InstrumentSleep(const struct RBRGen4 *conn, RBRGen4DateTime time);
+RBRGen4Error gen4InstrumentSleep(const RBRGen4 *conn, RBRGen4DateTime time);
 
-RBRGen4Error gen4InstrumentRead(const struct RBRGen4 *conn, void *data, int32_t *size);
+RBRGen4Error gen4InstrumentRead(const RBRGen4 *conn, void *data, int32_t *size);
 
-RBRGen4Error gen4InstrumentWrite(const struct RBRGen4 *conn, const void *const data, int32_t size);
+RBRGen4Error gen4InstrumentWrite(const RBRGen4 *conn, const void *const data, int32_t size);
 
 #ifdef __cplusplus
 }

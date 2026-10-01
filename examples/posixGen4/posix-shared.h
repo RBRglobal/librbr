@@ -29,28 +29,28 @@ int openSerialFd(char *devicePath);
  * \see RBRGen4Environment
  * \see RBRGen4TimeCallback
  */
-RBRGen4Error instrumentTime(const struct RBRGen4 *conn, RBRGen4DateTime *time);
+RBRGen4Error instrumentTime(const RBRGen4 *conn, RBRGen4DateTime *time);
 
 /**
  * \brief Callback to run when the instrument goes to sleep.
  * \see RBRGen4Environment
  * \see RBRGen4TimeCallback
  */
-RBRGen4Error instrumentSleep(const struct RBRGen4 *conn, RBRGen4DateTime time);
+RBRGen4Error instrumentSleep(const RBRGen4 *conn, RBRGen4DateTime time);
 
 /**
  * \brief Callback to read from the instrument.
  * \see RBRGen4Environment
  * \see RBRGen4ReadCallback
  */
-RBRGen4Error instrumentRead(const struct RBRGen4 *conn, void *data, int32_t *size);
+RBRGen4Error instrumentRead(const RBRGen4 *conn, void *data, int32_t *size);
 
 /**
  * \brief Callback to write to the instrument.
  * \see RBRGen4Environment
  * \see RBRGen4WriteCallback
  */
-RBRGen4Error instrumentWrite(const struct RBRGen4 *conn, const void *const data, int32_t size);
+RBRGen4Error instrumentWrite(const RBRGen4 *conn, const void *const data, int32_t size);
 
 #ifdef __cplusplus
 }

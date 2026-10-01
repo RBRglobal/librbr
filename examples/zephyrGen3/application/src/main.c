@@ -40,7 +40,7 @@ RBRGen3Sample sampleBuffer = {.size = CHANNEL_MAX, .readings = sampleReadings};
 
 ZephyrRBRGen3IO io;
 
-RBRGen3Error instrumentSample(const struct RBRGen3 *conn, const struct RBRGen3Sample *const sample)
+RBRGen3Error instrumentSample(const RBRGen3 *conn, const RBRGen3Sample *const sample)
 {
     /* Unused. */
     (void) conn;

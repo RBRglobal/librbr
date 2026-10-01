@@ -116,7 +116,7 @@ RBRGen3Error ZephyrRBRGen3IO_init(ZephyrRBRGen3IO *io, const struct device *dev)
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error ZephyrRBRGen3IO_read(const struct RBRGen3 *conn, void *data, int32_t *size)
+RBRGen3Error ZephyrRBRGen3IO_read(const RBRGen3 *conn, void *data, int32_t *size)
 {
     ZephyrRBRGen3IO *io = RBRGen3_getUserData(conn);
 
@@ -177,7 +177,7 @@ done:
     }
 }
 
-RBRGen3Error ZephyrRBRGen3IO_write(const struct RBRGen3 *conn, const void *const data, int32_t size)
+RBRGen3Error ZephyrRBRGen3IO_write(const RBRGen3 *conn, const void *const data, int32_t size)
 {
     ZephyrRBRGen3IO *io = RBRGen3_getUserData(conn);
 

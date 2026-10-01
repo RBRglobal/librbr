@@ -77,7 +77,7 @@ int openSerialFd(char *devicePath)
     return instrumentFd;
 }
 
-RBRGen4Error instrumentTime(const struct RBRGen4 *conn, RBRGen4DateTime *time)
+RBRGen4Error instrumentTime(const RBRGen4 *conn, RBRGen4DateTime *time)
 {
     /* Unused. */
     (void) conn;
@@ -87,7 +87,7 @@ RBRGen4Error instrumentTime(const struct RBRGen4 *conn, RBRGen4DateTime *time)
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error instrumentSleep(const struct RBRGen4 *conn, RBRGen4DateTime time)
+RBRGen4Error instrumentSleep(const RBRGen4 *conn, RBRGen4DateTime time)
 {
     /* Unused. */
     (void) conn;
@@ -100,7 +100,7 @@ RBRGen4Error instrumentSleep(const struct RBRGen4 *conn, RBRGen4DateTime time)
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error instrumentRead(const struct RBRGen4 *conn, void *data, int32_t *size)
+RBRGen4Error instrumentRead(const RBRGen4 *conn, void *data, int32_t *size)
 {
     int *instrumentFd = (int *) RBRGen4_getUserData(conn);
 
@@ -120,7 +120,7 @@ RBRGen4Error instrumentRead(const struct RBRGen4 *conn, void *data, int32_t *siz
     }
 }
 
-RBRGen4Error instrumentWrite(const struct RBRGen4 *conn, const void *const data, int32_t size)
+RBRGen4Error instrumentWrite(const RBRGen4 *conn, const void *const data, int32_t size)
 {
     int *instrumentFd = (int *) RBRGen4_getUserData(conn);
     const uint8_t *const byteData = (const uint8_t *const) data;

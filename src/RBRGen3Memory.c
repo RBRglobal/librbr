@@ -117,7 +117,7 @@ static RBRGen3Error RBRGen3L3_parseDataResponse(RBRGen3 *conn, RBRGen3Data *data
  * \param [out] data the buffer to write into
  * \param [in] size the amount of data to write into the buffer
  */
-static RBRGen3Error RBRGen3_fixedRead(struct RBRGen3 *conn, void *data, int32_t size)
+static RBRGen3Error RBRGen3_fixedRead(RBRGen3 *conn, void *data, int32_t size)
 {
     int32_t bufferLength = 0;
     int32_t readLength;

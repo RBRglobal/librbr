@@ -705,7 +705,7 @@ static RBRGen4DateTime pollTimeoutClock;
 /** \brief A time callback that advances #pollTimeoutClock by less than a
  * third of RBRGen4.pollTimeout on every call, so a poll's
  * overall timeout can be exercised without waiting in real time. */
-static RBRGen4Error pollTimeoutTime(const struct RBRGen4 *conn, RBRGen4DateTime *time)
+static RBRGen4Error pollTimeoutTime(const RBRGen4 *conn, RBRGen4DateTime *time)
 {
     (void) conn;
     *time = pollTimeoutClock;
@@ -783,7 +783,7 @@ static RBRGen4DateTime pollSlowResponseClock;
 /** \brief A time callback that advances #pollSlowResponseClock by more than
  * a small commandTimeout on every call, so that a wait spanning several
  * such ticks can be exercised without waiting in real time. */
-static RBRGen4Error pollSlowResponseTime(const struct RBRGen4 *conn, RBRGen4DateTime *time)
+static RBRGen4Error pollSlowResponseTime(const RBRGen4 *conn, RBRGen4DateTime *time)
 {
     (void) conn;
     *time = pollSlowResponseClock;

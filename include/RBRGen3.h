@@ -614,7 +614,7 @@ typedef struct RBRGen3 {
      *
      * Cached every time RBRGen3_getId() is called.
      */
-    struct RBRGen3Id id;
+    RBRGen3Id id;
 
     /**
      * \brief The generation of the instrument.

@@ -45,7 +45,7 @@ struct RBRGen3Parser;
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
  */
 typedef RBRGen3Error (*RBRGen3ParserSampleCallback)(const struct RBRGen3Parser *parser,
-                                                    const struct RBRGen3Sample *const sample);
+                                                    const RBRGen3Sample *const sample);
 
 /**
  * \brief Instrument event types.
@@ -140,7 +140,7 @@ typedef struct RBRGen3Event {
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
  */
 typedef RBRGen3Error (*RBRGen3ParserEventCallback)(const struct RBRGen3Parser *parser,
-                                                   const struct RBRGen3Event *const event);
+                                                   const RBRGen3Event *const event);
 
 /**
  * \brief A set of callbacks from parser to user code.
@@ -214,7 +214,7 @@ typedef struct RBRGen3ParserConfig {
     /** \brief Format-specific configuration. */
     union {
         /** \brief EasyParse-specific parser configuration. */
-        struct RBRGen3ParserEasyParseConfig easyParse;
+        RBRGen3ParserEasyParseConfig easyParse;
     } formatConfig;
 } RBRGen3ParserConfig;
 

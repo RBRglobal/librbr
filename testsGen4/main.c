@@ -76,7 +76,7 @@ void TestIOBuffers_init(TestIOBuffers *buffers, const char *readBuffer, int32_t 
     }
 }
 
-RBRGen4Error TestIOBuffers_time(const struct RBRGen4 *conn, RBRGen4DateTime *time)
+RBRGen4Error TestIOBuffers_time(const RBRGen4 *conn, RBRGen4DateTime *time)
 {
     /* No-op. */
     *time = 0;
@@ -84,7 +84,7 @@ RBRGen4Error TestIOBuffers_time(const struct RBRGen4 *conn, RBRGen4DateTime *tim
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error TestIOBuffers_sleep(const struct RBRGen4 *conn, RBRGen4DateTime time)
+RBRGen4Error TestIOBuffers_sleep(const RBRGen4 *conn, RBRGen4DateTime time)
 {
     /* No-op. */
     (void) conn;
@@ -92,7 +92,7 @@ RBRGen4Error TestIOBuffers_sleep(const struct RBRGen4 *conn, RBRGen4DateTime tim
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error TestIOBuffers_read(const struct RBRGen4 *conn, void *data, int32_t *size)
+RBRGen4Error TestIOBuffers_read(const RBRGen4 *conn, void *data, int32_t *size)
 {
     TestIOBuffers *buffers;
     buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
@@ -117,7 +117,7 @@ RBRGen4Error TestIOBuffers_read(const struct RBRGen4 *conn, void *data, int32_t 
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error TestIOBuffers_write(const struct RBRGen4 *conn, const void *const data, int32_t size)
+RBRGen4Error TestIOBuffers_write(const RBRGen4 *conn, const void *const data, int32_t size)
 {
     TestIOBuffers *buffers;
     buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
@@ -140,8 +140,7 @@ RBRGen4Error TestIOBuffers_write(const struct RBRGen4 *conn, const void *const d
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error TestIOBuffers_sample(const struct RBRGen4 *conn,
-                                  const struct RBRGen4Sample *const sample)
+RBRGen4Error TestIOBuffers_sample(const RBRGen4 *conn, const RBRGen4Sample *const sample)
 {
     TestIOBuffers *buffers;
     buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);

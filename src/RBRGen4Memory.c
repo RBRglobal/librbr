@@ -367,7 +367,7 @@ const char *RBRGen4DownloadEventsUnit_name(RBRGen4DownloadEventsUnit unit)
  * \param [out] data the buffer to write into
  * \param [in] size the amount of data to write into the buffer
  */
-static RBRGen4Error RBRGen4_fixedRead(struct RBRGen4 *conn, void *data, int64_t size)
+static RBRGen4Error RBRGen4_fixedRead(RBRGen4 *conn, void *data, int64_t size)
 {
     int64_t bufferLength = 0;
     int32_t readLength;

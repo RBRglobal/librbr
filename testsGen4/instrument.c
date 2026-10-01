@@ -720,7 +720,7 @@ TEST_LOGGER4(responseBufferOverflow)
 
 /** \brief A clock which stands still until the fixture has been read, then
  * steps past the command timeout on every call. */
-static RBRGen4Error overflowReplyTime(const struct RBRGen4 *conn, RBRGen4DateTime *time)
+static RBRGen4Error overflowReplyTime(const RBRGen4 *conn, RBRGen4DateTime *time)
 {
     TestIOBuffers *buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
     static RBRGen4DateTime clock;
@@ -763,7 +763,7 @@ TEST_LOGGER4(responseBufferOverflowReply)
 /** \brief A clock which advances by a second on every call, whatever has been
  * read. */
 static RBRGen4DateTime tickingClock;
-static RBRGen4Error tickingTime(const struct RBRGen4 *conn, RBRGen4DateTime *time)
+static RBRGen4Error tickingTime(const RBRGen4 *conn, RBRGen4DateTime *time)
 {
     (void) conn;
     tickingClock += 1000;
@@ -891,7 +891,7 @@ TEST_LOGGER4(responseBufferOverflowInterrupted)
 /** \brief A clock which jumps past any command timeout as soon as anything
  * has been read, so the deadline lands right after the read which fills the
  * response buffer. */
-static RBRGen4Error overflowTimeoutTime(const struct RBRGen4 *conn, RBRGen4DateTime *time)
+static RBRGen4Error overflowTimeoutTime(const RBRGen4 *conn, RBRGen4DateTime *time)
 {
     TestIOBuffers *buffers = (TestIOBuffers *) RBRGen4_getUserData(conn);
     *time = buffers->readBufferPos > 0 ? INT64_MAX / 2 : 0;
