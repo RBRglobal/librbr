@@ -14,7 +14,7 @@
 #include <ctype.h>
 /* Required for SCNi64. */
 #include <inttypes.h>
-/* Required for INFINITY, NAN. */
+/* Required for NAN. */
 #include <math.h>
 /* Required for vsnprintf, va_list, va_start, va_end. */
 #include <stdarg.h>

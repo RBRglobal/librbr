@@ -10,11 +10,11 @@
  * \brief Library implementation.
  */
 
-/* Required for isnan, NAN. */
+/* Required for isnan. */
 #include <math.h>
-/* Required for strtol. */
+/* Required for atof, strtol. */
 #include <stdlib.h>
-/* Required for strchr, strcmp. */
+/* Required for memset, strcmp. */
 #include <string.h>
 /* Required for snprintf. */
 #include <stdio.h>

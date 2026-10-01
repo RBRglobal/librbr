@@ -10,7 +10,7 @@
  * \brief Library implementation.
  */
 
-/* Required for memcpy, memcmp, memset, strlen. */
+/* Required for memcpy, memset. */
 #include <string.h>
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
