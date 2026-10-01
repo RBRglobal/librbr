@@ -303,7 +303,7 @@ static void RBRGen3_removeLastResponse(RBRGen3 *conn)
  * \brief Read data until we find the command termination sequence or the callback indicates a
  * timeout.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] startTime when we started trying to read the command response
  * \param [out] end the end of the response within the response buffer
  * \return #RBRGEN3_SUCCESS when data is successfully read
@@ -413,7 +413,7 @@ static RBRGen3Error RBRGen3_readSingleResponse(RBRGen3 *conn, RBRGen3DateTime st
 /**
  * \brief Find the beginning of a response and null-terminate the end.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] beginning the beginning of the response
  * \param [in] end the end of the response
  */
@@ -554,7 +554,7 @@ static RBRGen3Error RBRGen3Sample_parse(RBRGen3Sample *sample, char *response)
  *
  * Updates RBRGen3.response as appropriate.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
  * \return #RBRGEN3_SUCCESS when the response is a warning or success

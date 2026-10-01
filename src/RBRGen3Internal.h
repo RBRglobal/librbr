@@ -341,7 +341,7 @@ void RBRGen3_parseResponse(RBRGen3 *conn, char **command, RBRGen3ResponseParamet
  *
  * Updates RBRGen3.response as appropriate.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
  * \return #RBRGEN3_SUCCESS when the response is a warning or success

@@ -748,7 +748,7 @@ RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Environment *environment,
  * Clears the connection state. Does not release the caller-provided instance
  * memory and does not perform any communication with the instrument.
  *
- * \param [in,out] conn the instrument connection to terminate
+ * \param [in] conn the instrument connection to terminate
  * \return #RBRGEN3_SUCCESS when the instrument was closed successfully
  * \see RBRGen3_open()
  */
@@ -764,8 +764,8 @@ RBRGen3Error RBRGen3_close(RBRGen3 *conn);
  *
  * Does not communicate with the instrument.
  *
- * \param [in,out] conn the instrument connection
- * \param [in] command storage for commands destined for the instrument
+ * \param [in] conn the instrument connection
+ * \param [out] command storage for commands destined for the instrument
  * \param [in] capacity the capacity of \a command in bytes
  * \return #RBRGEN3_SUCCESS when the buffer is replaced
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the buffer is missing or empty
@@ -786,8 +786,8 @@ RBRGen3Error RBRGen3_setCommandBuffer(RBRGen3 *conn, uint8_t *command, int32_t c
  *
  * Does not communicate with the instrument.
  *
- * \param [in,out] conn the instrument connection
- * \param [in] response storage for data received from the instrument
+ * \param [in] conn the instrument connection
+ * \param [out] response storage for data received from the instrument
  * \param [in] capacity the capacity of \a response in bytes
  * \return #RBRGEN3_SUCCESS when the buffer is replaced
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the buffer is missing or cannot hold more than a
@@ -816,7 +816,7 @@ RBRGen3Error RBRGen3_setResponseBuffer(RBRGen3 *conn, uint8_t *response, int32_t
  *
  * Does not communicate with the instrument.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \see RBRGen3Environment for the rules on sharing buffers between connections
  */
 void RBRGen3_resetResponseBuffer(RBRGen3 *conn);
@@ -843,7 +843,7 @@ RBRGen3DateTime RBRGen3_getCommandTimeout(const RBRGen3 *conn);
 /**
  * \brief Set the command timeout.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] commandTimeout the new command timeout
  * \see RBRGen3_getCommandTimeout()
  */
@@ -864,7 +864,7 @@ void *RBRGen3_getUserData(const RBRGen3 *conn);
 /**
  * \brief Change the arbitrary user data pointer.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] userData the new user data
  * \see RBRGen3_getUserData()
  */
