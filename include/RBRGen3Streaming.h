@@ -71,6 +71,7 @@ typedef struct RBRGen3ChannelsList {
  * \return #RBRGEN3_TRUNCATED when the instrument reported more channels than the list holds; the
  *         first RBRGen3ChannelsList.size are populated
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -122,6 +123,7 @@ typedef struct RBRGen3LabelsList {
  * \return #RBRGEN3_TRUNCATED when the instrument reported more labels than the list holds; the
  *         first RBRGen3LabelsList.size are populated
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -180,6 +182,7 @@ const char *RBRGen3OutputFormat_name(RBRGen3OutputFormat format);
  * \param [in] conn the instrument connection
  * \param [out] outputFormats available output formats
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -195,6 +198,7 @@ RBRGen3Error RBRGen3_getAvailableOutputFormats(RBRGen3 *conn, RBRGen3OutputForma
  * \param [in] conn the instrument connection
  * \param [out] outputFormat the current output format
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -211,6 +215,7 @@ RBRGen3Error RBRGen3_getOutputFormat(RBRGen3 *conn, RBRGen3OutputFormat *outputF
  * \param [in] conn the instrument connection
  * \param [in] outputFormat the current output format
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -229,6 +234,7 @@ RBRGen3Error RBRGen3_setOutputFormat(RBRGen3 *conn, RBRGen3OutputFormat outputFo
  * \param [in] conn the instrument connection
  * \param [out] enabled whether USB streaming is enabled
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -246,6 +252,7 @@ RBRGen3Error RBRGen3_getUSBStreamingState(RBRGen3 *conn, bool *enabled);
  * \param [in] conn the instrument connection
  * \param [in] enabled whether USB streaming is enabled
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -263,6 +270,7 @@ RBRGen3Error RBRGen3_setUSBStreamingState(RBRGen3 *conn, bool enabled);
  * \param [in] conn the instrument connection
  * \param [out] enabled whether serial streaming is enabled
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -280,6 +288,7 @@ RBRGen3Error RBRGen3_getSerialStreamingState(RBRGen3 *conn, bool *enabled);
  * \param [in] conn the instrument connection
  * \param [in] enabled whether serial streaming is enabled
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -412,6 +421,7 @@ typedef struct RBRGen3AuxOutput {
  * \param [in] conn the instrument connection
  * \param [in,out] auxOutput the auxiliary output signal parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -435,6 +445,7 @@ RBRGen3Error RBRGen3_getAuxOutput(RBRGen3 *conn, RBRGen3AuxOutput *auxOutput);
  * \param [in] conn the instrument connection
  * \param [in] auxOutput the auxiliary output signal parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback

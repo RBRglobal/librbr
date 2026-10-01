@@ -55,6 +55,7 @@ const char *RBRGen3Link_name(RBRGen3Link link);
  * \param [in] conn the instrument connection
  * \param [out] link the link type
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -199,6 +200,7 @@ typedef struct RBRGen3Serial {
  * \param [in] conn the instrument connection
  * \param [out] serial the current and available serial parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -224,6 +226,7 @@ RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn, RBRGen3Serial *serial);
  * \param [in] conn the instrument connection
  * \param [in] serial the new serial parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -241,6 +244,7 @@ RBRGen3Error RBRGen3_setSerial(RBRGen3 *conn, const RBRGen3Serial *serial);
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the instrument has been put to sleep
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  */
@@ -329,6 +333,7 @@ typedef struct RBRGen3WiFi {
  * \param [in] conn the instrument connection
  * \param [out] wifi the current Wi-Fi parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -352,6 +357,7 @@ RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn, RBRGen3WiFi *wifi);
  * \param [in] conn the instrument connection
  * \param [in] wifi the new Wi-Fi parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback

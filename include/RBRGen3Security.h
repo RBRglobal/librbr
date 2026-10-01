@@ -33,6 +33,7 @@ extern "C" {
  * \param [in] conn the instrument connection
  * \param [in] command the command to permit
  * \return #RBRGEN3_SUCCESS when the command has been permitted
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -52,6 +53,7 @@ RBRGen3Error RBRGen3_permit(RBRGen3 *conn, const char *command);
  * \param [in] conn the instrument connection
  * \param [out] prompt whether the prompt is enabled
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -68,6 +70,7 @@ RBRGen3Error RBRGen3_getPrompt(RBRGen3 *conn, bool *prompt);
  * \param [in] conn the instrument connection
  * \param [in] prompt whether the prompt should be enabled
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -87,6 +90,7 @@ RBRGen3Error RBRGen3_setPrompt(RBRGen3 *conn, bool prompt);
  * \param [in] conn the instrument connection
  * \param [out] confirmation whether confirmation is enabled
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -107,6 +111,7 @@ RBRGen3Error RBRGen3_getConfirmation(RBRGen3 *conn, bool *confirmation);
  * \param [in] conn the instrument connection
  * \param [in] confirmation whether confirmation should be enabled
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -123,6 +128,7 @@ RBRGen3Error RBRGen3_setConfirmation(RBRGen3 *conn, bool confirmation);
  * \param [in] conn the instrument connection
  * \param [in] delay time in milliseconds to wait before rebooting
  * \return #RBRGEN3_SUCCESS when the CPU has been rebooted
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback

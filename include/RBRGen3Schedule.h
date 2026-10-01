@@ -75,6 +75,7 @@ typedef struct RBRGen3Clock {
  * \param [in] conn the instrument connection
  * \param [out] clock the clock value
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -104,6 +105,7 @@ RBRGen3Error RBRGen3_getClock(RBRGen3 *conn, RBRGen3Clock *clock);
  * \param [in] conn the instrument connection
  * \param [in] clock the clock value
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -269,6 +271,7 @@ typedef struct RBRGen3Sampling {
  * \param [in] conn the instrument connection
  * \param [out] sampling the sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -313,6 +316,7 @@ RBRGen3Error RBRGen3_getSampling(RBRGen3 *conn, RBRGen3Sampling *sampling);
  * \param [in] conn the instrument connection
  * \param [in] sampling the sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -348,6 +352,7 @@ RBRGen3Error RBRGen3_setSampling(RBRGen3 *conn, const RBRGen3Sampling *sampling)
  * \param [in] conn the instrument connection
  * \param [in] sampling the sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -445,6 +450,7 @@ typedef struct RBRGen3Deployment {
  * \param [in] conn the instrument connection
  * \param [out] deployment the deployment parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -470,6 +476,7 @@ RBRGen3Error RBRGen3_getDeployment(RBRGen3 *conn, RBRGen3Deployment *deployment)
  * \param [in] conn the instrument connection
  * \param [in] deployment the deployment parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback

@@ -101,6 +101,7 @@ typedef struct RBRGen3MemoryInfo {
  * \param [in] conn the instrument connection
  * \param [in,out] memoryInfo data memory information
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -170,6 +171,7 @@ typedef struct RBRGen3Data {
  * \param [in] conn the instrument connection
  * \param [in,out] data the instrument data
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -190,6 +192,7 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *conn, RBRGen3Data *data);
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the memory is successfully cleared
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -237,6 +240,7 @@ const char *RBRGen3MemoryFormat_name(RBRGen3MemoryFormat format);
  * \param [in] conn the instrument connection
  * \param [out] memoryFormats available memory formats
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -257,6 +261,7 @@ RBRGen3Error RBRGen3_getAvailableMemoryFormats(RBRGen3 *conn, RBRGen3MemoryForma
  * \param [in] conn the instrument connection
  * \param [out] memoryFormat the current memory format
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -272,6 +277,7 @@ RBRGen3Error RBRGen3_getCurrentMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *
  * \param [in] conn the instrument connection
  * \param [out] memoryFormat the new memory format
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -293,6 +299,7 @@ RBRGen3Error RBRGen3_getNewMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *memo
  * \param [in] conn the instrument connection
  * \param [in] memoryFormat the new memory format
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -587,6 +594,7 @@ typedef struct RBRGen3Postprocessing {
  * \return #RBRGEN3_TRUNCATED when the instrument reported more than
  *         #RBRGEN3_POSTPROCESSING_CHANNEL_MAX channels; the first
  *         #RBRGEN3_POSTPROCESSING_CHANNEL_MAX are populated
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -637,6 +645,7 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
  * \param [in] command the post-processing command
  * \param [out] status the post-processing status after executing the command
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback

@@ -191,6 +191,7 @@ RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Samp
  * \param [in] conn the instrument connection
  * \param [in] command the command to send as a printf-style format string
  * \return #RBRGEN3_SUCCESS when the command was successfully sent and a response was read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a line too long for the response buffer was met and the
  *         correct response never arrived
@@ -235,6 +236,7 @@ RBRGen3Error RBRGen3_converseBuffer(RBRGen3 *conn);
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
  * \return #RBRGEN3_SUCCESS when the command was successfully sent and a response was read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -260,6 +262,7 @@ RBRGen3Error RBRGen3_getBool(RBRGen3 *conn, const char *command, const char *par
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
  * \return #RBRGEN3_SUCCESS when the command was successfully sent and a response was read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
@@ -285,6 +288,7 @@ RBRGen3Error RBRGen3_getFloat(RBRGen3 *conn, const char *command, const char *pa
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
  * \return #RBRGEN3_SUCCESS when the command was successfully sent and a response was read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
