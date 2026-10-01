@@ -38,20 +38,6 @@ extern "C" {
 #define RBRGEN3_COMMAND_TERMINATOR_LEN      2
 
 /**
- * \brief The length of the timestamp of a streamed sample.
- *
- * “YYYY-mm-dd HH:MM:SS.sss” format.
- */
-#define RBRGEN3_SAMPLE_TIME_LEN 23
-
-/**
- * \brief The length of the timestamp of schedule settings.
- *
- * “YYYYmmddHHMMSS” format.
- */
-#define RBRGEN3_SCHEDULE_TIME_LEN 14
-
-/**
  * \brief Simple error-checked return around a function call.
  *
  * Evaluates the function call passed as \a op. If it returns a value other
@@ -394,28 +380,17 @@ RBRGen3Error RBRGen3DateTime_parseScheduleTime(const char *s, RBRGen3DateTime *t
                                                char **end);
 
 /**
- * \brief Convert a timestamp to a sample time/date string (i.e.,
- * “YYYY-mm-dd HH:MM:SS.sss” format).
+ * \brief Append a timestamp as “YYYYmmddHHMMSS”, the form the clock,
+ *        deployment, calibration and postprocessing commands take, to the
+ *        command in RBRGen3Environment.command.
  *
- * Exactly #RBRGEN3_SAMPLE_TIME_LEN + 1 characters will be written into
- * the buffer for the timestamp plus null terminator.
- *
+ * \param [in] conn the instrument connection
  * \param [in] timestamp the timestamp
- * \param [out] s the destination buffer
+ * \return #RBRGEN3_SUCCESS when the timestamp is appended
+ * \return #RBRGEN3_COMMAND_TOO_LONG when it does not fit
+ * \see RBRGen3_appendCommand()
  */
-void RBRGen3DateTime_toSampleTime(RBRGen3DateTime timestamp, char *s);
-
-/**
- * \brief Convert a timestamp to a schedule setting time/date string (i.e.,
- * “YYYYmmddHHMMSS” format).
- *
- * Exactly #RBRGEN3_SCHEDULE_TIME_LEN + 1 characters will be written into
- * the buffer for the timestamp plus null terminator.
- *
- * \param [in] timestamp the timestamp
- * \param [out] s the destination buffer
- */
-void RBRGen3DateTime_toScheduleTime(RBRGen3DateTime timestamp, char *s);
+RBRGen3Error RBRGen3_appendDateTime(RBRGen3 *conn, RBRGen3DateTime timestamp);
 
 #ifdef __cplusplus
 }

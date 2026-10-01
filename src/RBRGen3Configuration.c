@@ -300,6 +300,28 @@ RBRGen3Error RBRGen3_setChannelGain(RBRGen3 *conn, RBRGen3ChannelIndex channel,
     }
 }
 
+/**
+ * \brief Send one `calibration <channel> datetime = <datetime>, <group><index>
+ *        = <value>` command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [in] channel the channel index
+ * \param [in] dateTime the calibration date/time
+ * \param [in] group the coefficient group letter
+ * \param [in] index the coefficient index within the group
+ * \param [in] value the coefficient value
+ */
+static RBRGen3Error RBRGen3_sendCalibrationCoefficient(RBRGen3 *conn, RBRGen3ChannelIndex channel,
+                                                       RBRGen3DateTime dateTime, char group,
+                                                       int32_t index, float value)
+{
+    RBRGen3_beginCommand(conn);
+    RBR_TRY(RBRGen3_appendCommand(conn, "calibration %d datetime = ", channel));
+    RBR_TRY(RBRGen3_appendDateTime(conn, dateTime));
+    RBR_TRY(RBRGen3_appendCommand(conn, ", %c%d = %g", group, index, (double) value));
+    return RBRGen3_converseBuffer(conn);
+}
+
 RBRGen3Error RBRGen3_setCalibration(RBRGen3 *conn, RBRGen3ChannelIndex channel,
                                     const RBRGen3Calibration *calibration)
 {
@@ -317,28 +339,13 @@ RBRGen3Error RBRGen3_setCalibration(RBRGen3 *conn, RBRGen3ChannelIndex channel,
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    char calibrationDateTime[RBRGEN3_SCHEDULE_TIME_LEN + 1];
-    RBRGen3DateTime_toScheduleTime(calibration->dateTime, calibrationDateTime);
-
-    const char *calibrationCommand = "calibration %d datetime = %s, %c%d = %g";
-
     for (int32_t c = 0; c < calibration->cCount; ++c) {
-        RBR_TRY(RBRGen3_converse(conn,
-                                 calibrationCommand,
-                                 channel,
-                                 calibrationDateTime,
-                                 'c',
-                                 c,
-                                 (double) calibration->c[c]));
+        RBR_TRY(RBRGen3_sendCalibrationCoefficient(
+            conn, channel, calibration->dateTime, 'c', c, calibration->c[c]));
     }
     for (int32_t x = 0; x < calibration->xCount; ++x) {
-        RBR_TRY(RBRGen3_converse(conn,
-                                 calibrationCommand,
-                                 channel,
-                                 calibrationDateTime,
-                                 'x',
-                                 x,
-                                 (double) calibration->x[x]));
+        RBR_TRY(RBRGen3_sendCalibrationCoefficient(
+            conn, channel, calibration->dateTime, 'x', x, calibration->x[x]));
     }
 
     return RBRGEN3_SUCCESS;

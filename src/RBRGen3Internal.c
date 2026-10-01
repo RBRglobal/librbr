@@ -104,8 +104,6 @@ static const RBRGen3HardwareError WARNING_NUMBERS[] = {
 #define SAMPLE_ERROR_PREFIX     "Error-"
 #define SAMPLE_ERROR_PREFIX_LEN ((long) (sizeof(SAMPLE_ERROR_PREFIX) - 1))
 
-static const char *RBRGen3DateTime_sampleFormat = "%04d-%02d-%02d %02d:%02d:%02d.%03d";
-
 static const char *RBRGen3DateTime_sampleScanFormat = "%04d-%02d-%02d %02d:%02d:%02d.%" SCNi64 "%n";
 
 static const char *RBRGen3DateTime_scheduleFormat = "%04d%02d%02d%02d%02d%02d";
@@ -1183,32 +1181,16 @@ RBRGen3Error RBRGen3DateTime_parseScheduleTime(const char *s, RBRGen3DateTime *t
     return RBRGEN3_SUCCESS;
 }
 
-static void RBRGen3DateTime_toFormat(RBRGen3DateTime timestamp, char *s, size_t size,
-                                     const char *format)
+RBRGen3Error RBRGen3_appendDateTime(RBRGen3 *conn, RBRGen3DateTime timestamp)
 {
     time_t t = timestamp / 1000;
     struct tm *split = gmtime(&t);
-    int milliseconds = (int) (timestamp % 1000);
-    snprintf(s,
-             size,
-             format,
-             split->tm_year + 1900,
-             split->tm_mon + 1,
-             split->tm_mday,
-             split->tm_hour,
-             split->tm_min,
-             split->tm_sec,
-             milliseconds);
-}
-
-void RBRGen3DateTime_toSampleTime(RBRGen3DateTime timestamp, char *s)
-{
-    RBRGen3DateTime_toFormat(
-        timestamp, s, RBRGEN3_SAMPLE_TIME_LEN + 1, RBRGen3DateTime_sampleFormat);
-}
-
-void RBRGen3DateTime_toScheduleTime(RBRGen3DateTime timestamp, char *s)
-{
-    RBRGen3DateTime_toFormat(
-        timestamp, s, RBRGEN3_SCHEDULE_TIME_LEN + 1, RBRGen3DateTime_scheduleFormat);
+    return RBRGen3_appendCommand(conn,
+                                 RBRGen3DateTime_scheduleFormat,
+                                 split->tm_year + 1900,
+                                 split->tm_mon + 1,
+                                 split->tm_mday,
+                                 split->tm_hour,
+                                 split->tm_min,
+                                 split->tm_sec);
 }
