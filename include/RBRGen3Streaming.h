@@ -21,12 +21,6 @@ extern "C" {
 #include "RBRGen3.h"
 
 /**
- * \brief The maximum number of characters in an output format name (e.g.,
- * “caltext01”).
- */
-#define RBRGEN3_OUTPUT_FORMAT_NAME_MAX 15
-
-/**
  * \brief The name and unit of one active channel.
  *
  * \see RBRGen3ChannelsList
