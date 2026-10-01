@@ -842,8 +842,8 @@ RBRGen3Error RBRGen3_getSensorParameter(RBRGen3 *conn, RBRGen3ChannelIndex chann
  * \param [in] conn the instrument connection
  * \param [in] channel the index of the channel for which sensor parameters are to be retrieved
  * \param [out] parameters the sensor parameters for the channel
- * \param [in,out] size initially, the maximum number of elements which can be written to \a
- *                 parameters; after return, the number of parameters actually written
+ * \param [in,out] size initially, the maximum number of elements which can be written to
+ *                 \a parameters; after return, the number of parameters actually written
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs

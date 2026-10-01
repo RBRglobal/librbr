@@ -25,6 +25,8 @@ extern "C" {
 /**
  * \brief Requests an “on-demand” sample set from the logger.
  *
+ * \command{fetch}
+ *
  * Unlike streaming data/RBRGen3_readSample(), fetched data is returned
  * directly to the caller (independent of any RBRGen3SampleCallback
  * defined in RBRGen3Environment.sample).
