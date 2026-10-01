@@ -243,14 +243,44 @@ TEST_LOGGER3(openRejectsInvalidBuffers)
         uint8_t *response;
         int32_t responseCapacity;
     } tests[] = {
-        {NULL, sizeof(commandBuffer), responseBuffer, sizeof(responseBuffer)},
-        {commandBuffer, 0, responseBuffer, sizeof(responseBuffer)},
-        {commandBuffer, sizeof(commandBuffer), NULL, sizeof(responseBuffer)},
-        {commandBuffer, sizeof(commandBuffer), responseBuffer, 0},
-        {commandBuffer, sizeof(commandBuffer), responseBuffer, -1},
+        {
+            .command = NULL,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = responseBuffer,
+            .responseCapacity = sizeof(responseBuffer),
+        },
+        {
+            .command = commandBuffer,
+            .commandCapacity = 0,
+            .response = responseBuffer,
+            .responseCapacity = sizeof(responseBuffer),
+        },
+        {
+            .command = commandBuffer,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = NULL,
+            .responseCapacity = sizeof(responseBuffer),
+        },
+        {
+            .command = commandBuffer,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = responseBuffer,
+            .responseCapacity = 0,
+        },
+        {
+            .command = commandBuffer,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = responseBuffer,
+            .responseCapacity = -1,
+        },
         /* Room for a line terminator and nothing else can never hold a
          * response. */
-        {commandBuffer, sizeof(commandBuffer), responseBuffer, 2},
+        {
+            .command = commandBuffer,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = responseBuffer,
+            .responseCapacity = 2,
+        },
     };
 
     RBRGen3 unopened;

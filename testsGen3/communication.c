@@ -36,9 +36,18 @@ static bool test_link(RBRGen3 *conn, TestIOBuffers *buffers, LinkTest *tests)
 TEST_LOGGER2(link)
 {
     LinkTest tests[] = {
-        {"link = usb" RESPONSE_TERMINATOR, RBRGEN3_LINK_USB},
-        {"link = serial" RESPONSE_TERMINATOR, RBRGEN3_LINK_SERIAL},
-        {"link = wifi" RESPONSE_TERMINATOR, RBRGEN3_LINK_WIFI},
+        {
+            .response = "link = usb" RESPONSE_TERMINATOR,
+            .expected = RBRGEN3_LINK_USB,
+        },
+        {
+            .response = "link = serial" RESPONSE_TERMINATOR,
+            .expected = RBRGEN3_LINK_SERIAL,
+        },
+        {
+            .response = "link = wifi" RESPONSE_TERMINATOR,
+            .expected = RBRGEN3_LINK_WIFI,
+        },
         {0},
     };
 
@@ -48,9 +57,18 @@ TEST_LOGGER2(link)
 TEST_LOGGER3(link)
 {
     LinkTest tests[] = {
-        {"link type = usb" RESPONSE_TERMINATOR, RBRGEN3_LINK_USB},
-        {"link type = serial" RESPONSE_TERMINATOR, RBRGEN3_LINK_SERIAL},
-        {"link type = wifi" RESPONSE_TERMINATOR, RBRGEN3_LINK_WIFI},
+        {
+            .response = "link type = usb" RESPONSE_TERMINATOR,
+            .expected = RBRGEN3_LINK_USB,
+        },
+        {
+            .response = "link type = serial" RESPONSE_TERMINATOR,
+            .expected = RBRGEN3_LINK_SERIAL,
+        },
+        {
+            .response = "link type = wifi" RESPONSE_TERMINATOR,
+            .expected = RBRGEN3_LINK_WIFI,
+        },
         {0},
     };
 
@@ -66,28 +84,30 @@ TEST_LOGGER2(serial)
 {
     SerialTest tests[] = {
         {
-            "serial baudrate = 19200, mode = rs232" RESPONSE_TERMINATOR,
-            {
-                RBRGEN3_SERIAL_BAUD_19200,
-                RBRGEN3_SERIAL_MODE_RS232,
-                RBRGEN3_SERIAL_BAUD_1200 | RBRGEN3_SERIAL_BAUD_2400 | RBRGEN3_SERIAL_BAUD_4800 |
-                    RBRGEN3_SERIAL_BAUD_9600 | RBRGEN3_SERIAL_BAUD_19200 |
-                    RBRGEN3_SERIAL_BAUD_115200,
-                RBRGEN3_SERIAL_MODE_RS232 | RBRGEN3_SERIAL_MODE_RS485F | RBRGEN3_SERIAL_MODE_UART |
-                    RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
-            },
+            .response = "serial baudrate = 19200, mode = rs232" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .baudRate = RBRGEN3_SERIAL_BAUD_19200,
+                    .mode = RBRGEN3_SERIAL_MODE_RS232,
+                    .availableBaudRates = RBRGEN3_SERIAL_BAUD_1200 | RBRGEN3_SERIAL_BAUD_2400 |
+                                          RBRGEN3_SERIAL_BAUD_4800 | RBRGEN3_SERIAL_BAUD_9600 |
+                                          RBRGEN3_SERIAL_BAUD_19200 | RBRGEN3_SERIAL_BAUD_115200,
+                    .availableModes = RBRGEN3_SERIAL_MODE_RS232 | RBRGEN3_SERIAL_MODE_RS485F |
+                                      RBRGEN3_SERIAL_MODE_UART | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
+                },
         },
         {
-            "serial baudrate = 115200, mode = rs485f" RESPONSE_TERMINATOR,
-            {
-                RBRGEN3_SERIAL_BAUD_115200,
-                RBRGEN3_SERIAL_MODE_RS485F,
-                RBRGEN3_SERIAL_BAUD_1200 | RBRGEN3_SERIAL_BAUD_2400 | RBRGEN3_SERIAL_BAUD_4800 |
-                    RBRGEN3_SERIAL_BAUD_9600 | RBRGEN3_SERIAL_BAUD_19200 |
-                    RBRGEN3_SERIAL_BAUD_115200,
-                RBRGEN3_SERIAL_MODE_RS232 | RBRGEN3_SERIAL_MODE_RS485F | RBRGEN3_SERIAL_MODE_UART |
-                    RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
-            },
+            .response = "serial baudrate = 115200, mode = rs485f" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .baudRate = RBRGEN3_SERIAL_BAUD_115200,
+                    .mode = RBRGEN3_SERIAL_MODE_RS485F,
+                    .availableBaudRates = RBRGEN3_SERIAL_BAUD_1200 | RBRGEN3_SERIAL_BAUD_2400 |
+                                          RBRGEN3_SERIAL_BAUD_4800 | RBRGEN3_SERIAL_BAUD_9600 |
+                                          RBRGEN3_SERIAL_BAUD_19200 | RBRGEN3_SERIAL_BAUD_115200,
+                    .availableModes = RBRGEN3_SERIAL_MODE_RS232 | RBRGEN3_SERIAL_MODE_RS485F |
+                                      RBRGEN3_SERIAL_MODE_UART | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
+                },
         },
         {0},
     };
@@ -112,34 +132,36 @@ TEST_LOGGER3(serial)
 {
     SerialTest tests[] = {
         {
-            "serial baudrate = 19200, mode = rs232, availablebaudrates = "
-            "115200|19200|9600|4800|2400|1200|230400|460800, availablemodes = "
-            "rs232|rs485f|uart|uart_idlelow" RESPONSE_TERMINATOR,
-            {
-                RBRGEN3_SERIAL_BAUD_19200,
-                RBRGEN3_SERIAL_MODE_RS232,
-                RBRGEN3_SERIAL_BAUD_1200 | RBRGEN3_SERIAL_BAUD_2400 | RBRGEN3_SERIAL_BAUD_4800 |
-                    RBRGEN3_SERIAL_BAUD_9600 | RBRGEN3_SERIAL_BAUD_19200 |
-                    RBRGEN3_SERIAL_BAUD_115200 | RBRGEN3_SERIAL_BAUD_230400 |
-                    RBRGEN3_SERIAL_BAUD_460800,
-                RBRGEN3_SERIAL_MODE_RS232 | RBRGEN3_SERIAL_MODE_RS485F | RBRGEN3_SERIAL_MODE_UART |
-                    RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
-            },
+            .response = "serial baudrate = 19200, mode = rs232, availablebaudrates = "
+                        "115200|19200|9600|4800|2400|1200|230400|460800, availablemodes = "
+                        "rs232|rs485f|uart|uart_idlelow" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .baudRate = RBRGEN3_SERIAL_BAUD_19200,
+                    .mode = RBRGEN3_SERIAL_MODE_RS232,
+                    .availableBaudRates = RBRGEN3_SERIAL_BAUD_1200 | RBRGEN3_SERIAL_BAUD_2400 |
+                                          RBRGEN3_SERIAL_BAUD_4800 | RBRGEN3_SERIAL_BAUD_9600 |
+                                          RBRGEN3_SERIAL_BAUD_19200 | RBRGEN3_SERIAL_BAUD_115200 |
+                                          RBRGEN3_SERIAL_BAUD_230400 | RBRGEN3_SERIAL_BAUD_460800,
+                    .availableModes = RBRGEN3_SERIAL_MODE_RS232 | RBRGEN3_SERIAL_MODE_RS485F |
+                                      RBRGEN3_SERIAL_MODE_UART | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
+                },
         },
         {
-            "serial baudrate = 115200, mode = rs485f, availablebaudrates = "
-            "115200|19200|9600|4800|2400|1200|230400|460800, availablemodes = "
-            "rs232|rs485f|uart|uart_idlelow" RESPONSE_TERMINATOR,
-            {
-                RBRGEN3_SERIAL_BAUD_115200,
-                RBRGEN3_SERIAL_MODE_RS485F,
-                RBRGEN3_SERIAL_BAUD_1200 | RBRGEN3_SERIAL_BAUD_2400 | RBRGEN3_SERIAL_BAUD_4800 |
-                    RBRGEN3_SERIAL_BAUD_9600 | RBRGEN3_SERIAL_BAUD_19200 |
-                    RBRGEN3_SERIAL_BAUD_115200 | RBRGEN3_SERIAL_BAUD_230400 |
-                    RBRGEN3_SERIAL_BAUD_460800,
-                RBRGEN3_SERIAL_MODE_RS232 | RBRGEN3_SERIAL_MODE_RS485F | RBRGEN3_SERIAL_MODE_UART |
-                    RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
-            },
+            .response = "serial baudrate = 115200, mode = rs485f, availablebaudrates = "
+                        "115200|19200|9600|4800|2400|1200|230400|460800, availablemodes = "
+                        "rs232|rs485f|uart|uart_idlelow" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .baudRate = RBRGEN3_SERIAL_BAUD_115200,
+                    .mode = RBRGEN3_SERIAL_MODE_RS485F,
+                    .availableBaudRates = RBRGEN3_SERIAL_BAUD_1200 | RBRGEN3_SERIAL_BAUD_2400 |
+                                          RBRGEN3_SERIAL_BAUD_4800 | RBRGEN3_SERIAL_BAUD_9600 |
+                                          RBRGEN3_SERIAL_BAUD_19200 | RBRGEN3_SERIAL_BAUD_115200 |
+                                          RBRGEN3_SERIAL_BAUD_230400 | RBRGEN3_SERIAL_BAUD_460800,
+                    .availableModes = RBRGEN3_SERIAL_MODE_RS232 | RBRGEN3_SERIAL_MODE_RS485F |
+                                      RBRGEN3_SERIAL_MODE_UART | RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
+                },
         },
         {0},
     };
@@ -200,15 +222,16 @@ TEST_LOGGER2(wifi)
 {
     WiFiTest tests[] = {
         {
-            "wifi timeout = 60, commandtimeout = 90" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                false,
-                RBRGEN3_UNKNOWN_WIFI,
-                60000,
-                90000,
-                RBRGEN3_SERIAL_BAUD_NONE,
-            },
+            .response = "wifi timeout = 60, commandtimeout = 90" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expected =
+                {
+                    .enabled = false,
+                    .state = RBRGEN3_UNKNOWN_WIFI,
+                    .powerTimeout = 60000,
+                    .commandTimeout = 90000,
+                    .baudRate = RBRGEN3_SERIAL_BAUD_NONE,
+                },
         },
         {0},
     };
@@ -220,39 +243,42 @@ TEST_LOGGER3(wifi)
 {
     WiFiTest tests[] = {
         {
-            "wifi enabled = false, state = n/a, timeout = 60, "
-            "commandtimeout = 60, baudrate = 921600" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                false,
-                RBRGEN3_WIFI_NA,
-                60000,
-                60000,
-                RBRGEN3_SERIAL_BAUD_921600,
-            },
+            .response = "wifi enabled = false, state = n/a, timeout = 60, "
+                        "commandtimeout = 60, baudrate = 921600" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expected =
+                {
+                    .enabled = false,
+                    .state = RBRGEN3_WIFI_NA,
+                    .powerTimeout = 60000,
+                    .commandTimeout = 60000,
+                    .baudRate = RBRGEN3_SERIAL_BAUD_921600,
+                },
         },
         {
-            "wifi enabled = true, state = off, timeout = 90, "
-            "commandtimeout = 30, baudrate = 921600" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                true,
-                RBRGEN3_WIFI_OFF,
-                90000,
-                30000,
-                RBRGEN3_SERIAL_BAUD_921600,
-            },
+            .response = "wifi enabled = true, state = off, timeout = 90, "
+                        "commandtimeout = 30, baudrate = 921600" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expected =
+                {
+                    .enabled = true,
+                    .state = RBRGEN3_WIFI_OFF,
+                    .powerTimeout = 90000,
+                    .commandTimeout = 30000,
+                    .baudRate = RBRGEN3_SERIAL_BAUD_921600,
+                },
         },
         {
-            "E0109 feature not available" RESPONSE_TERMINATOR,
-            RBRGEN3_HARDWARE_ERROR,
-            {
-                false,
-                RBRGEN3_UNKNOWN_WIFI,
-                0,
-                0,
-                RBRGEN3_SERIAL_BAUD_NONE,
-            },
+            .response = "E0109 feature not available" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_HARDWARE_ERROR,
+            .expected =
+                {
+                    .enabled = false,
+                    .state = RBRGEN3_UNKNOWN_WIFI,
+                    .powerTimeout = 0,
+                    .commandTimeout = 0,
+                    .baudRate = RBRGEN3_SERIAL_BAUD_NONE,
+                },
         },
         {0},
     };

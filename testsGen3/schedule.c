@@ -45,49 +45,54 @@ TEST_LOGGER2(now)
 {
     ClockTest tests[] = {
         {
-            "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
-            "settings offsetfromutc = unknown" RESPONSE_TERMINATOR
-            "now = 20180920214914" RESPONSE_TERMINATOR,
-            {
-                .dateTime = 1537480154000LL,
-                .offsetFromUtc = NAN,
-            },
+            .command = "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
+            .response = "settings offsetfromutc = unknown" RESPONSE_TERMINATOR
+                        "now = 20180920214914" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .dateTime = 1537480154000LL,
+                    .offsetFromUtc = NAN,
+                },
         },
         {
-            "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
-            "settings offsetfromutc = unknown" RESPONSE_TERMINATOR
-            "now = 20000101000000" RESPONSE_TERMINATOR,
-            {
-                .dateTime = RBRGEN3_DATETIME_MIN,
-                .offsetFromUtc = NAN,
-            },
+            .command = "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
+            .response = "settings offsetfromutc = unknown" RESPONSE_TERMINATOR
+                        "now = 20000101000000" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .dateTime = RBRGEN3_DATETIME_MIN,
+                    .offsetFromUtc = NAN,
+                },
         },
         {
-            "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
-            "settings offsetfromutc = unknown" RESPONSE_TERMINATOR
-            "now = 20991231235959" RESPONSE_TERMINATOR,
-            {
-                .dateTime = RBRGEN3_DATETIME_MAX,
-                .offsetFromUtc = NAN,
-            },
+            .command = "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
+            .response = "settings offsetfromutc = unknown" RESPONSE_TERMINATOR
+                        "now = 20991231235959" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .dateTime = RBRGEN3_DATETIME_MAX,
+                    .offsetFromUtc = NAN,
+                },
         },
         {
-            "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
-            "settings offsetfromutc = +7.50" RESPONSE_TERMINATOR
-            "now = 20180920214914" RESPONSE_TERMINATOR,
-            {
-                .dateTime = 1537480154000LL,
-                .offsetFromUtc = 7.5,
-            },
+            .command = "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
+            .response = "settings offsetfromutc = +7.50" RESPONSE_TERMINATOR
+                        "now = 20180920214914" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .dateTime = 1537480154000LL,
+                    .offsetFromUtc = 7.5,
+                },
         },
         {
-            "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
-            "settings offsetfromutc = -4.00" RESPONSE_TERMINATOR
-            "now = 20180920214914" RESPONSE_TERMINATOR,
-            {
-                .dateTime = 1537480154000LL,
-                .offsetFromUtc = -4,
-            },
+            .command = "settings offsetfromutc" COMMAND_TERMINATOR "now" COMMAND_TERMINATOR,
+            .response = "settings offsetfromutc = -4.00" RESPONSE_TERMINATOR
+                        "now = 20180920214914" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .dateTime = 1537480154000LL,
+                    .offsetFromUtc = -4,
+                },
         },
         {0},
     };
@@ -122,49 +127,54 @@ TEST_LOGGER3(clock)
 {
     ClockTest tests[] = {
         {
-            "clock" COMMAND_TERMINATOR,
-            "clock datetime = 20180920214914, "
-            "offsetfromutc = unknown" RESPONSE_TERMINATOR,
-            {
-                .dateTime = 1537480154000LL,
-                .offsetFromUtc = NAN,
-            },
+            .command = "clock" COMMAND_TERMINATOR,
+            .response = "clock datetime = 20180920214914, "
+                        "offsetfromutc = unknown" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .dateTime = 1537480154000LL,
+                    .offsetFromUtc = NAN,
+                },
         },
         {
-            "clock" COMMAND_TERMINATOR,
-            "clock datetime = 20000101000000, "
-            "offsetfromutc = unknown" RESPONSE_TERMINATOR,
-            {
-                .dateTime = RBRGEN3_DATETIME_MIN,
-                .offsetFromUtc = NAN,
-            },
+            .command = "clock" COMMAND_TERMINATOR,
+            .response = "clock datetime = 20000101000000, "
+                        "offsetfromutc = unknown" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .dateTime = RBRGEN3_DATETIME_MIN,
+                    .offsetFromUtc = NAN,
+                },
         },
         {
-            "clock" COMMAND_TERMINATOR,
-            "clock datetime = 20991231235959, "
-            "offsetfromutc = unknown" RESPONSE_TERMINATOR,
-            {
-                .dateTime = RBRGEN3_DATETIME_MAX,
-                .offsetFromUtc = NAN,
-            },
+            .command = "clock" COMMAND_TERMINATOR,
+            .response = "clock datetime = 20991231235959, "
+                        "offsetfromutc = unknown" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .dateTime = RBRGEN3_DATETIME_MAX,
+                    .offsetFromUtc = NAN,
+                },
         },
         {
-            "clock" COMMAND_TERMINATOR,
-            "clock datetime = 20180920214914, "
-            "offsetfromutc = +7.50" RESPONSE_TERMINATOR,
-            {
-                .dateTime = 1537480154000LL,
-                .offsetFromUtc = 7.5,
-            },
+            .command = "clock" COMMAND_TERMINATOR,
+            .response = "clock datetime = 20180920214914, "
+                        "offsetfromutc = +7.50" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .dateTime = 1537480154000LL,
+                    .offsetFromUtc = 7.5,
+                },
         },
         {
-            "clock" COMMAND_TERMINATOR,
-            "clock datetime = 20180920214914, "
-            "offsetfromutc = -4.00" RESPONSE_TERMINATOR,
-            {
-                .dateTime = 1537480154000LL,
-                .offsetFromUtc = -4,
-            },
+            .command = "clock" COMMAND_TERMINATOR,
+            .response = "clock datetime = 20180920214914, "
+                        "offsetfromutc = -4.00" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .dateTime = 1537480154000LL,
+                    .offsetFromUtc = -4,
+                },
         },
         {0},
     };
@@ -234,34 +244,36 @@ TEST_LOGGER2(sampling)
 {
     SamplingTest tests[] = {
         {
-            "sampling" COMMAND_TERMINATOR,
-            "sampling schedule = 1, mode = continuous, period = 167, "
-            "burstlength = 10, burstinterval = 10000, gate = none, "
-            "userperiodlimit = 167" RESPONSE_TERMINATOR,
-            {
-                .mode = RBRGEN3_SAMPLING_CONTINUOUS,
-                .period = 167,
-                .availableFastPeriods = {167, 250, 500, 0},
-                .userPeriodLimit = 167,
-                .burstLength = 10,
-                .burstInterval = 10000,
-                .gate = RBRGEN3_GATE_NONE,
-            },
+            .command = "sampling" COMMAND_TERMINATOR,
+            .response = "sampling schedule = 1, mode = continuous, period = 167, "
+                        "burstlength = 10, burstinterval = 10000, gate = none, "
+                        "userperiodlimit = 167" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .mode = RBRGEN3_SAMPLING_CONTINUOUS,
+                    .period = 167,
+                    .availableFastPeriods = {167, 250, 500, 0},
+                    .userPeriodLimit = 167,
+                    .burstLength = 10,
+                    .burstInterval = 10000,
+                    .gate = RBRGEN3_GATE_NONE,
+                },
         },
         {
-            "sampling" COMMAND_TERMINATOR,
-            "sampling schedule = 1, mode = ddsampling, period = 83, "
-            "burstlength = 10, burstinterval = 10000, gate = thresholding, "
-            "userperiodlimit = 83" RESPONSE_TERMINATOR,
-            {
-                .mode = RBRGEN3_SAMPLING_DDSAMPLING,
-                .period = 83,
-                .availableFastPeriods = {83, 125, 167, 250, 500, 0},
-                .userPeriodLimit = 83,
-                .burstLength = 10,
-                .burstInterval = 10000,
-                .gate = RBRGEN3_GATE_THRESHOLDING,
-            },
+            .command = "sampling" COMMAND_TERMINATOR,
+            .response = "sampling schedule = 1, mode = ddsampling, period = 83, "
+                        "burstlength = 10, burstinterval = 10000, gate = thresholding, "
+                        "userperiodlimit = 83" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .mode = RBRGEN3_SAMPLING_DDSAMPLING,
+                    .period = 83,
+                    .availableFastPeriods = {83, 125, 167, 250, 500, 0},
+                    .userPeriodLimit = 83,
+                    .burstLength = 10,
+                    .burstInterval = 10000,
+                    .gate = RBRGEN3_GATE_THRESHOLDING,
+                },
         },
         {0},
     };
@@ -273,34 +285,36 @@ TEST_LOGGER3(sampling)
 {
     SamplingTest tests[] = {
         {
-            "sampling all" COMMAND_TERMINATOR,
-            "sampling mode = continuous, period = 1000, burstlength = 240, "
-            "burstinterval = 300000, gate = none, userperiodlimit = 32, "
-            "availablefastperiods = 500|250|125|63|32" RESPONSE_TERMINATOR,
-            {
-                .mode = RBRGEN3_SAMPLING_CONTINUOUS,
-                .period = 1000,
-                .availableFastPeriods = {500, 250, 125, 63, 32, 0},
-                .userPeriodLimit = 32,
-                .burstLength = 240,
-                .burstInterval = 300000,
-                .gate = RBRGEN3_GATE_NONE,
-            },
+            .command = "sampling all" COMMAND_TERMINATOR,
+            .response = "sampling mode = continuous, period = 1000, burstlength = 240, "
+                        "burstinterval = 300000, gate = none, userperiodlimit = 32, "
+                        "availablefastperiods = 500|250|125|63|32" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .mode = RBRGEN3_SAMPLING_CONTINUOUS,
+                    .period = 1000,
+                    .availableFastPeriods = {500, 250, 125, 63, 32, 0},
+                    .userPeriodLimit = 32,
+                    .burstLength = 240,
+                    .burstInterval = 300000,
+                    .gate = RBRGEN3_GATE_NONE,
+                },
         },
         {
-            "sampling all" COMMAND_TERMINATOR,
-            "sampling mode = continuous, period = 1000, burstlength = 10, "
-            "burstinterval = 10000, gate = thresholding, "
-            "userperiodlimit = 1000, availablefastperiods = none" RESPONSE_TERMINATOR,
-            {
-                .mode = RBRGEN3_SAMPLING_CONTINUOUS,
-                .period = 1000,
-                .availableFastPeriods = {0},
-                .userPeriodLimit = 1000,
-                .burstLength = 10,
-                .burstInterval = 10000,
-                .gate = RBRGEN3_GATE_THRESHOLDING,
-            },
+            .command = "sampling all" COMMAND_TERMINATOR,
+            .response = "sampling mode = continuous, period = 1000, burstlength = 10, "
+                        "burstinterval = 10000, gate = thresholding, "
+                        "userperiodlimit = 1000, availablefastperiods = none" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .mode = RBRGEN3_SAMPLING_CONTINUOUS,
+                    .period = 1000,
+                    .availableFastPeriods = {0},
+                    .userPeriodLimit = 1000,
+                    .burstLength = 10,
+                    .burstInterval = 10000,
+                    .gate = RBRGEN3_GATE_THRESHOLDING,
+                },
         },
         {0},
     };
@@ -320,75 +334,73 @@ TEST_LOGGER3(sampling_set)
 {
     SamplingSetTest tests[] = {
         {
-            {
-                .mode = RBRGEN3_SAMPLING_CONTINUOUS,
-                .period = 1000,
-                .availableFastPeriods = {500, 250, 125, 63, 32, 0},
-                .userPeriodLimit = 32,
-                .burstLength = 240,
-                .burstInterval = 300000,
-                .gate = RBRGEN3_GATE_NONE,
-            },
-            "sampling mode = continuous, period = 1000",
-            "sampling burstlength = 240, burstinterval = 300000",
-            RBRGEN3_SUCCESS,
-            RBRGEN3_SUCCESS,
+            .sampling =
+                {
+                    .mode = RBRGEN3_SAMPLING_CONTINUOUS,
+                    .period = 1000,
+                    .availableFastPeriods = {500, 250, 125, 63, 32, 0},
+                    .userPeriodLimit = 32,
+                    .burstLength = 240,
+                    .burstInterval = 300000,
+                    .gate = RBRGEN3_GATE_NONE,
+                },
+            .response = "sampling mode = continuous, period = 1000",
+            .burstResponse = "sampling burstlength = 240, burstinterval = 300000",
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedBurstError = RBRGEN3_SUCCESS,
         },
         {
-            {
-                .mode = RBRGEN3_SAMPLING_CONTINUOUS,
-                .period = 100,
-                .availableFastPeriods = {500, 250, 125, 63, 0},
-                .userPeriodLimit = 63,
-                .burstLength = 10,
-                .burstInterval = 10000,
-                .gate = RBRGEN3_GATE_THRESHOLDING,
-            },
-            "",
-            "",
+            .sampling =
+                {
+                    .mode = RBRGEN3_SAMPLING_CONTINUOUS,
+                    .period = 100,
+                    .availableFastPeriods = {500, 250, 125, 63, 0},
+                    .userPeriodLimit = 63,
+                    .burstLength = 10,
+                    .burstInterval = 10000,
+                    .gate = RBRGEN3_GATE_THRESHOLDING,
+                },
+            .response = "",
+            .burstResponse = "",
             /* Failure because the period isn't in availableFastPeriods. */
-            RBRGEN3_INVALID_PARAMETER_VALUE,
-            RBRGEN3_INVALID_PARAMETER_VALUE,
+            .expectedError = RBRGEN3_INVALID_PARAMETER_VALUE,
+            .expectedBurstError = RBRGEN3_INVALID_PARAMETER_VALUE,
         },
         {
-            {
-                .mode = RBRGEN3_SAMPLING_CONTINUOUS,
-                .period = 63,
-                .availableFastPeriods = {0},
-                .userPeriodLimit = 125,
-                .burstLength = 10,
-                .burstInterval = 10000,
-                .gate = RBRGEN3_GATE_THRESHOLDING,
-            },
-            "",
-            "",
+            .sampling =
+                {
+                    .mode = RBRGEN3_SAMPLING_CONTINUOUS,
+                    .period = 63,
+                    .availableFastPeriods = {0},
+                    .userPeriodLimit = 125,
+                    .burstLength = 10,
+                    .burstInterval = 10000,
+                    .gate = RBRGEN3_GATE_THRESHOLDING,
+                },
+            .response = "",
+            .burstResponse = "",
             /* Failure because the period is less than userPeriodLimit. */
-            RBRGEN3_INVALID_PARAMETER_VALUE,
-            RBRGEN3_INVALID_PARAMETER_VALUE,
+            .expectedError = RBRGEN3_INVALID_PARAMETER_VALUE,
+            .expectedBurstError = RBRGEN3_INVALID_PARAMETER_VALUE,
         },
         {
-            {
-                .mode = RBRGEN3_SAMPLING_CONTINUOUS,
-                .period = 1000,
-                .availableFastPeriods = {500, 250, 125, 63, 32, 0},
-                .userPeriodLimit = 32,
-                .burstLength = 240,
-                .burstInterval = 1000 * 240,
-                .gate = RBRGEN3_GATE_NONE,
-            },
-            "sampling mode = continuous, period = 1000",
-            "",
-            RBRGEN3_SUCCESS,
+            .sampling =
+                {
+                    .mode = RBRGEN3_SAMPLING_CONTINUOUS,
+                    .period = 1000,
+                    .availableFastPeriods = {500, 250, 125, 63, 32, 0},
+                    .userPeriodLimit = 32,
+                    .burstLength = 240,
+                    .burstInterval = 1000 * 240,
+                    .gate = RBRGEN3_GATE_NONE,
+                },
+            .response = "sampling mode = continuous, period = 1000",
+            .burstResponse = "",
+            .expectedError = RBRGEN3_SUCCESS,
             /* Failure because the burst interval is inconsistent. */
-            RBRGEN3_INVALID_PARAMETER_VALUE,
+            .expectedBurstError = RBRGEN3_INVALID_PARAMETER_VALUE,
         },
-        {
-            {0},
-            0,
-            0,
-            0,
-            0,
-        },
+        {.sampling = {0}},
     };
 
     RBRGen3Error err;
@@ -439,15 +451,17 @@ TEST_LOGGER2(deployment)
 {
     DeploymentTest tests[] = {
         {
-            "starttime" COMMAND_TERMINATOR "endtime" COMMAND_TERMINATOR "status" COMMAND_TERMINATOR,
-            "starttime = 20000101000000" RESPONSE_TERMINATOR
-            "endtime = 2099123123595959" RESPONSE_TERMINATOR
-            "status = disabled" RESPONSE_TERMINATOR,
-            {
-                .startTime = RBRGEN3_DATETIME_MIN,
-                .endTime = RBRGEN3_DATETIME_MAX,
-                .status = RBRGEN3_STATUS_DISABLED,
-            },
+            .command = "starttime" COMMAND_TERMINATOR "endtime" COMMAND_TERMINATOR
+                       "status" COMMAND_TERMINATOR,
+            .response = "starttime = 20000101000000" RESPONSE_TERMINATOR
+                        "endtime = 2099123123595959" RESPONSE_TERMINATOR
+                        "status = disabled" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .startTime = RBRGEN3_DATETIME_MIN,
+                    .endTime = RBRGEN3_DATETIME_MAX,
+                    .status = RBRGEN3_STATUS_DISABLED,
+                },
         },
         {0},
     };
@@ -459,14 +473,15 @@ TEST_LOGGER3(deployment)
 {
     DeploymentTest tests[] = {
         {
-            "deployment" COMMAND_TERMINATOR,
-            "deployment starttime = 20000101000000, "
-            "endtime = 2099123123595959, status = disabled" RESPONSE_TERMINATOR,
-            {
-                .startTime = RBRGEN3_DATETIME_MIN,
-                .endTime = RBRGEN3_DATETIME_MAX,
-                .status = RBRGEN3_STATUS_DISABLED,
-            },
+            .command = "deployment" COMMAND_TERMINATOR,
+            .response = "deployment starttime = 20000101000000, "
+                        "endtime = 2099123123595959, status = disabled" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .startTime = RBRGEN3_DATETIME_MIN,
+                    .endTime = RBRGEN3_DATETIME_MAX,
+                    .status = RBRGEN3_STATUS_DISABLED,
+                },
         },
         {0},
     };
@@ -484,60 +499,61 @@ TEST_LOGGER3(deployment_set)
 {
     DeploymentSetTest tests[] = {
         {
-            {
-                .startTime = RBRGEN3_DATETIME_MIN,
-                .endTime = RBRGEN3_DATETIME_MAX,
-                .status = RBRGEN3_STATUS_DISABLED,
-            },
-            "deployment starttime = 20000101000000, "
-            "endtime = 20991231235959",
-            RBRGEN3_SUCCESS,
+            .deployment =
+                {
+                    .startTime = RBRGEN3_DATETIME_MIN,
+                    .endTime = RBRGEN3_DATETIME_MAX,
+                    .status = RBRGEN3_STATUS_DISABLED,
+                },
+            .response = "deployment starttime = 20000101000000, "
+                        "endtime = 20991231235959",
+            .expectedError = RBRGEN3_SUCCESS,
         },
         {
-            {
-                .startTime = 1537556712000LL,
-                .endTime = 1537556699000LL,
-                .status = RBRGEN3_STATUS_DISABLED,
-            },
-            "",
+            .deployment =
+                {
+                    .startTime = 1537556712000LL,
+                    .endTime = 1537556699000LL,
+                    .status = RBRGEN3_STATUS_DISABLED,
+                },
+            .response = "",
             /* Failure because the end time is before the start time. */
-            RBRGEN3_INVALID_PARAMETER_VALUE,
+            .expectedError = RBRGEN3_INVALID_PARAMETER_VALUE,
         },
         {
-            {
-                .startTime = 1537556699000LL,
-                .endTime = 1537556699000LL,
-                .status = RBRGEN3_STATUS_DISABLED,
-            },
-            "",
+            .deployment =
+                {
+                    .startTime = 1537556699000LL,
+                    .endTime = 1537556699000LL,
+                    .status = RBRGEN3_STATUS_DISABLED,
+                },
+            .response = "",
             /* Failure because the end time equals the start time. */
-            RBRGEN3_INVALID_PARAMETER_VALUE,
+            .expectedError = RBRGEN3_INVALID_PARAMETER_VALUE,
         },
         {
-            {
-                .startTime = 915148800000LL,
-                .endTime = 1537556699000LL,
-                .status = RBRGEN3_STATUS_DISABLED,
-            },
-            "",
+            .deployment =
+                {
+                    .startTime = 915148800000LL,
+                    .endTime = 1537556699000LL,
+                    .status = RBRGEN3_STATUS_DISABLED,
+                },
+            .response = "",
             /* Failure because the start time is before the epoch. */
-            RBRGEN3_INVALID_PARAMETER_VALUE,
+            .expectedError = RBRGEN3_INVALID_PARAMETER_VALUE,
         },
         {
-            {
-                .startTime = 915148800000LL,
-                .endTime = 4102444800000LL,
-                .status = RBRGEN3_STATUS_DISABLED,
-            },
-            "",
+            .deployment =
+                {
+                    .startTime = 915148800000LL,
+                    .endTime = 4102444800000LL,
+                    .status = RBRGEN3_STATUS_DISABLED,
+                },
+            .response = "",
             /* Failure because the end time is after the limit. */
-            RBRGEN3_INVALID_PARAMETER_VALUE,
+            .expectedError = RBRGEN3_INVALID_PARAMETER_VALUE,
         },
-        {
-            {0},
-            0,
-            0,
-        },
+        {.deployment = {0}},
     };
 
     RBRGen3Error err;

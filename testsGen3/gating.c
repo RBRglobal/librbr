@@ -47,18 +47,19 @@ TEST_LOGGER2(thresholding)
 {
     ThresholdingTest tests[] = {
         {
-            "thresholding state = off, channel = 1, condition = above, "
-            "value = 0.0000, interval = 60000" RESPONSE_TERMINATOR,
-            {
-                .enabled = false,
-                .state = RBRGEN3_UNKNOWN_GATING,
-                .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
-                .channelIndex = 1,
-                .channelLabel = "",
-                .condition = RBRGEN3_THRESHOLDING_ABOVE,
-                .value = 0.0,
-                .interval = 60000,
-            },
+            .response = "thresholding state = off, channel = 1, condition = above, "
+                        "value = 0.0000, interval = 60000" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .enabled = false,
+                    .state = RBRGEN3_UNKNOWN_GATING,
+                    .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
+                    .channelIndex = 1,
+                    .channelLabel = "",
+                    .condition = RBRGEN3_THRESHOLDING_ABOVE,
+                    .value = 0.0,
+                    .interval = 60000,
+                },
         },
         {0},
     };
@@ -70,49 +71,52 @@ TEST_LOGGER3(thresholding)
 {
     ThresholdingTest tests[] = {
         {
-            "thresholding enabled = false, state = n/a, channelindex = 1, "
-            "channellabel = temperature_00, condition = above, value = 0.0000, "
-            "interval = 60000" RESPONSE_TERMINATOR,
-            {
-                .enabled = false,
-                .state = RBRGEN3_GATING_NA,
-                .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
-                .channelIndex = 1,
-                .channelLabel = "temperature_00",
-                .condition = RBRGEN3_THRESHOLDING_ABOVE,
-                .value = 0.0,
-                .interval = 60000,
-            },
+            .response = "thresholding enabled = false, state = n/a, channelindex = 1, "
+                        "channellabel = temperature_00, condition = above, value = 0.0000, "
+                        "interval = 60000" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .enabled = false,
+                    .state = RBRGEN3_GATING_NA,
+                    .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
+                    .channelIndex = 1,
+                    .channelLabel = "temperature_00",
+                    .condition = RBRGEN3_THRESHOLDING_ABOVE,
+                    .value = 0.0,
+                    .interval = 60000,
+                },
         },
         {
-            "thresholding enabled = true, state = paused, channelindex = 2, "
-            "channellabel = pressure_00, condition = below, value = 600.0000, "
-            "interval = 10000" RESPONSE_TERMINATOR,
-            {
-                .enabled = true,
-                .state = RBRGEN3_GATING_PAUSED,
-                .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
-                .channelIndex = 2,
-                .channelLabel = "pressure_00",
-                .condition = RBRGEN3_THRESHOLDING_BELOW,
-                .value = 600.0,
-                .interval = 10000,
-            },
+            .response = "thresholding enabled = true, state = paused, channelindex = 2, "
+                        "channellabel = pressure_00, condition = below, value = 600.0000, "
+                        "interval = 10000" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .enabled = true,
+                    .state = RBRGEN3_GATING_PAUSED,
+                    .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
+                    .channelIndex = 2,
+                    .channelLabel = "pressure_00",
+                    .condition = RBRGEN3_THRESHOLDING_BELOW,
+                    .value = 600.0,
+                    .interval = 10000,
+                },
         },
         {
-            "thresholding enabled = true, state = paused, channelindex = 2, "
-            "channellabel = thispressurelabelislongerthanthe31characterlimit, "
-            "condition = below, value = 600.0000, interval = 10000" RESPONSE_TERMINATOR,
-            {
-                .enabled = true,
-                .state = RBRGEN3_GATING_PAUSED,
-                .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
-                .channelIndex = 2,
-                .channelLabel = "thispressurelabelislongerthanth",
-                .condition = RBRGEN3_THRESHOLDING_BELOW,
-                .value = 600.0,
-                .interval = 10000,
-            },
+            .response = "thresholding enabled = true, state = paused, channelindex = 2, "
+                        "channellabel = thispressurelabelislongerthanthe31characterlimit, "
+                        "condition = below, value = 600.0000, interval = 10000" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .enabled = true,
+                    .state = RBRGEN3_GATING_PAUSED,
+                    .channelSelection = RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
+                    .channelIndex = 2,
+                    .channelLabel = "thispressurelabelislongerthanth",
+                    .condition = RBRGEN3_THRESHOLDING_BELOW,
+                    .value = 600.0,
+                    .interval = 10000,
+                },
         },
         {0},
     };
@@ -228,18 +232,20 @@ TEST_LOGGER2(twistactivation)
 {
     TwistActivationTest tests[] = {
         {
-            "twistactivation state = off, location = off" RESPONSE_TERMINATOR,
-            {
-                .enabled = false,
-                .state = RBRGEN3_UNKNOWN_GATING,
-            },
+            .response = "twistactivation state = off, location = off" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .enabled = false,
+                    .state = RBRGEN3_UNKNOWN_GATING,
+                },
         },
         {
-            "twistactivation state = on, location = who cares" RESPONSE_TERMINATOR,
-            {
-                .enabled = true,
-                .state = RBRGEN3_UNKNOWN_GATING,
-            },
+            .response = "twistactivation state = on, location = who cares" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .enabled = true,
+                    .state = RBRGEN3_UNKNOWN_GATING,
+                },
         },
         {0},
     };
@@ -251,25 +257,28 @@ TEST_LOGGER3(twistactivation)
 {
     TwistActivationTest tests[] = {
         {
-            "twistactivation enabled = false, state = n/a" RESPONSE_TERMINATOR,
-            {
-                .enabled = false,
-                .state = RBRGEN3_GATING_NA,
-            },
+            .response = "twistactivation enabled = false, state = n/a" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .enabled = false,
+                    .state = RBRGEN3_GATING_NA,
+                },
         },
         {
-            "twistactivation enabled = true, state = paused" RESPONSE_TERMINATOR,
-            {
-                .enabled = true,
-                .state = RBRGEN3_GATING_PAUSED,
-            },
+            .response = "twistactivation enabled = true, state = paused" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .enabled = true,
+                    .state = RBRGEN3_GATING_PAUSED,
+                },
         },
         {
-            "twistactivation enabled = true, state = running" RESPONSE_TERMINATOR,
-            {
-                .enabled = true,
-                .state = RBRGEN3_GATING_RUNNING,
-            },
+            .response = "twistactivation enabled = true, state = running" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .enabled = true,
+                    .state = RBRGEN3_GATING_RUNNING,
+                },
         },
         {0},
     };

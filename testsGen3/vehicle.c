@@ -22,21 +22,24 @@ TEST_LOGGER3(regimes)
 {
     RegimesTest tests[] = {
         {
-            "regimes direction = ascending, count = 1, reference = absolute" RESPONSE_TERMINATOR,
-            {
-                .direction = RBRGEN3_DIRECTION_ASCENDING,
-                .count = 1,
-                .reference = RBRGEN3_REFERENCE_ABSOLUTE,
-            },
+            .response = "regimes direction = ascending, count = 1, reference = "
+                        "absolute" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .direction = RBRGEN3_DIRECTION_ASCENDING,
+                    .count = 1,
+                    .reference = RBRGEN3_REFERENCE_ABSOLUTE,
+                },
         },
         {
-            "regimes direction = descending, count = 3, "
-            "reference = seapressure" RESPONSE_TERMINATOR,
-            {
-                .direction = RBRGEN3_DIRECTION_DESCENDING,
-                .count = 3,
-                .reference = RBRGEN3_REFERENCE_SEAPRESSURE,
-            },
+            .response = "regimes direction = descending, count = 3, "
+                        "reference = seapressure" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .direction = RBRGEN3_DIRECTION_DESCENDING,
+                    .count = 3,
+                    .reference = RBRGEN3_REFERENCE_SEAPRESSURE,
+                },
         },
         {0},
     };
@@ -60,21 +63,23 @@ TEST_LOGGER3(regimes_set)
 {
     RegimesTest tests[] = {
         {
-            "regimes direction = ascending, count = 1, reference = absolute",
-            {
-                .direction = RBRGEN3_DIRECTION_ASCENDING,
-                .count = 1,
-                .reference = RBRGEN3_REFERENCE_ABSOLUTE,
-            },
+            .response = "regimes direction = ascending, count = 1, reference = absolute",
+            .expected =
+                {
+                    .direction = RBRGEN3_DIRECTION_ASCENDING,
+                    .count = 1,
+                    .reference = RBRGEN3_REFERENCE_ABSOLUTE,
+                },
         },
         {
-            "regimes direction = descending, count = 3, "
-            "reference = seapressure",
-            {
-                .direction = RBRGEN3_DIRECTION_DESCENDING,
-                .count = 3,
-                .reference = RBRGEN3_REFERENCE_SEAPRESSURE,
-            },
+            .response = "regimes direction = descending, count = 3, "
+                        "reference = seapressure",
+            .expected =
+                {
+                    .direction = RBRGEN3_DIRECTION_DESCENDING,
+                    .count = 3,
+                    .reference = RBRGEN3_REFERENCE_SEAPRESSURE,
+                },
         },
         {0},
     };
@@ -103,22 +108,26 @@ TEST_LOGGER3(regime)
 {
     RegimeTest tests[] = {
         {
-            "regime 1 boundary = 50, binsize = 0.1, samplingperiod = 63" RESPONSE_TERMINATOR,
-            {
-                .index = 1,
-                .boundary = 50.0,
-                .binSize = 0.1,
-                .samplingPeriod = 63,
-            },
+            .response =
+                "regime 1 boundary = 50, binsize = 0.1, samplingperiod = 63" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .index = 1,
+                    .boundary = 50.0,
+                    .binSize = 0.1,
+                    .samplingPeriod = 63,
+                },
         },
         {
-            "regime 2 boundary = 100, binsize = 1.0, samplingperiod = 125" RESPONSE_TERMINATOR,
-            {
-                .index = 2,
-                .boundary = 100.0,
-                .binSize = 1.0,
-                .samplingPeriod = 125,
-            },
+            .response =
+                "regime 2 boundary = 100, binsize = 1.0, samplingperiod = 125" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .index = 2,
+                    .boundary = 100.0,
+                    .binSize = 1.0,
+                    .samplingPeriod = 125,
+                },
         },
         {0},
     };
@@ -144,22 +153,24 @@ TEST_LOGGER3(regime_set)
 {
     RegimeTest tests[] = {
         {
-            "regime 1 boundary = 50, binsize = 0.1, samplingperiod = 63",
-            {
-                .index = 1,
-                .boundary = 50.0,
-                .binSize = 0.1,
-                .samplingPeriod = 63,
-            },
+            .response = "regime 1 boundary = 50, binsize = 0.1, samplingperiod = 63",
+            .expected =
+                {
+                    .index = 1,
+                    .boundary = 50.0,
+                    .binSize = 0.1,
+                    .samplingPeriod = 63,
+                },
         },
         {
-            "regime 2 boundary = 100, binsize = 1.4, samplingperiod = 125",
-            {
-                .index = 2,
-                .boundary = 100.123,
-                .binSize = 1.38,
-                .samplingPeriod = 125,
-            },
+            .response = "regime 2 boundary = 100, binsize = 1.4, samplingperiod = 125",
+            .expected =
+                {
+                    .index = 2,
+                    .boundary = 100.123,
+                    .binSize = 1.38,
+                    .samplingPeriod = 125,
+                },
         },
         {0},
     };
@@ -187,15 +198,17 @@ TEST_LOGGER3(ddsampling)
 {
     DirectionDependentSamplingTest tests[] = {
         {
-            "ddsampling direction = ascending, fastperiod = 63, "
-            "slowperiod = 1000, fastthreshold = 3.0, slowthreshold = 3.0" RESPONSE_TERMINATOR,
-            {
-                .direction = RBRGEN3_DIRECTION_ASCENDING,
-                .fastPeriod = 63,
-                .slowPeriod = 1000,
-                .fastThreshold = 3.0,
-                .slowThreshold = 3.0,
-            },
+            .response =
+                "ddsampling direction = ascending, fastperiod = 63, "
+                "slowperiod = 1000, fastthreshold = 3.0, slowthreshold = 3.0" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .direction = RBRGEN3_DIRECTION_ASCENDING,
+                    .fastPeriod = 63,
+                    .slowPeriod = 1000,
+                    .fastThreshold = 3.0,
+                    .slowThreshold = 3.0,
+                },
         },
         {0},
     };
@@ -221,15 +234,16 @@ TEST_LOGGER3(ddsampling_set)
 {
     DirectionDependentSamplingTest tests[] = {
         {
-            "ddsampling direction = ascending, fastperiod = 63, "
-            "slowperiod = 1000, fastthreshold = 3.0, slowthreshold = 3.0",
-            {
-                .direction = RBRGEN3_DIRECTION_ASCENDING,
-                .fastPeriod = 63,
-                .slowPeriod = 1000,
-                .fastThreshold = 3.0,
-                .slowThreshold = 3.0,
-            },
+            .response = "ddsampling direction = ascending, fastperiod = 63, "
+                        "slowperiod = 1000, fastthreshold = 3.0, slowthreshold = 3.0",
+            .expected =
+                {
+                    .direction = RBRGEN3_DIRECTION_ASCENDING,
+                    .fastPeriod = 63,
+                    .slowPeriod = 1000,
+                    .fastThreshold = 3.0,
+                    .slowThreshold = 3.0,
+                },
         },
         {0},
     };

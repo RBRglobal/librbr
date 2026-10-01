@@ -76,7 +76,11 @@ static bool test_resume_error(RBRGen3 *conn, TestIOBuffers *buffers, ResumeTest 
 TEST_LOGGER2(pauseresume_error)
 {
     PauseResumeTest tests[] = {
-        {"pauseresume" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 3},
+        {
+            .command = "pauseresume" COMMAND_TERMINATOR,
+            .response = "E0102 invalid command" RESPONSE_TERMINATOR,
+            .state = 3,
+        },
         {0},
     };
     return test_pauseResume_error(conn, buffers, tests);
@@ -85,7 +89,11 @@ TEST_LOGGER2(pauseresume_error)
 TEST_LOGGER2(pause_error)
 {
     PauseTest tests[] = {
-        {"pause" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 1},
+        {
+            .command = "pause" COMMAND_TERMINATOR,
+            .response = "E0102 invalid command" RESPONSE_TERMINATOR,
+            .status = 1,
+        },
         {0},
     };
     return test_pause_error(conn, buffers, tests);
@@ -94,7 +102,11 @@ TEST_LOGGER2(pause_error)
 TEST_LOGGER2(resume_error)
 {
     ResumeTest tests[] = {
-        {"resume" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 2},
+        {
+            .command = "resume" COMMAND_TERMINATOR,
+            .response = "E0102 invalid command" RESPONSE_TERMINATOR,
+            .status = 2,
+        },
         {0},
     };
     return test_resume_error(conn, buffers, tests);
@@ -103,8 +115,16 @@ TEST_LOGGER2(resume_error)
 TEST_LOGGER3(pauseresume_error)
 {
     PauseResumeTest tests[] = {
-        {"pauseresume" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 3},
-        {"pauseresume" COMMAND_TERMINATOR, "E0109 feature not available" RESPONSE_TERMINATOR, 3},
+        {
+            .command = "pauseresume" COMMAND_TERMINATOR,
+            .response = "E0102 invalid command" RESPONSE_TERMINATOR,
+            .state = 3,
+        },
+        {
+            .command = "pauseresume" COMMAND_TERMINATOR,
+            .response = "E0109 feature not available" RESPONSE_TERMINATOR,
+            .state = 3,
+        },
         {0},
     };
     return test_pauseResume_error(conn, buffers, tests);
@@ -113,18 +133,30 @@ TEST_LOGGER3(pauseresume_error)
 TEST_LOGGER3(pause_error)
 {
     PauseTest tests[] = {
-        {"pause" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 1},
-        {"pause" COMMAND_TERMINATOR, "E0109 feature not available" RESPONSE_TERMINATOR, 1},
-        {"pause" COMMAND_TERMINATOR, "E0406 not logging" RESPONSE_TERMINATOR, 1},
         {
-            "pause" COMMAND_TERMINATOR,
-            "E0415 more than one gating condition is enabled" RESPONSE_TERMINATOR,
-            1,
+            .command = "pause" COMMAND_TERMINATOR,
+            .response = "E0102 invalid command" RESPONSE_TERMINATOR,
+            .status = 1,
         },
         {
-            "pause" COMMAND_TERMINATOR,
-            "E0417 no gating allowed with regimes mode" RESPONSE_TERMINATOR,
-            1,
+            .command = "pause" COMMAND_TERMINATOR,
+            .response = "E0109 feature not available" RESPONSE_TERMINATOR,
+            .status = 1,
+        },
+        {
+            .command = "pause" COMMAND_TERMINATOR,
+            .response = "E0406 not logging" RESPONSE_TERMINATOR,
+            .status = 1,
+        },
+        {
+            .command = "pause" COMMAND_TERMINATOR,
+            .response = "E0415 more than one gating condition is enabled" RESPONSE_TERMINATOR,
+            .status = 1,
+        },
+        {
+            .command = "pause" COMMAND_TERMINATOR,
+            .response = "E0417 no gating allowed with regimes mode" RESPONSE_TERMINATOR,
+            .status = 1,
         },
         {0},
     };
@@ -134,18 +166,30 @@ TEST_LOGGER3(pause_error)
 TEST_LOGGER3(resume_error)
 {
     ResumeTest tests[] = {
-        {"resume" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 2},
-        {"resume" COMMAND_TERMINATOR, "E0109 feature not available" RESPONSE_TERMINATOR, 2},
-        {"resume" COMMAND_TERMINATOR, "E0406 not logging" RESPONSE_TERMINATOR, 2},
         {
-            "resume" COMMAND_TERMINATOR,
-            "E0415 more than one gating condition is enabled" RESPONSE_TERMINATOR,
-            2,
+            .command = "resume" COMMAND_TERMINATOR,
+            .response = "E0102 invalid command" RESPONSE_TERMINATOR,
+            .status = 2,
         },
         {
-            "resume" COMMAND_TERMINATOR,
-            "E0417 no gating allowed with regimes mode" RESPONSE_TERMINATOR,
-            2,
+            .command = "resume" COMMAND_TERMINATOR,
+            .response = "E0109 feature not available" RESPONSE_TERMINATOR,
+            .status = 2,
+        },
+        {
+            .command = "resume" COMMAND_TERMINATOR,
+            .response = "E0406 not logging" RESPONSE_TERMINATOR,
+            .status = 2,
+        },
+        {
+            .command = "resume" COMMAND_TERMINATOR,
+            .response = "E0415 more than one gating condition is enabled" RESPONSE_TERMINATOR,
+            .status = 2,
+        },
+        {
+            .command = "resume" COMMAND_TERMINATOR,
+            .response = "E0417 no gating allowed with regimes mode" RESPONSE_TERMINATOR,
+            .status = 2,
         },
         {0},
     };
@@ -198,9 +242,21 @@ static bool test_resume(RBRGen3 *conn, TestIOBuffers *buffers, ResumeTest *tests
 TEST_LOGGER3(pauseresume)
 {
     PauseResumeTest tests[] = {
-        {"pauseresume" COMMAND_TERMINATOR, "pauseresume state = n/a" RESPONSE_TERMINATOR, 0},
-        {"pauseresume" COMMAND_TERMINATOR, "pauseresume state = paused" RESPONSE_TERMINATOR, 1},
-        {"pauseresume" COMMAND_TERMINATOR, "pauseresume state = running" RESPONSE_TERMINATOR, 2},
+        {
+            .command = "pauseresume" COMMAND_TERMINATOR,
+            .response = "pauseresume state = n/a" RESPONSE_TERMINATOR,
+            .state = 0,
+        },
+        {
+            .command = "pauseresume" COMMAND_TERMINATOR,
+            .response = "pauseresume state = paused" RESPONSE_TERMINATOR,
+            .state = 1,
+        },
+        {
+            .command = "pauseresume" COMMAND_TERMINATOR,
+            .response = "pauseresume state = running" RESPONSE_TERMINATOR,
+            .state = 2,
+        },
         {0},
     };
 
@@ -210,7 +266,11 @@ TEST_LOGGER3(pauseresume)
 TEST_LOGGER3(pause)
 {
     PauseTest tests[] = {
-        {"pause" COMMAND_TERMINATOR, "pause status = paused" RESPONSE_TERMINATOR, 0},
+        {
+            .command = "pause" COMMAND_TERMINATOR,
+            .response = "pause status = paused" RESPONSE_TERMINATOR,
+            .status = 0,
+        },
         {0},
     };
 
@@ -220,8 +280,16 @@ TEST_LOGGER3(pause)
 TEST_LOGGER3(resume)
 {
     ResumeTest tests[] = {
-        {"resume" COMMAND_TERMINATOR, "resume status = pending" RESPONSE_TERMINATOR, 0},
-        {"resume" COMMAND_TERMINATOR, "resume status = logging" RESPONSE_TERMINATOR, 1},
+        {
+            .command = "resume" COMMAND_TERMINATOR,
+            .response = "resume status = pending" RESPONSE_TERMINATOR,
+            .status = 0,
+        },
+        {
+            .command = "resume" COMMAND_TERMINATOR,
+            .response = "resume status = logging" RESPONSE_TERMINATOR,
+            .status = 1,
+        },
         {0},
     };
 

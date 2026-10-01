@@ -130,7 +130,18 @@ TEST_LOGGER3(outputformat_channelslist_truncated)
 {
     RBRGen3Error err;
     /* Two entries of storage with a guard entry behind them. */
-    RBRGen3ChannelsListEntry storage[3] = {{"", ""}, {"", ""}, {"guard", "g"}};
+    RBRGen3ChannelsListEntry storage[3] = {{
+                                               .name = "",
+                                               .unit = "",
+                                           },
+                                           {
+                                               .name = "",
+                                               .unit = "",
+                                           },
+                                           {
+                                               .name = "guard",
+                                               .unit = "g",
+                                           }};
     RBRGen3ChannelsList actual = {.size = 2, .channels = storage};
 
     TestIOBuffers_init(buffers,
@@ -276,9 +287,15 @@ TEST_LOGGER3(streamusb)
     bool actual;
 
     ToggleTest tests[] = {
-        {"streamusb state = on" RESPONSE_TERMINATOR, true},
-        {"streamusb state = off" RESPONSE_TERMINATOR, false},
-        {NULL, 0},
+        {
+            .response = "streamusb state = on" RESPONSE_TERMINATOR,
+            .expected = true,
+        },
+        {
+            .response = "streamusb state = off" RESPONSE_TERMINATOR,
+            .expected = false,
+        },
+        {0},
     };
 
     for (int i = 0; tests[i].response != NULL; i++) {
@@ -297,9 +314,15 @@ TEST_LOGGER3(streamserial)
     bool actual;
 
     ToggleTest tests[] = {
-        {"streamserial state = on" RESPONSE_TERMINATOR, true},
-        {"streamserial state = off" RESPONSE_TERMINATOR, false},
-        {NULL, 0},
+        {
+            .response = "streamserial state = on" RESPONSE_TERMINATOR,
+            .expected = true,
+        },
+        {
+            .response = "streamserial state = off" RESPONSE_TERMINATOR,
+            .expected = false,
+        },
+        {0},
     };
 
     for (int i = 0; tests[i].response != NULL; i++) {
