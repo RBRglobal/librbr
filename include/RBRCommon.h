@@ -37,7 +37,7 @@ typedef enum RBRCommonGeneration {
     /** The number of known generations. */
     RBRCOMMON_GENERATION_COUNT,
     /** An unknown or unrecognized instrument generation. */
-    RBRCOMMON_UNKNOWN_GENERATION
+    RBRCOMMON_UNKNOWN_GENERATION,
 } RBRCommonGeneration;
 
 /**

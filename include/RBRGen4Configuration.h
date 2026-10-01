@@ -145,7 +145,7 @@ typedef enum RBRGen4ChannelNature {
     /** The number of specific channel natures. */
     RBRGEN4_CHANNEL_NATURE_COUNT,
     /** An unknown or unrecognized channel nature. */
-    RBRGEN4_UNKNOWN_CHANNEL_NATURE
+    RBRGEN4_UNKNOWN_CHANNEL_NATURE,
 } RBRGen4ChannelNature;
 
 /**
@@ -439,7 +439,7 @@ typedef enum RBRGen4SettingsState {
     /** The parameter is not available on this instrument. */
     RBRGEN4_SETTINGS_STATE_UNAVAILABLE,
     /** The parameter was reported with a value the library does not know. */
-    RBRGEN4_UNKNOWN_SETTINGS_STATE
+    RBRGEN4_UNKNOWN_SETTINGS_STATE,
 } RBRGen4SettingsState;
 
 /**
@@ -839,7 +839,7 @@ typedef enum RBRGen4ScheduleMode {
     /** \brief Regimes mode. */
     RBRGEN4_SCHEDULE_MODE_REGIMES = 1 << 6,
     /** \brief The greatest mode flag. */
-    RBRGEN4_SCHEDULE_MODE_MAX = RBRGEN4_SCHEDULE_MODE_REGIMES
+    RBRGEN4_SCHEDULE_MODE_MAX = RBRGEN4_SCHEDULE_MODE_REGIMES,
 } RBRGen4ScheduleMode;
 
 /**
@@ -857,7 +857,7 @@ typedef enum RBRGen4ScheduleStorage {
     /** The parameter is not available on this instrument. */
     RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
     /** The parameter was reported with a value the library does not know. */
-    RBRGEN4_UNKNOWN_SCHEDULE_STORAGE
+    RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
 } RBRGen4ScheduleStorage;
 
 /**
@@ -917,7 +917,7 @@ typedef enum RBRGen4ScheduleStream {
     /** The number of specific stream destinations. */
     RBRGEN4_SCHEDULE_STREAM_COUNT,
     /** An unknown or unrecognized stream destination. */
-    RBRGEN4_UNKNOWN_SCHEDULE_STREAM
+    RBRGEN4_UNKNOWN_SCHEDULE_STREAM,
 } RBRGen4ScheduleStream;
 
 /**

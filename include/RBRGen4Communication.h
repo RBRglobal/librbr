@@ -34,7 +34,7 @@ typedef enum RBRGen4LinkType {
     /** The number of specific link types. */
     RBRGEN4_LINK_TYPE_COUNT,
     /** An unknown or unrecognized link type. */
-    RBRGEN4_UNKNOWN_LINK_TYPE
+    RBRGEN4_UNKNOWN_LINK_TYPE,
 } RBRGen4LinkType;
 
 /**
@@ -95,7 +95,7 @@ typedef enum RBRGen4LinkSerialBaudRate {
     /** 230,400 Bd */
     RBRGEN4_LINK_SERIAL_BAUD_230400 = 1 << 6,
     /** Corresponds to the largest baud rate enum value. */
-    RBRGEN4_LINK_SERIAL_BAUD_MAX = RBRGEN4_LINK_SERIAL_BAUD_230400
+    RBRGEN4_LINK_SERIAL_BAUD_MAX = RBRGEN4_LINK_SERIAL_BAUD_230400,
 } RBRGen4LinkSerialBaudRate;
 
 /**
@@ -129,7 +129,7 @@ typedef enum RBRGen4LinkSerialMode {
     /** 0-3.3V logic, idle low. */
     RBRGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW = 1 << 3,
     /** Corresponds to the largest serial mode enum value. */
-    RBRGEN4_LINK_SERIAL_MODE_MAX = RBRGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW
+    RBRGEN4_LINK_SERIAL_MODE_MAX = RBRGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW,
 } RBRGen4LinkSerialMode;
 
 /**

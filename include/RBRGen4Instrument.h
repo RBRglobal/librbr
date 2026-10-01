@@ -40,7 +40,7 @@ typedef enum RBRGen4InstrumentState {
     /** The number of specific instrument states. */
     RBRGEN4_INSTRUMENT_STATE_COUNT,
     /** An unknown or unrecognized instrument state. */
-    RBRGEN4_UNKNOWN_INSTRUMENT_STATE
+    RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
 } RBRGen4InstrumentState;
 
 /**
@@ -89,7 +89,7 @@ typedef enum RBRGen4PowerSource {
     /** The number of specific power sources. */
     RBRGEN4_POWER_SOURCE_COUNT,
     /** An unknown or unrecognized power source. */
-    RBRGEN4_UNKNOWN_POWER_SOURCE
+    RBRGEN4_UNKNOWN_POWER_SOURCE,
 } RBRGen4PowerSource;
 
 /**
@@ -138,7 +138,7 @@ typedef enum RBRGen4InternalBatteryType {
     /** The number of specific internal battery types. */
     RBRGEN4_INTERNAL_BATTERY_COUNT,
     /** An unknown or unrecognized internal battery type. */
-    RBRGEN4_UNKNOWN_INTERNAL_BATTERY
+    RBRGEN4_UNKNOWN_INTERNAL_BATTERY,
 } RBRGen4InternalBatteryType;
 
 /**
@@ -270,7 +270,7 @@ typedef enum RBRGen4ExternalBatteryType {
     /** The number of specific external battery types. */
     RBRGEN4_EXTERNAL_BATTERY_COUNT,
     /** An unknown or unrecognized external battery type. */
-    RBRGEN4_UNKNOWN_EXTERNAL_BATTERY
+    RBRGEN4_UNKNOWN_EXTERNAL_BATTERY,
 } RBRGen4ExternalBatteryType;
 
 /**

@@ -97,7 +97,7 @@ typedef enum RBRGen4DeploymentStatus {
     /** The number of specific deployment statuses. */
     RBRGEN4_DEPLOYMENT_STATUS_COUNT,
     /** An unknown or unrecognized deployment status. */
-    RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS
+    RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
 } RBRGen4DeploymentStatus;
 
 /**
@@ -126,7 +126,7 @@ typedef enum RBRGen4DeploymentGate {
     /** The number of specific gating conditions. */
     RBRGEN4_DEPLOYMENT_GATE_COUNT,
     /** An unknown or unrecognized gating condition. */
-    RBRGEN4_UNKNOWN_DEPLOYMENT_GATE
+    RBRGEN4_UNKNOWN_DEPLOYMENT_GATE,
 } RBRGen4DeploymentGate;
 
 /**

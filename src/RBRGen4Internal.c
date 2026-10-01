@@ -1062,7 +1062,13 @@ static inline void RBRGen4DateTime_initializeOffset(void)
 {
     if (localTimeOffset == OFFSET_UNINITIALIZED) {
         struct tm instrumentMinTimestamp = {
-            .tm_year = 100, .tm_mon = 0, .tm_mday = 1, .tm_hour = 0, .tm_min = 0, .tm_sec = 0};
+            .tm_year = 100,
+            .tm_mon = 0,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 0,
+        };
         localTimeOffset =
             RBRGEN4_DATETIME_MIN - ((RBRGen4DateTime) mktime(&instrumentMinTimestamp) * 1000);
     }

@@ -36,7 +36,7 @@ typedef enum RBRGen4StorageAccess {
     /** The number of storage access modes. */
     RBRGEN4_STORAGE_ACCESS_COUNT,
     /** An unknown or unrecognized storage access mode. */
-    RBRGEN4_UNKNOWN_STORAGE_ACCESS
+    RBRGEN4_UNKNOWN_STORAGE_ACCESS,
 } RBRGen4StorageAccess;
 
 /**
@@ -124,7 +124,7 @@ typedef enum RBRGen4DatasetStatus {
     /** The number of specific dataset statuses. */
     RBRGEN4_DATASET_STATUS_COUNT,
     /** An unknown or unrecognized dataset status. */
-    RBRGEN4_UNKNOWN_DATASET_STATUS
+    RBRGEN4_UNKNOWN_DATASET_STATUS,
 } RBRGen4DatasetStatus;
 
 /**
@@ -479,7 +479,7 @@ typedef enum RBRGen4DownloadDataUnit {
     /** The number of sample data download units. */
     RBRGEN4_DOWNLOAD_DATA_UNIT_COUNT,
     /** An unknown or unrecognized sample data download unit. */
-    RBRGEN4_UNKNOWN_DOWNLOAD_DATA_UNIT
+    RBRGEN4_UNKNOWN_DOWNLOAD_DATA_UNIT,
 } RBRGen4DownloadDataUnit;
 
 /**
@@ -505,7 +505,7 @@ typedef enum RBRGen4DownloadEventsUnit {
     /** The number of events download units. */
     RBRGEN4_DOWNLOAD_EVENTS_UNIT_COUNT,
     /** An unknown or unrecognized events download unit. */
-    RBRGEN4_UNKNOWN_DOWNLOAD_EVENTS_UNIT
+    RBRGEN4_UNKNOWN_DOWNLOAD_EVENTS_UNIT,
 } RBRGen4DownloadEventsUnit;
 
 /**

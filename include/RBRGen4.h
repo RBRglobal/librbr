@@ -239,7 +239,7 @@ typedef enum RBRGen4Error {
     /** The number of specific errors. Should not be used as an error value. */
     RBRGEN4_ERROR_COUNT,
     /** An unknown or unrecognized error. */
-    RBRGEN4_UNKNOWN_ERROR
+    RBRGEN4_UNKNOWN_ERROR,
 } RBRGen4Error;
 
 /**
@@ -295,7 +295,7 @@ typedef enum RBRGen4DataType {
     /** The number of specific datatypes. */
     RBRGEN4_DATA_TYPE_COUNT,
     /** An unknown or unrecognized dataType. */
-    RBRGEN4_UNKNOWN_DATA_TYPE
+    RBRGEN4_UNKNOWN_DATA_TYPE,
 } RBRGen4DataType;
 
 /**
@@ -353,12 +353,14 @@ typedef struct RBRGen4OutputFormat {
  *
  * \see RBRGen4_open()
  */
-#define RBRGEN4_DEFAULT_OUTPUT_FORMAT              \
-    ((RBRGen4OutputFormat) {.sn = false,           \
-                            .scheduleLabel = true, \
-                            .dateTime = true,      \
-                            .crc = false,          \
-                            .dataType = RBRGEN4_DATA_TYPE_FLOAT32})
+#define RBRGEN4_DEFAULT_OUTPUT_FORMAT          \
+    ((RBRGen4OutputFormat) {                   \
+        .sn = false,                           \
+        .scheduleLabel = true,                 \
+        .dateTime = true,                      \
+        .crc = false,                          \
+        .dataType = RBRGEN4_DATA_TYPE_FLOAT32, \
+    })
 
 /**
  * \brief Instrument `id4` command parameters.
@@ -674,7 +676,7 @@ typedef enum RBRGen4ResponseType {
     /** The number of specific types. */
     RBRGEN4_RESPONSE_TYPE_COUNT,
     /** The response has been incorrectly or incompletely populated. */
-    RBRGEN4_RESPONSE_UNKNOWN_TYPE
+    RBRGEN4_RESPONSE_UNKNOWN_TYPE,
 } RBRGen4ResponseType;
 
 /**

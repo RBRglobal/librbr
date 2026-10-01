@@ -78,7 +78,7 @@ typedef enum RBRGen4ReadingError {
     /** The number of reading flags. */
     RBRGEN4_READING_ERROR_COUNT,
     /** An unknown or unrecognized reading flag. */
-    RBRGEN4_UNKNOWN_READING_ERROR
+    RBRGEN4_UNKNOWN_READING_ERROR,
 } RBRGen4ReadingError;
 
 /**
