@@ -163,11 +163,11 @@ static int listenUdp(void)
     }
 
     bool messageReceived = false;
-    struct sockaddr peer_addr;
-    socklen_t peer_addr_len = sizeof(struct sockaddr_storage);
+    struct sockaddr peerAddr;
+    socklen_t peerAddrLen = sizeof(struct sockaddr_storage);
     while (!messageReceived) {
 
-        bytes = recvfrom(sock, message, 1024, 0, &peer_addr, &peer_addr_len);
+        bytes = recvfrom(sock, message, 1024, 0, &peerAddr, &peerAddrLen);
         printf("nrecv:");
         for (int i = 0; i < bytes; i++) {
             printf("%c", message[i]);
@@ -180,8 +180,8 @@ static int listenUdp(void)
 
         /* get host information. */
         char service[64];
-        int s = getnameinfo((struct sockaddr *) &peer_addr,
-                            peer_addr_len,
+        int s = getnameinfo((struct sockaddr *) &peerAddr,
+                            peerAddrLen,
                             host,
                             HOST_SIZE,
                             service,
@@ -237,7 +237,7 @@ static int listenUdp(void)
 static int openSocketFd(void)
 {
     int sock = 0;
-    struct sockaddr_in serv_addr;
+    struct sockaddr_in serverAddr;
 
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
@@ -245,17 +245,17 @@ static int openSocketFd(void)
         return -1;
     }
 
-    memset(&serv_addr, '0', sizeof(serv_addr));
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(port);
+    memset(&serverAddr, '0', sizeof(serverAddr));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(port);
 
     /* Convert IPv4 and IPv6 addresses from text to binary form */
-    if (inet_pton(AF_INET, host, &serv_addr.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, host, &serverAddr.sin_addr) <= 0) {
         printf("Invalid address/ Address not supported \n");
         return -1;
     }
 
-    if (connect(sock, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+    if (connect(sock, (struct sockaddr *) &serverAddr, sizeof(serverAddr)) < 0) {
         printf("\nConnection Failed \n");
         return -1;
     }
