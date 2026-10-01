@@ -112,6 +112,35 @@ RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *conn);
 RBRGen3Error RBRGen3_sendCommand(RBRGen3 *conn, const char *command, ...);
 
 /**
+ * \brief Start a new command in RBRGen3Environment.command.
+ *
+ * Discards whatever the buffer holds from the previous command, including a
+ * length poisoned by a failed append, so that RBRGen3_appendCommand() writes
+ * from the start of the buffer.
+ *
+ * \param [in] conn the instrument connection
+ * \see RBRGen3_appendCommand() to add to the command
+ */
+void RBRGen3_beginCommand(RBRGen3 *conn);
+
+/**
+ * \brief Append formatted text to the command in RBRGen3Environment.command.
+ *
+ * Builds a command piece by piece, directly in the caller-supplied buffer.
+ * Call RBRGen3_beginCommand() before the first piece, then send the whole
+ * with RBRGen3_converseBuffer() or RBRGen3_sendBuffer().
+ *
+ * \param [in] conn the instrument connection
+ * \param [in] command the text to append as a printf-style format string
+ * \return #RBRGEN3_SUCCESS when the text is appended
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the text does not fit; the buffer
+ *                                   then holds a truncated command which
+ *                                   RBRGen3_sendBuffer() refuses
+ * \see RBRGen3_converseBuffer() to send the buffer and await the response
+ */
+RBRGen3Error RBRGen3_appendCommand(RBRGen3 *conn, const char *command, ...);
+
+/**
  * Read a response from the instrument. This function will block until a
  * complete response is read, or until the callback returns
  * #RBRGEN3_TIMEOUT or #RBRGEN3_CALLBACK_ERROR.
@@ -184,6 +213,29 @@ RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Samp
  * \see RBRGen3_readResponse() to read the command response
  */
 RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...);
+
+/**
+ * \brief Send the command already in RBRGen3Environment.command and await an
+ *        appropriate response.
+ *
+ * The buffer form of RBRGen3_converse(), for commands assembled with
+ * RBRGen3_appendCommand(). A terminator is added if the command lacks one.
+ * The response matching and retry behaviour is exactly that of
+ * RBRGen3_converse(); a retry resends the buffer as it stands.
+ *
+ * \param [in] conn the instrument connection
+ * \return #RBRGEN3_SUCCESS when the command was successfully sent and a
+ *                                response was read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the buffer holds a truncated command
+ *                                   or has no room for the terminator
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a line too long for the response
+ *         buffer was met and the correct response never arrived
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \see RBRGen3_appendCommand() to build the command
+ */
+RBRGen3Error RBRGen3_converseBuffer(RBRGen3 *conn);
 
 /**
  * \brief Read a single boolean parameter from the instrument.
