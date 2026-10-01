@@ -7,7 +7,7 @@
 /**
  * \file instrument.c
  *
- * \brief Tests for other instrument commands.
+ * \brief Tests for instrument commands.
  */
 
 /* Required for NAN. */

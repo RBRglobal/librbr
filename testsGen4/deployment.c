@@ -803,18 +803,7 @@ TEST_LOGGER4(verify)
             .expectedError = RBRGEN4_HARDWARE_ERROR,
             .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
-        {
-            .config =
-                {
-                    .label = "",
-                },
-            .datasetLabel = NULL,
-            .storageMode = 0,
-            .command = NULL,
-            .response = NULL,
-            .expectedError = 0,
-            .expectedState = 0,
-        },
+        {.config = {.label = {0}}},
     };
 
     RBRGen4Error err;
@@ -1019,18 +1008,7 @@ TEST_LOGGER4(enable)
             .expectedError = RBRGEN4_HARDWARE_ERROR,
             .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
-        {
-            .config =
-                {
-                    .label = "",
-                },
-            .datasetLabel = NULL,
-            .storageMode = 0,
-            .command = NULL,
-            .response = NULL,
-            .expectedError = 0,
-            .expectedState = 0,
-        },
+        {.config = {.label = {0}}},
     };
 
     RBRGen4Error err;

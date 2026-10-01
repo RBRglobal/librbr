@@ -8,7 +8,7 @@ Runtime environment: cygwin
 
 ## Build this example
 Assuming librbr is already built.(if not, go to librbr directory, and then use cygwin command "make")
-Go to librbr/examples/dynanicCorrection directory, then use sygwin command "make". Ignore the error you see.
+Go to librbr/examples/dynanicCorrection directory, then use sygwin command "make".
 
 ## Tips before you start:
 (1) How to clean the built files:
@@ -17,7 +17,7 @@ To clean the .a, .o, .exe files one built, use cygwin command "make clean" in th
 ## Usage for this example:
 File name   |      command to use it | things to know
 ------------- | ------------- | -------------
-posix-parse-file-dynamiccorrection.c    | ./dynamicCorrection-example ../sampledata/dynamiccorrection-sample.csv | the sample .bin file columns have to be: Cmeas(mS/cm), Tmeas(°C), Pmeas(sea pressure, dbar), Tcond(°C)
+dynamicCorrection-example.c    | ./dynamicCorrection-example ../sampledata/dynamiccorrection-sample.csv | the sample .csv file columns have to be: timestamp(s), Cmeas(mS/cm), Tmeas(°C), Pmeas(sea pressure, dbar), Tcond(°C)
 
 ## Contributing
 
@@ -25,7 +25,7 @@ The library is primarily maintained by RBR, and development is directed by our n
 However, we're happy to take [contributions] generally.
 
 [OEM]: https://rbr-global.com/products/oem
-[contributions]: CONTRIBUTING.md
+[contributions]: ../../CONTRIBUTING.rst
 
 ## License
 

@@ -13,8 +13,8 @@
  * developers will want to consult it for insight on test authoring.
  */
 
-#ifndef LIBRBR_TESTS_H
-#define LIBRBR_TESTS_H
+#ifndef LIBRBR_TESTSGEN4_TESTS_H
+#define LIBRBR_TESTSGEN4_TESTS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -394,4 +394,4 @@ extern InstrumentTest instrumentTests[];
 }
 #endif
 
-#endif /* LIBRBR_TESTS_H */
+#endif /* LIBRBR_TESTSGEN4_TESTS_H */

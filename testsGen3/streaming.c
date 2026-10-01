@@ -130,18 +130,20 @@ TEST_LOGGER3(outputformat_channelslist_truncated)
 {
     RBRGen3Error err;
     /* Two entries of storage with a guard entry behind them. */
-    RBRGen3ChannelsListEntry storage[3] = {{
-                                               .name = "",
-                                               .unit = "",
-                                           },
-                                           {
-                                               .name = "",
-                                               .unit = "",
-                                           },
-                                           {
-                                               .name = "guard",
-                                               .unit = "g",
-                                           }};
+    RBRGen3ChannelsListEntry storage[3] = {
+        {
+            .name = "",
+            .unit = "",
+        },
+        {
+            .name = "",
+            .unit = "",
+        },
+        {
+            .name = "guard",
+            .unit = "g",
+        },
+    };
     RBRGen3ChannelsList actual = {.size = 2, .channels = storage};
 
     TestIOBuffers_init(buffers,

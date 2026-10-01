@@ -7,7 +7,7 @@
 /**
  * \file dynamiccorrection.c
  *
- * \brief Tests for dynamic correction
+ * \brief Tests for dynamic correction.
  */
 
 #include <math.h>
@@ -490,7 +490,15 @@ TEST(verify_dynamic_correction)
             8.64815699985981f,
             35.1926670326019f,
         },
-        {-1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        {
+            -1.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+            0.0f,
+        },
     };
 
     return test_dynamic_correction(dataset[0], 4.0f);

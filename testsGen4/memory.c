@@ -377,16 +377,7 @@ TEST_LOGGER4(getDataset)
             .expectedScheduleCount = 0,
             .expectedScheduleList = {NULL},
         },
-        {
-            .response = NULL,
-            .expectedError = 0,
-            .expected =
-                {
-                    .label = "",
-                },
-            .expectedScheduleCount = 0,
-            .expectedScheduleList = {NULL},
-        },
+        {0},
     };
 
     RBRGen4Error err;
