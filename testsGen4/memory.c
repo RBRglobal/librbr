@@ -27,67 +27,68 @@ TEST_LOGGER4(getStorage)
     GetStorageTest tests[] = {
         /* A bare query reports all four parameters. */
         {
-            "storage used=15372 remaining=61016097780 size=61016113152"
-            " access=instrument" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .used = 15372LL,
-                .remaining = 61016097780LL,
-                .size = 61016113152LL,
-                .access = RBRGEN4_STORAGE_ACCESS_INSTRUMENT,
-            },
+            .response = "storage used=15372 remaining=61016097780 size=61016113152"
+                        " access=instrument" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .used = 15372LL,
+                    .remaining = 61016097780LL,
+                    .size = 61016113152LL,
+                    .access = RBRGEN4_STORAGE_ACCESS_INSTRUMENT,
+                },
         },
         {
-            "storage used=1528 remaining=134216192 size=134217728"
-            " access=usbhost" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .used = 1528LL,
-                .remaining = 134216192LL,
-                .size = 134217728LL,
-                .access = RBRGEN4_STORAGE_ACCESS_USBHOST,
-            },
+            .response = "storage used=1528 remaining=134216192 size=134217728"
+                        " access=usbhost" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .used = 1528LL,
+                    .remaining = 134216192LL,
+                    .size = 134217728LL,
+                    .access = RBRGEN4_STORAGE_ACCESS_USBHOST,
+                },
         },
         /* An unreported parameter keeps its unset value. */
         {
-            "storage used=15372" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .used = 15372LL,
-                .remaining = 0LL,
-                .size = 0LL,
-                .access = RBRGEN4_UNKNOWN_STORAGE_ACCESS,
-            },
+            .response = "storage used=15372" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .used = 15372LL,
+                    .remaining = 0LL,
+                    .size = 0LL,
+                    .access = RBRGEN4_UNKNOWN_STORAGE_ACCESS,
+                },
         },
         /* An unrecognized access location parses to the unknown member. */
         {
-            "storage used=15372 remaining=61016097780 size=61016113152"
-            " access=cloud" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .used = 15372LL,
-                .remaining = 61016097780LL,
-                .size = 61016113152LL,
-                .access = RBRGEN4_UNKNOWN_STORAGE_ACCESS,
-            },
+            .response = "storage used=15372 remaining=61016097780 size=61016113152"
+                        " access=cloud" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .used = 15372LL,
+                    .remaining = 61016097780LL,
+                    .size = 61016113152LL,
+                    .access = RBRGEN4_UNKNOWN_STORAGE_ACCESS,
+                },
         },
         /* Keys the library does not model are ignored. */
         {
-            "storage used=15372 remaining=61016097780 size=61016113152"
-            " access=instrument bogus=1" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .used = 15372LL,
-                .remaining = 61016097780LL,
-                .size = 61016113152LL,
-                .access = RBRGEN4_STORAGE_ACCESS_INSTRUMENT,
-            },
+            .response = "storage used=15372 remaining=61016097780 size=61016113152"
+                        " access=instrument bogus=1" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .used = 15372LL,
+                    .remaining = 61016097780LL,
+                    .size = 61016113152LL,
+                    .access = RBRGEN4_STORAGE_ACCESS_INSTRUMENT,
+                },
         },
-        {
-            NULL,
-            0,
-            {0, 0, 0, 0},
-        },
+        {0},
     };
 
     RBRGen4Error err;
@@ -118,16 +119,16 @@ TEST_LOGGER4(setStorage)
 {
     SetStorageTest tests[] = {
         {
-            RBRGEN4_STORAGE_ACCESS_INSTRUMENT,
-            "storage access=instrument" COMMAND_TERMINATOR,
-            "storage access=instrument" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
+            .access = RBRGEN4_STORAGE_ACCESS_INSTRUMENT,
+            .command = "storage access=instrument" COMMAND_TERMINATOR,
+            .response = "storage access=instrument" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
         },
         {
-            RBRGEN4_STORAGE_ACCESS_USBHOST,
-            "storage access=usbhost" COMMAND_TERMINATOR,
-            "storage access=usbhost" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
+            .access = RBRGEN4_STORAGE_ACCESS_USBHOST,
+            .command = "storage access=usbhost" COMMAND_TERMINATOR,
+            .response = "storage access=usbhost" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
         },
         /*
          * Selecting the location already in use is a warning, which the
@@ -135,15 +136,25 @@ TEST_LOGGER4(setStorage)
          * distinguishing it.
          */
         {
-            RBRGEN4_STORAGE_ACCESS_INSTRUMENT,
-            "storage access=instrument" COMMAND_TERMINATOR,
-            "WRN-305 storage access already at selected location" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
+            .access = RBRGEN4_STORAGE_ACCESS_INSTRUMENT,
+            .command = "storage access=instrument" COMMAND_TERMINATOR,
+            .response = "WRN-305 storage access already at selected location" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
         },
         /* Sentinel members are refused before the command. */
-        {RBRGEN4_STORAGE_ACCESS_COUNT, "", "", RBRGEN4_INVALID_PARAMETER_VALUE},
-        {RBRGEN4_UNKNOWN_STORAGE_ACCESS, "", "", RBRGEN4_INVALID_PARAMETER_VALUE},
-        {0, NULL, NULL, 0},
+        {
+            .access = RBRGEN4_STORAGE_ACCESS_COUNT,
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+        },
+        {
+            .access = RBRGEN4_UNKNOWN_STORAGE_ACCESS,
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+        },
+        {0},
     };
 
     RBRGen4Error err;
@@ -172,37 +183,32 @@ TEST_LOGGER4(getDatasetPool)
 {
     GetDatasetPoolTest tests[] = {
         {
-            "dataset count=3 maxcount=4 list=d1|d2|d5" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            3,
-            {"d1", "d2", "d5"},
+            .response = "dataset count=3 maxcount=4 list=d1|d2|d5" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedLen = 3,
+            .expectedLabels = {"d1", "d2", "d5"},
         },
         {
-            "dataset count=1 maxcount=20 list=DeepCove" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            1,
-            {"DeepCove"},
+            .response = "dataset count=1 maxcount=20 list=DeepCove" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedLen = 1,
+            .expectedLabels = {"DeepCove"},
         },
         /* An empty pool reports `none`. */
         {
-            "dataset count=0 maxcount=4 list=none" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            0,
-            {NULL},
+            .response = "dataset count=0 maxcount=4 list=none" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedLen = 0,
+            .expectedLabels = {NULL},
         },
         /* Keys the library does not model are ignored. */
         {
-            "dataset count=1 maxcount=4 list=d1 bogus=1" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            1,
-            {"d1"},
+            .response = "dataset count=1 maxcount=4 list=d1 bogus=1" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedLen = 1,
+            .expectedLabels = {"d1"},
         },
-        {
-            NULL,
-            0,
-            0,
-            {NULL},
-        },
+        {0},
     };
 
     RBRGen4Error err;
@@ -315,66 +321,71 @@ TEST_LOGGER4(getDataset)
 {
     GetDatasetTest tests[] = {
         {
-            "dataset d1 status=closed schedulelist=s_cont bytecount=5604"
-            " datatype=float64" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .label = "d1",
-                .status = RBRGEN4_DATASET_STATUS_CLOSED,
-                .byteCount = 5604LL,
-                .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
-            },
-            1,
-            {"s_cont"},
+            .response = "dataset d1 status=closed schedulelist=s_cont bytecount=5604"
+                        " datatype=float64" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .label = "d1",
+                    .status = RBRGEN4_DATASET_STATUS_CLOSED,
+                    .byteCount = 5604LL,
+                    .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
+                },
+            .expectedScheduleCount = 1,
+            .expectedScheduleList = {"s_cont"},
         },
         {
-            "dataset d1 status=open schedulelist=tides_schedule|DO_schedule"
-            " bytecount=3749498 datatype=float32" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .label = "d1",
-                .status = RBRGEN4_DATASET_STATUS_OPEN,
-                .byteCount = 3749498LL,
-                .dataType = RBRGEN4_DATA_TYPE_FLOAT32,
-            },
-            2,
-            {"tides_schedule", "DO_schedule"},
+            .response = "dataset d1 status=open schedulelist=tides_schedule|DO_schedule"
+                        " bytecount=3749498 datatype=float32" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .label = "d1",
+                    .status = RBRGEN4_DATASET_STATUS_OPEN,
+                    .byteCount = 3749498LL,
+                    .dataType = RBRGEN4_DATA_TYPE_FLOAT32,
+                },
+            .expectedScheduleCount = 2,
+            .expectedScheduleList = {"tides_schedule", "DO_schedule"},
         },
         /* Values the library does not model parse to the unknown members. */
         {
-            "dataset d1 status=bogus schedulelist=s_cont bytecount=0"
-            " datatype=bogus" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .label = "d1",
-                .status = RBRGEN4_UNKNOWN_DATASET_STATUS,
-                .byteCount = 0LL,
-                .dataType = RBRGEN4_UNKNOWN_DATA_TYPE,
-            },
-            1,
-            {"s_cont"},
+            .response = "dataset d1 status=bogus schedulelist=s_cont bytecount=0"
+                        " datatype=bogus" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .label = "d1",
+                    .status = RBRGEN4_UNKNOWN_DATASET_STATUS,
+                    .byteCount = 0LL,
+                    .dataType = RBRGEN4_UNKNOWN_DATA_TYPE,
+                },
+            .expectedScheduleCount = 1,
+            .expectedScheduleList = {"s_cont"},
         },
         /* A dataset which does not exist is a hardware error. */
         {
-            "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            {
-                .label = "d1",
-                .status = RBRGEN4_UNKNOWN_DATASET_STATUS,
-                .byteCount = 0LL,
-                .dataType = RBRGEN4_UNKNOWN_DATA_TYPE,
-            },
-            0,
-            {NULL},
+            .response = "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expected =
+                {
+                    .label = "d1",
+                    .status = RBRGEN4_UNKNOWN_DATASET_STATUS,
+                    .byteCount = 0LL,
+                    .dataType = RBRGEN4_UNKNOWN_DATA_TYPE,
+                },
+            .expectedScheduleCount = 0,
+            .expectedScheduleList = {NULL},
         },
         {
-            NULL,
-            0,
-            {
-                .label = "",
-            },
-            0,
-            {NULL},
+            .response = NULL,
+            .expectedError = 0,
+            .expected =
+                {
+                    .label = "",
+                },
+            .expectedScheduleCount = 0,
+            .expectedScheduleList = {NULL},
         },
     };
 
@@ -451,31 +462,31 @@ TEST_LOGGER4(getDatasetEventsBlock)
 {
     GetBlockTest tests[] = {
         {
-            NULL,
-            "dataset d1/events" COMMAND_TERMINATOR,
-            "dataset d1/events bytecount=120 eventcount=5" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            120,
-            5,
+            .scheduleLabel = NULL,
+            .command = "dataset d1/events" COMMAND_TERMINATOR,
+            .response = "dataset d1/events bytecount=120 eventcount=5" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedByteCount = 120,
+            .expectedOtherCount = 5,
         },
         /* A dataset with no events reports zero counts. */
         {
-            NULL,
-            "dataset d1/events" COMMAND_TERMINATOR,
-            "dataset d1/events bytecount=0 eventcount=0" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            0,
-            0,
+            .scheduleLabel = NULL,
+            .command = "dataset d1/events" COMMAND_TERMINATOR,
+            .response = "dataset d1/events bytecount=0 eventcount=0" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedByteCount = 0,
+            .expectedOtherCount = 0,
         },
         {
-            NULL,
-            "dataset d1/events" COMMAND_TERMINATOR,
-            "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            0,
-            0,
+            .scheduleLabel = NULL,
+            .command = "dataset d1/events" COMMAND_TERMINATOR,
+            .response = "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedByteCount = 0,
+            .expectedOtherCount = 0,
         },
-        {NULL, NULL, NULL, 0, 0, 0},
+        {0},
     };
 
     RBRGen4Error err;
@@ -500,22 +511,22 @@ TEST_LOGGER4(getDatasetMetaBlock)
 {
     GetBlockTest tests[] = {
         {
-            NULL,
-            "dataset d1/meta" COMMAND_TERMINATOR,
-            "dataset d1/meta bytecount=4836" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            4836,
-            0,
+            .scheduleLabel = NULL,
+            .command = "dataset d1/meta" COMMAND_TERMINATOR,
+            .response = "dataset d1/meta bytecount=4836" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedByteCount = 4836,
+            .expectedOtherCount = 0,
         },
         {
-            NULL,
-            "dataset d1/meta" COMMAND_TERMINATOR,
-            "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            0,
-            0,
+            .scheduleLabel = NULL,
+            .command = "dataset d1/meta" COMMAND_TERMINATOR,
+            .response = "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedByteCount = 0,
+            .expectedOtherCount = 0,
         },
-        {NULL, NULL, NULL, 0, 0, 0},
+        {0},
     };
 
     RBRGen4Error err;
@@ -539,26 +550,26 @@ TEST_LOGGER4(getDatasetScheduleBlock)
 {
     GetBlockTest tests[] = {
         {
-            "s_cont",
-            "dataset d1/s_cont" COMMAND_TERMINATOR,
-            "dataset d1/s_cont bytecount=768" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            768,
-            0,
+            .scheduleLabel = "s_cont",
+            .command = "dataset d1/s_cont" COMMAND_TERMINATOR,
+            .response = "dataset d1/s_cont bytecount=768" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedByteCount = 768,
+            .expectedOtherCount = 0,
         },
         /*
          * A schedule the dataset does not know reports the dataset as not
          * found, naming the dataset rather than the schedule.
          */
         {
-            "nosuch",
-            "dataset d1/nosuch" COMMAND_TERMINATOR,
-            "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            0,
-            0,
+            .scheduleLabel = "nosuch",
+            .command = "dataset d1/nosuch" COMMAND_TERMINATOR,
+            .response = "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedByteCount = 0,
+            .expectedOtherCount = 0,
         },
-        {NULL, NULL, NULL, 0, 0, 0},
+        {0},
     };
 
     RBRGen4Error err;
@@ -588,26 +599,26 @@ TEST_LOGGER4(getDatasetScheduleEventsBlock)
 {
     GetBlockTest tests[] = {
         {
-            "s_cont",
-            "dataset d1/s_cont/events" COMMAND_TERMINATOR,
-            "dataset d1/s_cont/events bytecount=120 eventcount=5" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            120,
-            5,
+            .scheduleLabel = "s_cont",
+            .command = "dataset d1/s_cont/events" COMMAND_TERMINATOR,
+            .response = "dataset d1/s_cont/events bytecount=120 eventcount=5" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedByteCount = 120,
+            .expectedOtherCount = 5,
         },
         /*
          * A schedule the dataset does not know reports the dataset as not
          * found, naming the dataset rather than the schedule.
          */
         {
-            "nosuch",
-            "dataset d1/nosuch/events" COMMAND_TERMINATOR,
-            "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            0,
-            0,
+            .scheduleLabel = "nosuch",
+            .command = "dataset d1/nosuch/events" COMMAND_TERMINATOR,
+            .response = "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedByteCount = 0,
+            .expectedOtherCount = 0,
         },
-        {NULL, NULL, NULL, 0, 0, 0},
+        {0},
     };
 
     RBRGen4Error err;
@@ -632,31 +643,31 @@ TEST_LOGGER4(getDatasetScheduleDataBlock)
 {
     GetBlockTest tests[] = {
         {
-            "s_cont",
-            "dataset d1/s_cont/data" COMMAND_TERMINATOR,
-            "dataset d1/s_cont/data bytecount=648 samplecount=27" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            648,
-            27,
+            .scheduleLabel = "s_cont",
+            .command = "dataset d1/s_cont/data" COMMAND_TERMINATOR,
+            .response = "dataset d1/s_cont/data bytecount=648 samplecount=27" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedByteCount = 648,
+            .expectedOtherCount = 27,
         },
         /* A schedule which never sampled reports zero counts. */
         {
-            "s_cont",
-            "dataset d1/s_cont/data" COMMAND_TERMINATOR,
-            "dataset d1/s_cont/data bytecount=0 samplecount=0" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            0,
-            0,
+            .scheduleLabel = "s_cont",
+            .command = "dataset d1/s_cont/data" COMMAND_TERMINATOR,
+            .response = "dataset d1/s_cont/data bytecount=0 samplecount=0" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedByteCount = 0,
+            .expectedOtherCount = 0,
         },
         {
-            "nosuch",
-            "dataset d1/nosuch/data" COMMAND_TERMINATOR,
-            "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            0,
-            0,
+            .scheduleLabel = "nosuch",
+            .command = "dataset d1/nosuch/data" COMMAND_TERMINATOR,
+            .response = "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedByteCount = 0,
+            .expectedOtherCount = 0,
         },
-        {NULL, NULL, NULL, 0, 0, 0},
+        {0},
     };
 
     RBRGen4Error err;
@@ -688,18 +699,18 @@ TEST_LOGGER4(deleteDataset)
 {
     DeleteDatasetTest tests[] = {
         {
-            "d5",
-            "dataset delete d5" COMMAND_TERMINATOR,
-            "dataset delete d5" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
+            .label = "d5",
+            .command = "dataset delete d5" COMMAND_TERMINATOR,
+            .response = "dataset delete d5" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
         },
         {
-            "nosuch",
-            "dataset delete nosuch" COMMAND_TERMINATOR,
-            "ERR-304 dataset not found: 'nosuch'" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
+            .label = "nosuch",
+            .command = "dataset delete nosuch" COMMAND_TERMINATOR,
+            .response = "ERR-304 dataset not found: 'nosuch'" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
         },
-        {NULL, NULL, NULL, 0},
+        {0},
     };
 
     RBRGen4Error err;

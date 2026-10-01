@@ -37,8 +37,14 @@ static bool test_link(RBRGen4 *conn, TestIOBuffers *buffers, LinkTest *tests)
 TEST_LOGGER4(link)
 {
     LinkTest tests[] = {
-        {"link type=usb" RESPONSE_TERMINATOR, RBRGEN4_LINK_TYPE_USB},
-        {"link type=serial" RESPONSE_TERMINATOR, RBRGEN4_LINK_TYPE_SERIAL},
+        {
+            .response = "link type=usb" RESPONSE_TERMINATOR,
+            .expected = RBRGEN4_LINK_TYPE_USB,
+        },
+        {
+            .response = "link type=serial" RESPONSE_TERMINATOR,
+            .expected = RBRGEN4_LINK_TYPE_SERIAL,
+        },
         {0},
     };
 
@@ -55,29 +61,32 @@ TEST_LOGGER4(linkSerial)
 {
     LinkSerialTest tests[] = {
         {
-            "link serial baudrate=230400 mode=rs232" RESPONSE_TERMINATOR,
-            {
-                .baudRate = RBRGEN4_LINK_SERIAL_BAUD_230400,
-                .mode = RBRGEN4_LINK_SERIAL_MODE_RS232,
-            },
-            RBRGEN4_SUCCESS,
+            .response = "link serial baudrate=230400 mode=rs232" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .baudRate = RBRGEN4_LINK_SERIAL_BAUD_230400,
+                    .mode = RBRGEN4_LINK_SERIAL_MODE_RS232,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
         },
         {
-            "link serial baudrate=115200 mode=uart_idlelow" RESPONSE_TERMINATOR,
-            {
-                .baudRate = RBRGEN4_LINK_SERIAL_BAUD_115200,
-                .mode = RBRGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW,
-            },
-            RBRGEN4_SUCCESS,
+            .response = "link serial baudrate=115200 mode=uart_idlelow" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .baudRate = RBRGEN4_LINK_SERIAL_BAUD_115200,
+                    .mode = RBRGEN4_LINK_SERIAL_MODE_UART_IDLE_LOW,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
         },
         /* Values the library does not know are reported as unknown. */
         {
-            "link serial baudrate=921600 mode=rs485h" RESPONSE_TERMINATOR,
-            {
-                .baudRate = RBRGEN4_LINK_SERIAL_BAUD_NONE,
-                .mode = RBRGEN4_LINK_SERIAL_MODE_NONE,
-            },
-            RBRGEN4_SUCCESS,
+            .response = "link serial baudrate=921600 mode=rs485h" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .baudRate = RBRGEN4_LINK_SERIAL_BAUD_NONE,
+                    .mode = RBRGEN4_LINK_SERIAL_MODE_NONE,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
         },
         {0},
     };
@@ -108,62 +117,68 @@ TEST_LOGGER4(setLinkSerial)
 {
     SetLinkSerialTest tests[] = {
         {
-            "link serial baudrate=19200 mode=rs232" COMMAND_TERMINATOR,
-            "link serial baudrate=19200 mode=rs232" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .baudRate = RBRGEN4_LINK_SERIAL_BAUD_19200,
-                .mode = RBRGEN4_LINK_SERIAL_MODE_RS232,
-            },
+            .command = "link serial baudrate=19200 mode=rs232" COMMAND_TERMINATOR,
+            .response = "link serial baudrate=19200 mode=rs232" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .serial =
+                {
+                    .baudRate = RBRGEN4_LINK_SERIAL_BAUD_19200,
+                    .mode = RBRGEN4_LINK_SERIAL_MODE_RS232,
+                },
         },
         {
-            "link serial baudrate=9600 mode=uart" COMMAND_TERMINATOR,
-            "link serial baudrate=9600 mode=uart" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .baudRate = RBRGEN4_LINK_SERIAL_BAUD_9600,
-                .mode = RBRGEN4_LINK_SERIAL_MODE_UART,
-            },
+            .command = "link serial baudrate=9600 mode=uart" COMMAND_TERMINATOR,
+            .response = "link serial baudrate=9600 mode=uart" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .serial =
+                {
+                    .baudRate = RBRGEN4_LINK_SERIAL_BAUD_9600,
+                    .mode = RBRGEN4_LINK_SERIAL_MODE_UART,
+                },
         },
         /* A value the getter could not read reaches the setter as `none`, a
          * value out of range is a mistake, and the command takes one rate and
          * one mode so a combination of flags is a mistake too: none of the
          * three is sent. */
         {
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
-            {
-                .baudRate = RBRGEN4_LINK_SERIAL_BAUD_NONE,
-                .mode = RBRGEN4_LINK_SERIAL_MODE_RS232,
-            },
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+            .serial =
+                {
+                    .baudRate = RBRGEN4_LINK_SERIAL_BAUD_NONE,
+                    .mode = RBRGEN4_LINK_SERIAL_MODE_RS232,
+                },
         },
         {
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
-            {
-                .baudRate = RBRGEN4_LINK_SERIAL_BAUD_115200,
-                .mode = RBRGEN4_LINK_SERIAL_MODE_NONE,
-            },
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+            .serial =
+                {
+                    .baudRate = RBRGEN4_LINK_SERIAL_BAUD_115200,
+                    .mode = RBRGEN4_LINK_SERIAL_MODE_NONE,
+                },
         },
         {
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
-            {
-                .baudRate = RBRGEN4_LINK_SERIAL_BAUD_MAX << 1,
-                .mode = RBRGEN4_LINK_SERIAL_MODE_RS232,
-            },
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+            .serial =
+                {
+                    .baudRate = RBRGEN4_LINK_SERIAL_BAUD_MAX << 1,
+                    .mode = RBRGEN4_LINK_SERIAL_MODE_RS232,
+                },
         },
         {
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
-            {
-                .baudRate = RBRGEN4_LINK_SERIAL_BAUD_9600 | RBRGEN4_LINK_SERIAL_BAUD_19200,
-                .mode = RBRGEN4_LINK_SERIAL_MODE_RS232,
-            },
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+            .serial =
+                {
+                    .baudRate = RBRGEN4_LINK_SERIAL_BAUD_9600 | RBRGEN4_LINK_SERIAL_BAUD_19200,
+                    .mode = RBRGEN4_LINK_SERIAL_MODE_RS232,
+                },
         },
         {0},
     };

@@ -26,51 +26,54 @@ TEST_LOGGER4(id4)
 {
     IdTest tests[] = {
         {
-            "id4 model=L4 "
-            "sn=999999 "
-            "fwversion=2.0.0 "
-            "semver=2.0.0-rc1-10-g148bc5eb1 "
-            "fwtype=150 "
-            "apiversion=2.1" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .model = "L4",
-                .fwVersion = "2.0.0",
-                .semver = "2.0.0-rc1-10-g148bc5eb1",
-                .apiVersion = "2.1",
-                .sn = 999999,
-                .fwType = 150,
-            },
+            .response = "id4 model=L4 "
+                        "sn=999999 "
+                        "fwversion=2.0.0 "
+                        "semver=2.0.0-rc1-10-g148bc5eb1 "
+                        "fwtype=150 "
+                        "apiversion=2.1" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .model = "L4",
+                    .fwVersion = "2.0.0",
+                    .semver = "2.0.0-rc1-10-g148bc5eb1",
+                    .apiVersion = "2.1",
+                    .sn = 999999,
+                    .fwType = 150,
+                },
         },
         /* A response without the parameter leaves it empty. */
         {
-            "id4 model=L4 "
-            "sn=999999 "
-            "fwversion=2.0.0 "
-            "semver=2.0.0-rc1-10-g148bc5eb1 "
-            "fwtype=150" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .model = "L4",
-                .fwVersion = "2.0.0",
-                .semver = "2.0.0-rc1-10-g148bc5eb1",
-                .apiVersion = "",
-                .sn = 999999,
-                .fwType = 150,
-            },
+            .response = "id4 model=L4 "
+                        "sn=999999 "
+                        "fwversion=2.0.0 "
+                        "semver=2.0.0-rc1-10-g148bc5eb1 "
+                        "fwtype=150" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .model = "L4",
+                    .fwVersion = "2.0.0",
+                    .semver = "2.0.0-rc1-10-g148bc5eb1",
+                    .apiVersion = "",
+                    .sn = 999999,
+                    .fwType = 150,
+                },
         },
         /* A response carrying no parameters leaves the struct zeroed. */
         {
-            "id4" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .model = "",
-                .fwVersion = "",
-                .semver = "",
-                .apiVersion = "",
-                .sn = 0,
-                .fwType = 0,
-            },
+            .response = "id4" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .model = "",
+                    .fwVersion = "",
+                    .semver = "",
+                    .apiVersion = "",
+                    .sn = 0,
+                    .fwType = 0,
+                },
         },
         {0},
     };
@@ -103,19 +106,19 @@ TEST_LOGGER4(power)
 {
     PowerTest tests[] = {
         {
-            "instrument power source=usb" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_POWER_SOURCE_USB,
+            .response = "instrument power source=usb" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected = RBRGEN4_POWER_SOURCE_USB,
         },
         {
-            "instrument power source=ext" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_POWER_SOURCE_EXTERNAL,
+            .response = "instrument power source=ext" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected = RBRGEN4_POWER_SOURCE_EXTERNAL,
         },
         {
-            "instrument power source=int" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_POWER_SOURCE_INTERNAL,
+            .response = "instrument power source=int" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected = RBRGEN4_POWER_SOURCE_INTERNAL,
         },
         {0},
     };
@@ -167,40 +170,40 @@ TEST_LOGGER4(setPowerInternalBatteryType)
 {
     PowerInternalBatteryTypeTest tests[] = {
         {
-            "instrument power internal batterytype=lisocl2" COMMAND_TERMINATOR,
-            "instrument power internal batterytype=lisocl2" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INTERNAL_BATTERY_LISOCL2,
+            .command = "instrument power internal batterytype=lisocl2" COMMAND_TERMINATOR,
+            .response = "instrument power internal batterytype=lisocl2" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_INTERNAL_BATTERY_LISOCL2,
         },
         {
-            "instrument power internal batterytype=lifes2" COMMAND_TERMINATOR,
-            "instrument power internal batterytype=lifes2" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INTERNAL_BATTERY_LIFES2,
+            .command = "instrument power internal batterytype=lifes2" COMMAND_TERMINATOR,
+            .response = "instrument power internal batterytype=lifes2" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_INTERNAL_BATTERY_LIFES2,
         },
         {
-            "instrument power internal batterytype=znmno2" COMMAND_TERMINATOR,
-            "instrument power internal batterytype=znmno2" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INTERNAL_BATTERY_ZNMNO2,
+            .command = "instrument power internal batterytype=znmno2" COMMAND_TERMINATOR,
+            .response = "instrument power internal batterytype=znmno2" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_INTERNAL_BATTERY_ZNMNO2,
         },
         {
-            "instrument power internal batterytype=linimnco" COMMAND_TERMINATOR,
-            "instrument power internal batterytype=linimnco" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INTERNAL_BATTERY_LINIMNCO,
+            .command = "instrument power internal batterytype=linimnco" COMMAND_TERMINATOR,
+            .response = "instrument power internal batterytype=linimnco" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_INTERNAL_BATTERY_LINIMNCO,
         },
         {
-            "instrument power internal batterytype=nimh" COMMAND_TERMINATOR,
-            "instrument power internal batterytype=nimh" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INTERNAL_BATTERY_NIMH,
+            .command = "instrument power internal batterytype=nimh" COMMAND_TERMINATOR,
+            .response = "instrument power internal batterytype=nimh" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_INTERNAL_BATTERY_NIMH,
         },
         {
-            "instrument power internal batterytype=none" COMMAND_TERMINATOR,
-            "instrument power internal batterytype=none" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INTERNAL_BATTERY_NONE,
+            .command = "instrument power internal batterytype=none" COMMAND_TERMINATOR,
+            .response = "instrument power internal batterytype=none" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_INTERNAL_BATTERY_NONE,
         },
         {0},
     };
@@ -257,70 +260,75 @@ TEST_LOGGER4(setPowerExternalBatteryType)
 {
     PowerExternalBatteryTypeTest tests[] = {
         {
-            "instrument power external batterytype=fermata_lisocl2" COMMAND_TERMINATOR,
-            "instrument power external batterytype=fermata_lisocl2" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_EXTERNAL_BATTERY_FERMATA_LISOCL2,
+            .command = "instrument power external batterytype=fermata_lisocl2" COMMAND_TERMINATOR,
+            .response = "instrument power external batterytype=fermata_lisocl2" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_EXTERNAL_BATTERY_FERMATA_LISOCL2,
         },
         {
-            "instrument power external batterytype=fermata_znmno2" COMMAND_TERMINATOR,
-            "instrument power external batterytype=fermata_znmno2" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_EXTERNAL_BATTERY_FERMATA_ZNMNO2,
+            .command = "instrument power external batterytype=fermata_znmno2" COMMAND_TERMINATOR,
+            .response = "instrument power external batterytype=fermata_znmno2" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_EXTERNAL_BATTERY_FERMATA_ZNMNO2,
         },
         {
-            "instrument power external batterytype=fermette_limno2" COMMAND_TERMINATOR,
-            "instrument power external batterytype=fermette_limno2" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_EXTERNAL_BATTERY_FERMETTE_LIMNO2,
+            .command = "instrument power external batterytype=fermette_limno2" COMMAND_TERMINATOR,
+            .response = "instrument power external batterytype=fermette_limno2" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_EXTERNAL_BATTERY_FERMETTE_LIMNO2,
         },
         {
-            "instrument power external batterytype=fermette3_lisocl2" COMMAND_TERMINATOR,
-            "instrument power external batterytype=fermette3_lisocl2" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_LISOCL2,
+            .command = "instrument power external batterytype=fermette3_lisocl2" COMMAND_TERMINATOR,
+            .response =
+                "instrument power external batterytype=fermette3_lisocl2" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_LISOCL2,
         },
         {
-            "instrument power external batterytype=fermette3_lifes2" COMMAND_TERMINATOR,
-            "instrument power external batterytype=fermette3_lifes2" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_LIFES2,
+            .command = "instrument power external batterytype=fermette3_lifes2" COMMAND_TERMINATOR,
+            .response =
+                "instrument power external batterytype=fermette3_lifes2" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_LIFES2,
         },
         {
-            "instrument power external batterytype=fermette3_znmno2" COMMAND_TERMINATOR,
-            "instrument power external batterytype=fermette3_znmno2" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_ZNMNO2,
+            .command = "instrument power external batterytype=fermette3_znmno2" COMMAND_TERMINATOR,
+            .response =
+                "instrument power external batterytype=fermette3_znmno2" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_ZNMNO2,
         },
         {
-            "instrument power external batterytype=fermette3_linimnco" COMMAND_TERMINATOR,
-            "instrument power external batterytype=fermette3_linimnco" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_LINIMNCO,
+            .command =
+                "instrument power external batterytype=fermette3_linimnco" COMMAND_TERMINATOR,
+            .response =
+                "instrument power external batterytype=fermette3_linimnco" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_LINIMNCO,
         },
         {
-            "instrument power external batterytype=fermette3_nimh" COMMAND_TERMINATOR,
-            "instrument power external batterytype=fermette3_nimh" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_NIMH,
+            .command = "instrument power external batterytype=fermette3_nimh" COMMAND_TERMINATOR,
+            .response = "instrument power external batterytype=fermette3_nimh" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_EXTERNAL_BATTERY_FERMETTE3_NIMH,
         },
         {
-            "instrument power external batterytype=fermata_nimh" COMMAND_TERMINATOR,
-            "instrument power external batterytype=fermata_nimh" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_EXTERNAL_BATTERY_FERMATA_NIMH,
+            .command = "instrument power external batterytype=fermata_nimh" COMMAND_TERMINATOR,
+            .response = "instrument power external batterytype=fermata_nimh" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_EXTERNAL_BATTERY_FERMATA_NIMH,
         },
         {
-            "instrument power external batterytype=other" COMMAND_TERMINATOR,
-            "instrument power external batterytype=other" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_EXTERNAL_BATTERY_OTHER,
+            .command = "instrument power external batterytype=other" COMMAND_TERMINATOR,
+            .response = "instrument power external batterytype=other" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_EXTERNAL_BATTERY_OTHER,
         },
         {
-            "instrument power external batterytype=none" COMMAND_TERMINATOR,
-            "instrument power external batterytype=none" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_EXTERNAL_BATTERY_NONE,
+            .command = "instrument power external batterytype=none" COMMAND_TERMINATOR,
+            .response = "instrument power external batterytype=none" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .batteryType = RBRGEN4_EXTERNAL_BATTERY_NONE,
         },
         {0},
     };
@@ -354,83 +362,87 @@ TEST_LOGGER4(conn)
 {
     InstrumentCommandTest tests[] = {
         {
-            "instrument state=disabled sn=999999 model=L4 pn=9999999revA "
-            "fwversion=2.0.0 semver=2.0.0-rc1-10-g148bc5eb1 fwtype=150 "
-            "fwlock=off datatype=float64 name=L4 apiversion=2.1" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .state = RBRGEN4_INSTRUMENT_STATE_DISABLED,
-                .sn = 999999,
-                .model = "L4",
-                .pn = "9999999revA",
-                .fwVersion = "2.0.0",
-                .semver = "2.0.0-rc1-10-g148bc5eb1",
-                .fwType = 150,
-                .fwLock = false,
-                .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
-                .name = "L4",
-                .apiVersion = "2.1",
-            },
+            .response = "instrument state=disabled sn=999999 model=L4 pn=9999999revA "
+                        "fwversion=2.0.0 semver=2.0.0-rc1-10-g148bc5eb1 fwtype=150 "
+                        "fwlock=off datatype=float64 name=L4 apiversion=2.1" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .state = RBRGEN4_INSTRUMENT_STATE_DISABLED,
+                    .sn = 999999,
+                    .model = "L4",
+                    .pn = "9999999revA",
+                    .fwVersion = "2.0.0",
+                    .semver = "2.0.0-rc1-10-g148bc5eb1",
+                    .fwType = 150,
+                    .fwLock = false,
+                    .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
+                    .name = "L4",
+                    .apiVersion = "2.1",
+                },
         },
         /* An enabled instrument with the firmware locked, and the extended
          * name and part number populated. */
         {
-            "instrument state=enabled sn=210000 model=RBRsolo4 "
-            "pn=L3-M11-BEC11-SC11-ST11-SP11 fwversion=1.0.0 "
-            "semver=1.0.0-rc4-11-g941ae64 fwtype=130 fwlock=on "
-            "datatype=float32 name=RBRsolo^4_T.D!fast32" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .state = RBRGEN4_INSTRUMENT_STATE_ENABLED,
-                .sn = 210000,
-                .model = "RBRsolo4",
-                .pn = "L3-M11-BEC11-SC11-ST11-SP11",
-                .fwVersion = "1.0.0",
-                .semver = "1.0.0-rc4-11-g941ae64",
-                .fwType = 130,
-                .fwLock = true,
-                .dataType = RBRGEN4_DATA_TYPE_FLOAT32,
-                .name = "RBRsolo^4_T.D!fast32",
-            },
+            .response = "instrument state=enabled sn=210000 model=RBRsolo4 "
+                        "pn=L3-M11-BEC11-SC11-ST11-SP11 fwversion=1.0.0 "
+                        "semver=1.0.0-rc4-11-g941ae64 fwtype=130 fwlock=on "
+                        "datatype=float32 name=RBRsolo^4_T.D!fast32" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .state = RBRGEN4_INSTRUMENT_STATE_ENABLED,
+                    .sn = 210000,
+                    .model = "RBRsolo4",
+                    .pn = "L3-M11-BEC11-SC11-ST11-SP11",
+                    .fwVersion = "1.0.0",
+                    .semver = "1.0.0-rc4-11-g941ae64",
+                    .fwType = 130,
+                    .fwLock = true,
+                    .dataType = RBRGEN4_DATA_TYPE_FLOAT32,
+                    .name = "RBRsolo^4_T.D!fast32",
+                },
         },
         /* calfloat64 is reported only during a calibration-mode deployment. */
         {
-            "instrument state=enabled sn=210000 model=RBRsolo4 pn=012345revA "
-            "fwversion=1.0.0 semver=1.0.0 fwtype=130 fwlock=off "
-            "datatype=calfloat64 name=RBRsolo4" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .state = RBRGEN4_INSTRUMENT_STATE_ENABLED,
-                .sn = 210000,
-                .model = "RBRsolo4",
-                .pn = "012345revA",
-                .fwVersion = "1.0.0",
-                .semver = "1.0.0",
-                .fwType = 130,
-                .fwLock = false,
-                .dataType = RBRGEN4_DATA_TYPE_CALFLOAT64,
-                .name = "RBRsolo4",
-            },
+            .response = "instrument state=enabled sn=210000 model=RBRsolo4 pn=012345revA "
+                        "fwversion=1.0.0 semver=1.0.0 fwtype=130 fwlock=off "
+                        "datatype=calfloat64 name=RBRsolo4" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .state = RBRGEN4_INSTRUMENT_STATE_ENABLED,
+                    .sn = 210000,
+                    .model = "RBRsolo4",
+                    .pn = "012345revA",
+                    .fwVersion = "1.0.0",
+                    .semver = "1.0.0",
+                    .fwType = 130,
+                    .fwLock = false,
+                    .dataType = RBRGEN4_DATA_TYPE_CALFLOAT64,
+                    .name = "RBRsolo4",
+                },
         },
         /* An unrecognized data type must not be reported as float32, which is
          * the zero value of the enum. */
         {
-            "instrument state=disabled sn=999999 model=L4 pn=9999999revA "
-            "fwversion=2.0.0 semver=2.0.0 fwtype=150 fwlock=off "
-            "datatype=float128 name=L4" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .state = RBRGEN4_INSTRUMENT_STATE_DISABLED,
-                .sn = 999999,
-                .model = "L4",
-                .pn = "9999999revA",
-                .fwVersion = "2.0.0",
-                .semver = "2.0.0",
-                .fwType = 150,
-                .fwLock = false,
-                .dataType = RBRGEN4_UNKNOWN_DATA_TYPE,
-                .name = "L4",
-            },
+            .response = "instrument state=disabled sn=999999 model=L4 pn=9999999revA "
+                        "fwversion=2.0.0 semver=2.0.0 fwtype=150 fwlock=off "
+                        "datatype=float128 name=L4" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .state = RBRGEN4_INSTRUMENT_STATE_DISABLED,
+                    .sn = 999999,
+                    .model = "L4",
+                    .pn = "9999999revA",
+                    .fwVersion = "2.0.0",
+                    .semver = "2.0.0",
+                    .fwType = 150,
+                    .fwLock = false,
+                    .dataType = RBRGEN4_UNKNOWN_DATA_TYPE,
+                    .name = "L4",
+                },
         },
         {0},
     };
@@ -471,14 +483,44 @@ TEST_LOGGER4(openRejectsInvalidBuffers)
         uint8_t *response;
         int32_t responseCapacity;
     } tests[] = {
-        {NULL, sizeof(commandBuffer), responseBuffer, sizeof(responseBuffer)},
-        {commandBuffer, 0, responseBuffer, sizeof(responseBuffer)},
-        {commandBuffer, sizeof(commandBuffer), NULL, sizeof(responseBuffer)},
-        {commandBuffer, sizeof(commandBuffer), responseBuffer, 0},
-        {commandBuffer, sizeof(commandBuffer), responseBuffer, -1},
+        {
+            .command = NULL,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = responseBuffer,
+            .responseCapacity = sizeof(responseBuffer),
+        },
+        {
+            .command = commandBuffer,
+            .commandCapacity = 0,
+            .response = responseBuffer,
+            .responseCapacity = sizeof(responseBuffer),
+        },
+        {
+            .command = commandBuffer,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = NULL,
+            .responseCapacity = sizeof(responseBuffer),
+        },
+        {
+            .command = commandBuffer,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = responseBuffer,
+            .responseCapacity = 0,
+        },
+        {
+            .command = commandBuffer,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = responseBuffer,
+            .responseCapacity = -1,
+        },
         /* Room for a line terminator and nothing else can never hold a
          * response. */
-        {commandBuffer, sizeof(commandBuffer), responseBuffer, 2},
+        {
+            .command = commandBuffer,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = responseBuffer,
+            .responseCapacity = 2,
+        },
     };
 
     RBRGen4 unopened;
@@ -940,37 +982,40 @@ TEST_LOGGER4(outputformat)
     OutputFormatTest tests[] = {
         /* The format an L4 reports out of the box. */
         {
-            "instrument outputformat sn=off schedulelabel=on datetime=on "
-            "crc=off datatype=float32" RESPONSE_TERMINATOR,
-            {
-                .sn = false,
-                .scheduleLabel = true,
-                .dateTime = true,
-                .crc = false,
-                .dataType = RBRGEN4_DATA_TYPE_FLOAT32,
-            },
+            .response = "instrument outputformat sn=off schedulelabel=on datetime=on "
+                        "crc=off datatype=float32" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .sn = false,
+                    .scheduleLabel = true,
+                    .dateTime = true,
+                    .crc = false,
+                    .dataType = RBRGEN4_DATA_TYPE_FLOAT32,
+                },
         },
         {
-            "instrument outputformat sn=on schedulelabel=on datetime=off "
-            "crc=on datatype=float64" RESPONSE_TERMINATOR,
-            {
-                .sn = true,
-                .scheduleLabel = true,
-                .dateTime = false,
-                .crc = true,
-                .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
-            },
+            .response = "instrument outputformat sn=on schedulelabel=on datetime=off "
+                        "crc=on datatype=float64" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .sn = true,
+                    .scheduleLabel = true,
+                    .dateTime = false,
+                    .crc = true,
+                    .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
+                },
         },
         {
-            "instrument outputformat sn=off schedulelabel=off datetime=off "
-            "crc=off datatype=calfloat64" RESPONSE_TERMINATOR,
-            {
-                .sn = false,
-                .scheduleLabel = false,
-                .dateTime = false,
-                .crc = false,
-                .dataType = RBRGEN4_DATA_TYPE_CALFLOAT64,
-            },
+            .response = "instrument outputformat sn=off schedulelabel=off datetime=off "
+                        "crc=off datatype=calfloat64" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .sn = false,
+                    .scheduleLabel = false,
+                    .dateTime = false,
+                    .crc = false,
+                    .dataType = RBRGEN4_DATA_TYPE_CALFLOAT64,
+                },
         },
         {0},
     };
