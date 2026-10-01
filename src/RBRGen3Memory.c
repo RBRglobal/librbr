@@ -627,7 +627,7 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
                              (double) postprocessing->depthMax));
 
     /* on-board dynamic correction only available for firmware 1.134 and above */
-    if (conn->id.fwtype == 104 && RBRGen3Version_compare(conn->id.version, "1.134") >= 0) {
+    if (conn->id.fwType == 104 && RBRGen3Version_compare(conn->id.version, "1.134") >= 0) {
         RBR_TRY(RBRGen3_converse(
             conn,
             "postprocessing dc_alpha = %.3f, dc_tau = %.3f, dc_tdelay = %.3f, dc_ctcoeff = %.4e",

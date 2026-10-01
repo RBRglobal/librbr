@@ -279,8 +279,8 @@ RBRGen3Error RBRGen3_getSampling(RBRGen3 *conn, RBRGen3Sampling *sampling)
             bool has3Hz5HzAvailable = false;
             /* 200/333 are only available on firmware type 100/up to
              * firmware version 1.360 on firmware type 103. */
-            if (conn->id.fwtype == 100 ||
-                (conn->id.fwtype == 103 &&
+            if (conn->id.fwType == 100 ||
+                (conn->id.fwType == 103 &&
                  RBRGen3Version_compare(conn->id.version, "1.360") <= 0)) {
                 has3Hz5HzAvailable = true;
             }

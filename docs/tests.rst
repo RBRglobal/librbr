@@ -57,7 +57,7 @@ let's consider the test for the ``id`` command:
            .model = "RBRduo3",
            .version = "1.092",
            .serial = 923456,
-           .fwtype = 104
+           .fwType = 104
        };
        RBRGen3Id actual;
 
@@ -76,7 +76,7 @@ let's consider the test for the ``id`` command:
        TEST_ASSERT_STR_EQ(expected.model, actual.model);
        TEST_ASSERT_STR_EQ(expected.version, actual.version);
        TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
-       TEST_ASSERT_EQ(expected.fwtype, actual.fwtype, "%" PRIi32);
+       TEST_ASSERT_EQ(expected.fwType, actual.fwType, "%" PRIi32);
 
        /* If none of the previous tests failed, the test passes. */
        return true;

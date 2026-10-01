@@ -59,12 +59,12 @@ const char *RBRCommonGeneration_name(RBRCommonGeneration generation);
  * was introduced part-way through Logger2, so instruments with very old
  * firmware do not report one.
  *
- * \param [in] fwtype the firmware type from the `id` (or `id4`) command
+ * \param [in] fwType the firmware type from the `id` (or `id4`) command
  * \return the generation the firmware type belongs to
  * \return #RBRCOMMON_UNKNOWN_GENERATION for a firmware type this library does
  *         not know
  */
-RBRCommonGeneration RBRCommonGeneration_fromFwtype(int32_t fwtype);
+RBRCommonGeneration RBRCommonGeneration_fromFwType(int32_t fwType);
 
 #ifdef __cplusplus
 }

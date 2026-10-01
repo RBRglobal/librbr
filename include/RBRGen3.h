@@ -271,7 +271,7 @@ typedef struct RBRGen3Id {
     /** The serial number of the instrument. */
     uint32_t serial;
     /** The firmware type of the instrument. */
-    uint16_t fwtype;
+    uint16_t fwType;
     /** The instrument mode. */
     char mode[RBRGEN3_ID_MODE_MAX + 1];
 } RBRGen3Id;

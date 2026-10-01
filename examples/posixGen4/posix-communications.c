@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
            " v%s (%s) with command API v%s; logging is %s.\n",
            instrument.model,
            instrument.sn,
-           instrument.fwversion,
+           instrument.fwVersion,
            instrument.semver,
            instrument.apiversion,
            RBRGen4InstrumentState_name(instrument.state));

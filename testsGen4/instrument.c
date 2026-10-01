@@ -35,11 +35,11 @@ TEST_LOGGER4(id4)
             RBRGEN4_SUCCESS,
             {
                 .model = "L4",
-                .fwversion = "2.0.0",
+                .fwVersion = "2.0.0",
                 .semver = "2.0.0-rc1-10-g148bc5eb1",
                 .apiversion = "2.1",
                 .sn = 999999,
-                .fwtype = 150,
+                .fwType = 150,
             },
         },
         /* A response without the parameter leaves it empty. */
@@ -52,11 +52,11 @@ TEST_LOGGER4(id4)
             RBRGEN4_SUCCESS,
             {
                 .model = "L4",
-                .fwversion = "2.0.0",
+                .fwVersion = "2.0.0",
                 .semver = "2.0.0-rc1-10-g148bc5eb1",
                 .apiversion = "",
                 .sn = 999999,
-                .fwtype = 150,
+                .fwType = 150,
             },
         },
         /* A response carrying no parameters leaves the struct zeroed. */
@@ -65,11 +65,11 @@ TEST_LOGGER4(id4)
             RBRGEN4_SUCCESS,
             {
                 .model = "",
-                .fwversion = "",
+                .fwVersion = "",
                 .semver = "",
                 .apiversion = "",
                 .sn = 0,
-                .fwtype = 0,
+                .fwType = 0,
             },
         },
         {0},
@@ -84,11 +84,11 @@ TEST_LOGGER4(id4)
         TEST_ASSERT_STR_EQ("id4" COMMAND_TERMINATOR, buffers->writeBuffer);
         TEST_ASSERT_ENUM_EQ(tests[i].expectedError, err, RBRGen4Error);
         TEST_ASSERT_STR_EQ(tests[i].expected.model, actual.model);
-        TEST_ASSERT_STR_EQ(tests[i].expected.fwversion, actual.fwversion);
+        TEST_ASSERT_STR_EQ(tests[i].expected.fwVersion, actual.fwVersion);
         TEST_ASSERT_STR_EQ(tests[i].expected.semver, actual.semver);
         TEST_ASSERT_STR_EQ(tests[i].expected.apiversion, actual.apiversion);
         TEST_ASSERT_EQ(tests[i].expected.sn, actual.sn, "%" PRIi32);
-        TEST_ASSERT_EQ(tests[i].expected.fwtype, actual.fwtype, "%" PRIi32);
+        TEST_ASSERT_EQ(tests[i].expected.fwType, actual.fwType, "%" PRIi32);
     }
     return true;
 }
@@ -325,9 +325,9 @@ TEST_LOGGER4(conn)
                 .sn = 999999,
                 .model = "L4",
                 .pn = "9999999revA",
-                .fwversion = "2.0.0",
+                .fwVersion = "2.0.0",
                 .semver = "2.0.0-rc1-10-g148bc5eb1",
-                .fwtype = 150,
+                .fwType = 150,
                 .fwLock = false,
                 .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
                 .name = "L4",
@@ -347,9 +347,9 @@ TEST_LOGGER4(conn)
                 .sn = 210000,
                 .model = "RBRsolo4",
                 .pn = "L3-M11-BEC11-SC11-ST11-SP11",
-                .fwversion = "1.0.0",
+                .fwVersion = "1.0.0",
                 .semver = "1.0.0-rc4-11-g941ae64",
-                .fwtype = 130,
+                .fwType = 130,
                 .fwLock = true,
                 .dataType = RBRGEN4_DATA_TYPE_FLOAT32,
                 .name = "RBRsolo^4_T.D!fast32",
@@ -366,9 +366,9 @@ TEST_LOGGER4(conn)
                 .sn = 210000,
                 .model = "RBRsolo4",
                 .pn = "012345revA",
-                .fwversion = "1.0.0",
+                .fwVersion = "1.0.0",
                 .semver = "1.0.0",
-                .fwtype = 130,
+                .fwType = 130,
                 .fwLock = false,
                 .dataType = RBRGEN4_DATA_TYPE_CALFLOAT64,
                 .name = "RBRsolo4",
@@ -386,9 +386,9 @@ TEST_LOGGER4(conn)
                 .sn = 999999,
                 .model = "L4",
                 .pn = "9999999revA",
-                .fwversion = "2.0.0",
+                .fwVersion = "2.0.0",
                 .semver = "2.0.0",
-                .fwtype = 150,
+                .fwType = 150,
                 .fwLock = false,
                 .dataType = RBRGEN4_UNKNOWN_DATA_TYPE,
                 .name = "L4",
@@ -408,9 +408,9 @@ TEST_LOGGER4(conn)
         TEST_ASSERT_EQ(tests[i].expected.sn, actual.sn, "%" PRIi32);
         TEST_ASSERT_STR_EQ(tests[i].expected.model, actual.model);
         TEST_ASSERT_STR_EQ(tests[i].expected.pn, actual.pn);
-        TEST_ASSERT_STR_EQ(tests[i].expected.fwversion, actual.fwversion);
+        TEST_ASSERT_STR_EQ(tests[i].expected.fwVersion, actual.fwVersion);
         TEST_ASSERT_STR_EQ(tests[i].expected.semver, actual.semver);
-        TEST_ASSERT_EQ(tests[i].expected.fwtype, actual.fwtype, "%" PRIi32);
+        TEST_ASSERT_EQ(tests[i].expected.fwType, actual.fwType, "%" PRIi32);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.fwLock, actual.fwLock, bool);
         TEST_ASSERT_ENUM_EQ(tests[i].expected.dataType, actual.dataType, RBRGen4DataType);
         TEST_ASSERT_STR_EQ(tests[i].expected.name, actual.name);

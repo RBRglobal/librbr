@@ -292,7 +292,7 @@ int main(int argc, char *argv[])
             fprintf(stderr, "%s: Gen4 id4 failed: %s!\n", argv[0], RBRGen4Error_name(err4));
             goto closeGen4;
         }
-        printf("Gen4: %s %" PRId32 " firmware %s\n", id4.model, id4.sn, id4.fwversion);
+        printf("Gen4: %s %" PRId32 " firmware %s\n", id4.model, id4.sn, id4.fwVersion);
     }
     status = EXIT_SUCCESS;
 

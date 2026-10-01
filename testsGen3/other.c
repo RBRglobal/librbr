@@ -46,7 +46,7 @@ TEST_LOGGER2(id)
         .model = "RBRduo",
         .version = "1.440",
         .serial = 912345,
-        .fwtype = 103,
+        .fwType = 103,
         .mode = "",
     };
     RBRGen3Id actual;
@@ -60,7 +60,7 @@ TEST_LOGGER2(id)
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
     TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.fwtype, actual.fwtype, "%" PRIi32);
+    TEST_ASSERT_EQ(expected.fwType, actual.fwType, "%" PRIi32);
     TEST_ASSERT_STR_EQ(expected.mode, actual.mode);
 
     return true;
@@ -72,7 +72,7 @@ TEST_LOGGER3(id)
         .model = "RBRduo3",
         .version = "1.092",
         .serial = 923456,
-        .fwtype = 104,
+        .fwType = 104,
         .mode = "",
     };
     RBRGen3Id actual;
@@ -87,7 +87,7 @@ TEST_LOGGER3(id)
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
     TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.fwtype, actual.fwtype, "%" PRIi32);
+    TEST_ASSERT_EQ(expected.fwType, actual.fwType, "%" PRIi32);
     TEST_ASSERT_STR_EQ(expected.mode, actual.mode);
 
     return true;
@@ -99,7 +99,7 @@ TEST_LOGGER3(id_simulated)
         .model = "RBRduo3",
         .version = "1.092",
         .serial = 923456,
-        .fwtype = 104,
+        .fwType = 104,
         .mode = "SIMULATED",
     };
     RBRGen3Id actual;
@@ -114,7 +114,7 @@ TEST_LOGGER3(id_simulated)
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
     TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.fwtype, actual.fwtype, "%" PRIi32);
+    TEST_ASSERT_EQ(expected.fwType, actual.fwType, "%" PRIi32);
     TEST_ASSERT_STR_EQ(expected.mode, actual.mode);
 
     return true;
@@ -126,7 +126,7 @@ TEST_LOGGER3(id_short)
         .model = "",
         .version = "",
         .serial = 0,
-        .fwtype = 0,
+        .fwType = 0,
         .mode = "",
     };
     RBRGen3Id actual;
@@ -138,7 +138,7 @@ TEST_LOGGER3(id_short)
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
     TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.fwtype, actual.fwtype, "%" PRIi32);
+    TEST_ASSERT_EQ(expected.fwType, actual.fwType, "%" PRIi32);
 
     return true;
 }

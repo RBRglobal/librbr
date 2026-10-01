@@ -371,7 +371,7 @@ int main(int argc, char *argv[])
     printf("The instrument is an %s (fwtype %d), serial number %06d, with "
            "firmware v%s.\n",
            id.model,
-           id.fwtype,
+           id.fwType,
            id.serial,
            id.version);
 

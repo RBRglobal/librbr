@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
         printf("Generation: %s\n", RBRCommonGeneration_name(RBRGen3_getGeneration(&gen3Conn)));
         printf("Model:      %s\n", id.model);
         printf("Serial:     %06" PRIu32 "\n", id.serial);
-        printf("Firmware:   v%s (type %" PRIu16 ")\n", id.version, id.fwtype);
+        printf("Firmware:   v%s (type %" PRIu16 ")\n", id.version, id.fwType);
         RBRGen3_close(&gen3Conn);
         close(instrumentFd);
         return EXIT_SUCCESS;
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
     printf("Generation: %s\n", RBRCommonGeneration_name(RBRGen4_getGeneration(&gen4Conn)));
     printf("Model:      %s\n", id.model);
     printf("Serial:     %06" PRId32 "\n", id.sn);
-    printf("Firmware:   v%s (type %" PRId32 ")\n", id.fwversion, id.fwtype);
+    printf("Firmware:   v%s (type %" PRId32 ")\n", id.fwVersion, id.fwType);
     RBRGen4_close(&gen4Conn);
     close(instrumentFd);
     return EXIT_SUCCESS;

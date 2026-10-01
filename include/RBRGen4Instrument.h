@@ -388,7 +388,7 @@ typedef struct RBRGen4Instrument {
     /** \brief The RBR part number of the instrument. */
     char pn[RBRGEN4_PART_NUMBER_MAX + 1];
     /** \brief The instrument firmware version. */
-    char fwversion[RBRGEN4_ID_VERSION_MAX + 1];
+    char fwVersion[RBRGEN4_ID_VERSION_MAX + 1];
     /**
      * \brief The instrument firmware version in Semantic Version form.
      *
@@ -396,7 +396,7 @@ typedef struct RBRGen4Instrument {
      */
     char semver[RBRGEN4_ID_SEMVER_MAX + 1];
     /** \brief The firmware type of the instrument. */
-    int32_t fwtype;
+    int32_t fwType;
     /** \brief Whether firmware upgrades are locked. */
     bool fwLock;
     /** \brief The data type used by the instrument's samples. */

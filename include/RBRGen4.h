@@ -377,7 +377,7 @@ typedef struct RBRGen4Id4 {
      *
      * \readonly
      */
-    char fwversion[RBRGEN4_ID_VERSION_MAX + 1];
+    char fwVersion[RBRGEN4_ID_VERSION_MAX + 1];
     /**
      * \brief The instrument firmware version in Semantic Version form.
      *
@@ -397,7 +397,7 @@ typedef struct RBRGen4Id4 {
     /** The serial number of the instrument. */
     int32_t sn;
     /** The firmware type of the instrument. */
-    int32_t fwtype;
+    int32_t fwType;
 } RBRGen4Id4;
 
 struct RBRGen4;

@@ -215,7 +215,7 @@ bool test_outputformat_support_caltext07(RBRGen3 *conn)
 
     err = RBRGen3_getAvailableOutputFormats(conn, &formats);
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-    /* assuming instrument->id.fwtype==104, and id.version>=1.109. */
+    /* assuming instrument->id.fwType==104, and id.version>=1.109. */
     TEST_ASSERT_EQ(RBRGEN3_OUTFORMAT_CALTEXT01 | RBRGEN3_OUTFORMAT_CALTEXT02 |
                        RBRGEN3_OUTFORMAT_CALTEXT03 | RBRGEN3_OUTFORMAT_CALTEXT04 |
                        RBRGEN3_OUTFORMAT_CALTEXT07,

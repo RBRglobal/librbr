@@ -51,7 +51,7 @@ RBRGen4Error RBRGen4_getId4(RBRGen4 *conn, RBRGen4Id4 *id)
         if (strcmp(parameter.key, "model") == 0) {
             snprintf(id->model, sizeof(id->model), "%s", parameter.value);
         } else if (strcmp(parameter.key, "fwversion") == 0) {
-            snprintf(id->fwversion, sizeof(id->fwversion), "%s", parameter.value);
+            snprintf(id->fwVersion, sizeof(id->fwVersion), "%s", parameter.value);
         } else if (strcmp(parameter.key, "semver") == 0) {
             snprintf(id->semver, sizeof(id->semver), "%s", parameter.value);
         } else if (strcmp(parameter.key, "apiversion") == 0) {
@@ -59,7 +59,7 @@ RBRGen4Error RBRGen4_getId4(RBRGen4 *conn, RBRGen4Id4 *id)
         } else if (strcmp(parameter.key, "sn") == 0) {
             id->sn = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "fwtype") == 0) {
-            id->fwtype = strtol(parameter.value, NULL, 10);
+            id->fwType = strtol(parameter.value, NULL, 10);
         }
     } while (true);
     if (id != &conn->id) {
@@ -362,14 +362,14 @@ RBRGen4Error RBRGen4_getInstrument(RBRGen4 *conn, RBRGen4Instrument *instrumentI
         } else if (strcmp(parameter.key, "pn") == 0) {
             snprintf(instrumentInfo->pn, sizeof(instrumentInfo->pn), "%s", parameter.value);
         } else if (strcmp(parameter.key, "fwversion") == 0) {
-            snprintf(instrumentInfo->fwversion,
-                     sizeof(instrumentInfo->fwversion),
+            snprintf(instrumentInfo->fwVersion,
+                     sizeof(instrumentInfo->fwVersion),
                      "%s",
                      parameter.value);
         } else if (strcmp(parameter.key, "semver") == 0) {
             snprintf(instrumentInfo->semver, sizeof(instrumentInfo->semver), "%s", parameter.value);
         } else if (strcmp(parameter.key, "fwtype") == 0) {
-            instrumentInfo->fwtype = strtol(parameter.value, NULL, 10);
+            instrumentInfo->fwType = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "fwlock") == 0) {
             instrumentInfo->fwLock = (strcmp(parameter.value, "on") == 0);
         } else if (strcmp(parameter.key, "datatype") == 0) {

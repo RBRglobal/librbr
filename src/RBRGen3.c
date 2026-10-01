@@ -110,7 +110,7 @@ static RBRGen3Error RBRGen3_populateGeneration(RBRGen3 *conn)
     }
     RBR_TRY(err);
 
-    conn->generation = RBRCommonGeneration_fromFwtype(conn->id.fwtype);
+    conn->generation = RBRCommonGeneration_fromFwType(conn->id.fwType);
     return RBRGEN3_SUCCESS;
 }
 
