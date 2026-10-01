@@ -731,20 +731,18 @@ typedef struct RBRGen3 {
  *                         connection
  * \param [in] commandTimeout the command timeout in milliseconds
  * \param [in] userData arbitrary user data; useful in callbacks
- * \return #RBRGEN3_SUCCESS if the instrument was opened successfully
- * \return #RBRGEN3_MISSING_CALLBACK if \a environment or a callback was not
+ * \return #RBRGEN3_SUCCESS when the instrument was opened successfully
+ * \return #RBRGEN3_MISSING_CALLBACK when \a environment or a callback was not
  *         provided
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE if a buffer is missing or empty,
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when a buffer is missing or empty,
  *         or RBRGen3Environment.sampleBuffer has no readings storage
- * \return #RBRGEN3_COMMAND_TOO_LONG if the command buffer cannot hold the
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command buffer cannot hold the
  *         opening command
- * \return #RBRGEN3_RESPONSE_TOO_LONG if the response buffer cannot hold the
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when the response buffer cannot hold the
  *         instrument's reply
- * \return #RBRGEN3_TIMEOUT if an instrument communication timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument rejects the opening
- *         command
- * \return #RBRGEN3_UNSUPPORTED if the instrument is unsupported
+ * \return #RBRGEN3_UNSUPPORTED when the instrument is unsupported, does not
+ *         answer, or answers with an error
  * \see RBRGen3_close()
  */
 RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Environment *environment,
@@ -757,7 +755,7 @@ RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Environment *environment,
  * memory and does not perform any communication with the instrument.
  *
  * \param [in,out] conn the instrument connection to terminate
- * \return #RBRGEN3_SUCCESS if the instrument was closed successfully
+ * \return #RBRGEN3_SUCCESS when the instrument was closed successfully
  * \see RBRGen3_open()
  */
 RBRGen3Error RBRGen3_close(RBRGen3 *conn);
@@ -776,7 +774,7 @@ RBRGen3Error RBRGen3_close(RBRGen3 *conn);
  * \param [in] command storage for commands destined for the instrument
  * \param [in] capacity the capacity of \a command in bytes
  * \return #RBRGEN3_SUCCESS when the buffer is replaced
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE if the buffer is missing or empty
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the buffer is missing or empty
  * \see RBRGen3Environment for the rules on sizing and sharing buffers
  * \see RBRGen3_setResponseBuffer()
  */
@@ -798,7 +796,7 @@ RBRGen3Error RBRGen3_setCommandBuffer(RBRGen3 *conn, uint8_t *command, int32_t c
  * \param [in] response storage for data received from the instrument
  * \param [in] capacity the capacity of \a response in bytes
  * \return #RBRGEN3_SUCCESS when the buffer is replaced
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE if the buffer is missing or cannot
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the buffer is missing or cannot
  *         hold more than a line terminator
  * \see RBRGen3Environment for the rules on sizing and sharing buffers
  * \see RBRGen3_setCommandBuffer()

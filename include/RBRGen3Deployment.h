@@ -35,12 +35,12 @@ extern "C" {
  * \param [in] conn the instrument connection
  * \param [in] eraseMemory whether to erase memory before enabling logging
  * \param [out] status the status which would be produced by enabling logging
- * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_SUCCESS when the status is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if an error would occur when enabling
+ * \return #RBRGEN3_HARDWARE_ERROR when an error would occur when enabling
  *                                 logging, or another hardware error occurs
  * \see RBRGen3_enable()
  */
@@ -59,7 +59,7 @@ RBRGen3Error RBRGen3_verify(RBRGen3 *conn, bool eraseMemory, RBRGen3DeploymentSt
  * \param [in] conn the instrument connection
  * \param [in] eraseMemory whether to erase memory before enabling logging
  * \param [out] status the instrument's status after having enabled logging
- * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_SUCCESS when logging is successfully enabled
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
@@ -74,11 +74,12 @@ RBRGen3Error RBRGen3_enable(RBRGen3 *conn, bool eraseMemory, RBRGen3DeploymentSt
  *
  * \param [in] conn the instrument connection
  * \param [out] status the instrument's status after having disabled logging
- * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_SUCCESS when logging is successfully disabled
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  */
 RBRGen3Error RBRGen3_disable(RBRGen3 *conn, RBRGen3DeploymentStatus *status);
 

@@ -35,7 +35,7 @@ extern "C" {
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the command can't be permitted, or
+ * \return #RBRGEN3_HARDWARE_ERROR when the command can't be permitted, or
  *                                 another hardware error occurs
  */
 RBRGen3Error RBRGen3_permit(RBRGen3 *conn, const char *command);
@@ -53,6 +53,7 @@ RBRGen3Error RBRGen3_permit(RBRGen3 *conn, const char *command);
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_setPrompt()
  */
 RBRGen3Error RBRGen3_getPrompt(RBRGen3 *conn, bool *prompt);
@@ -67,6 +68,7 @@ RBRGen3Error RBRGen3_getPrompt(RBRGen3 *conn, bool *prompt);
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_getPrompt()
  */
 RBRGen3Error RBRGen3_setPrompt(RBRGen3 *conn, bool prompt);
@@ -84,6 +86,7 @@ RBRGen3Error RBRGen3_setPrompt(RBRGen3 *conn, bool prompt);
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_setConfirmation()
  */
 RBRGen3Error RBRGen3_getConfirmation(RBRGen3 *conn, bool *confirmation);
@@ -102,6 +105,7 @@ RBRGen3Error RBRGen3_getConfirmation(RBRGen3 *conn, bool *confirmation);
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_getConfirmation()
  */
 RBRGen3Error RBRGen3_setConfirmation(RBRGen3 *conn, bool confirmation);
@@ -116,6 +120,7 @@ RBRGen3Error RBRGen3_setConfirmation(RBRGen3 *conn, bool confirmation);
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  */
 RBRGen3Error RBRGen3_reboot(RBRGen3 *conn, int32_t delay);
 

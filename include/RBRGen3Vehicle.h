@@ -205,7 +205,7 @@ typedef struct RBRGen3Regime {
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or if an
  *                                 invalid regime index is given, or another
  *                                 hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE if an invalid regime index
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid regime index
  *                                                is given
  * \see RBRGen3_setRegime()
  */

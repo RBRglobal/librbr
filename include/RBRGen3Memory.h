@@ -105,7 +105,7 @@ typedef struct RBRGen3MemoryInfo {
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is
  *                                                requested
- * \return #RBRGEN3_HARDWARE_ERROR if the dataset is unsupported, or another
+ * \return #RBRGEN3_HARDWARE_ERROR when the dataset is unsupported, or another
  *                                 hardware error occurs
  */
 RBRGen3Error RBRGen3_getMemoryInfo(RBRGen3 *conn, RBRGen3MemoryInfo *memoryInfo);
@@ -169,10 +169,11 @@ typedef struct RBRGen3Data {
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_COMMUNICATION_ERROR when the offset in the response does not match the request
  * \return #RBRGEN3_CHECKSUM_ERROR in the event of a CRC failure
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is
  *                                                requested
- * \return #RBRGEN3_HARDWARE_ERROR if the dataset is unsupported, or another
+ * \return #RBRGEN3_HARDWARE_ERROR when the dataset is unsupported, or another
  *                                 hardware error occurs
  */
 RBRGen3Error RBRGen3_readData(RBRGen3 *conn, RBRGen3Data *data);
@@ -184,12 +185,12 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *conn, RBRGen3Data *data);
  * use.
  *
  * \param [in] conn the instrument connection
- * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_SUCCESS when the memory is successfully cleared
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the memory failed to erase, or another
+ * \return #RBRGEN3_HARDWARE_ERROR when the memory failed to erase, or another
  *                                 hardware error occurs
  */
 RBRGen3Error RBRGen3_memoryClear(RBRGen3 *conn);
@@ -236,6 +237,7 @@ const char *RBRGen3MemoryFormat_name(RBRGen3MemoryFormat format);
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  */
 RBRGen3Error RBRGen3_getAvailableMemoryFormats(RBRGen3 *conn, RBRGen3MemoryFormat *memoryFormats);
 
@@ -254,6 +256,7 @@ RBRGen3Error RBRGen3_getAvailableMemoryFormats(RBRGen3 *conn, RBRGen3MemoryForma
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  */
 RBRGen3Error RBRGen3_getCurrentMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *memoryFormat);
 
@@ -267,6 +270,7 @@ RBRGen3Error RBRGen3_getCurrentMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_setNewMemoryFormat()
  */
 RBRGen3Error RBRGen3_getNewMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *memoryFormat);
@@ -281,7 +285,7 @@ RBRGen3Error RBRGen3_getNewMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *memo
  *
  * \param [in] conn the instrument connection
  * \param [in] memoryFormat the new memory format
- * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer

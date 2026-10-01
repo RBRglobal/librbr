@@ -270,10 +270,10 @@ typedef struct RBRGen3Parser {
  * \param [in] callbacks the set of callbacks to be used by the parser
  * \param [in] config the parser configuration
  * \param [in] userData arbitrary user data; useful in callbacks
- * \return #RBRGEN3_SUCCESS if the parser was instantiated successfully
- * \return #RBRGEN3_MISSING_CALLBACK if no callbacks were provided
- * \return #RBRGEN3_UNSUPPORTED if the memory format is unsupported
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE if the config is invalid, or the
+ * \return #RBRGEN3_SUCCESS when the parser was instantiated successfully
+ * \return #RBRGEN3_MISSING_CALLBACK when no callbacks were provided
+ * \return #RBRGEN3_UNSUPPORTED when the memory format is unsupported
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the config is invalid, or the
  *         sample buffer has no readings storage
  * \see RBRGen3Parser_destroy()
  */
@@ -287,7 +287,7 @@ RBRGen3Error RBRGen3Parser_init(RBRGen3Parser *parser, const RBRGen3ParserCallba
  * memory.
  *
  * \param [in,out] parser the dataset parser to close
- * \return #RBRGEN3_SUCCESS if the parser was closed successfully
+ * \return #RBRGEN3_SUCCESS when the parser was closed successfully
  * \see RBRGen3Parser_init()
  */
 RBRGen3Error RBRGen3Parser_destroy(RBRGen3Parser *parser);

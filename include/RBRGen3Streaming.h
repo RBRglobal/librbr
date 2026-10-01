@@ -59,7 +59,7 @@ typedef struct RBRGen3ChannelsList {
  * by the instrument, up to RBRGen3ChannelsList.size entries. Unpopulated
  * entries will have zero-length name and unit members.
  *
- * \nol2 Use RBRGen3_getChannels() and RBRGen3_getChannel().
+ * \nol2 Use RBRGen3_getChannels().
  *
  * \param [in] conn the instrument connection
  * \param [out] channelsList the channels list; RBRGen3ChannelsList.channels
@@ -110,7 +110,7 @@ typedef struct RBRGen3LabelsList {
  * instrument, up to RBRGen3LabelsList.size entries. Unpopulated entries will
  * be zero-length.
  *
- * \nol2 Use RBRGen3_getChannels() and RBRGen3_getChannel().
+ * \nol2 Use RBRGen3_getChannels().
  *
  * \param [in] conn the instrument connection
  * \param [out] labelsList the channel labels list; RBRGen3LabelsList.labels
@@ -182,6 +182,7 @@ const char *RBRGen3OutputFormat_name(RBRGen3OutputFormat format);
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  */
 RBRGen3Error RBRGen3_getAvailableOutputFormats(RBRGen3 *conn, RBRGen3OutputFormat *outputFormats);
 
@@ -195,6 +196,7 @@ RBRGen3Error RBRGen3_getAvailableOutputFormats(RBRGen3 *conn, RBRGen3OutputForma
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_setOutputFormat()
  */
 RBRGen3Error RBRGen3_getOutputFormat(RBRGen3 *conn, RBRGen3OutputFormat *outputFormat);
@@ -204,13 +206,14 @@ RBRGen3Error RBRGen3_getOutputFormat(RBRGen3 *conn, RBRGen3OutputFormat *outputF
  *
  * \param [in] conn the instrument connection
  * \param [in] outputFormat the current output format
- * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when an unavailable output format is
  *                                 selected, or another hardware error occurs
+ * \return #RBRGEN3_UNSUPPORTED when the instrument does not support the output format
  * \see RBRGen3_getOutputFormat()
  */
 RBRGen3Error RBRGen3_setOutputFormat(RBRGen3 *conn, RBRGen3OutputFormat outputFormat);
@@ -236,7 +239,7 @@ RBRGen3Error RBRGen3_getUSBStreamingState(RBRGen3 *conn, bool *enabled);
  *
  * \param [in] conn the instrument connection
  * \param [in] enabled whether USB streaming is enabled
- * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
@@ -268,7 +271,7 @@ RBRGen3Error RBRGen3_getSerialStreamingState(RBRGen3 *conn, bool *enabled);
  *
  * \param [in] conn the instrument connection
  * \param [in] enabled whether serial streaming is enabled
- * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
@@ -430,8 +433,6 @@ RBRGen3Error RBRGen3_getAuxOutput(RBRGen3 *conn, RBRGen3AuxOutput *auxOutput);
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
  *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
- *                                                of range
  * \see RBRGen3_getAuxOutput()
  */
 RBRGen3Error RBRGen3_setAuxOutput(RBRGen3 *conn, const RBRGen3AuxOutput *auxOutput);
@@ -560,6 +561,7 @@ typedef struct RBRGen3Sample {
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_fetchSample() for on-demand sample fetching
  */
 RBRGen3Error RBRGen3_readSample(RBRGen3 *conn);

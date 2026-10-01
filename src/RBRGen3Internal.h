@@ -163,7 +163,7 @@ RBRGen3Error RBRGen3_appendCommand(RBRGen3 *conn, const char *command, ...);
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when the response exceeds the buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_sendCommand() to send a command
  * \see RBRGen3_converse() for a send/receive shortcut
  */
@@ -194,7 +194,7 @@ RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Samp
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a line too long for the response
  *         buffer was met and the correct response never arrived
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_sendCommand() to send a command
  * \see RBRGen3_readResponse() to read the command response
  */
@@ -238,8 +238,10 @@ RBRGen3Error RBRGen3_converseBuffer(RBRGen3 *conn);
  * \return #RBRGEN3_SUCCESS when the command was successfully sent and a
  *                                response was read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_converse() to send a command
  * \see RBRGen3_readResponse() to read the command response
  * \see RBRGen3_getFloat() for the float equivalent
@@ -263,8 +265,10 @@ RBRGen3Error RBRGen3_getBool(RBRGen3 *conn, const char *command, const char *par
  * \return #RBRGEN3_SUCCESS when the command was successfully sent and a
  *                                response was read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_converse() to send a command
  * \see RBRGen3_readResponse() to read the command response
  * \see RBRGen3_getBool() for the boolean equivalent
@@ -288,8 +292,10 @@ RBRGen3Error RBRGen3_getFloat(RBRGen3 *conn, const char *command, const char *pa
  * \return #RBRGEN3_SUCCESS when the command was successfully sent and a
  *                                response was read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_converse() to send a command
  * \see RBRGen3_readResponse() to read the command response
  * \see RBRGen3_getBool() for the boolean equivalent

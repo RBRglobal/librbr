@@ -57,6 +57,7 @@ const char *RBRGen3Link_name(RBRGen3Link link);
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  */
 RBRGen3Error RBRGen3_getLink(RBRGen3 *conn, RBRGen3Link *link);
 
@@ -202,6 +203,7 @@ typedef struct RBRGen3Serial {
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_setSerial()
  */
 RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn, RBRGen3Serial *serial);
@@ -238,6 +240,7 @@ RBRGen3Error RBRGen3_setSerial(RBRGen3 *conn, const RBRGen3Serial *serial);
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the instrument has been put to sleep
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  */
 RBRGen3Error RBRGen3_sleep(RBRGen3 *conn);
