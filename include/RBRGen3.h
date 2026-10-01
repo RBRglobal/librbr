@@ -683,10 +683,10 @@ typedef struct RBRGen3 {
  * instance (statically, on the stack, or from a heap of its choosing) and the
  * constructor initializes it in place. Any prior contents are discarded. The
  * caller likewise provides the command and response buffers through
- * \a environment. If either buffer is
- * `NULL`, the command buffer has a capacity of zero or less, or the response
- * buffer cannot hold more than a line terminator, the connection is not
- * opened and #RBRGEN3_INVALID_PARAMETER_VALUE is returned. A buffer too small for the
+ * \a environment. If either buffer is `NULL`, the command buffer has a
+ * capacity of zero or less, or the response buffer cannot hold more than a
+ * line terminator, the connection is not opened and
+ * #RBRGEN3_INVALID_PARAMETER_VALUE is returned. A buffer too small for the
  * opening exchange yields #RBRGEN3_COMMAND_TOO_LONG or
  * #RBRGEN3_RESPONSE_TOO_LONG.
  *
@@ -696,12 +696,12 @@ typedef struct RBRGen3 {
  * until the connection is closed or they are replaced with
  * RBRGen3_setCommandBuffer() or RBRGen3_setResponseBuffer(). The same
  * applies to RBRGen3Environment.sampleBuffer.
- * All callbacks must be given except for
- * RBRGen3Environment.sample. If any others are given as null pointers,
- * #RBRGEN3_MISSING_CALLBACK is returned and the instrument connection
- * will not be opened. If RBRGen3Environment.sample is given, then
- * RBRGen3Environment.sampleBuffer must also be given; if it is not,
- * #RBRGEN3_MISSING_CALLBACK is returned.
+ *
+ * All callbacks must be given except for RBRGen3Environment.sample. If any
+ * others are given as null pointers, #RBRGEN3_MISSING_CALLBACK is returned and
+ * the instrument connection will not be opened. If
+ * RBRGen3Environment.sample is given, then RBRGen3Environment.sampleBuffer
+ * must also be given; if it is not, #RBRGEN3_MISSING_CALLBACK is returned.
  *
  * Whenever callbacks are called, the data passed to them should be handled
  * immediately. The pointers passed will coincide with the caller-supplied
@@ -712,8 +712,7 @@ typedef struct RBRGen3 {
  * instruments are not supported. 4th-generation instruments can be identified,
  * but full support is left to the Gen4 side of the library; see the note below.
  * If the constructor detects an unsupported instrument during connection,
- * #RBRGEN3_UNSUPPORTED is returned; a callback failure or a buffer too small
- * for the identification exchange is reported as itself.
+ * #RBRGEN3_UNSUPPORTED is returned.
  *
  * In the event of any return value other than #RBRGEN3_SUCCESS, no cleanup of
  * library resources is required. In the event of a successful result,

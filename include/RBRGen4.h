@@ -835,10 +835,10 @@ typedef struct RBRGen4 {
  * instance (statically, on the stack, or from a heap of its choosing) and the
  * constructor initializes it in place. Any prior contents are discarded. The
  * caller likewise provides the command and response buffers through
- * \a environment. If either buffer is
- * `NULL`, the command buffer has a capacity of zero or less, or the response
- * buffer cannot hold more than a line terminator, the connection is not
- * opened and #RBRGEN4_INVALID_PARAMETER_VALUE is returned. A buffer too small for the
+ * \a environment. If either buffer is `NULL`, the command buffer has a
+ * capacity of zero or less, or the response buffer cannot hold more than a
+ * line terminator, the connection is not opened and
+ * #RBRGEN4_INVALID_PARAMETER_VALUE is returned. A buffer too small for the
  * opening exchange yields #RBRGEN4_COMMAND_TOO_LONG or
  * #RBRGEN4_RESPONSE_TOO_LONG.
  *
@@ -862,8 +862,7 @@ typedef struct RBRGen4 {
  *
  * This constructor supports only 4th-generation RBR instruments. If the
  * constructor detects an unsupported instrument during connection,
- * #RBRGEN4_UNSUPPORTED is returned; a callback failure or a buffer too small
- * for the identification exchange is reported as itself.
+ * #RBRGEN4_UNSUPPORTED is returned.
  *
  * Until this function has read the instrument's output format, the library
  * assumes it to be #RBRGEN4_DEFAULT_OUTPUT_FORMAT. Samples streamed
