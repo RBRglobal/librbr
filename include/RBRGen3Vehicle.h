@@ -105,6 +105,8 @@ typedef struct RBRGen3Regimes {
 /**
  * \brief Get the instrument regimes settings.
  *
+ * \command{regimes}
+ *
  * \param [in] conn the instrument connection
  * \param [out] regimes the regimes parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -120,6 +122,8 @@ RBRGen3Error RBRGen3_getRegimes(RBRGen3 *conn, RBRGen3Regimes *regimes);
 
 /**
  * \brief Set the instrument regimes settings.
+ *
+ * \command{regimes}
  *
  * These settings are only used when the RBRGen3Sampling.mode is
  * #RBRGEN3_SAMPLING_REGIMES.
@@ -187,6 +191,8 @@ typedef struct RBRGen3Regime {
 /**
  * \brief Get the instrument regime settings.
  *
+ * \command{regime}
+ *
  * Set RBRGen3Regime.index to indicate which regime settings are to be
  * retrieved.
  *
@@ -213,6 +219,8 @@ RBRGen3Error RBRGen3_getRegime(RBRGen3 *conn, RBRGen3Regime *regime);
 
 /**
  * \brief Set the instrument regime settings.
+ *
+ * \command{regime}
  *
  * Hardware errors may occur if:
  *
@@ -279,6 +287,8 @@ typedef struct RBRGen3DirectionDependentSampling {
 /**
  * \brief Get the instrument direction-dependent sampling settings.
  *
+ * \command{ddsampling}
+ *
  * \param [in] conn the instrument connection
  * \param [out] ddsampling the direction-dependent sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -295,6 +305,8 @@ RBRGen3Error RBRGen3_getDirectionDependentSampling(RBRGen3 *conn,
 
 /**
  * \brief Set the instrument regime settings.
+ *
+ * \command{ddsampling}
  *
  * Hardware errors may occur if:
  *

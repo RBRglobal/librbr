@@ -161,6 +161,8 @@ typedef struct RBRGen3Thresholding {
 /**
  * \brief Get the instrument thresholding settings.
  *
+ * \command{thresholding}
+ *
  * \param [in] conn the instrument connection
  * \param [out] threshold the thresholding parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -176,6 +178,8 @@ RBRGen3Error RBRGen3_getThresholding(RBRGen3 *conn, RBRGen3Thresholding *thresho
 
 /**
  * \brief Set the instrument thresholding settings.
+ *
+ * \command{thresholding}
  *
  * Hardware errors may occur if:
  *
@@ -223,6 +227,8 @@ typedef struct RBRGen3TwistActivation {
 /**
  * \brief Get the instrument twist activation settings.
  *
+ * \command{twistactivation}
+ *
  * \param [in] conn the instrument connection
  * \param [out] twistActivation the twist activation parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -238,6 +244,8 @@ RBRGen3Error RBRGen3_getTwistActivation(RBRGen3 *conn, RBRGen3TwistActivation *t
 
 /**
  * \brief Set the instrument twist activation settings.
+ *
+ * \command{twistactivation}
  *
  * Hardware errors may occur if:
  *

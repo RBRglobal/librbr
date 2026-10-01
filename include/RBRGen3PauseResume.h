@@ -92,6 +92,8 @@ const char *RBRGen3ResumeStatus_name(RBRGen3ResumeStatus status);
 /**
  * \brief Get the state of the `pauseresume` feature.
  *
+ * \command{pauseresume}
+ *
  * It allows the host to determine if the pauseresume feature is available on
  * the instrument. It allows an elevated host to allow and deny the feature
  * for the instrument.
@@ -112,6 +114,8 @@ RBRGen3Error RBRGen3_getPauseResume(RBRGen3 *conn, RBRGen3PauseResumeState *stat
 /**
  * \brief Pause an enabled deployment.
  *
+ * \command{pause}
+ *
  * \param [in] conn the instrument connection
  * \param [out] status the status of pause
  * \return #RBRGEN3_SUCCESS when the status is "paused".
@@ -127,6 +131,8 @@ RBRGen3Error RBRGen3_pause(RBRGen3 *conn, RBRGen3PauseStatus *status);
 
 /**
  * \brief Resume an enabled deployment which was previously paused.
+ *
+ * \command{resume}
  *
  * The deployment must have been paused using RBRGen3_pause().
  *

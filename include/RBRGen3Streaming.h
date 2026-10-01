@@ -52,6 +52,8 @@ typedef struct RBRGen3ChannelsList {
 /**
  * \brief Report a list of names and units for active channels, in order.
  *
+ * \command{outputformat}
+ *
  * Helpful for identifying the channel corresponding to each value in the
  * transmitted data.
  *
@@ -103,6 +105,8 @@ typedef struct RBRGen3LabelsList {
 
 /**
  * \brief Report a list of labels for active channels, in order.
+ *
+ * \command{outputformat}
  *
  * Helpful for identifying the channel corresponding to each value in the
  * transmitted data.
@@ -172,6 +176,8 @@ const char *RBRGen3OutputFormat_name(RBRGen3OutputFormat format);
 /**
  * \brief Report a list of available output formats.
  *
+ * \command{outputformat}
+ *
  * \a outputFormats will be treated as a bit field representation of available
  * output formats as defined by RBRGen3OutputFormat. For details, consult
  * the Working with Bit Fields page of the documentation.
@@ -190,6 +196,8 @@ RBRGen3Error RBRGen3_getAvailableOutputFormats(RBRGen3 *conn, RBRGen3OutputForma
 /**
  * \brief Get the current output format.
  *
+ * \command{outputformat}
+ *
  * \param [in] conn the instrument connection
  * \param [out] outputFormat the current output format
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -204,6 +212,8 @@ RBRGen3Error RBRGen3_getOutputFormat(RBRGen3 *conn, RBRGen3OutputFormat *outputF
 
 /**
  * \brief Set the current output format.
+ *
+ * \command{id,outputformat}
  *
  * \param [in] conn the instrument connection
  * \param [in] outputFormat the current output format
@@ -222,6 +232,8 @@ RBRGen3Error RBRGen3_setOutputFormat(RBRGen3 *conn, RBRGen3OutputFormat outputFo
 /**
  * \brief Get the USB streaming state.
  *
+ * \command{streamusb}
+ *
  * \param [in] conn the instrument connection
  * \param [out] enabled whether USB streaming is enabled
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -237,6 +249,8 @@ RBRGen3Error RBRGen3_getUSBStreamingState(RBRGen3 *conn, bool *enabled);
 
 /**
  * \brief Set the USB streaming state.
+ *
+ * \command{streamusb}
  *
  * \param [in] conn the instrument connection
  * \param [in] enabled whether USB streaming is enabled
@@ -254,6 +268,8 @@ RBRGen3Error RBRGen3_setUSBStreamingState(RBRGen3 *conn, bool enabled);
 /**
  * \brief Get the serial streaming state.
  *
+ * \command{streamserial}
+ *
  * \param [in] conn the instrument connection
  * \param [out] enabled whether serial streaming is enabled
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -269,6 +285,8 @@ RBRGen3Error RBRGen3_getSerialStreamingState(RBRGen3 *conn, bool *enabled);
 
 /**
  * \brief Set the serial streaming state.
+ *
+ * \command{streamserial}
  *
  * \param [in] conn the instrument connection
  * \param [in] enabled whether serial streaming is enabled
@@ -391,6 +409,8 @@ typedef struct RBRGen3AuxOutput {
 /**
  * \brief Get the instrument auxiliary output signal parameters.
  *
+ * \command{streamserial}
+ *
  * RBRGen3AuxOutput.aux must be set to the index of the auxiliary output
  * for which signal parameters are to be retrieved. Currently, it can only ever
  * be set to `1` (AUX1). For example:
@@ -419,6 +439,8 @@ RBRGen3Error RBRGen3_getAuxOutput(RBRGen3 *conn, RBRGen3AuxOutput *auxOutput);
 
 /**
  * \brief Set the instrument auxiliary output signal parameters.
+ *
+ * \command{streamserial}
  *
  * Hardware errors may occur if:
  *

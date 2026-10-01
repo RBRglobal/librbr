@@ -314,7 +314,7 @@ typedef struct RBRGen3Channels {
 /**
  * \brief Get the number of channels installed in the instrument.
  *
- * \note Issues the `channels count` command.
+ * \command{channels}
  *
  * \param [in] conn the instrument connection
  * \param [out] count the number of installed and configured channels
@@ -333,7 +333,7 @@ RBRGen3Error RBRGen3_getChannelCount(RBRGen3 *conn, int32_t *count);
  * \brief Get the number of enabled channels, which excludes any turned off by
  * the user.
  *
- * \note Issues the `channels on` command.
+ * \command{channels}
  *
  * \param [in] conn the instrument connection
  * \param [out] count the number of enabled channels
@@ -350,6 +350,8 @@ RBRGen3Error RBRGen3_getEnabledChannelCount(RBRGen3 *conn, int32_t *count);
 
 /**
  * \brief Get channel information for the instrument.
+ *
+ * \command{channels,channel,calibration}
  *
  * Channel information is composed from a combination of the `channels`,
  * `channel`, and `calibration` commands. The information returned by this
@@ -375,6 +377,8 @@ RBRGen3Error RBRGen3_getChannels(RBRGen3 *conn, RBRGen3Channels *channels);
 
 /**
  * \brief Get channel information for the instrument without calibration data.
+ *
+ * \command{channels,channel}
  *
  * Channel information is composed from combining the `channels` and `channel`
  * commands. Unlike RBRGen3_getChannels(), calibration information is
@@ -402,6 +406,8 @@ RBRGen3Error RBRGen3_getChannelsWithoutCalibrations(RBRGen3 *conn, RBRGen3Channe
 /**
  * \brief Set the status of a channel.
  *
+ * \command{channel}
+ *
  * \param [in] conn the instrument connection
  * \param [in] channel the index of the channel to update
  * \param [in] status whether the channel is activated for sampling
@@ -418,6 +424,8 @@ RBRGen3Error RBRGen3_setChannelStatus(RBRGen3 *conn, RBRGen3ChannelIndex channel
 
 /**
  * \brief Set the gain parameters of a channel.
+ *
+ * \command{channel}
  *
  * RBRGen3ChannelGain.rangingMode must be either
  * #RBRGEN3_RANGING_MANUAL or #RBRGEN3_RANGING_AUTO. Otherwise,
@@ -456,6 +464,8 @@ RBRGen3Error RBRGen3_setChannelGain(RBRGen3 *conn, RBRGen3ChannelIndex channel,
 
 /**
  * \brief Update a channel's calibration coefficients.
+ *
+ * \command{calibration}
  *
  * Hardware errors may occur if:
  *
@@ -496,6 +506,8 @@ RBRGen3Error RBRGen3_setCalibration(RBRGen3 *conn, RBRGen3ChannelIndex channel,
 /**
  * \brief Get the fetch power-off delay.
  *
+ * \command{settings}
+ *
  * The fetch power-off delay delay in milliseconds between the successful
  * completion of a fetch command and power to the front end sensors being
  * removed by the instrument.
@@ -514,6 +526,8 @@ RBRGen3Error RBRGen3_getFetchPowerOffDelay(RBRGen3 *conn, RBRGen3Period *fetchPo
 
 /**
  * \brief Set the fetch power-off delay.
+ *
+ * \command{permit,settings}
  *
  * Hardware errors may occur if:
  *
@@ -536,6 +550,8 @@ RBRGen3Error RBRGen3_setFetchPowerOffDelay(RBRGen3 *conn, RBRGen3Period fetchPow
 /**
  * \brief Get whether sensor power is always on.
  *
+ * \command{settings}
+ *
  * The instrument does not have to power down front end sensors between
  * samples. This can be useful for sensors with very long power-on
  * stabilization times.
@@ -555,6 +571,8 @@ RBRGen3Error RBRGen3_isSensorPowerAlwaysOn(RBRGen3 *conn, bool *sensorPowerAlway
 /**
  * \brief Set whether sensor power is always on.
  *
+ * \command{permit,settings}
+ *
  * A hardware error will occur if the instrument is logging.
  *
  * \param [in] conn the instrument connection
@@ -572,6 +590,8 @@ RBRGen3Error RBRGen3_setSensorPowerAlwaysOn(RBRGen3 *conn, bool sensorPowerAlway
 
 /**
  * \brief Get whether cast detection is enabled.
+ *
+ * \command{settings}
  *
  * The instrument can automatically detect upcasts and downcasts and generate
  * cast detection events in the datastream.
@@ -591,6 +611,8 @@ RBRGen3Error RBRGen3_getCastDetection(RBRGen3 *conn, bool *castDetection);
 /**
  * \brief Set whether cast detection is enabled.
  *
+ * \command{permit,settings}
+ *
  * A hardware error will occur if the instrument is logging.
  *
  * \param [in] conn the instrument connection
@@ -608,6 +630,8 @@ RBRGen3Error RBRGen3_setCastDetection(RBRGen3 *conn, bool castDetection);
 
 /**
  * \brief Get the timeout for output suppression while receiving commands.
+ *
+ * \command{settings}
  *
  * Specified in milliseconds. Must be between 10,000 and 240,000,
  * inclusive; partial seconds are rounded up to the next whole second by the
@@ -627,6 +651,8 @@ RBRGen3Error RBRGen3_getInputTimeout(RBRGen3 *conn, RBRGen3Period *inputTimeout)
 
 /**
  * \brief Set the timeout for output suppression while receiving commands.
+ *
+ * \command{permit,settings}
  *
  * Must be between 10,000 and 240,000, inclusive; partial seconds are rounded
  * up to the next whole second.
@@ -734,6 +760,8 @@ const char *RBRGen3ValueSetting_name(RBRGen3ValueSetting setting);
 /**
  * \brief Read a value setting from the instrument.
  *
+ * \command{settings}
+ *
  * \param [in] conn the instrument connection
  * \param [in] setting the setting to retrieve
  * \param [out] value the value of the setting
@@ -751,6 +779,8 @@ RBRGen3Error RBRGen3_getValueSetting(RBRGen3 *conn, RBRGen3ValueSetting setting,
 
 /**
  * \brief Write the a value setting to the instrument.
+ *
+ * \command{permit,settings}
  *
  * A hardware error will occur if the instrument is logging.
  *
@@ -788,6 +818,8 @@ typedef struct RBRGen3SensorParameter {
 /**
  * \brief Retrieve a single sensor parameter for a channel.
  *
+ * \command{sensor}
+ *
  * If the parameter is not configured, its value is set to “n/a”. This is the
  * native behaviour of Logger3 instruments. However, at a hardware level,
  * attempting to retrieve a nonexistent sensor parameter from a Logger2
@@ -816,6 +848,8 @@ RBRGen3Error RBRGen3_getSensorParameter(RBRGen3 *conn, RBRGen3ChannelIndex chann
 /**
  * \brief Retrieve the sensor parameters for a channel.
  *
+ * \command{sensor}
+ *
  * To ease memory requirements, sensor parameters are not included with other
  * channel information retrieved by RBRGen3_getChannels().
  *
@@ -842,6 +876,8 @@ RBRGen3Error RBRGen3_getSensorParameters(RBRGen3 *conn, RBRGen3ChannelIndex chan
 
 /**
  * \brief Set a sensor parameter for a channel.
+ *
+ * \command{sensor}
  *
  * Hardware errors may occur if:
  *

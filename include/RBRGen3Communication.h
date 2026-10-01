@@ -50,6 +50,8 @@ const char *RBRGen3Link_name(RBRGen3Link link);
 /**
  * \brief Get the type of connectivity for the instrument connection.
  *
+ * \command{link}
+ *
  * \param [in] conn the instrument connection
  * \param [out] link the link type
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
@@ -196,6 +198,8 @@ typedef struct RBRGen3Serial {
 /**
  * \brief Retrieve the current and available serial baud rates and modes.
  *
+ * \command{serial}
+ *
  * \param [in] conn the instrument connection
  * \param [out] serial the current and available serial parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
@@ -210,6 +214,8 @@ RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn, RBRGen3Serial *serial);
 
 /**
  * \brief Reconfigure the instrument serial baud rate and mode.
+ *
+ * \command{serial}
  *
  * A hardware error will occur if the baud rate or mode is unsupported by the
  * instrument. See RBRGen3Serial.availableBaudRates and
@@ -237,6 +243,8 @@ RBRGen3Error RBRGen3_setSerial(RBRGen3 *conn, const RBRGen3Serial *serial);
 /**
  * \brief Immediately shut down communications and implement any possible
  * power-saving measures.
+ *
+ * \command{sleep}
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the instrument has been put to sleep
@@ -323,6 +331,8 @@ typedef struct RBRGen3WiFi {
 /**
  * \brief Retrieve the current instrument Wi-Fi settings.
  *
+ * \command{wifi}
+ *
  * \param [in] conn the instrument connection
  * \param [out] wifi the current Wi-Fi parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
@@ -338,6 +348,8 @@ RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn, RBRGen3WiFi *wifi);
 
 /**
  * \brief Reconfigure the instrument Wi-Fi settings.
+ *
+ * \command{wifi}
  *
  * For Logger3 instruments, this sends the values of RBRGen3WiFi.enabled,
  * RBRGen3WiFi.powerTimeout, and RBRGen3WiFi.commandTimeout. For

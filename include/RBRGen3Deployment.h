@@ -24,6 +24,8 @@ extern "C" {
 /**
  * \brief Perform a “dry run” of the `enable` command.
  *
+ * \command{verify}
+ *
  * A hardware error can be generated for a variety of reasons. See the `verify`
  * command documentation for a comprehensive list. In the event of a hardware
  * error, \a status will be set to #RBRGEN3_UNKNOWN_STATUS. While Logger2
@@ -50,6 +52,8 @@ RBRGen3Error RBRGen3_verify(RBRGen3 *conn, bool eraseMemory, RBRGen3DeploymentSt
 /**
  * \brief Enable the instrument to sample according to the programmed schedule.
  *
+ * \command{enable}
+ *
  * If \a eraseMemory is not `true`, RBRGen3_memoryClear() must be used to
  * erase the memory beforehand as necessary.
  *
@@ -73,6 +77,9 @@ RBRGen3Error RBRGen3_enable(RBRGen3 *conn, bool eraseMemory, RBRGen3DeploymentSt
 
 /**
  * \brief If the instrument is logging, terminate the current deployment.
+ *
+ * \par Command:
+ * `disable`, or `stop` for Logger2
  *
  * \param [in] conn the instrument connection
  * \param [out] status the instrument's status after having disabled logging
@@ -106,6 +113,8 @@ typedef struct RBRGen3Simulation {
 /**
  * \brief Get the instrument simulation settings.
  *
+ * \command{simulation}
+ *
  * \param [in] conn the instrument connection
  * \param [out] simulation the simulation parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -121,6 +130,8 @@ RBRGen3Error RBRGen3_getSimulation(RBRGen3 *conn, RBRGen3Simulation *simulation)
 
 /**
  * \brief Set the instrument simulation settings.
+ *
+ * \command{permit,simulation}
  *
  * Hardware errors may occur if:
  *

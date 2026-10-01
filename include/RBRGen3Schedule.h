@@ -62,6 +62,9 @@ typedef struct RBRGen3Clock {
 /**
  * \brief Get the instrument clock.
  *
+ * \par Commands:
+ * `clock`, or `settings` and `now` for Logger2
+ *
  * Because UTC offset is tracked as a setting on Logger2 instruments, not as a
  * parameter of the `now` command (as it is of `clock` on Logger3), this
  * function will internally issue two commands to Logger2 instruments to
@@ -83,6 +86,9 @@ RBRGen3Error RBRGen3_getClock(RBRGen3 *conn, RBRGen3Clock *clock);
 
 /**
  * \brief Set the instrument clock.
+ *
+ * \par Commands:
+ * `clock`, or `now`, `permit`, and `settings` for Logger2
  *
  * Because UTC offset is tracked as a setting on Logger2 instruments, not as a
  * parameter of the `now` command (as it is of `clock` on Logger3), this
@@ -261,6 +267,8 @@ typedef struct RBRGen3Sampling {
 /**
  * \brief Get the instrument sampling parameters.
  *
+ * \command{sampling}
+ *
  * \param [in] conn the instrument connection
  * \param [out] sampling the sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -275,6 +283,8 @@ RBRGen3Error RBRGen3_getSampling(RBRGen3 *conn, RBRGen3Sampling *sampling);
 
 /**
  * \brief Set the instrument sampling mode and period.
+ *
+ * \command{sampling}
  *
  * This does _not_ set burst parameters (RBRGen3Sampling.burstLength and
  * RBRGen3Sampling.burstInterval). On instruments which do not support
@@ -322,6 +332,8 @@ RBRGen3Error RBRGen3_setSampling(RBRGen3 *conn, const RBRGen3Sampling *sampling)
 
 /**
  * \brief Set the instrument burst sampling length and interval.
+ *
+ * \command{sampling}
  *
  * This sets only burst parameters (RBRGen3Sampling.burstLength and
  * RBRGen3Sampling.burstInterval). To configure the sampling mode and
@@ -435,6 +447,9 @@ typedef struct RBRGen3Deployment {
 /**
  * \brief Get the instrument deployment parameters.
  *
+ * \par Commands:
+ * `deployment`, or `starttime`, `endtime`, and `status` for Logger2
+ *
  * \param [in] conn the instrument connection
  * \param [out] deployment the deployment parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -449,6 +464,9 @@ RBRGen3Error RBRGen3_getDeployment(RBRGen3 *conn, RBRGen3Deployment *deployment)
 
 /**
  * \brief Set the instrument deployment parameters.
+ *
+ * \par Commands:
+ * `deployment`, or `starttime` and `endtime` for Logger2
  *
  * As noted in the description of RBRGen3Deployment.status, that field is
  * ignored when setting the deployment.

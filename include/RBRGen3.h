@@ -674,6 +674,8 @@ typedef struct RBRGen3 {
 /**
  * \brief Establish a connection with an instrument and initialize the context.
  *
+ * \command{id}
+ *
  * What this library calls a “connection” concerns purely the state tracking
  * and management of an instrument: the underlying physical communication with
  * that instrument (via serial, TCP/IP socket, RFC 1149, whatever) must be

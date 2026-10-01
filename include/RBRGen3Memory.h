@@ -87,6 +87,8 @@ typedef struct RBRGen3MemoryInfo {
 /**
  * \brief Get information about the usage and characteristics of data memory.
  *
+ * \command{meminfo}
+ *
  * RBRGen3MemoryInfo.dataset must be set to the index of the dataset for
  * which information is to be retrieved.
  *
@@ -128,6 +130,9 @@ typedef struct RBRGen3Data {
 
 /**
  * \brief Request a chunk of binary data from instrument data memory.
+ *
+ * \par Command:
+ * `readdata`, or `read` for Logger2
  *
  * When calling RBRGen3_readData(), \a data must be populated:
  *
@@ -184,6 +189,8 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *conn, RBRGen3Data *data);
 /**
  * \brief Clear the data storage area of the flash memory.
  *
+ * \command{permit,memclear}
+ *
  * Currently, all datasets are erased, regardless of the data storage format in
  * use.
  *
@@ -229,6 +236,8 @@ const char *RBRGen3MemoryFormat_name(RBRGen3MemoryFormat format);
 /**
  * \brief Report a list of available memory formats.
  *
+ * \command{memformat}
+ *
  * \a memoryFormats will be treated as a bit field representation of available
  * memory formats as defined by RBRGen3MemoryFormat. For details, consult
  * the Working with Bit Fields page of the documentation.
@@ -246,6 +255,8 @@ RBRGen3Error RBRGen3_getAvailableMemoryFormats(RBRGen3 *conn, RBRGen3MemoryForma
 
 /**
  * \brief Get the current memory format.
+ *
+ * \command{memformat}
  *
  * Retrieves the format of the data presently stored in memory, either for a
  * deployment in progress or for one which has finished. If the memory is
@@ -266,6 +277,8 @@ RBRGen3Error RBRGen3_getCurrentMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *
 /**
  * \brief Get the memory format to be used for the next deployment.
  *
+ * \command{memformat}
+ *
  * \param [in] conn the instrument connection
  * \param [out] memoryFormat the new memory format
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -280,6 +293,8 @@ RBRGen3Error RBRGen3_getNewMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *memo
 
 /**
  * \brief Set the memory format to be used for the next deployment.
+ *
+ * \command{memformat}
  *
  * Hardware errors may occur if:
  *
@@ -578,6 +593,8 @@ typedef struct RBRGen3Postprocessing {
 /**
  * \brief Get the instrument post-processing settings.
  *
+ * \command{postprocessing}
+ *
  * \param [in] conn the instrument connection
  * \param [out] postprocessing the post-processing parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
@@ -596,6 +613,8 @@ RBRGen3Error RBRGen3_getPostprocessing(RBRGen3 *conn, RBRGen3Postprocessing *pos
 
 /**
  * \brief Set the instrument post-processing settings.
+ *
+ * \command{postprocessing}
  *
  * Hardware errors may occur if:
  *
@@ -623,6 +642,8 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
 
 /**
  * \brief Exercises control over the post-processing state.
+ *
+ * \command{postprocessing}
  *
  * Hardware errors may occur if:
  *

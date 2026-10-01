@@ -51,6 +51,8 @@ int RBRGen3Version_compare(const char *a, const char *b);
 /**
  * \brief Get identification information from the instrument.
  *
+ * \command{id}
+ *
  * \param [in] conn the instrument connection
  * \param [out] id the instrument information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
@@ -78,6 +80,8 @@ typedef struct RBRGen3HardwareRevision {
 
 /**
  * \brief Get instrument hardware revision information.
+ *
+ * \command{hwrev}
  *
  * \param [in] conn the instrument connection
  * \param [out] hwrev the hardware revision information
@@ -144,6 +148,9 @@ typedef struct RBRGen3Power {
 
 /**
  * \brief Get instrument power information.
+ *
+ * \par Command:
+ * `power`, or `powerstatus` for Logger2
  *
  * \param [in] conn the instrument connection
  * \param [out] power the power information
@@ -229,6 +236,8 @@ typedef struct RBRGen3PowerInternal {
 /**
  * \brief Get instrument internal power information.
  *
+ * \command{powerinternal}
+ *
  * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
  * \param [in] conn the instrument connection
@@ -247,6 +256,8 @@ RBRGen3Error RBRGen3_getPowerInternal(RBRGen3 *conn, RBRGen3PowerInternal *power
 
 /**
  * \brief Set the internal power battery type.
+ *
+ * \command{powerinternal}
  *
  * \nol2
  *
@@ -267,6 +278,8 @@ RBRGen3Error RBRGen3_setPowerInternalBatteryType(RBRGen3 *conn, RBRGen3InternalB
 
 /**
  * \brief Reset the counter of energy used from the internal battery.
+ *
+ * \command{powerinternal}
  *
  * \nol2
  *
@@ -362,6 +375,8 @@ typedef struct RBRGen3PowerExternal {
 /**
  * \brief Get instrument external power information.
  *
+ * \command{powerexternal}
+ *
  * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
  * \param [in] conn the instrument connection
@@ -381,6 +396,8 @@ RBRGen3Error RBRGen3_getPowerExternal(RBRGen3 *conn, RBRGen3PowerExternal *power
 /**
  * \brief Set the external power battery type.
  *
+ * \command{powerexternal}
+ *
  * \nol2
  *
  * \param [in] conn the instrument connection
@@ -399,6 +416,8 @@ RBRGen3Error RBRGen3_setPowerExternalBatteryType(RBRGen3 *conn, RBRGen3ExternalB
 
 /**
  * \brief Reset the counter of energy used from the external battery.
+ *
+ * \command{powerexternal}
  *
  * \nol2
  *
@@ -427,6 +446,8 @@ typedef struct RBRGen3Info {
 
 /**
  * \brief Get more information about the instrument.
+ *
+ * \command{info}
  *
  * \nol2
  *
