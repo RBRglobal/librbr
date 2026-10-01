@@ -39,6 +39,11 @@ General rules:
   between struct and enum members,
   and between function arguments
   where necessary.
+- End multi-line enums and initializer lists
+  with a trailing comma,
+  and put one item on each line.
+  Tests use designated initializers
+  (``.member = value``).
 - Code contributes to documentation.
   Annotate code with Doxygen commands
   and prefer to document any function subtleties
@@ -142,10 +147,15 @@ Technical pedantry:
     and ``\return`` comments.
   - Functions which send instrument commands
     name them with ``\command{command}``
-    (or ``\command{first,second}`` for more than one),
-    in its own paragraph after the ``\brief``.
+    (or ``\command{first,second}`` or ``\command{first,second,third}``
+    for two or three),
+    in their own paragraph after the ``\brief``.
+    For any other case,
+    write a ``\par Command:`` or ``\par Commands:`` paragraph by hand.
   - When a tag's text wraps, as in Zephyr,
-    continue a ``\param`` description under its first word,
+    continue a ``\param`` description
+    aligned with the start of its description
+    (after the parameter name),
     a ``\return`` or ``\see`` description just past the tag,
     and ``\brief``, ``\note``, or ``\warning`` text
     flush with the comment.
@@ -169,7 +179,7 @@ A short example:
     */
    int32_t RBRGen3_examplePrototype(RBRGen3 *conn,
                                     int32_t theseParametersAreAligned,
-                                    int32_t *becauseTheyFitOnTheLine);
+                                    const int32_t *becauseTheyFitOnTheLine);
 
    RBRGen3Error RBRGen3_exampleOfAReallyLongFunctionName(
        RBRGen3 *conn, int32_t theseParametersAreAllWrapped,
@@ -183,6 +193,8 @@ A short example:
                whereNecessary++;
            }
        }
+
+       return RBRGEN3_SUCCESS;
    }
 
 Formatting is enforced with `clang-format <https://clang.llvm.org/docs/ClangFormat.html>`__
