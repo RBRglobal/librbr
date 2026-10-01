@@ -65,10 +65,13 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 1710054066000LL,
                 .channelCount = 4,
-                .readings = (double[]) {RBRGen4Reading_setError(1),
-                                        RBRGen4Reading_setError(9),
-                                        RBRGen4Reading_setError(9),
-                                        RBRGen4Reading_setError(9)},
+                .readings =
+                    (double[]) {
+                        RBRGen4Reading_setError(1),
+                        RBRGen4Reading_setError(9),
+                        RBRGen4Reading_setError(9),
+                        RBRGen4Reading_setError(9),
+                    },
             },
             {0},
         },
@@ -129,9 +132,12 @@ TEST_LOGGER4(poll)
             {
                 .timestamp = 1710054069000LL,
                 .channelCount = 3,
-                .readings = (double[]) {RBRGen4Reading_setError(9),
-                                        RBRGen4Reading_setError(1),
-                                        RBRGen4Reading_setError(9)},
+                .readings =
+                    (double[]) {
+                        RBRGen4Reading_setError(9),
+                        RBRGen4Reading_setError(1),
+                        RBRGen4Reading_setError(9),
+                    },
             },
             {0},
         },
@@ -467,7 +473,11 @@ TEST_LOGGER4(poll)
                 .channelCount = 4,
                 .readings =
                     (double[]) {
-                        12.5369242316864, 9.80062000000000, -0.331880648498535, -0.329841267502290},
+                        12.5369242316864,
+                        9.80062000000000,
+                        -0.331880648498535,
+                        -0.329841267502290,
+                    },
             },
             {0},
         },
@@ -1046,7 +1056,11 @@ TEST_LOGGER4(readSampleWithoutCallback)
     conn->environment.sample = NULL;
 
     conn->outputFormat = (RBRGen4OutputFormat) {
-        .sn = false, .scheduleLabel = false, .dateTime = false, .crc = false};
+        .sn = false,
+        .scheduleLabel = false,
+        .dateTime = false,
+        .crc = false,
+    };
     TestIOBuffers_init(buffers, "9.85054000e+000 12.5359318e+000" RESPONSE_TERMINATOR, 0);
 
     err = RBRGen4_readSample(conn);

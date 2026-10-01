@@ -91,10 +91,16 @@ int main(int argc, char *argv[])
         .sampleBuffer = &sampleBuffer,
     };
 
-    RBRGen3ParserConfig parserConfig = {.format = RBRGEN3_MEMFORMAT_CALBIN00,
-                                        .formatConfig = {.easyParse = {
-                                                             .channels = channels,
-                                                         }}};
+    RBRGen3ParserConfig parserConfig = {
+        .format = RBRGEN3_MEMFORMAT_CALBIN00,
+        .formatConfig =
+            {
+                .easyParse =
+                    {
+                        .channels = channels,
+                    },
+            },
+    };
 
     RBRGen3Error err;
     if ((err = RBRGen3Parser_init(&parser, &parserCallbacks, &parserConfig, NULL)) !=

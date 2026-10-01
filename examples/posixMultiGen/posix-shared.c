@@ -85,7 +85,7 @@ int openSerialFd(const char *devicePath)
 typedef enum RawIoStatus {
     RAW_IO_SUCCESS,
     RAW_IO_TIMEOUT,
-    RAW_IO_ERROR
+    RAW_IO_ERROR,
 } RawIoStatus;
 
 static int64_t rawTime(void)

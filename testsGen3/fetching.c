@@ -89,7 +89,10 @@ TEST_LOGGER3(fetchCommandBufferTooSmall)
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
 
     RBRGen3LabelsList channels = {
-        .size = 1, .len = 1, .labels = (RBRGen3Label[]) {"temperature_00"}};
+        .size = 1,
+        .len = 1,
+        .labels = (RBRGen3Label[]) {"temperature_00"},
+    };
     RBRGEN3_SAMPLE_DECL(sample, TESTS_CHANNEL_MAX);
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen3_fetch(&tiny, &channels, false, &sample);
@@ -166,10 +169,11 @@ TEST_LOGGER3(fetchLabelTooLongForBuffer)
     TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
 
     /* 31 characters: the longest label the instrument allows. */
-    RBRGen3LabelsList channels = {.size = 2,
-                                  .len = 2,
-                                  .labels =
-                                      (RBRGen3Label[]) {"temp", "abcdefghijklmnopqrstuvwxyz01234"}};
+    RBRGen3LabelsList channels = {
+        .size = 2,
+        .len = 2,
+        .labels = (RBRGen3Label[]) {"temp", "abcdefghijklmnopqrstuvwxyz01234"},
+    };
     RBRGEN3_SAMPLE_DECL(sample, TESTS_CHANNEL_MAX);
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen3_fetch(&tiny, &channels, false, &sample);

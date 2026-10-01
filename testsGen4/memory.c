@@ -117,23 +117,29 @@ typedef struct SetStorageTest {
 TEST_LOGGER4(setStorage)
 {
     SetStorageTest tests[] = {
-        {RBRGEN4_STORAGE_ACCESS_INSTRUMENT,
-         "storage access=instrument" COMMAND_TERMINATOR,
-         "storage access=instrument" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS},
-        {RBRGEN4_STORAGE_ACCESS_USBHOST,
-         "storage access=usbhost" COMMAND_TERMINATOR,
-         "storage access=usbhost" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS},
+        {
+            RBRGEN4_STORAGE_ACCESS_INSTRUMENT,
+            "storage access=instrument" COMMAND_TERMINATOR,
+            "storage access=instrument" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+        },
+        {
+            RBRGEN4_STORAGE_ACCESS_USBHOST,
+            "storage access=usbhost" COMMAND_TERMINATOR,
+            "storage access=usbhost" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+        },
         /*
          * Selecting the location already in use is a warning, which the
          * library surfaces as a hardware error with the response type
          * distinguishing it.
          */
-        {RBRGEN4_STORAGE_ACCESS_INSTRUMENT,
-         "storage access=instrument" COMMAND_TERMINATOR,
-         "WRN-305 storage access already at selected location" RESPONSE_TERMINATOR,
-         RBRGEN4_HARDWARE_ERROR},
+        {
+            RBRGEN4_STORAGE_ACCESS_INSTRUMENT,
+            "storage access=instrument" COMMAND_TERMINATOR,
+            "WRN-305 storage access already at selected location" RESPONSE_TERMINATOR,
+            RBRGEN4_HARDWARE_ERROR,
+        },
         /* Sentinel members are refused before the command. */
         {RBRGEN4_STORAGE_ACCESS_COUNT, "", "", RBRGEN4_INVALID_PARAMETER_VALUE},
         {RBRGEN4_UNKNOWN_STORAGE_ACCESS, "", "", RBRGEN4_INVALID_PARAMETER_VALUE},
@@ -444,25 +450,31 @@ typedef struct GetBlockTest {
 TEST_LOGGER4(getDatasetEventsBlock)
 {
     GetBlockTest tests[] = {
-        {NULL,
-         "dataset d1/events" COMMAND_TERMINATOR,
-         "dataset d1/events bytecount=120 eventcount=5" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         120,
-         5},
+        {
+            NULL,
+            "dataset d1/events" COMMAND_TERMINATOR,
+            "dataset d1/events bytecount=120 eventcount=5" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            120,
+            5,
+        },
         /* A dataset with no events reports zero counts. */
-        {NULL,
-         "dataset d1/events" COMMAND_TERMINATOR,
-         "dataset d1/events bytecount=0 eventcount=0" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         0,
-         0},
-        {NULL,
-         "dataset d1/events" COMMAND_TERMINATOR,
-         "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
-         RBRGEN4_HARDWARE_ERROR,
-         0,
-         0},
+        {
+            NULL,
+            "dataset d1/events" COMMAND_TERMINATOR,
+            "dataset d1/events bytecount=0 eventcount=0" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            0,
+            0,
+        },
+        {
+            NULL,
+            "dataset d1/events" COMMAND_TERMINATOR,
+            "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+            RBRGEN4_HARDWARE_ERROR,
+            0,
+            0,
+        },
         {NULL, NULL, NULL, 0, 0, 0},
     };
 
@@ -487,18 +499,22 @@ TEST_LOGGER4(getDatasetEventsBlock)
 TEST_LOGGER4(getDatasetMetaBlock)
 {
     GetBlockTest tests[] = {
-        {NULL,
-         "dataset d1/meta" COMMAND_TERMINATOR,
-         "dataset d1/meta bytecount=4836" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         4836,
-         0},
-        {NULL,
-         "dataset d1/meta" COMMAND_TERMINATOR,
-         "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
-         RBRGEN4_HARDWARE_ERROR,
-         0,
-         0},
+        {
+            NULL,
+            "dataset d1/meta" COMMAND_TERMINATOR,
+            "dataset d1/meta bytecount=4836" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            4836,
+            0,
+        },
+        {
+            NULL,
+            "dataset d1/meta" COMMAND_TERMINATOR,
+            "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+            RBRGEN4_HARDWARE_ERROR,
+            0,
+            0,
+        },
         {NULL, NULL, NULL, 0, 0, 0},
     };
 
@@ -522,22 +538,26 @@ TEST_LOGGER4(getDatasetMetaBlock)
 TEST_LOGGER4(getDatasetScheduleBlock)
 {
     GetBlockTest tests[] = {
-        {"s_cont",
-         "dataset d1/s_cont" COMMAND_TERMINATOR,
-         "dataset d1/s_cont bytecount=768" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         768,
-         0},
+        {
+            "s_cont",
+            "dataset d1/s_cont" COMMAND_TERMINATOR,
+            "dataset d1/s_cont bytecount=768" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            768,
+            0,
+        },
         /*
          * A schedule the dataset does not know reports the dataset as not
          * found, naming the dataset rather than the schedule.
          */
-        {"nosuch",
-         "dataset d1/nosuch" COMMAND_TERMINATOR,
-         "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
-         RBRGEN4_HARDWARE_ERROR,
-         0,
-         0},
+        {
+            "nosuch",
+            "dataset d1/nosuch" COMMAND_TERMINATOR,
+            "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+            RBRGEN4_HARDWARE_ERROR,
+            0,
+            0,
+        },
         {NULL, NULL, NULL, 0, 0, 0},
     };
 
@@ -567,22 +587,26 @@ TEST_LOGGER4(getDatasetScheduleBlock)
 TEST_LOGGER4(getDatasetScheduleEventsBlock)
 {
     GetBlockTest tests[] = {
-        {"s_cont",
-         "dataset d1/s_cont/events" COMMAND_TERMINATOR,
-         "dataset d1/s_cont/events bytecount=120 eventcount=5" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         120,
-         5},
+        {
+            "s_cont",
+            "dataset d1/s_cont/events" COMMAND_TERMINATOR,
+            "dataset d1/s_cont/events bytecount=120 eventcount=5" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            120,
+            5,
+        },
         /*
          * A schedule the dataset does not know reports the dataset as not
          * found, naming the dataset rather than the schedule.
          */
-        {"nosuch",
-         "dataset d1/nosuch/events" COMMAND_TERMINATOR,
-         "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
-         RBRGEN4_HARDWARE_ERROR,
-         0,
-         0},
+        {
+            "nosuch",
+            "dataset d1/nosuch/events" COMMAND_TERMINATOR,
+            "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+            RBRGEN4_HARDWARE_ERROR,
+            0,
+            0,
+        },
         {NULL, NULL, NULL, 0, 0, 0},
     };
 
@@ -607,25 +631,31 @@ TEST_LOGGER4(getDatasetScheduleEventsBlock)
 TEST_LOGGER4(getDatasetScheduleDataBlock)
 {
     GetBlockTest tests[] = {
-        {"s_cont",
-         "dataset d1/s_cont/data" COMMAND_TERMINATOR,
-         "dataset d1/s_cont/data bytecount=648 samplecount=27" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         648,
-         27},
+        {
+            "s_cont",
+            "dataset d1/s_cont/data" COMMAND_TERMINATOR,
+            "dataset d1/s_cont/data bytecount=648 samplecount=27" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            648,
+            27,
+        },
         /* A schedule which never sampled reports zero counts. */
-        {"s_cont",
-         "dataset d1/s_cont/data" COMMAND_TERMINATOR,
-         "dataset d1/s_cont/data bytecount=0 samplecount=0" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         0,
-         0},
-        {"nosuch",
-         "dataset d1/nosuch/data" COMMAND_TERMINATOR,
-         "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
-         RBRGEN4_HARDWARE_ERROR,
-         0,
-         0},
+        {
+            "s_cont",
+            "dataset d1/s_cont/data" COMMAND_TERMINATOR,
+            "dataset d1/s_cont/data bytecount=0 samplecount=0" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            0,
+            0,
+        },
+        {
+            "nosuch",
+            "dataset d1/nosuch/data" COMMAND_TERMINATOR,
+            "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR,
+            RBRGEN4_HARDWARE_ERROR,
+            0,
+            0,
+        },
         {NULL, NULL, NULL, 0, 0, 0},
     };
 
@@ -657,14 +687,18 @@ typedef struct DeleteDatasetTest {
 TEST_LOGGER4(deleteDataset)
 {
     DeleteDatasetTest tests[] = {
-        {"d5",
-         "dataset delete d5" COMMAND_TERMINATOR,
-         "dataset delete d5" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS},
-        {"nosuch",
-         "dataset delete nosuch" COMMAND_TERMINATOR,
-         "ERR-304 dataset not found: 'nosuch'" RESPONSE_TERMINATOR,
-         RBRGEN4_HARDWARE_ERROR},
+        {
+            "d5",
+            "dataset delete d5" COMMAND_TERMINATOR,
+            "dataset delete d5" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+        },
+        {
+            "nosuch",
+            "dataset delete nosuch" COMMAND_TERMINATOR,
+            "ERR-304 dataset not found: 'nosuch'" RESPONSE_TERMINATOR,
+            RBRGEN4_HARDWARE_ERROR,
+        },
         {NULL, NULL, NULL, 0},
     };
 
@@ -729,11 +763,13 @@ TEST_LOGGER4(downloadDatasetScheduleData)
      */
     response = "download d1/s_cont/data samplecount=2 samplestart=0 bytecount=8" RESPONSE_TERMINATOR
                "AAAAAAAA\x25\x94";
-    download = (RBRGen4DownloadData) {.unit = RBRGEN4_DOWNLOAD_DATA_UNIT_SAMPLES,
-                                      .count = 100,
-                                      .start = 0,
-                                      .data = data,
-                                      .dataSize = sizeof(data)};
+    download = (RBRGen4DownloadData) {
+        .unit = RBRGEN4_DOWNLOAD_DATA_UNIT_SAMPLES,
+        .count = 100,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data),
+    };
     TestIOBuffers_init(buffers, response, 0);
     err = RBRGen4_downloadDatasetScheduleData(conn, &dataset, "s_cont", &download);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
@@ -745,11 +781,13 @@ TEST_LOGGER4(downloadDatasetScheduleData)
     /* A corrupted transfer fails its CRC check. */
     response =
         "download d1/s_cont/data bytecount=8 bytestart=0" RESPONSE_TERMINATOR "AAAAAAAB\x25\x94";
-    download = (RBRGen4DownloadData) {.unit = RBRGEN4_DOWNLOAD_DATA_UNIT_BYTES,
-                                      .count = 8,
-                                      .start = 0,
-                                      .data = data,
-                                      .dataSize = sizeof(data)};
+    download = (RBRGen4DownloadData) {
+        .unit = RBRGEN4_DOWNLOAD_DATA_UNIT_BYTES,
+        .count = 8,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data),
+    };
     TestIOBuffers_init(buffers, response, 0);
     err = RBRGen4_downloadDatasetScheduleData(conn, &dataset, "s_cont", &download);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_CHECKSUM_ERROR, err, RBRGen4Error);
@@ -758,32 +796,38 @@ TEST_LOGGER4(downloadDatasetScheduleData)
     char small[4];
     response =
         "download d1/s_cont/data bytecount=8 bytestart=0" RESPONSE_TERMINATOR "AAAAAAAA\x25\x94";
-    download = (RBRGen4DownloadData) {.unit = RBRGEN4_DOWNLOAD_DATA_UNIT_BYTES,
-                                      .count = 8,
-                                      .start = 0,
-                                      .data = small,
-                                      .dataSize = sizeof(small)};
+    download = (RBRGen4DownloadData) {
+        .unit = RBRGEN4_DOWNLOAD_DATA_UNIT_BYTES,
+        .count = 8,
+        .start = 0,
+        .data = small,
+        .dataSize = sizeof(small),
+    };
     TestIOBuffers_init(buffers, response, 0);
     err = RBRGen4_downloadDatasetScheduleData(conn, &dataset, "s_cont", &download);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_BUFFER_TOO_SMALL, err, RBRGen4Error);
 
     /* A dataset the instrument does not know is a hardware error. */
     response = "ERR-304 dataset not found: 'd1'" RESPONSE_TERMINATOR;
-    download = (RBRGen4DownloadData) {.unit = RBRGEN4_DOWNLOAD_DATA_UNIT_BYTES,
-                                      .count = 8,
-                                      .start = 0,
-                                      .data = data,
-                                      .dataSize = sizeof(data)};
+    download = (RBRGen4DownloadData) {
+        .unit = RBRGEN4_DOWNLOAD_DATA_UNIT_BYTES,
+        .count = 8,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data),
+    };
     TestIOBuffers_init(buffers, response, 0);
     err = RBRGen4_downloadDatasetScheduleData(conn, &dataset, "s_cont", &download);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_HARDWARE_ERROR, err, RBRGen4Error);
 
     /* An invalid request is refused before the command. */
-    download = (RBRGen4DownloadData) {.unit = RBRGEN4_UNKNOWN_DOWNLOAD_DATA_UNIT,
-                                      .count = 8,
-                                      .start = 0,
-                                      .data = data,
-                                      .dataSize = sizeof(data)};
+    download = (RBRGen4DownloadData) {
+        .unit = RBRGEN4_UNKNOWN_DOWNLOAD_DATA_UNIT,
+        .count = 8,
+        .start = 0,
+        .data = data,
+        .dataSize = sizeof(data),
+    };
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen4_downloadDatasetScheduleData(conn, &dataset, "s_cont", &download);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_INVALID_PARAMETER_VALUE, err, RBRGen4Error);

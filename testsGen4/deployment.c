@@ -990,32 +990,40 @@ TEST_LOGGER4(disable)
 {
     DisableTest tests[] = {
         /* The command reports an instrument state, not a deployment status. */
-        {"disable state=disabled" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_RESPONSE_INFO,
-         RBRGEN4_HARDWARE_ERROR_NONE,
-         RBRGEN4_INSTRUMENT_STATE_DISABLED},
+        {
+            "disable state=disabled" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            RBRGEN4_RESPONSE_INFO,
+            RBRGEN4_HARDWARE_ERROR_NONE,
+            RBRGEN4_INSTRUMENT_STATE_DISABLED,
+        },
         /*
          * Disabling an instrument that is already disabled is a warning, which
          * the library surfaces as a hardware error with the response type
          * distinguishing it.
          */
-        {"WRN-435 instrument state is already disabled" RESPONSE_TERMINATOR,
-         RBRGEN4_HARDWARE_ERROR,
-         RBRGEN4_RESPONSE_WARNING,
-         RBRGEN4_HARDWARE_ERROR_INSTRUMENT_STATE_IS_ALREADY_DISABLED,
-         RBRGEN4_UNKNOWN_INSTRUMENT_STATE},
+        {
+            "WRN-435 instrument state is already disabled" RESPONSE_TERMINATOR,
+            RBRGEN4_HARDWARE_ERROR,
+            RBRGEN4_RESPONSE_WARNING,
+            RBRGEN4_HARDWARE_ERROR_INSTRUMENT_STATE_IS_ALREADY_DISABLED,
+            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+        },
         /* A state the library does not model reads as unknown. */
-        {"disable state=bogus" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_RESPONSE_INFO,
-         RBRGEN4_HARDWARE_ERROR_NONE,
-         RBRGEN4_UNKNOWN_INSTRUMENT_STATE},
-        {"disable" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_RESPONSE_INFO,
-         RBRGEN4_HARDWARE_ERROR_NONE,
-         RBRGEN4_UNKNOWN_INSTRUMENT_STATE},
+        {
+            "disable state=bogus" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            RBRGEN4_RESPONSE_INFO,
+            RBRGEN4_HARDWARE_ERROR_NONE,
+            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+        },
+        {
+            "disable" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            RBRGEN4_RESPONSE_INFO,
+            RBRGEN4_HARDWARE_ERROR_NONE,
+            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+        },
         {0},
     };
 
@@ -1065,22 +1073,30 @@ static bool test_pauseResume(RBRGen4 *conn, TestIOBuffers *buffers, const char *
 TEST_LOGGER4(pause)
 {
     PauseResumeTest tests[] = {
-        {"pause status=paused" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_DEPLOYMENT_STATUS_PAUSED},
+        {
+            "pause status=paused" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            RBRGEN4_DEPLOYMENT_STATUS_PAUSED,
+        },
         /*
          * Pausing a deployment that is waiting on its gating condition
          * succeeds and leaves it gated, not paused.
          */
-        {"pause status=gated" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_DEPLOYMENT_STATUS_GATED},
-        {"ERR-406 cannot pause while disabled" RESPONSE_TERMINATOR,
-         RBRGEN4_HARDWARE_ERROR,
-         RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS},
-        {"pause status=bogus" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS},
+        {
+            "pause status=gated" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            RBRGEN4_DEPLOYMENT_STATUS_GATED,
+        },
+        {
+            "ERR-406 cannot pause while disabled" RESPONSE_TERMINATOR,
+            RBRGEN4_HARDWARE_ERROR,
+            RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+        },
+        {
+            "pause status=bogus" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+        },
         {"pause" RESPONSE_TERMINATOR, RBRGEN4_SUCCESS, RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS},
         {0},
     };
@@ -1091,18 +1107,26 @@ TEST_LOGGER4(pause)
 TEST_LOGGER4(resume)
 {
     PauseResumeTest tests[] = {
-        {"resume status=sampling" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_DEPLOYMENT_STATUS_SAMPLING},
-        {"resume status=gated" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_DEPLOYMENT_STATUS_GATED},
-        {"ERR-407 cannot resume while disabled" RESPONSE_TERMINATOR,
-         RBRGEN4_HARDWARE_ERROR,
-         RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS},
-        {"resume status=bogus" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS},
+        {
+            "resume status=sampling" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
+        },
+        {
+            "resume status=gated" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            RBRGEN4_DEPLOYMENT_STATUS_GATED,
+        },
+        {
+            "ERR-407 cannot resume while disabled" RESPONSE_TERMINATOR,
+            RBRGEN4_HARDWARE_ERROR,
+            RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+        },
+        {
+            "resume status=bogus" RESPONSE_TERMINATOR,
+            RBRGEN4_SUCCESS,
+            RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+        },
         {"resume" RESPONSE_TERMINATOR, RBRGEN4_SUCCESS, RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS},
         {0},
     };

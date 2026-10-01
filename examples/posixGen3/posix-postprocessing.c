@@ -133,15 +133,25 @@ int main(int argc, char *argv[])
     now *= 1000;
 
     postprocessing = (RBRGen3Postprocessing) {
-        .channels = {.len = 3,
-                     .channels = {{.function = RBRGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
-                                   .label = "pressure_00"},
-                                  {.function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
-                                   .label = "temperature_00"},
-                                  {
-                                      .function = RBRGEN3_POSTPROCESSING_AGGREGATE_STD,
-                                      .label = "temperature_00",
-                                  }}},
+        .channels =
+            {
+                .len = 3,
+                .channels =
+                    {
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_SAMPLE_COUNT,
+                            .label = "pressure_00",
+                        },
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_MEAN,
+                            .label = "temperature_00",
+                        },
+                        {
+                            .function = RBRGEN3_POSTPROCESSING_AGGREGATE_STD,
+                            .label = "temperature_00",
+                        },
+                    },
+            },
         .binReference = "tstamp",
         .binFilter = RBRGEN3_POSTPROCESSING_BINFILTER_NONE,
         .binSize = 0,

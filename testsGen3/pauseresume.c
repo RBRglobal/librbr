@@ -116,12 +116,16 @@ TEST_LOGGER3(pause_error)
         {"pause" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 1},
         {"pause" COMMAND_TERMINATOR, "E0109 feature not available" RESPONSE_TERMINATOR, 1},
         {"pause" COMMAND_TERMINATOR, "E0406 not logging" RESPONSE_TERMINATOR, 1},
-        {"pause" COMMAND_TERMINATOR,
-         "E0415 more than one gating condition is enabled" RESPONSE_TERMINATOR,
-         1},
-        {"pause" COMMAND_TERMINATOR,
-         "E0417 no gating allowed with regimes mode" RESPONSE_TERMINATOR,
-         1},
+        {
+            "pause" COMMAND_TERMINATOR,
+            "E0415 more than one gating condition is enabled" RESPONSE_TERMINATOR,
+            1,
+        },
+        {
+            "pause" COMMAND_TERMINATOR,
+            "E0417 no gating allowed with regimes mode" RESPONSE_TERMINATOR,
+            1,
+        },
         {0},
     };
     return test_pause_error(conn, buffers, tests);
@@ -133,12 +137,16 @@ TEST_LOGGER3(resume_error)
         {"resume" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 2},
         {"resume" COMMAND_TERMINATOR, "E0109 feature not available" RESPONSE_TERMINATOR, 2},
         {"resume" COMMAND_TERMINATOR, "E0406 not logging" RESPONSE_TERMINATOR, 2},
-        {"resume" COMMAND_TERMINATOR,
-         "E0415 more than one gating condition is enabled" RESPONSE_TERMINATOR,
-         2},
-        {"resume" COMMAND_TERMINATOR,
-         "E0417 no gating allowed with regimes mode" RESPONSE_TERMINATOR,
-         2},
+        {
+            "resume" COMMAND_TERMINATOR,
+            "E0415 more than one gating condition is enabled" RESPONSE_TERMINATOR,
+            2,
+        },
+        {
+            "resume" COMMAND_TERMINATOR,
+            "E0417 no gating allowed with regimes mode" RESPONSE_TERMINATOR,
+            2,
+        },
         {0},
     };
     return test_resume_error(conn, buffers, tests);

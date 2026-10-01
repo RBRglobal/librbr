@@ -186,7 +186,7 @@ static RBRGen4Error gen4Write(const struct RBRGen4 *conn, const void *const data
 typedef enum Owner {
     NOBODY,
     GEN3,
-    GEN4
+    GEN4,
 } Owner;
 static Owner bufferOwner = NOBODY;
 
