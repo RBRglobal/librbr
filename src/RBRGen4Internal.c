@@ -618,7 +618,7 @@ static RBRGen4Error RBRGen4Sample_parse(RBRGen4Sample *sample, RBRGen4OutputForm
  *
  * Updates RBRGen4.response as appropriate.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
  * \return #RBRGEN4_SUCCESS when the response is a warning or success

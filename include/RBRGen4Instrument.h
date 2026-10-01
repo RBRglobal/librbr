@@ -20,7 +20,7 @@ extern "C" {
 #include "RBRGen4.h"
 
 /**
- * \brief Possible instrument instrument states.
+ * \brief Possible instrument states.
  * This tracks whether the deployment is running on the instrument.
  *
  * Returned by:
@@ -117,6 +117,8 @@ const char *RBRGen4PowerSource_name(RBRGen4PowerSource source);
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the information cannot be read, or
  *                                      another hardware error occurs
+ * \see RBRGen4_getPowerInternal()
+ * \see RBRGen4_getPowerExternal()
  */
 RBRGen4Error RBRGen4_getPowerSource(RBRGen4 *conn, RBRGen4PowerSource *powerSource);
 
@@ -171,6 +173,8 @@ const char *RBRGen4InternalBatteryType_displayName(RBRGen4InternalBatteryType ty
  * \brief Instrument `instrument power internal` command parameters.
  *
  * \see RBRGen4_getPowerInternal()
+ * \see RBRGen4_setPowerInternalBatteryType()
+ * \see RBRGen4_resetPowerInternalUsed()
  */
 typedef struct RBRGen4PowerInternal {
     /**
@@ -309,6 +313,8 @@ const char *RBRGen4ExternalBatteryType_displayName(RBRGen4ExternalBatteryType ty
  * \brief Instrument `instrument power external` command parameters.
  *
  * \see RBRGen4_getPowerExternal()
+ * \see RBRGen4_setPowerExternalBatteryType()
+ * \see RBRGen4_resetPowerExternalUsed()
  */
 typedef struct RBRGen4PowerExternal {
     /**

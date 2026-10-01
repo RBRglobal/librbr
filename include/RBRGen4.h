@@ -287,7 +287,7 @@ typedef enum RBRGen4DataType {
     RBRGEN4_DATA_TYPE_FLOAT64,
     /** Same as Float64, but no calibration equation applied. It is presented
      * as a ratio compared to nominal full-scale, so the expected range is
-     * nominally 0.0 to 1.0. The full thoretical range is -2.0 to +2.0, but the
+     * nominally 0.0 to 1.0. The full theoretical range is -2.0 to +2.0, but the
      * output of most channels will remain within or close to the expected
      * nominal range.
      */
@@ -925,8 +925,8 @@ RBRGen4Error RBRGen4_close(RBRGen4 *conn);
  *
  * Does not communicate with the instrument.
  *
- * \param [in,out] conn the instrument connection
- * \param [in] command storage for commands destined for the instrument
+ * \param [in] conn the instrument connection
+ * \param [out] command storage for commands destined for the instrument
  * \param [in] capacity the capacity of \a command in bytes
  * \return #RBRGEN4_SUCCESS when the buffer is replaced
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the buffer is missing or empty
@@ -947,8 +947,8 @@ RBRGen4Error RBRGen4_setCommandBuffer(RBRGen4 *conn, uint8_t *command, int32_t c
  *
  * Does not communicate with the instrument.
  *
- * \param [in,out] conn the instrument connection
- * \param [in] response storage for data received from the instrument
+ * \param [in] conn the instrument connection
+ * \param [out] response storage for data received from the instrument
  * \param [in] capacity the capacity of \a response in bytes
  * \return #RBRGEN4_SUCCESS when the buffer is replaced
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the buffer is missing or cannot
@@ -962,7 +962,7 @@ RBRGen4Error RBRGen4_setResponseBuffer(RBRGen4 *conn, uint8_t *response, int32_t
  * \brief Discard any buffered instrument response data.
  *
  * This function must be called after a response buffer has been shared with
- * another RBRGenX connection instance.
+ * another RBRGen4 connection instance.
  *
  * The response buffer is not always fully consumed during a command-response
  * interaction with an instrument. Unread data can include the prompt or
@@ -977,7 +977,7 @@ RBRGen4Error RBRGen4_setResponseBuffer(RBRGen4 *conn, uint8_t *response, int32_t
  *
  * Does not communicate with the instrument.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \see RBRGen4Environment for the rules on sharing buffers between connections
  */
 void RBRGen4_resetResponseBuffer(RBRGen4 *conn);

@@ -336,6 +336,7 @@ typedef struct RBRGen4DatasetDataBlock {
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
  *                                      hardware error occurs
+ * \see RBRGen4DatasetEventsBlock
  */
 RBRGen4Error RBRGen4_getDatasetEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                            RBRGen4DatasetEventsBlock *block);
@@ -356,6 +357,7 @@ RBRGen4Error RBRGen4_getDatasetEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
  *                                      hardware error occurs
+ * \see RBRGen4DatasetMetaBlock
  */
 RBRGen4Error RBRGen4_getDatasetMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                          RBRGen4DatasetMetaBlock *block);
@@ -380,6 +382,7 @@ RBRGen4Error RBRGen4_getDatasetMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *da
  *                                                    empty
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
  *                                      or another hardware error occurs
+ * \see RBRGen4DatasetScheduleBlock
  */
 RBRGen4Error RBRGen4_getDatasetScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                              const char *scheduleLabel,
@@ -404,6 +407,7 @@ RBRGen4Error RBRGen4_getDatasetScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset
  *                                                    empty
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
  *                                      or another hardware error occurs
+ * \see RBRGen4DatasetEventsBlock
  */
 RBRGen4Error RBRGen4_getDatasetScheduleEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                                    const char *scheduleLabel,
@@ -429,6 +433,7 @@ RBRGen4Error RBRGen4_getDatasetScheduleEventsBlock(RBRGen4 *conn, const RBRGen4D
  *                                                    empty
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
  *                                      or another hardware error occurs
+ * \see RBRGen4DatasetDataBlock
  */
 RBRGen4Error RBRGen4_getDatasetScheduleDataBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                                  const char *scheduleLabel,
@@ -754,9 +759,10 @@ RBRGen4Error RBRGen4_downloadDatasetMeta(RBRGen4 *conn, const RBRGen4Dataset *da
                                          RBRGen4DownloadMeta *download);
 
 /**
- * \brief Calculate the 16-bit CRC using the CCITT polynomial f(x)=x^16+x^12+x^5+1
- * feeding bytes into the generator LSB first and using 0xFFFF as a seed value,
- * is then transmitted.
+ * \brief Calculate the 16-bit CRC of a block of data.
+ *
+ * Uses the CCITT polynomial f(x)=x^16+x^12+x^5+1 and a seed value of 0xFFFF.
+ * The download functions check transferred data against the same calculation.
  *
  * \param [in] data the data string used to calculate the CRC
  * \param [in] size the number of characters in the string used to calculate the CRC

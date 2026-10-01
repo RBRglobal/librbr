@@ -462,7 +462,7 @@ const char *RBRGen4SettingsState_name(RBRGen4SettingsState state);
  */
 typedef struct RBRGen4Settings {
     /**
-     * \brief Whether the instrument returns the “Ready:” prompt following a
+     * \brief Whether the instrument returns the "Ready:" prompt following a
      * response.
      */
     RBRGen4SettingsState prompt;
@@ -481,7 +481,7 @@ typedef struct RBRGen4Settings {
 } RBRGen4Settings;
 
 /**
- * \brief Get miscellaneous logger settings
+ * \brief Get miscellaneous logger settings.
  *
  * \command{settings}
  *
@@ -524,8 +524,9 @@ RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings);
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the power-off delay
  *                                                    is negative, or a setting
  *                                                    state is unknown
- * \warning The library expects \a prompt and \a confirmation to be on, or
- *          unavailable. With \a confirmation explicitly off the instrument
+ * \warning The library expects RBRGen4Settings.prompt and
+ *          RBRGen4Settings.confirmation to be on, or unavailable. With
+ *          RBRGen4Settings.confirmation explicitly off the instrument
  *          answers a set with nothing at all, and every later setter blocks
  *          until the command timeout.
  * \see RBRGen4_getSettings()
@@ -540,7 +541,7 @@ RBRGen4Error RBRGen4_setSettings(RBRGen4 *conn, const RBRGen4Settings *settings)
  */
 typedef struct RBRGen4Parameters {
     /**
-     * \brief the temperature coefficient used to correct the derived channel
+     * \brief The temperature coefficient used to correct the derived channel
      * for specific conductivity to 25°C. Its value depends on the ionic
      * composition of the water being monitored, and should be set to an
      * appropriate value for best results.
@@ -548,25 +549,26 @@ typedef struct RBRGen4Parameters {
      * suitable for KCl solutions and the upper end for NaCl solutions.
      */
     float specCondTempCo;
-    /** \brief the height above the seabed in metres at which the logger
+    /** \brief The height above the seabed in metres at which the logger
      * is deployed. This is a user-entered parameter which is required by
      * host software to calculate statistics and parameters for
-     * wave analysis. Can be ignored if not used.*/
+     * wave analysis. Can be ignored if not used. */
     float altitude;
-    /** \brief below are default parameter values, to be used when the logger does
+    /** \brief Below are default parameter values, to be used when the logger does
      * not have a channel which measures the named parameter, but one or more
      * cross-channel calibration equations requires it as an input.
-     * temperature in °C, default value 15.0*/
+     * Temperature in °C, default value 15.0.
+     */
     float temperature;
-    /** \brief absolute pressure in dbar, default value 10.132501 (1 standard atmosphere)*/
+    /** \brief Absolute pressure in dbar, default value 10.132501 (1 standard atmosphere). */
     float pressure;
-    /** \brief atmospheric pressure in dbar, default value 10.132501*/
+    /** \brief Atmospheric pressure in dbar, default value 10.132501. */
     float atmosphere;
-    /** \brief water density in g/cm3, default value 1.026021*/
+    /** \brief Water density in g/cm3, default value 1.026021. */
     float density;
-    /** \brief salinity in PSU, default value 35*/
+    /** \brief Salinity in PSU, default value 35. */
     float salinity;
-    /** \brief avgSoundSpeed in m/s, default value 1506.8*/
+    /** \brief The `avgSoundSpeed` in m/s, default value 1506.8. */
     float avgSoundSpeed;
 } RBRGen4Parameters;
 
@@ -803,6 +805,7 @@ RBRGen4Error RBRGen4_createGroup(RBRGen4 *conn, const char *label);
  *                                      hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteGroupAll()
+ * \see RBRGen4_createGroup()
  */
 RBRGen4Error RBRGen4_deleteGroup(RBRGen4 *conn, const char *label);
 
@@ -1195,6 +1198,7 @@ RBRGen4Error RBRGen4_createSchedule(RBRGen4 *conn, const char *label);
  *                                      error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteScheduleAll()
+ * \see RBRGen4_createSchedule()
  */
 RBRGen4Error RBRGen4_deleteSchedule(RBRGen4 *conn, const char *label);
 
@@ -1412,6 +1416,7 @@ RBRGen4Error RBRGen4_createConfig(RBRGen4 *conn, const char *label);
  *                                      error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteConfigAll()
+ * \see RBRGen4_createConfig()
  */
 RBRGen4Error RBRGen4_deleteConfig(RBRGen4 *conn, const char *label);
 

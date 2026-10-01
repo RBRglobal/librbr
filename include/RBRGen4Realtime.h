@@ -195,7 +195,7 @@ typedef struct RBRGen4Sample {
 RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
 
 /**
- * \brief Requests an “on-demand” sample of every channel from the
+ * \brief Requests an "on-demand" sample of every channel from the
  * instrument.
  *
  * \command{poll}
@@ -229,11 +229,13 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the
  *         command buffer
+ * \see RBRGen4_pollChannels()
+ * \see RBRGen4_pollGroups()
  */
 RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sample);
 
 /**
- * \brief Requests an “on-demand” sample of the given channels from the
+ * \brief Requests an "on-demand" sample of the given channels from the
  * instrument.
  *
  * \command{poll channellist=<channel_list>}
@@ -272,12 +274,14 @@ RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sampl
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when an invalid channel is requested, or
  *                                      another hardware error occurs
+ * \see RBRGen4_poll()
+ * \see RBRGen4_pollGroups()
  */
 RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel,
                                   const RBRGen4LabelList *channelList, RBRGen4Sample *sample);
 
 /**
- * \brief Requests an “on-demand” sample of the given groups of channels from
+ * \brief Requests an "on-demand" sample of the given groups of channels from
  * the instrument.
  *
  * \command{poll grouplist=<group_list>}
@@ -316,6 +320,8 @@ RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel,
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when an invalid group is requested, or
  *                                      another hardware error occurs
+ * \see RBRGen4_poll()
+ * \see RBRGen4_pollChannels()
  */
 RBRGen4Error RBRGen4_pollGroups(RBRGen4 *conn, bool requireLabel, const RBRGen4LabelList *groupList,
                                 RBRGen4Sample *sample);

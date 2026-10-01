@@ -34,7 +34,7 @@ extern "C" {
 #define RBRGEN4_SEND_COMMAND_TERMINATOR_LEN 1
 /** \brief The terminator at the end of a command received from the instrument. */
 #define RBRGEN4_RESPONSE_TERMINATOR         "\r\n"
-/** \brief The length of the command terminator. */
+/** \brief The length of the response terminator. */
 #define RBRGEN4_RESPONSE_TERMINATOR_LEN     2
 /** \brief The value an empty list is reported and sent as. */
 #define RBRGEN4_EMPTY_LIST                  "none"
@@ -70,7 +70,9 @@ extern "C" {
     } while (0)
 
 /**
- * Send the first RBRGen4.commandBufferLength bytes of
+ * \brief Send the contents of the command buffer to the instrument.
+ *
+ * Sends the first RBRGen4.commandBufferLength bytes of
  * RBRGen4Environment.command to the instrument. No formatting of the contents of
  * the buffer is performed; a buffer with no room left for a null byte is
  * refused, since it holds a command truncated by snprintf().
@@ -89,7 +91,9 @@ extern "C" {
 RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *conn);
 
 /**
- * Send a command to the instrument. The command will be formatted into
+ * \brief Format a command and send it to the instrument.
+ *
+ * The command will be formatted into
  * RBRGen4Environment.command and RBRGen4.commandBufferLength will be
  * updated accordingly. If the command does not include a terminating `\r\n`,
  * it will be added for you.
@@ -162,7 +166,9 @@ RBRGen4Error RBRGen4_appendCommand(RBRGen4 *conn, const char *command, ...);
 RBRGen4Error RBRGen4_appendLabelList(RBRGen4 *conn, const RBRGen4LabelList *labelList);
 
 /**
- * Read a response from the instrument. This function will block until a
+ * \brief Read a response from the instrument.
+ *
+ * This function will block until a
  * complete response is read, or until the callback returns
  * #RBRGEN4_TIMEOUT or #RBRGEN4_CALLBACK_ERROR.
  *
@@ -377,7 +383,7 @@ void RBRGen4_parseResponse(RBRGen4 *conn, char **command, RBRGen4ResponseParamet
  *
  * Updates RBRGen4.response as appropriate.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
  * \return #RBRGEN4_SUCCESS when the response is a warning or success
@@ -409,7 +415,7 @@ RBRGen4Error RBRGen4DateTime_parseSampleTime(const char *s, RBRGen4DateTime *tim
  * character after the timestamp in \a s. If the timestamp cannot be parsed, it
  * will be modified to point to `NULL`.
  *
- * \param [in] s the sample date/time string
+ * \param [in] s the schedule setting date/time string
  * \param [out] timestamp the parsed timestamp
  * \param [out] end the first character not parsed
  * \return #RBRGEN4_SUCCESS when the timestamp is successfully parsed
