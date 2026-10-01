@@ -5,7 +5,7 @@
  */
 
 /**
- * \file other.c
+ * \file instrument.c
  *
  * \brief Tests for other instrument commands.
  */

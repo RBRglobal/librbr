@@ -5,9 +5,9 @@
  */
 
 /**
- * \file posix-stream.c
+ * \file posix-fetch.c
  *
- * \brief Example of using the library to stream instrument data in a POSIX
+ * \brief Example of using the library to fetch instrument data in a POSIX
  * environment.
  */
 

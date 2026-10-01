@@ -5,8 +5,9 @@
  */
 
 /**
- * \file dynamiccorrection_example.c
- * \brief Library for salinity dynamic correction (example / test)
+ * \file dynamicCorrection-example.c
+ * \brief Example of using the library to apply the dynamic correction to data
+ * read from a CSV file.
  */
 
 #include <stdlib.h>

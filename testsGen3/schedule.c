@@ -5,7 +5,7 @@
  */
 
 /**
- * \file memory.c
+ * \file schedule.c
  *
  * \brief Tests for instrument schedule commands.
  */

@@ -5,7 +5,7 @@
  */
 
 /**
- * \file runner.c
+ * \file main.c
  *
  * \brief Runner for library tests.
  */

@@ -7,7 +7,7 @@
 /**
  * \file posix-pauseresume.c
  *
- * \brief Example of using the library to pauseresume instrument data in a POSIX
+ * \brief Example of using the library to pause and resume a deployment in a POSIX
  * environment.
  */
 

@@ -5,7 +5,7 @@
  */
 
 /**
- * \file gating.c
+ * \file fetching.c
  *
  * \brief Tests for instrument fetching commands.
  */
