@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2025 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file main.c
  *
  * \brief Example of using libRBR with Zephyr.
- *
- * \copyright
- * Copyright (c) 2025 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #include <stdio.h>

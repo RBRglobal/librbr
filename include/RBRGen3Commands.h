@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file RBRGen3Commands.h
  *
@@ -5,10 +11,6 @@
  *
  * Each command header can also be included on its own; this file simply
  * includes all of them.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #ifndef LIBRBR_RBRGEN3COMMANDS_H

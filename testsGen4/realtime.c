@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file realtime.c
  *
  * \brief Tests for instrument realtime data commands.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 /* Required for memset. */

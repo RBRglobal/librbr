@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2025 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file instrument.c
  *
  * \brief Instrument management helper implementations.
- *
- * \copyright
- * Copyright (c) 2025 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #include <RBRGen3Commands.h>

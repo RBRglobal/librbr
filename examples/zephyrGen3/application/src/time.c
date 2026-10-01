@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2025 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file time.c
  *
  * \brief Time callback implementations using Zephyr kernel timing.
- *
- * \copyright
- * Copyright (c) 2025 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #include <inttypes.h>

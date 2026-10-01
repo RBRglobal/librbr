@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file security.c
  *
  * \brief Tests for instrument security commands.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #include "tests.h"

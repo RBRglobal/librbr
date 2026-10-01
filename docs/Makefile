@@ -1,3 +1,6 @@
+# Copyright (c) 2026 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
 # Sphinx documentation build. `make html` runs Doxygen (XML only) and then
 # Sphinx; output lands in _build/html/. Requires the packages listed in
 # requirements.txt plus the doxygen executable.

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file RBRGen3Internal.h
  *
@@ -7,10 +13,6 @@
  * defined within this file may be unstable from version to version. If there's
  * something in here you think you need, please let us know and we'll discuss
  * how to expose it stably.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #ifndef LIBRBR_RBRGEN3INTERNAL_H

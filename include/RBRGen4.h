@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file RBRGen4.h
  *
@@ -7,10 +13,6 @@
  * library. Command-specific declarations are stored in categorical headers,
  * each of which includes this one and can be included on its own. To include
  * every command header at once, include RBRGen4Commands.h.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #ifndef LIBRBR_RBRGEN4_H

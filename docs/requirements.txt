@@ -1,3 +1,6 @@
+# Copyright (c) 2026 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
 sphinx>=8.1
 breathe>=4.36
 sphinx_rtd_theme>=3.0.2

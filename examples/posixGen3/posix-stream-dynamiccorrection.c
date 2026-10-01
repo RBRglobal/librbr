@@ -1,12 +1,14 @@
+/*
+ * Copyright (c) 2021 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file posix-stream-dynamiccorrection.c
  *
  * \brief Example of using the library to use the dynamic correction.
  *        Data are streamed from logger and the correction is applied.
- *
- * \copyright
- * Copyright (c) 2021 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 /* Prerequisite for gmtime_r in time.h. */

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file posix-poll.c
  *
@@ -7,10 +13,6 @@
  * Polls every channel, then just the pressure and temperature channels.
  * Nothing is written to the instrument, and polling works whether or not a
  * deployment is enabled.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 /* Required for errno. */

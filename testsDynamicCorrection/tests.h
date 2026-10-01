@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2026 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file tests.h
  *
  * \brief Testing definitions for the dynamic correction test suite.
- *
- * \copyright
- * Copyright (c) 2026 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #ifndef LIBRBR_TESTSDYNAMICCORRECTION_TESTS_H

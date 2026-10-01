@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file posix-shared-buffers.c
  *
@@ -8,10 +14,6 @@
  * storage. This example opens a Gen3 and a Gen4 connection on shared buffers
  * and alternates commands between them, resetting the response buffer each
  * time the other connection takes over.
- *
- * \copyright
- * Copyright (c) 2026 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 /* Prerequisite for clock_gettime, struct timespec in time.h. */

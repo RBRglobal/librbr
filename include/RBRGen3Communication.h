@@ -1,12 +1,14 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file RBRGen3Communication.h
  *
  * \brief Instrument commands and structures pertaining to the communication
  * interfaces of the instrument.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #ifndef LIBRBR_RBRGEN3COMMUNICATION_H

@@ -1,3 +1,6 @@
+# Copyright (c) 2018 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
 ## \file Makefile
 ##
 ## \brief Build automation.
@@ -11,10 +14,6 @@
 ## Additional targets may be useful to developers:
 ##
 ## - `clean` will remove any compiled binaries and documentation
-##
-## \copyright
-## Copyright (c) 2018 RBR Ltd.
-## Licensed under the Apache License, Version 2.0.
 
 ## \brief The project name.
 ##

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file posix-stream.c
  *
@@ -7,10 +13,6 @@
  *
  * \warning Clears all groups, schedules, configs, and datasets, then enables
  * the instrument. The instrument is disabled again on exit.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 /* Prerequisite for gmtime_r in time.h. */

@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# Copyright (c) 2026 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
 # This file runs on Ubuntu and Raspbian. Interrupt with Ctl+C anytime.
 # Run with command $<dir> ./<filename.sh> or $sh <dir> ./<filename.sh>
 # If it doesn't work, use command $chmod u+x <filename.sh> first before running.

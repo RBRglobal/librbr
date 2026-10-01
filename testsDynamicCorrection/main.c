@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2026 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file main.c
  *
  * \brief Runner for the dynamic correction tests.
- *
- * \copyright
- * Copyright (c) 2026 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #include <inttypes.h>

@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file posix-download.c
  *
@@ -6,10 +12,6 @@
  *
  * Intended to run after posix-enable has recorded some
  * data. Nothing is written to the instrument.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 /* Prerequisite for PATH_MAX in limits.h. */

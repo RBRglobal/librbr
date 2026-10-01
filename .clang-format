@@ -1,3 +1,6 @@
+# Copyright (c) 2026 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
 # For C, we'll use the same as the Zephyr project.
 Language: Cpp
 BasedOnStyle: LLVM

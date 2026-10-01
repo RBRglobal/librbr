@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file posix-communications.c
  *
@@ -5,10 +11,6 @@
  * instrument is connected and powered, and putting it to sleep.
  *
  * Nothing is written to the instrument.
- *
- * \copyright
- * Copyright (c) 2024 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 /* Required for errno. */

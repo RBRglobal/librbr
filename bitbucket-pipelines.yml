@@ -1,3 +1,6 @@
+# Copyright (c) 2026 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
 clone:
     # Full clone so `git describe` can always see a tag.
     depth: full
@@ -146,6 +149,14 @@ pipelines:
                 image: docker.io/silkeh/clang:20
                 script:
                     - ./tools/format-check.sh
+
+            - step:
+                name: License header check
+                image: docker.io/library/alpine:3
+                script:
+                    - apk add --no-cache git
+                    - git config --global --add safe.directory "$BITBUCKET_CLONE_DIR"
+                    - ./tools/license-check.sh
 
             - step:
                 name: Documentation compilation

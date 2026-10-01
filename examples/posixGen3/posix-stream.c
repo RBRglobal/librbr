@@ -1,12 +1,14 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file posix-stream.c
  *
  * \brief Example of using the library to stream instrument data in a POSIX
  * environment.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 /* Prerequisite for gmtime_r in time.h. */

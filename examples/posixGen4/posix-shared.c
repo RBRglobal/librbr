@@ -1,11 +1,13 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file posix-shared.c
  *
  * \brief Shared functions used by the libRBR POSIX examples.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 /* Prerequisite for clock_gettime, struct timespec in time.h. */

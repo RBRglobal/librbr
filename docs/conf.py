@@ -1,3 +1,6 @@
+# Copyright (c) 2026 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
 # Sphinx configuration for the libRBR documentation.
 #
 # Build with `make html` in this directory. Doxygen must run first (the

@@ -1,3 +1,6 @@
+<!-- Copyright (c) 2026 RBR Ltd. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # How to use the multi-generation posix examples
 
 These examples are for an application built with both the Gen3 and Gen4

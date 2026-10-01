@@ -1,12 +1,14 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file posix-parse-download-dataset.c
  *
  * \brief Example of using the library to download and parse
  * instrument data from dataset1 or dataset4 in a POSIX environment.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 /* Prerequisite for gmtime_r in time.h. */

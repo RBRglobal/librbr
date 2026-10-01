@@ -1,4 +1,8 @@
 #! /bin/sh
+
+# Copyright (c) 2026 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
 # Report every library, header, test, and example source whose formatting differs
 # from what clang-format produces from the repository's .clang-format.
 status=0

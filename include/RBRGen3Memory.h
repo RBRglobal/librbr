@@ -1,12 +1,14 @@
+/*
+ * Copyright (c) 2018 RBR Ltd.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /**
  * \file RBRGen3Memory.h
  *
  * \brief Instrument commands and structures pertaining to memory and data
  * retrieval.
- *
- * \copyright
- * Copyright (c) 2018 RBR Ltd.
- * Licensed under the Apache License, Version 2.0.
  */
 
 #ifndef LIBRBR_RBRGEN3MEMORY_H
