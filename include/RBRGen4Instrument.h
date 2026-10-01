@@ -23,12 +23,9 @@ extern "C" {
  * \brief Possible instrument states.
  * This tracks whether the deployment is running on the instrument.
  *
- * Returned by:
  * \see RBRGen4_getInstrument()
  * \see RBRGen4_enable()
  * \see RBRGen4_verify()
- *
- * For the deployment state:
  * \see RBRGen4DeploymentStatus
  * \see RBRGen4Deployment
  */

@@ -321,11 +321,11 @@ RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPo
 /**
  * \brief Read the labels of the channels of one nature.
  *
- * Reports nothing but the labels; read a channel's parameters with
- * RBRGen4_getChannel().
- *
  * \par Command:
  * `channel scientific` or `channel system`
+ *
+ * Reports nothing but the labels; read a channel's parameters with
+ * RBRGen4_getChannel().
  *
  * \param [in] conn the instrument connection
  * \param [in] nature the nature of the channels to report
@@ -339,8 +339,8 @@ RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPo
  *         `size` are stored
  * \return #RBRGEN4_HARDWARE_ERROR when the channel pool cannot be read, or another hardware error
  *         occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the nature is not one the command accepts, or \a
- *         channelPool has no storage
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the nature is not one the command accepts, or
+ *         \a channelPool has no storage
  * \see RBRGen4_getChannelPool()
  */
 RBRGen4Error RBRGen4_getChannelPoolByNature(RBRGen4 *conn, RBRGen4ChannelNature nature,
@@ -546,7 +546,7 @@ typedef struct RBRGen4Parameters {
     float density;
     /** \brief Salinity in PSU, default value 35. */
     float salinity;
-    /** \brief The `avgSoundSpeed` in m/s, default value 1506.8. */
+    /** \brief The average sound speed in m/s, default value 1506.8. */
     float avgSoundSpeed;
 } RBRGen4Parameters;
 
@@ -646,11 +646,8 @@ RBRGen4Error RBRGen4_getGroup(RBRGen4 *conn, RBRGen4Group *group, RBRGen4LabelLi
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be written, or another hardware error
  *         occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
- *                                          \a channelList is `NULL`,
- *                                          its length does not fit
- *                                          its array, or a channel
- *                                          label is empty
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, \a channelList is `NULL`, its
+ *         length does not fit its array, or a channel label is empty
  * \see RBRGen4_getGroup()
  */
 RBRGen4Error RBRGen4_setGroup(RBRGen4 *conn, const RBRGen4Group *group,
@@ -1231,11 +1228,8 @@ RBRGen4Error RBRGen4_getConfig(RBRGen4 *conn, RBRGen4Config *config,
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the configuration cannot be written, or another hardware
  *         error occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
- *                                          \a scheduleList is
- *                                          `NULL`, its length does
- *                                          not fit its array, or a
- *                                          schedule label is empty
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, \a scheduleList is `NULL`, its
+ *         length does not fit its array, or a schedule label is empty
  * \see RBRGen4_getConfig()
  */
 RBRGen4Error RBRGen4_setConfig(RBRGen4 *conn, const RBRGen4Config *config,

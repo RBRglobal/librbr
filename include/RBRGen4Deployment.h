@@ -180,8 +180,9 @@ typedef struct RBRGen4Deployment {
  *
  * \command{deployment}
  *
- * \note RBRGen4Deployment.startTime is 0 when the instrument does not report a start time, as when
- * RBRGen4Deployment.gate is not #RBRGEN4_DEPLOYMENT_GATE_TIME.
+ * \note RBRGen4Deployment.startTime is 0 when the instrument does not report a
+ * start time, as when RBRGen4Deployment.gate is not
+ * #RBRGEN4_DEPLOYMENT_GATE_TIME.
  *
  * \param [in] conn the instrument connection
  * \param [out] deployment the deployment parameters
@@ -202,9 +203,8 @@ RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment)
  *
  * \command{deployment}
  *
- * \note RBRGen4Deployment.startTime is sent only when
- * RBRGen4Deployment.gate is #RBRGEN4_DEPLOYMENT_GATE_TIME.
- * RBRGen4Deployment.status and
+ * \note RBRGen4Deployment.startTime is sent only when RBRGen4Deployment.gate is
+ * #RBRGEN4_DEPLOYMENT_GATE_TIME. RBRGen4Deployment.status and
  * RBRGen4Deployment.simulation are never sent.
  *
  * \param [in] conn the instrument connection
@@ -216,9 +216,8 @@ RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment)
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the deployment cannot be changed, or another hardware error
  *         occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the gating condition is set to more than one
- *         condition, or the start time is being sent and is outside #RBRGEN4_DATETIME_MIN to
- *         #RBRGEN4_DATETIME_MAX
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the gate is not a known gating condition, or the
+ *         start time is being sent and is outside #RBRGEN4_DATETIME_MIN to #RBRGEN4_DATETIME_MAX
  * \see RBRGen4_getDeployment()
  */
 RBRGen4Error RBRGen4_setDeployment(RBRGen4 *conn, const RBRGen4Deployment *deployment);

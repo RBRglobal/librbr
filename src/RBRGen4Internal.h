@@ -73,8 +73,8 @@ extern "C" {
  * \brief Send the contents of the command buffer to the instrument.
  *
  * Sends the first RBRGen4.commandBufferLength bytes of
- * RBRGen4Environment.command to the instrument. No formatting of the contents of
- * the buffer is performed; a buffer with no room left for a null byte is
+ * RBRGen4Environment.command to the instrument. No formatting of the contents
+ * of the buffer is performed; a buffer with no room left for a null byte is
  * refused, since it holds a command truncated by snprintf().
  *
  * You almost certainly want to use RBRGen4_sendCommand() instead unless
@@ -93,10 +93,9 @@ RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *conn);
 /**
  * \brief Format a command and send it to the instrument.
  *
- * The command will be formatted into
- * RBRGen4Environment.command and RBRGen4.commandBufferLength will be
- * updated accordingly. If the command does not include a terminating `\r\n`,
- * it will be added for you.
+ * The command will be formatted into RBRGen4Environment.command and
+ * RBRGen4.commandBufferLength will be updated accordingly. If the command does
+ * not include a terminating `\r\n`, it will be added for you.
  *
  * This function should only be used to send commands which don't produce any
  * response, or in conjunction with response parsing via
@@ -164,9 +163,8 @@ RBRGen4Error RBRGen4_appendLabelList(RBRGen4 *conn, const RBRGen4LabelList *labe
 /**
  * \brief Read a response from the instrument.
  *
- * This function will block until a
- * complete response is read, or until the callback returns
- * #RBRGEN4_TIMEOUT or #RBRGEN4_CALLBACK_ERROR.
+ * This function will block until a complete response is read, or until the
+ * callback returns #RBRGEN4_TIMEOUT or #RBRGEN4_CALLBACK_ERROR.
  *
  * The response will be returned via RBRGen4Environment.response. The previous
  * complete response, if any, will be removed, and newly-read data will be

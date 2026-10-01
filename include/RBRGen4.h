@@ -902,7 +902,7 @@ RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Environment *environment,
  * Clears the connection state. Does not release the caller-provided instance
  * memory and does not perform any communication with the instrument.
  *
- * \param [in,out] conn the instrument connection to terminate
+ * \param [in] conn the instrument connection to terminate
  * \return #RBRGEN4_SUCCESS when the instrument was closed successfully
  * \see RBRGen4_open()
  */

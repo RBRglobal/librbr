@@ -176,12 +176,13 @@ RBRGen4Error RBRGen4_getLinkSerial(RBRGen4 *conn, RBRGen4LinkSerial *serial);
  *
  * \command{link serial}
  *
- * Every parameter of the command is sent, so \a serial must be fully populated: read the current
- * parameters with RBRGen4_getLinkSerial() and modify them if only one is of interest.
+ * Every parameter of the command is sent, so \a serial must be fully populated:
+ * read the current parameters with RBRGen4_getLinkSerial() and modify them if
+ * only one is of interest.
  *
- * \warning The new serial mode and/or baud rate will take effect immediately after the response to
- * this command has been produced. Make sure you alter the configuration of your connection to the
- * instrument correspondingly.
+ * \warning The new serial mode and/or baud rate will take effect immediately
+ * after the response to this command has been produced. Make sure you alter the
+ * configuration of your connection to the instrument correspondingly.
  *
  * \param [in] conn the instrument connection
  * \param [in] serial the new serial parameters
@@ -201,11 +202,6 @@ RBRGen4Error RBRGen4_setLinkSerial(RBRGen4 *conn, const RBRGen4LinkSerial *seria
  * power-saving measures.
  *
  * \command{sleep}
- *
- * Any scheduled sampling activity is not affected.
- * The `sleep` command does not attempt to power down a USB link, because there
- * is always enough power available via USB to run the logger's basic functions;
- * sensor channels used for a `poll` command will still be shut down.
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the instrument has been put to sleep

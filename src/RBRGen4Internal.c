@@ -290,7 +290,7 @@ static void RBRGen4_removeLastResponse(RBRGen4 *conn)
  * \brief Read data until we find the command termination sequence or the callback indicates a
  * timeout.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] startTime when we started trying to read the command response
  * \param [in] timeout the longest to wait, in milliseconds, from \a startTime
  * \param [out] end the end of the response within the response buffer
@@ -409,7 +409,7 @@ static RBRGen4Error RBRGen4_readSingleResponse(RBRGen4 *conn, RBRGen4DateTime st
 /**
  * \brief Find the beginning of a response and null-terminate the end.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] beginning the beginning of the response
  * \param [in] end the end of the response
  */
