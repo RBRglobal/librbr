@@ -56,8 +56,7 @@ const char *RBRGen3Link_name(RBRGen3Link link);
  * \param [out] link the link type
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  */
@@ -204,8 +203,7 @@ typedef struct RBRGen3Serial {
  * \param [out] serial the current and available serial parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_setSerial()
@@ -230,11 +228,9 @@ RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn, RBRGen3Serial *serial);
  * \param [in] serial the new serial parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when a value is not supported, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when a value is not supported, or another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the baud/mode is invalid
  * \see RBRGen3_getSerial()
  */
@@ -337,11 +333,9 @@ typedef struct RBRGen3WiFi {
  * \param [out] wifi the current Wi-Fi parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another hardware error occurs
  * \see RBRGen3_setWiFi()
  */
 RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn, RBRGen3WiFi *wifi);
@@ -362,13 +356,10 @@ RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn, RBRGen3WiFi *wifi);
  * \param [in] wifi the new Wi-Fi parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
- *                                 hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
- *                                                of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another hardware error occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out of range
  * \see RBRGen3_getWiFi()
  */
 RBRGen3Error RBRGen3_setWiFi(RBRGen3 *conn, const RBRGen3WiFi *wifi);

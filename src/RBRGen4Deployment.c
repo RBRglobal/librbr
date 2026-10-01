@@ -271,14 +271,14 @@ static void RBRGen4_parseInstrumentState(RBRGen4 *conn, RBRGen4InstrumentState *
 
 /**
  * \brief Check the parameters `verify` and `enable` share, and build the
- *        command they have in common: `<command> config=<label>
- *        [dataset=<label> ]storagemode=<mode>`.
+ * command they have in common:
+ * `<command> config=<label> [dataset=<label> ]storagemode=<mode>`.
  *
  * \param [in] conn the instrument connection
  * \param [in] command the command word
  * \param [in] config the configuration to deploy
- * \param [in] datasetLabel the label for the deployment's dataset, or `NULL`
- *                          to leave the parameter out
+ * \param [in] datasetLabel the label for the deployment's dataset, or `NULL` to leave the parameter
+ *             out
  * \param [in] storageMode the data storage mode
  * \return #RBRGEN4_SUCCESS when the command is built
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a parameter is out of range

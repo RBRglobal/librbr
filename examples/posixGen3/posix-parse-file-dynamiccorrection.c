@@ -7,15 +7,11 @@
 /**
  * \file posix-parse-file-dynamiccorrection.c
  *
- * \brief Example of using the library to use the dynamic correction.
- *        Data are parse from a file
- * easyparse testfile is provided as .bin file in the ../examples/sampledata folder.
- * if one wants to test with customer bin file, a few assumptions are made:
- * in the bin file, the channels are defined in the following order:
- *      channel 1 -> C(mS/cm),
- *      channel 2 -> T meas (°C),
- *      channel 3 -> P (sea pressure, dbar),
- *      channel 4 -> T cond (°C).
+ * \brief Example of using the library to use the dynamic correction. Data are parse from a file
+ * easyparse testfile is provided as .bin file in the ../examples/sampledata folder. if one wants to
+ * test with customer bin file, a few assumptions are made: in the bin file, the channels are
+ * defined in the following order: channel 1 -> C(mS/cm), channel 2 -> T meas (°C), channel 3 -> P
+ * (sea pressure, dbar), channel 4 -> T cond (°C).
  */
 
 /* Required for errno. */

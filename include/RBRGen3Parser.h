@@ -273,8 +273,8 @@ typedef struct RBRGen3Parser {
  * \return #RBRGEN3_SUCCESS when the parser was instantiated successfully
  * \return #RBRGEN3_MISSING_CALLBACK when no callbacks were provided
  * \return #RBRGEN3_UNSUPPORTED when the memory format is unsupported
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the config is invalid, or the
- *         sample buffer has no readings storage
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the config is invalid, or the sample buffer has no
+ *         readings storage
  * \see RBRGen3Parser_destroy()
  */
 RBRGen3Error RBRGen3Parser_init(RBRGen3Parser *parser, const RBRGen3ParserCallbacks *callbacks,
@@ -345,14 +345,11 @@ void RBRGen3Parser_setUserData(RBRGen3Parser *parser, void *userData);
  * \param [in] parser the dataset parser
  * \param [in] dataset the dataset from which the chunk originated
  * \param [in] data the data to be parsed
- * \param [in,out] size initially, the size of the data given by \a data; set
- *                                 by the callback to the number of bytes
- *                                 actually parsed
+ * \param [in,out] size initially, the size of the data given by \a data; set by the callback to the
+ *                 number of bytes actually parsed
  * \return #RBRGEN3_SUCCESS when no parsing errors occur
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is
- *                                                given, or when the parser
- *                                                configuration is incomplete
- *                                                or invalid
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is given, or when the parser
+ *         configuration is incomplete or invalid
  */
 RBRGen3Error RBRGen3Parser_parse(RBRGen3Parser *parser, RBRGen3Dataset dataset,
                                  const void *const data, int32_t *size);

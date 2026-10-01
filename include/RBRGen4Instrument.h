@@ -68,8 +68,7 @@ const char *RBRGen4InstrumentState_name(RBRGen4InstrumentState state);
  * \param [out] id the instrument information
  * \return #RBRGEN4_SUCCESS when the information is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_getInstrument()
@@ -112,11 +111,10 @@ const char *RBRGen4PowerSource_name(RBRGen4PowerSource source);
  * \param [out] powerSource the power source from which the instrument is running
  * \return #RBRGEN4_SUCCESS when the information is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the information cannot be read, or
- *                                      another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the information cannot be read, or another hardware error
+ *         occurs
  * \see RBRGen4_getPowerInternal()
  * \see RBRGen4_getPowerExternal()
  */
@@ -201,11 +199,10 @@ typedef struct RBRGen4PowerInternal {
  * \param [out] power the power information
  * \return #RBRGEN4_SUCCESS when the information is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when an error occurs reading voltages, or
- *                                      another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when an error occurs reading voltages, or another hardware error
+ *         occurs
  * \see RBRGen4_setPowerInternalBatteryType()
  * \see RBRGen4_resetPowerInternalUsed()
  */
@@ -220,11 +217,9 @@ RBRGen4Error RBRGen4_getPowerInternal(RBRGen4 *conn, RBRGen4PowerInternal *power
  * \param [in] type the battery type
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another
- *                                      hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the battery type is unknown
  * \see RBRGen4_getPowerInternal()
  * \see RBRGen4_resetPowerInternalUsed()
@@ -240,11 +235,9 @@ RBRGen4Error RBRGen4_setPowerInternalBatteryType(RBRGen4 *conn,
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another
- *                                      hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another hardware error occurs
  * \see RBRGen4_getPowerInternal()
  * \see RBRGen4_setPowerInternalBatteryType()
  */
@@ -341,8 +334,7 @@ typedef struct RBRGen4PowerExternal {
  * \param [out] power the power information
  * \return #RBRGEN4_SUCCESS when the information is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_setPowerExternalBatteryType()
@@ -359,11 +351,9 @@ RBRGen4Error RBRGen4_getPowerExternal(RBRGen4 *conn, RBRGen4PowerExternal *power
  * \param [in] type the battery type
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another
- *                                      hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the battery type is unknown
  * \see RBRGen4_getPowerExternal()
  * \see RBRGen4_resetPowerExternalUsed()
@@ -379,11 +369,9 @@ RBRGen4Error RBRGen4_setPowerExternalBatteryType(RBRGen4 *conn,
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another
- *                                      hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is logging, or another hardware error occurs
  * \see RBRGen4_getPowerExternal()
  * \see RBRGen4_setPowerExternalBatteryType()
  */
@@ -445,8 +433,7 @@ typedef struct RBRGen4Instrument {
  * \param [out] instrumentInfo the instrument information
  * \return #RBRGEN4_SUCCESS when the information is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_getId4()
@@ -465,8 +452,7 @@ RBRGen4Error RBRGen4_getInstrument(RBRGen4 *conn, RBRGen4Instrument *instrumentI
  * \param [out] outputFormat the current output format
  * \return #RBRGEN4_SUCCESS when the settings are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_setOutputFormat()
@@ -493,13 +479,11 @@ RBRGen4Error RBRGen4_getOutputFormat(RBRGen4 *conn, RBRGen4OutputFormat *outputF
  * \param [in] outputFormat the desired output format
  * \return #RBRGEN4_SUCCESS when the settings are successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the datatype is not a real
- *                                                   value
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument refuses a value, or
- *                                      another hardware error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the datatype is not a real value
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument refuses a value, or another hardware error
+ *         occurs
  * \see RBRGen4_getOutputFormat()
  */
 RBRGen4Error RBRGen4_setOutputFormat(RBRGen4 *conn, const RBRGen4OutputFormat *outputFormat);
@@ -512,11 +496,9 @@ RBRGen4Error RBRGen4_setOutputFormat(RBRGen4 *conn, const RBRGen4OutputFormat *o
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the instrument has been reset
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument refuses, or another
- *                                      hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument refuses, or another hardware error occurs
  */
 RBRGen4Error RBRGen4_factoryReset(RBRGen4 *conn);
 
@@ -526,12 +508,11 @@ RBRGen4Error RBRGen4_factoryReset(RBRGen4 *conn);
  * \command{instrument reboot}
  *
  * \param [in] conn the instrument connection
- * \param [in] delay time in milliseconds to wait before rebooting; zero omits
- *                   the parameter, rebooting without a delay
+ * \param [in] delay time in milliseconds to wait before rebooting; zero omits the parameter,
+ *             rebooting without a delay
  * \return #RBRGEN4_SUCCESS when the reboot has been requested
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  */
 RBRGen4Error RBRGen4_reboot(RBRGen4 *conn, const int32_t delay);

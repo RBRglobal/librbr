@@ -102,13 +102,10 @@ typedef struct RBRGen3MemoryInfo {
  * \param [in,out] memoryInfo data memory information
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is
- *                                                requested
- * \return #RBRGEN3_HARDWARE_ERROR when the dataset is unsupported, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is requested
+ * \return #RBRGEN3_HARDWARE_ERROR when the dataset is unsupported, or another hardware error occurs
  */
 RBRGen3Error RBRGen3_getMemoryInfo(RBRGen3 *conn, RBRGen3MemoryInfo *memoryInfo);
 
@@ -174,15 +171,12 @@ typedef struct RBRGen3Data {
  * \param [in,out] data the instrument data
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_COMMUNICATION_ERROR when the offset in the response does not match the request
  * \return #RBRGEN3_CHECKSUM_ERROR in the event of a CRC failure
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is
- *                                                requested
- * \return #RBRGEN3_HARDWARE_ERROR when the dataset is unsupported, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is requested
+ * \return #RBRGEN3_HARDWARE_ERROR when the dataset is unsupported, or another hardware error occurs
  */
 RBRGen3Error RBRGen3_readData(RBRGen3 *conn, RBRGen3Data *data);
 
@@ -197,11 +191,9 @@ RBRGen3Error RBRGen3_readData(RBRGen3 *conn, RBRGen3Data *data);
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the memory is successfully cleared
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the memory failed to erase, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when the memory failed to erase, or another hardware error occurs
  */
 RBRGen3Error RBRGen3_memoryClear(RBRGen3 *conn);
 
@@ -246,8 +238,7 @@ const char *RBRGen3MemoryFormat_name(RBRGen3MemoryFormat format);
  * \param [out] memoryFormats available memory formats
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  */
@@ -267,8 +258,7 @@ RBRGen3Error RBRGen3_getAvailableMemoryFormats(RBRGen3 *conn, RBRGen3MemoryForma
  * \param [out] memoryFormat the current memory format
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  */
@@ -283,8 +273,7 @@ RBRGen3Error RBRGen3_getCurrentMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *
  * \param [out] memoryFormat the new memory format
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_setNewMemoryFormat()
@@ -305,14 +294,11 @@ RBRGen3Error RBRGen3_getNewMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *memo
  * \param [in] memoryFormat the new memory format
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid format is
- *                                                requested
- * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging or if an
- *                                 unavailable memory format is selected, or
- *                                 another hardware error occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid format is requested
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging or if an unavailable memory format
+ *         is selected, or another hardware error occurs
  * \see RBRGen3_getNewMemoryFormat()
  */
 RBRGen3Error RBRGen3_setNewMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat memoryFormat);
@@ -571,8 +557,8 @@ typedef struct RBRGen3Postprocessing {
      */
     float dcTau;
     /**
-     * \brief (dynamic correction) Parameter for the time lag correction
-     *          between marine temperature and conductivity cell temperature
+     * \brief (dynamic correction) Parameter for the time lag correction between marine temperature
+     * and conductivity cell temperature
      *
      * Coefficient is in second (default 0.35)
      *
@@ -580,8 +566,8 @@ typedef struct RBRGen3Postprocessing {
      */
     float dcTdelay;
     /**
-     * \brief (dynamic correction) Parameter for the long term thermal coefficient
-     *                  for the conductivity cell
+     * \brief (dynamic correction) Parameter for the long term thermal coefficient for the
+     * conductivity cell
      *
      * Coefficient is in 1/celcius (default 2.4e-4)
      *
@@ -602,11 +588,9 @@ typedef struct RBRGen3Postprocessing {
  *         #RBRGEN3_POSTPROCESSING_CHANNEL_MAX channels; the first
  *         #RBRGEN3_POSTPROCESSING_CHANNEL_MAX are populated
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another hardware error occurs
  * \see RBRGen3_setPostprocessing()
  */
 RBRGen3Error RBRGen3_getPostprocessing(RBRGen3 *conn, RBRGen3Postprocessing *postprocessing);
@@ -625,17 +609,14 @@ RBRGen3Error RBRGen3_getPostprocessing(RBRGen3 *conn, RBRGen3Postprocessing *pos
  * \param [in] conn the instrument connection
  * \param [in] postprocessing the post-processing parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
- * \return #RBRGEN3_COMMAND_TOO_LONG when a channel entry does not fit the
- *         command buffer; the channel list itself may be longer than the
- *         buffer
+ * \return #RBRGEN3_COMMAND_TOO_LONG when a channel entry does not fit the command buffer; the
+ *         channel list itself may be longer than the buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
- *                                                of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out of range
  * \see RBRGen3_getPostprocessing()
  */
 RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessing *postprocessing);
@@ -657,13 +638,11 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
  * \param [out] status the post-processing status after executing the command
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
- *                                                of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out of range
  * \see RBRGen3PostprocessingCommand
  * \see RBRGen3PostprocessingStatus
  */

@@ -61,8 +61,7 @@ const char *RBRCommonGeneration_name(RBRCommonGeneration generation);
  *
  * \param [in] fwType the firmware type from the `id` (or `id4`) command
  * \return the generation the firmware type belongs to
- * \return #RBRCOMMON_UNKNOWN_GENERATION for a firmware type this library does
- *         not know
+ * \return #RBRCOMMON_UNKNOWN_GENERATION for a firmware type this library does not know
  */
 RBRCommonGeneration RBRCommonGeneration_fromFwType(int32_t fwType);
 

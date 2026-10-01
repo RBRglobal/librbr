@@ -123,10 +123,9 @@ static void RBRGen4Sample_copy(RBRGen4Sample *to, const RBRGen4Sample *from)
  * \brief Send a poll command and read the resulting sample.
  *
  * \param [in] conn the instrument connection
- * \param [in] requireLabel whether to require and wait for a sample
- *                          labelled #RBRGEN4_POLL_SCHEDULE_LABEL
- * \param [in] parameter the list parameter to send, or `NULL` for a bare
- *                       `poll`
+ * \param [in] requireLabel whether to require and wait for a sample labelled
+ *             #RBRGEN4_POLL_SCHEDULE_LABEL
+ * \param [in] parameter the list parameter to send, or `NULL` for a bare `poll`
  * \param [in] list the labels to send as the value of \a parameter
  * \param [out] sample the polled sample
  */

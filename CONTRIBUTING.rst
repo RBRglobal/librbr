@@ -144,6 +144,11 @@ Technical pedantry:
     name them with ``\command{command}``
     (or ``\command{first,second}`` for more than one),
     in its own paragraph after the ``\brief``.
+  - When a tag's text wraps, as in Zephyr,
+    continue a ``\param`` description under its first word,
+    a ``\return`` or ``\see`` description just past the tag,
+    and ``\brief``, ``\note``, or ``\warning`` text
+    flush with the comment.
 
 A short example:
 
@@ -159,7 +164,8 @@ A short example:
     * \param [in] conn the instrument connection
     * \param [in] theseParametersAreAligned a description of the first parameter
     * \param [in] becauseTheyFitOnTheLine a description of the second parameter
-    * \return a description of the return value
+    * \return a description of the return value, which continues just past the tag when it is
+    *         too long for one line
     */
    int32_t RBRGen3_examplePrototype(RBRGen3 *conn,
                                     int32_t theseParametersAreAligned,

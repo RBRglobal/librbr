@@ -61,8 +61,7 @@ extern const char *RBRGEN3_LIB_VERSION;
 extern const char *RBRGEN3_LIB_BUILD_DATE;
 
 /**
- * \brief A reasonable size for the buffer storing commands destined for the
- *        instrument.
+ * \brief A reasonable size for the buffer storing commands destined for the instrument.
  *
  * \see RBRGen3Environment.commandCapacity for how to size the buffer
  */
@@ -296,8 +295,8 @@ struct RBRGen3;
  * \param [out] time the current platform time in milliseconds
  * \return #RBRGEN3_SUCCESS when the time is successfully retrieved
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
- * \see RBRGen3ReadCallback() for details on how the values returned from
- *                                  user callback functions are used
+ * \see RBRGen3ReadCallback() for details on how the values returned from user callback functions
+ *      are used
  */
 typedef RBRGen3Error (*RBRGen3TimeCallback)(const struct RBRGen3 *conn, RBRGen3DateTime *time);
 
@@ -314,8 +313,8 @@ typedef RBRGen3Error (*RBRGen3TimeCallback)(const struct RBRGen3 *conn, RBRGen3D
  * \param [in] time the duration for which a sleep is requested in milliseconds
  * \return #RBRGEN3_SUCCESS when the time is successfully retrieved
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
- * \see RBRGen3ReadCallback() for details on how the values returned from
- *                                  user callback functions are used
+ * \see RBRGen3ReadCallback() for details on how the values returned from user callback functions
+ *      are used
  */
 typedef RBRGen3Error (*RBRGen3SleepCallback)(const struct RBRGen3 *conn, RBRGen3DateTime time);
 
@@ -354,9 +353,8 @@ typedef RBRGen3Error (*RBRGen3SleepCallback)(const struct RBRGen3 *conn, RBRGen3
  *
  * \param [in] conn the instrument for which data is being requested
  * \param [in,out] data where up to \a size bytes of data can be written
- * \param [in,out] size initially, the maximum amount of data which can be
- *                      written to \a data; set by the callback to the number
- *                      of bytes actually written
+ * \param [in,out] size initially, the maximum amount of data which can be written to \a data; set
+ *                 by the callback to the number of bytes actually written
  * \return #RBRGEN3_SUCCESS when data is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
@@ -386,8 +384,8 @@ typedef RBRGen3Error (*RBRGen3ReadCallback)(const struct RBRGen3 *conn, void *da
  * \return #RBRGEN3_SUCCESS when the data is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
- * \see RBRGen3ReadCallback() for details on how the values returned from
- *                                  user callback functions are used
+ * \see RBRGen3ReadCallback() for details on how the values returned from user callback functions
+ *      are used
  */
 typedef RBRGen3Error (*RBRGen3WriteCallback)(const struct RBRGen3 *conn, const void *const data,
                                              int32_t size);
@@ -719,32 +717,26 @@ typedef struct RBRGen3 {
  * library resources is required. In the event of a successful result,
  * RBRGen3_close() should be used to terminate the instrument connection.
  *
- * \note When #RBRGEN3_UNSUPPORTED is returned, the connection is not open,
- *       but RBRGen3_getGeneration() reports the generation that was
- *       detected (e.g., #RBRCOMMON_LOGGER4 for a 4th-generation instrument,
- *       or #RBRCOMMON_UNKNOWN_GENERATION if none could be identified).
- *       Applications built with both APIs can therefore call
- *       RBRGen3_open() and fall back to RBRGen4_open() on
- *       #RBRGEN3_UNSUPPORTED. Only RBRGen3_getGeneration() and
- *       RBRGen3_close() may be used on the connection in that state.
+ * \note When #RBRGEN3_UNSUPPORTED is returned, the connection is not open, but
+ * RBRGen3_getGeneration() reports the generation that was detected (e.g., #RBRCOMMON_LOGGER4 for a
+ * 4th-generation instrument, or #RBRCOMMON_UNKNOWN_GENERATION if none could be identified).
+ * Applications built with both APIs can therefore call RBRGen3_open() and fall back to
+ * RBRGen4_open() on #RBRGEN3_UNSUPPORTED. Only RBRGen3_getGeneration() and RBRGen3_close() may be
+ * used on the connection in that state.
  *
  * \param [out] conn the context object to populate
- * \param [in] environment the callbacks and buffers to be used by the
- *                         connection
+ * \param [in] environment the callbacks and buffers to be used by the connection
  * \param [in] commandTimeout the command timeout in milliseconds
  * \param [in] userData arbitrary user data; useful in callbacks
  * \return #RBRGEN3_SUCCESS when the instrument was opened successfully
- * \return #RBRGEN3_MISSING_CALLBACK when \a environment or a callback was not
- *         provided
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when a buffer is missing or empty,
- *         or RBRGen3Environment.sampleBuffer has no readings storage
- * \return #RBRGEN3_COMMAND_TOO_LONG when the command buffer cannot hold the
- *         opening command
- * \return #RBRGEN3_RESPONSE_TOO_LONG when the response buffer cannot hold the
- *         instrument's reply
+ * \return #RBRGEN3_MISSING_CALLBACK when \a environment or a callback was not provided
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when a buffer is missing or empty, or
+ *         RBRGen3Environment.sampleBuffer has no readings storage
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command buffer cannot hold the opening command
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when the response buffer cannot hold the instrument's reply
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_UNSUPPORTED when the instrument is unsupported, does not
- *         answer, or answers with an error
+ * \return #RBRGEN3_UNSUPPORTED when the instrument is unsupported, does not answer, or answers with
+ *         an error
  * \see RBRGen3_close()
  */
 RBRGen3Error RBRGen3_open(RBRGen3 *conn, const RBRGen3Environment *environment,
@@ -798,8 +790,8 @@ RBRGen3Error RBRGen3_setCommandBuffer(RBRGen3 *conn, uint8_t *command, int32_t c
  * \param [in] response storage for data received from the instrument
  * \param [in] capacity the capacity of \a response in bytes
  * \return #RBRGEN3_SUCCESS when the buffer is replaced
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the buffer is missing or cannot
- *         hold more than a line terminator
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the buffer is missing or cannot hold more than a
+ *         line terminator
  * \see RBRGen3Environment for the rules on sizing and sharing buffers
  * \see RBRGen3_setCommandBuffer()
  */
@@ -832,8 +824,7 @@ void RBRGen3_resetResponseBuffer(RBRGen3 *conn);
 /**
  * \brief Get the generation of an instrument.
  *
- * \note Also reports the detected generation after RBRGen3_open() returns
- *       #RBRGEN3_UNSUPPORTED.
+ * \note Also reports the detected generation after RBRGen3_open() returns #RBRGEN3_UNSUPPORTED.
  *
  * \param [in] conn the instrument connection
  * \return the instrument generation
@@ -880,8 +871,7 @@ void *RBRGen3_getUserData(const RBRGen3 *conn);
 void RBRGen3_setUserData(RBRGen3 *conn, void *userData);
 
 /**
- * \brief Get the error which resulted from the last instrument command, if
- *        applicable.
+ * \brief Get the error which resulted from the last instrument command, if applicable.
  *
  * If the instrument responded with an error or a warning to the last command,
  * this function returns that error. Otherwise, and before any commands have
@@ -903,8 +893,7 @@ void RBRGen3_setUserData(RBRGen3 *conn, void *userData);
 RBRGen3HardwareError RBRGen3_getLastHardwareError(const RBRGen3 *conn);
 
 /**
- * \brief Get the error message which resulted from the last instrument
- *        command, if applicable.
+ * \brief Get the error message which resulted from the last instrument command, if applicable.
  *
  * If the last instrument command returned #RBRGEN3_HARDWARE_ERROR and an
  * error message is available, this function returns the verbatim error

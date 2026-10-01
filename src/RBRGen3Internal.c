@@ -300,8 +300,8 @@ static void RBRGen3_removeLastResponse(RBRGen3 *conn)
 }
 
 /**
- * \brief Read data until we find the command termination sequence or the
- *        callback indicates a timeout.
+ * \brief Read data until we find the command termination sequence or the callback indicates a
+ * timeout.
  *
  * \param [in,out] conn the instrument connection
  * \param [in] startTime when we started trying to read the command response
@@ -465,8 +465,7 @@ static void RBRGen3_terminateResponse(RBRGen3 *conn, char **beginning, char *end
  * \param [out] sample the sample
  * \param [in] response the response to parse
  * \return RBRGEN3_SUCCESS if the response is a sample
- * \return RBRGEN3_INVALID_PARAMETER_VALUE if the response is not a
- *                                               sample
+ * \return RBRGEN3_INVALID_PARAMETER_VALUE if the response is not a sample
  */
 static RBRGen3Error RBRGen3Sample_parse(RBRGen3Sample *sample, char *response)
 {

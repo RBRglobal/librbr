@@ -39,11 +39,10 @@ extern "C" {
  * \param [out] status the status which would be produced by enabling logging
  * \return #RBRGEN3_SUCCESS when the status is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when an error would occur when enabling
- *                                 logging, or another hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when an error would occur when enabling logging, or another
+ *         hardware error occurs
  * \see RBRGen3_enable()
  * \see RBRGen3DeploymentStatus
  */
@@ -66,11 +65,10 @@ RBRGen3Error RBRGen3_verify(RBRGen3 *conn, bool eraseMemory, RBRGen3DeploymentSt
  * \param [out] status the instrument's status after having enabled logging
  * \return #RBRGEN3_SUCCESS when logging is successfully enabled
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when an error occurs enabling logging, or
- *                                 another hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when an error occurs enabling logging, or another hardware error
+ *         occurs
  * \see RBRGen3DeploymentStatus
  */
 RBRGen3Error RBRGen3_enable(RBRGen3 *conn, bool eraseMemory, RBRGen3DeploymentStatus *status);
@@ -85,8 +83,7 @@ RBRGen3Error RBRGen3_enable(RBRGen3 *conn, bool eraseMemory, RBRGen3DeploymentSt
  * \param [out] status the instrument's status after having disabled logging
  * \return #RBRGEN3_SUCCESS when logging is successfully disabled
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3DeploymentStatus
@@ -119,11 +116,9 @@ typedef struct RBRGen3Simulation {
  * \param [out] simulation the simulation parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another hardware error occurs
  * \see RBRGen3_setSimulation()
  */
 RBRGen3Error RBRGen3_getSimulation(RBRGen3 *conn, RBRGen3Simulation *simulation);
@@ -144,14 +139,11 @@ RBRGen3Error RBRGen3_getSimulation(RBRGen3 *conn, RBRGen3Simulation *simulation)
  * \param [in] simulation the simulation parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an out-of-bounds
- *                                                simulation period is
- *                                                requested
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an out-of-bounds simulation period is requested
  * \see RBRGen3_getSimulation()
  */
 RBRGen3Error RBRGen3_setSimulation(RBRGen3 *conn, const RBRGen3Simulation *simulation);

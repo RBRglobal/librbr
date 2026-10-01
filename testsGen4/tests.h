@@ -198,8 +198,7 @@ extern "C" {
     }
 
 /**
- * \brief Declare a sample named \a name with readings storage for \a size_
- *        channels.
+ * \brief Declare a sample named \a name with readings storage for \a size_ channels.
  */
 #define RBRGEN4_SAMPLE_DECL(name, size_)                               \
     double name##Readings[size_];                                      \

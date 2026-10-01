@@ -287,8 +287,8 @@ static void RBRGen4_removeLastResponse(RBRGen4 *conn)
 }
 
 /**
- * \brief Read data until we find the command termination sequence or the
- *        callback indicates a timeout.
+ * \brief Read data until we find the command termination sequence or the callback indicates a
+ * timeout.
  *
  * \param [in,out] conn the instrument connection
  * \param [in] startTime when we started trying to read the command response
@@ -491,13 +491,13 @@ static char *seek(const char *str, char delimiter)
 /**
  * \brief Attempt to parse a sample from a response.
  *
- * \param [out] sample the sample; RBRGen4Sample.readings and
- *                     RBRGen4Sample.size must be set by the caller
+ * \param [out] sample the sample; RBRGen4Sample.readings and RBRGen4Sample.size must be set by the
+ *              caller
  * \param [in] outputFormat the format of the response to parse
  * \param [in] response the response to parse
  * \return RBRGEN4_SUCCESS if the response is a sample
- * \return RBRGEN4_INVALID_PARAMETER_VALUE if the response does not
- *         follow the specified output format
+ * \return RBRGEN4_INVALID_PARAMETER_VALUE if the response does not follow the specified output
+ *         format
  * \return RBRGEN4_CHECKSUM_ERROR if the CRC does not match
  */
 static RBRGen4Error RBRGen4Sample_parse(RBRGen4Sample *sample, RBRGen4OutputFormat *outputFormat,

@@ -111,11 +111,9 @@ typedef struct RBRGen3Regimes {
  * \param [out] regimes the regimes parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another hardware error occurs
  * \see RBRGen3_setRegimes()
  */
 RBRGen3Error RBRGen3_getRegimes(RBRGen3 *conn, RBRGen3Regimes *regimes);
@@ -137,13 +135,11 @@ RBRGen3Error RBRGen3_getRegimes(RBRGen3 *conn, RBRGen3Regimes *regimes);
  * \param [in] regimes the regimes parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when too many regimes are
- *                                                requested
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when too many regimes are requested
  * \see RBRGen3_getRegimes()
  */
 RBRGen3Error RBRGen3_setRegimes(RBRGen3 *conn, const RBRGen3Regimes *regimes);
@@ -205,14 +201,11 @@ typedef struct RBRGen3Regime {
  * \param [out] regime the regime parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or if an
- *                                 invalid regime index is given, or another
- *                                 hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid regime index
- *                                                is given
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or if an invalid regime index is
+ *         given, or another hardware error occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid regime index is given
  * \see RBRGen3_setRegime()
  */
 RBRGen3Error RBRGen3_getRegime(RBRGen3 *conn, RBRGen3Regime *regime);
@@ -232,13 +225,11 @@ RBRGen3Error RBRGen3_getRegime(RBRGen3 *conn, RBRGen3Regime *regime);
  * \param [in] regime the regime parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
- *                                                of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out of range
  * \see RBRGen3_getRegime()
  */
 RBRGen3Error RBRGen3_setRegime(RBRGen3 *conn, const RBRGen3Regime *regime);
@@ -293,11 +284,9 @@ typedef struct RBRGen3DirectionDependentSampling {
  * \param [out] ddsampling the direction-dependent sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another hardware error occurs
  * \see RBRGen3_setDirectionDependentSampling()
  */
 RBRGen3Error RBRGen3_getDirectionDependentSampling(RBRGen3 *conn,
@@ -318,13 +307,11 @@ RBRGen3Error RBRGen3_getDirectionDependentSampling(RBRGen3 *conn,
  * \param [in] ddsampling the direction-dependent sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
- *                                                of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out of range
  * \see RBRGen3_getDirectionDependentSampling()
  */
 RBRGen3Error RBRGen3_setDirectionDependentSampling(RBRGen3 *conn,

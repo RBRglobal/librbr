@@ -76,8 +76,7 @@ typedef struct RBRGen3Clock {
  * \param [out] clock the clock value
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_setClock()
@@ -106,13 +105,11 @@ RBRGen3Error RBRGen3_getClock(RBRGen3 *conn, RBRGen3Clock *clock);
  * \param [in] clock the clock value
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the clock values are out
- *                                                of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the clock values are out of range
  * \see RBRGen3_getClock()
  */
 RBRGen3Error RBRGen3_setClock(RBRGen3 *conn, const RBRGen3Clock *clock);
@@ -273,8 +270,7 @@ typedef struct RBRGen3Sampling {
  * \param [out] sampling the sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_setSampling()
@@ -318,13 +314,11 @@ RBRGen3Error RBRGen3_getSampling(RBRGen3 *conn, RBRGen3Sampling *sampling);
  * \param [in] sampling the sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
- *                                                of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out of range
  * \see RBRGen3_getSampling()
  * \see RBRGen3_setBurstSampling()
  */
@@ -355,13 +349,11 @@ RBRGen3Error RBRGen3_setSampling(RBRGen3 *conn, const RBRGen3Sampling *sampling)
  * \param [in] sampling the sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
- *                                                of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out of range
  * \see RBRGen3_setSampling()
  */
 RBRGen3Error RBRGen3_setBurstSampling(RBRGen3 *conn, const RBRGen3Sampling *sampling);
@@ -454,8 +446,7 @@ typedef struct RBRGen3Deployment {
  * \param [out] deployment the deployment parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_setDeployment()
@@ -480,13 +471,11 @@ RBRGen3Error RBRGen3_getDeployment(RBRGen3 *conn, RBRGen3Deployment *deployment)
  * \param [in] deployment the deployment parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the start or end time
- *                                                values are out of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the start or end time values are out of range
  * \see RBRGen3_getDeployment()
  */
 RBRGen3Error RBRGen3_setDeployment(RBRGen3 *conn, const RBRGen3Deployment *deployment);

@@ -301,8 +301,9 @@ RBRGen3Error RBRGen3_setChannelGain(RBRGen3 *conn, RBRGen3ChannelIndex channel,
 }
 
 /**
- * \brief Send one `calibration <channel> datetime = <datetime>, <group><index>
- *        = <value>` command.
+ * \brief Send one
+ * `calibration <channel> datetime = <datetime>, <group><index> = <value>`
+ * command.
  *
  * \param [in] conn the instrument connection
  * \param [in] channel the channel index

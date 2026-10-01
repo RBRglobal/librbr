@@ -7,8 +7,8 @@
 /**
  * \file posix-stream-dynamiccorrection.c
  *
- * \brief Example of using the library to use the dynamic correction.
- *        Data are streamed from logger and the correction is applied.
+ * \brief Example of using the library to use the dynamic correction. Data are streamed from logger
+ * and the correction is applied.
  */
 
 /* Prerequisite for gmtime_r in time.h. */
