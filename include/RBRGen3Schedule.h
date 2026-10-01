@@ -196,6 +196,7 @@ const char *RBRGen3Gate_name(RBRGen3Gate gate);
  *
  * \see RBRGen3_getSampling()
  * \see RBRGen3_setSampling()
+ * \see RBRGen3_setBurstSampling()
  */
 typedef struct RBRGen3Sampling {
     /** \brief The instrument sampling mode. */
@@ -359,6 +360,8 @@ RBRGen3Error RBRGen3_setBurstSampling(RBRGen3 *conn, const RBRGen3Sampling *samp
  * \see RBRGen3Deployment
  * \see RBRGen3_getDeployment()
  * \see RBRGen3_enable()
+ * \see RBRGen3_verify()
+ * \see RBRGen3_disable()
  */
 typedef enum RBRGen3DeploymentStatus {
     /** Logging is not enabled. */

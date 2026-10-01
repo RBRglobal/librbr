@@ -43,6 +43,7 @@ extern "C" {
  * \return #RBRGEN3_HARDWARE_ERROR when an error would occur when enabling
  *                                 logging, or another hardware error occurs
  * \see RBRGen3_enable()
+ * \see RBRGen3DeploymentStatus
  */
 RBRGen3Error RBRGen3_verify(RBRGen3 *conn, bool eraseMemory, RBRGen3DeploymentStatus *status);
 
@@ -66,6 +67,7 @@ RBRGen3Error RBRGen3_verify(RBRGen3 *conn, bool eraseMemory, RBRGen3DeploymentSt
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when an error occurs enabling logging, or
  *                                 another hardware error occurs
+ * \see RBRGen3DeploymentStatus
  */
 RBRGen3Error RBRGen3_enable(RBRGen3 *conn, bool eraseMemory, RBRGen3DeploymentStatus *status);
 
@@ -80,6 +82,7 @@ RBRGen3Error RBRGen3_enable(RBRGen3 *conn, bool eraseMemory, RBRGen3DeploymentSt
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \see RBRGen3DeploymentStatus
  */
 RBRGen3Error RBRGen3_disable(RBRGen3 *conn, RBRGen3DeploymentStatus *status);
 
@@ -127,7 +130,7 @@ RBRGen3Error RBRGen3_getSimulation(RBRGen3 *conn, RBRGen3Simulation *simulation)
  * - you set an out-of-bounds parameter the library fails to detect
  *
  * \param [in] conn the instrument connection
- * \param [out] simulation the simulation parameters
+ * \param [in] simulation the simulation parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the

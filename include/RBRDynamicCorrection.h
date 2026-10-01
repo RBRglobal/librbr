@@ -229,18 +229,18 @@ typedef struct {
  *
  * Initialize the algorithm for the given sampling rate.
  *
- * \param params Parameters for dynamic correction algorithm
- * \param Fs sampling rate (Samples/sec)
- * \param t_delay default value DCORR_T_DELAY used as input
- * \param alpha_a default value DCORR_ALPHA_A used as input
- * \param alpha_e default value DCORR_ALPHA_E used as input
- * \param tau_a default value DCORR_TAU_A used as input
- * \param tau_e default value DCORR_TAU_E used as input
- * \param ctcoeff_a default value DCORR_COEFF_A used as input
- * \param ctcoeff_e default value DCORR_COEFF_E used as input
- * \param Vp_min default value DCORR_VP_MIN used as input
- * \param Vp_max default value DCORR_VP_MAX used as input
- * \param Vp_fc default value DCORR_VP_FC used as input
+ * \param [out] params Parameters for dynamic correction algorithm
+ * \param [in] Fs sampling rate (Samples/sec)
+ * \param [in] t_delay default value DCORR_T_DELAY used as input
+ * \param [in] alpha_a default value DCORR_ALPHA_A used as input
+ * \param [in] alpha_e default value DCORR_ALPHA_E used as input
+ * \param [in] tau_a default value DCORR_TAU_A used as input
+ * \param [in] tau_e default value DCORR_TAU_E used as input
+ * \param [in] ctcoeff_a default value DCORR_COEFF_A used as input
+ * \param [in] ctcoeff_e default value DCORR_COEFF_E used as input
+ * \param [in] Vp_min default value DCORR_VP_MIN used as input
+ * \param [in] Vp_max default value DCORR_VP_MAX used as input
+ * \param [in] Vp_fc default value DCORR_VP_FC used as input
  * \return error code (0 = no error)
  */
 RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *params, float Fs,
@@ -252,8 +252,8 @@ RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *
 /**
  * \brief Change the sampling rate for the algorithm.
  *
- * \param params Parameters for dynamic correction algorithm
- * \param Fs sampling rate (Samples/sec)
+ * \param [in,out] params Parameters for dynamic correction algorithm
+ * \param [in] Fs sampling rate (Samples/sec)
  * \return error code (0 = no error)
  */
 RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionParams *params,
@@ -264,9 +264,9 @@ RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionPar
  *
  * Return a corrected output (with proper time delay to align with all correction results)
  *
- * \param params Parameters for dynamic correction algorithm
- * \param measIn Input measurements for algorithm
- * \param corrMeasOut Output corrected measurements (time aligned)
+ * \param [in,out] params Parameters for dynamic correction algorithm
+ * \param [in] measIn Input measurements for algorithm
+ * \param [out] corrMeasOut Output corrected measurements (time aligned)
  * \return error code (0 = no error)
  */
 RBRDynamicCorrectionError

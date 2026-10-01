@@ -84,6 +84,7 @@ RBRGen3Error RBRGen3_getChannelsList(RBRGen3 *conn, RBRGen3ChannelsList *channel
  * \brief Response to the `outputformat labelslist` command.
  *
  * \see RBRGen3_getLabelsList()
+ * \see RBRGen3_fetch()
  */
 typedef struct RBRGen3LabelsList {
     /** \brief The number of labels RBRGen3LabelsList.labels can hold. */
@@ -425,7 +426,7 @@ RBRGen3Error RBRGen3_getAuxOutput(RBRGen3 *conn, RBRGen3AuxOutput *auxOutput);
  * - you set an out-of-bounds parameter the library fails to detect
  *
  * \param [in] conn the instrument connection
- * \param [out] auxOutput the auxiliary output signal parameters
+ * \param [in] auxOutput the auxiliary output signal parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
@@ -468,7 +469,7 @@ const char *RBRGen3ReadingFlag_name(RBRGen3ReadingFlag flag);
  * If the reading is not a NaN, returns the error flag encoded within the NaN.
  * Otherwise, returns #RBRGEN3_READING_FLAG_NONE.
  *
- * \param reading the reading
+ * \param [in] reading the reading
  * \return the error flag of the reading, if present
  * \see RBRGen3Reading_getError() to get the error value, if present
  * \see RBRGen3Reading_setError() to create a reading with an error set
@@ -481,7 +482,7 @@ RBRGen3ReadingFlag RBRGen3Reading_getFlag(double reading);
  * If the reading is not a NaN, returns the error value encoded within the NaN.
  * Otherwise, returns 0.
  *
- * \param reading the reading
+ * \param [in] reading the reading
  * \return the error value of the reading, if present
  * \see RBRGen3Reading_getFlag() to get the error flag, if present
  * \see RBRGen3Reading_setError() to create a reading with an error set
@@ -491,8 +492,8 @@ uint8_t RBRGen3Reading_getError(double reading);
 /**
  * \brief Synthesize a reading with an error set.
  *
- * \param flag the error flag
- * \param value the error value
+ * \param [in] flag the error flag
+ * \param [in] value the error value
  * \return the error reading
  * \see RBRGen3Reading_getFlag() to get the error flag, if present
  * \see RBRGen3Reading_getError() to get the error value, if present
@@ -501,6 +502,9 @@ double RBRGen3Reading_setError(RBRGen3ReadingFlag flag, uint8_t value);
 
 /**
  * \brief An instrument sample.
+ *
+ * \see RBRGen3_fetch()
+ * \see RBRGen3_readSample()
  */
 typedef struct RBRGen3Sample {
     /** \brief The timestamp of the sample. */
@@ -562,7 +566,7 @@ typedef struct RBRGen3Sample {
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
- * \see RBRGen3_fetchSample() for on-demand sample fetching
+ * \see RBRGen3_fetch() for on-demand sample fetching
  */
 RBRGen3Error RBRGen3_readSample(RBRGen3 *conn);
 

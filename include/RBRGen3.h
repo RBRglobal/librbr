@@ -682,7 +682,7 @@ typedef struct RBRGen3 {
  * The library never allocates memory: the caller provides the RBRGen3
  * instance (statically, on the stack, or from a heap of its choosing) and the
  * constructor initializes it in place. Any prior contents are discarded. The
- * caller likewise provides the command and response buffers via \a buffers;
+ * caller likewise provides the command and response buffers via \a environment;
  * they must remain valid until RBRGen3_close() is called. If either buffer is
  * `NULL`, the command buffer has a capacity of zero or less, or the response
  * buffer cannot hold more than a line terminator, the connection is not

@@ -158,8 +158,11 @@ typedef struct RBRGen3Data {
  *
  * A communication error will be reported if the offset in response doesn't match request.
  * A checksum error will be reported if the CRC check of the read data fails.
- * However, \a data will still faithfully reflect the response parameters and
- * data. Be sure to check the return value lest you accidentally consume
+ * In either case, and on any other error except
+ * #RBRGEN3_INVALID_PARAMETER_VALUE, RBRGen3Data.size in \a data is set to 0
+ * while its dataset and offset are left unchanged, and the memory
+ * RBRGen3Data.data points to may have been written with unverified data. Be
+ * sure to check the return value lest you accidentally consume
  * invalid/corrupt data!
  *
  * \param [in] conn the instrument connection
@@ -302,7 +305,7 @@ RBRGen3Error RBRGen3_setNewMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat memor
 /**
  * \brief Functions available to aggregate channel values within bins.
  *
- * \see RBRGen3PostprocessingChannel
+ * \see RBRGen3PostprocessingChannelsList
  */
 typedef enum RBRGen3PostprocessingAggregate {
     /** average value in the bin */
@@ -357,6 +360,7 @@ typedef struct RBRGen3PostprocessingChannelsList {
  * \brief Post-processing job statuses.
  *
  * \see RBRGen3Postprocessing
+ * \see RBRGen3_setPostprocessingCommand()
  */
 typedef enum RBRGen3PostprocessingStatus {
     /** Post-processing is idle. */
@@ -386,6 +390,7 @@ const char *RBRGen3PostprocessingStatus_name(RBRGen3PostprocessingStatus status)
  * \brief Post-processing control commands.
  *
  * \see RBRGen3Postprocessing
+ * \see RBRGen3_setPostprocessingCommand()
  */
 typedef enum RBRGen3PostprocessingCommand {
     /** Start the post-processing job. */
@@ -463,7 +468,7 @@ typedef struct RBRGen3Postprocessing {
      * \brief Post-processing statistics channel configurations.
      *
      * Functions which receive an RBRGen3Postprocessing instance will
-     * expect the first RBRGen3PostprocessingChannelList.count entries to
+     * expect the first RBRGen3PostprocessingChannelsList.len entries to
      * be populated, and functions which return a RBRGen3Postprocessing
      * instance will similarly indicate how many entries are populated.
      */
@@ -638,6 +643,8 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
  *                                 another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
  *                                                of range
+ * \see RBRGen3PostprocessingCommand
+ * \see RBRGen3PostprocessingStatus
  */
 RBRGen3Error RBRGen3_setPostprocessingCommand(RBRGen3 *conn, RBRGen3PostprocessingCommand command,
                                               RBRGen3PostprocessingStatus *status);

@@ -20,11 +20,15 @@ extern "C" {
 
 #include "RBRGen3.h"
 
-/** \brief The state of a pauseresume condition. */
+/**
+ * \brief The state of a pauseresume condition.
+ *
+ * \see RBRGen3_getPauseResume()
+ */
 typedef enum RBRGen3PauseResumeState {
     /** \brief The pauseresuming condition is disabled, or sampling mode is regimes. */
     RBRGEN3_PAUSE_RESUME_NA,
-    /** \brief Deployment is enaled and paused. */
+    /** \brief Deployment is enabled and paused. */
     RBRGEN3_PAUSE_RESUME_PAUSED,
     /** \brief Deployment is enabled and not paused. */
     RBRGEN3_PAUSE_RESUME_RUNNING,
@@ -36,7 +40,7 @@ typedef enum RBRGen3PauseResumeState {
  * \brief Get a human-readable string name for a pauseresume state.
  *
  * \param [in] state the pauseresume state
- * \return a string name for the gating state
+ * \return a string name for the pauseresume state
  * \see RBRGen3Error_name() for a description of the format of names
  */
 const char *RBRGen3PauseResumeState_name(RBRGen3PauseResumeState state);
@@ -44,7 +48,7 @@ const char *RBRGen3PauseResumeState_name(RBRGen3PauseResumeState state);
 /**
  * \brief Possible instrument pause status.
  *
- * \see RBRGen3Pause
+ * \see RBRGen3_pause()
  */
 typedef enum RBRGen3PauseStatus {
     /** Deployment is paused and no more samples will be taken once the current acquisition
@@ -66,7 +70,7 @@ const char *RBRGen3PauseStatus_name(RBRGen3PauseStatus status);
 /**
  * \brief Possible instrument resume status.
  *
- * \see RBRGen3Resume
+ * \see RBRGen3_resume()
  */
 typedef enum RBRGen3ResumeStatus {
     /** Deployment has resumed running as scheduled. */
@@ -86,12 +90,14 @@ typedef enum RBRGen3ResumeStatus {
 const char *RBRGen3ResumeStatus_name(RBRGen3ResumeStatus status);
 
 /**
+ * \brief Get the state of the `pauseresume` feature.
+ *
  * It allows the host to determine if the pauseresume feature is available on
  * the instrument. It allows an elevated host to allow and deny the feature
  * for the instrument.
  *
  * \param [in] conn the instrument connection
- * \param [in, out] state the state of pauseresume
+ * \param [out] state the state of pauseresume
  * \return #RBRGEN3_SUCCESS when the state is one of the following:
  * "n/a", "paused", or "running".
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -99,28 +105,33 @@ const char *RBRGen3ResumeStatus_name(RBRGen3ResumeStatus status);
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \see RBRGen3PauseResumeState
  */
 RBRGen3Error RBRGen3_getPauseResume(RBRGen3 *conn, RBRGen3PauseResumeState *state);
 
 /**
- * It pauses an enabled deloyment.
+ * \brief Pause an enabled deployment.
  *
  * \param [in] conn the instrument connection
- * \param [in, out] status the status of pause
+ * \param [out] status the status of pause
  * \return #RBRGEN3_SUCCESS when the status is "paused".
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \see RBRGen3PauseStatus
+ * \see RBRGen3_resume()
  */
 RBRGen3Error RBRGen3_pause(RBRGen3 *conn, RBRGen3PauseStatus *status);
+
 /**
- * It resumes an enabled deployment which was previously
- * paused using the pause command
+ * \brief Resume an enabled deployment which was previously paused.
+ *
+ * The deployment must have been paused using RBRGen3_pause().
  *
  * \param [in] conn the instrument connection
- * \param [in, out] status the status of resume
+ * \param [out] status the status of resume
  * \return #RBRGEN3_SUCCESS when the state is one of the following:
  * "pending", "logging".
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -128,6 +139,8 @@ RBRGen3Error RBRGen3_pause(RBRGen3 *conn, RBRGen3PauseStatus *status);
  *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \see RBRGen3ResumeStatus
+ * \see RBRGen3_pause()
  */
 RBRGen3Error RBRGen3_resume(RBRGen3 *conn, RBRGen3ResumeStatus *status);
 

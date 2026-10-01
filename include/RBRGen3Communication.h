@@ -65,7 +65,7 @@ RBRGen3Error RBRGen3_getLink(RBRGen3 *conn, RBRGen3Link *link);
  * \brief Instrument serial baud rates.
  *
  * Most of these baud rates are unsupported by the instrument, but are included
- * for sake of completeness. Call RBRGen3_getBaudRates() to determine
+ * for sake of completeness. Call RBRGen3_getSerial() to determine
  * which rates are supported by a given instrument.
  *
  * \see RBRGen3Serial
@@ -213,7 +213,7 @@ RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn, RBRGen3Serial *serial);
  *
  * A hardware error will occur if the baud rate or mode is unsupported by the
  * instrument. See RBRGen3Serial.availableBaudRates and
- * RBRGen3Serial.availableSerialModes to determine supported
+ * RBRGen3Serial.availableModes to determine supported
  * rates/modes.
  *
  * The new serial mode and/or baud rate will take effect immediately after the
@@ -347,7 +347,7 @@ RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn, RBRGen3WiFi *wifi);
  * instruments.
  *
  * \param [in] conn the instrument connection
- * \param [out] wifi the new Wi-Fi parameters
+ * \param [in] wifi the new Wi-Fi parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the

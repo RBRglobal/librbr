@@ -247,7 +247,7 @@ typedef struct RBRGen3Parser {
  * RBRGen3Parser instance and it is initialized in place; the library never
  * allocates memory.
  *
- * As with the \a callbacks argument to RBRGen3_open(), the
+ * As with the \a environment argument to RBRGen3_open(), the
  * \a config and \a callbacks structures will be copied into the RBRGen3Parser
  * structure and no references to them are retained.
  *

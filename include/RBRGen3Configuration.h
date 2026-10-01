@@ -795,7 +795,7 @@ typedef struct RBRGen3SensorParameter {
  * things for users, the library emulates the Logger3 behaviour for Logger2
  * instruments.
  *
- * \param conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] channel the index of the channel from which the parameter is to
  *                     be retrieved
  * \param [in,out] parameter initially, the sensor parameter to be retrieved;
@@ -819,7 +819,7 @@ RBRGen3Error RBRGen3_getSensorParameter(RBRGen3 *conn, RBRGen3ChannelIndex chann
  * To ease memory requirements, sensor parameters are not included with other
  * channel information retrieved by RBRGen3_getChannels().
  *
- * \param conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] channel the index of the channel for which sensor parameters are
  *                     to be retrieved
  * \param [out] parameters the sensor parameters for the channel
@@ -848,7 +848,7 @@ RBRGen3Error RBRGen3_getSensorParameters(RBRGen3 *conn, RBRGen3ChannelIndex chan
  * - the instrument is logging
  * - the parameter name has not been defined at the RBR factory
  *
- * \param conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] channel the index of the channel the sensor parameter of which
  *                     is to be updated
  * \param [in] parameter the sensor parameter for the channel

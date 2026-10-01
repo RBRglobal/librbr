@@ -30,11 +30,11 @@ are available:
 
    RBRGen3OutputFormat outputFormats;
    RBRGen3_getAvailableOutputFormats(conn, &outputFormats);
-   assert(outputFormats == RBRGEN3_CALTEXT01
-                         | RBRGEN3_CALTEXT02
-                         | RBRGEN3_CALTEXT03
-                         | RBRGEN3_CALTEXT04
-                         | RBRGEN3_CALTEXT07);
+   assert(outputFormats == RBRGEN3_OUTFORMAT_CALTEXT01
+                         | RBRGEN3_OUTFORMAT_CALTEXT02
+                         | RBRGEN3_OUTFORMAT_CALTEXT03
+                         | RBRGEN3_OUTFORMAT_CALTEXT04
+                         | RBRGEN3_OUTFORMAT_CALTEXT07);
 
 And to check if a specific format is supported, e.g., ``caltext03``:
 
@@ -42,7 +42,7 @@ And to check if a specific format is supported, e.g., ``caltext03``:
 
    RBRGen3OutputFormat outputFormats;
    RBRGen3_getAvailableOutputFormats(conn, &outputFormats);
-   if (outputFormats | RBRGEN3_CALTEXT03)
+   if (outputFormats & RBRGEN3_OUTFORMAT_CALTEXT03)
    {
        ...
    }

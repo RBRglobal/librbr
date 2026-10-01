@@ -53,7 +53,9 @@ extern "C" {
     } while (0)
 
 /**
- * Send the first RBRGen3.commandBufferLength bytes of
+ * \brief Send the contents of the command buffer to the instrument.
+ *
+ * Sends the first RBRGen3.commandBufferLength bytes of
  * RBRGen3Environment.command to the instrument. No formatting of the contents of
  * the buffer is performed; a buffer with no room left for a null byte is
  * refused, since it holds a command truncated by snprintf().
@@ -72,7 +74,9 @@ extern "C" {
 RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *conn);
 
 /**
- * Send a command to the instrument. The command will be formatted into
+ * \brief Send a command to the instrument.
+ *
+ * The command will be formatted into
  * RBRGen3Environment.command and RBRGen3.commandBufferLength will be
  * updated accordingly. If the command does not include a terminating `\r\n`,
  * it will be added for you.
@@ -127,9 +131,10 @@ void RBRGen3_beginCommand(RBRGen3 *conn);
 RBRGen3Error RBRGen3_appendCommand(RBRGen3 *conn, const char *command, ...);
 
 /**
- * Read a response from the instrument. This function will block until a
- * complete response is read, or until the callback returns
- * #RBRGEN3_TIMEOUT or #RBRGEN3_CALLBACK_ERROR.
+ * \brief Read a response from the instrument.
+ *
+ * This function will block until a complete response is read, or until the
+ * callback returns #RBRGEN3_TIMEOUT or #RBRGEN3_CALLBACK_ERROR.
  *
  * The response will be returned via RBRGen3Environment.response. The previous
  * complete response, if any, will be removed, and newly-read data will be

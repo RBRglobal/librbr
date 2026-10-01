@@ -40,8 +40,8 @@ extern "C" {
  * will indicate that it is the lesser version. If neither is valid, then the
  * result will indicate equality.
  *
- * \param a the first firmware version as a null-terminated C string
- * \param b the second firmware version as a null-terminated C string
+ * \param [in] a the first firmware version as a null-terminated C string
+ * \param [in] b the second firmware version as a null-terminated C string
  * \return <0 when \a a is a lower version than \a b
  * \return 0 when \a a and \a b are the same version
  * \return >0 when \a b is a lower version than \a a
@@ -161,6 +161,7 @@ RBRGen3Error RBRGen3_getPower(RBRGen3 *conn, RBRGen3Power *power);
  * Internal battery types.
  *
  * \see RBRGen3PowerInternal
+ * \see RBRGen3_setPowerInternalBatteryType()
  */
 typedef enum RBRGen3InternalBatteryType {
     /** No internal battery */
@@ -247,7 +248,7 @@ RBRGen3Error RBRGen3_getPowerInternal(RBRGen3 *conn, RBRGen3PowerInternal *power
 /**
  * \brief Set the internal power battery type.
  *
- * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
+ * \nol2
  *
  * \param [in] conn the instrument connection
  * \param [in] type the battery type
@@ -260,13 +261,14 @@ RBRGen3Error RBRGen3_getPowerInternal(RBRGen3 *conn, RBRGen3PowerInternal *power
  *                                 hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when \a type is not a valid battery type
  * \see RBRGen3_getPowerInternal()
+ * \see RBRGen3InternalBatteryType
  */
 RBRGen3Error RBRGen3_setPowerInternalBatteryType(RBRGen3 *conn, RBRGen3InternalBatteryType type);
 
 /**
  * \brief Reset the counter of energy used from the internal battery.
  *
- * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
+ * \nol2
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
@@ -284,6 +286,7 @@ RBRGen3Error RBRGen3_resetPowerInternalUsed(RBRGen3 *conn);
  * External battery types.
  *
  * \see RBRGen3PowerExternal
+ * \see RBRGen3_setPowerExternalBatteryType()
  */
 typedef enum RBRGen3ExternalBatteryType {
     /** Other/unknown external battery type */
@@ -378,7 +381,7 @@ RBRGen3Error RBRGen3_getPowerExternal(RBRGen3 *conn, RBRGen3PowerExternal *power
 /**
  * \brief Set the external power battery type.
  *
- * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
+ * \nol2
  *
  * \param [in] conn the instrument connection
  * \param [in] type the battery type
@@ -390,13 +393,14 @@ RBRGen3Error RBRGen3_getPowerExternal(RBRGen3 *conn, RBRGen3PowerExternal *power
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when \a type is not a valid battery type
  * \see RBRGen3_getPowerExternal()
+ * \see RBRGen3ExternalBatteryType
  */
 RBRGen3Error RBRGen3_setPowerExternalBatteryType(RBRGen3 *conn, RBRGen3ExternalBatteryType type);
 
 /**
  * \brief Reset the counter of energy used from the external battery.
  *
- * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
+ * \nol2
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
