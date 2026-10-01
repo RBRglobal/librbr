@@ -31,7 +31,7 @@ extern "C" {
 #include "RBRGen3Other.h"
 #include "RBRGen3Fetching.h"
 #include "RBRGen3Security.h"
-#include "RBRGen3Pauseresume.h"
+#include "RBRGen3PauseResume.h"
 
 #ifdef __cplusplus
 }

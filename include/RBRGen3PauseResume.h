@@ -5,7 +5,7 @@
  */
 
 /**
- * \file RBRGen3Pauseresume.h
+ * \file RBRGen3PauseResume.h
  *
  * \brief Instrument commands and structures pertaining to pauseresume.
  * This feature is available in firmware versions 1.116 or later.
@@ -21,16 +21,16 @@ extern "C" {
 #include "RBRGen3.h"
 
 /** \brief The state of a pauseresume condition. */
-typedef enum RBRGen3PauseresumeState {
+typedef enum RBRGen3PauseResumeState {
     /** \brief The pauseresuming condition is disabled, or sampling mode is regimes. */
-    RBRGEN3_PAUSERESUME_NA,
+    RBRGEN3_PAUSE_RESUME_NA,
     /** \brief Deployment is enaled and paused. */
-    RBRGEN3_PAUSERESUME_PAUSED,
+    RBRGEN3_PAUSE_RESUME_PAUSED,
     /** \brief Deployment is enabled and not paused. */
-    RBRGEN3_PAUSERESUME_RUNNING,
+    RBRGEN3_PAUSE_RESUME_RUNNING,
     /** feature is not allowed, or firmware in use doesn't support this feature. */
-    RBRGEN3_UNKNOWN_PAUSERESUME
-} RBRGen3PauseresumeState;
+    RBRGEN3_UNKNOWN_PAUSE_RESUME
+} RBRGen3PauseResumeState;
 
 /**
  * \brief Get a human-readable string name for a pauseresume state.
@@ -39,7 +39,7 @@ typedef enum RBRGen3PauseresumeState {
  * \return a string name for the gating state
  * \see RBRGen3Error_name() for a description of the format of names
  */
-const char *RBRGen3PauseresumeState_name(RBRGen3PauseresumeState state);
+const char *RBRGen3PauseResumeState_name(RBRGen3PauseResumeState state);
 
 /**
  * \brief Possible instrument pause status.
@@ -102,7 +102,7 @@ const char *RBRGen3ResumeStatus_name(RBRGen3ResumeStatus status);
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the response indicates an error.
  */
-RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *conn, RBRGen3PauseresumeState *state);
+RBRGen3Error RBRGen3_getPauseResume(RBRGen3 *conn, RBRGen3PauseResumeState *state);
 
 /**
  * It pauses an enabled deloyment.

@@ -5,7 +5,7 @@
  */
 
 /**
- * \file RBRGen3Pauseresume.c
+ * \file RBRGen3PauseResume.c
  *
  * \brief Library implementation.
  */
@@ -17,22 +17,22 @@
 
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
-#include "RBRGen3Pauseresume.h"
+#include "RBRGen3PauseResume.h"
 
-const char *RBRGen3PauseresumeState_name(RBRGen3PauseresumeState state)
+const char *RBRGen3PauseResumeState_name(RBRGen3PauseResumeState state)
 {
     switch (state) {
     /* Either the deployment has not been enabled or the samling mode is 'regimes' */
-    case RBRGEN3_PAUSERESUME_NA:
+    case RBRGEN3_PAUSE_RESUME_NA:
         return "n/a";
     /* The deployment has been enabled and is paused */
-    case RBRGEN3_PAUSERESUME_PAUSED:
+    case RBRGEN3_PAUSE_RESUME_PAUSED:
         return "paused";
     /* The deployment has been enabled and is not paused */
-    case RBRGEN3_PAUSERESUME_RUNNING:
+    case RBRGEN3_PAUSE_RESUME_RUNNING:
         return "running";
     /* The feature is not allowed on this instrument */
-    case RBRGEN3_UNKNOWN_PAUSERESUME:
+    case RBRGEN3_UNKNOWN_PAUSE_RESUME:
     default:
         return "unknown pauseresume state";
     }
@@ -62,9 +62,9 @@ const char *RBRGen3ResumeStatus_name(RBRGen3ResumeStatus status)
     }
 }
 
-RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *conn, RBRGen3PauseresumeState *state)
+RBRGen3Error RBRGen3_getPauseResume(RBRGen3 *conn, RBRGen3PauseResumeState *state)
 {
-    /** To be safe, make *state = RBRGEN3_UNKNOWN_PAUSERESUME
+    /** To be safe, make *state = RBRGEN3_UNKNOWN_PAUSE_RESUME
      *  before using this function.
      */
     RBR_TRY(RBRGen3_converse(conn, "pauseresume"));
@@ -75,9 +75,9 @@ RBRGen3Error RBRGen3_getPauseresume(RBRGen3 *conn, RBRGen3PauseresumeState *stat
     RBRGen3_parseResponse(conn, &command, &parameter);
 
     if (strcmp(parameter.key, "state") == 0) {
-        for (int i = RBRGEN3_PAUSERESUME_NA; i < RBRGEN3_UNKNOWN_PAUSERESUME; i++) {
-            /* refer to RBRGen3PauseresumeState_name */
-            if (strcmp(RBRGen3PauseresumeState_name(i), parameter.value) == 0) {
+        for (int i = RBRGEN3_PAUSE_RESUME_NA; i < RBRGEN3_UNKNOWN_PAUSE_RESUME; i++) {
+            /* refer to RBRGen3PauseResumeState_name */
+            if (strcmp(RBRGen3PauseResumeState_name(i), parameter.value) == 0) {
                 *state = i;
                 return RBRGEN3_SUCCESS;
             }

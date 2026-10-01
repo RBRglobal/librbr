@@ -11,13 +11,13 @@
  */
 
 #include "tests.h"
-#include "RBRGen3Pauseresume.h"
+#include "RBRGen3PauseResume.h"
 
-typedef struct PauseresumeTest {
+typedef struct PauseResumeTest {
     const char *command;
     const char *response;
-    RBRGen3PauseresumeState state;
-} PauseresumeTest;
+    RBRGen3PauseResumeState state;
+} PauseResumeTest;
 
 typedef struct PauseTest {
     const char *command;
@@ -31,16 +31,16 @@ typedef struct ResumeTest {
     RBRGen3ResumeStatus status;
 } ResumeTest;
 
-static bool test_pauseresume_error(RBRGen3 *conn, TestIOBuffers *buffers, PauseresumeTest *tests)
+static bool test_pauseResume_error(RBRGen3 *conn, TestIOBuffers *buffers, PauseResumeTest *tests)
 {
     RBRGen3Error err;
-    RBRGen3PauseresumeState state;
+    RBRGen3PauseResumeState state;
     state = 3;
     for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_getPauseresume(conn, &state);
+        err = RBRGen3_getPauseResume(conn, &state);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_HARDWARE_ERROR, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].state, state, RBRGen3PauseresumeState);
+        TEST_ASSERT_ENUM_EQ(tests[i].state, state, RBRGen3PauseResumeState);
     }
     return true;
 }
@@ -75,11 +75,11 @@ static bool test_resume_error(RBRGen3 *conn, TestIOBuffers *buffers, ResumeTest 
 
 TEST_LOGGER2(pauseresume_error)
 {
-    PauseresumeTest tests[] = {
+    PauseResumeTest tests[] = {
         {"pauseresume" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 3},
         {0},
     };
-    return test_pauseresume_error(conn, buffers, tests);
+    return test_pauseResume_error(conn, buffers, tests);
 }
 
 TEST_LOGGER2(pause_error)
@@ -102,12 +102,12 @@ TEST_LOGGER2(resume_error)
 
 TEST_LOGGER3(pauseresume_error)
 {
-    PauseresumeTest tests[] = {
+    PauseResumeTest tests[] = {
         {"pauseresume" COMMAND_TERMINATOR, "E0102 invalid command" RESPONSE_TERMINATOR, 3},
         {"pauseresume" COMMAND_TERMINATOR, "E0109 feature not available" RESPONSE_TERMINATOR, 3},
         {0},
     };
-    return test_pauseresume_error(conn, buffers, tests);
+    return test_pauseResume_error(conn, buffers, tests);
 }
 
 TEST_LOGGER3(pause_error)
@@ -144,17 +144,17 @@ TEST_LOGGER3(resume_error)
     return test_resume_error(conn, buffers, tests);
 }
 
-static bool test_pauseresume(RBRGen3 *conn, TestIOBuffers *buffers, PauseresumeTest *tests)
+static bool test_pauseResume(RBRGen3 *conn, TestIOBuffers *buffers, PauseResumeTest *tests)
 {
     RBRGen3Error err;
-    RBRGen3PauseresumeState state;
+    RBRGen3PauseResumeState state;
     state = 3;
 
     for (int i = 0; tests[i].command != NULL; i++) {
         TestIOBuffers_init(buffers, tests[i].response, 0);
-        err = RBRGen3_getPauseresume(conn, &state);
+        err = RBRGen3_getPauseResume(conn, &state);
         TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
-        TEST_ASSERT_ENUM_EQ(tests[i].state, state, RBRGen3PauseresumeState);
+        TEST_ASSERT_ENUM_EQ(tests[i].state, state, RBRGen3PauseResumeState);
     }
     return true;
 }
@@ -189,14 +189,14 @@ static bool test_resume(RBRGen3 *conn, TestIOBuffers *buffers, ResumeTest *tests
 
 TEST_LOGGER3(pauseresume)
 {
-    PauseresumeTest tests[] = {
+    PauseResumeTest tests[] = {
         {"pauseresume" COMMAND_TERMINATOR, "pauseresume state = n/a" RESPONSE_TERMINATOR, 0},
         {"pauseresume" COMMAND_TERMINATOR, "pauseresume state = paused" RESPONSE_TERMINATOR, 1},
         {"pauseresume" COMMAND_TERMINATOR, "pauseresume state = running" RESPONSE_TERMINATOR, 2},
         {0},
     };
 
-    return test_pauseresume(conn, buffers, tests);
+    return test_pauseResume(conn, buffers, tests);
 }
 
 TEST_LOGGER3(pause)

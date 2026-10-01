@@ -17,7 +17,7 @@ Gen3 API
    RBRGen3Memory
    RBRGen3Other
    RBRGen3Parser
-   RBRGen3Pauseresume
+   RBRGen3PauseResume
    RBRGen3
    RBRGen3Schedule
    RBRGen3Security
