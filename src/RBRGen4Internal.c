@@ -168,42 +168,88 @@ RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *conn)
     return RBRGEN4_SUCCESS;
 }
 
-static RBRGen4Error RBRGen4_vSendCommand(RBRGen4 *conn, const char *command, va_list format)
+static RBRGen4Error RBRGen4_vAppendCommand(RBRGen4 *conn, const char *command, va_list format)
 {
-    /* Prepare the command. */
+    /* The remaining space is only meaningful while the length is still within
+     * the buffer. */
+    if (conn->commandBufferLength < 0 ||
+        conn->commandBufferLength >= conn->environment.commandCapacity) {
+        return RBRGEN4_COMMAND_TOO_LONG;
+    }
 
-    conn->commandBufferLength = vsnprintf((char *) conn->environment.command,
-                                          (size_t) conn->environment.commandCapacity,
-                                          command,
-                                          format);
+    int32_t written =
+        vsnprintf((char *) conn->environment.command + conn->commandBufferLength,
+                  (size_t) (conn->environment.commandCapacity - conn->commandBufferLength),
+                  command,
+                  format);
 
     /* Make sure we're within buffer bounds. This is a greater-or-equal check,
      * not just a greater-than check, because vsnprintf doesn't include the
      * null terminator in its return value. The longest value vsnprintf can
      * write is commandBufferCapacity - 1 bytes. */
-    if (conn->commandBufferLength >= conn->environment.commandCapacity) {
+    if (written < 0 || conn->commandBufferLength + written >= conn->environment.commandCapacity) {
         conn->commandBufferLength = conn->environment.commandCapacity;
         return RBRGEN4_COMMAND_TOO_LONG;
     }
 
-    /* Make sure the command is LF-terminated. */
-    if (conn->commandBufferLength < RBRGEN4_SEND_COMMAND_TERMINATOR_LEN ||
+    conn->commandBufferLength += written;
+    return RBRGEN4_SUCCESS;
+}
+
+void RBRGen4_beginCommand(RBRGen4 *conn)
+{
+    conn->commandBufferLength = 0;
+}
+
+RBRGen4Error RBRGen4_appendCommand(RBRGen4 *conn, const char *command, ...)
+{
+    RBRGen4Error err;
+    va_list format;
+    va_start(format, command);
+    err = RBRGen4_vAppendCommand(conn, command, format);
+    va_end(format);
+    return err;
+}
+
+RBRGen4Error RBRGen4_appendLabelList(RBRGen4 *conn, const RBRGen4LabelList *labelList)
+{
+    if (conn->commandBufferLength < 0 ||
+        conn->commandBufferLength >= conn->environment.commandCapacity) {
+        return RBRGEN4_COMMAND_TOO_LONG;
+    }
+
+    char *value = (char *) conn->environment.command + conn->commandBufferLength;
+    RBRGen4Error err = RBRGen4_formatLabelList(
+        value, conn->environment.commandCapacity - conn->commandBufferLength, labelList);
+    if (err != RBRGEN4_SUCCESS) {
+        /* Labels may already have been written past the length. Poison the
+         * length as RBRGen4_appendCommand() does so RBRGen4_sendBuffer()
+         * refuses the partial command. */
+        conn->commandBufferLength = conn->environment.commandCapacity;
+        return err;
+    }
+    conn->commandBufferLength += (int32_t) strlen(value);
+    return RBRGEN4_SUCCESS;
+}
+
+/**
+ * \brief Make sure the command in the buffer carries the send terminator.
+ *
+ * \param [in] conn the instrument connection
+ * \return #RBRGEN4_SUCCESS when the command is terminated
+ * \return #RBRGEN4_COMMAND_TOO_LONG when there is no room for the terminator
+ */
+static RBRGen4Error RBRGen4_terminateCommand(RBRGen4 *conn)
+{
+    if (conn->commandBufferLength >= RBRGEN4_SEND_COMMAND_TERMINATOR_LEN &&
         memcmp(conn->environment.command + conn->commandBufferLength -
                    RBRGEN4_SEND_COMMAND_TERMINATOR_LEN,
                RBRGEN4_SEND_COMMAND_TERMINATOR,
-               RBRGEN4_SEND_COMMAND_TERMINATOR_LEN) != 0) {
-        /* It isn't. Make sure there's room before adding it. */
-        if (conn->commandBufferLength + RBRGEN4_SEND_COMMAND_TERMINATOR_LEN >=
-            conn->environment.commandCapacity) {
-            return RBRGEN4_COMMAND_TOO_LONG;
-        }
-
-        memcpy(conn->environment.command + conn->commandBufferLength,
-               RBRGEN4_SEND_COMMAND_TERMINATOR,
-               RBRGEN4_SEND_COMMAND_TERMINATOR_LEN);
-        conn->commandBufferLength += RBRGEN4_SEND_COMMAND_TERMINATOR_LEN;
+               RBRGEN4_SEND_COMMAND_TERMINATOR_LEN) == 0) {
+        return RBRGEN4_SUCCESS;
     }
-    return RBRGen4_sendBuffer(conn);
+
+    return RBRGen4_appendCommand(conn, RBRGEN4_SEND_COMMAND_TERMINATOR);
 }
 
 RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn, const char *command, ...)
@@ -211,9 +257,15 @@ RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn, const char *command, ...)
     RBRGen4Error err;
     va_list format;
     va_start(format, command);
-    err = RBRGen4_vSendCommand(conn, command, format);
+    RBRGen4_beginCommand(conn);
+    err = RBRGen4_vAppendCommand(conn, command, format);
     va_end(format);
-    return err;
+    if (err != RBRGEN4_SUCCESS) {
+        return err;
+    }
+
+    RBR_TRY(RBRGen4_terminateCommand(conn));
+    return RBRGen4_sendBuffer(conn);
 }
 
 /**
@@ -794,8 +846,22 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn, const char *command, ...)
 {
     RBRGen4Error err;
     va_list format;
-    va_list formatSend;
     va_start(format, command);
+    RBRGen4_beginCommand(conn);
+    err = RBRGen4_vAppendCommand(conn, command, format);
+    va_end(format);
+    if (err != RBRGEN4_SUCCESS) {
+        return err;
+    }
+
+    return RBRGen4_converseBuffer(conn);
+}
+
+RBRGen4Error RBRGen4_converseBuffer(RBRGen4 *conn)
+{
+    RBRGen4Error err;
+
+    RBR_TRY(RBRGen4_terminateCommand(conn));
 
     /* Keep firing off the command and looking for a response until we find one
      * which matches. */
@@ -810,12 +876,9 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn, const char *command, ...)
         retry = false;
         responseTooLong = false;
 
-        /* Can't use RBR_TRY anywhere within these while loops because we need
-         * to be sure to call va_end() on both va_lists before returning. */
-        va_copy(formatSend, format);
-        err = RBRGen4_vSendCommand(conn, command, formatSend);
-        va_end(formatSend);
-
+        /* The reads touch only the response buffer, so the command buffer
+         * still holds the command when it has to be sent again. */
+        err = RBRGen4_sendBuffer(conn);
         if (err != RBRGEN4_SUCCESS) {
             break;
         }
@@ -921,8 +984,6 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn, const char *command, ...)
             err = RBRGEN4_RESPONSE_TOO_LONG;
         }
     } while (retry);
-
-    va_end(format);
 
     return err;
 }

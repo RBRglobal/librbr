@@ -626,12 +626,6 @@ typedef struct RBRGen4Environment {
      * not fit is refused with #RBRGEN4_COMMAND_TOO_LONG before anything is
      * sent.
      *
-     * The label lists sent by the configuration setters and the poll functions
-     * are currently assembled in library storage of
-     * #RBRGEN4_COMMAND_BUFFER_DEFAULT bytes before being placed in the command
-     * buffer, so those commands are limited to that length regardless of the
-     * buffer supplied.
-     *
      * \see RBRGEN4_COMMAND_BUFFER_DEFAULT for a reasonable size
      */
     int32_t commandCapacity;
