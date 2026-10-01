@@ -272,6 +272,7 @@ int main(int argc, char *argv[])
 
         printf("Correction written to %s\n", filenameOut);
         RBRDynamicCorrection_replayData(file, &data, Fs);
+        fclose(file);
     } else {
         fprintf(stderr, "Unable to write file %s\n", filenameOut);
     }

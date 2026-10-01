@@ -22,7 +22,6 @@ ALWAYS_EXAMPLES := \
     posix-parse-download \
     posix-parse-download-dataset \
     posix-parse-file \
-    posix-parse-file-dynamiccorrection \
     posix-pauseresume \
     posix-postprocessing \
     posix-stream

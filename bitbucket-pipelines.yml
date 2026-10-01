@@ -33,6 +33,9 @@ definitions:
                 - cd ../posixCommon
                 - make clean
                 - make
+                - cd ../dynamicCorrection
+                - make clean
+                - make
 
 pipelines:
     default:
@@ -141,6 +144,9 @@ pipelines:
                     - make clean
                     - scan-build make
                     - cd ../posixCommon
+                    - make clean
+                    - scan-build make
+                    - cd ../dynamicCorrection
                     - make clean
                     - scan-build make
 
