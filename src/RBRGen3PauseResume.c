@@ -10,9 +10,7 @@
  * \brief Library implementation.
  */
 
-/* Required for snprintf. */
-#include <stdio.h>
-/* Required for memset. */
+/* Required for strcmp, strlen. */
 #include <string.h>
 
 #include "RBRGen3.h"
