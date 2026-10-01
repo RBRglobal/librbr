@@ -127,7 +127,18 @@ static void RBRGen4Sample_copy(RBRGen4Sample *to, const RBRGen4Sample *from)
  *                          #RBRGEN4_POLL_SCHEDULE_LABEL
  * \param [in] parameter the list parameter to send, or `NULL` for a bare `poll`
  * \param [in] list the labels to send as the value of \a parameter
- * \param [out] sample the polled sample
+ * \param [in,out] sample the polled sample; RBRGen4Sample.readings and RBRGen4Sample.size must be
+ *                        set by the caller
+ * \return #RBRGEN4_SUCCESS when the sample is polled
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings storage, or \a list is
+ *         needed but is `NULL`, empty, or invalid
+ * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is true but the output format has no schedule
+ *         label
  */
 static RBRGen4Error RBRGen4_sendPoll(RBRGen4 *conn, bool requireLabel, const char *parameter,
                                      const RBRGen4LabelList *list, RBRGen4Sample *sample)

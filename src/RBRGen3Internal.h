@@ -156,7 +156,8 @@ RBRGen3Error RBRGen3_appendCommand(RBRGen3 *conn, const char *command, ...);
  *
  * \param [in] conn the instrument connection
  * \param [in] breakOnSample whether to return early when a sample is parsed
- * \param [out] sample where to put a parsed sample
+ * \param [in,out] sample where to put a parsed sample; RBRGen3Sample.readings and
+ *                        RBRGen3Sample.size must be set by the caller
  * \param [in] startTime when the wait began; the command timeout is measured from here, so a caller
  *                       which loops over this function to skip unrelated lines bounds the whole
  *                       wait by passing the same value each time

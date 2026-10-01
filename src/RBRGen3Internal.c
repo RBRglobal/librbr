@@ -156,7 +156,7 @@ static int rbr_strncasecmp(const char *s1, const char *s2, size_t n)
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the instrument has been woken
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  */
 static RBRGen3Error RBRGen3_wake(const RBRGen3 *conn)
 {
@@ -307,9 +307,9 @@ static void RBRGen3_removeLastResponse(RBRGen3 *conn)
  * \param [in] startTime when we started trying to read the command response
  * \param [out] end the end of the response within the response buffer
  * \return #RBRGEN3_SUCCESS when data is successfully read
- * \return #RBRGEN3_RESPONSE_TOO_LONG when the response exceeds the buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when the response exceeds the buffer
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  */
 static RBRGen3Error RBRGen3_readSingleResponse(RBRGen3 *conn, RBRGen3DateTime startTime, char **end)
 {
@@ -462,7 +462,8 @@ static void RBRGen3_terminateResponse(RBRGen3 *conn, char **beginning, char *end
 /**
  * \brief Attempt to parse a sample from a response.
  *
- * \param [out] sample the sample
+ * \param [in,out] sample the sample; RBRGen3Sample.readings and RBRGen3Sample.size must be set by
+ *                        the caller
  * \param [in] response the response to parse
  * \return RBRGEN3_SUCCESS if the response is a sample
  * \return RBRGEN3_INVALID_PARAMETER_VALUE if the response is not a sample

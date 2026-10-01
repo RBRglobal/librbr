@@ -493,6 +493,10 @@ RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings);
  * command, so settings read back from an instrument can be written to it
  * unchanged.
  *
+ * \warning The library expects RBRGen4Settings.prompt and RBRGen4Settings.confirmation to be on, or
+ * unavailable. With RBRGen4Settings.confirmation explicitly off the instrument answers a set with
+ * nothing at all, and every later setter blocks until the command timeout.
+ *
  * \param [in] conn the instrument connection
  * \param [in] settings the values for the settings in the logger
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
@@ -504,9 +508,6 @@ RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings);
  *         where the instrument does not offer it, or another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the power-off delay is negative, or a setting state
  *         is unknown
- * \warning The library expects RBRGen4Settings.prompt and RBRGen4Settings.confirmation to be on, or
- * unavailable. With RBRGen4Settings.confirmation explicitly off the instrument answers a set with
- * nothing at all, and every later setter blocks until the command timeout.
  * \see RBRGen4_getSettings()
  */
 RBRGen4Error RBRGen4_setSettings(RBRGen4 *conn, const RBRGen4Settings *settings);

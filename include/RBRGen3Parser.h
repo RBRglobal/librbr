@@ -272,9 +272,9 @@ typedef struct RBRGen3Parser {
  * \param [in] userData arbitrary user data; useful in callbacks
  * \return #RBRGEN3_SUCCESS when the parser was instantiated successfully
  * \return #RBRGEN3_MISSING_CALLBACK when no callbacks were provided
- * \return #RBRGEN3_UNSUPPORTED when the memory format is unsupported
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the config is invalid, or the sample buffer has no
  *         readings storage
+ * \return #RBRGEN3_UNSUPPORTED when the memory format is unsupported
  * \see RBRGen3Parser_destroy()
  */
 RBRGen3Error RBRGen3Parser_init(RBRGen3Parser *parser, const RBRGen3ParserCallbacks *callbacks,
@@ -286,7 +286,7 @@ RBRGen3Error RBRGen3Parser_init(RBRGen3Parser *parser, const RBRGen3ParserCallba
  * Clears the parser state. Does not release the caller-provided instance
  * memory.
  *
- * \param [in,out] parser the dataset parser to close
+ * \param [in] parser the dataset parser to close
  * \return #RBRGEN3_SUCCESS when the parser was closed successfully
  * \see RBRGen3Parser_init()
  */
@@ -322,7 +322,7 @@ void *RBRGen3Parser_getUserData(const RBRGen3Parser *parser);
 /**
  * \brief Change the arbitrary user data pointer.
  *
- * \param [in,out] parser the dataset parser
+ * \param [in] parser the dataset parser
  * \param [in] userData the new user data
  * \see RBRGen3Parser_getUserData()
  */
@@ -348,8 +348,8 @@ void RBRGen3Parser_setUserData(RBRGen3Parser *parser, void *userData);
  * \param [in,out] size initially, the size of the data given by \a data; set by the function to the
  *                      number of bytes actually parsed
  * \return #RBRGEN3_SUCCESS when no parsing errors occur
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is given
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is given
  */
 RBRGen3Error RBRGen3Parser_parse(RBRGen3Parser *parser, RBRGen3Dataset dataset,
                                  const void *const data, int32_t *size);

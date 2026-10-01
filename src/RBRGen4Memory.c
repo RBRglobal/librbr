@@ -366,6 +366,9 @@ const char *RBRGen4DownloadEventsUnit_name(RBRGen4DownloadEventsUnit unit)
  * \param [in] conn the instrument connection
  * \param [out] data the buffer to write into
  * \param [in] size the amount of data to write into the buffer
+ * \return #RBRGEN4_SUCCESS when \a size bytes have been read
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  */
 static RBRGen4Error RBRGen4_fixedRead(RBRGen4 *conn, void *data, int64_t size)
 {
@@ -411,6 +414,11 @@ static RBRGen4Error RBRGen4_fixedRead(RBRGen4 *conn, void *data, int64_t size)
  * \param [out] byteCount the byte count reported
  * \param [out] data the buffer receiving the transfer
  * \param [in] dataSize the capacity of \a data in bytes
+ * \return #RBRGEN4_SUCCESS when the transfer is read and its CRC matches
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_BUFFER_TOO_SMALL when the response byte count exceeds \a dataSize
+ * \return #RBRGEN4_CHECKSUM_ERROR when the transfer fails its CRC check
  */
 static RBRGen4Error RBRGen4_downloadDatasetCommon(RBRGen4 *conn, const char *countKey,
                                                   int64_t *count, int64_t *byteCount, void *data,
@@ -507,6 +515,16 @@ RBRGen4Error RBRGen4_downloadDatasetScheduleData(RBRGen4 *conn, const RBRGen4Dat
  * \param [in] dataset the dataset, selected by its label
  * \param [in] scheduleLabel the schedule, or NULL for the whole dataset
  * \param [in,out] download the download request and its result
+ * \return #RBRGEN4_SUCCESS when the data is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, the unit is invalid, or the
+ *         count, start, or data is invalid
+ * \return #RBRGEN4_BUFFER_TOO_SMALL when the response byte count exceeds the buffer capacity
+ * \return #RBRGEN4_CHECKSUM_ERROR when the transfer fails its CRC check
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  */
 static RBRGen4Error RBRGen4_downloadDatasetEventsCommon(RBRGen4 *conn,
                                                         const RBRGen4Dataset *dataset,

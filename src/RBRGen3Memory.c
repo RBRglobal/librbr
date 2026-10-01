@@ -116,6 +116,9 @@ static RBRGen3Error RBRGen3L3_parseDataResponse(RBRGen3 *conn, RBRGen3Data *data
  * \param [in] conn the instrument connection
  * \param [out] data the buffer to write into
  * \param [in] size the amount of data to write into the buffer
+ * \return #RBRGEN3_SUCCESS when \a size bytes have been read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  */
 static RBRGen3Error RBRGen3_fixedRead(RBRGen3 *conn, void *data, int32_t size)
 {

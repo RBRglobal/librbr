@@ -122,7 +122,7 @@ static void *rbr_memmem(void *ptr1, size_t num1, const void *ptr2, size_t num2)
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the instrument has been woken
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  */
 static RBRGen4Error RBRGen4_wake(const RBRGen4 *conn)
 {
@@ -295,9 +295,9 @@ static void RBRGen4_removeLastResponse(RBRGen4 *conn)
  * \param [in] timeout the longest to wait, in milliseconds, from \a startTime
  * \param [out] end the end of the response within the response buffer
  * \return #RBRGEN4_SUCCESS when data is successfully read
- * \return #RBRGEN4_RESPONSE_TOO_LONG when the response exceeds the buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when the response exceeds the buffer
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  */
 static RBRGen4Error RBRGen4_readSingleResponse(RBRGen4 *conn, RBRGen4DateTime startTime,
                                                RBRGen4DateTime timeout, char **end)
@@ -491,8 +491,8 @@ static char *seek(const char *str, char delimiter)
 /**
  * \brief Attempt to parse a sample from a response.
  *
- * \param [out] sample the sample; RBRGen4Sample.readings and RBRGen4Sample.size must be set by the
- *                     caller
+ * \param [in,out] sample the sample; RBRGen4Sample.readings and RBRGen4Sample.size must be set by
+ *                        the caller
  * \param [in] outputFormat the format of the response to parse
  * \param [in] response the response to parse
  * \return #RBRGEN4_SUCCESS when the response is a sample

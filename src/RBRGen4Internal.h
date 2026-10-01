@@ -188,7 +188,8 @@ RBRGen4Error RBRGen4_appendLabelList(RBRGen4 *conn, const RBRGen4LabelList *labe
  *
  * \param [in] conn the instrument connection
  * \param [in] breakOnSample whether to return early when a sample is parsed
- * \param [out] sample where to put a parsed sample
+ * \param [in,out] sample where to put a parsed sample; RBRGen4Sample.readings and
+ *                        RBRGen4Sample.size must be set by the caller
  * \param [in] startTime when the caller began waiting for this response
  * \param [in] timeout the longest to wait, in milliseconds, from \a startTime
  * \return #RBRGEN4_SUCCESS when a response was successfully read
@@ -446,9 +447,9 @@ char *RBRGen4_splitListValue(char *value);
  * \param [in] size the size of \a value
  * \param [in] labelList the labels to write
  * \return #RBRGEN4_SUCCESS when the list is formatted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a labelList is `NULL`, its length does not fit its
  *         array, or a label is empty
- * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit
  */
 RBRGen4Error RBRGen4_formatLabelList(char *value, int32_t size, const RBRGen4LabelList *labelList);
 
@@ -458,7 +459,7 @@ RBRGen4Error RBRGen4_formatLabelList(char *value, int32_t size, const RBRGen4Lab
  * `none` yields a zero length. Labels past the list's capacity are
  * discarded.
  *
- * \param [out] labelList the caller-provided label list
+ * \param [in,out] labelList the caller-provided label list
  * \param [in,out] value the response value, consumed in place
  * \return #RBRGEN4_SUCCESS when every label is stored
  * \return #RBRGEN4_TRUNCATED when labels were discarded
