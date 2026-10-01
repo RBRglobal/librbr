@@ -191,11 +191,36 @@ static bool test_dynamic_correction(float *dataset, float Fs)
 TEST(verify_pss78)
 {
     Pss78Test tests[] = {
-        {110.0f, 5.0f, 2500.0f, 138.626f},
-        {55.0f, 5.0f, 2500.0f, 59.4009f},
-        {55.0f, 21.0f, 2500.0f, 39.0323f},
-        {55.0f, 21.0f, 100.0f, 39.8831f},
-        {0.0f, 0.0f, 0.0f, 0.0f},
+        {
+            .C_value = 110.0f,
+            .T_value = 5.0f,
+            .P_value = 2500.0f,
+            .S_expected = 138.626f,
+        },
+        {
+            .C_value = 55.0f,
+            .T_value = 5.0f,
+            .P_value = 2500.0f,
+            .S_expected = 59.4009f,
+        },
+        {
+            .C_value = 55.0f,
+            .T_value = 21.0f,
+            .P_value = 2500.0f,
+            .S_expected = 39.0323f,
+        },
+        {
+            .C_value = 55.0f,
+            .T_value = 21.0f,
+            .P_value = 100.0f,
+            .S_expected = 39.8831f,
+        },
+        {
+            .C_value = 0.0f,
+            .T_value = 0.0f,
+            .P_value = 0.0f,
+            .S_expected = 0.0f,
+        },
     };
 
     return test_verify_pss78(tests);
@@ -209,23 +234,108 @@ TEST(verify_ascent_rate)
 TEST(verify_coeff_alpha_tau_ctcoeff)
 {
     DCorrCoeffTest tests[] = {
-        {0.02f, 0.120f, 12.26f, 0.046f},
-        {0.03f, 0.120f, 12.26f, 0.046f},
-        {0.05f, 0.071f, 10.54f, 0.0280f},
-        {0.06f, 0.058f, 10.05f, 0.0233f},
-        {0.07f, 0.050f, 9.66f, 0.0200f},
-        {0.08f, 0.043f, 9.33f, 0.0175f},
-        {0.09f, 0.038f, 9.05f, 0.0156f},
-        {0.10f, 0.035f, 8.80f, 0.0140f},
-        {0.11f, 0.031f, 8.59f, 0.0127f},
-        {0.12f, 0.029f, 8.40f, 0.0117f},
-        {0.13f, 0.026f, 8.22f, 0.0108f},
-        {0.14f, 0.024f, 8.07f, 0.0100f},
-        {0.15f, 0.023f, 7.92f, 0.0093f},
-        {0.20f, 0.0169f, 7.492f, 0.0069f},
-        {0.45f, 0.0074f, 6.07f, 0.0031f},
-        {0.50f, 0.0074f, 6.07f, 0.0031f},
-        {0.0f, 0.0f, 0.f, 0.0f} /* end-of-test */,
+        {
+            .Vp = 0.02f,
+            .alpha_expected = 0.120f,
+            .tau_expected = 12.26f,
+            .ctcoeff_expected = 0.046f,
+        },
+        {
+            .Vp = 0.03f,
+            .alpha_expected = 0.120f,
+            .tau_expected = 12.26f,
+            .ctcoeff_expected = 0.046f,
+        },
+        {
+            .Vp = 0.05f,
+            .alpha_expected = 0.071f,
+            .tau_expected = 10.54f,
+            .ctcoeff_expected = 0.0280f,
+        },
+        {
+            .Vp = 0.06f,
+            .alpha_expected = 0.058f,
+            .tau_expected = 10.05f,
+            .ctcoeff_expected = 0.0233f,
+        },
+        {
+            .Vp = 0.07f,
+            .alpha_expected = 0.050f,
+            .tau_expected = 9.66f,
+            .ctcoeff_expected = 0.0200f,
+        },
+        {
+            .Vp = 0.08f,
+            .alpha_expected = 0.043f,
+            .tau_expected = 9.33f,
+            .ctcoeff_expected = 0.0175f,
+        },
+        {
+            .Vp = 0.09f,
+            .alpha_expected = 0.038f,
+            .tau_expected = 9.05f,
+            .ctcoeff_expected = 0.0156f,
+        },
+        {
+            .Vp = 0.10f,
+            .alpha_expected = 0.035f,
+            .tau_expected = 8.80f,
+            .ctcoeff_expected = 0.0140f,
+        },
+        {
+            .Vp = 0.11f,
+            .alpha_expected = 0.031f,
+            .tau_expected = 8.59f,
+            .ctcoeff_expected = 0.0127f,
+        },
+        {
+            .Vp = 0.12f,
+            .alpha_expected = 0.029f,
+            .tau_expected = 8.40f,
+            .ctcoeff_expected = 0.0117f,
+        },
+        {
+            .Vp = 0.13f,
+            .alpha_expected = 0.026f,
+            .tau_expected = 8.22f,
+            .ctcoeff_expected = 0.0108f,
+        },
+        {
+            .Vp = 0.14f,
+            .alpha_expected = 0.024f,
+            .tau_expected = 8.07f,
+            .ctcoeff_expected = 0.0100f,
+        },
+        {
+            .Vp = 0.15f,
+            .alpha_expected = 0.023f,
+            .tau_expected = 7.92f,
+            .ctcoeff_expected = 0.0093f,
+        },
+        {
+            .Vp = 0.20f,
+            .alpha_expected = 0.0169f,
+            .tau_expected = 7.492f,
+            .ctcoeff_expected = 0.0069f,
+        },
+        {
+            .Vp = 0.45f,
+            .alpha_expected = 0.0074f,
+            .tau_expected = 6.07f,
+            .ctcoeff_expected = 0.0031f,
+        },
+        {
+            .Vp = 0.50f,
+            .alpha_expected = 0.0074f,
+            .tau_expected = 6.07f,
+            .ctcoeff_expected = 0.0031f,
+        },
+        {
+            .Vp = 0.0f,
+            .alpha_expected = 0.0f,
+            .tau_expected = 0.f,
+            .ctcoeff_expected = 0.0f,
+        } /* end-of-test */,
     };
 
     return test_verify_coeff_alpha_tau_ctcoeff(tests);
@@ -386,9 +496,21 @@ TEST(verify_dynamic_correction)
 }
 
 const DynamicCorrectionTest dynamicCorrectionTests[] = {
-    {"verify_pss78", verify_pss78},
-    {"verify_ascent_rate", verify_ascent_rate},
-    {"verify_coeff_alpha_tau_ctcoeff", verify_coeff_alpha_tau_ctcoeff},
-    {"verify_dynamic_correction", verify_dynamic_correction},
+    {
+        .name = "verify_pss78",
+        .function = verify_pss78,
+    },
+    {
+        .name = "verify_ascent_rate",
+        .function = verify_ascent_rate,
+    },
+    {
+        .name = "verify_coeff_alpha_tau_ctcoeff",
+        .function = verify_coeff_alpha_tau_ctcoeff,
+    },
+    {
+        .name = "verify_dynamic_correction",
+        .function = verify_dynamic_correction,
+    },
     {0},
 };
