@@ -165,5 +165,4 @@ pipelines:
                     - apt-get update && apt-get -y install doxygen python3-venv
                     - python3 -m venv /tmp/venv && . /tmp/venv/bin/activate
                     - pip install -r docs/requirements.txt
-                    # Warnings are reported but not yet fatal (SYS-1615).
-                    - make docs
+                    - make docs SPHINXOPTS=-W

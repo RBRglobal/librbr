@@ -4,4 +4,6 @@
 testsGen4/tests.h
 =================
 
+.. c:namespace:: testsGen4
+
 .. doxygenfile:: testsGen4/tests.h

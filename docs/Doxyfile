@@ -37,4 +37,4 @@ WARN_IF_DOC_ERROR      = YES
 # for every documented function when only XML output is generated; leave the
 # check off until the toolchain moves past that release.
 WARN_NO_PARAMDOC       = NO
-WARN_AS_ERROR          = NO
+WARN_AS_ERROR          = YES

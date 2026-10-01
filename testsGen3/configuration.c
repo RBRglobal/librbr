@@ -38,7 +38,7 @@ static bool test_channels(RBRGen3 *conn, TestIOBuffers *buffers, ChannelsTest *t
             RBRGen3Channel *actualChannel = &actual.channels[channel];
 
             TEST_ASSERT_STR_EQ(expectedChannel->type, actualChannel->type);
-            TEST_ASSERT_EQ(expectedChannel->module, actualChannel->module, "%" PRIi32);
+            TEST_ASSERT_EQ(expectedChannel->moduleAddr, actualChannel->moduleAddr, "%" PRIi32);
             TEST_ASSERT_ENUM_EQ(expectedChannel->status, actualChannel->status, bool);
             TEST_ASSERT_EQ(expectedChannel->settlingTime, actualChannel->settlingTime, "%" PRIi32);
             TEST_ASSERT_EQ(expectedChannel->readTime, actualChannel->readTime, "%" PRIi32);
@@ -142,7 +142,7 @@ TEST_LOGGER2(channels)
                     (RBRGen3Channel[]) {
                         {
                             .type = "temp09",
-                            .module = 1,
+                            .moduleAddr = 1,
                             .status = true,
                             .settlingTime = 50,
                             .readTime = 260,
@@ -171,7 +171,7 @@ TEST_LOGGER2(channels)
                         },
                         {
                             .type = "pres19",
-                            .module = 2,
+                            .moduleAddr = 2,
                             .status = true,
                             .settlingTime = 50,
                             .readTime = 260,
@@ -212,7 +212,7 @@ TEST_LOGGER2(channels)
                         },
                         {
                             .type = "volt00",
-                            .module = 40,
+                            .moduleAddr = 40,
                             .status = true,
                             .settlingTime = 300,
                             .readTime = 350,
@@ -258,7 +258,7 @@ TEST_LOGGER2(channels)
                     (RBRGen3Channel[]) {
                         {
                             .type = "fluo01",
-                            .module = 40,
+                            .moduleAddr = 40,
                             .status = true,
                             .settlingTime = 600,
                             .readTime = 1700,
@@ -353,7 +353,7 @@ TEST_LOGGER3(channels)
                     (RBRGen3Channel[]) {
                         {
                             .type = "temp09",
-                            .module = 1,
+                            .moduleAddr = 1,
                             .status = true,
                             .settlingTime = 50,
                             .readTime = 260,
@@ -382,7 +382,7 @@ TEST_LOGGER3(channels)
                         },
                         {
                             .type = "pres24",
-                            .module = 2,
+                            .moduleAddr = 2,
                             .status = true,
                             .settlingTime = 50,
                             .readTime = 290,
@@ -423,7 +423,7 @@ TEST_LOGGER3(channels)
                         },
                         {
                             .type = "pres08",
-                            .module = 240,
+                            .moduleAddr = 240,
                             .status = true,
                             .settlingTime = 0,
                             .readTime = 0,
@@ -446,7 +446,7 @@ TEST_LOGGER3(channels)
                         },
                         {
                             .type = "dpth01",
-                            .module = 241,
+                            .moduleAddr = 241,
                             .status = true,
                             .settlingTime = 0,
                             .readTime = 0,
@@ -469,7 +469,7 @@ TEST_LOGGER3(channels)
                         },
                         {
                             .type = "cnt_00",
-                            .module = 242,
+                            .moduleAddr = 242,
                             .status = true,
                             .settlingTime = 0,
                             .readTime = 0,
@@ -511,7 +511,7 @@ TEST_LOGGER3(channels)
                     (RBRGen3Channel[]) {
                         {
                             .type = "fluo10",
-                            .module = 40,
+                            .moduleAddr = 40,
                             .status = true,
                             .settlingTime = 5000,
                             .readTime = 10500,
@@ -558,7 +558,7 @@ TEST_LOGGER3(channels)
                     (RBRGen3Channel[]) {
                         {
                             .type = "turb00",
-                            .module = 40,
+                            .moduleAddr = 40,
                             .status = true,
                             .settlingTime = 1000,
                             .readTime = 350,
@@ -614,7 +614,7 @@ TEST_LOGGER3(channels_calibration_indices)
                     (RBRGen3Channel[]) {
                         {
                             .type = "fluo10",
-                            .module = 40,
+                            .moduleAddr = 40,
                             .status = true,
                             .settlingTime = 5000,
                             .readTime = 10500,

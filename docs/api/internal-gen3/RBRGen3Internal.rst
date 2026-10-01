@@ -4,4 +4,6 @@
 RBRGen3Internal
 =========================
 
+.. c:namespace:: RBRGen3Internal
+
 .. doxygenfile:: RBRGen3Internal.h

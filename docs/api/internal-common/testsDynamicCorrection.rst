@@ -4,4 +4,6 @@
 testsDynamicCorrection/tests.h
 ==============================
 
+.. c:namespace:: testsDynamicCorrection
+
 .. doxygenfile:: testsDynamicCorrection/tests.h
