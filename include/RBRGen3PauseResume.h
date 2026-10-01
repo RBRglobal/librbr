@@ -29,7 +29,7 @@ typedef enum RBRGen3PauseResumeState {
     /** \brief Deployment is enabled and not paused. */
     RBRGEN3_PAUSE_RESUME_RUNNING,
     /** feature is not allowed, or firmware in use doesn't support this feature. */
-    RBRGEN3_UNKNOWN_PAUSE_RESUME
+    RBRGEN3_UNKNOWN_PAUSE_RESUME,
 } RBRGen3PauseResumeState;
 
 /**
@@ -51,7 +51,7 @@ typedef enum RBRGen3PauseStatus {
      * finishes. */
     RBRGEN3_PAUSE_PAUSED,
     /** An unknown or unrecognized pause status. */
-    RBRGEN3_UNKNOWN_PAUSE
+    RBRGEN3_UNKNOWN_PAUSE,
 } RBRGen3PauseStatus;
 
 /**
@@ -73,7 +73,7 @@ typedef enum RBRGen3ResumeStatus {
     RBRGEN3_RESUME_PENDING,
     RBRGEN3_RESUME_LOGGING,
     /** An unknown or unrecognized resume status. */
-    RBRGEN3_UNKNOWN_RESUME
+    RBRGEN3_UNKNOWN_RESUME,
 } RBRGen3ResumeStatus;
 
 /**

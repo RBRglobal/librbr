@@ -153,7 +153,7 @@ typedef enum RBRGen3ChannelRangingMode {
     /** The number of specific gain ranging modes. */
     RBRGEN3_RANGING_COUNT,
     /** An unknown or unrecognized gain ranging mode. */
-    RBRGEN3_UNKNOWN_RANGING
+    RBRGEN3_UNKNOWN_RANGING,
 } RBRGen3ChannelRangingMode;
 
 /**
@@ -712,7 +712,7 @@ typedef enum RBRGen3ValueSetting {
     /** The number of specific value settings. */
     RBRGEN3_SETTING_COUNT,
     /** An unknown or unrecognized value setting. */
-    RBRGEN3_UNKNOWN_SETTING
+    RBRGEN3_UNKNOWN_SETTING,
 } RBRGen3ValueSetting;
 
 /**

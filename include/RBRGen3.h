@@ -222,7 +222,7 @@ typedef enum RBRGen3Error {
     /** The number of specific errors. Should not be used as an error value. */
     RBRGEN3_ERROR_COUNT,
     /** An unknown or unrecognized error. */
-    RBRGEN3_UNKNOWN_ERROR
+    RBRGEN3_UNKNOWN_ERROR,
 } RBRGen3Error;
 
 /**
@@ -548,7 +548,7 @@ typedef enum RBRGen3ResponseType {
     /** The number of specific types. */
     RBRGEN3_RESPONSE_TYPE_COUNT,
     /** The response has been incorrectly or incompletely populated. */
-    RBRGEN3_RESPONSE_UNKNOWN_TYPE
+    RBRGEN3_RESPONSE_UNKNOWN_TYPE,
 } RBRGen3ResponseType;
 
 /**

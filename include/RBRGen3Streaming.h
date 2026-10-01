@@ -156,7 +156,7 @@ typedef enum RBRGen3OutputFormat {
      *  This format is available for LOGGER3 with fw 1.109 or later*/
     RBRGEN3_OUTFORMAT_CALTEXT07 = 1 << 4,
     /** Corresponds to the largest output format enum value. */
-    RBRGEN3_OUTFORMAT_MAX = RBRGEN3_OUTFORMAT_CALTEXT07
+    RBRGEN3_OUTFORMAT_MAX = RBRGEN3_OUTFORMAT_CALTEXT07,
 } RBRGen3OutputFormat;
 
 /**
@@ -293,7 +293,7 @@ typedef enum RBRGen3AuxOutputActiveLevel {
     /** The number of active output levels. */
     RBRGEN3_ACTIVE_COUNT,
     /** An unknown or unrecognized active output level. */
-    RBRGEN3_UNKNOWN_ACTIVE
+    RBRGEN3_UNKNOWN_ACTIVE,
 } RBRGen3AuxOutputActiveLevel;
 
 /**
@@ -322,7 +322,7 @@ typedef enum RBRGen3AuxOutputSleepLevel {
     /** The number of sleep output levels. */
     RBRGEN3_SLEEP_COUNT,
     /** An unknown or unrecognized sleep output level. */
-    RBRGEN3_UNKNOWN_SLEEP
+    RBRGEN3_UNKNOWN_SLEEP,
 } RBRGen3AuxOutputSleepLevel;
 
 /**
@@ -449,7 +449,7 @@ typedef enum RBRGen3ReadingFlag {
     /** The number of reading flags. */
     RBRGEN3_READING_FLAG_COUNT,
     /** An unknown or unrecognized reading flag. */
-    RBRGEN3_UNKNOWN_READING_FLAG
+    RBRGEN3_UNKNOWN_READING_FLAG,
 } RBRGen3ReadingFlag;
 
 /**

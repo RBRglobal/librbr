@@ -50,7 +50,7 @@ typedef enum RBRGen3Dataset {
     /** The number of specific datasets. */
     RBRGEN3_DATASET_COUNT,
     /** An unknown or unrecognized dataset. */
-    RBRGEN3_UNKNOWN_DATASET
+    RBRGEN3_UNKNOWN_DATASET,
 } RBRGen3Dataset;
 
 /**
@@ -150,7 +150,7 @@ typedef struct RBRGen3Data {
  *     .dataset = RBRGEN3_DATASET_STANDARD,
  *     .size    = 1400,
  *     .offset  = 2800,
- *     .data    = buf
+ *     .data    = buf,
  * };
  * RBRGen3_readData(instrument, &data);
  * fwrite(buf, data.size, 1, datasetFile);
@@ -210,7 +210,7 @@ typedef enum RBRGen3MemoryFormat {
     /** “EasyParse” format, `calbin00`. */
     RBRGEN3_MEMFORMAT_CALBIN00 = 1 << 1,
     /** Corresponds to the largest memory format enum value. */
-    RBRGEN3_MEMFORMAT_MAX = RBRGEN3_MEMFORMAT_CALBIN00
+    RBRGEN3_MEMFORMAT_MAX = RBRGEN3_MEMFORMAT_CALBIN00,
 } RBRGen3MemoryFormat;
 
 /**
@@ -310,7 +310,7 @@ typedef enum RBRGen3PostprocessingAggregate {
     /** The number of specific post-processing aggregate functions. */
     RBRGEN3_POSTPROCESSING_AGGREGATE_COUNT,
     /** An unknown or unrecognized post-processing aggregate function. */
-    RBRGEN3_UNKNOWN_POSTPROCESSING_AGGREGATE
+    RBRGEN3_UNKNOWN_POSTPROCESSING_AGGREGATE,
 } RBRGen3PostprocessingAggregate;
 
 /**
@@ -366,7 +366,7 @@ typedef enum RBRGen3PostprocessingStatus {
     /** The number of specific post-processing statuses. */
     RBRGEN3_POSTPROCESSING_STATUS_COUNT,
     /** An unknown or unrecognized post-processing status. */
-    RBRGEN3_UNKNOWN_POSTPROCESSING_STATUS
+    RBRGEN3_UNKNOWN_POSTPROCESSING_STATUS,
 } RBRGen3PostprocessingStatus;
 
 /**
@@ -393,7 +393,7 @@ typedef enum RBRGen3PostprocessingCommand {
     /** The number of specific post-processing commands. */
     RBRGEN3_POSTPROCESSING_COMMAND_COUNT,
     /** An unknown or unrecognized post-processing command. */
-    RBRGEN3_UNKNOWN_POSTPROCESSING_COMMAND
+    RBRGEN3_UNKNOWN_POSTPROCESSING_COMMAND,
 } RBRGen3PostprocessingCommand;
 
 /**
@@ -430,7 +430,7 @@ typedef enum RBRGen3PostprocessingBinFilter {
     /** The number of specific post-processing bin filters. */
     RBRGEN3_POSTPROCESSING_BINFILTER_COUNT,
     /** An unknown or unrecognized post-processing bin filter. */
-    RBRGEN3_UNKNOWN_POSTPROCESSING_BINFILTER
+    RBRGEN3_UNKNOWN_POSTPROCESSING_BINFILTER,
 } RBRGen3PostprocessingBinFilter;
 
 /**

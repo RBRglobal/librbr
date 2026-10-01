@@ -103,7 +103,7 @@ typedef enum RBRGen3PowerSource {
     /** The number of specific power sources. */
     RBRGEN3_POWER_SOURCE_COUNT,
     /** An unknown or unrecognized power source. */
-    RBRGEN3_UNKNOWN_POWER_SOURCE
+    RBRGEN3_UNKNOWN_POWER_SOURCE,
 } RBRGen3PowerSource;
 
 /**
@@ -176,7 +176,7 @@ typedef enum RBRGen3InternalBatteryType {
     /** The number of specific internal battery types. */
     RBRGEN3_INTERNAL_BATTERY_COUNT,
     /** An unknown or unrecognized internal battery type. */
-    RBRGEN3_UNKNOWN_INTERNAL_BATTERY
+    RBRGEN3_UNKNOWN_INTERNAL_BATTERY,
 } RBRGen3InternalBatteryType;
 
 /**
@@ -302,7 +302,7 @@ typedef enum RBRGen3ExternalBatteryType {
     /** The number of specific external battery types. */
     RBRGEN3_EXTERNAL_BATTERY_COUNT,
     /** An unknown or unrecognized external battery type. */
-    RBRGEN3_UNKNOWN_EXTERNAL_BATTERY
+    RBRGEN3_UNKNOWN_EXTERNAL_BATTERY,
 } RBRGen3ExternalBatteryType;
 
 /**

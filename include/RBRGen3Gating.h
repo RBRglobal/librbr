@@ -32,7 +32,7 @@ typedef enum RBRGen3GatingState {
     /** The number of specific gating condition types. */
     RBRGEN3_GATING_COUNT,
     /** An unknown or unrecognized gating condition type. */
-    RBRGEN3_UNKNOWN_GATING
+    RBRGEN3_UNKNOWN_GATING,
 } RBRGen3GatingState;
 
 /**
@@ -53,7 +53,7 @@ typedef enum RBRGen3ThresholdingChannelSelection {
     /** The channel is set by index. */
     RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
     /** The channel is set by label. */
-    RBRGEN3_THRESHOLD_CHANNEL_BY_LABEL
+    RBRGEN3_THRESHOLD_CHANNEL_BY_LABEL,
 } RBRGen3ThresholdingChannelSelection;
 
 /**
@@ -79,7 +79,7 @@ typedef enum RBRGen3ThresholdingCondition {
     /** The number of thresholding conditions. */
     RBRGEN3_THRESHOLDING_COUNT,
     /** An unknown or unrecognized thresholding condition. */
-    RBRGEN3_UNKNOWN_THRESHOLDING
+    RBRGEN3_UNKNOWN_THRESHOLDING,
 } RBRGen3ThresholdingCondition;
 
 /**

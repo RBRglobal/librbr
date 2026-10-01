@@ -90,7 +90,8 @@
  */
 static const RBRGen3HardwareError WARNING_NUMBERS[] = {
     RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
-    RBRGEN3_HARDWARE_ERROR_NOT_LOGGING};
+    RBRGEN3_HARDWARE_ERROR_NOT_LOGGING,
+};
 #define WARNING_NUMBER_COUNT ((long) (sizeof(WARNING_NUMBERS) / sizeof(WARNING_NUMBERS[0])))
 
 #define WARNING_PARAMETER     ", warning = W"
@@ -1070,7 +1071,13 @@ static inline void RBRGen3DateTime_initializeOffset(void)
 {
     if (localTimeOffset == OFFSET_UNINITIALIZED) {
         struct tm instrumentMinTimestamp = {
-            .tm_year = 100, .tm_mon = 0, .tm_mday = 1, .tm_hour = 0, .tm_min = 0, .tm_sec = 0};
+            .tm_year = 100,
+            .tm_mon = 0,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 0,
+        };
         localTimeOffset =
             RBRGEN3_DATETIME_MIN - ((RBRGen3DateTime) mktime(&instrumentMinTimestamp) * 1000);
     }

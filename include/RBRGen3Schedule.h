@@ -138,7 +138,7 @@ typedef enum RBRGen3SamplingMode {
     /** The number of specific sampling modes. */
     RBRGEN3_SAMPLING_COUNT,
     /** An unknown or unrecognized sampling mode. */
-    RBRGEN3_UNKNOWN_SAMPLING
+    RBRGEN3_UNKNOWN_SAMPLING,
 } RBRGen3SamplingMode;
 
 /**
@@ -176,7 +176,7 @@ typedef enum RBRGen3Gate {
     /** The number of specific sampling modes. */
     RBRGEN3_GATE_COUNT,
     /** An unknown or unrecognized sampling mode. */
-    RBRGEN3_UNKNOWN_GATE
+    RBRGEN3_UNKNOWN_GATE,
 } RBRGen3Gate;
 
 /**
@@ -388,7 +388,7 @@ typedef enum RBRGen3DeploymentStatus {
     /** The number of specific statuses. */
     RBRGEN3_STATUS_COUNT,
     /** An unknown or unrecognized status. */
-    RBRGEN3_UNKNOWN_STATUS
+    RBRGEN3_UNKNOWN_STATUS,
 } RBRGen3DeploymentStatus;
 
 /**

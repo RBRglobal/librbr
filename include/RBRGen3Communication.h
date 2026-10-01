@@ -35,7 +35,7 @@ typedef enum RBRGen3Link {
     /** The number of specific link types. */
     RBRGEN3_LINK_COUNT,
     /** An unknown or unrecognized link type. */
-    RBRGEN3_UNKNOWN_LINK
+    RBRGEN3_UNKNOWN_LINK,
 } RBRGen3Link;
 
 /**
@@ -103,7 +103,7 @@ typedef enum RBRGen3SerialBaudRate {
     /** 921,600 Bd */
     RBRGEN3_SERIAL_BAUD_921600 = 1 << 13,
     /** Corresponds to the largest baud rate enum value. */
-    RBRGEN3_SERIAL_BAUD_MAX = RBRGEN3_SERIAL_BAUD_921600
+    RBRGEN3_SERIAL_BAUD_MAX = RBRGEN3_SERIAL_BAUD_921600,
 } RBRGen3SerialBaudRate;
 
 /**
@@ -139,7 +139,7 @@ typedef enum RBRGen3SerialMode {
     /** 0-3.3V logic, idle low. */
     RBRGEN3_SERIAL_MODE_UART_IDLE_LOW = 1 << 4,
     /** Corresponds to the largest UART mode enum value. */
-    RBRGEN3_SERIAL_MODE_MAX = RBRGEN3_SERIAL_MODE_UART_IDLE_LOW
+    RBRGEN3_SERIAL_MODE_MAX = RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
 } RBRGen3SerialMode;
 
 /**
@@ -257,7 +257,7 @@ typedef enum RBRGen3WiFiState {
     /** The number of specific states. */
     RBRGEN3_WIFI_COUNT,
     /** An unknown or unrecognized state. */
-    RBRGEN3_UNKNOWN_WIFI
+    RBRGEN3_UNKNOWN_WIFI,
 } RBRGen3WiFiState;
 
 /**

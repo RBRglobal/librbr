@@ -45,7 +45,7 @@ typedef enum RBRGen3Direction {
     /** The number of specific directions. */
     RBRGEN3_DIRECTION_COUNT,
     /** An unknown or unrecognized direction. */
-    RBRGEN3_UNKNOWN_DIRECTION
+    RBRGEN3_UNKNOWN_DIRECTION,
 } RBRGen3Direction;
 
 /**
@@ -71,7 +71,7 @@ typedef enum RBRGen3RegimesReference {
     /** The number of specific regime reference types. */
     RBRGEN3_REFERENCE_COUNT,
     /** An unknown or unrecognized regime reference type. */
-    RBRGEN3_UNKNOWN_REFERENCE
+    RBRGEN3_UNKNOWN_REFERENCE,
 } RBRGen3RegimesReference;
 
 /**

@@ -104,7 +104,7 @@ typedef enum {
     /** Invalid parameters (initialization failure) */
     RBRDYNAMICCORRECTION_BAD_PARAMS,
     /** Other error */
-    RBRDYNAMICCORRECTION_UNKNOWN_ERROR
+    RBRDYNAMICCORRECTION_UNKNOWN_ERROR,
 } RBRDynamicCorrectionError;
 
 /** \struct RBRDynamicCorrectionParams
