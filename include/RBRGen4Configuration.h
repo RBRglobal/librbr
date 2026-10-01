@@ -496,6 +496,7 @@ typedef struct RBRGen4Settings {
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_setSettings()
  */
 RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings);
@@ -581,6 +582,7 @@ typedef struct RBRGen4Parameters {
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_setParameters()
  */
 RBRGen4Error RBRGen4_getParameters(RBRGen4 *conn, RBRGen4Parameters *parameters);
@@ -718,6 +720,7 @@ typedef struct RBRGen4GroupPool {
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \return #RBRGEN4_TRUNCATED when \a groupPool cannot hold every
  *                            reported group; the first `size` are
  *                            stored
@@ -814,6 +817,7 @@ RBRGen4Error RBRGen4_deleteGroup(RBRGen4 *conn, const char *label);
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_deleteGroup()
  */
 RBRGen4Error RBRGen4_deleteGroupAll(RBRGen4 *conn);
@@ -1108,6 +1112,7 @@ const char *RBRGen4ScheduleMode_name(RBRGen4ScheduleMode mode);
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \return #RBRGEN4_TRUNCATED when \a schedulePool cannot hold every
  *                            reported schedule; the first `size` are
  *                            stored
@@ -1204,6 +1209,7 @@ RBRGen4Error RBRGen4_deleteSchedule(RBRGen4 *conn, const char *label);
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_deleteSchedule()
  */
 RBRGen4Error RBRGen4_deleteScheduleAll(RBRGen4 *conn);
@@ -1323,6 +1329,7 @@ typedef struct RBRGen4ConfigPool {
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \return #RBRGEN4_TRUNCATED when \a configPool cannot hold every
  *                            reported configuration; the first
  *                            `size` are stored
@@ -1419,6 +1426,7 @@ RBRGen4Error RBRGen4_deleteConfig(RBRGen4 *conn, const char *label);
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_deleteConfig()
  */
 RBRGen4Error RBRGen4_deleteConfigAll(RBRGen4 *conn);

@@ -438,7 +438,7 @@ typedef RBRGen4Error (*RBRGen4TimeCallback)(const struct RBRGen4 *conn, RBRGen4D
  *
  * \param [in] conn the instrument for which sleep is being requested
  * \param [in] time the duration for which a sleep is requested in milliseconds
- * \return #RBRGEN4_SUCCESS when the time is successfully retrieved
+ * \return #RBRGEN4_SUCCESS when the requested time has elapsed
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
  * \see RBRGen4ReadCallback() for details on how the values returned from
  *                                  user callback functions are used
@@ -884,20 +884,20 @@ typedef struct RBRGen4 {
  *                         connection
  * \param [in] commandTimeout the command timeout in milliseconds
  * \param [in] userData arbitrary user data; useful in callbacks
- * \return #RBRGEN4_SUCCESS if the instrument was opened successfully
- * \return #RBRGEN4_MISSING_CALLBACK if \a environment or a callback was not
+ * \return #RBRGEN4_SUCCESS when the instrument was opened successfully
+ * \return #RBRGEN4_MISSING_CALLBACK when \a environment or a callback was not
  *         provided
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE if a buffer is missing or empty,
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a buffer is missing or empty,
  *         or RBRGen4Environment.sampleBuffer has no readings storage
- * \return #RBRGEN4_COMMAND_TOO_LONG if the command buffer cannot hold the
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command buffer cannot hold the
  *         opening command
- * \return #RBRGEN4_RESPONSE_TOO_LONG if the response buffer cannot hold the
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when the response buffer cannot hold the
  *         instrument's reply
- * \return #RBRGEN4_TIMEOUT if an instrument communication timeout occurs
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the instrument rejects the opening
- *         command
- * \return #RBRGEN4_UNSUPPORTED if the instrument is unsupported
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument rejects the opening
+ *         command, or another hardware error occurs
+ * \return #RBRGEN4_UNSUPPORTED when the instrument is unsupported
  * \see RBRGen4_close()
  */
 RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Environment *environment,
@@ -910,7 +910,7 @@ RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Environment *environment,
  * memory and does not perform any communication with the instrument.
  *
  * \param [in,out] conn the instrument connection to terminate
- * \return #RBRGEN4_SUCCESS if the instrument was closed successfully
+ * \return #RBRGEN4_SUCCESS when the instrument was closed successfully
  * \see RBRGen4_open()
  */
 RBRGen4Error RBRGen4_close(RBRGen4 *conn);
@@ -929,7 +929,7 @@ RBRGen4Error RBRGen4_close(RBRGen4 *conn);
  * \param [in] command storage for commands destined for the instrument
  * \param [in] capacity the capacity of \a command in bytes
  * \return #RBRGEN4_SUCCESS when the buffer is replaced
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE if the buffer is missing or empty
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the buffer is missing or empty
  * \see RBRGen4Environment for the rules on sizing and sharing buffers
  * \see RBRGen4_setResponseBuffer()
  */
@@ -951,7 +951,7 @@ RBRGen4Error RBRGen4_setCommandBuffer(RBRGen4 *conn, uint8_t *command, int32_t c
  * \param [in] response storage for data received from the instrument
  * \param [in] capacity the capacity of \a response in bytes
  * \return #RBRGEN4_SUCCESS when the buffer is replaced
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE if the buffer is missing or cannot
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the buffer is missing or cannot
  *         hold more than a line terminator
  * \see RBRGen4Environment for the rules on sizing and sharing buffers
  * \see RBRGen4_setCommandBuffer()

@@ -190,6 +190,7 @@ typedef struct RBRGen4Sample {
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  */
 RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
 
@@ -225,6 +226,7 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the
  *         command buffer
  */

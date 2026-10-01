@@ -68,6 +68,7 @@ typedef struct RBRGen4Link {
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  */
 RBRGen4Error RBRGen4_getLink(RBRGen4 *conn, RBRGen4Link *link);
 
@@ -167,6 +168,7 @@ typedef struct RBRGen4LinkSerial {
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_setLinkSerial()
  */
 RBRGen4Error RBRGen4_getLinkSerial(RBRGen4 *conn, RBRGen4LinkSerial *serial);

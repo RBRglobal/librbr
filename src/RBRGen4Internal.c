@@ -622,7 +622,7 @@ static RBRGen4Error RBRGen4Sample_parse(RBRGen4Sample *sample, RBRGen4OutputForm
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
  * \return #RBRGEN4_SUCCESS when the response is a warning or success
- * \return #RBRGEN4_HARDWARE_ERROR when the response indicates an error
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  */
 RBRGen4Error RBRGen4_errorCheckResponse(RBRGen4 *conn, char *beginning, char *end)
 {

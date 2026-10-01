@@ -196,7 +196,7 @@ RBRGen4Error RBRGen4_appendLabelList(RBRGen4 *conn, const RBRGen4LabelList *labe
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when the response exceeds the buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_sendCommand() to send a command
  * \see RBRGen4_converse() for a send/receive shortcut
  */
@@ -227,7 +227,7 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn, bool breakOnSample, RBRGen4Samp
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a line too long for the response
  *         buffer was met and the correct response never arrived
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_sendCommand() to send a command
  * \see RBRGen4_readResponse() to read the command response
  */
@@ -271,8 +271,10 @@ RBRGen4Error RBRGen4_converseBuffer(RBRGen4 *conn);
  * \return #RBRGEN4_SUCCESS when the command was successfully sent and a
  *                                response was read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_converse() to send a command
  * \see RBRGen4_readResponse() to read the command response
  * \see RBRGen4_getFloat() for the float equivalent
@@ -296,8 +298,10 @@ RBRGen4Error RBRGen4_getBool(RBRGen4 *conn, const char *command, const char *par
  * \return #RBRGEN4_SUCCESS when the command was successfully sent and a
  *                                response was read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_converse() to send a command
  * \see RBRGen4_readResponse() to read the command response
  * \see RBRGen4_getBool() for the boolean equivalent
@@ -321,8 +325,10 @@ RBRGen4Error RBRGen4_getFloat(RBRGen4 *conn, const char *command, const char *pa
  * \return #RBRGEN4_SUCCESS when the command was successfully sent and a
  *                                response was read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_converse() to send a command
  * \see RBRGen4_readResponse() to read the command response
  * \see RBRGen4_getBool() for the boolean equivalent
@@ -375,7 +381,7 @@ void RBRGen4_parseResponse(RBRGen4 *conn, char **command, RBRGen4ResponseParamet
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
  * \return #RBRGEN4_SUCCESS when the response is a warning or success
- * \return #RBRGEN4_HARDWARE_ERROR when the response indicates an error
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  */
 RBRGen4Error RBRGen4_errorCheckResponse(RBRGen4 *conn, char *beginning, char *end);
 

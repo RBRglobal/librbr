@@ -53,6 +53,7 @@ typedef struct RBRGen4Clock {
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_setClock()
  */
 RBRGen4Error RBRGen4_getClock(RBRGen4 *conn, RBRGen4Clock *clock);
@@ -185,6 +186,7 @@ typedef struct RBRGen4Deployment {
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_setDeployment()
  */
 RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment);

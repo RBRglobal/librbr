@@ -86,6 +86,7 @@ typedef struct RBRGen4Storage {
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_setStorage()
  */
 RBRGen4Error RBRGen4_getStorage(RBRGen4 *conn, RBRGen4Storage *storage);
@@ -105,6 +106,7 @@ RBRGen4Error RBRGen4_getStorage(RBRGen4 *conn, RBRGen4Storage *storage);
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the storage access
  *                                                    mode is invalid
  * \see RBRGen4_getStorage()
@@ -197,6 +199,7 @@ typedef struct RBRGen4DatasetPool {
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \return #RBRGEN4_TRUNCATED when \a datasetPool cannot hold every
  *                            reported dataset; the first `size` are
  *                            stored
@@ -461,6 +464,7 @@ RBRGen4Error RBRGen4_deleteDataset(RBRGen4 *conn, const char *label);
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
  *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_deleteDataset()
  */
 RBRGen4Error RBRGen4_deleteDatasetAll(RBRGen4 *conn);
