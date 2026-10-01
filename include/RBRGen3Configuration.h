@@ -210,7 +210,7 @@ typedef struct RBRGen3Channel {
     char type[RBRGEN3_CHANNEL_TYPE_MAX + 1];
 
     /** \brief The internal address to which the channel responds. */
-    RBRGen3ModuleAddress module;
+    RBRGen3ModuleAddress moduleAddr;
 
     /**
      * \brief Whether the channel is activated for sampling.

@@ -134,7 +134,7 @@ static RBRGen3Error RBRGen3_getChannel(RBRGen3 *conn, int32_t channelIndex, RBRG
         if (strcmp(parameter.key, "type") == 0) {
             snprintf(channel->type, sizeof(channel->type), "%s", parameter.value);
         } else if (strcmp(parameter.key, "module") == 0) {
-            channel->module = strtol(parameter.value, NULL, 10);
+            channel->moduleAddr = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "status") == 0) {
             channel->status = (strcmp(parameter.value, "on") == 0);
         } else if (strcmp(parameter.key, "settlingtime") == 0 ||
