@@ -238,7 +238,7 @@ extern "C" {
  *
  * \param [out] destination the destination string buffer
  * \param [in] source the source string
- * \param [num] the maximum number of characters to write into the destination
+ * \param [in] num the maximum number of characters to write into the destination
  * \return the destination string buffer
  */
 char *rbr_strnesccntrl(char *destination, const char *source, size_t num);
@@ -254,8 +254,8 @@ char *rbr_strnesccntrl(char *destination, const char *source, size_t num);
  * RESPONSE_TERMINATOR.
  *
  * \param [in] text the string used in command and appear in response
- * \param [in] expectedCommand the command expected to be written to TESTIOBuffers->writeBuffer
- * \param [in] response the response expected to be in TESTIOBuffers->readBuffer
+ * \param [out] expectedCommand the command expected to be written to TestIOBuffers.writeBuffer
+ * \param [out] response the response expected to be in TestIOBuffers.readBuffer
  */
 void rbr_prepareCommandResponse(const char *text, char *expectedCommand, char *response);
 
@@ -325,8 +325,8 @@ const char *bool_name(bool value);
 /**
  * \brief An instrument test to be run.
  *
- * \param conn the instrument connection
- * \param buffers the test I/O buffers
+ * \param [in] conn the instrument connection
+ * \param [in,out] buffers the test I/O buffers
  * \return whether the test passed
  */
 typedef bool InstrumentTestFunction(RBRGen3 *conn, TestIOBuffers *buffers);
@@ -387,8 +387,8 @@ typedef struct TestParserBuffers {
 /**
  * \brief A parser test to be run.
  *
- * \param parser the parser to test
- * \param buffers the parser result buffers
+ * \param [in] parser the parser to test
+ * \param [in,out] buffers the parser result buffers
  * \return whether the test passed
  */
 typedef bool ParserTestFunction(RBRGen3Parser *parser, TestParserBuffers *buffers);
