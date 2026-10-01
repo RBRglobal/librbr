@@ -870,7 +870,6 @@ typedef struct RBRGen4 {
  * in any other format while the connection is being opened are not
  * recognised as samples: they are discarded rather than passed to
  * RBRGen4Environment.sample.
- * \see RBRGen4_setOutputFormat()
  *
  * In the event of any return value other than #RBRGEN4_SUCCESS, no cleanup of
  * library resources is required. In the event of a successful result,
@@ -892,6 +891,7 @@ typedef struct RBRGen4 {
  *         command, or another hardware error occurs
  * \return #RBRGEN4_UNSUPPORTED when the instrument is unsupported
  * \see RBRGen4_close()
+ * \see RBRGen4_setOutputFormat()
  */
 RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Environment *environment,
                           const RBRGen4DateTime commandTimeout, void *userData);

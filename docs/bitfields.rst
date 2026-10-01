@@ -42,7 +42,6 @@ And to check if a specific format is supported, e.g., ``caltext03``:
 
    RBRGen3OutputFormat outputFormats;
    RBRGen3_getAvailableOutputFormats(conn, &outputFormats);
-   if (outputFormats & RBRGEN3_OUTFORMAT_CALTEXT03)
-   {
+   if (outputFormats & RBRGEN3_OUTFORMAT_CALTEXT03) {
        ...
    }

@@ -141,7 +141,7 @@ typedef struct RBRGen3Data {
  *   can be written
  *
  * Upon return, \a data will have been modified so that the dataset, size, and
- * offset reflect the the instrument response. Be sure to check the reported
+ * offset reflect the instrument response. Be sure to check the reported
  * size as it may differ from the requested size, especially when the
  * instrument is busy or if you're reading the last chunk of the dataset.
  *

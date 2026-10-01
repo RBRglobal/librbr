@@ -682,11 +682,13 @@ typedef struct RBRGen3 {
  * The library never allocates memory: the caller provides the RBRGen3
  * instance (statically, on the stack, or from a heap of its choosing) and the
  * constructor initializes it in place. Any prior contents are discarded. The
- * caller likewise provides the command and response buffers via \a environment;
- * they must remain valid until RBRGen3_close() is called. If either buffer is
+ * caller likewise provides the command and response buffers through
+ * \a environment. If either buffer is
  * `NULL`, the command buffer has a capacity of zero or less, or the response
  * buffer cannot hold more than a line terminator, the connection is not
- * opened and #RBRGEN3_INVALID_PARAMETER_VALUE is returned.
+ * opened and #RBRGEN3_INVALID_PARAMETER_VALUE is returned. A buffer too small for the
+ * opening exchange yields #RBRGEN3_COMMAND_TOO_LONG or
+ * #RBRGEN3_RESPONSE_TOO_LONG.
  *
  * The \a environment structure will be copied into the RBRGen3 structure;
  * no reference to it is retained, so any subsequent modifications will not
@@ -697,7 +699,7 @@ typedef struct RBRGen3 {
  * All callbacks must be given except for
  * RBRGen3Environment.sample. If any others are given as null pointers,
  * #RBRGEN3_MISSING_CALLBACK is returned and the instrument connection
- * will not be opened. RBRGen3Environment.sample is given, then
+ * will not be opened. If RBRGen3Environment.sample is given, then
  * RBRGen3Environment.sampleBuffer must also be given; if it is not,
  * #RBRGEN3_MISSING_CALLBACK is returned.
  *
@@ -801,7 +803,7 @@ RBRGen3Error RBRGen3_setResponseBuffer(RBRGen3 *conn, uint8_t *response, int32_t
  * \brief Discard any buffered instrument response data.
  *
  * This function must be called after a response buffer has been shared with
- * another RBRGenX connection instance.
+ * another RBRGen3 connection instance.
  *
  * The response buffer is not always fully consumed during a command-response
  * interaction with an instrument. Unread data can include the prompt or

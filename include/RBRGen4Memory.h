@@ -199,7 +199,7 @@ typedef struct RBRGen4DatasetPool {
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \return #RBRGEN4_TRUNCATED when \a datasetPool cannot hold every reported dataset; the first
- *         `size` are stored
+ *         RBRGen4DatasetPool.size are stored
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a datasetPool has no storage
  * \see RBRGen4_getDataset()
  */
@@ -257,7 +257,7 @@ RBRGen4Error RBRGen4_getDatasetMaxCount(RBRGen4 *conn, int32_t *maxCount);
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another hardware error occurs
  * \return #RBRGEN4_TRUNCATED when \a scheduleList cannot hold every reported schedule; the first
- *         `size` are stored
+ *         RBRGen4LabelList.size are stored
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
  *         \a scheduleList is given without storage
  * \see RBRGen4_getDatasetPool()
