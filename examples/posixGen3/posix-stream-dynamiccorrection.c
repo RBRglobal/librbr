@@ -89,7 +89,7 @@ RBRGen3Error streamCTD(RBRGen3 *conn, int dynamicCorrection_channel[], bool _fla
 
         /* we already pre-validated the channels to be
          * defined in the following order */
-        meas->timestamp = g_sample.timestamp - g_timeReference; // in millisecond
+        meas->timestamp = g_sample.timestamp - g_timeReference; /* in millisecond */
         meas->conductivity = g_sample.readings[dynamicCorrection_channel[0]];
         meas->marineTemperature = g_sample.readings[dynamicCorrection_channel[1]];
         meas->pressure =
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
     fprintf(stderr, "%s: Using %s v%s.\n", programName, RBRGEN3_LIB_NAME, RBRGEN3_LIB_VERSION);
 
     RBRGen3Environment environment = {
-        .time = instrumentTime, // in millisecond
+        .time = instrumentTime, /* in millisecond */
         .sleep = instrumentSleep,
         .read = instrumentRead,
         .write = instrumentWrite,
@@ -225,7 +225,7 @@ int main(int argc, char *argv[])
      * channel index in an array */
     int i = 0;
     int dynamicCorrection_channel[4];
-    bool _flagAbsP = false; // if false, it means no absolute pressure channel detected.
+    bool _flagAbsP = false; /* if false, it means no absolute pressure channel detected. */
     int _iSeaP = -1;
     int _iAbsP = -1;
 
@@ -264,13 +264,13 @@ int main(int argc, char *argv[])
          * treated as CTD instrument.
          */
         if (_iSeaP >= 0) {
-            // found sea pressure channel, use it
+            /* found sea pressure channel, use it */
             dynamicCorrection_channel[2] = _iSeaP;
         } else {
-            // didn't find sea pressure channel
-            if (_flagAbsP == true) { // found absolute pressure channel, use it
+            /* didn't find sea pressure channel */
+            if (_flagAbsP == true) { /* found absolute pressure channel, use it */
                 dynamicCorrection_channel[2] = _iAbsP;
-            } else { // didn't find absolute pressure channel
+            } else { /* didn't find absolute pressure channel */
                 isCtd = false;
             }
         }

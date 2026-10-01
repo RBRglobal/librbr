@@ -38,13 +38,12 @@
 #include <sys/time.h>
 
 /* Networking includes */
-#include <sys/socket.h>
-#include <sys/types.h>
 #include <arpa/inet.h>
-#include <unistd.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 #include "posix-shared.h"
 #include "RBRGen3Commands.h"
@@ -179,7 +178,7 @@ static int listenUdp(void)
             continue;
         }
 
-        // get host information.
+        /* get host information. */
         char service[64];
         int s = getnameinfo((struct sockaddr *) &peer_addr,
                             peer_addr_len,
@@ -195,7 +194,7 @@ static int listenUdp(void)
             continue;
         }
 
-        // Find 'RBR_' location (in case UDP packet is split and out of order)
+        /* Find 'RBR_' location (in case UDP packet is split and out of order) */
         int offset = -1;
         for (int i = 0; i < bytes; i++) {
             if (message[i] == 'R' && message[i + 1] == 'B' && message[i + 2] == 'R' &&
@@ -212,7 +211,7 @@ static int listenUdp(void)
 
         printf("\r\nDevice ID: %s\n", message + offset);
 
-        // we want to know if the device is busy
+        /* we want to know if the device is busy */
         int busy = message[7];
         printf("Device is busy? %d\r\n", busy);
         if (busy == 0) {
@@ -250,7 +249,7 @@ static int openSocketFd(void)
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
 
-    // Convert IPv4 and IPv6 addresses from text to binary form
+    /* Convert IPv4 and IPv6 addresses from text to binary form */
     if (inet_pton(AF_INET, host, &serv_addr.sin_addr) <= 0) {
         printf("Invalid address/ Address not supported \n");
         return -1;
@@ -329,10 +328,10 @@ int main(int argc, char *argv[])
     uint8_t commandBuffer[RBRGEN3_COMMAND_BUFFER_DEFAULT];
     uint8_t responseBuffer[RBRGEN3_RESPONSE_BUFFER_DEFAULT];
 
-    // first listen for UDP packets indicating a connection is alive.
+    /* first listen for UDP packets indicating a connection is alive. */
     listenUdp();
 
-    // ok, instrument Logger is up and not busy, let's try to connect to socket.
+    /* ok, instrument Logger is up and not busy, let's try to connect to socket. */
     instrumentFd = openSocketFd();
     if (instrumentFd <= 0) {
         fprintf(stderr, "%s: Failed to open network port: %s!\n", programName, strerror(errno));

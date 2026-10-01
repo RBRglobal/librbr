@@ -10,9 +10,10 @@
  * \brief Tests for dynamic correction
  */
 
-#include "tests.h"
-#include <stdlib.h>
 #include <math.h>
+#include <stdlib.h>
+
+#include "tests.h"
 
 #define TEST_DYNCORR_DATASET_SIZE 7
 

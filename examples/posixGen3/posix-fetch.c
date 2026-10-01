@@ -13,8 +13,6 @@
 
 /* Required for errno. */
 #include <errno.h>
-/* Required for isnan. */
-#include <math.h>
 /* Required for fprintf, printf, snprintf. */
 #include <stdio.h>
 /* Required for EXIT_FAILURE, EXIT_SUCCESS. */

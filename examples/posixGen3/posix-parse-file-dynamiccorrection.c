@@ -18,9 +18,6 @@
  *      channel 4 -> T cond (°C).
  */
 
-/* Prerequisite for gmtime_r in time.h. */
-#define _POSIX_C_SOURCE 200112L
-
 /* Required for errno. */
 #include <errno.h>
 /* Required for NAN, isnan. */
@@ -35,8 +32,6 @@
 #include <stdio.h>
 /* Required for strerror. */
 #include <string.h>
-/* Required for gmtime_r, nanosleep, time_t, strftime. */
-#include <time.h>
 /* Required for close. */
 #include <unistd.h>
 
@@ -82,7 +77,7 @@ RBRGen3Error parserSample(const struct RBRGen3Parser *parser,
     /* The channels to be defined in the following order (for this example) */
     /* channel id from 1 to 4 corresponds to C(mS/cm), T meas(°C), P meas(dbar), T cond(°C) */
     /* here the P meas means sea pressure */
-    meas.timestamp = sample->timestamp - g_timeReference; // in millisecond
+    meas.timestamp = sample->timestamp - g_timeReference; /* in millisecond */
     meas.conductivity = sample->readings[CHANNEL_COND - 1];
     meas.marineTemperature = sample->readings[CHANNEL_T_MEAS - 1];
     meas.pressure = sample->readings[CHANNEL_P_MEAS - 1];
@@ -105,7 +100,7 @@ RBRGen3Error parserSample(const struct RBRGen3Parser *parser,
 
     /* report the result. here pressure is sea pressure*/
     printf("%.3f, %.8f, %.8f, %.8f, %.8f\n",
-           // output timestamp in seconds
+           /* output timestamp in seconds */
            (double) corrResult.timestamp / 1000.0,
            (double) corrResult.corrTemperature,
            (double) corrResult.pressure,
@@ -213,7 +208,7 @@ int main(int argc, char *argv[])
             fprintf(stderr, "\nRetrying...\n");
             continue;
         } else if (readSize < 0) {
-            // unknown error (just report errno)
+            /* unknown error (just report errno) */
             fprintf(stderr, "\nReading error: errno = %s", strerror(errno));
             break;
         } else if (readSize == 0) {
@@ -225,7 +220,7 @@ int main(int argc, char *argv[])
         RBRGen3Parser_parse(&parser,
                             RBRGEN3_DATASET_EASYPARSE_SAMPLE_DATA,
                             buf,
-                            &parsedSize); // parserSample() gets called and prints the sample.
+                            &parsedSize); /* parserSample() gets called and prints the sample. */
         bufSize -= parsedSize;
         memmove(buf, buf + parsedSize, bufSize);
     }

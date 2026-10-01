@@ -27,8 +27,6 @@
 #include <time.h>
 /* Required for read, write. */
 #include <unistd.h>
-/* Required for fprintf, printf, snprintf. */
-#include <stdio.h>
 
 #include "RBRGen4.h"
 #include "posix-shared.h"

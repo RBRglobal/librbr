@@ -124,8 +124,8 @@ int main(int argc, char *argv[])
     if (_downloadFrom == 1) {
         RBRGen3_getEnabledChannelCount(&conn, &enabledChannels);
     } else if (_downloadFrom == 4) {
-        // Important! This must match the postprocessing channels configured
-        // in the instrument.
+        /* Important! This must match the postprocessing channels configured
+         * in the instrument. */
         enabledChannels = 5;
     }
 

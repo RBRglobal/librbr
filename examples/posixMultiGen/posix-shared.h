@@ -10,8 +10,8 @@
  * \brief Shared functions used by the libRBR POSIX examples.
  */
 
-#ifndef LIBRBR_POSIX_SHARED_H
-#define LIBRBR_POSIX_SHARED_H
+#ifndef LIBRBR_POSIXMULTIGEN_POSIX_SHARED_H
+#define LIBRBR_POSIXMULTIGEN_POSIX_SHARED_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -45,4 +45,4 @@ RBRGen4Error gen4InstrumentWrite(const struct RBRGen4 *conn, const void *const d
 }
 #endif
 
-#endif /* LIBRBR_POSIX_SHARED_H */
+#endif /* LIBRBR_POSIXMULTIGEN_POSIX_SHARED_H */

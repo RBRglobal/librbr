@@ -159,7 +159,6 @@ int main(int argc, char *argv[])
 
     switch (link.type) {
     case RBRGEN4_LINK_TYPE_USB:
-        // case RBRGEN4_LINK_TYPE_WIFI:
         break;
     case RBRGEN4_LINK_TYPE_SERIAL: {
         RBRGen4LinkSerial serial;
