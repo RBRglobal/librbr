@@ -346,7 +346,7 @@ void RBRGen3Parser_setUserData(RBRGen3Parser *parser, void *userData);
  * \param [in] dataset the dataset from which the chunk originated
  * \param [in] data the data to be parsed
  * \param [in,out] size initially, the size of the data given by \a data; set by the function to the
- *                 number of bytes actually parsed
+ *                      number of bytes actually parsed
  * \return #RBRGEN3_SUCCESS when no parsing errors occur
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is given
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback

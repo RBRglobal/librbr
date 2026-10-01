@@ -1349,8 +1349,8 @@ RBRGen4Error RBRGen4_createConfig(RBRGen4 *conn, const char *label);
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the configuration does not exist, or another hardware
- *         error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the configuration does not exist, or another hardware error
+ *         occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteConfigAll()
  * \see RBRGen4_createConfig()

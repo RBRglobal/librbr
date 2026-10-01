@@ -73,7 +73,7 @@ RBRGen4Error RBRGen4_getClock(RBRGen4 *conn, RBRGen4Clock *clock);
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the clock cannot be changed, or another hardware error
- * occurs
+ *         occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the date and time is outside #RBRGEN4_DATETIME_MIN
  *         to #RBRGEN4_DATETIME_MAX, or the UTC offset is `NAN`
  * \see RBRGen4_getClock()

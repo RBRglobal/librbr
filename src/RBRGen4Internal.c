@@ -492,7 +492,7 @@ static char *seek(const char *str, char delimiter)
  * \brief Attempt to parse a sample from a response.
  *
  * \param [out] sample the sample; RBRGen4Sample.readings and RBRGen4Sample.size must be set by the
- *              caller
+ *                     caller
  * \param [in] outputFormat the format of the response to parse
  * \param [in] response the response to parse
  * \return #RBRGEN4_SUCCESS when the response is a sample

@@ -65,7 +65,7 @@ typedef struct RBRGen3ChannelsList {
  *
  * \param [in] conn the instrument connection
  * \param [out] channelsList the channels list; RBRGen3ChannelsList.channels and
- *              RBRGen3ChannelsList.size must be set by the caller
+ *                           RBRGen3ChannelsList.size must be set by the caller
  * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TRUNCATED when the instrument reported more channels than the list holds; the
@@ -117,7 +117,7 @@ typedef struct RBRGen3LabelsList {
  *
  * \param [in] conn the instrument connection
  * \param [out] labelsList the channel labels list; RBRGen3LabelsList.labels and
- *              RBRGen3LabelsList.size must be set by the caller
+ *                         RBRGen3LabelsList.size must be set by the caller
  * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TRUNCATED when the instrument reported more labels than the list holds; the

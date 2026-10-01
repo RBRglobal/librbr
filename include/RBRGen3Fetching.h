@@ -46,11 +46,12 @@ extern "C" {
  *
  * \param [in] conn the instrument connection
  * \param [in] channels the list of channels to be acquired (may be `NULL`); its length must not
- *             exceed its size; an empty list selects every channel, and a list
- *             RBRGen3_getLabelsList() returned as truncated selects only the labels it holds
+ *                      exceed its size; an empty list selects every channel, and a list
+ *                      RBRGen3_getLabelsList() returned as truncated selects only the labels it
+ *                      holds
  * \param [in] sleepAfter whether the instrument should sleep after fetching
  * \param [in,out] sample the fetched sample; RBRGen3Sample.readings and RBRGen3Sample.size must be
- *                 set by the caller
+ *                        set by the caller
  * \return #RBRGEN3_SUCCESS when a sample is successfully read
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when \a sample has no readings storage, or \a channels
  *         has a negative length, more labels than storage, or labels but no label storage

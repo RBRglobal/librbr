@@ -158,8 +158,8 @@ RBRGen3Error RBRGen3_appendCommand(RBRGen3 *conn, const char *command, ...);
  * \param [in] breakOnSample whether to return early when a sample is parsed
  * \param [out] sample where to put a parsed sample
  * \param [in] startTime when the wait began; the command timeout is measured from here, so a caller
- *             which loops over this function to skip unrelated lines bounds the whole wait by
- *             passing the same value each time
+ *                       which loops over this function to skip unrelated lines bounds the whole
+ *                       wait by passing the same value each time
  * \return #RBRGEN3_SUCCESS when a response was successfully read
  * \return #RBRGEN3_SAMPLE when a sample is read and \a sample is given
  * \return #RBRGEN3_TIMEOUT when a timeout occurs

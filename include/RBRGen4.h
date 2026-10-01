@@ -480,7 +480,7 @@ typedef RBRGen4Error (*RBRGen4SleepCallback)(const struct RBRGen4 *conn, RBRGen4
  * \param [in] conn the instrument for which data is being requested
  * \param [in,out] data where up to \a size bytes of data can be written
  * \param [in,out] size initially, the maximum amount of data which can be written to \a data; set
- *                 by the callback to the number of bytes actually written
+ *                      by the callback to the number of bytes actually written
  * \return #RBRGEN4_SUCCESS when data is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs

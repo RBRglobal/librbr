@@ -354,7 +354,7 @@ typedef RBRGen3Error (*RBRGen3SleepCallback)(const struct RBRGen3 *conn, RBRGen3
  * \param [in] conn the instrument for which data is being requested
  * \param [in,out] data where up to \a size bytes of data can be written
  * \param [in,out] size initially, the maximum amount of data which can be written to \a data; set
- *                 by the callback to the number of bytes actually written
+ *                      by the callback to the number of bytes actually written
  * \return #RBRGEN3_SUCCESS when data is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs

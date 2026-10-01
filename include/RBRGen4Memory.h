@@ -622,8 +622,8 @@ typedef struct RBRGen4DownloadMeta {
  * \param [in] dataset the dataset, selected by its label
  * \param [in] scheduleLabel the schedule, as listed by RBRGen4_getDataset()
  * \param [in,out] download the download request: the caller populates the unit, count, offset, and
- *                 buffer fields to say what to transfer and where to put it; the counts are updated
- *                 with what the instrument returned
+ *                          buffer fields to say what to transfer and where to put it; the counts
+ *                          are updated with what the instrument returned
  * \return #RBRGEN4_SUCCESS when the data is successfully read
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -649,8 +649,8 @@ RBRGen4Error RBRGen4_downloadDatasetScheduleData(RBRGen4 *conn, const RBRGen4Dat
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in,out] download the download request: the caller populates the unit, count, offset, and
- *                 buffer fields to say what to transfer and where to put it; the counts are updated
- *                 with what the instrument returned
+ *                          buffer fields to say what to transfer and where to put it; the counts
+ *                          are updated with what the instrument returned
  * \return #RBRGEN4_SUCCESS when the data is successfully read
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -675,8 +675,8 @@ RBRGen4Error RBRGen4_downloadDatasetEvents(RBRGen4 *conn, const RBRGen4Dataset *
  * \param [in] dataset the dataset, selected by its label
  * \param [in] scheduleLabel the schedule, as listed by RBRGen4_getDataset()
  * \param [in,out] download the download request: the caller populates the unit, count, offset, and
- *                 buffer fields to say what to transfer and where to put it; the counts are updated
- *                 with what the instrument returned
+ *                          buffer fields to say what to transfer and where to put it; the counts
+ *                          are updated with what the instrument returned
  * \return #RBRGEN4_SUCCESS when the data is successfully read
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
@@ -702,8 +702,8 @@ RBRGen4Error RBRGen4_downloadDatasetScheduleEvents(RBRGen4 *conn, const RBRGen4D
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [in,out] download the download request: the caller populates the count, offset, and buffer
- *                 fields to say what to transfer and where to put it; the counts are updated with
- *                 what the instrument returned
+ *                          fields to say what to transfer and where to put it; the counts are
+ *                          updated with what the instrument returned
  * \return #RBRGEN4_SUCCESS when the data is successfully read
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs

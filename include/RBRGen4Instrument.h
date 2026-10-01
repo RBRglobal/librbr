@@ -518,7 +518,7 @@ RBRGen4Error RBRGen4_factoryReset(RBRGen4 *conn);
  *
  * \param [in] conn the instrument connection
  * \param [in] delay time in milliseconds to wait before rebooting; zero omits the parameter,
- *             rebooting without a delay
+ *                   rebooting without a delay
  * \return #RBRGEN4_SUCCESS when the reboot has been requested
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs

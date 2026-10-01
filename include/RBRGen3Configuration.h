@@ -359,7 +359,7 @@ RBRGen3Error RBRGen3_getEnabledChannelCount(RBRGen3 *conn, int32_t *count);
  *
  * \param [in] conn the instrument connection
  * \param [out] channels the channel information; RBRGen3Channels.channels and RBRGen3Channels.size
- *              must be set by the caller
+ *                       must be set by the caller
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TRUNCATED when the instrument has more channels than the list holds; the first
  *         RBRGen3Channels.size are populated and RBRGen3_getChannelCount() reports how many there
@@ -387,7 +387,7 @@ RBRGen3Error RBRGen3_getChannels(RBRGen3 *conn, RBRGen3Channels *channels);
  *
  * \param [in] conn the instrument connection
  * \param [out] channels the channel information; RBRGen3Channels.channels and RBRGen3Channels.size
- *              must be set by the caller
+ *                       must be set by the caller
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TRUNCATED when the instrument has more channels than the list holds; the first
  *         RBRGen3Channels.size are populated and RBRGen3_getChannelCount() reports how many there
@@ -817,7 +817,7 @@ typedef struct RBRGen3SensorParameter {
  * \param [in] conn the instrument connection
  * \param [in] channel the index of the channel from which the parameter is to be retrieved
  * \param [in,out] parameter initially, the sensor parameter to be retrieved; after return, the
- *                 instrument response
+ *                           instrument response
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
