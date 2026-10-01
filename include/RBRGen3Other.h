@@ -242,13 +242,13 @@ typedef struct RBRGen3PowerInternal {
  *
  * \param [in] conn the instrument connection
  * \param [out] power the power information
- * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \see RBRGen3_setPowerInternalBatteryType()
  * \see RBRGen3_resetPowerInternalUsed()
  */
@@ -379,13 +379,13 @@ typedef struct RBRGen3PowerExternal {
  *
  * \param [in] conn the instrument connection
  * \param [out] power the power information
- * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \see RBRGen3_setPowerExternalBatteryType()
  * \see RBRGen3_resetPowerExternalUsed()
  */
@@ -451,13 +451,13 @@ typedef struct RBRGen3Info {
  *
  * \param [in] conn the instrument connection
  * \param [out] info the extended instrument information
- * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \return #RBRGEN3_SUCCESS when the information is successfully read
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  */
 RBRGen3Error RBRGen3_getInfo(RBRGen3 *conn, RBRGen3Info *info);
 

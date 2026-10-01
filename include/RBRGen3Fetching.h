@@ -53,8 +53,6 @@ extern "C" {
  * \param [in,out] sample the fetched sample; RBRGen3Sample.readings and RBRGen3Sample.size must be
  *                        set by the caller
  * \return #RBRGEN3_SUCCESS when a sample is successfully read
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when \a sample has no readings storage, or \a channels
- *         has a negative length, more labels than storage, or labels but no label storage
  * \return #RBRGEN3_COMMAND_TOO_LONG when a channel label does not fit the command buffer; the
  *         command itself may be longer than the buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
@@ -62,6 +60,8 @@ extern "C" {
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when an invalid channel is requested, or another hardware error
  *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when \a sample has no readings storage, or \a channels
+ *         has a negative length, more labels than storage, or labels but no label storage
  * \see RBRGen3LabelsList
  * \see RBRGen3Sample
  * \see RBRGen3_readSample()

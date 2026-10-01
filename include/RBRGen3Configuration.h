@@ -361,15 +361,15 @@ RBRGen3Error RBRGen3_getEnabledChannelCount(RBRGen3 *conn, int32_t *count);
  * \param [in,out] channels the channel information; RBRGen3Channels.channels and
  *                          RBRGen3Channels.size must be set by the caller
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
- * \return #RBRGEN3_TRUNCATED when the instrument has more channels than the list holds; the first
- *         RBRGen3Channels.size are populated and RBRGen3_getChannelCount() reports how many there
- *         are
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN3_TRUNCATED when the instrument has more channels than the list holds; the first
+ *         RBRGen3Channels.size are populated and RBRGen3_getChannelCount() reports how many there
+ *         are
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
  * \see RBRGen3_getChannelsWithoutCalibrations()
  * \see RBRGen3_getSensorParameters()
  */
@@ -389,15 +389,15 @@ RBRGen3Error RBRGen3_getChannels(RBRGen3 *conn, RBRGen3Channels *channels);
  * \param [in,out] channels the channel information; RBRGen3Channels.channels and
  *                          RBRGen3Channels.size must be set by the caller
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
- * \return #RBRGEN3_TRUNCATED when the instrument has more channels than the list holds; the first
- *         RBRGen3Channels.size are populated and RBRGen3_getChannelCount() reports how many there
- *         are
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN3_TRUNCATED when the instrument has more channels than the list holds; the first
+ *         RBRGen3Channels.size are populated and RBRGen3_getChannelCount() reports how many there
+ *         are
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
  * \see RBRGen3_getChannels()
  * \see RBRGen3_getSensorParameters()
  */

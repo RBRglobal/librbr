@@ -335,10 +335,10 @@ RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPo
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_TRUNCATED when \a channelPool cannot hold every reported channel; the first
- *         `size` are stored
  * \return #RBRGEN4_HARDWARE_ERROR when the channel pool cannot be read, or another hardware error
  *         occurs
+ * \return #RBRGEN4_TRUNCATED when \a channelPool cannot hold every reported channel; the first
+ *         `size` are stored
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the nature is not one the command accepts, or
  *         \a channelPool has no storage
  * \see RBRGen4_getChannelPool()

@@ -66,16 +66,16 @@ typedef struct RBRGen3ChannelsList {
  * \param [in] conn the instrument connection
  * \param [in,out] channelsList the channels list; RBRGen3ChannelsList.channels and
  *                              RBRGen3ChannelsList.size must be set by the caller
- * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
- * \return #RBRGEN3_TRUNCATED when the instrument reported more channels than the list holds; the
- *         first RBRGen3ChannelsList.size are populated
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the command is unavailable, or another hardware error occurs
+ * \return #RBRGEN3_TRUNCATED when the instrument reported more channels than the list holds; the
+ *         first RBRGen3ChannelsList.size are populated
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
+ * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \see RBRGen3_getLabelsList()
  */
 RBRGen3Error RBRGen3_getChannelsList(RBRGen3 *conn, RBRGen3ChannelsList *channelsList);
@@ -118,16 +118,16 @@ typedef struct RBRGen3LabelsList {
  * \param [in] conn the instrument connection
  * \param [in,out] labelsList the channel labels list; RBRGen3LabelsList.labels and
  *                            RBRGen3LabelsList.size must be set by the caller
- * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
- * \return #RBRGEN3_TRUNCATED when the instrument reported more labels than the list holds; the
- *         first RBRGen3LabelsList.size are populated
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the command is unavailable, or another hardware error occurs
+ * \return #RBRGEN3_TRUNCATED when the instrument reported more labels than the list holds; the
+ *         first RBRGen3LabelsList.size are populated
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
+ * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \see RBRGen3_getChannelsList()
  */
 RBRGen3Error RBRGen3_getLabelsList(RBRGen3 *conn, RBRGen3LabelsList *labelsList);

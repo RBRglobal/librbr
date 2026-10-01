@@ -885,8 +885,8 @@ typedef struct RBRGen4 {
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a buffer is missing or empty, or
  *         RBRGen4Environment.sampleBuffer has no readings storage
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command buffer cannot hold the opening command
- * \return #RBRGEN4_RESPONSE_TOO_LONG when the response buffer cannot hold the instrument's reply
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when the response buffer cannot hold the instrument's reply
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument rejects the `instrument outputformat`
  *         command, or another hardware error occurs

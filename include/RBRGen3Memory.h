@@ -105,8 +105,8 @@ typedef struct RBRGen3MemoryInfo {
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is requested
  * \return #RBRGEN3_HARDWARE_ERROR when the dataset is unsupported, or another hardware error occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid dataset is requested
  */
 RBRGen3Error RBRGen3_getMemoryInfo(RBRGen3 *conn, RBRGen3MemoryInfo *memoryInfo);
 
@@ -303,9 +303,9 @@ RBRGen3Error RBRGen3_getNewMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat *memo
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid format is requested
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging or if an unavailable memory format
  *         is selected, or another hardware error occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an invalid format is requested
  * \see RBRGen3_getNewMemoryFormat()
  */
 RBRGen3Error RBRGen3_setNewMemoryFormat(RBRGen3 *conn, RBRGen3MemoryFormat memoryFormat);
@@ -591,14 +591,14 @@ typedef struct RBRGen3Postprocessing {
  * \param [in] conn the instrument connection
  * \param [out] postprocessing the post-processing parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
- * \return #RBRGEN3_TRUNCATED when the instrument reported more than
- *         #RBRGEN3_POSTPROCESSING_CHANNEL_MAX channels; the first
- *         #RBRGEN3_POSTPROCESSING_CHANNEL_MAX are populated
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another hardware error occurs
+ * \return #RBRGEN3_TRUNCATED when the instrument reported more than
+ *         #RBRGEN3_POSTPROCESSING_CHANNEL_MAX channels; the first
+ *         #RBRGEN3_POSTPROCESSING_CHANNEL_MAX are populated
  * \see RBRGen3_setPostprocessing()
  */
 RBRGen3Error RBRGen3_getPostprocessing(RBRGen3 *conn, RBRGen3Postprocessing *postprocessing);

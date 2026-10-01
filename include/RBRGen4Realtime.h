@@ -214,15 +214,15 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
  * \param [in,out] sample the polled sample; RBRGen4Sample.readings and RBRGen4Sample.size must be
  *                        set by the caller
  * \return #RBRGEN4_SUCCESS when a sample is successfully read
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings storage
- * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but RBRGen4OutputFormat.scheduleLabel is
- *         false
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no polled sample arrives within
  *         RBRGen4.pollTimeout
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings storage
+ * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but RBRGen4OutputFormat.scheduleLabel is
+ *         false
  * \see RBRGen4_pollChannels()
  * \see RBRGen4_pollGroups()
  */
@@ -253,10 +253,6 @@ RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sampl
  * \param [in,out] sample the polled sample; RBRGen4Sample.readings and RBRGen4Sample.size must be
  *                        set by the caller
  * \return #RBRGEN4_SUCCESS when a sample is successfully read
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings storage, or when
- *         \a channelList is `NULL`, empty, its count is out of range, or a channel label is empty
- * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but RBRGen4OutputFormat.scheduleLabel is
- *         false
  * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the command
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no polled sample arrives within
  *         RBRGen4.pollTimeout
@@ -264,6 +260,10 @@ RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sampl
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when an invalid channel is requested, or another hardware error
  *         occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings storage, or when
+ *         \a channelList is `NULL`, empty, its count is out of range, or a channel label is empty
+ * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but RBRGen4OutputFormat.scheduleLabel is
+ *         false
  * \see RBRGen4_poll()
  * \see RBRGen4_pollGroups()
  */
@@ -295,10 +295,6 @@ RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel,
  * \param [in,out] sample the polled sample; RBRGen4Sample.readings and RBRGen4Sample.size must be
  *                        set by the caller
  * \return #RBRGEN4_SUCCESS when a sample is successfully read
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings storage, or when
- *         \a groupList is `NULL`, empty, its count is out of range, or a group label is empty
- * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but RBRGen4OutputFormat.scheduleLabel is
- *         false
  * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the command
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no polled sample arrives within
  *         RBRGen4.pollTimeout
@@ -306,6 +302,10 @@ RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel,
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when an invalid group is requested, or another hardware error
  *         occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings storage, or when
+ *         \a groupList is `NULL`, empty, its count is out of range, or a group label is empty
+ * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but RBRGen4OutputFormat.scheduleLabel is
+ *         false
  * \see RBRGen4_poll()
  * \see RBRGen4_pollChannels()
  */
