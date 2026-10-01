@@ -30,6 +30,12 @@ ALIASES += "writeonly=**Write-only.**"
 ALIASES += "nol2=This parameter is unavailable for Logger2 instruments."
 ALIASES += "nol3=This parameter is unavailable for Logger3 instruments."
 
+# The instrument commands a function sends, as described in CONTRIBUTING.rst.
+# docs/conf.py shows the resulting section as a field.
+ALIASES += "command{1}=\par Command:^^`\1`"
+ALIASES += "command{2}=\par Commands:^^`\1`, `\2`"
+ALIASES += "command{3}=\par Commands:^^`\1`, `\2`, `\3`"
+
 WARNINGS               = YES
 WARN_IF_UNDOCUMENTED   = YES
 WARN_IF_DOC_ERROR      = YES

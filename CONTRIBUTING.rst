@@ -140,6 +140,10 @@ Technical pedantry:
 
   - Functions must have at least appropriate ``\param``
     and ``\return`` comments.
+  - Functions which send instrument commands
+    name them with ``\command{command}``
+    (or ``\command{first,second}`` for more than one),
+    in its own paragraph after the ``\brief``.
 
 A short example:
 
@@ -147,6 +151,8 @@ A short example:
 
    /**
     * \brief A short description of the function.
+    *
+    * \command{example}
     *
     * A longer description of the function.
     *
