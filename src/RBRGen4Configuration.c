@@ -25,16 +25,10 @@
 
 RBRGen4Error RBRGen4_getCalibration(RBRGen4 *conn, RBRGen4Calibration *calibration)
 {
-    /* The label selects the calibration to read, so it has to outlive the
-     * reset of the rest of the structure. */
-    char label[sizeof(calibration->label)];
-    snprintf(label, sizeof(label), "%s", calibration->label);
+    /* The label selects the calibration to read, so it survives the reset. */
+    RBR_RESET_EXCEPT(calibration, label);
 
-    memset(calibration, 0, sizeof(RBRGen4Calibration));
-
-    RBR_TRY(RBRGen4_converse(conn, "calibration %s", label));
-
-    snprintf(calibration->label, sizeof(calibration->label), "%s", label);
+    RBR_TRY(RBRGen4_converse(conn, "calibration %s", calibration->label));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
@@ -365,34 +359,28 @@ RBRGen4Error RBRGen4_setSettings(RBRGen4 *conn, const RBRGen4Settings *settings)
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
+    RBRGen4_beginCommand(conn);
+    RBR_TRY(RBRGen4_appendCommand(conn, "settings "));
+
     /* An unavailable parameter is left out. */
-    char prompt[sizeof("prompt=off ")] = "";
     if (settings->prompt < RBRGEN4_SETTINGS_STATE_COUNT) {
-        snprintf(prompt, sizeof(prompt), "prompt=%s ", RBRGen4SettingsState_name(settings->prompt));
+        RBR_TRY(
+            RBRGen4_appendCommand(conn, "prompt=%s ", RBRGen4SettingsState_name(settings->prompt)));
+    }
+    if (settings->confirmation < RBRGEN4_SETTINGS_STATE_COUNT) {
+        RBR_TRY(RBRGen4_appendCommand(
+            conn, "confirmation=%s ", RBRGen4SettingsState_name(settings->confirmation)));
     }
 
-    char confirmation[sizeof("confirmation=off ")] = "";
-    if (settings->confirmation < RBRGEN4_SETTINGS_STATE_COUNT) {
-        snprintf(confirmation,
-                 sizeof(confirmation),
-                 "confirmation=%s ",
-                 RBRGen4SettingsState_name(settings->confirmation));
-    }
+    RBR_TRY(RBRGen4_appendCommand(conn, "pollpoweroffdelay=%" PRId32, settings->pollPowerOffDelay));
 
     /* The instrument answers with nothing at all once confirmation is off. */
     if (settings->confirmation == RBRGEN4_SETTINGS_STATE_OFF) {
-        return RBRGen4_sendCommand(conn,
-                                   "settings %s%spollpoweroffdelay=%" PRId32,
-                                   prompt,
-                                   confirmation,
-                                   settings->pollPowerOffDelay);
+        RBR_TRY(RBRGen4_appendCommand(conn, RBRGEN4_SEND_COMMAND_TERMINATOR));
+        return RBRGen4_sendBuffer(conn);
     }
 
-    return RBRGen4_converse(conn,
-                            "settings %s%spollpoweroffdelay=%" PRId32,
-                            prompt,
-                            confirmation,
-                            settings->pollPowerOffDelay);
+    return RBRGen4_converseBuffer(conn);
 }
 
 RBRGen4Error RBRGen4_getParameters(RBRGen4 *conn, RBRGen4Parameters *parameters)

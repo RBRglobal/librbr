@@ -61,11 +61,11 @@ RBRGen4Error RBRGen4_setClock(RBRGen4 *conn, const RBRGen4Clock *clock)
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    char dateTime[RBRGEN4_SCHEDULE_TIME_LEN + 1];
-    RBRGen4DateTime_toScheduleTime(clock->dateTime, dateTime);
-
-    return RBRGen4_converse(
-        conn, "clock datetime=%s offsetfromutc=%.2f", dateTime, (double) clock->offsetFromUtc);
+    RBRGen4_beginCommand(conn);
+    RBR_TRY(RBRGen4_appendCommand(conn, "clock datetime="));
+    RBR_TRY(RBRGen4_appendDateTime(conn, clock->dateTime));
+    RBR_TRY(RBRGen4_appendCommand(conn, " offsetfromutc=%.2f", (double) clock->offsetFromUtc));
+    return RBRGen4_converseBuffer(conn);
 }
 
 const char *RBRGen4DeploymentStatus_name(RBRGen4DeploymentStatus status)
@@ -188,13 +188,11 @@ RBRGen4Error RBRGen4_setDeployment(RBRGen4 *conn, const RBRGen4Deployment *deplo
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    char startTime[RBRGEN4_SCHEDULE_TIME_LEN + 1];
-    RBRGen4DateTime_toScheduleTime(deployment->startTime, startTime);
-
-    return RBRGen4_converse(conn,
-                            "deployment gate=%s starttime=%s",
-                            RBRGen4DeploymentGate_name(deployment->gate),
-                            startTime);
+    RBRGen4_beginCommand(conn);
+    RBR_TRY(RBRGen4_appendCommand(
+        conn, "deployment gate=%s starttime=", RBRGen4DeploymentGate_name(deployment->gate)));
+    RBR_TRY(RBRGen4_appendDateTime(conn, deployment->startTime));
+    return RBRGen4_converseBuffer(conn);
 }
 
 /**
@@ -273,24 +271,25 @@ static void RBRGen4_parseInstrumentState(RBRGen4 *conn, RBRGen4InstrumentState *
     }
 }
 
-/** \brief Room for `dataset=<label> ` and its terminator. */
-#define RBRGEN4_DATASET_PARAMETER_MAX (sizeof("dataset= ") + RBRGEN4_LABEL_NAME_MAX)
-
 /**
- * \brief Check the parameters `verify` and `enable` share.
+ * \brief Check the parameters `verify` and `enable` share, and build the
+ *        command they have in common: `<command> config=<label>
+ *        [dataset=<label> ]storagemode=<mode>`.
  *
+ * \param [in] conn the instrument connection
+ * \param [in] command the command word
  * \param [in] config the configuration to deploy
  * \param [in] datasetLabel the label for the deployment's dataset, or `NULL`
+ *                          to leave the parameter out
  * \param [in] storageMode the data storage mode
- * \param [out] dataset the `dataset` parameter to send, with its trailing
- *                      space, or empty
- * \return #RBRGEN4_SUCCESS when the parameters are all in range
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE otherwise
+ * \return #RBRGEN4_SUCCESS when the command is built
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a parameter is out of range
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit
  */
-static RBRGen4Error RBRGen4_checkDeploymentParameters(const RBRGen4Config *config,
-                                                      const char *datasetLabel,
-                                                      RBRGen4DeploymentStorageMode storageMode,
-                                                      char dataset[RBRGEN4_DATASET_PARAMETER_MAX])
+static RBRGen4Error RBRGen4_buildDeploymentCommand(RBRGen4 *conn, const char *command,
+                                                   const RBRGen4Config *config,
+                                                   const char *datasetLabel,
+                                                   RBRGen4DeploymentStorageMode storageMode)
 {
     if (config == NULL || config->label[0] == '\0' ||
         (datasetLabel != NULL &&
@@ -300,26 +299,20 @@ static RBRGen4Error RBRGen4_checkDeploymentParameters(const RBRGen4Config *confi
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    /* A `NULL` label leaves the parameter out. */
-    dataset[0] = '\0';
+    RBRGen4_beginCommand(conn);
+    RBR_TRY(RBRGen4_appendCommand(conn, "%s config=%s ", command, config->label));
     if (datasetLabel != NULL) {
-        snprintf(dataset, RBRGEN4_DATASET_PARAMETER_MAX, "dataset=%s ", datasetLabel);
+        RBR_TRY(RBRGen4_appendCommand(conn, "dataset=%s ", datasetLabel));
     }
-
-    return RBRGEN4_SUCCESS;
+    return RBRGen4_appendCommand(
+        conn, "storagemode=%s", RBRGen4DeploymentStorageMode_name(storageMode));
 }
 
 RBRGen4Error RBRGen4_verify(RBRGen4 *conn, const RBRGen4Config *config, const char *datasetLabel,
                             RBRGen4DeploymentStorageMode storageMode, RBRGen4InstrumentState *state)
 {
-    char dataset[RBRGEN4_DATASET_PARAMETER_MAX];
-    RBR_TRY(RBRGen4_checkDeploymentParameters(config, datasetLabel, storageMode, dataset));
-
-    RBR_TRY(RBRGen4_converse(conn,
-                             "verify config=%s %sstoragemode=%s",
-                             config->label,
-                             dataset,
-                             RBRGen4DeploymentStorageMode_name(storageMode)));
+    RBR_TRY(RBRGen4_buildDeploymentCommand(conn, "verify", config, datasetLabel, storageMode));
+    RBR_TRY(RBRGen4_converseBuffer(conn));
 
     RBRGen4_parseInstrumentState(conn, state);
 
@@ -344,14 +337,8 @@ const char *RBRGen4DeploymentStorageMode_name(RBRGen4DeploymentStorageMode stora
 RBRGen4Error RBRGen4_enable(RBRGen4 *conn, const RBRGen4Config *config, const char *datasetLabel,
                             RBRGen4DeploymentStorageMode storageMode, RBRGen4InstrumentState *state)
 {
-    char dataset[RBRGEN4_DATASET_PARAMETER_MAX];
-    RBR_TRY(RBRGen4_checkDeploymentParameters(config, datasetLabel, storageMode, dataset));
-
-    RBR_TRY(RBRGen4_converse(conn,
-                             "enable config=%s %sstoragemode=%s",
-                             config->label,
-                             dataset,
-                             RBRGen4DeploymentStorageMode_name(storageMode)));
+    RBR_TRY(RBRGen4_buildDeploymentCommand(conn, "enable", config, datasetLabel, storageMode));
+    RBR_TRY(RBRGen4_converseBuffer(conn));
 
     RBRGen4_parseInstrumentState(conn, state);
 
