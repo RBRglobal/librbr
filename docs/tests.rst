@@ -48,7 +48,7 @@ at build time.
 
 Functions declared with these macros
 receive two arguments:
-``instrument``, the test instrument connection;
+``conn``, the test instrument connection;
 and ``buffers``, the I/O buffers for the instrument.
 Test functions return a boolean indicating pass/fail.
 
@@ -64,14 +64,15 @@ let's consider the test for the ``id`` command:
            .model = "RBRduo3",
            .version = "1.092",
            .serial = 923456,
-           .fwType = 104
+           .fwType = 104,
+           .mode = "",
        };
        RBRGen3Id actual;
 
        /* Populate the read buffer with the command response. */
        TestIOBuffers_init(buffers,
                           "id model = RBRduo3, version = 1.092, "
-                          "serial = 923456, fwtype = 104" COMMAND_TERMINATOR,
+                          "serial = 923456, fwtype = 104" RESPONSE_TERMINATOR,
                           0);
        /* Get the test instrument connection to send/parse the command. */
        RBRGen3Error err = RBRGen3_getId(conn, &actual);
@@ -119,11 +120,13 @@ For example,
 
    TEST_PARSER_CONFIG(two_channels) = {
        .format = RBRGEN3_MEMFORMAT_CALBIN00,
-       .formatConfig = {
-           .easyParse = {
-               .channels = 2
-           }
-       }
+       .formatConfig =
+           {
+               .easyParse =
+                   {
+                       .channels = 2,
+                   },
+           },
    };
 
    TEST_PARSER(test_a, two_channels)
@@ -152,9 +155,8 @@ then adding its name (without extension)
 to the ``GEN3_TEST_MODULES`` variable in the ``Makefile``.
 Gen4 modules live in ``testsGen4/``
 and are listed in ``GEN4_TEST_MODULES``.
-Unless you have good reason not to,
-try to retain alphabetical ordering
-of the module names in the declaration.
+The test runner is generated from the listed modules,
+so no other registration is needed.
 
 For example,
 to add a new module
