@@ -4,8 +4,10 @@
 Writing Tests
 =============
 
-Unit tests are found
-in the ``testsGen3/`` subdirectory.
+Gen3 instrument tests are found
+in the ``testsGen3/`` subdirectory,
+and Gen4 instrument tests
+in the ``testsGen4/`` subdirectory.
 
 The dynamic correction tests are a separate suite
 in the ``testsDynamicCorrection/`` subdirectory.
@@ -32,6 +34,11 @@ i.e., you may have both ``TEST_LOGGER2(foo)``
 and ``TEST_LOGGER3(foo)``,
 but you may not have two instances
 of ``TEST_LOGGER3(bar)``.
+Gen4 tests use the ``TEST_LOGGER4`` macro instead,
+within any of the test modules
+found within ``testsGen4/``;
+it takes the same argument
+and its functions receive an ``RBRGen4`` connection.
 You do not need to declare test functions
 in a header;
 test functions defined
@@ -142,7 +149,9 @@ However, if you're sure you do need a new module,
 then you can add one
 by creating a ``.c`` file in the ``testsGen3/`` subdirectory,
 then adding its name (without extension)
-to the ``TEST_MODULES`` variable in the ``Makefile``.
+to the ``GEN3_TEST_MODULES`` variable in the ``Makefile``.
+Gen4 modules live in ``testsGen4/``
+and are listed in ``GEN4_TEST_MODULES``.
 Unless you have good reason not to,
 try to retain alphabetical ordering
 of the module names in the declaration.
@@ -155,9 +164,9 @@ and add it to the Makefile:
 
 ::
 
-   TEST_MODULES := communication \
-                   ...
-                   fetching \
-                   frobbing \
-                   gating \
-                   ...
+   GEN3_TEST_MODULES := communication \
+                        ...
+                        fetching \
+                        frobbing \
+                        gating \
+                        ...
