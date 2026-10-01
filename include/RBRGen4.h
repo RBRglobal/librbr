@@ -128,7 +128,7 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
  *
  * Does not include any null terminator.
  */
-#define RBRGEN4_ID_APIVERSION_MAX 8
+#define RBRGEN4_ID_API_VERSION_MAX 8
 
 /**
  * \brief The maximum number of characters in a label.
@@ -393,7 +393,7 @@ typedef struct RBRGen4Id4 {
      *
      * \readonly
      */
-    char apiversion[RBRGEN4_ID_APIVERSION_MAX + 1];
+    char apiVersion[RBRGEN4_ID_API_VERSION_MAX + 1];
     /** The serial number of the instrument. */
     int32_t sn;
     /** The firmware type of the instrument. */

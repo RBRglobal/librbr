@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
            instrument.sn,
            instrument.fwVersion,
            instrument.semver,
-           instrument.apiversion,
+           instrument.apiVersion,
            RBRGen4InstrumentState_name(instrument.state));
 
     /* Report how the instrument is connected */

@@ -412,7 +412,7 @@ typedef struct RBRGen4Instrument {
      *
      * For example, `2.1`. Empty when the parameter is not reported.
      */
-    char apiversion[RBRGEN4_ID_APIVERSION_MAX + 1];
+    char apiVersion[RBRGEN4_ID_API_VERSION_MAX + 1];
 } RBRGen4Instrument;
 
 /**
