@@ -398,7 +398,7 @@ typedef struct RBRGen4Instrument {
     /**
      * \brief The instrument firmware version in Semantic Version form.
      *
-     * For example, `2.0.0-rc1-10-g148bc5eb1`.
+     * For example, `2.0.0-rc3-14-g5e07a2c91`.
      */
     char semver[RBRGEN4_ID_SEMVER_MAX + 1];
     /** \brief The firmware type of the instrument. */

@@ -29,7 +29,7 @@ TEST_LOGGER4(id4)
             .response = "id4 model=L4 "
                         "sn=999999 "
                         "fwversion=2.0.0 "
-                        "semver=2.0.0-rc1-10-g148bc5eb1 "
+                        "semver=2.0.0-rc3-14-g5e07a2c91 "
                         "fwtype=150 "
                         "apiversion=2.1" RESPONSE_TERMINATOR,
             .expectedError = RBRGEN4_SUCCESS,
@@ -37,7 +37,7 @@ TEST_LOGGER4(id4)
                 {
                     .model = "L4",
                     .fwVersion = "2.0.0",
-                    .semver = "2.0.0-rc1-10-g148bc5eb1",
+                    .semver = "2.0.0-rc3-14-g5e07a2c91",
                     .apiVersion = "2.1",
                     .sn = 999999,
                     .fwType = 150,
@@ -48,14 +48,14 @@ TEST_LOGGER4(id4)
             .response = "id4 model=L4 "
                         "sn=999999 "
                         "fwversion=2.0.0 "
-                        "semver=2.0.0-rc1-10-g148bc5eb1 "
+                        "semver=2.0.0-rc3-14-g5e07a2c91 "
                         "fwtype=150" RESPONSE_TERMINATOR,
             .expectedError = RBRGEN4_SUCCESS,
             .expected =
                 {
                     .model = "L4",
                     .fwVersion = "2.0.0",
-                    .semver = "2.0.0-rc1-10-g148bc5eb1",
+                    .semver = "2.0.0-rc3-14-g5e07a2c91",
                     .apiVersion = "",
                     .sn = 999999,
                     .fwType = 150,
@@ -363,7 +363,7 @@ TEST_LOGGER4(conn)
     InstrumentCommandTest tests[] = {
         {
             .response = "instrument state=disabled sn=999999 model=L4 pn=9999999revA "
-                        "fwversion=2.0.0 semver=2.0.0-rc1-10-g148bc5eb1 fwtype=150 "
+                        "fwversion=2.0.0 semver=2.0.0-rc3-14-g5e07a2c91 fwtype=150 "
                         "fwlock=off datatype=float64 name=L4 apiversion=2.1" RESPONSE_TERMINATOR,
             .expectedError = RBRGEN4_SUCCESS,
             .expected =
@@ -373,7 +373,7 @@ TEST_LOGGER4(conn)
                     .model = "L4",
                     .pn = "9999999revA",
                     .fwVersion = "2.0.0",
-                    .semver = "2.0.0-rc1-10-g148bc5eb1",
+                    .semver = "2.0.0-rc3-14-g5e07a2c91",
                     .fwType = 150,
                     .fwLock = false,
                     .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
@@ -386,7 +386,7 @@ TEST_LOGGER4(conn)
         {
             .response = "instrument state=enabled sn=210000 model=RBRsolo4 "
                         "pn=L3-M11-BEC11-SC11-ST11-SP11 fwversion=1.0.0 "
-                        "semver=1.0.0-rc4-11-g941ae64 fwtype=130 fwlock=on "
+                        "semver=1.0.0-rc2-8-gb36d0f4 fwtype=130 fwlock=on "
                         "datatype=float32 name=RBRsolo^4_T.D!fast32" RESPONSE_TERMINATOR,
             .expectedError = RBRGEN4_SUCCESS,
             .expected =
@@ -396,7 +396,7 @@ TEST_LOGGER4(conn)
                     .model = "RBRsolo4",
                     .pn = "L3-M11-BEC11-SC11-ST11-SP11",
                     .fwVersion = "1.0.0",
-                    .semver = "1.0.0-rc4-11-g941ae64",
+                    .semver = "1.0.0-rc2-8-gb36d0f4",
                     .fwType = 130,
                     .fwLock = true,
                     .dataType = RBRGEN4_DATA_TYPE_FLOAT32,

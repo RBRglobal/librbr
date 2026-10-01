@@ -189,7 +189,7 @@ int main(void)
 
     TestIOBuffers_init(&ioBuffers,
                        "id4 model=L4 sn=999999 fwversion=2.0.0 "
-                       "semver=2.0.0-rc1-10-g148bc5eb1 fwtype=150 "
+                       "semver=2.0.0-rc3-14-g5e07a2c91 fwtype=150 "
                        "apiversion=2.1" RESPONSE_TERMINATOR
                        "instrument outputformat sn=off schedulelabel=on datetime=on crc=off "
                        "datatype=float32" RESPONSE_TERMINATOR,
