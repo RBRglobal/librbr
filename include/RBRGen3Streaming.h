@@ -210,7 +210,8 @@ RBRGen3Error RBRGen3_getOutputFormat(RBRGen3 *conn, RBRGen3OutputFormat *outputF
 /**
  * \brief Set the current output format.
  *
- * \command{id,outputformat}
+ * \par Commands:
+ * `outputformat`, preceded by `id` for caltext07
  *
  * \param [in] conn the instrument connection
  * \param [in] outputFormat the current output format
@@ -221,7 +222,8 @@ RBRGen3Error RBRGen3_getOutputFormat(RBRGen3 *conn, RBRGen3OutputFormat *outputF
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when an unavailable output format is selected, or another
  *         hardware error occurs
- * \return #RBRGEN3_UNSUPPORTED when the instrument does not support the output format
+ * \return #RBRGEN3_UNSUPPORTED when the instrument does not support the output format, or its
+ *         identification needed to check support cannot be read
  * \see RBRGen3_getOutputFormat()
  */
 RBRGen3Error RBRGen3_setOutputFormat(RBRGen3 *conn, RBRGen3OutputFormat outputFormat);

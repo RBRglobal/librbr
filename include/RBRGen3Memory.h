@@ -130,7 +130,7 @@ typedef struct RBRGen3Data {
  * \brief Request a chunk of binary data from instrument data memory.
  *
  * \par Command:
- * `readdata`, or `read` for Logger2
+ * `readdata`, or `read data` for Logger2
  *
  * When calling RBRGen3_readData(), \a data must be populated:
  *
@@ -170,7 +170,7 @@ typedef struct RBRGen3Data {
  *
  * \param [in] conn the instrument connection
  * \param [in,out] data the instrument data
- * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_SUCCESS when the data is successfully read
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
@@ -644,7 +644,7 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
  * \param [in] conn the instrument connection
  * \param [in] command the post-processing command
  * \param [out] status the post-processing status after executing the command
- * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_SUCCESS when the command is successfully executed
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer

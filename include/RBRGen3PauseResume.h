@@ -100,7 +100,7 @@ const char *RBRGen3ResumeStatus_name(RBRGen3ResumeStatus status);
  *
  * \param [in] conn the instrument connection
  * \param [out] state the state of pauseresume
- * \return #RBRGEN3_SUCCESS when the state is one of the following: "n/a", "paused", or "running".
+ * \return #RBRGEN3_SUCCESS when the state is successfully read
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
@@ -117,7 +117,7 @@ RBRGen3Error RBRGen3_getPauseResume(RBRGen3 *conn, RBRGen3PauseResumeState *stat
  *
  * \param [in] conn the instrument connection
  * \param [out] status the status of pause
- * \return #RBRGEN3_SUCCESS when the status is "paused".
+ * \return #RBRGEN3_SUCCESS when the deployment is successfully paused
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
@@ -137,7 +137,7 @@ RBRGen3Error RBRGen3_pause(RBRGen3 *conn, RBRGen3PauseStatus *status);
  *
  * \param [in] conn the instrument connection
  * \param [out] status the status of resume
- * \return #RBRGEN3_SUCCESS when the state is one of the following: "pending", "logging".
+ * \return #RBRGEN3_SUCCESS when the deployment is successfully resumed
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer

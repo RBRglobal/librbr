@@ -80,6 +80,8 @@ typedef struct RBRGen3Clock {
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the instrument reports a time which cannot be
+ *         parsed
  * \see RBRGen3_setClock()
  */
 RBRGen3Error RBRGen3_getClock(RBRGen3 *conn, RBRGen3Clock *clock);
@@ -455,6 +457,8 @@ typedef struct RBRGen3Deployment {
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the instrument reports a time which cannot be
+ *         parsed
  * \see RBRGen3_setDeployment()
  */
 RBRGen3Error RBRGen3_getDeployment(RBRGen3 *conn, RBRGen3Deployment *deployment);

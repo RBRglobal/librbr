@@ -283,7 +283,7 @@ RBRGen3Error RBRGen3_setPowerInternalBatteryType(RBRGen3 *conn, RBRGen3InternalB
  * \nol2
  *
  * \param [in] conn the instrument connection
- * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_SUCCESS when the counter is successfully reset
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
@@ -420,7 +420,7 @@ RBRGen3Error RBRGen3_setPowerExternalBatteryType(RBRGen3 *conn, RBRGen3ExternalB
  * \nol2
  *
  * \param [in] conn the instrument connection
- * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_SUCCESS when the counter is successfully reset
  * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
