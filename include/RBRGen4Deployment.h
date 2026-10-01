@@ -49,6 +49,7 @@ typedef struct RBRGen4Clock {
  * \param [in] conn the instrument connection
  * \param [out] clock the clock value
  * \return #RBRGEN4_SUCCESS when the settings are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -65,6 +66,7 @@ RBRGen4Error RBRGen4_getClock(RBRGen4 *conn, RBRGen4Clock *clock);
  * \param [in] conn the instrument connection
  * \param [in] clock the clock value
  * \return #RBRGEN4_SUCCESS when the settings are successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -182,6 +184,7 @@ typedef struct RBRGen4Deployment {
  * \param [in] conn the instrument connection
  * \param [out] deployment the deployment parameters
  * \return #RBRGEN4_SUCCESS when the deployment is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -203,6 +206,7 @@ RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment)
  * \param [in] conn the instrument connection
  * \param [in] deployment the deployment parameters
  * \return #RBRGEN4_SUCCESS when the deployment is successfully changed
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -223,6 +227,7 @@ RBRGen4Error RBRGen4_setDeployment(RBRGen4 *conn, const RBRGen4Deployment *deplo
  * \param [in] conn the instrument connection
  * \param [out] status the deployment status; untouched unless the command succeeds
  * \return #RBRGEN4_SUCCESS when the deployment is paused
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -240,6 +245,7 @@ RBRGen4Error RBRGen4_pause(RBRGen4 *conn, RBRGen4DeploymentStatus *status);
  * \param [in] conn the instrument connection
  * \param [out] status the deployment status; untouched unless the command succeeds
  * \return #RBRGEN4_SUCCESS when the deployment is resumed
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -291,6 +297,7 @@ const char *RBRGen4DeploymentStorageMode_name(RBRGen4DeploymentStorageMode stora
  * \param [in] storageMode the data storage mode which would be used
  * \param [out] state the state the instrument would assume; untouched unless the command succeeds
  * \return #RBRGEN4_SUCCESS when the checks all pass
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -320,6 +327,7 @@ RBRGen4Error RBRGen4_verify(RBRGen4 *conn, const RBRGen4Config *config, const ch
  * \param [in] storageMode the data storage mode for this deployment
  * \param [out] state the state of the instrument; untouched unless the command succeeds
  * \return #RBRGEN4_SUCCESS when the instrument is enabled
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -346,6 +354,7 @@ RBRGen4Error RBRGen4_enable(RBRGen4 *conn, const RBRGen4Config *config, const ch
  * \param [in] conn the instrument connection
  * \param [out] state the state of the instrument; untouched unless the command succeeds
  * \return #RBRGEN4_SUCCESS when the deployment is terminated
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback

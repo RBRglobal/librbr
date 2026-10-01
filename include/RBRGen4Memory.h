@@ -82,6 +82,7 @@ typedef struct RBRGen4Storage {
  * \param [in] conn the instrument connection
  * \param [out] storage data memory information
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -100,6 +101,7 @@ RBRGen4Error RBRGen4_getStorage(RBRGen4 *conn, RBRGen4Storage *storage);
  * \param [in] conn the instrument connection
  * \param [in] storage the storage parameters to write
  * \return #RBRGEN4_SUCCESS when the parameters are successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -191,6 +193,7 @@ typedef struct RBRGen4DatasetPool {
  * \param [in] conn the instrument connection
  * \param [in,out] datasetPool the datasets in storage, labels only
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -210,6 +213,7 @@ RBRGen4Error RBRGen4_getDatasetPool(RBRGen4 *conn, RBRGen4DatasetPool *datasetPo
  * \param [in] conn the instrument connection
  * \param [out] count the number of datasets stored
  * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -227,6 +231,7 @@ RBRGen4Error RBRGen4_getDatasetCount(RBRGen4 *conn, int32_t *count);
  * \param [in] conn the instrument connection
  * \param [out] maxCount the maximum number of datasets
  * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -246,6 +251,7 @@ RBRGen4Error RBRGen4_getDatasetMaxCount(RBRGen4 *conn, int32_t *maxCount);
  * \param [in,out] dataset the dataset to read, selected by its label
  * \param [out] scheduleList the schedules run by the dataset, or `NULL` to skip them
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -315,6 +321,7 @@ typedef struct RBRGen4DatasetDataBlock {
  * \param [in] dataset the dataset, selected by its label
  * \param [out] block the memory usage of the events block
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -334,6 +341,7 @@ RBRGen4Error RBRGen4_getDatasetEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *
  * \param [in] dataset the dataset, selected by its label
  * \param [out] block the memory usage of the metadata block
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -355,6 +363,7 @@ RBRGen4Error RBRGen4_getDatasetMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *da
  * \param [in] scheduleLabel the schedule, as listed by RBRGen4_getDataset()
  * \param [out] block the memory usage of the schedule's blocks
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -377,6 +386,7 @@ RBRGen4Error RBRGen4_getDatasetScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset
  * \param [in] scheduleLabel the schedule, as listed by RBRGen4_getDataset()
  * \param [out] block the memory usage of the schedule's events block
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -400,6 +410,7 @@ RBRGen4Error RBRGen4_getDatasetScheduleEventsBlock(RBRGen4 *conn, const RBRGen4D
  * \param [in] scheduleLabel the schedule, as listed by RBRGen4_getDataset()
  * \param [out] block the memory usage of the schedule's sample data block
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -420,6 +431,7 @@ RBRGen4Error RBRGen4_getDatasetScheduleDataBlock(RBRGen4 *conn, const RBRGen4Dat
  * \param [in] conn the instrument connection
  * \param [in] label the label of the dataset to delete
  * \return #RBRGEN4_SUCCESS when the dataset is deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -436,6 +448,7 @@ RBRGen4Error RBRGen4_deleteDataset(RBRGen4 *conn, const char *label);
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the datasets are deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -612,6 +625,7 @@ typedef struct RBRGen4DownloadMeta {
  *                 buffer fields to say what to transfer and where to put it; the counts are updated
  *                 with what the instrument returned
  * \return #RBRGEN4_SUCCESS when the data is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -638,6 +652,7 @@ RBRGen4Error RBRGen4_downloadDatasetScheduleData(RBRGen4 *conn, const RBRGen4Dat
  *                 buffer fields to say what to transfer and where to put it; the counts are updated
  *                 with what the instrument returned
  * \return #RBRGEN4_SUCCESS when the data is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -663,6 +678,7 @@ RBRGen4Error RBRGen4_downloadDatasetEvents(RBRGen4 *conn, const RBRGen4Dataset *
  *                 buffer fields to say what to transfer and where to put it; the counts are updated
  *                 with what the instrument returned
  * \return #RBRGEN4_SUCCESS when the data is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -689,6 +705,7 @@ RBRGen4Error RBRGen4_downloadDatasetScheduleEvents(RBRGen4 *conn, const RBRGen4D
  *                 fields to say what to transfer and where to put it; the counts are updated with
  *                 what the instrument returned
  * \return #RBRGEN4_SUCCESS when the data is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback

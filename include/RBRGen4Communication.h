@@ -64,6 +64,7 @@ typedef struct RBRGen4Link {
  * \param [in] conn the instrument connection
  * \param [out] link the link parameters
  * \return #RBRGEN4_SUCCESS when the setting is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -161,6 +162,7 @@ typedef struct RBRGen4LinkSerial {
  * \param [in] conn the instrument connection
  * \param [out] serial the current serial parameters
  * \return #RBRGEN4_SUCCESS when the setting is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -184,6 +186,7 @@ RBRGen4Error RBRGen4_getLinkSerial(RBRGen4 *conn, RBRGen4LinkSerial *serial);
  * \param [in] conn the instrument connection
  * \param [in] serial the new serial parameters
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -206,6 +209,7 @@ RBRGen4Error RBRGen4_setLinkSerial(RBRGen4 *conn, const RBRGen4LinkSerial *seria
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the instrument has been put to sleep
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  */
 RBRGen4Error RBRGen4_sleep(RBRGen4 *conn);

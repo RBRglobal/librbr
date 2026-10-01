@@ -259,6 +259,7 @@ typedef struct RBRGen4ChannelPool {
  * \param [in] conn the instrument connection
  * \param [in,out] channel the channel to read, selected by its label
  * \return #RBRGEN4_SUCCESS when the channel is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -282,6 +283,7 @@ RBRGen4Error RBRGen4_getChannel(RBRGen4 *conn, RBRGen4Channel *channel);
  * \param [in] conn the instrument connection
  * \param [in] channel the channel to write, selected by its label
  * \return #RBRGEN4_SUCCESS when the channel is successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -303,6 +305,7 @@ RBRGen4Error RBRGen4_setChannel(RBRGen4 *conn, const RBRGen4Channel *channel);
  * \param [in] conn the instrument connection
  * \param [in,out] channelPool the channels present, labels only
  * \return #RBRGEN4_SUCCESS when the pool is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -328,6 +331,7 @@ RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPo
  * \param [in] nature the nature of the channels to report
  * \param [in,out] channelPool the channels present, labels only
  * \return #RBRGEN4_SUCCESS when the pool is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -350,6 +354,7 @@ RBRGen4Error RBRGen4_getChannelPoolByNature(RBRGen4 *conn, RBRGen4ChannelNature 
  * \param [in] conn the instrument connection
  * \param [out] count the number of channels present
  * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -368,6 +373,7 @@ RBRGen4Error RBRGen4_getChannelCount(RBRGen4 *conn, int32_t *count);
  * \param [in] conn the instrument connection
  * \param [in,out] calibration the calibration to read, selected by its label
  * \return #RBRGEN4_SUCCESS when the calibration is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -392,6 +398,7 @@ RBRGen4Error RBRGen4_getCalibration(RBRGen4 *conn, RBRGen4Calibration *calibrati
  * \param [in] conn the instrument connection
  * \param [in] calibration the calibration to write, selected by its label
  * \return #RBRGEN4_SUCCESS when the calibration is successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -468,6 +475,7 @@ typedef struct RBRGen4Settings {
  * \param [in] conn the instrument connection
  * \param [out] settings the logger settings
  * \return #RBRGEN4_SUCCESS when the setting is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -488,6 +496,7 @@ RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings);
  * \param [in] conn the instrument connection
  * \param [in] settings the values for the settings in the logger
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -549,6 +558,7 @@ typedef struct RBRGen4Parameters {
  * \param [in] conn the instrument connection
  * \param [out] parameters the parameters in the logger
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -565,6 +575,7 @@ RBRGen4Error RBRGen4_getParameters(RBRGen4 *conn, RBRGen4Parameters *parameters)
  * \param [in] conn the instrument connection
  * \param [in] parameters the values for the parameters in the logger
  * \return #RBRGEN4_SUCCESS when the parameters are successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -603,6 +614,7 @@ typedef struct RBRGen4Group {
  * \param [in,out] group the group to read, selected by its label
  * \param [out] channelList the channels in the group, or `NULL` to skip them
  * \return #RBRGEN4_SUCCESS when the group is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -628,6 +640,7 @@ RBRGen4Error RBRGen4_getGroup(RBRGen4 *conn, RBRGen4Group *group, RBRGen4LabelLi
  * \param [in] group the group to write, selected by its label
  * \param [in] channelList the channels to put in the group
  * \return #RBRGEN4_SUCCESS when the group is successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the command
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -638,7 +651,6 @@ RBRGen4Error RBRGen4_getGroup(RBRGen4 *conn, RBRGen4Group *group, RBRGen4LabelLi
  *                                          its length does not fit
  *                                          its array, or a channel
  *                                          label is empty
- * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the command
  * \see RBRGen4_getGroup()
  */
 RBRGen4Error RBRGen4_setGroup(RBRGen4 *conn, const RBRGen4Group *group,
@@ -677,6 +689,7 @@ typedef struct RBRGen4GroupPool {
  * \param [in] conn the instrument connection
  * \param [in,out] groupPool the groups defined, labels only
  * \return #RBRGEN4_SUCCESS when the groups are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -696,6 +709,7 @@ RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool);
  * \param [in] conn the instrument connection
  * \param [out] count the number of groups defined
  * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -713,6 +727,7 @@ RBRGen4Error RBRGen4_getGroupCount(RBRGen4 *conn, int32_t *count);
  * \param [in] conn the instrument connection
  * \param [out] maxCount the maximum number of groups
  * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -731,6 +746,7 @@ RBRGen4Error RBRGen4_getGroupMaxCount(RBRGen4 *conn, int32_t *maxCount);
  * \param [in] conn the instrument connection
  * \param [in] label the label to give the new group
  * \return #RBRGEN4_SUCCESS when the group is successfully created
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -749,6 +765,7 @@ RBRGen4Error RBRGen4_createGroup(RBRGen4 *conn, const char *label);
  * \param [in] conn the instrument connection
  * \param [in] label the label of the group to delete
  * \return #RBRGEN4_SUCCESS when the group is successfully deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -766,6 +783,7 @@ RBRGen4Error RBRGen4_deleteGroup(RBRGen4 *conn, const char *label);
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the groups are successfully deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -956,6 +974,7 @@ typedef struct RBRGen4Schedule {
  * \param [in,out] schedule the schedule to read, selected by its label
  * \param [out] groupList the groups the schedule samples, or `NULL` to skip them
  * \return #RBRGEN4_SUCCESS when the schedule is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -985,6 +1004,7 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
  * \param [in] schedule the schedule to write
  * \param [in] groupList the groups the schedule samples, or `NULL` to leave them as they are
  * \return #RBRGEN4_SUCCESS when the schedule is successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -994,7 +1014,6 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
  *         its array, a group label is empty, the stream destination or storage state is unknown, or
  *         the mode is not a single known flag
  * \return #RBRGEN4_UNSUPPORTED when the mode is `ddsampling` or `regimes`
- * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit
  * \see RBRGen4_getSchedule()
  */
 RBRGen4Error RBRGen4_setSchedule(RBRGen4 *conn, const RBRGen4Schedule *schedule,
@@ -1045,6 +1064,7 @@ const char *RBRGen4ScheduleMode_name(RBRGen4ScheduleMode mode);
  * \param [in] conn the instrument connection
  * \param [in,out] schedulePool the schedules defined, labels only
  * \return #RBRGEN4_SUCCESS when the schedules are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1064,6 +1084,7 @@ RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedul
  * \param [in] conn the instrument connection
  * \param [out] count the number of schedules defined
  * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1081,6 +1102,7 @@ RBRGen4Error RBRGen4_getScheduleCount(RBRGen4 *conn, int32_t *count);
  * \param [in] conn the instrument connection
  * \param [out] maxCount the maximum number of schedules
  * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1099,6 +1121,7 @@ RBRGen4Error RBRGen4_getScheduleMaxCount(RBRGen4 *conn, int32_t *maxCount);
  * \param [in] conn the instrument connection
  * \param [in] label the label to give the new schedule
  * \return #RBRGEN4_SUCCESS when the schedule is successfully created
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1116,6 +1139,7 @@ RBRGen4Error RBRGen4_createSchedule(RBRGen4 *conn, const char *label);
  * \param [in] conn the instrument connection
  * \param [in] label the label of the schedule to delete
  * \return #RBRGEN4_SUCCESS when the schedule is successfully deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1133,6 +1157,7 @@ RBRGen4Error RBRGen4_deleteSchedule(RBRGen4 *conn, const char *label);
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the schedules are deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1170,6 +1195,7 @@ typedef struct RBRGen4Config {
  * \param [in,out] config the configuration to read, selected by its label
  * \param [out] scheduleList the schedules in the configuration, or `NULL` to skip them
  * \return #RBRGEN4_SUCCESS when the configuration is read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1197,6 +1223,7 @@ RBRGen4Error RBRGen4_getConfig(RBRGen4 *conn, RBRGen4Config *config,
  * \param [in] config the configuration to write, selected by its label
  * \param [in] scheduleList the schedules to put in the configuration
  * \return #RBRGEN4_SUCCESS when the configuration is written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the command
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1207,7 +1234,6 @@ RBRGen4Error RBRGen4_getConfig(RBRGen4 *conn, RBRGen4Config *config,
  *                                          `NULL`, its length does
  *                                          not fit its array, or a
  *                                          schedule label is empty
- * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the command
  * \see RBRGen4_getConfig()
  */
 RBRGen4Error RBRGen4_setConfig(RBRGen4 *conn, const RBRGen4Config *config,
@@ -1247,6 +1273,7 @@ typedef struct RBRGen4ConfigPool {
  * \param [in] conn the instrument connection
  * \param [in,out] configPool the configurations defined, labels only
  * \return #RBRGEN4_SUCCESS when the configurations are read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1266,6 +1293,7 @@ RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool)
  * \param [in] conn the instrument connection
  * \param [out] count the number of configurations defined
  * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1283,6 +1311,7 @@ RBRGen4Error RBRGen4_getConfigCount(RBRGen4 *conn, int32_t *count);
  * \param [in] conn the instrument connection
  * \param [out] maxCount the maximum number of configurations
  * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1301,6 +1330,7 @@ RBRGen4Error RBRGen4_getConfigMaxCount(RBRGen4 *conn, int32_t *maxCount);
  * \param [in] conn the instrument connection
  * \param [in] label the label to give the new configuration
  * \return #RBRGEN4_SUCCESS when the configuration is created
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1318,6 +1348,7 @@ RBRGen4Error RBRGen4_createConfig(RBRGen4 *conn, const char *label);
  * \param [in] conn the instrument connection
  * \param [in] label the label of the configuration to delete
  * \return #RBRGEN4_SUCCESS when the configuration is deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -1335,6 +1366,7 @@ RBRGen4Error RBRGen4_deleteConfig(RBRGen4 *conn, const char *label);
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the configurations are deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
