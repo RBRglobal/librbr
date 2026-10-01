@@ -48,12 +48,14 @@ typedef struct RBRGen4Clock {
  *
  * \param [in] conn the instrument connection
  * \param [out] clock the clock value
- * \return #RBRGEN4_SUCCESS when the settings are successfully read
+ * \return #RBRGEN4_SUCCESS when the clock is successfully read
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the instrument reports a time which cannot be
+ *         parsed
  * \see RBRGen4_setClock()
  */
 RBRGen4Error RBRGen4_getClock(RBRGen4 *conn, RBRGen4Clock *clock);
@@ -65,13 +67,13 @@ RBRGen4Error RBRGen4_getClock(RBRGen4 *conn, RBRGen4Clock *clock);
  *
  * \param [in] conn the instrument connection
  * \param [in] clock the clock value
- * \return #RBRGEN4_SUCCESS when the settings are successfully written
+ * \return #RBRGEN4_SUCCESS when the clock is successfully written
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
- *         occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the clock cannot be changed, or another hardware error
+ * occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the date and time is outside #RBRGEN4_DATETIME_MIN
  *         to #RBRGEN4_DATETIME_MAX, or the UTC offset is `NAN`
  * \see RBRGen4_getClock()
@@ -189,6 +191,8 @@ typedef struct RBRGen4Deployment {
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the instrument reports a time which cannot be
+ *         parsed
  * \see RBRGen4_setDeployment()
  */
 RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment);

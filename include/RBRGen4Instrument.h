@@ -492,9 +492,9 @@ RBRGen4Error RBRGen4_getOutputFormat(RBRGen4 *conn, RBRGen4OutputFormat *outputF
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the datatype is not a real value
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument refuses a value, or another hardware error
  *         occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the datatype is not a real value
  * \see RBRGen4_getOutputFormat()
  */
 RBRGen4Error RBRGen4_setOutputFormat(RBRGen4 *conn, const RBRGen4OutputFormat *outputFormat);
@@ -525,7 +525,6 @@ RBRGen4Error RBRGen4_factoryReset(RBRGen4 *conn);
  * \return #RBRGEN4_SUCCESS when the reboot has been requested
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  */
 RBRGen4Error RBRGen4_reboot(RBRGen4 *conn, const int32_t delay);

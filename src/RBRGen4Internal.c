@@ -495,10 +495,10 @@ static char *seek(const char *str, char delimiter)
  *              caller
  * \param [in] outputFormat the format of the response to parse
  * \param [in] response the response to parse
- * \return RBRGEN4_SUCCESS if the response is a sample
- * \return RBRGEN4_INVALID_PARAMETER_VALUE if the response does not follow the specified output
+ * \return #RBRGEN4_SUCCESS when the response is a sample
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the response does not follow the specified output
  *         format
- * \return RBRGEN4_CHECKSUM_ERROR if the CRC does not match
+ * \return #RBRGEN4_CHECKSUM_ERROR when the CRC does not match
  */
 static RBRGen4Error RBRGen4Sample_parse(RBRGen4Sample *sample, RBRGen4OutputFormat *outputFormat,
                                         char *response)
@@ -621,8 +621,8 @@ static RBRGen4Error RBRGen4Sample_parse(RBRGen4Sample *sample, RBRGen4OutputForm
  * \param [in] conn the instrument connection
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
- * \return #RBRGEN4_SUCCESS when the response is a warning or success
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN4_SUCCESS when the response is neither a warning nor an error
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error or a warning
  */
 RBRGen4Error RBRGen4_errorCheckResponse(RBRGen4 *conn, char *beginning, char *end)
 {

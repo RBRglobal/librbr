@@ -194,7 +194,7 @@ RBRGen4Error RBRGen4_appendLabelList(RBRGen4 *conn, const RBRGen4LabelList *labe
  * \param [in] startTime when the caller began waiting for this response
  * \param [in] timeout the longest to wait, in milliseconds, from \a startTime
  * \return #RBRGEN4_SUCCESS when a response was successfully read
- * \return #RBRGEN4_SAMPLE when a sample is read and \a sample is given
+ * \return #RBRGEN4_SAMPLE when a sample is read and \a breakOnSample is true
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when the response exceeds the buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -377,8 +377,8 @@ void RBRGen4_parseResponse(RBRGen4 *conn, char **command, RBRGen4ResponseParamet
  * \param [in] conn the instrument connection
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
- * \return #RBRGEN4_SUCCESS when the response is a warning or success
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN4_SUCCESS when the response is neither a warning nor an error
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error or a warning
  */
 RBRGen4Error RBRGen4_errorCheckResponse(RBRGen4 *conn, char *beginning, char *end);
 

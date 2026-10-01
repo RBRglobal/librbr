@@ -210,6 +210,7 @@ RBRGen4Error RBRGen4_setLinkSerial(RBRGen4 *conn, const RBRGen4LinkSerial *seria
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the instrument has been put to sleep
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  */
 RBRGen4Error RBRGen4_sleep(RBRGen4 *conn);

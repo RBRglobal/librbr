@@ -263,8 +263,8 @@ typedef struct RBRGen4ChannelPool {
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist, or another hardware error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_getChannelPool()
  * \see RBRGen4_setChannel()
  */
@@ -309,11 +309,11 @@ RBRGen4Error RBRGen4_setChannel(RBRGen4 *conn, const RBRGen4Channel *channel);
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the channel pool cannot be read, or another hardware error
+ *         occurs
  * \return #RBRGEN4_TRUNCATED when \a channelPool cannot hold every reported channel; the first
  *         `size` are stored
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a channelPool has no storage
- * \return #RBRGEN4_HARDWARE_ERROR when the channel pool cannot be read, or another hardware error
- *         occurs
  * \see RBRGen4_getChannelPoolByNature()
  */
 RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPool);
@@ -618,11 +618,11 @@ typedef struct RBRGen4Group {
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
- *         \a channelList is given without storage
+ * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist, or another hardware error occurs
  * \return #RBRGEN4_TRUNCATED when \a channelList cannot hold every reported channel; the first
  *         `size` are stored
- * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist, or another hardware error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
+ *         \a channelList is given without storage
  * \see RBRGen4_getGroupPool()
  * \see RBRGen4_setGroup()
  */
@@ -978,12 +978,12 @@ typedef struct RBRGen4Schedule {
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
- *         \a groupList is given without storage
- * \return #RBRGEN4_TRUNCATED when \a groupList cannot hold every reported group; the first `size`
- *         are stored
  * \return #RBRGEN4_HARDWARE_ERROR when the schedule does not exist, or another hardware error
  *         occurs
+ * \return #RBRGEN4_TRUNCATED when \a groupList cannot hold every reported group; the first `size`
+ *         are stored
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
+ *         \a groupList is given without storage
  * \see RBRGen4_getSchedulePool()
  * \see RBRGen4_setSchedule()
  */
@@ -1125,7 +1125,8 @@ RBRGen4Error RBRGen4_getScheduleMaxCount(RBRGen4 *conn, int32_t *maxCount);
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when it cannot be created, or another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the schedule cannot be created, or another hardware error
+ *         occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteSchedule()
  */
@@ -1143,7 +1144,8 @@ RBRGen4Error RBRGen4_createSchedule(RBRGen4 *conn, const char *label);
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when it does not exist, or another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the schedule does not exist, or another hardware error
+ *         occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteScheduleAll()
  * \see RBRGen4_createSchedule()
@@ -1156,7 +1158,7 @@ RBRGen4Error RBRGen4_deleteSchedule(RBRGen4 *conn, const char *label);
  * \command{schedule delete all}
  *
  * \param [in] conn the instrument connection
- * \return #RBRGEN4_SUCCESS when the schedules are deleted
+ * \return #RBRGEN4_SUCCESS when the schedules are successfully deleted
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
@@ -1199,12 +1201,12 @@ typedef struct RBRGen4Config {
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
- *         \a scheduleList is given without storage
- * \return #RBRGEN4_TRUNCATED when \a scheduleList cannot hold every reported schedule; the first
- *         `size` are stored
  * \return #RBRGEN4_HARDWARE_ERROR when the configuration does not exist, or another hardware error
  *         occurs
+ * \return #RBRGEN4_TRUNCATED when \a scheduleList cannot hold every reported schedule; the first
+ *         `size` are stored
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
+ *         \a scheduleList is given without storage
  * \see RBRGen4_getConfigPool()
  * \see RBRGen4_setConfig()
  */
@@ -1329,12 +1331,13 @@ RBRGen4Error RBRGen4_getConfigMaxCount(RBRGen4 *conn, int32_t *maxCount);
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label to give the new configuration
- * \return #RBRGEN4_SUCCESS when the configuration is created
+ * \return #RBRGEN4_SUCCESS when the configuration is successfully created
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when it cannot be created, or another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the configuration cannot be created, or another hardware
+ *         error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteConfig()
  */
@@ -1347,12 +1350,13 @@ RBRGen4Error RBRGen4_createConfig(RBRGen4 *conn, const char *label);
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label of the configuration to delete
- * \return #RBRGEN4_SUCCESS when the configuration is deleted
+ * \return #RBRGEN4_SUCCESS when the configuration is successfully deleted
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when it does not exist, or another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the configuration does not exist, or another hardware
+ *         error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteConfigAll()
  * \see RBRGen4_createConfig()
@@ -1365,7 +1369,7 @@ RBRGen4Error RBRGen4_deleteConfig(RBRGen4 *conn, const char *label);
  * \command{config delete all}
  *
  * \param [in] conn the instrument connection
- * \return #RBRGEN4_SUCCESS when the configurations are deleted
+ * \return #RBRGEN4_SUCCESS when the configurations are successfully deleted
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer

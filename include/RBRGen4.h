@@ -694,13 +694,12 @@ typedef struct RBRGen4Response {
      * \brief The type of this response: informational, warning, or error.
      *
      * Successful commands, as indicated by the command having returned
-     * #RBRGEN4_SUCCESS, may yield informational or warning responses
-     * (types #RBRGEN4_RESPONSE_INFO and #RBRGEN4_RESPONSE_WARNING,
-     * respectively). Commands having resulted in a hardware error will return
-     * #RBRGEN4_HARDWARE_ERROR and yield an error response (type
-     * #RBRGEN4_RESPONSE_ERROR). In any other case, the response is
-     * unpopulated and its contents are irrelevant (type
-     * #RBRGEN4_RESPONSE_UNKNOWN_TYPE).
+     * #RBRGEN4_SUCCESS, yield informational responses (type
+     * #RBRGEN4_RESPONSE_INFO). Commands having resulted in a hardware error
+     * will return #RBRGEN4_HARDWARE_ERROR and yield an error or warning
+     * response (types #RBRGEN4_RESPONSE_ERROR and #RBRGEN4_RESPONSE_WARNING,
+     * respectively). In any other case, the response is unpopulated and its
+     * contents are irrelevant (type #RBRGEN4_RESPONSE_UNKNOWN_TYPE).
      *
      * - Informational responses will provide only a response (number as `0`).
      * - Warnings and errors will provide a number and occasionally a response.
@@ -889,8 +888,8 @@ typedef struct RBRGen4 {
  * \return #RBRGEN4_RESPONSE_TOO_LONG when the response buffer cannot hold the instrument's reply
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument rejects the opening command, or another
- *         hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument rejects the `instrument outputformat`
+ *         command, or another hardware error occurs
  * \return #RBRGEN4_UNSUPPORTED when the instrument is unsupported
  * \see RBRGen4_close()
  */

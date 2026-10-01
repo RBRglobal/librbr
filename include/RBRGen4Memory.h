@@ -255,11 +255,11 @@ RBRGen4Error RBRGen4_getDatasetMaxCount(RBRGen4 *conn, int32_t *maxCount);
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
- *         \a scheduleList is given without storage
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another hardware error occurs
  * \return #RBRGEN4_TRUNCATED when \a scheduleList cannot hold every reported schedule; the first
  *         `size` are stored
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another hardware error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
+ *         \a scheduleList is given without storage
  * \see RBRGen4_getDatasetPool()
  */
 RBRGen4Error RBRGen4_getDataset(RBRGen4 *conn, RBRGen4Dataset *dataset,
@@ -325,8 +325,8 @@ typedef struct RBRGen4DatasetDataBlock {
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another hardware error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4DatasetEventsBlock
  */
 RBRGen4Error RBRGen4_getDatasetEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
@@ -345,8 +345,8 @@ RBRGen4Error RBRGen4_getDatasetEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another hardware error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4DatasetMetaBlock
  */
 RBRGen4Error RBRGen4_getDatasetMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
@@ -367,9 +367,9 @@ RBRGen4Error RBRGen4_getDatasetMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *da
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is empty
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist, or another hardware
  *         error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is empty
  * \see RBRGen4DatasetScheduleBlock
  */
 RBRGen4Error RBRGen4_getDatasetScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
@@ -390,9 +390,9 @@ RBRGen4Error RBRGen4_getDatasetScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is empty
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist, or another hardware
  *         error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is empty
  * \see RBRGen4DatasetEventsBlock
  */
 RBRGen4Error RBRGen4_getDatasetScheduleEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
@@ -414,9 +414,9 @@ RBRGen4Error RBRGen4_getDatasetScheduleEventsBlock(RBRGen4 *conn, const RBRGen4D
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is empty
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist, or another hardware
  *         error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is empty
  * \see RBRGen4DatasetDataBlock
  */
 RBRGen4Error RBRGen4_getDatasetScheduleDataBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
@@ -435,8 +435,8 @@ RBRGen4Error RBRGen4_getDatasetScheduleDataBlock(RBRGen4 *conn, const RBRGen4Dat
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another hardware error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteDatasetAll()
  */
 RBRGen4Error RBRGen4_deleteDataset(RBRGen4 *conn, const char *label);
