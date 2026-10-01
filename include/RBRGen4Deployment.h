@@ -176,6 +176,9 @@ typedef struct RBRGen4Deployment {
  *
  * \command{deployment}
  *
+ * \note RBRGen4Deployment.startTime is 0 when the instrument does not report a start time, as when
+ * RBRGen4Deployment.gate is not #RBRGEN4_DEPLOYMENT_GATE_TIME.
+ *
  * \param [in] conn the instrument connection
  * \param [out] deployment the deployment parameters
  * \return #RBRGEN4_SUCCESS when the deployment is successfully read
@@ -192,7 +195,7 @@ RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment)
  *
  * \command{deployment}
  *
- * RBRGen4Deployment.startTime is sent only when
+ * \note RBRGen4Deployment.startTime is sent only when
  * RBRGen4Deployment.gate is #RBRGEN4_DEPLOYMENT_GATE_TIME.
  * RBRGen4Deployment.status and
  * RBRGen4Deployment.simulation are never sent.

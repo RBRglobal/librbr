@@ -112,9 +112,6 @@ const char *RBRGen4LinkSerialBaudRate_name(RBRGen4LinkSerialBaudRate baud);
 /**
  * \brief Instrument serial modes.
  *
- * All modes are 8N1, use no flow control, and are full-duplex unless otherwise
- * noted.
- *
  * \see RBRGen4LinkSerial
  * \see RBRGen4_getLinkSerial()
  * \see RBRGen4_setLinkSerial()
@@ -177,17 +174,12 @@ RBRGen4Error RBRGen4_getLinkSerial(RBRGen4 *conn, RBRGen4LinkSerial *serial);
  *
  * \command{link serial}
  *
- * Every parameter of the command is sent, so \a serial must be fully
- * populated: read the current parameters with
- * RBRGen4_getLinkSerial() and modify them if only one is of
- * interest.
+ * Every parameter of the command is sent, so \a serial must be fully populated: read the current
+ * parameters with RBRGen4_getLinkSerial() and modify them if only one is of interest.
  *
- * A hardware error will occur if the baud rate or mode is unsupported by the
- * instrument.
- *
- * The new serial mode and/or baud rate will take effect immediately after the
- * response to this command has been produced. Make sure you alter the
- * configuration of your connection to the instrument correspondingly.
+ * \warning The new serial mode and/or baud rate will take effect immediately after the response to
+ * this command has been produced. Make sure you alter the configuration of your connection to the
+ * instrument correspondingly.
  *
  * \param [in] conn the instrument connection
  * \param [in] serial the new serial parameters

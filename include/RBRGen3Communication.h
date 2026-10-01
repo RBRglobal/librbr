@@ -120,9 +120,6 @@ const char *RBRGen3SerialBaudRate_name(RBRGen3SerialBaudRate baud);
 /**
  * \brief Instrument serial modes.
  *
- * All modes are 8N1, use no flow control, and are full-duplex unless otherwise
- * noted.
- *
  * \see RBRGen3Serial
  * \see RBRGen3_getSerial()
  * \see RBRGen3_setSerial()

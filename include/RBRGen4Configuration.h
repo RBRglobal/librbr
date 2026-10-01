@@ -99,17 +99,13 @@ typedef struct RBRGen4Calibration {
     /** \brief The number of a coefficients the equation uses. */
     int32_t aCount;
 
-    /** \brief The a coefficients, which any user may change. */
+    /** \brief The a coefficients. */
     float a[RBRGEN4_CALIBRATION_COEFFICIENT_MAX];
 
     /** \brief The number of b coefficients the equation uses. */
     int32_t bCount;
 
-    /**
-     * \brief The b coefficients.
-     *
-     * \warning Intended to be changed by RBR or an expert user only.
-     */
+    /** \brief The b coefficients. */
     float b[RBRGEN4_CALIBRATION_COEFFICIENT_MAX];
 
     /** \brief The number of m references the equation uses. */
@@ -393,9 +389,6 @@ RBRGen4Error RBRGen4_getCalibration(RBRGen4 *conn, RBRGen4Calibration *calibrati
  * The equation is read-only and never sent; the instrument rejects a write to
  * it.
  *
- * \warning Hardware errors may occur if the instrument is logging, a coefficient is out of range
- * for the equation, or an m reference does not name something the equation can use.
- *
  * \param [in] conn the instrument connection
  * \param [in] calibration the calibration to write, selected by its label
  * \return #RBRGEN4_SUCCESS when the calibration is successfully written
@@ -568,8 +561,6 @@ RBRGen4Error RBRGen4_getParameters(RBRGen4 *conn, RBRGen4Parameters *parameters)
  * \brief Set parameters which may be required when computing calibrated output.
  *
  * \command{parameters}
- *
- * \warning Hardware errors may occur if the instrument is logging.
  *
  * \param [in] conn the instrument connection
  * \param [in] parameters the values for the parameters in the logger
