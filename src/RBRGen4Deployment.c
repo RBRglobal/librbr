@@ -18,8 +18,6 @@
 #include <string.h>
 /* Required for snprintf. */
 #include <stdio.h>
-/* Required for PRId32. */
-#include <inttypes.h>
 
 #include "RBRGen4.h"
 #include "RBRGen4Internal.h"

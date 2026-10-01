@@ -10,7 +10,7 @@
  * \brief Library implementation.
  */
 
-/* Required for memcpy, memset, strcmp, strstr. */
+/* Required for memcpy, memset, strcmp. */
 #include <string.h>
 /* Required for snprintf. */
 #include <stdio.h>
