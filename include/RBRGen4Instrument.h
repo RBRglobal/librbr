@@ -89,7 +89,7 @@ typedef enum RBRGen4PowerSource {
     /** The number of specific power sources. */
     RBRGEN4_POWER_SOURCE_COUNT,
     /** An unknown or unrecognized power source. */
-    RBRGEN4_POWER_SOURCE_UNKNOWN
+    RBRGEN4_UNKNOWN_POWER_SOURCE
 } RBRGen4PowerSource;
 
 /**

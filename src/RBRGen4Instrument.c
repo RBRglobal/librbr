@@ -80,6 +80,7 @@ const char *RBRGen4PowerSource_name(RBRGen4PowerSource source)
         return "ext";
     case RBRGEN4_POWER_SOURCE_COUNT:
         return "power source count";
+    case RBRGEN4_UNKNOWN_POWER_SOURCE:
     default:
         return "unknown power source";
     }
@@ -87,7 +88,7 @@ const char *RBRGen4PowerSource_name(RBRGen4PowerSource source)
 
 RBRGen4Error RBRGen4_getPowerSource(RBRGen4 *conn, RBRGen4PowerSource *powerSource)
 {
-    *powerSource = RBRGEN4_POWER_SOURCE_UNKNOWN;
+    *powerSource = RBRGEN4_UNKNOWN_POWER_SOURCE;
 
     RBR_TRY(RBRGen4_converse(conn, "instrument power"));
 
