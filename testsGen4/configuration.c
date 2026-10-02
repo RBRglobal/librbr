@@ -2341,7 +2341,7 @@ TEST_LOGGER4(scheduleSetCommandTooLong)
     TestIOBuffers_init(buffers, "", 0);
 
     RBRGen4Error err = RBRGen4_setSchedule(conn, &schedule, &groupList);
-    TEST_ASSERT_ENUM_EQ(RBRGEN4_BUFFER_TOO_SMALL, err, RBRGen4Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_COMMAND_TOO_LONG, err, RBRGen4Error);
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;

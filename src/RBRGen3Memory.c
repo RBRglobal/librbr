@@ -652,7 +652,7 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
             RBRGen3PostprocessingAggregate_name(channelsList->channels[channel].function);
         if (3 + strlen(functionName) + strlen(channelsList->channels[channel].label) >=
             (size_t) conn->environment.commandCapacity) {
-            return RBRGEN3_BUFFER_TOO_SMALL;
+            return RBRGEN3_COMMAND_TOO_LONG;
         }
     }
 
@@ -698,8 +698,10 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
      * by looping on RBRGen3_readResponse(). */
     char *command = NULL;
     RBRGen3ResponseParameter parameter;
+    RBRGen3DateTime now;
     while (true) {
-        RBR_TRY(RBRGen3_readResponse(conn, false, NULL));
+        RBR_TRY(conn->environment.time(conn, &now));
+        RBR_TRY(RBRGen3_readResponse(conn, false, NULL, now));
         RBRGen3_parseResponse(conn, &command, &parameter);
         if (strcmp(command, "postprocessing") == 0) {
             break;

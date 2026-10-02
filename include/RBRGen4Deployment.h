@@ -49,6 +49,8 @@ typedef struct RBRGen4Clock {
  * \param [out] clock the clock value
  * \return #RBRGEN4_SUCCESS when the settings are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_setClock()
  */
@@ -62,6 +64,8 @@ RBRGen4Error RBRGen4_getClock(RBRGen4 *conn, RBRGen4Clock *clock);
  * \param [in] clock the clock value
  * \return #RBRGEN4_SUCCESS when the settings are successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the settings cannot be changed, or
  *                                      another hardware error occurs
@@ -175,6 +179,8 @@ typedef struct RBRGen4Deployment {
  * \param [out] deployment the deployment parameters
  * \return #RBRGEN4_SUCCESS when the deployment is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_setDeployment()
  */
@@ -194,6 +200,8 @@ RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment)
  * \return #RBRGEN4_SUCCESS when the deployment is successfully
  *         changed
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the deployment cannot be changed, or
  *                                      another hardware error occurs
@@ -214,6 +222,8 @@ RBRGen4Error RBRGen4_setDeployment(RBRGen4 *conn, const RBRGen4Deployment *deplo
  *                     succeeds
  * \return #RBRGEN4_SUCCESS when the deployment is paused
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not enabled, or
  *                                      another hardware error occurs
@@ -230,6 +240,8 @@ RBRGen4Error RBRGen4_pause(RBRGen4 *conn, RBRGen4DeploymentStatus *status);
  *                     succeeds
  * \return #RBRGEN4_SUCCESS when the deployment is resumed
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not enabled, or
  *                                      another hardware error occurs
@@ -281,6 +293,8 @@ const char *RBRGen4DeploymentStorageMode_name(RBRGen4DeploymentStorageMode stora
  *                    the command succeeds
  * \return #RBRGEN4_SUCCESS when the checks all pass
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when a check fails, or another hardware
  *                                      error occurs
@@ -311,6 +325,8 @@ RBRGen4Error RBRGen4_verify(RBRGen4 *conn, const RBRGen4Config *config, const ch
  *                    succeeds
  * \return #RBRGEN4_SUCCESS when the instrument is enabled
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument cannot be enabled, or
  *                                      another hardware error occurs
@@ -337,6 +353,8 @@ RBRGen4Error RBRGen4_enable(RBRGen4 *conn, const RBRGen4Config *config, const ch
  *                    succeeds
  * \return #RBRGEN4_SUCCESS when the deployment is terminated
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the instrument was not enabled, or
  *                                      another hardware error occurs

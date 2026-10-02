@@ -48,6 +48,10 @@ const char *RBRGen4Error_name(RBRGen4Error error)
         return "success";
     case RBRGEN4_BUFFER_TOO_SMALL:
         return "buffer too small";
+    case RBRGEN4_COMMAND_TOO_LONG:
+        return "command too long";
+    case RBRGEN4_RESPONSE_TOO_LONG:
+        return "response too long";
     case RBRGEN4_MISSING_CALLBACK:
         return "missing callback";
     case RBRGEN4_CALLBACK_ERROR:

@@ -89,7 +89,7 @@ RBRGen4Error RBRGen4_getCalibration(RBRGen4 *conn, RBRGen4Calibration *calibrati
 /**
  * \brief Append one `<group><index>=<value>` coefficient to a command.
  *
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the coefficient does not
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the coefficient does not
  *                                             fit
  */
 static RBRGen4Error RBRGen4Calibration_appendCoefficient(char *command, int32_t size,
@@ -99,14 +99,14 @@ static RBRGen4Error RBRGen4Calibration_appendCoefficient(char *command, int32_t 
     /* Checked before appending: the remaining space is only meaningful while
      * the length is still within the buffer. */
     if (*length < 0 || *length >= size) {
-        return RBRGEN4_BUFFER_TOO_SMALL;
+        return RBRGEN4_COMMAND_TOO_LONG;
     }
 
     int32_t written = snprintf(
         command + *length, size - *length, " %c%" PRId32 "=%.9g", group, index, (double) value);
 
     if (written < 0 || *length + written >= size) {
-        return RBRGEN4_BUFFER_TOO_SMALL;
+        return RBRGEN4_COMMAND_TOO_LONG;
     }
 
     *length += written;
@@ -119,13 +119,13 @@ static RBRGen4Error RBRGen4Calibration_appendCoefficient(char *command, int32_t 
  * An empty label is sent as `none`, which is how the instrument reports a
  * reference the equation does not use.
  *
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the reference does not fit
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the reference does not fit
  */
 static RBRGen4Error RBRGen4Calibration_appendReference(char *command, int32_t size, int32_t *length,
                                                        int32_t index, const char *label)
 {
     if (*length < 0 || *length >= size) {
-        return RBRGEN4_BUFFER_TOO_SMALL;
+        return RBRGEN4_COMMAND_TOO_LONG;
     }
 
     int32_t written = snprintf(command + *length,
@@ -135,7 +135,7 @@ static RBRGen4Error RBRGen4Calibration_appendReference(char *command, int32_t si
                                label[0] == '\0' ? "none" : label);
 
     if (written < 0 || *length + written >= size) {
-        return RBRGEN4_BUFFER_TOO_SMALL;
+        return RBRGEN4_COMMAND_TOO_LONG;
     }
 
     *length += written;

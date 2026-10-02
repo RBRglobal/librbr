@@ -264,6 +264,8 @@ typedef struct RBRGen4ChannelPool {
  * \param [in,out] channel the channel to read, selected by its label
  * \return #RBRGEN4_SUCCESS when the channel is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist, or another
@@ -287,6 +289,8 @@ RBRGen4Error RBRGen4_getChannel(RBRGen4 *conn, RBRGen4Channel *channel);
  * \param [in] channel the channel to write, selected by its label
  * \return #RBRGEN4_SUCCESS when the channel is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the channel cannot be changed, or
  *                                      another hardware error occurs
@@ -307,6 +311,8 @@ RBRGen4Error RBRGen4_setChannel(RBRGen4 *conn, const RBRGen4Channel *channel);
  * \param [in,out] channelPool the channels present, labels only
  * \return #RBRGEN4_SUCCESS when the pool is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_TRUNCATED when \a channelPool cannot hold every
  *                            reported channel; the first `size` are
@@ -331,6 +337,8 @@ RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPo
  * \param [in,out] channelPool the channels present, labels only
  * \return #RBRGEN4_SUCCESS when the pool is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_TRUNCATED when \a channelPool cannot hold every
  *                            reported channel; the first `size` are
@@ -355,6 +363,8 @@ RBRGen4Error RBRGen4_getChannelPoolByNature(RBRGen4 *conn, RBRGen4ChannelNature 
  * \param [out] count the number of channels present
  * \return #RBRGEN4_SUCCESS when the count is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
  *                                 hardware error occurs
@@ -373,6 +383,8 @@ RBRGen4Error RBRGen4_getChannelCount(RBRGen4 *conn, int32_t *count);
  * \param [in,out] calibration the calibration to read, selected by its label
  * \return #RBRGEN4_SUCCESS when the calibration is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist, or another
  *                                      hardware error occurs
@@ -400,6 +412,8 @@ RBRGen4Error RBRGen4_getCalibration(RBRGen4 *conn, RBRGen4Calibration *calibrati
  * \return #RBRGEN4_SUCCESS when the calibration is successfully
  *                                    written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the calibration cannot be changed, or
  *                                      another hardware error occurs
@@ -476,6 +490,8 @@ typedef struct RBRGen4Settings {
  * \param [out] settings the logger settings
  * \return #RBRGEN4_SUCCESS when the setting is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_setSettings()
  */
@@ -494,6 +510,8 @@ RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings);
  * \param [in] settings the values for the settings in the logger
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the settings cannot be changed, or when
  *                                      a parameter is set where the instrument
@@ -556,6 +574,8 @@ typedef struct RBRGen4Parameters {
  * \param [out] parameters the parameters in the logger
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_setParameters()
  */
@@ -572,6 +592,8 @@ RBRGen4Error RBRGen4_getParameters(RBRGen4 *conn, RBRGen4Parameters *parameters)
  * \return #RBRGEN4_SUCCESS when the parameters are successfully
  *                                    written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the parameters cannot be changed, or
  *                                      another hardware error occurs
@@ -609,6 +631,8 @@ typedef struct RBRGen4Group {
  * \param [out] channelList the channels in the group, or `NULL` to skip them
  * \return #RBRGEN4_SUCCESS when the group is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
  *         \a channelList is given without storage
@@ -635,6 +659,8 @@ RBRGen4Error RBRGen4_getGroup(RBRGen4 *conn, RBRGen4Group *group, RBRGen4LabelLi
  * \param [in] channelList the channels to put in the group
  * \return #RBRGEN4_SUCCESS when the group is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be written, or another
  *                                      hardware error occurs
@@ -643,7 +669,7 @@ RBRGen4Error RBRGen4_getGroup(RBRGen4 *conn, RBRGen4Group *group, RBRGen4LabelLi
  *                                          its length does not fit
  *                                          its array, or a channel
  *                                          label is empty
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the
  *                                            command
  * \see RBRGen4_getGroup()
  */
@@ -684,6 +710,8 @@ typedef struct RBRGen4GroupPool {
  * \param [in,out] groupPool the groups defined, labels only
  * \return #RBRGEN4_SUCCESS when the groups are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_TRUNCATED when \a groupPool cannot hold every
  *                            reported group; the first `size` are
@@ -702,6 +730,8 @@ RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool);
  * \param [out] count the number of groups defined
  * \return #RBRGEN4_SUCCESS when the count is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
  *                                 hardware error occurs
@@ -719,6 +749,8 @@ RBRGen4Error RBRGen4_getGroupCount(RBRGen4 *conn, int32_t *count);
  * \param [out] maxCount the maximum number of groups
  * \return #RBRGEN4_SUCCESS when the maximum is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another
  *                                 hardware error occurs
@@ -737,6 +769,8 @@ RBRGen4Error RBRGen4_getGroupMaxCount(RBRGen4 *conn, int32_t *maxCount);
  * \param [in] label the label to give the new group
  * \return #RBRGEN4_SUCCESS when the group is successfully created
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be created, or another
  *                                      hardware error occurs
@@ -754,6 +788,8 @@ RBRGen4Error RBRGen4_createGroup(RBRGen4 *conn, const char *label);
  * \param [in] label the label of the group to delete
  * \return #RBRGEN4_SUCCESS when the group is successfully deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist, or another
  *                                      hardware error occurs
@@ -770,6 +806,8 @@ RBRGen4Error RBRGen4_deleteGroup(RBRGen4 *conn, const char *label);
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the groups are successfully deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_deleteGroup()
  */
@@ -961,6 +999,8 @@ typedef struct RBRGen4Schedule {
  *                        them
  * \return #RBRGEN4_SUCCESS when the schedule is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
  *         \a groupList is given without storage
@@ -991,6 +1031,8 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
  *                       them as they are
  * \return #RBRGEN4_SUCCESS when the schedule is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the schedule cannot be written, or when
  *                                      a parameter is set where the instrument
@@ -1006,7 +1048,7 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
  *                                          single known flag
  * \return #RBRGEN4_UNSUPPORTED when the mode is `ddsampling` or
  *                                        `regimes`
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the command does not fit
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit
  * \see RBRGen4_getSchedule()
  */
 RBRGen4Error RBRGen4_setSchedule(RBRGen4 *conn, const RBRGen4Schedule *schedule,
@@ -1058,6 +1100,8 @@ const char *RBRGen4ScheduleMode_name(RBRGen4ScheduleMode mode);
  * \param [in,out] schedulePool the schedules defined, labels only
  * \return #RBRGEN4_SUCCESS when the schedules are successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_TRUNCATED when \a schedulePool cannot hold every
  *                            reported schedule; the first `size` are
@@ -1076,6 +1120,8 @@ RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedul
  * \param [out] count the number of schedules defined
  * \return #RBRGEN4_SUCCESS when the count is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
  *                                 hardware error occurs
@@ -1093,6 +1139,8 @@ RBRGen4Error RBRGen4_getScheduleCount(RBRGen4 *conn, int32_t *count);
  * \param [out] maxCount the maximum number of schedules
  * \return #RBRGEN4_SUCCESS when the maximum is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another
  *                                 hardware error occurs
@@ -1111,6 +1159,8 @@ RBRGen4Error RBRGen4_getScheduleMaxCount(RBRGen4 *conn, int32_t *maxCount);
  * \param [in] label the label to give the new schedule
  * \return #RBRGEN4_SUCCESS when the schedule is successfully created
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when it cannot be created, or another
  *                                      hardware error occurs
@@ -1128,6 +1178,8 @@ RBRGen4Error RBRGen4_createSchedule(RBRGen4 *conn, const char *label);
  * \param [in] label the label of the schedule to delete
  * \return #RBRGEN4_SUCCESS when the schedule is successfully deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when it does not exist, or another hardware
  *                                      error occurs
@@ -1144,6 +1196,8 @@ RBRGen4Error RBRGen4_deleteSchedule(RBRGen4 *conn, const char *label);
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the schedules are deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_deleteSchedule()
  */
@@ -1180,6 +1234,8 @@ typedef struct RBRGen4Config {
  *                           skip them
  * \return #RBRGEN4_SUCCESS when the configuration is read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
  *         \a scheduleList is given without storage
@@ -1207,6 +1263,8 @@ RBRGen4Error RBRGen4_getConfig(RBRGen4 *conn, RBRGen4Config *config,
  * \param [in] scheduleList the schedules to put in the configuration
  * \return #RBRGEN4_SUCCESS when the configuration is written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the configuration cannot be written, or
  *                                      another hardware error occurs
@@ -1215,7 +1273,7 @@ RBRGen4Error RBRGen4_getConfig(RBRGen4 *conn, RBRGen4Config *config,
  *                                          `NULL`, its length does
  *                                          not fit its array, or a
  *                                          schedule label is empty
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the
  *                                            command
  * \see RBRGen4_getConfig()
  */
@@ -1257,6 +1315,8 @@ typedef struct RBRGen4ConfigPool {
  * \param [in,out] configPool the configurations defined, labels only
  * \return #RBRGEN4_SUCCESS when the configurations are read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_TRUNCATED when \a configPool cannot hold every
  *                            reported configuration; the first
@@ -1275,6 +1335,8 @@ RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool)
  * \param [out] count the number of configurations defined
  * \return #RBRGEN4_SUCCESS when the count is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
  *                                 hardware error occurs
@@ -1292,6 +1354,8 @@ RBRGen4Error RBRGen4_getConfigCount(RBRGen4 *conn, int32_t *count);
  * \param [out] maxCount the maximum number of configurations
  * \return #RBRGEN4_SUCCESS when the maximum is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another
  *                                 hardware error occurs
@@ -1310,6 +1374,8 @@ RBRGen4Error RBRGen4_getConfigMaxCount(RBRGen4 *conn, int32_t *maxCount);
  * \param [in] label the label to give the new configuration
  * \return #RBRGEN4_SUCCESS when the configuration is created
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when it cannot be created, or another
  *                                      hardware error occurs
@@ -1327,6 +1393,8 @@ RBRGen4Error RBRGen4_createConfig(RBRGen4 *conn, const char *label);
  * \param [in] label the label of the configuration to delete
  * \return #RBRGEN4_SUCCESS when the configuration is deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when it does not exist, or another hardware
  *                                      error occurs
@@ -1343,6 +1411,8 @@ RBRGen4Error RBRGen4_deleteConfig(RBRGen4 *conn, const char *label);
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the configurations are deleted
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_deleteConfig()
  */

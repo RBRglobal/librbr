@@ -189,7 +189,7 @@ RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *conn)
      * be. Refuse it before anything, including the wake sequence, goes out.
      */
     if (conn->commandBufferLength >= conn->environment.commandCapacity) {
-        return RBRGEN3_BUFFER_TOO_SMALL;
+        return RBRGEN3_COMMAND_TOO_LONG;
     }
 
     /* Wake the instrument if necessary. */
@@ -215,7 +215,7 @@ static RBRGen3Error RBRGen3_vSendCommand(RBRGen3 *conn, const char *command, va_
      * write is commandBufferCapacity - 1 bytes. */
     if (conn->commandBufferLength >= conn->environment.commandCapacity) {
         conn->commandBufferLength = conn->environment.commandCapacity;
-        return RBRGEN3_BUFFER_TOO_SMALL;
+        return RBRGEN3_COMMAND_TOO_LONG;
     }
 
     /* Make sure the command is LF-terminated. */
@@ -227,7 +227,7 @@ static RBRGen3Error RBRGen3_vSendCommand(RBRGen3 *conn, const char *command, va_
         /* It isn't. Make sure there's room before adding it. */
         if (conn->commandBufferLength + RBRGEN3_SEND_COMMAND_TERMINATOR_LEN >=
             conn->environment.commandCapacity) {
-            return RBRGEN3_BUFFER_TOO_SMALL;
+            return RBRGEN3_COMMAND_TOO_LONG;
         }
 
         memcpy(conn->environment.command + conn->commandBufferLength,
@@ -277,6 +277,7 @@ static void RBRGen3_removeLastResponse(RBRGen3 *conn)
  * \param [in] startTime when we started trying to read the command response
  * \param [out] end the end of the response within the response buffer
  * \return #RBRGEN3_SUCCESS when data is successfully read
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when the response exceeds the buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
  */
@@ -284,10 +285,30 @@ static RBRGen3Error RBRGen3_readSingleResponse(RBRGen3 *conn, RBRGen3DateTime st
 {
     RBRGen3DateTime now;
     int32_t readLength;
+    RBRGen3Error err = RBRGEN3_SUCCESS;
+    /* Whether the line being read has already overflowed the buffer. */
+    bool overflowed = false;
     while ((*end = (char *) rbr_memmem(conn->environment.response,
                                        conn->responseBufferLength,
                                        RBRGEN3_COMMAND_TERMINATOR,
                                        RBRGEN3_COMMAND_TERMINATOR_LEN)) == NULL) {
+        /*
+         * The buffer is full and the response still hasn't ended, so it is
+         * longer than the buffer the caller gave us. Throw out what we have
+         * and keep reading: we'll try to flush the rest of the response here,
+         * so the next interaction with the instrument doesn't have to.
+         */
+        if (conn->responseBufferLength == conn->environment.responseCapacity) {
+            /* The terminator may straddle the reset, so keep its possible
+             * first bytes at the front where the next read continues it. */
+            int32_t kept = RBRGEN3_COMMAND_TERMINATOR_LEN - 1;
+            memmove(conn->environment.response,
+                    conn->environment.response + conn->responseBufferLength - kept,
+                    kept);
+            overflowed = true;
+            conn->responseBufferLength = kept;
+        }
+
         /*
          * If we're not seeing any response at all then the read callback
          * should return a character-level timeout. But if we're reading
@@ -301,32 +322,59 @@ static RBRGen3Error RBRGen3_readSingleResponse(RBRGen3 *conn, RBRGen3DateTime st
          *   responses have been samples. If the command got lost en-route and
          *   the instrument is streaming then we'll keep seeing complete
          *   responses, but none of them will be for the command. Because the
-         *   start time is set in RBRGen3_readResponse(), we have context
-         *   for the total amount of time spent attempting to read a command
-         *   response, not just how long has been spent on _this_ response.
+         *   start time is supplied by the caller of RBRGen3_readResponse(),
+         *   we have context for the total amount of time spent attempting to
+         *   read a command response, not just how long has been spent on
+         *   _this_ response.
          *
          * In either of these cases, we want to give up and indicate a timeout
          * to the caller.
          */
-        RBR_TRY(conn->environment.time(conn, &now));
-        if (now - startTime > conn->commandTimeout) {
-
-            return RBRGEN3_TIMEOUT;
+        if ((err = conn->environment.time(conn, &now)) != RBRGEN3_SUCCESS) {
+            break;
         }
-
-        /* If the buffer is full but doesn't contain a terminator, there's
-         * not much we can do about it: throw out the buffer, then keep
-         * trying to fill it. */
-        if (conn->responseBufferLength == conn->environment.responseCapacity) {
-            conn->responseBufferLength = 0;
-            conn->lastResponseLength = 0;
+        if (now - startTime > conn->commandTimeout) {
+            err = RBRGEN3_TIMEOUT;
+            break;
         }
 
         readLength = conn->environment.responseCapacity - conn->responseBufferLength;
-        RBR_TRY(conn->environment.read(
-            conn, conn->environment.response + conn->responseBufferLength, &readLength));
+        if ((err = conn->environment.read(conn,
+                                          conn->environment.response + conn->responseBufferLength,
+                                          &readLength)) != RBRGEN3_SUCCESS) {
+            break;
+        }
 
         conn->responseBufferLength += readLength;
+    }
+
+    if (err != RBRGEN3_SUCCESS) {
+        if (overflowed && err == RBRGEN3_TIMEOUT) {
+            /*
+             * We hit a timeout while flushing the link after the response
+             * buffer overflowed. We can't know whether the link is broken or
+             * if the response is just taking a really long time to get here.
+             * If it's the latter case, the next call to this function will read
+             * the tail end of this response -- it's up to the caller to verify
+             * that the response starts with the expected command so they can
+             * discard it.
+             */
+            return RBRGEN3_RESPONSE_TOO_LONG;
+        }
+        return err;
+    }
+
+    if (overflowed) {
+        /*
+         * The response buffer overflowed, but we received a response terminator
+         * after flushing it. Mark the tail of the oversized response,
+         * terminator included, as the last response: the next read slides it
+         * off and keeps whatever arrived behind it, exactly as it would for a
+         * response which fit.
+         */
+        conn->lastResponseLength = (int32_t) ((uint8_t *) *end + RBRGEN3_COMMAND_TERMINATOR_LEN -
+                                              conn->environment.response);
+        return RBRGEN3_RESPONSE_TOO_LONG;
     }
 
     return RBRGEN3_SUCCESS;
@@ -565,7 +613,8 @@ RBRGen3Error RBRGen3_errorCheckResponse(RBRGen3 *conn, char *beginning, char *en
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Sample *sample)
+RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Sample *sample,
+                                  RBRGen3DateTime startTime)
 {
     /* Reset the response state. */
     conn->response.type = RBRGEN3_RESPONSE_UNKNOWN_TYPE;
@@ -581,8 +630,6 @@ RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Samp
 
     /* Skip over streaming samples until we find a real command response, or
      * until we exceed the command timeout. */
-    RBRGen3DateTime startTime;
-    RBR_TRY(conn->environment.time(conn, &startTime));
     while (true) {
         RBRGen3_removeLastResponse(conn);
 
@@ -764,11 +811,15 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...)
     /* Keep firing off the command and looking for a response until we find one
      * which matches. */
     bool retry;
+    /* Whether a line too long for the response buffer was met while waiting
+     * for the reply. */
+    bool responseTooLong = false;
     do {
         /* The retry flag might be set on by the “E0102 invalid command” error
          * handling below. It needs to be reset every time we send the command
          * so that we don't accidentally retry infinitely. */
         retry = false;
+        responseTooLong = false;
 
         /* Can't use RBR_TRY anywhere within these while loops because we need
          * to be sure to call va_end() on both va_lists before returning. */
@@ -799,8 +850,32 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...)
             commandResponse = (uint8_t *) "data";
         }
 
+        /* The command timeout bounds the whole wait for the reply, however
+         * many unrelated lines are skipped on the way. */
+        RBRGen3DateTime startTime;
+        err = conn->environment.time(conn, &startTime);
+        if (err != RBRGEN3_SUCCESS) {
+            break;
+        }
+
         do {
-            err = RBRGen3_readResponse(conn, false, NULL);
+            err = RBRGen3_readResponse(conn, false, NULL, startTime);
+            if (err == RBRGEN3_RESPONSE_TOO_LONG) {
+                /* The oversized line may have been a streamed sample rather
+                 * than the reply, so keep waiting. If the reply never comes
+                 * the oversized line most likely was it, and that is what
+                 * gets reported. */
+                responseTooLong = true;
+                continue;
+            }
+
+            /* A line which starts like an error but carries no error number
+             * is not one: most likely the tail of a line which overflowed the
+             * response buffer. It has nothing to do with this command. */
+            if (err == RBRGEN3_HARDWARE_ERROR &&
+                conn->response.error == RBRGEN3_HARDWARE_ERROR_NONE) {
+                continue;
+            }
 
             /*
              * There are a few reasons the instrument might generate an “E0102
@@ -871,6 +946,9 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...)
         } while (
             (conn->response.response == NULL ||
              strncmp(conn->response.response, (const char *) commandResponse, commandLength) != 0));
+        if (err == RBRGEN3_TIMEOUT && responseTooLong) {
+            err = RBRGEN3_RESPONSE_TOO_LONG;
+        }
     } while (retry);
 
     va_end(format);

@@ -60,7 +60,7 @@ RBRGen3Error RBRGen3_fetch(RBRGen3 *conn, RBRGen3LabelsList *channels, bool slee
         for (int32_t channel = 0; channel < channels->len; ++channel) {
             if (1 + strlen(channels->labels[channel]) >=
                 (size_t) conn->environment.commandCapacity) {
-                return RBRGEN3_BUFFER_TOO_SMALL;
+                return RBRGEN3_COMMAND_TOO_LONG;
             }
         }
 
@@ -109,12 +109,14 @@ RBRGen3Error RBRGen3_fetch(RBRGen3 *conn, RBRGen3LabelsList *channels, bool slee
     RBR_TRY(RBRGen3_sendBuffer(conn));
 
     RBRGen3Error err;
+    RBRGen3DateTime now;
     /* RBRGen3_readResponse() returns #RBRGEN3_SAMPLE when a sample
      * is read to the given sample pointer; a return of #RBRGEN3_SUCCESS
      * means that it found some other command response instead, so we'll loop
      * until we get a “failure” value (which we hope is SAMPLE). */
     do {
-        err = RBRGen3_readResponse(conn, true, sample);
+        RBR_TRY(conn->environment.time(conn, &now));
+        err = RBRGen3_readResponse(conn, true, sample, now);
     } while (err == RBRGEN3_SUCCESS);
     /* SAMPLE is what we were hoping for, so we'll translate to SUCCESS. Any
      * other errors can really be errors. */

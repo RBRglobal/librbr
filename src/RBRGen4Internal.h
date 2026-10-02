@@ -95,7 +95,7 @@ extern "C" {
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the command is successfully written
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the buffer is full
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the buffer is full
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \see RBRGen4_sendCommand() to send a string command
@@ -118,7 +118,7 @@ RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *conn);
  * \param [in] conn the instrument connection
  * \param [in] command the command to send as a printf-style format string
  * \return #RBRGEN4_SUCCESS when the command is successfully written
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the formatted command is too
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the formatted command is too
  *                                         large for the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
@@ -161,6 +161,7 @@ RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn, const char *command, ...);
  * \return #RBRGEN4_SUCCESS when a response was successfully read
  * \return #RBRGEN4_SAMPLE when a sample is read and \a sample is given
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when the response exceeds the buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR if the instrument indicated an error
  * \see RBRGen4_sendCommand() to send a command
@@ -180,11 +181,18 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn, bool breakOnSample, RBRGen4Samp
  * from this function means that a timeout was reached waiting for the
  * _correct_ response, not just _any_ response.
  *
+ * A line too long for the response buffer met while waiting is drained and
+ * skipped, since it may be a streamed sample rather than the reply. If the
+ * correct response then never arrives, the oversized line most likely was
+ * it, and #RBRGEN4_RESPONSE_TOO_LONG is returned in place of the timeout.
+ *
  * \param [in] conn the instrument connection
  * \param [in] command the command to send as a printf-style format string
  * \return #RBRGEN4_SUCCESS when the command was successfully sent and a
  *                                response was read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a line too long for the response
+ *         buffer was met and the correct response never arrived
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR if the instrument indicated an error
  * \see RBRGen4_sendCommand() to send a command
@@ -397,7 +405,7 @@ char *RBRGen4_splitListValue(char *value);
  *                                          `NULL`, its length does
  *                                          not fit its array, or a
  *                                          label is empty
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit
  */
 RBRGen4Error RBRGen4_formatLabelList(char *value, int32_t size, const RBRGen4LabelList *labelList);
 

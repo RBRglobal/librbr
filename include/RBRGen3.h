@@ -61,30 +61,17 @@ extern const char *RBRGEN3_LIB_VERSION;
 extern const char *RBRGEN3_LIB_BUILD_DATE;
 
 /**
- * \brief The recommended size of the buffer storing commands destined for the
+ * \brief A reasonable size for the buffer storing commands destined for the
  *        instrument.
  *
- * The buffer must be large enough to hold the largest command you will want
- * to send to the instrument, its terminator (`\r`), and a trailing null byte.
- *
- * The library does not depend on this value: the caller supplies the command
- * buffer and its capacity through RBRGen3Environment. This constant is a
- * recommended size for that buffer.
+ * \see RBRGen3Environment.commandCapacity for how to size the buffer
  */
 #define RBRGEN3_COMMAND_BUFFER_DEFAULT 120
 
 /**
- * \brief The recommended size of the buffer storing instrument responses.
+ * \brief A reasonable size for the buffer storing instrument responses.
  *
- * The buffer must be large enough to hold the largest command response you
- * will want to receive, and the longest streamed sample line if the
- * instrument streams: a line which does not fit is discarded without being
- * reported. This does not include download data, which is read directly into
- * a user-managed buffer.
- *
- * The library does not depend on this value: the caller supplies the response
- * buffer and its capacity through RBRGen3Environment. This constant is a
- * recommended size for that buffer.
+ * \see RBRGen3Environment.responseCapacity for how to size the buffer
  */
 #define RBRGEN3_RESPONSE_BUFFER_DEFAULT 1024
 
@@ -191,8 +178,15 @@ typedef int32_t RBRGen3Period;
 typedef enum RBRGen3Error {
     /** No error. */
     RBRGEN3_SUCCESS,
-    /** The command buffer was too small to hold the outbound command. */
+    /**
+     * A caller-supplied output buffer was too small. Unused by Gen3 today;
+     * kept for parity with #RBRGEN4_BUFFER_TOO_SMALL.
+     */
     RBRGEN3_BUFFER_TOO_SMALL,
+    /** The outbound command does not fit the command buffer. */
+    RBRGEN3_COMMAND_TOO_LONG,
+    /** A response from the instrument did not fit the response buffer. */
+    RBRGEN3_RESPONSE_TOO_LONG,
     /** A required callback function was not provided. */
     RBRGEN3_MISSING_CALLBACK,
     /** An unrecoverable error from within a user callback function. */
@@ -437,11 +431,8 @@ typedef RBRGen3Error (*RBRGen3SampleCallback)(const struct RBRGen3 *conn,
  * and must remain valid until it is closed or they are replaced with
  * RBRGen3_setCommandBuffer() or RBRGen3_setResponseBuffer().
  *
- * The two buffers must not overlap. The command buffer must have room for
- * the longest command, its terminator, and a trailing null byte; a command
- * which does not fit is refused with #RBRGEN3_BUFFER_TOO_SMALL. RBRGen3_fetch()
- * and RBRGen3_setPostprocessing() send their channel lists in several writes
- * when they do not fit, so for them only a single label must fit.
+ * The two buffers must not overlap. See RBRGen3Environment.commandCapacity and
+ * RBRGen3Environment.responseCapacity for how to size each.
  *
  * The command buffer holds nothing between commands and may be shared freely
  * between connections which are never used at the same time.
@@ -500,7 +491,18 @@ typedef struct RBRGen3Environment {
      */
     uint8_t *command;
 
-    /** \brief The capacity of RBRGen3Environment.command in bytes. */
+    /**
+     * \brief The capacity of RBRGen3Environment.command in bytes.
+     *
+     * The buffer must have room for the longest command the application will
+     * send, its terminator, and a trailing null byte. A command which
+     * does not fit is refused with #RBRGEN3_COMMAND_TOO_LONG before anything is
+     * sent. RBRGen3_fetch() and RBRGen3_setPostprocessing() send their channel
+     * lists in several writes when they do not fit, so for them each label,
+     * with its separator, need only fit on its own.
+     *
+     * \see RBRGEN3_COMMAND_BUFFER_DEFAULT for a reasonable size
+     */
     int32_t commandCapacity;
 
     /**
@@ -513,7 +515,21 @@ typedef struct RBRGen3Environment {
      */
     uint8_t *response;
 
-    /** \brief The capacity of RBRGen3Environment.response in bytes. */
+    /**
+     * \brief The capacity of RBRGen3Environment.response in bytes.
+     *
+     * The buffer must be large enough to hold the largest command response the
+     * application will want to receive, and the longest streamed sample line
+     * if the instrument streams. libRBR functions that converse with the
+     * instrument fail with #RBRGEN3_RESPONSE_TOO_LONG when the response buffer
+     * isn't large enough. An application that wants a clean link after such a
+     * failure should flush its transport before the next command.
+     *
+     * The response buffer does not need to be sized for downloading data, as
+     * downloads use their own dedicated buffer.
+     *
+     * \see RBRGEN3_RESPONSE_BUFFER_DEFAULT for a reasonable size
+     */
     int32_t responseCapacity;
 } RBRGen3Environment;
 
@@ -720,6 +736,10 @@ typedef struct RBRGen3 {
  *         provided
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE if a buffer is missing or empty,
  *         or RBRGen3Environment.sampleBuffer has no readings storage
+ * \return #RBRGEN3_COMMAND_TOO_LONG if the command buffer cannot hold the
+ *         opening command
+ * \return #RBRGEN3_RESPONSE_TOO_LONG if the response buffer cannot hold the
+ *         instrument's reply
  * \return #RBRGEN3_TIMEOUT if an instrument communication timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the instrument rejects the opening

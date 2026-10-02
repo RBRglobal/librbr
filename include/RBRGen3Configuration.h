@@ -320,6 +320,8 @@ typedef struct RBRGen3Channels {
  * \param [out] count the number of installed and configured channels
  * \return #RBRGEN3_SUCCESS when the count is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
  * \see RBRGen3_getEnabledChannelCount()
@@ -337,6 +339,8 @@ RBRGen3Error RBRGen3_getChannelCount(RBRGen3 *conn, int32_t *count);
  * \param [out] count the number of enabled channels
  * \return #RBRGEN3_SUCCESS when the count is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
  * \see RBRGen3_getChannelCount()
@@ -360,6 +364,8 @@ RBRGen3Error RBRGen3_getEnabledChannelCount(RBRGen3 *conn, int32_t *count);
  *         RBRGen3_getChannelCount() reports how many there are
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_getChannelsWithoutCalibrations()
  * \see RBRGen3_getSensorParameters()
@@ -383,6 +389,8 @@ RBRGen3Error RBRGen3_getChannels(RBRGen3 *conn, RBRGen3Channels *channels);
  *         RBRGen3_getChannelCount() reports how many there are
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the list has no storage
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_getChannels()
  * \see RBRGen3_getSensorParameters()
@@ -397,6 +405,8 @@ RBRGen3Error RBRGen3_getChannelsWithoutCalibrations(RBRGen3 *conn, RBRGen3Channe
  * \param [in] status whether the channel is activated for sampling
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging, or another
  *                                 hardware error occurs
@@ -427,6 +437,8 @@ RBRGen3Error RBRGen3_setChannelStatus(RBRGen3 *conn, RBRGen3ChannelIndex channel
  * \param [in] gain the gain parameters for the channel
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging, or an invalid
  *                                 gain value is given, or another hardware
@@ -464,6 +476,8 @@ RBRGen3Error RBRGen3_setChannelGain(RBRGen3 *conn, RBRGen3ChannelIndex channel,
  * \param [in] calibration the new calibration coefficients for the channel
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the calibration cannot be changed, or
  *                                 another hardware error occurs
@@ -488,6 +502,8 @@ RBRGen3Error RBRGen3_setCalibration(RBRGen3 *conn, RBRGen3ChannelIndex channel,
  * \param [out] fetchPowerOffDelay the fetch power-off delay
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setFetchPowerOffDelay()
  */
@@ -505,6 +521,8 @@ RBRGen3Error RBRGen3_getFetchPowerOffDelay(RBRGen3 *conn, RBRGen3Period *fetchPo
  * \param [in] fetchPowerOffDelay the fetch power-off delay
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
  *                                 another hardware error occurs
@@ -523,6 +541,8 @@ RBRGen3Error RBRGen3_setFetchPowerOffDelay(RBRGen3 *conn, RBRGen3Period fetchPow
  * \param [out] sensorPowerAlwaysOn whether sensor power is always on
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setSensorPowerAlwaysOn()
  */
@@ -537,6 +557,8 @@ RBRGen3Error RBRGen3_isSensorPowerAlwaysOn(RBRGen3 *conn, bool *sensorPowerAlway
  * \param [in] sensorPowerAlwaysOn whether sensor power is always on
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging, or another
  *                                 hardware error occurs
@@ -554,6 +576,8 @@ RBRGen3Error RBRGen3_setSensorPowerAlwaysOn(RBRGen3 *conn, bool sensorPowerAlway
  * \param [out] castDetection whether cast detection is enabled
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setCastDetection()
  */
@@ -568,6 +592,8 @@ RBRGen3Error RBRGen3_getCastDetection(RBRGen3 *conn, bool *castDetection);
  * \param [in] castDetection whether cast detection is enabled
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging, or another
  *                                 hardware error occurs
@@ -586,6 +612,8 @@ RBRGen3Error RBRGen3_setCastDetection(RBRGen3 *conn, bool castDetection);
  * \param [out] inputTimeout the timeout for output suppression
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setInputTimeout()
  */
@@ -603,6 +631,8 @@ RBRGen3Error RBRGen3_getInputTimeout(RBRGen3 *conn, RBRGen3Period *inputTimeout)
  * \param [in] inputTimeout the timeout for output suppression
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging, or another
  *                                 hardware error occurs
@@ -702,6 +732,8 @@ const char *RBRGen3ValueSetting_name(RBRGen3ValueSetting setting);
  * \param [out] value the value of the setting
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when an unrecognized setting
  *                                                is requested
@@ -719,6 +751,8 @@ RBRGen3Error RBRGen3_getValueSetting(RBRGen3 *conn, RBRGen3ValueSetting setting,
  * \param [in] value the value of the setting
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the instrument is logging, or another
  *                                 hardware error occurs
@@ -760,6 +794,8 @@ typedef struct RBRGen3SensorParameter {
  *                           after return, the instrument response
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_getChannels()
  * \see RBRGen3_getSensorParameters()
@@ -783,6 +819,8 @@ RBRGen3Error RBRGen3_getSensorParameter(RBRGen3 *conn, RBRGen3ChannelIndex chann
  *                      parameters actually written
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_getChannels()
  * \see RBRGen3_getSensorParameter()
@@ -804,9 +842,11 @@ RBRGen3Error RBRGen3_getSensorParameters(RBRGen3 *conn, RBRGen3ChannelIndex chan
  *                     is to be updated
  * \param [in] parameter the sensor parameter for the channel
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
- * \return #RBRGEN3_BUFFER_TOO_SMALL when the command does not fit the
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the
  *         command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR when the parameter cannot be changed, or
  *                                 another hardware error occurs

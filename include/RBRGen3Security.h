@@ -32,6 +32,8 @@ extern "C" {
  * \param [in] command the command to permit
  * \return #RBRGEN3_SUCCESS when the command has been permitted
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN3_HARDWARE_ERROR if the command can't be permitted, or
  *                                 another hardware error occurs
@@ -48,6 +50,8 @@ RBRGen3Error RBRGen3_permit(RBRGen3 *conn, const char *command);
  * \param [out] prompt whether the prompt is enabled
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setPrompt()
  */
@@ -60,6 +64,8 @@ RBRGen3Error RBRGen3_getPrompt(RBRGen3 *conn, bool *prompt);
  * \param [in] prompt whether the prompt should be enabled
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_getPrompt()
  */
@@ -75,6 +81,8 @@ RBRGen3Error RBRGen3_setPrompt(RBRGen3 *conn, bool prompt);
  * \param [out] confirmation whether confirmation is enabled
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_setConfirmation()
  */
@@ -91,6 +99,8 @@ RBRGen3Error RBRGen3_getConfirmation(RBRGen3 *conn, bool *confirmation);
  * \param [in] confirmation whether confirmation should be enabled
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_getConfirmation()
  */
@@ -103,6 +113,8 @@ RBRGen3Error RBRGen3_setConfirmation(RBRGen3 *conn, bool confirmation);
  * \param [in] delay time in milliseconds to wait before rebooting
  * \return #RBRGEN3_SUCCESS when the CPU has been rebooted
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  */
 RBRGen3Error RBRGen3_reboot(RBRGen3 *conn, int32_t delay);

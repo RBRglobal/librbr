@@ -156,7 +156,7 @@ RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *conn)
      * be. Refuse it before anything, including the wake sequence, goes out.
      */
     if (conn->commandBufferLength >= conn->environment.commandCapacity) {
-        return RBRGEN4_BUFFER_TOO_SMALL;
+        return RBRGEN4_COMMAND_TOO_LONG;
     }
 
     /* Wake the instrument if necessary. */
@@ -183,7 +183,7 @@ static RBRGen4Error RBRGen4_vSendCommand(RBRGen4 *conn, const char *command, va_
      * write is commandBufferCapacity - 1 bytes. */
     if (conn->commandBufferLength >= conn->environment.commandCapacity) {
         conn->commandBufferLength = conn->environment.commandCapacity;
-        return RBRGEN4_BUFFER_TOO_SMALL;
+        return RBRGEN4_COMMAND_TOO_LONG;
     }
 
     /* Make sure the command is LF-terminated. */
@@ -195,7 +195,7 @@ static RBRGen4Error RBRGen4_vSendCommand(RBRGen4 *conn, const char *command, va_
         /* It isn't. Make sure there's room before adding it. */
         if (conn->commandBufferLength + RBRGEN4_SEND_COMMAND_TERMINATOR_LEN >=
             conn->environment.commandCapacity) {
-            return RBRGEN4_BUFFER_TOO_SMALL;
+            return RBRGEN4_COMMAND_TOO_LONG;
         }
 
         memcpy(conn->environment.command + conn->commandBufferLength,
@@ -245,6 +245,7 @@ static void RBRGen4_removeLastResponse(RBRGen4 *conn)
  * \param [in] timeout the longest to wait, in milliseconds, from \a startTime
  * \param [out] end the end of the response within the response buffer
  * \return #RBRGEN4_SUCCESS when data is successfully read
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when the response exceeds the buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
  */
@@ -256,10 +257,30 @@ static RBRGen4Error RBRGen4_readSingleResponse(RBRGen4 *conn, RBRGen4DateTime st
     */
     RBRGen4DateTime now;
     int32_t readLength;
+    RBRGen4Error err = RBRGEN4_SUCCESS;
+    /* Whether the line being read has already overflowed the buffer. */
+    bool overflowed = false;
     while ((*end = (char *) rbr_memmem(conn->environment.response,
                                        conn->responseBufferLength,
                                        RBRGEN4_RESPONSE_TERMINATOR,
                                        RBRGEN4_RESPONSE_TERMINATOR_LEN)) == NULL) {
+        /*
+         * The buffer is full and the response still hasn't ended, so it is
+         * longer than the buffer the caller gave us. Throw out what we have
+         * and keep reading: we'll try to flush the rest of the response here,
+         * so the next interaction with the instrument doesn't have to.
+         */
+        if (conn->responseBufferLength == conn->environment.responseCapacity) {
+            /* The terminator may straddle the reset, so keep its possible
+             * first bytes at the front where the next read continues it. */
+            int32_t kept = RBRGEN4_RESPONSE_TERMINATOR_LEN - 1;
+            memmove(conn->environment.response,
+                    conn->environment.response + conn->responseBufferLength - kept,
+                    kept);
+            overflowed = true;
+            conn->responseBufferLength = kept;
+        }
+
         /*
          * If we're not seeing any response at all then the read callback
          * should return a character-level timeout. But if we're reading
@@ -281,28 +302,55 @@ static RBRGen4Error RBRGen4_readSingleResponse(RBRGen4 *conn, RBRGen4DateTime st
          * In either of these cases, we want to give up and indicate a timeout
          * to the caller.
          */
-        RBR_TRY(conn->environment.time(conn, &now));
-
-        if (now - startTime > timeout) {
-            return RBRGEN4_TIMEOUT;
+        if ((err = conn->environment.time(conn, &now)) != RBRGEN4_SUCCESS) {
+            break;
         }
 
-        /* If the buffer is full but doesn't contain a terminator, there's
-         * not much we can do about it: throw out the buffer, then keep
-         * trying to fill it. */
-        if (conn->responseBufferLength == conn->environment.responseCapacity) {
-            conn->responseBufferLength = 0;
-            conn->lastResponseLength = 0;
+        if (now - startTime > timeout) {
+            err = RBRGEN4_TIMEOUT;
+            break;
         }
 
         /* calculate the remaining space in the responseBuffer. */
         readLength = conn->environment.responseCapacity - conn->responseBufferLength;
 
         /* read from the instrument and update responseBuffer length. */
-        RBR_TRY(conn->environment.read(
-            conn, conn->environment.response + conn->responseBufferLength, &readLength));
+        if ((err = conn->environment.read(conn,
+                                          conn->environment.response + conn->responseBufferLength,
+                                          &readLength)) != RBRGEN4_SUCCESS) {
+            break;
+        }
 
         conn->responseBufferLength += readLength;
+    }
+
+    if (err != RBRGEN4_SUCCESS) {
+        if (overflowed && err == RBRGEN4_TIMEOUT) {
+            /*
+             * We hit a timeout while flushing the link after the response
+             * buffer overflowed. We can't know whether the link is broken or
+             * if the response is just taking a really long time to get here.
+             * If it's the latter case, the next call to this function will read
+             * the tail end of this response -- it's up to the caller to verify
+             * that the response starts with the expected command so they can
+             * discard it.
+             */
+            return RBRGEN4_RESPONSE_TOO_LONG;
+        }
+        return err;
+    }
+
+    if (overflowed) {
+        /*
+         * The response buffer overflowed, but we received a response terminator
+         * after flushing it. Mark the tail of the oversized response,
+         * terminator included, as the last response: the next read slides it
+         * off and keeps whatever arrived behind it, exactly as it would for a
+         * response which fit.
+         */
+        conn->lastResponseLength = (int32_t) ((uint8_t *) *end + RBRGEN4_RESPONSE_TERMINATOR_LEN -
+                                              conn->environment.response);
+        return RBRGEN4_RESPONSE_TOO_LONG;
     }
 
     return RBRGEN4_SUCCESS;
@@ -752,11 +800,15 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn, const char *command, ...)
     /* Keep firing off the command and looking for a response until we find one
      * which matches. */
     bool retry;
+    /* Whether a line too long for the response buffer was met while waiting
+     * for the reply. */
+    bool responseTooLong = false;
     do {
         /* The retry flag might be set on by the “ERR-102 invalid command” error
          * handling below. It needs to be reset every time we send the command
          * so that we don't accidentally retry infinitely. */
         retry = false;
+        responseTooLong = false;
 
         /* Can't use RBR_TRY anywhere within these while loops because we need
          * to be sure to call va_end() on both va_lists before returning. */
@@ -777,23 +829,24 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn, const char *command, ...)
             ++commandLength;
         }
 
-        /* The Logger2 “read” command response don't start with the command
-         * itself. It's the only such command, so we'll just handle it here
-         * rather than add another parameter to the function to indicate the
-         * expected response, or to specialize the command handling function
-         * to include error checking/retry. */
-        uint8_t *commandResponse = conn->environment.command;
-        if (commandLength == 4 && memcmp("read", conn->environment.command, 4) == 0) {
-            commandResponse = (uint8_t *) "data";
+        /* The command timeout bounds the whole wait for the reply, however
+         * many unrelated lines are skipped on the way. */
+        RBRGen4DateTime startTime;
+        err = conn->environment.time(conn, &startTime);
+        if (err != RBRGEN4_SUCCESS) {
+            break;
         }
 
         do {
-            RBRGen4DateTime now;
-            err = conn->environment.time(conn, &now);
-            if (err != RBRGEN4_SUCCESS) {
-                break;
+            err = RBRGen4_readResponse(conn, false, NULL, startTime, conn->commandTimeout);
+            if (err == RBRGEN4_RESPONSE_TOO_LONG) {
+                /* The oversized line may have been a streamed sample rather
+                 * than the reply, so keep waiting. If the reply never comes
+                 * the oversized line most likely was it, and that is what
+                 * gets reported. */
+                responseTooLong = true;
+                continue;
             }
-            err = RBRGen4_readResponse(conn, false, NULL, now, conn->commandTimeout);
             /*
              * There are a few reasons the instrument might generate an “ERR-102
              * invalid command” error, and we can make the user's life a bit
@@ -861,8 +914,12 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn, const char *command, ...)
                 break;
             }
         } while (
-            (conn->response.response == NULL ||
-             strncmp(conn->response.response, (const char *) commandResponse, commandLength) != 0));
+            (conn->response.response == NULL || strncmp(conn->response.response,
+                                                        (const char *) conn->environment.command,
+                                                        commandLength) != 0));
+        if (err == RBRGEN4_TIMEOUT && responseTooLong) {
+            err = RBRGEN4_RESPONSE_TOO_LONG;
+        }
     } while (retry);
 
     va_end(format);
@@ -1113,7 +1170,7 @@ RBRGen4Error RBRGen4_formatLabelList(char *value, int32_t size, const RBRGen4Lab
 
     if (labelList->len == 0) {
         length = snprintf(value, size, RBRGEN4_EMPTY_LIST);
-        return length > 0 && length < size ? RBRGEN4_SUCCESS : RBRGEN4_BUFFER_TOO_SMALL;
+        return length > 0 && length < size ? RBRGEN4_SUCCESS : RBRGEN4_COMMAND_TOO_LONG;
     }
 
     for (int32_t i = 0; i < labelList->len; ++i) {
@@ -1125,7 +1182,7 @@ RBRGen4Error RBRGen4_formatLabelList(char *value, int32_t size, const RBRGen4Lab
             value + length, size - length, "%s%s", i == 0 ? "" : "|", labelList->labels[i]);
 
         if (written < 0 || length + written >= size) {
-            return RBRGEN4_BUFFER_TOO_SMALL;
+            return RBRGEN4_COMMAND_TOO_LONG;
         }
 
         length += written;

@@ -187,6 +187,8 @@ typedef struct RBRGen4Sample {
  * \return #RBRGEN4_MISSING_CALLBACK when the connection was opened
  *         without a sample callback
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  */
 RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
@@ -219,8 +221,10 @@ RBRGen4Error RBRGen4_readSample(RBRGen4 *conn);
  *         instrument.outputformat.scheduleLabel is false
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
  *         polled sample arrives within RBRGen4.pollTimeout
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the command does not fit the
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the
  *         command buffer
  */
 RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sample);
@@ -253,12 +257,14 @@ RBRGen4Error RBRGen4_poll(RBRGen4 *conn, bool requireLabel, RBRGen4Sample *sampl
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings
  *         storage, or when \a channelList is `NULL`,
  *         empty, its count is out of range, or a channel label is empty
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the
  *         command
  * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but
  *         instrument.outputformat.scheduleLabel is false
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
  *         polled sample arrives within RBRGen4.pollTimeout
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when an invalid channel is requested, or
  *                                      another hardware error occurs
@@ -294,12 +300,14 @@ RBRGen4Error RBRGen4_pollChannels(RBRGen4 *conn, bool requireLabel,
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a sample has no readings
  *         storage, or when \a groupList is `NULL`,
  *         empty, its count is out of range, or a group label is empty
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the list does not fit the
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the
  *         command
  * \return #RBRGEN4_UNSUPPORTED when \a requireLabel is set but
  *         instrument.outputformat.scheduleLabel is false
  * \return #RBRGEN4_TIMEOUT when a timeout occurs, or when no
  *         polled sample arrives within RBRGen4.pollTimeout
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
+ *         response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR when an invalid group is requested, or
  *                                      another hardware error occurs

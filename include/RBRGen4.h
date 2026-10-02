@@ -51,35 +51,17 @@ extern const char *RBRGEN4_LIB_VERSION;
 extern const char *RBRGEN4_LIB_BUILD_DATE;
 
 /**
- * \brief The library's default size for the buffer storing commands destined
- *        for the instrument.
+ * \brief A reasonable size for the buffer storing commands destined for the
+ *        instrument.
  *
- * This is a starting point, not a limit or a recommendation. The caller
- * supplies the command buffer and its capacity through RBRGen4Environment and
- * should size it for the commands the application sends: the length of a
- * command varies widely with the number and length of the labels it carries,
- * so an application which configures many channels, groups, or schedules may
- * need considerably more, and one which only polls may need much less. A
- * command which does not fit is refused with #RBRGEN4_BUFFER_TOO_SMALL.
- *
- * The label lists sent by the configuration setters and the poll functions
- * are currently assembled in library storage of this size before being placed
- * in the command buffer, so those commands are limited to this length
- * regardless of the buffer supplied.
+ * \see RBRGen4Environment.commandCapacity for how to size the buffer
  */
 #define RBRGEN4_COMMAND_BUFFER_DEFAULT 256
 
 /**
- * \brief The library's default size for the buffer storing instrument
- *        responses.
+ * \brief A reasonable size for the buffer storing instrument responses.
  *
- * This is a starting point, not a limit or a recommendation. The caller
- * supplies the response buffer and its capacity through RBRGen4Environment and
- * should size it for the longest response the application expects, which
- * grows with the number of channels and labels the instrument reports and
- * with the number of channels in a streamed or polled sample. A line which
- * does not fit is discarded without being reported. This does not include
- * download data, which is read directly into a user-managed buffer.
+ * \see RBRGen4Environment.responseCapacity for how to size the buffer
  */
 #define RBRGEN4_RESPONSE_BUFFER_DEFAULT 1024
 
@@ -216,8 +198,12 @@ typedef int32_t RBRGen4Period;
 typedef enum RBRGen4Error {
     /** No error. */
     RBRGEN4_SUCCESS,
-    /** The command buffer was too small to hold the outbound command. */
+    /** A caller-supplied output buffer, such as a download buffer, was too small. */
     RBRGEN4_BUFFER_TOO_SMALL,
+    /** The outbound command does not fit the command buffer. */
+    RBRGEN4_COMMAND_TOO_LONG,
+    /** A response from the instrument did not fit the response buffer. */
+    RBRGEN4_RESPONSE_TOO_LONG,
     /** A required callback function was not provided. */
     RBRGEN4_MISSING_CALLBACK,
     /** An unrecoverable error from within a user callback function. */
@@ -569,9 +555,8 @@ typedef RBRGen4Error (*RBRGen4SampleCallback)(const struct RBRGen4 *conn,
  * and must remain valid until it is closed or they are replaced with
  * RBRGen4_setCommandBuffer() or RBRGen4_setResponseBuffer().
  *
- * The two buffers must not overlap. The command buffer must have room for
- * the longest command, its terminator, and a trailing null byte; a command
- * which does not fit is refused with #RBRGEN4_BUFFER_TOO_SMALL.
+ * The two buffers must not overlap. See RBRGen4Environment.commandCapacity and
+ * RBRGen4Environment.responseCapacity for how to size each.
  *
  * The command buffer holds nothing between commands and may be shared freely
  * between connections which are never used at the same time.
@@ -588,8 +573,8 @@ typedef RBRGen4Error (*RBRGen4SampleCallback)(const struct RBRGen4 *conn,
  * \see RBRGen4_open()
  * \see RBRGen4_setCommandBuffer()
  * \see RBRGen4_setResponseBuffer()
- * \see RBRGEN4_COMMAND_BUFFER_DEFAULT for a starting command buffer size
- * \see RBRGEN4_RESPONSE_BUFFER_DEFAULT for a starting response buffer size
+ * \see RBRGEN4_COMMAND_BUFFER_DEFAULT
+ * \see RBRGEN4_RESPONSE_BUFFER_DEFAULT
  */
 typedef struct RBRGen4Environment {
     /** \brief Callback to get the current platform time in milliseconds. */
@@ -630,7 +615,25 @@ typedef struct RBRGen4Environment {
      */
     uint8_t *command;
 
-    /** \brief The capacity of RBRGen4Environment.command in bytes. */
+    /**
+     * \brief The capacity of RBRGen4Environment.command in bytes.
+     *
+     * The buffer must have room for the longest command the application will
+     * send, its terminator, and a trailing null byte. The length of a command
+     * varies widely with the number and length of the labels it carries, so an
+     * application which configures many channels, groups, or schedules may
+     * need considerably more than one which only polls. A command which does
+     * not fit is refused with #RBRGEN4_COMMAND_TOO_LONG before anything is
+     * sent.
+     *
+     * The label lists sent by the configuration setters and the poll functions
+     * are currently assembled in library storage of
+     * #RBRGEN4_COMMAND_BUFFER_DEFAULT bytes before being placed in the command
+     * buffer, so those commands are limited to that length regardless of the
+     * buffer supplied.
+     *
+     * \see RBRGEN4_COMMAND_BUFFER_DEFAULT for a reasonable size
+     */
     int32_t commandCapacity;
 
     /**
@@ -643,7 +646,22 @@ typedef struct RBRGen4Environment {
      */
     uint8_t *response;
 
-    /** \brief The capacity of RBRGen4Environment.response in bytes. */
+    /**
+     * \brief The capacity of RBRGen4Environment.response in bytes.
+     *
+     * The buffer must be large enough to hold the largest command response the
+     * application will want to receive, which grows with the number of
+     * channels and labels the instrument reports, and the longest streamed or
+     * polled sample line. libRBR functions that converse with the instrument
+     * fail with #RBRGEN4_RESPONSE_TOO_LONG when the response buffer isn't
+     * large enough. An application that wants a clean link after such a
+     * failure should flush its transport before the next command.
+     *
+     * The response buffer does not need to be sized for downloading data, as
+     * downloads use their own dedicated buffer.
+     *
+     * \see RBRGEN4_RESPONSE_BUFFER_DEFAULT for a reasonable size
+     */
     int32_t responseCapacity;
 } RBRGen4Environment;
 
@@ -827,7 +845,8 @@ typedef struct RBRGen4 {
  * `NULL`, the command buffer has a capacity of zero or less, or the response
  * buffer cannot hold more than a line terminator, the connection is not
  * opened and #RBRGEN4_INVALID_PARAMETER_VALUE is returned. A buffer too small for the
- * opening exchange yields #RBRGEN4_BUFFER_TOO_SMALL.
+ * opening exchange yields #RBRGEN4_COMMAND_TOO_LONG or
+ * #RBRGEN4_RESPONSE_TOO_LONG.
  *
  * The \a environment structure will be copied into the RBRGen4 structure;
  * no reference to it is retained, so any subsequent modifications will not
@@ -873,8 +892,10 @@ typedef struct RBRGen4 {
  *         provided
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE if a buffer is missing or empty,
  *         or RBRGen4Environment.sampleBuffer has no readings storage
- * \return #RBRGEN4_BUFFER_TOO_SMALL if a buffer cannot hold the opening
- *         exchange
+ * \return #RBRGEN4_COMMAND_TOO_LONG if the command buffer cannot hold the
+ *         opening command
+ * \return #RBRGEN4_RESPONSE_TOO_LONG if the response buffer cannot hold the
+ *         instrument's reply
  * \return #RBRGEN4_TIMEOUT if an instrument communication timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  * \return #RBRGEN4_HARDWARE_ERROR if the instrument rejects the opening

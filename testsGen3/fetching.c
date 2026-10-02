@@ -93,7 +93,7 @@ TEST_LOGGER3(fetchCommandBufferTooSmall)
     RBRGEN3_SAMPLE_DECL(sample, TESTS_CHANNEL_MAX);
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen3_fetch(&tiny, &channels, false, &sample);
-    TEST_ASSERT_ENUM_EQ(RBRGEN3_BUFFER_TOO_SMALL, err, RBRGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_COMMAND_TOO_LONG, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     /* An idle connection would normally be woken first; a refused command
@@ -101,7 +101,7 @@ TEST_LOGGER3(fetchCommandBufferTooSmall)
     tiny.lastActivityTime = -1;
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen3_fetch(&tiny, &channels, false, &sample);
-    TEST_ASSERT_ENUM_EQ(RBRGEN3_BUFFER_TOO_SMALL, err, RBRGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_COMMAND_TOO_LONG, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
@@ -173,7 +173,7 @@ TEST_LOGGER3(fetchLabelTooLongForBuffer)
     RBRGEN3_SAMPLE_DECL(sample, TESTS_CHANNEL_MAX);
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen3_fetch(&tiny, &channels, false, &sample);
-    TEST_ASSERT_ENUM_EQ(RBRGEN3_BUFFER_TOO_SMALL, err, RBRGen3Error);
+    TEST_ASSERT_ENUM_EQ(RBRGEN3_COMMAND_TOO_LONG, err, RBRGen3Error);
     TEST_ASSERT_STR_EQ("", buffers->writeBuffer);
 
     return true;
