@@ -49,11 +49,11 @@
  */
 #define DCORR_TAU        8.11f
 /** \def DCORR_TAU_A
- * \brief Define the 'a' ascent-rate fit coefficient for alpha (unitless)
+ * \brief Define the 'a' ascent-rate fit coefficient for tau (unitless)
  */
 #define DCORR_TAU_A      4.93f
 /** \def DCORR_TAU_E
- * \brief Define the 'e' ascent-rate fit coefficient for alpha (unitless)
+ * \brief Define the 'e' ascent-rate fit coefficient for tau (unitless)
  */
 #define DCORR_TAU_E      -0.26f
 /**
@@ -76,7 +76,7 @@
 #define DCORR_VP_MIN     0.03f
 /**
  *   \def DCORR_VP_MAX
- * \brief Define the minimum for the range for ascent rate as pressure/time (dbar/sec)
+ * \brief Define the maximum for the range for ascent rate as pressure/time (dbar/sec)
  */
 #define DCORR_VP_MAX     0.45f
 /**
@@ -108,7 +108,7 @@ typedef enum {
 } RBRDynamicCorrectionError;
 
 /** \struct RBRDynamicCorrectionParams
- *  This is a struct
+ *  Dynamic correction parameters and state
  *
  *  \var RBRDynamicCorrectionParams::t_delay
  *    time delay (sec), or C-T lag
@@ -145,11 +145,11 @@ typedef struct {
     float alpha;
     float tau;
     float CT_coeff;
-    float alpha_a; /* alpha = alpha_a * powf(Vp * alpha_e) */
+    float alpha_a; /* alpha = alpha_a * powf(Vp, alpha_e) */
     float alpha_e;
-    float tau_a; /* tau = tau_a * powf(Vp * tau_e) */
+    float tau_a; /* tau = tau_a * powf(Vp, tau_e) */
     float tau_e;
-    float ctcoeff_a; /* ctcoeff = ctcoeff_a * powf(Vp * ctcoeff_e) */
+    float ctcoeff_a; /* ctcoeff = ctcoeff_a * powf(Vp, ctcoeff_e) */
     float ctcoeff_e;
     float Vp_min;
     float Vp_max;
@@ -181,7 +181,7 @@ typedef struct {
 } RBRDynamicCorrectionParams;
 
 /** \struct RBRDynamicCorrectionMeasurement
- *  This is a struct
+ *  A measurement to correct
  *
  *  \var RBRDynamicCorrectionMeasurement::timestamp
  *    Time in milliseconds
@@ -203,7 +203,7 @@ typedef struct {
 } RBRDynamicCorrectionMeasurement;
 
 /** \struct RBRDynamicCorrectionResult
- *  This is a struct
+ *  A corrected measurement
  *
  *  \var RBRDynamicCorrectionResult::timestamp
  *    Time in milliseconds
@@ -236,8 +236,8 @@ typedef struct {
  * \param [in] alpha_e default value DCORR_ALPHA_E used as input
  * \param [in] tau_a default value DCORR_TAU_A used as input
  * \param [in] tau_e default value DCORR_TAU_E used as input
- * \param [in] ctcoeff_a default value DCORR_COEFF_A used as input
- * \param [in] ctcoeff_e default value DCORR_COEFF_E used as input
+ * \param [in] ctcoeff_a default value DCORR_CT_COEFF_A used as input
+ * \param [in] ctcoeff_e default value DCORR_CT_COEFF_E used as input
  * \param [in] Vp_min default value DCORR_VP_MIN used as input
  * \param [in] Vp_max default value DCORR_VP_MAX used as input
  * \param [in] Vp_fc default value DCORR_VP_FC used as input
