@@ -24,7 +24,9 @@ This process should be transparent
 to users of the library.
 For implementation details,
 see ``RBRGen3_wake()``
-in ``RBRGen3Internal.c``.
+in ``RBRGen3Internal.c``
+and ``RBRGen4_wake()``
+in ``RBRGen4Internal.c``.
 
 Command Timeout
 ---------------
@@ -32,7 +34,9 @@ Command Timeout
 The second type of timeout,
 configured by the user
 via the *commandTimeout* value passed to :c:func:`RBRGen3_open`
-or :c:func:`RBRGen3_setCommandTimeout`,
+or :c:func:`RBRGen4_open`,
+or later changed via :c:func:`RBRGen3_setCommandTimeout`
+or :c:func:`RBRGen4_setCommandTimeout`,
 defines the minimum amount of time the library will wait
 for a complete response from the instrument.
 
@@ -46,7 +50,8 @@ Character Timeout
 -----------------
 
 Because character reads are implemented by the user
-via the RBRGen3ReadCallback() callback function,
+via the RBRGen3ReadCallback()
+or RBRGen4ReadCallback() callback function,
 any character timeout must also be implemented by the user.
 On POSIX systems, this can be done by using ``select(3)``
 to determine whether a file descriptor is ready for reading

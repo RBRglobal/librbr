@@ -51,7 +51,7 @@ into the same library
 by default
 (see the Building section below).
 
-The library also offers basic parsing
+The Gen3 API also offers basic parsing
 for EasyParse sample data and events.
 
 The library tries to be platform-agnostic.
@@ -205,6 +205,7 @@ an example might be run like:
    ./posix-stream /dev/ttyACM0
 
 The ``posix-parse-file-dynamiccorrection`` example 
+in ``examples/posixGen3``
 requires a dataset rather than an instrument. 
 Run it with the provided sample data:
 

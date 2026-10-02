@@ -100,7 +100,7 @@ Technical pedantry:
     even where it's far larger than necessary.
     This sort of consistency helps reduce mental overhead.
 
-- Most functions should return an ``RBRGen3Error``
+- Most functions should return an ``RBRGen3Error`` or ``RBRGen4Error``
   and pass actual values back to the caller via out pointers.
   Only the most trivial or pure functions
   should return a value directly.
