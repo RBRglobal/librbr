@@ -5,15 +5,20 @@
 ##
 ## \brief Build automation.
 ##
-## This makefile provides three different targets of interest to the end user:
+## This makefile provides these targets of interest to the end user:
 ##
 ## - `lib` will build the library (`bin/libRBR.a`)
+## - `libdynamiccorrection` will build the standalone dynamic correction library
+##   (`bin/libRBRDynamicCorrection.a`)
 ## - `docs` will generate the documentation via Sphinx (in `docs/_build/html/`)
 ## - `tests` will run library tests (from `testsDynamicCorrection/`, `testsGen3/`, and `testsGen4/`)
+## - `all` will do all of the above
 ##
 ## Additional targets may be useful to developers:
 ##
 ## - `clean` will remove any compiled binaries and documentation
+## - `checknoalloc` will check that the libraries never call the dynamic allocation
+##   functions
 
 ## \brief The project name.
 ##
