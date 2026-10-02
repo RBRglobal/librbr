@@ -122,7 +122,7 @@ static void *rbr_memmem(void *ptr1, size_t num1, const void *ptr2, size_t num2)
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the instrument has been woken
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  */
 static RBRGen4Error RBRGen4_wake(const RBRGen4 *conn)
 {
@@ -287,17 +287,17 @@ static void RBRGen4_removeLastResponse(RBRGen4 *conn)
 }
 
 /**
- * \brief Read data until we find the command termination sequence or the
- *        callback indicates a timeout.
+ * \brief Read data until we find the command termination sequence or the callback indicates a
+ * timeout.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] startTime when we started trying to read the command response
  * \param [in] timeout the longest to wait, in milliseconds, from \a startTime
  * \param [out] end the end of the response within the response buffer
  * \return #RBRGEN4_SUCCESS when data is successfully read
- * \return #RBRGEN4_RESPONSE_TOO_LONG when the response exceeds the buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when the response exceeds the buffer
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
  */
 static RBRGen4Error RBRGen4_readSingleResponse(RBRGen4 *conn, RBRGen4DateTime startTime,
                                                RBRGen4DateTime timeout, char **end)
@@ -409,7 +409,7 @@ static RBRGen4Error RBRGen4_readSingleResponse(RBRGen4 *conn, RBRGen4DateTime st
 /**
  * \brief Find the beginning of a response and null-terminate the end.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] beginning the beginning of the response
  * \param [in] end the end of the response
  */
@@ -491,14 +491,14 @@ static char *seek(const char *str, char delimiter)
 /**
  * \brief Attempt to parse a sample from a response.
  *
- * \param [out] sample the sample; RBRGen4Sample.readings and
- *                     RBRGen4Sample.size must be set by the caller
+ * \param [in,out] sample the sample; RBRGen4Sample.readings and RBRGen4Sample.size must be set by
+ *                        the caller
  * \param [in] outputFormat the format of the response to parse
  * \param [in] response the response to parse
- * \return RBRGEN4_SUCCESS if the response is a sample
- * \return RBRGEN4_INVALID_PARAMETER_VALUE if the response does not
- *         follow the specified output format
- * \return RBRGEN4_CHECKSUM_ERROR if the CRC does not match
+ * \return #RBRGEN4_SUCCESS when the response is a sample
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the response does not follow the specified output
+ *         format
+ * \return #RBRGEN4_CHECKSUM_ERROR when the CRC does not match
  */
 static RBRGen4Error RBRGen4Sample_parse(RBRGen4Sample *sample, RBRGen4OutputFormat *outputFormat,
                                         char *response)
@@ -618,11 +618,11 @@ static RBRGen4Error RBRGen4Sample_parse(RBRGen4Sample *sample, RBRGen4OutputForm
  *
  * Updates RBRGen4.response as appropriate.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
- * \return #RBRGEN4_SUCCESS when the response is a warning or success
- * \return #RBRGEN4_HARDWARE_ERROR when the response indicates an error
+ * \return #RBRGEN4_SUCCESS when the response is neither a warning nor an error
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error or a warning
  */
 RBRGen4Error RBRGen4_errorCheckResponse(RBRGen4 *conn, char *beginning, char *end)
 {
@@ -1062,7 +1062,13 @@ static inline void RBRGen4DateTime_initializeOffset(void)
 {
     if (localTimeOffset == OFFSET_UNINITIALIZED) {
         struct tm instrumentMinTimestamp = {
-            .tm_year = 100, .tm_mon = 0, .tm_mday = 1, .tm_hour = 0, .tm_min = 0, .tm_sec = 0};
+            .tm_year = 100,
+            .tm_mon = 0,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 0,
+        };
         localTimeOffset =
             RBRGEN4_DATETIME_MIN - ((RBRGen4DateTime) mktime(&instrumentMinTimestamp) * 1000);
     }

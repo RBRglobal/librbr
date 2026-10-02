@@ -43,35 +43,39 @@ typedef struct RBRGen4Clock {
 
 /**
  * \brief Get the instrument clock.
- * \note Issues the `clock` command.
+ *
+ * \command{clock}
  *
  * \param [in] conn the instrument connection
  * \param [out] clock the clock value
- * \return #RBRGEN4_SUCCESS when the settings are successfully read
+ * \return #RBRGEN4_SUCCESS when the clock is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the instrument reports a time which cannot be
+ *         parsed
  * \see RBRGen4_setClock()
  */
 RBRGen4Error RBRGen4_getClock(RBRGen4 *conn, RBRGen4Clock *clock);
 
 /**
  * \brief Set the instrument clock.
- * \note Issues the `clock` command.
+ *
+ * \command{clock}
  *
  * \param [in] conn the instrument connection
  * \param [in] clock the clock value
- * \return #RBRGEN4_SUCCESS when the settings are successfully written
+ * \return #RBRGEN4_SUCCESS when the clock is successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the settings cannot be changed, or
- *                                      another hardware error occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the date and time is
- *         outside #RBRGEN4_DATETIME_MIN to
- *         #RBRGEN4_DATETIME_MAX, or the UTC offset is `NAN`
+ * \return #RBRGEN4_HARDWARE_ERROR when the clock cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the date and time is outside #RBRGEN4_DATETIME_MIN
+ *         to #RBRGEN4_DATETIME_MAX, or the UTC offset is `NAN`
  * \see RBRGen4_getClock()
  */
 RBRGen4Error RBRGen4_setClock(RBRGen4 *conn, const RBRGen4Clock *clock);
@@ -97,7 +101,7 @@ typedef enum RBRGen4DeploymentStatus {
     /** The number of specific deployment statuses. */
     RBRGEN4_DEPLOYMENT_STATUS_COUNT,
     /** An unknown or unrecognized deployment status. */
-    RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS
+    RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
 } RBRGen4DeploymentStatus;
 
 /**
@@ -126,7 +130,7 @@ typedef enum RBRGen4DeploymentGate {
     /** The number of specific gating conditions. */
     RBRGEN4_DEPLOYMENT_GATE_COUNT,
     /** An unknown or unrecognized gating condition. */
-    RBRGEN4_UNKNOWN_DEPLOYMENT_GATE
+    RBRGEN4_UNKNOWN_DEPLOYMENT_GATE,
 } RBRGen4DeploymentGate;
 
 /**
@@ -173,78 +177,83 @@ typedef struct RBRGen4Deployment {
 
 /**
  * \brief Get the instrument deployment parameters.
- * \note Issues the `deployment` command.
+ *
+ * \command{deployment}
+ *
+ * \note RBRGen4Deployment.startTime is 0 when the instrument does not report a
+ * start time, as when RBRGen4Deployment.gate is not
+ * #RBRGEN4_DEPLOYMENT_GATE_TIME.
  *
  * \param [in] conn the instrument connection
  * \param [out] deployment the deployment parameters
  * \return #RBRGEN4_SUCCESS when the deployment is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the instrument reports a time which cannot be
+ *         parsed
  * \see RBRGen4_setDeployment()
  */
 RBRGen4Error RBRGen4_getDeployment(RBRGen4 *conn, RBRGen4Deployment *deployment);
 
 /**
  * \brief Set the instrument deployment parameters.
- * \note Issues the `deployment` command.
  *
- * RBRGen4Deployment.startTime is sent only when
- * RBRGen4Deployment.gate is #RBRGEN4_DEPLOYMENT_GATE_TIME.
- * RBRGen4Deployment.status and
+ * \command{deployment}
+ *
+ * \note RBRGen4Deployment.startTime is sent only when RBRGen4Deployment.gate is
+ * #RBRGEN4_DEPLOYMENT_GATE_TIME. RBRGen4Deployment.status and
  * RBRGen4Deployment.simulation are never sent.
  *
  * \param [in] conn the instrument connection
  * \param [in] deployment the deployment parameters
- * \return #RBRGEN4_SUCCESS when the deployment is successfully
- *         changed
+ * \return #RBRGEN4_SUCCESS when the deployment is successfully changed
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the deployment cannot be changed, or
- *                                      another hardware error occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the gating condition
- *         is set to more than one condition, or the start time is being sent
- *         and is outside #RBRGEN4_DATETIME_MIN to
- *         #RBRGEN4_DATETIME_MAX
+ * \return #RBRGEN4_HARDWARE_ERROR when the deployment cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the gate is not a known gating condition, or the
+ *         start time is being sent and is outside #RBRGEN4_DATETIME_MIN to #RBRGEN4_DATETIME_MAX
  * \see RBRGen4_getDeployment()
  */
 RBRGen4Error RBRGen4_setDeployment(RBRGen4 *conn, const RBRGen4Deployment *deployment);
 
 /**
  * \brief Pause an enabled deployment.
- * \note Issues the `pause` command.
+ *
+ * \command{pause}
  *
  * \param [in] conn the instrument connection
- * \param [out] status the deployment status; untouched unless the command
- *                     succeeds
+ * \param [out] status the deployment status; untouched unless the command succeeds
  * \return #RBRGEN4_SUCCESS when the deployment is paused
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not enabled, or
- *                                      another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not enabled, or another hardware error
+ *         occurs
  * \see RBRGen4_resume()
  */
 RBRGen4Error RBRGen4_pause(RBRGen4 *conn, RBRGen4DeploymentStatus *status);
 
 /**
  * \brief Resume a paused deployment.
- * \note Issues the `resume` command.
+ *
+ * \command{resume}
  *
  * \param [in] conn the instrument connection
- * \param [out] status the deployment status; untouched unless the command
- *                     succeeds
+ * \param [out] status the deployment status; untouched unless the command succeeds
  * \return #RBRGEN4_SUCCESS when the deployment is resumed
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not enabled, or
- *                                      another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument is not enabled, or another hardware error
+ *         occurs
  * \see RBRGen4_pause()
  */
 RBRGen4Error RBRGen4_resume(RBRGen4 *conn, RBRGen4DeploymentStatus *status);
@@ -278,7 +287,8 @@ const char *RBRGen4DeploymentStorageMode_name(RBRGen4DeploymentStorageMode stora
 /**
  * \brief Perform the deployment consistency checks of the `enable` command
  * without enabling the instrument (a dry run).
- * \note Issues the `verify` command.
+ *
+ * \command{verify}
  *
  * A `NULL` \a datasetLabel leaves the `dataset` parameter out. Only an
  * instrument which does not store data accepts that; one which does needs
@@ -286,21 +296,17 @@ const char *RBRGen4DeploymentStorageMode_name(RBRGen4DeploymentStorageMode stora
  *
  * \param [in] conn the instrument connection
  * \param [in] config the configuration which would define this deployment
- * \param [in] datasetLabel the label which would be given to the deployment's
- *                          dataset, or `NULL`
+ * \param [in] datasetLabel the label which would be given to the deployment's dataset, or `NULL`
  * \param [in] storageMode the data storage mode which would be used
- * \param [out] state the state the instrument would assume; untouched unless
- *                    the command succeeds
+ * \param [out] state the state the instrument would assume; untouched unless the command succeeds
  * \return #RBRGEN4_SUCCESS when the checks all pass
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when a check fails, or another hardware
- *                                      error occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the configuration or a
- *         given dataset label is empty or too long, or the storage mode is
- *         not a specific mode
+ * \return #RBRGEN4_HARDWARE_ERROR when a check fails, or another hardware error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the configuration or a given dataset label is empty
+ *         or too long, or the storage mode is not a specific mode
  * \see RBRGen4_enable()
  */
 RBRGen4Error RBRGen4_verify(RBRGen4 *conn, const RBRGen4Config *config, const char *datasetLabel,
@@ -309,7 +315,8 @@ RBRGen4Error RBRGen4_verify(RBRGen4 *conn, const RBRGen4Config *config, const ch
 
 /**
  * \brief Enable the instrument to sample for a new deployment.
- * \note Issues the `enable` command.
+ *
+ * \command{enable}
  *
  * A `NULL` \a datasetLabel leaves the `dataset` parameter out. Only an
  * instrument which does not store data accepts that; one which does needs
@@ -321,18 +328,16 @@ RBRGen4Error RBRGen4_verify(RBRGen4 *conn, const RBRGen4Config *config, const ch
  * \param [in] config the configuration which defines this deployment
  * \param [in] datasetLabel the label for the deployment's dataset, or `NULL`
  * \param [in] storageMode the data storage mode for this deployment
- * \param [out] state the state of the instrument; untouched unless the command
- *                    succeeds
+ * \param [out] state the state of the instrument; untouched unless the command succeeds
  * \return #RBRGEN4_SUCCESS when the instrument is enabled
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument cannot be enabled, or
- *                                      another hardware error occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the configuration or a
- *         given dataset label is empty or too long, or the storage mode is
- *         not a specific mode
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument cannot be enabled, or another hardware error
+ *         occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the configuration or a given dataset label is empty
+ *         or too long, or the storage mode is not a specific mode
  * \see RBRGen4_verify()
  * \see RBRGen4_disable()
  */
@@ -342,22 +347,22 @@ RBRGen4Error RBRGen4_enable(RBRGen4 *conn, const RBRGen4Config *config, const ch
 
 /**
  * \brief Terminate the current deployment.
- * \note Issues the `disable` command.
+ *
+ * \command{disable}
  *
  * A warning from the instrument is reported as
  * #RBRGEN4_HARDWARE_ERROR with the response type set to
  * #RBRGEN4_RESPONSE_WARNING.
  *
  * \param [in] conn the instrument connection
- * \param [out] state the state of the instrument; untouched unless the command
- *                    succeeds
+ * \param [out] state the state of the instrument; untouched unless the command succeeds
  * \return #RBRGEN4_SUCCESS when the deployment is terminated
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the instrument was not enabled, or
- *                                      another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument was not enabled, or another hardware error
+ *         occurs
  * \see RBRGen4_enable()
  */
 RBRGen4Error RBRGen4_disable(RBRGen4 *conn, RBRGen4InstrumentState *state);

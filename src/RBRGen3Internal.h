@@ -53,7 +53,9 @@ extern "C" {
     } while (0)
 
 /**
- * Send the first RBRGen3.commandBufferLength bytes of
+ * \brief Send the contents of the command buffer to the instrument.
+ *
+ * Sends the first RBRGen3.commandBufferLength bytes of
  * RBRGen3Environment.command to the instrument. No formatting of the contents of
  * the buffer is performed; a buffer with no room left for a null byte is
  * refused, since it holds a command truncated by snprintf().
@@ -72,7 +74,9 @@ extern "C" {
 RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *conn);
 
 /**
- * Send a command to the instrument. The command will be formatted into
+ * \brief Send a command to the instrument.
+ *
+ * The command will be formatted into
  * RBRGen3Environment.command and RBRGen3.commandBufferLength will be
  * updated accordingly. If the command does not include a terminating `\r\n`,
  * it will be added for you.
@@ -87,8 +91,7 @@ RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *conn);
  * \param [in] conn the instrument connection
  * \param [in] command the command to send as a printf-style format string
  * \return #RBRGEN3_SUCCESS when the command is successfully written
- * \return #RBRGEN3_COMMAND_TOO_LONG when the formatted command is too
- *                                         large for the command buffer
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the formatted command is too large for the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  * \see RBRGen3_sendBuffer() to send raw data from the command buffer
@@ -119,17 +122,17 @@ void RBRGen3_beginCommand(RBRGen3 *conn);
  * \param [in] conn the instrument connection
  * \param [in] command the text to append as a printf-style format string
  * \return #RBRGEN3_SUCCESS when the text is appended
- * \return #RBRGEN3_COMMAND_TOO_LONG when the text does not fit; the buffer
- *                                   then holds a truncated command which
- *                                   RBRGen3_sendBuffer() refuses
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the text does not fit; the buffer then holds a truncated
+ *         command which RBRGen3_sendBuffer() refuses
  * \see RBRGen3_converseBuffer() to send the buffer and await the response
  */
 RBRGen3Error RBRGen3_appendCommand(RBRGen3 *conn, const char *command, ...);
 
 /**
- * Read a response from the instrument. This function will block until a
- * complete response is read, or until the callback returns
- * #RBRGEN3_TIMEOUT or #RBRGEN3_CALLBACK_ERROR.
+ * \brief Read a response from the instrument.
+ *
+ * This function will block until a complete response is read, or until the
+ * callback returns #RBRGEN3_TIMEOUT or #RBRGEN3_CALLBACK_ERROR.
  *
  * The response will be returned via RBRGen3Environment.response. The previous
  * complete response, if any, will be removed, and newly-read data will be
@@ -153,17 +156,17 @@ RBRGen3Error RBRGen3_appendCommand(RBRGen3 *conn, const char *command, ...);
  *
  * \param [in] conn the instrument connection
  * \param [in] breakOnSample whether to return early when a sample is parsed
- * \param [out] sample where to put a parsed sample
- * \param [in] startTime when the wait began; the command timeout is measured
- *                       from here, so a caller which loops over this function
- *                       to skip unrelated lines bounds the whole wait by
- *                       passing the same value each time
+ * \param [in,out] sample where to put a parsed sample; RBRGen3Sample.readings and
+ *                        RBRGen3Sample.size must be set by the caller
+ * \param [in] startTime when the wait began; the command timeout is measured from here, so a caller
+ *                       which loops over this function to skip unrelated lines bounds the whole
+ *                       wait by passing the same value each time
  * \return #RBRGEN3_SUCCESS when a response was successfully read
  * \return #RBRGEN3_SAMPLE when a sample is read and \a sample is given
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_RESPONSE_TOO_LONG when the response exceeds the buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_sendCommand() to send a command
  * \see RBRGen3_converse() for a send/receive shortcut
  */
@@ -188,21 +191,20 @@ RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Samp
  *
  * \param [in] conn the instrument connection
  * \param [in] command the command to send as a printf-style format string
- * \return #RBRGEN3_SUCCESS when the command was successfully sent and a
- *                                response was read
+ * \return #RBRGEN3_SUCCESS when the command was successfully sent and a response was read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a line too long for the response
- *         buffer was met and the correct response never arrived
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a line too long for the response buffer was met and the
+ *         correct response never arrived
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_sendCommand() to send a command
  * \see RBRGen3_readResponse() to read the command response
  */
 RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...);
 
 /**
- * \brief Send the command already in RBRGen3Environment.command and await an
- *        appropriate response.
+ * \brief Send the command already in RBRGen3Environment.command and await an appropriate response.
  *
  * The buffer form of RBRGen3_converse(), for commands assembled with
  * RBRGen3_appendCommand(). A terminator is added if the command lacks one.
@@ -210,15 +212,14 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...);
  * RBRGen3_converse(); a retry resends the buffer as it stands.
  *
  * \param [in] conn the instrument connection
- * \return #RBRGEN3_SUCCESS when the command was successfully sent and a
- *                                response was read
- * \return #RBRGEN3_COMMAND_TOO_LONG when the buffer holds a truncated command
- *                                   or has no room for the terminator
+ * \return #RBRGEN3_SUCCESS when the command was successfully sent and a response was read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the buffer holds a truncated command or has no room for
+ *         the terminator
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a line too long for the response
- *         buffer was met and the correct response never arrived
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a line too long for the response buffer was met and the
+ *         correct response never arrived
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_appendCommand() to build the command
  */
 RBRGen3Error RBRGen3_converseBuffer(RBRGen3 *conn);
@@ -235,11 +236,12 @@ RBRGen3Error RBRGen3_converseBuffer(RBRGen3 *conn);
  * \param [in] command the name of the command
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
- * \return #RBRGEN3_SUCCESS when the command was successfully sent and a
- *                                response was read
+ * \return #RBRGEN3_SUCCESS when the command was successfully sent and a response was read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_converse() to send a command
  * \see RBRGen3_readResponse() to read the command response
  * \see RBRGen3_getFloat() for the float equivalent
@@ -260,11 +262,12 @@ RBRGen3Error RBRGen3_getBool(RBRGen3 *conn, const char *command, const char *par
  * \param [in] command the name of the command
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
- * \return #RBRGEN3_SUCCESS when the command was successfully sent and a
- *                                response was read
+ * \return #RBRGEN3_SUCCESS when the command was successfully sent and a response was read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_converse() to send a command
  * \see RBRGen3_readResponse() to read the command response
  * \see RBRGen3_getBool() for the boolean equivalent
@@ -285,11 +288,12 @@ RBRGen3Error RBRGen3_getFloat(RBRGen3 *conn, const char *command, const char *pa
  * \param [in] command the name of the command
  * \param [in] parameter the name of the parameter
  * \param [out] value the parameter value
- * \return #RBRGEN3_SUCCESS when the command was successfully sent and a
- *                                response was read
+ * \return #RBRGEN3_SUCCESS when the command was successfully sent and a response was read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_converse() to send a command
  * \see RBRGen3_readResponse() to read the command response
  * \see RBRGen3_getBool() for the boolean equivalent
@@ -338,7 +342,7 @@ void RBRGen3_parseResponse(RBRGen3 *conn, char **command, RBRGen3ResponseParamet
  *
  * Updates RBRGen3.response as appropriate.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
  * \return #RBRGEN3_SUCCESS when the response is a warning or success
@@ -380,9 +384,8 @@ RBRGen3Error RBRGen3DateTime_parseScheduleTime(const char *s, RBRGen3DateTime *t
                                                char **end);
 
 /**
- * \brief Append a timestamp as “YYYYmmddHHMMSS”, the form the clock,
- *        deployment, calibration and postprocessing commands take, to the
- *        command in RBRGen3Environment.command.
+ * \brief Append a timestamp as “YYYYmmddHHMMSS”, the form the clock, deployment, calibration and
+ * postprocessing commands take, to the command in RBRGen3Environment.command.
  *
  * \param [in] conn the instrument connection
  * \param [in] timestamp the timestamp

@@ -126,7 +126,7 @@ GEN3_OBJECTS := src/RBRGen3.o \
                 src/RBRGen3Internal.o \
                 src/RBRGen3Memory.o \
                 src/RBRGen3Other.o \
-                src/RBRGen3Pauseresume.o \
+                src/RBRGen3PauseResume.o \
                 src/RBRGen3Schedule.o \
                 src/RBRGen3Security.o \
                 src/RBRGen3Streaming.o \

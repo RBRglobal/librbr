@@ -62,6 +62,9 @@ typedef struct RBRGen3Clock {
 /**
  * \brief Get the instrument clock.
  *
+ * \par Commands:
+ * `clock`, or `settings` and `now` for Logger2
+ *
  * Because UTC offset is tracked as a setting on Logger2 instruments, not as a
  * parameter of the `now` command (as it is of `clock` on Logger3), this
  * function will internally issue two commands to Logger2 instruments to
@@ -72,16 +75,22 @@ typedef struct RBRGen3Clock {
  * \param [in] conn the instrument connection
  * \param [out] clock the clock value
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the instrument reports a time which cannot be
+ *         parsed
  * \see RBRGen3_setClock()
  */
 RBRGen3Error RBRGen3_getClock(RBRGen3 *conn, RBRGen3Clock *clock);
 
 /**
  * \brief Set the instrument clock.
+ *
+ * \par Commands:
+ * `clock`, or `now`, `permit`, and `settings` for Logger2
  *
  * Because UTC offset is tracked as a setting on Logger2 instruments, not as a
  * parameter of the `now` command (as it is of `clock` on Logger3), this
@@ -98,14 +107,13 @@ RBRGen3Error RBRGen3_getClock(RBRGen3 *conn, RBRGen3Clock *clock);
  * \param [in] conn the instrument connection
  * \param [in] clock the clock value
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the clock values are out
- *                                                of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the clock values are out of range
  * \see RBRGen3_getClock()
  */
 RBRGen3Error RBRGen3_setClock(RBRGen3 *conn, const RBRGen3Clock *clock);
@@ -138,7 +146,7 @@ typedef enum RBRGen3SamplingMode {
     /** The number of specific sampling modes. */
     RBRGEN3_SAMPLING_COUNT,
     /** An unknown or unrecognized sampling mode. */
-    RBRGEN3_UNKNOWN_SAMPLING
+    RBRGEN3_UNKNOWN_SAMPLING,
 } RBRGen3SamplingMode;
 
 /**
@@ -176,7 +184,7 @@ typedef enum RBRGen3Gate {
     /** The number of specific sampling modes. */
     RBRGEN3_GATE_COUNT,
     /** An unknown or unrecognized sampling mode. */
-    RBRGEN3_UNKNOWN_GATE
+    RBRGEN3_UNKNOWN_GATE,
 } RBRGen3Gate;
 
 /**
@@ -195,6 +203,7 @@ const char *RBRGen3Gate_name(RBRGen3Gate gate);
  *
  * \see RBRGen3_getSampling()
  * \see RBRGen3_setSampling()
+ * \see RBRGen3_setBurstSampling()
  */
 typedef struct RBRGen3Sampling {
     /** \brief The instrument sampling mode. */
@@ -259,19 +268,24 @@ typedef struct RBRGen3Sampling {
 /**
  * \brief Get the instrument sampling parameters.
  *
+ * \command{sampling}
+ *
  * \param [in] conn the instrument connection
  * \param [out] sampling the sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_setSampling()
  */
 RBRGen3Error RBRGen3_getSampling(RBRGen3 *conn, RBRGen3Sampling *sampling);
 
 /**
  * \brief Set the instrument sampling mode and period.
+ *
+ * \command{sampling}
  *
  * This does _not_ set burst parameters (RBRGen3Sampling.burstLength and
  * RBRGen3Sampling.burstInterval). On instruments which do not support
@@ -304,14 +318,13 @@ RBRGen3Error RBRGen3_getSampling(RBRGen3 *conn, RBRGen3Sampling *sampling);
  * \param [in] conn the instrument connection
  * \param [in] sampling the sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
- *                                                of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out of range
  * \see RBRGen3_getSampling()
  * \see RBRGen3_setBurstSampling()
  */
@@ -319,6 +332,8 @@ RBRGen3Error RBRGen3_setSampling(RBRGen3 *conn, const RBRGen3Sampling *sampling)
 
 /**
  * \brief Set the instrument burst sampling length and interval.
+ *
+ * \command{sampling}
  *
  * This sets only burst parameters (RBRGen3Sampling.burstLength and
  * RBRGen3Sampling.burstInterval). To configure the sampling mode and
@@ -339,14 +354,13 @@ RBRGen3Error RBRGen3_setSampling(RBRGen3 *conn, const RBRGen3Sampling *sampling)
  * \param [in] conn the instrument connection
  * \param [in] sampling the sampling parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
- *                                                of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out of range
  * \see RBRGen3_setSampling()
  */
 RBRGen3Error RBRGen3_setBurstSampling(RBRGen3 *conn, const RBRGen3Sampling *sampling);
@@ -357,6 +371,8 @@ RBRGen3Error RBRGen3_setBurstSampling(RBRGen3 *conn, const RBRGen3Sampling *samp
  * \see RBRGen3Deployment
  * \see RBRGen3_getDeployment()
  * \see RBRGen3_enable()
+ * \see RBRGen3_verify()
+ * \see RBRGen3_disable()
  */
 typedef enum RBRGen3DeploymentStatus {
     /** Logging is not enabled. */
@@ -388,7 +404,7 @@ typedef enum RBRGen3DeploymentStatus {
     /** The number of specific statuses. */
     RBRGEN3_STATUS_COUNT,
     /** An unknown or unrecognized status. */
-    RBRGEN3_UNKNOWN_STATUS
+    RBRGEN3_UNKNOWN_STATUS,
 } RBRGen3DeploymentStatus;
 
 /**
@@ -430,19 +446,28 @@ typedef struct RBRGen3Deployment {
 /**
  * \brief Get the instrument deployment parameters.
  *
+ * \par Commands:
+ * `deployment`, or `starttime`, `endtime`, and `status` for Logger2
+ *
  * \param [in] conn the instrument connection
  * \param [out] deployment the deployment parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the instrument reports a time which cannot be
+ *         parsed
  * \see RBRGen3_setDeployment()
  */
 RBRGen3Error RBRGen3_getDeployment(RBRGen3 *conn, RBRGen3Deployment *deployment);
 
 /**
  * \brief Set the instrument deployment parameters.
+ *
+ * \par Commands:
+ * `deployment`, or `starttime` and `endtime` for Logger2
  *
  * As noted in the description of RBRGen3Deployment.status, that field is
  * ignored when setting the deployment.
@@ -455,14 +480,13 @@ RBRGen3Error RBRGen3_getDeployment(RBRGen3 *conn, RBRGen3Deployment *deployment)
  * \param [in] conn the instrument connection
  * \param [in] deployment the deployment parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the start or end time
- *                                                values are out of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the start or end time values are out of range
  * \see RBRGen3_getDeployment()
  */
 RBRGen3Error RBRGen3_setDeployment(RBRGen3 *conn, const RBRGen3Deployment *deployment);

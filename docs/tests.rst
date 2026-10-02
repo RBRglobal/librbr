@@ -4,8 +4,10 @@
 Writing Tests
 =============
 
-Unit tests are found
-in the ``testsGen3/`` subdirectory.
+Gen3 instrument tests are found
+in the ``testsGen3/`` subdirectory,
+and Gen4 instrument tests
+in the ``testsGen4/`` subdirectory.
 
 The dynamic correction tests are a separate suite
 in the ``testsDynamicCorrection/`` subdirectory.
@@ -32,6 +34,11 @@ i.e., you may have both ``TEST_LOGGER2(foo)``
 and ``TEST_LOGGER3(foo)``,
 but you may not have two instances
 of ``TEST_LOGGER3(bar)``.
+Gen4 tests use the ``TEST_LOGGER4`` macro instead,
+within any of the test modules
+found within ``testsGen4/``;
+it takes the same argument
+and its functions receive an ``RBRGen4`` connection.
 You do not need to declare test functions
 in a header;
 test functions defined
@@ -41,7 +48,7 @@ at build time.
 
 Functions declared with these macros
 receive two arguments:
-``instrument``, the test instrument connection;
+``conn``, the test instrument connection;
 and ``buffers``, the I/O buffers for the instrument.
 Test functions return a boolean indicating pass/fail.
 
@@ -57,14 +64,15 @@ let's consider the test for the ``id`` command:
            .model = "RBRduo3",
            .version = "1.092",
            .serial = 923456,
-           .fwtype = 104
+           .fwType = 104,
+           .mode = "",
        };
        RBRGen3Id actual;
 
        /* Populate the read buffer with the command response. */
        TestIOBuffers_init(buffers,
                           "id model = RBRduo3, version = 1.092, "
-                          "serial = 923456, fwtype = 104" COMMAND_TERMINATOR,
+                          "serial = 923456, fwtype = 104" RESPONSE_TERMINATOR,
                           0);
        /* Get the test instrument connection to send/parse the command. */
        RBRGen3Error err = RBRGen3_getId(conn, &actual);
@@ -76,7 +84,7 @@ let's consider the test for the ``id`` command:
        TEST_ASSERT_STR_EQ(expected.model, actual.model);
        TEST_ASSERT_STR_EQ(expected.version, actual.version);
        TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
-       TEST_ASSERT_EQ(expected.fwtype, actual.fwtype, "%" PRIi32);
+       TEST_ASSERT_EQ(expected.fwType, actual.fwType, "%" PRIi32);
 
        /* If none of the previous tests failed, the test passes. */
        return true;
@@ -112,11 +120,13 @@ For example,
 
    TEST_PARSER_CONFIG(two_channels) = {
        .format = RBRGEN3_MEMFORMAT_CALBIN00,
-       .formatConfig = {
-           .easyParse = {
-               .channels = 2
-           }
-       }
+       .formatConfig =
+           {
+               .easyParse =
+                   {
+                       .channels = 2,
+                   },
+           },
    };
 
    TEST_PARSER(test_a, two_channels)
@@ -142,10 +152,11 @@ However, if you're sure you do need a new module,
 then you can add one
 by creating a ``.c`` file in the ``testsGen3/`` subdirectory,
 then adding its name (without extension)
-to the ``TEST_MODULES`` variable in the ``Makefile``.
-Unless you have good reason not to,
-try to retain alphabetical ordering
-of the module names in the declaration.
+to the ``GEN3_TEST_MODULES`` variable in the ``Makefile``.
+Gen4 modules live in ``testsGen4/``
+and are listed in ``GEN4_TEST_MODULES``.
+The test runner is generated from the listed modules,
+so no other registration is needed.
 
 For example,
 to add a new module
@@ -155,9 +166,9 @@ and add it to the Makefile:
 
 ::
 
-   TEST_MODULES := communication \
-                   ...
-                   fetching \
-                   frobbing \
-                   gating \
-                   ...
+   GEN3_TEST_MODULES := communication \
+                        ...
+                        fetching \
+                        frobbing \
+                        gating \
+                        ...

@@ -10,11 +10,11 @@
  * \brief Library implementation.
  */
 
-/* Required for isnan, NAN. */
+/* Required for isnan. */
 #include <math.h>
-/* Required for strtol. */
+/* Required for atof, strtol. */
 #include <stdlib.h>
-/* Required for strchr, strcmp. */
+/* Required for memset, strcmp. */
 #include <string.h>
 /* Required for snprintf. */
 #include <stdio.h>
@@ -259,7 +259,7 @@ RBRGen3Error RBRGen3_setOutputFormat(RBRGen3 *conn, RBRGen3OutputFormat outputFo
         if (err != RBRGEN3_SUCCESS) {
             return RBRGEN3_UNSUPPORTED;
         } else {
-            if (conn->id.fwtype == 104 && (atof) (conn->id.version) >= 1.109) {
+            if (conn->id.fwType == 104 && (atof) (conn->id.version) >= 1.109) {
                 return RBRGen3_converse(conn, "outputformat type = %s", formatName);
             } else {
                 /* caltext07 is not supported by the firmware version in use. */

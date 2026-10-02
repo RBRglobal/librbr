@@ -99,17 +99,13 @@ typedef struct RBRGen4Calibration {
     /** \brief The number of a coefficients the equation uses. */
     int32_t aCount;
 
-    /** \brief The a coefficients, which any user may change. */
+    /** \brief The a coefficients. */
     float a[RBRGEN4_CALIBRATION_COEFFICIENT_MAX];
 
     /** \brief The number of b coefficients the equation uses. */
     int32_t bCount;
 
-    /**
-     * \brief The b coefficients.
-     *
-     * \warning Intended to be changed by RBR or an expert user only.
-     */
+    /** \brief The b coefficients. */
     float b[RBRGEN4_CALIBRATION_COEFFICIENT_MAX];
 
     /** \brief The number of m references the equation uses. */
@@ -145,7 +141,7 @@ typedef enum RBRGen4ChannelNature {
     /** The number of specific channel natures. */
     RBRGEN4_CHANNEL_NATURE_COUNT,
     /** An unknown or unrecognized channel nature. */
-    RBRGEN4_UNKNOWN_CHANNEL_NATURE
+    RBRGEN4_UNKNOWN_CHANNEL_NATURE,
 } RBRGen4ChannelNature;
 
 /**
@@ -255,21 +251,20 @@ typedef struct RBRGen4ChannelPool {
 /**
  * \brief Populate the parameters of a channel.
  *
+ * \command{channel <channel_label>}
+ *
  * The caller sets RBRGen4Channel.label to select the channel to
  * read.
- *
- * \note Issues the `channel <channel_label>` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] channel the channel to read, selected by its label
  * \return #RBRGEN4_SUCCESS when the channel is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist, or another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist, or another
- *                                      hardware error occurs
  * \see RBRGen4_getChannelPool()
  * \see RBRGen4_setChannel()
  */
@@ -278,22 +273,22 @@ RBRGen4Error RBRGen4_getChannel(RBRGen4 *conn, RBRGen4Channel *channel);
 /**
  * \brief Update a channel's user units.
  *
+ * \command{channel <channel_label>}
+ *
  * RBRGen4Channel.userUnits is the only parameter of the command a
  * caller may change; every other field of the structure is read-only. Read
  * the channel with RBRGen4_getChannel(), change the units, and write
  * the structure back.
  *
- * \note Issues the `channel <channel_label>` command.
- *
  * \param [in] conn the instrument connection
  * \param [in] channel the channel to write, selected by its label
  * \return #RBRGEN4_SUCCESS when the channel is successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the channel cannot be changed, or
- *                                      another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the channel cannot be changed, or another hardware error
+ *         occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the units are empty
  * \see RBRGen4_getChannel()
  */
@@ -302,24 +297,23 @@ RBRGen4Error RBRGen4_setChannel(RBRGen4 *conn, const RBRGen4Channel *channel);
 /**
  * \brief Read the labels of the channels configured on the instrument.
  *
+ * \command{channel}
+ *
  * Reports nothing but the labels; read a channel's parameters with
  * RBRGen4_getChannel().
- *
- * \note Issues the `channel` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] channelPool the channels present, labels only
  * \return #RBRGEN4_SUCCESS when the pool is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_TRUNCATED when \a channelPool cannot hold every
- *                            reported channel; the first `size` are
- *                            stored
+ * \return #RBRGEN4_HARDWARE_ERROR when the channel pool cannot be read, or another hardware error
+ *         occurs
+ * \return #RBRGEN4_TRUNCATED when \a channelPool cannot hold every reported channel; the first
+ *         RBRGen4ChannelPool.size are stored
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a channelPool has no storage
- * \return #RBRGEN4_HARDWARE_ERROR when the channel pool cannot be read, or
- *                                      another hardware error occurs
  * \see RBRGen4_getChannelPoolByNature()
  */
 RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPool);
@@ -327,28 +321,26 @@ RBRGen4Error RBRGen4_getChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPo
 /**
  * \brief Read the labels of the channels of one nature.
  *
+ * \par Command:
+ * `channel scientific` or `channel system`
+ *
  * Reports nothing but the labels; read a channel's parameters with
  * RBRGen4_getChannel().
- *
- * \note Issues the `channel scientific` or `channel system` command.
  *
  * \param [in] conn the instrument connection
  * \param [in] nature the nature of the channels to report
  * \param [in,out] channelPool the channels present, labels only
  * \return #RBRGEN4_SUCCESS when the pool is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_TRUNCATED when \a channelPool cannot hold every
- *                            reported channel; the first `size` are
- *                            stored
- * \return #RBRGEN4_HARDWARE_ERROR when the channel pool cannot be read, or
- *                                      another hardware error occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the nature is not
- *                                                    one the command accepts,
- *                                                    or \a channelPool has no
- *                                                    storage
+ * \return #RBRGEN4_HARDWARE_ERROR when the channel pool cannot be read, or another hardware error
+ *         occurs
+ * \return #RBRGEN4_TRUNCATED when \a channelPool cannot hold every reported channel; the first
+ *         RBRGen4ChannelPool.size are stored
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the nature is not one the command accepts, or
+ *         \a channelPool has no storage
  * \see RBRGen4_getChannelPool()
  */
 RBRGen4Error RBRGen4_getChannelPoolByNature(RBRGen4 *conn, RBRGen4ChannelNature nature,
@@ -357,17 +349,16 @@ RBRGen4Error RBRGen4_getChannelPoolByNature(RBRGen4 *conn, RBRGen4ChannelNature 
 /**
  * \brief Read the number of channels present on the instrument.
  *
- * \note Issues the `channel count` command.
+ * \command{channel count}
  *
  * \param [in] conn the instrument connection
  * \param [out] count the number of channels present
  * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
- *                                 hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another hardware error occurs
  * \see RBRGen4_getChannelPool()
  */
 RBRGen4Error RBRGen4_getChannelCount(RBRGen4 *conn, int32_t *count);
@@ -375,25 +366,26 @@ RBRGen4Error RBRGen4_getChannelCount(RBRGen4 *conn, int32_t *count);
 /**
  * \brief Read a channel's calibration.
  *
- * The caller sets RBRGen4Calibration.label to select the channel.
+ * \command{calibration <channel_label>}
  *
- * \note Issues the `calibration <channel_label>` command.
+ * The caller sets RBRGen4Calibration.label to select the channel.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] calibration the calibration to read, selected by its label
  * \return #RBRGEN4_SUCCESS when the calibration is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist, or another
- *                                      hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the channel does not exist, or another hardware error occurs
  * \see RBRGen4_setCalibration()
  */
 RBRGen4Error RBRGen4_getCalibration(RBRGen4 *conn, RBRGen4Calibration *calibration);
 
 /**
  * \brief Update a channel's calibration.
+ *
+ * \command{calibration <channel_label>}
  *
  * Sends the date, the offset and slope, and every a, b, and m coefficient the
  * equation uses. Read the calibration with RBRGen4_getCalibration(),
@@ -403,22 +395,16 @@ RBRGen4Error RBRGen4_getCalibration(RBRGen4 *conn, RBRGen4Calibration *calibrati
  * The equation is read-only and never sent; the instrument rejects a write to
  * it.
  *
- * \warning Hardware errors may occur if the instrument is logging, a
- *          coefficient is out of range for the equation, or an m reference
- *          does not name something the equation can use.
- *
  * \param [in] conn the instrument connection
  * \param [in] calibration the calibration to write, selected by its label
- * \return #RBRGEN4_SUCCESS when the calibration is successfully
- *                                    written
+ * \return #RBRGEN4_SUCCESS when the calibration is successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the calibration cannot be changed, or
- *                                      another hardware error occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a coefficient count
- *                                                    is out of range
+ * \return #RBRGEN4_HARDWARE_ERROR when the calibration cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a coefficient count is out of range
  * \see RBRGen4_getCalibration()
  */
 RBRGen4Error RBRGen4_setCalibration(RBRGen4 *conn, const RBRGen4Calibration *calibration);
@@ -439,7 +425,7 @@ typedef enum RBRGen4SettingsState {
     /** The parameter is not available on this instrument. */
     RBRGEN4_SETTINGS_STATE_UNAVAILABLE,
     /** The parameter was reported with a value the library does not know. */
-    RBRGEN4_UNKNOWN_SETTINGS_STATE
+    RBRGEN4_UNKNOWN_SETTINGS_STATE,
 } RBRGen4SettingsState;
 
 /**
@@ -459,7 +445,7 @@ const char *RBRGen4SettingsState_name(RBRGen4SettingsState state);
  */
 typedef struct RBRGen4Settings {
     /**
-     * \brief Whether the instrument returns the “Ready:” prompt following a
+     * \brief Whether the instrument returns the "Ready:" prompt following a
      * response.
      */
     RBRGen4SettingsState prompt;
@@ -478,21 +464,22 @@ typedef struct RBRGen4Settings {
 } RBRGen4Settings;
 
 /**
- * \brief Get miscellaneous logger settings
+ * \brief Get miscellaneous logger settings.
+ *
+ * \command{settings}
  *
  * A parameter the instrument does not report is set to
  * #RBRGEN4_SETTINGS_STATE_UNAVAILABLE, and one reported with a value the
  * library does not know to #RBRGEN4_UNKNOWN_SETTINGS_STATE.
  *
- * \note Issues the `settings` command.
- *
  * \param [in] conn the instrument connection
  * \param [out] settings the logger settings
  * \return #RBRGEN4_SUCCESS when the setting is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_setSettings()
  */
 RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings);
@@ -500,30 +487,27 @@ RBRGen4Error RBRGen4_getSettings(RBRGen4 *conn, RBRGen4Settings *settings);
 /**
  * \brief Set the miscellaneous logger settings.
  *
+ * \command{settings}
+ *
  * A parameter in #RBRGEN4_SETTINGS_STATE_UNAVAILABLE is left out of the
  * command, so settings read back from an instrument can be written to it
  * unchanged.
  *
- * \note Issues the `settings` command.
+ * \warning The library expects RBRGen4Settings.prompt and RBRGen4Settings.confirmation to be on, or
+ * unavailable. With RBRGen4Settings.confirmation explicitly off the instrument answers a set with
+ * nothing at all, and every later setter blocks until the command timeout.
  *
  * \param [in] conn the instrument connection
  * \param [in] settings the values for the settings in the logger
  * \return #RBRGEN4_SUCCESS when the setting is successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the settings cannot be changed, or when
- *                                      a parameter is set where the instrument
- *                                      does not offer it, or another hardware
- *                                      error occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the power-off delay
- *                                                    is negative, or a setting
- *                                                    state is unknown
- * \warning The library expects \a prompt and \a confirmation to be on, or
- *          unavailable. With \a confirmation explicitly off the instrument
- *          answers a set with nothing at all, and every later setter blocks
- *          until the command timeout.
+ * \return #RBRGEN4_HARDWARE_ERROR when the settings cannot be changed, or when a parameter is set
+ *         where the instrument does not offer it, or another hardware error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the power-off delay is negative, or a setting state
+ *         is unknown
  * \see RBRGen4_getSettings()
  */
 RBRGen4Error RBRGen4_setSettings(RBRGen4 *conn, const RBRGen4Settings *settings);
@@ -536,7 +520,7 @@ RBRGen4Error RBRGen4_setSettings(RBRGen4 *conn, const RBRGen4Settings *settings)
  */
 typedef struct RBRGen4Parameters {
     /**
-     * \brief the temperature coefficient used to correct the derived channel
+     * \brief The temperature coefficient used to correct the derived channel
      * for specific conductivity to 25°C. Its value depends on the ionic
      * composition of the water being monitored, and should be set to an
      * appropriate value for best results.
@@ -544,59 +528,60 @@ typedef struct RBRGen4Parameters {
      * suitable for KCl solutions and the upper end for NaCl solutions.
      */
     float specCondTempCo;
-    /** \brief the height above the seabed in metres at which the logger
+    /** \brief The height above the seabed in metres at which the logger
      * is deployed. This is a user-entered parameter which is required by
      * host software to calculate statistics and parameters for
-     * wave analysis. Can be ignored if not used.*/
+     * wave analysis. Can be ignored if not used. */
     float altitude;
-    /** \brief below are default parameter values, to be used when the logger does
+    /** \brief Below are default parameter values, to be used when the logger does
      * not have a channel which measures the named parameter, but one or more
      * cross-channel calibration equations requires it as an input.
-     * temperature in °C, default value 15.0*/
+     * Temperature in °C, default value 15.0.
+     */
     float temperature;
-    /** \brief absolute pressure in dbar, default value 10.132501 (1 standard atmosphere)*/
+    /** \brief Absolute pressure in dbar, default value 10.132501 (1 standard atmosphere). */
     float pressure;
-    /** \brief atmospheric pressure in dbar, default value 10.132501*/
+    /** \brief Atmospheric pressure in dbar, default value 10.132501. */
     float atmosphere;
-    /** \brief water density in g/cm3, default value 1.026021*/
+    /** \brief Water density in g/cm3, default value 1.026021. */
     float density;
-    /** \brief salinity in PSU, default value 35*/
+    /** \brief Salinity in PSU, default value 35. */
     float salinity;
-    /** \brief avgSoundSpeed in m/s, default value 1506.8*/
+    /** \brief The average sound speed in m/s, default value 1506.8. */
     float avgSoundSpeed;
 } RBRGen4Parameters;
 
 /**
  * \brief Get parameters which may be required when computing calibrated output.
- * \note Issues the `parameters` command.
+ *
+ * \command{parameters}
  *
  * \param [in] conn the instrument connection
  * \param [out] parameters the parameters in the logger
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_setParameters()
  */
 RBRGen4Error RBRGen4_getParameters(RBRGen4 *conn, RBRGen4Parameters *parameters);
 
 /**
  * \brief Set parameters which may be required when computing calibrated output.
- * \note Issues the `parameters` command.
  *
- * \warning Hardware errors may occur if the instrument is logging.
+ * \command{parameters}
  *
  * \param [in] conn the instrument connection
  * \param [in] parameters the values for the parameters in the logger
- * \return #RBRGEN4_SUCCESS when the parameters are successfully
- *                                    written
+ * \return #RBRGEN4_SUCCESS when the parameters are successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the parameters cannot be changed, or
- *                                      another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the parameters cannot be changed, or another hardware error
+ *         occurs
  * \see RBRGen4_getParameters()
  */
 RBRGen4Error RBRGen4_setParameters(RBRGen4 *conn, const RBRGen4Parameters *parameters);
@@ -620,27 +605,25 @@ typedef struct RBRGen4Group {
 /**
  * \brief Read the channels in a group.
  *
+ * \command{group <group_label>}
+ *
  * The caller sets RBRGen4Group.label to select the group to read.
  * The labels of the group's channels are written to \a channelList when it
  * is given.
  *
- * \note Issues the `group <group_label>` command.
- *
  * \param [in] conn the instrument connection
  * \param [in,out] group the group to read, selected by its label
- * \param [out] channelList the channels in the group, or `NULL` to skip them
+ * \param [in,out] channelList the channels in the group, or `NULL` to skip them
  * \return #RBRGEN4_SUCCESS when the group is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist, or another hardware error occurs
+ * \return #RBRGEN4_TRUNCATED when \a channelList cannot hold every reported channel; the first
+ *         RBRGen4LabelList.size are stored
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
  *         \a channelList is given without storage
- * \return #RBRGEN4_TRUNCATED when \a channelList cannot hold every
- *                            reported channel; the first `size` are
- *                            stored
- * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist, or another
- *                                      hardware error occurs
  * \see RBRGen4_getGroupPool()
  * \see RBRGen4_setGroup()
  */
@@ -649,28 +632,23 @@ RBRGen4Error RBRGen4_getGroup(RBRGen4 *conn, RBRGen4Group *group, RBRGen4LabelLi
 /**
  * \brief Set the channels in a group.
  *
+ * \command{group <group_label>}
+ *
  * Sends `channellist`, the only writable parameter. An empty \a channelList
  * sends `none`.
- *
- * \note Issues the `group <group_label>` command.
  *
  * \param [in] conn the instrument connection
  * \param [in] group the group to write, selected by its label
  * \param [in] channelList the channels to put in the group
  * \return #RBRGEN4_SUCCESS when the group is successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the command
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be written, or another
- *                                      hardware error occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
- *                                          \a channelList is `NULL`,
- *                                          its length does not fit
- *                                          its array, or a channel
- *                                          label is empty
- * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the
- *                                            command
+ * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be written, or another hardware error
+ *         occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, \a channelList is `NULL`, its
+ *         length does not fit its array, or a channel label is empty
  * \see RBRGen4_getGroup()
  */
 RBRGen4Error RBRGen4_setGroup(RBRGen4 *conn, const RBRGen4Group *group,
@@ -701,21 +679,21 @@ typedef struct RBRGen4GroupPool {
 /**
  * \brief Populate the pool of the instrument's groups.
  *
+ * \command{group}
+ *
  * Only the labels are reported; read a group's parameters with
  * RBRGen4_getGroup().
- *
- * \note Issues the `group` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] groupPool the groups defined, labels only
  * \return #RBRGEN4_SUCCESS when the groups are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_TRUNCATED when \a groupPool cannot hold every
- *                            reported group; the first `size` are
- *                            stored
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN4_TRUNCATED when \a groupPool cannot hold every reported group; the first
+ *         RBRGen4GroupPool.size are stored
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a groupPool has no storage
  * \see RBRGen4_getGroup()
  */
@@ -724,17 +702,16 @@ RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool);
 /**
  * \brief Read the number of groups defined on the instrument.
  *
- * \note Issues the `group count` command.
+ * \command{group count}
  *
  * \param [in] conn the instrument connection
  * \param [out] count the number of groups defined
  * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
- *                                 hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another hardware error occurs
  * \see RBRGen4_getGroupPool()
  * \see RBRGen4_getGroupMaxCount()
  */
@@ -743,17 +720,16 @@ RBRGen4Error RBRGen4_getGroupCount(RBRGen4 *conn, int32_t *count);
 /**
  * \brief Read the maximum number of groups the instrument can hold.
  *
- * \note Issues the `group maxcount` command.
+ * \command{group maxcount}
  *
  * \param [in] conn the instrument connection
  * \param [out] maxCount the maximum number of groups
  * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another
- *                                 hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another hardware error occurs
  * \see RBRGen4_getGroupCount()
  */
 RBRGen4Error RBRGen4_getGroupMaxCount(RBRGen4 *conn, int32_t *maxCount);
@@ -761,19 +737,19 @@ RBRGen4Error RBRGen4_getGroupMaxCount(RBRGen4 *conn, int32_t *maxCount);
 /**
  * \brief Create an empty group.
  *
- * Add channels with RBRGen4_setGroup().
+ * \command{group create <group_label>}
  *
- * \note Issues the `group create <group_label>` command.
+ * Add channels with RBRGen4_setGroup().
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label to give the new group
  * \return #RBRGEN4_SUCCESS when the group is successfully created
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be created, or another
- *                                      hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the group cannot be created, or another hardware error
+ *         occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteGroup()
  */
@@ -782,33 +758,34 @@ RBRGen4Error RBRGen4_createGroup(RBRGen4 *conn, const char *label);
 /**
  * \brief Delete a group.
  *
- * \note Issues the `group delete <group_label>` command.
+ * \command{group delete <group_label>}
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label of the group to delete
  * \return #RBRGEN4_SUCCESS when the group is successfully deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist, or another
- *                                      hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the group does not exist, or another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteGroupAll()
+ * \see RBRGen4_createGroup()
  */
 RBRGen4Error RBRGen4_deleteGroup(RBRGen4 *conn, const char *label);
 
 /**
  * \brief Delete every group.
  *
- * \note Issues the `group delete all` command.
+ * \command{group delete all}
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the groups are successfully deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_deleteGroup()
  */
 RBRGen4Error RBRGen4_deleteGroupAll(RBRGen4 *conn);
@@ -839,7 +816,7 @@ typedef enum RBRGen4ScheduleMode {
     /** \brief Regimes mode. */
     RBRGEN4_SCHEDULE_MODE_REGIMES = 1 << 6,
     /** \brief The greatest mode flag. */
-    RBRGEN4_SCHEDULE_MODE_MAX = RBRGEN4_SCHEDULE_MODE_REGIMES
+    RBRGEN4_SCHEDULE_MODE_MAX = RBRGEN4_SCHEDULE_MODE_REGIMES,
 } RBRGen4ScheduleMode;
 
 /**
@@ -857,7 +834,7 @@ typedef enum RBRGen4ScheduleStorage {
     /** The parameter is not available on this instrument. */
     RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE,
     /** The parameter was reported with a value the library does not know. */
-    RBRGEN4_UNKNOWN_SCHEDULE_STORAGE
+    RBRGEN4_UNKNOWN_SCHEDULE_STORAGE,
 } RBRGen4ScheduleStorage;
 
 /**
@@ -870,8 +847,7 @@ typedef enum RBRGen4ScheduleStorage {
 const char *RBRGen4ScheduleStorage_name(RBRGen4ScheduleStorage storage);
 
 /**
- * \brief A schedule's parameters in
- *        #RBRGEN4_SCHEDULE_MODE_CONTINUOUS.
+ * \brief A schedule's parameters in #RBRGEN4_SCHEDULE_MODE_CONTINUOUS.
  *
  * \see RBRGen4Schedule.parameters
  */
@@ -917,7 +893,7 @@ typedef enum RBRGen4ScheduleStream {
     /** The number of specific stream destinations. */
     RBRGEN4_SCHEDULE_STREAM_COUNT,
     /** An unknown or unrecognized stream destination. */
-    RBRGEN4_UNKNOWN_SCHEDULE_STREAM
+    RBRGEN4_UNKNOWN_SCHEDULE_STREAM,
 } RBRGen4ScheduleStream;
 
 /**
@@ -970,8 +946,7 @@ typedef struct RBRGen4Schedule {
      */
     union {
         /**
-         * \brief Parameters for
-         *        #RBRGEN4_SCHEDULE_MODE_CONTINUOUS.
+         * \brief Parameters for #RBRGEN4_SCHEDULE_MODE_CONTINUOUS.
          */
         RBRGen4ScheduleModeContinuous continuous;
 
@@ -983,6 +958,8 @@ typedef struct RBRGen4Schedule {
 /**
  * \brief Populate the parameters of a schedule.
  *
+ * \command{schedule <schedule_label>}
+ *
  * The caller sets RBRGen4Schedule.label to select the schedule.
  * The labels of the groups the schedule samples are written to \a groupList
  * when it is given.
@@ -991,24 +968,20 @@ typedef struct RBRGen4Schedule {
  * instrument does not report it, and a parameter reported with a value the
  * library does not know is set to its `UNKNOWN` state.
  *
- * \note Issues the `schedule <schedule_label>` command.
- *
  * \param [in] conn the instrument connection
  * \param [in,out] schedule the schedule to read, selected by its label
- * \param [out] groupList the groups the schedule samples, or `NULL` to skip
- *                        them
+ * \param [in,out] groupList the groups the schedule samples, or `NULL` to skip them
  * \return #RBRGEN4_SUCCESS when the schedule is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the schedule does not exist, or another hardware error
+ *         occurs
+ * \return #RBRGEN4_TRUNCATED when \a groupList cannot hold every reported group; the first
+ *         RBRGen4LabelList.size are stored
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
  *         \a groupList is given without storage
- * \return #RBRGEN4_TRUNCATED when \a groupList cannot hold every
- *                            reported group; the first `size` are
- *                            stored
- * \return #RBRGEN4_HARDWARE_ERROR when the schedule does not exist, or another
- *                                      hardware error occurs
  * \see RBRGen4_getSchedulePool()
  * \see RBRGen4_setSchedule()
  */
@@ -1018,37 +991,27 @@ RBRGen4Error RBRGen4_getSchedule(RBRGen4 *conn, RBRGen4Schedule *schedule,
 /**
  * \brief Set the parameters of a schedule.
  *
+ * \command{schedule <schedule_label>}
+ *
  * A `storage` of #RBRGEN4_SCHEDULE_STORAGE_UNAVAILABLE is left out of the
  * command, so a schedule read back from an instrument can be written to it
  * unchanged. An empty \a groupList sends `none`; a `NULL` \a groupList
  * leaves the instrument's group list unchanged.
  *
- * \note Issues the `schedule <schedule_label>` command.
- *
  * \param [in] conn the instrument connection
  * \param [in] schedule the schedule to write
- * \param [in] groupList the groups the schedule samples, or `NULL` to leave
- *                       them as they are
+ * \param [in] groupList the groups the schedule samples, or `NULL` to leave them as they are
  * \return #RBRGEN4_SUCCESS when the schedule is successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the schedule cannot be written, or when
- *                                      a parameter is set where the instrument
- *                                      does not offer it, or another hardware
- *                                      error occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
- *                                          the list's length does
- *                                          not fit its array, a
- *                                          group label is empty,
- *                                          the stream destination or
- *                                          storage state is unknown,
- *                                          or the mode is not a
- *                                          single known flag
- * \return #RBRGEN4_UNSUPPORTED when the mode is `ddsampling` or
- *                                        `regimes`
- * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit
+ * \return #RBRGEN4_HARDWARE_ERROR when the schedule cannot be written, or when a parameter is set
+ *         where the instrument does not offer it, or another hardware error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, the list's length does not fit
+ *         its array, a group label is empty, the stream destination or storage state is unknown, or
+ *         the mode is not a single known flag
+ * \return #RBRGEN4_UNSUPPORTED when the mode is `ddsampling` or `regimes`
  * \see RBRGen4_getSchedule()
  */
 RBRGen4Error RBRGen4_setSchedule(RBRGen4 *conn, const RBRGen4Schedule *schedule,
@@ -1091,21 +1054,21 @@ const char *RBRGen4ScheduleMode_name(RBRGen4ScheduleMode mode);
 /**
  * \brief Populate the pool of the instrument's schedules.
  *
+ * \command{schedule}
+ *
  * Only the labels are reported; read a schedule's parameters with
  * RBRGen4_getSchedule().
- *
- * \note Issues the `schedule` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] schedulePool the schedules defined, labels only
  * \return #RBRGEN4_SUCCESS when the schedules are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_TRUNCATED when \a schedulePool cannot hold every
- *                            reported schedule; the first `size` are
- *                            stored
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN4_TRUNCATED when \a schedulePool cannot hold every reported schedule; the first
+ *         RBRGen4SchedulePool.size are stored
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a schedulePool has no storage
  * \see RBRGen4_getSchedule()
  */
@@ -1114,17 +1077,16 @@ RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedul
 /**
  * \brief Read the number of schedules defined on the instrument.
  *
- * \note Issues the `schedule count` command.
+ * \command{schedule count}
  *
  * \param [in] conn the instrument connection
  * \param [out] count the number of schedules defined
  * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
- *                                 hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another hardware error occurs
  * \see RBRGen4_getSchedulePool()
  * \see RBRGen4_getScheduleMaxCount()
  */
@@ -1133,17 +1095,16 @@ RBRGen4Error RBRGen4_getScheduleCount(RBRGen4 *conn, int32_t *count);
 /**
  * \brief Read the maximum number of schedules the instrument can hold.
  *
- * \note Issues the `schedule maxcount` command.
+ * \command{schedule maxcount}
  *
  * \param [in] conn the instrument connection
  * \param [out] maxCount the maximum number of schedules
  * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another
- *                                 hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another hardware error occurs
  * \see RBRGen4_getScheduleCount()
  */
 RBRGen4Error RBRGen4_getScheduleMaxCount(RBRGen4 *conn, int32_t *maxCount);
@@ -1151,19 +1112,19 @@ RBRGen4Error RBRGen4_getScheduleMaxCount(RBRGen4 *conn, int32_t *maxCount);
 /**
  * \brief Create a schedule with default parameters.
  *
- * Configure it with RBRGen4_setSchedule().
+ * \command{schedule create <schedule_label>}
  *
- * \note Issues the `schedule create <schedule_label>` command.
+ * Configure it with RBRGen4_setSchedule().
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label to give the new schedule
  * \return #RBRGEN4_SUCCESS when the schedule is successfully created
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when it cannot be created, or another
- *                                      hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the schedule cannot be created, or another hardware error
+ *         occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteSchedule()
  */
@@ -1172,33 +1133,35 @@ RBRGen4Error RBRGen4_createSchedule(RBRGen4 *conn, const char *label);
 /**
  * \brief Delete a schedule.
  *
- * \note Issues the `schedule delete <schedule_label>` command.
+ * \command{schedule delete <schedule_label>}
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label of the schedule to delete
  * \return #RBRGEN4_SUCCESS when the schedule is successfully deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when it does not exist, or another hardware
- *                                      error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the schedule does not exist, or another hardware error
+ *         occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteScheduleAll()
+ * \see RBRGen4_createSchedule()
  */
 RBRGen4Error RBRGen4_deleteSchedule(RBRGen4 *conn, const char *label);
 
 /**
  * \brief Delete every schedule.
  *
- * \note Issues the `schedule delete all` command.
+ * \command{schedule delete all}
  *
  * \param [in] conn the instrument connection
- * \return #RBRGEN4_SUCCESS when the schedules are deleted
+ * \return #RBRGEN4_SUCCESS when the schedules are successfully deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_deleteSchedule()
  */
 RBRGen4Error RBRGen4_deleteScheduleAll(RBRGen4 *conn);
@@ -1222,28 +1185,26 @@ typedef struct RBRGen4Config {
 /**
  * \brief Read the schedules in a configuration.
  *
+ * \command{config <config_label>}
+ *
  * The caller sets RBRGen4Config.label to select the configuration.
  * The labels of the configuration's schedules are written to
  * \a scheduleList when it is given.
  *
- * \note Issues the `config <config_label>` command.
- *
  * \param [in] conn the instrument connection
  * \param [in,out] config the configuration to read, selected by its label
- * \param [out] scheduleList the schedules in the configuration, or `NULL` to
- *                           skip them
+ * \param [in,out] scheduleList the schedules in the configuration, or `NULL` to skip them
  * \return #RBRGEN4_SUCCESS when the configuration is read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the configuration does not exist, or another hardware error
+ *         occurs
+ * \return #RBRGEN4_TRUNCATED when \a scheduleList cannot hold every reported schedule; the first
+ *         RBRGen4LabelList.size are stored
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
  *         \a scheduleList is given without storage
- * \return #RBRGEN4_TRUNCATED when \a scheduleList cannot hold every
- *                            reported schedule; the first `size` are
- *                            stored
- * \return #RBRGEN4_HARDWARE_ERROR when the configuration does not exist, or
- *                                      another hardware error occurs
  * \see RBRGen4_getConfigPool()
  * \see RBRGen4_setConfig()
  */
@@ -1253,28 +1214,23 @@ RBRGen4Error RBRGen4_getConfig(RBRGen4 *conn, RBRGen4Config *config,
 /**
  * \brief Set the schedules in a configuration.
  *
+ * \command{config <config_label>}
+ *
  * Sends `schedulelist`, the command's only parameter. An empty
  * \a scheduleList sends `none`.
- *
- * \note Issues the `config <config_label>` command.
  *
  * \param [in] conn the instrument connection
  * \param [in] config the configuration to write, selected by its label
  * \param [in] scheduleList the schedules to put in the configuration
  * \return #RBRGEN4_SUCCESS when the configuration is written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the command
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the configuration cannot be written, or
- *                                      another hardware error occurs
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty,
- *                                          \a scheduleList is
- *                                          `NULL`, its length does
- *                                          not fit its array, or a
- *                                          schedule label is empty
- * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit the
- *                                            command
+ * \return #RBRGEN4_HARDWARE_ERROR when the configuration cannot be written, or another hardware
+ *         error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, \a scheduleList is `NULL`, its
+ *         length does not fit its array, or a schedule label is empty
  * \see RBRGen4_getConfig()
  */
 RBRGen4Error RBRGen4_setConfig(RBRGen4 *conn, const RBRGen4Config *config,
@@ -1306,21 +1262,21 @@ typedef struct RBRGen4ConfigPool {
 /**
  * \brief Populate the pool of the instrument's configurations.
  *
+ * \command{config}
+ *
  * Only the labels are reported; read a configuration's parameters with
  * RBRGen4_getConfig().
- *
- * \note Issues the `config` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] configPool the configurations defined, labels only
  * \return #RBRGEN4_SUCCESS when the configurations are read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_TRUNCATED when \a configPool cannot hold every
- *                            reported configuration; the first
- *                            `size` are stored
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN4_TRUNCATED when \a configPool cannot hold every reported configuration; the first
+ *         RBRGen4ConfigPool.size are stored
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a configPool has no storage
  * \see RBRGen4_getConfig()
  */
@@ -1329,17 +1285,16 @@ RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool)
 /**
  * \brief Read the number of configurations defined on the instrument.
  *
- * \note Issues the `config count` command.
+ * \command{config count}
  *
  * \param [in] conn the instrument connection
  * \param [out] count the number of configurations defined
  * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
- *                                 hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another hardware error occurs
  * \see RBRGen4_getConfigPool()
  * \see RBRGen4_getConfigMaxCount()
  */
@@ -1348,17 +1303,16 @@ RBRGen4Error RBRGen4_getConfigCount(RBRGen4 *conn, int32_t *count);
 /**
  * \brief Read the maximum number of configurations the instrument can hold.
  *
- * \note Issues the `config maxcount` command.
+ * \command{config maxcount}
  *
  * \param [in] conn the instrument connection
  * \param [out] maxCount the maximum number of configurations
  * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another
- *                                 hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another hardware error occurs
  * \see RBRGen4_getConfigCount()
  */
 RBRGen4Error RBRGen4_getConfigMaxCount(RBRGen4 *conn, int32_t *maxCount);
@@ -1366,19 +1320,19 @@ RBRGen4Error RBRGen4_getConfigMaxCount(RBRGen4 *conn, int32_t *maxCount);
 /**
  * \brief Create an empty configuration.
  *
- * Add schedules with RBRGen4_setConfig().
+ * \command{config create <config_label>}
  *
- * \note Issues the `config create <config_label>` command.
+ * Add schedules with RBRGen4_setConfig().
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label to give the new configuration
- * \return #RBRGEN4_SUCCESS when the configuration is created
+ * \return #RBRGEN4_SUCCESS when the configuration is successfully created
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when it cannot be created, or another
- *                                      hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the configuration cannot be created, or another hardware
+ *         error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteConfig()
  */
@@ -1387,33 +1341,35 @@ RBRGen4Error RBRGen4_createConfig(RBRGen4 *conn, const char *label);
 /**
  * \brief Delete a configuration.
  *
- * \note Issues the `config delete <config_label>` command.
+ * \command{config delete <config_label>}
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label of the configuration to delete
- * \return #RBRGEN4_SUCCESS when the configuration is deleted
+ * \return #RBRGEN4_SUCCESS when the configuration is successfully deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when it does not exist, or another hardware
- *                                      error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the configuration does not exist, or another hardware error
+ *         occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
  * \see RBRGen4_deleteConfigAll()
+ * \see RBRGen4_createConfig()
  */
 RBRGen4Error RBRGen4_deleteConfig(RBRGen4 *conn, const char *label);
 
 /**
  * \brief Delete every configuration.
  *
- * \note Issues the `config delete all` command.
+ * \command{config delete all}
  *
  * \param [in] conn the instrument connection
- * \return #RBRGEN4_SUCCESS when the configurations are deleted
+ * \return #RBRGEN4_SUCCESS when the configurations are successfully deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_deleteConfig()
  */
 RBRGen4Error RBRGen4_deleteConfigAll(RBRGen4 *conn);

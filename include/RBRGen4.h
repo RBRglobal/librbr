@@ -51,8 +51,7 @@ extern const char *RBRGEN4_LIB_VERSION;
 extern const char *RBRGEN4_LIB_BUILD_DATE;
 
 /**
- * \brief A reasonable size for the buffer storing commands destined for the
- *        instrument.
+ * \brief A reasonable size for the buffer storing commands destined for the instrument.
  *
  * \see RBRGen4Environment.commandCapacity for how to size the buffer
  */
@@ -128,7 +127,7 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
  *
  * Does not include any null terminator.
  */
-#define RBRGEN4_ID_APIVERSION_MAX 8
+#define RBRGEN4_ID_API_VERSION_MAX 8
 
 /**
  * \brief The maximum number of characters in a label.
@@ -239,7 +238,7 @@ typedef enum RBRGen4Error {
     /** The number of specific errors. Should not be used as an error value. */
     RBRGEN4_ERROR_COUNT,
     /** An unknown or unrecognized error. */
-    RBRGEN4_UNKNOWN_ERROR
+    RBRGEN4_UNKNOWN_ERROR,
 } RBRGen4Error;
 
 /**
@@ -287,7 +286,7 @@ typedef enum RBRGen4DataType {
     RBRGEN4_DATA_TYPE_FLOAT64,
     /** Same as Float64, but no calibration equation applied. It is presented
      * as a ratio compared to nominal full-scale, so the expected range is
-     * nominally 0.0 to 1.0. The full thoretical range is -2.0 to +2.0, but the
+     * nominally 0.0 to 1.0. The full theoretical range is -2.0 to +2.0, but the
      * output of most channels will remain within or close to the expected
      * nominal range.
      */
@@ -295,7 +294,7 @@ typedef enum RBRGen4DataType {
     /** The number of specific datatypes. */
     RBRGEN4_DATA_TYPE_COUNT,
     /** An unknown or unrecognized dataType. */
-    RBRGEN4_UNKNOWN_DATA_TYPE
+    RBRGEN4_UNKNOWN_DATA_TYPE,
 } RBRGen4DataType;
 
 /**
@@ -353,12 +352,14 @@ typedef struct RBRGen4OutputFormat {
  *
  * \see RBRGen4_open()
  */
-#define RBRGEN4_DEFAULT_OUTPUT_FORMAT              \
-    ((RBRGen4OutputFormat) {.sn = false,           \
-                            .scheduleLabel = true, \
-                            .dateTime = true,      \
-                            .crc = false,          \
-                            .dataType = RBRGEN4_DATA_TYPE_FLOAT32})
+#define RBRGEN4_DEFAULT_OUTPUT_FORMAT          \
+    ((RBRGen4OutputFormat) {                   \
+        .sn = false,                           \
+        .scheduleLabel = true,                 \
+        .dateTime = true,                      \
+        .crc = false,                          \
+        .dataType = RBRGEN4_DATA_TYPE_FLOAT32, \
+    })
 
 /**
  * \brief Instrument `id4` command parameters.
@@ -377,11 +378,11 @@ typedef struct RBRGen4Id4 {
      *
      * \readonly
      */
-    char fwversion[RBRGEN4_ID_VERSION_MAX + 1];
+    char fwVersion[RBRGEN4_ID_VERSION_MAX + 1];
     /**
      * \brief The instrument firmware version in Semantic Version form.
      *
-     * For example, `2.0.0-rc1-10-g148bc5eb1`.
+     * For example, `2.0.0-rc3-14-g5e07a2c91`.
      *
      * \readonly
      */
@@ -393,11 +394,11 @@ typedef struct RBRGen4Id4 {
      *
      * \readonly
      */
-    char apiversion[RBRGEN4_ID_APIVERSION_MAX + 1];
+    char apiVersion[RBRGEN4_ID_API_VERSION_MAX + 1];
     /** The serial number of the instrument. */
     int32_t sn;
     /** The firmware type of the instrument. */
-    int32_t fwtype;
+    int32_t fwType;
 } RBRGen4Id4;
 
 struct RBRGen4;
@@ -420,8 +421,8 @@ struct RBRGen4;
  * \param [out] time the current platform time in milliseconds
  * \return #RBRGEN4_SUCCESS when the time is successfully retrieved
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
- * \see RBRGen4ReadCallback() for details on how the values returned from
- *                                  user callback functions are used
+ * \see RBRGen4ReadCallback() for details on how the values returned from user callback functions
+ *      are used
  */
 typedef RBRGen4Error (*RBRGen4TimeCallback)(const struct RBRGen4 *conn, RBRGen4DateTime *time);
 
@@ -436,10 +437,10 @@ typedef RBRGen4Error (*RBRGen4TimeCallback)(const struct RBRGen4 *conn, RBRGen4D
  *
  * \param [in] conn the instrument for which sleep is being requested
  * \param [in] time the duration for which a sleep is requested in milliseconds
- * \return #RBRGEN4_SUCCESS when the time is successfully retrieved
+ * \return #RBRGEN4_SUCCESS when the requested time has elapsed
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
- * \see RBRGen4ReadCallback() for details on how the values returned from
- *                                  user callback functions are used
+ * \see RBRGen4ReadCallback() for details on how the values returned from user callback functions
+ *      are used
  */
 typedef RBRGen4Error (*RBRGen4SleepCallback)(const struct RBRGen4 *conn, RBRGen4DateTime time);
 
@@ -478,9 +479,8 @@ typedef RBRGen4Error (*RBRGen4SleepCallback)(const struct RBRGen4 *conn, RBRGen4
  *
  * \param [in] conn the instrument for which data is being requested
  * \param [in,out] data where up to \a size bytes of data can be written
- * \param [in,out] size initially, the maximum amount of data which can be
- *                      written to \a data; set by the callback to the number
- *                      of bytes actually written
+ * \param [in,out] size initially, the maximum amount of data which can be written to \a data; set
+ *                      by the callback to the number of bytes actually written
  * \return #RBRGEN4_SUCCESS when data is successfully read
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
@@ -510,8 +510,8 @@ typedef RBRGen4Error (*RBRGen4ReadCallback)(const struct RBRGen4 *conn, void *da
  * \return #RBRGEN4_SUCCESS when the data is successfully written
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
  * \return #RBRGEN4_CALLBACK_ERROR when an unrecoverable error occurs
- * \see RBRGen4ReadCallback() for details on how the values returned from
- *                                  user callback functions are used
+ * \see RBRGen4ReadCallback() for details on how the values returned from user callback functions
+ *      are used
  */
 typedef RBRGen4Error (*RBRGen4WriteCallback)(const struct RBRGen4 *conn, const void *const data,
                                              int32_t size);
@@ -674,7 +674,7 @@ typedef enum RBRGen4ResponseType {
     /** The number of specific types. */
     RBRGEN4_RESPONSE_TYPE_COUNT,
     /** The response has been incorrectly or incompletely populated. */
-    RBRGEN4_RESPONSE_UNKNOWN_TYPE
+    RBRGEN4_RESPONSE_UNKNOWN_TYPE,
 } RBRGen4ResponseType;
 
 /**
@@ -694,13 +694,12 @@ typedef struct RBRGen4Response {
      * \brief The type of this response: informational, warning, or error.
      *
      * Successful commands, as indicated by the command having returned
-     * #RBRGEN4_SUCCESS, may yield informational or warning responses
-     * (types #RBRGEN4_RESPONSE_INFO and #RBRGEN4_RESPONSE_WARNING,
-     * respectively). Commands having resulted in a hardware error will return
-     * #RBRGEN4_HARDWARE_ERROR and yield an error response (type
-     * #RBRGEN4_RESPONSE_ERROR). In any other case, the response is
-     * unpopulated and its contents are irrelevant (type
-     * #RBRGEN4_RESPONSE_UNKNOWN_TYPE).
+     * #RBRGEN4_SUCCESS, yield informational responses (type
+     * #RBRGEN4_RESPONSE_INFO). Commands having resulted in a hardware error
+     * will return #RBRGEN4_HARDWARE_ERROR and yield an error or warning
+     * response (types #RBRGEN4_RESPONSE_ERROR and #RBRGEN4_RESPONSE_WARNING,
+     * respectively). In any other case, the response is unpopulated and its
+     * contents are irrelevant (type #RBRGEN4_RESPONSE_UNKNOWN_TYPE).
      *
      * - Informational responses will provide only a response (number as `0`).
      * - Warnings and errors will provide a number and occasionally a response.
@@ -824,7 +823,8 @@ typedef struct RBRGen4 {
 
 /**
  * \brief Establish a connection with an instrument and initialize the context.
- * \note Issues the `id4` and `instrument outputformat` commands.
+ *
+ * \command{id4,instrument outputformat}
  *
  * “connection” in this library means purely the state tracking
  * and management of an instrument: the underlying physical communication with
@@ -835,10 +835,10 @@ typedef struct RBRGen4 {
  * instance (statically, on the stack, or from a heap of its choosing) and the
  * constructor initializes it in place. Any prior contents are discarded. The
  * caller likewise provides the command and response buffers through
- * \a environment. If either buffer is
- * `NULL`, the command buffer has a capacity of zero or less, or the response
- * buffer cannot hold more than a line terminator, the connection is not
- * opened and #RBRGEN4_INVALID_PARAMETER_VALUE is returned. A buffer too small for the
+ * \a environment. If either buffer is `NULL`, the command buffer has a
+ * capacity of zero or less, or the response buffer cannot hold more than a
+ * line terminator, the connection is not opened and
+ * #RBRGEN4_INVALID_PARAMETER_VALUE is returned. A buffer too small for the
  * opening exchange yields #RBRGEN4_COMMAND_TOO_LONG or
  * #RBRGEN4_RESPONSE_TOO_LONG.
  *
@@ -862,40 +862,35 @@ typedef struct RBRGen4 {
  *
  * This constructor supports only 4th-generation RBR instruments. If the
  * constructor detects an unsupported instrument during connection,
- * #RBRGEN4_UNSUPPORTED is returned; a callback failure or a buffer too small
- * for the identification exchange is reported as itself.
+ * #RBRGEN4_UNSUPPORTED is returned.
  *
  * Until this function has read the instrument's output format, the library
  * assumes it to be #RBRGEN4_DEFAULT_OUTPUT_FORMAT. Samples streamed
  * in any other format while the connection is being opened are not
  * recognised as samples: they are discarded rather than passed to
  * RBRGen4Environment.sample.
- * \see RBRGen4_setOutputFormat()
  *
  * In the event of any return value other than #RBRGEN4_SUCCESS, no cleanup of
  * library resources is required. In the event of a successful result,
  * RBRGen4_close() should be used to terminate the instrument connection.
  *
  * \param [out] conn the context object to populate
- * \param [in] environment the callbacks and buffers to be used by the
- *                         connection
+ * \param [in] environment the callbacks and buffers to be used by the connection
  * \param [in] commandTimeout the command timeout in milliseconds
  * \param [in] userData arbitrary user data; useful in callbacks
- * \return #RBRGEN4_SUCCESS if the instrument was opened successfully
- * \return #RBRGEN4_MISSING_CALLBACK if \a environment or a callback was not
- *         provided
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE if a buffer is missing or empty,
- *         or RBRGen4Environment.sampleBuffer has no readings storage
- * \return #RBRGEN4_COMMAND_TOO_LONG if the command buffer cannot hold the
- *         opening command
- * \return #RBRGEN4_RESPONSE_TOO_LONG if the response buffer cannot hold the
- *         instrument's reply
- * \return #RBRGEN4_TIMEOUT if an instrument communication timeout occurs
+ * \return #RBRGEN4_SUCCESS when the instrument was opened successfully
+ * \return #RBRGEN4_MISSING_CALLBACK when \a environment or a callback was not provided
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a buffer is missing or empty, or
+ *         RBRGen4Environment.sampleBuffer has no readings storage
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command buffer cannot hold the opening command
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when the response buffer cannot hold the instrument's reply
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the instrument rejects the opening
- *         command
- * \return #RBRGEN4_UNSUPPORTED if the instrument is unsupported
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument rejects the `instrument outputformat`
+ *         command, or another hardware error occurs
+ * \return #RBRGEN4_UNSUPPORTED when the instrument is unsupported
  * \see RBRGen4_close()
+ * \see RBRGen4_setOutputFormat()
  */
 RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Environment *environment,
                           const RBRGen4DateTime commandTimeout, void *userData);
@@ -906,8 +901,8 @@ RBRGen4Error RBRGen4_open(RBRGen4 *conn, const RBRGen4Environment *environment,
  * Clears the connection state. Does not release the caller-provided instance
  * memory and does not perform any communication with the instrument.
  *
- * \param [in,out] conn the instrument connection to terminate
- * \return #RBRGEN4_SUCCESS if the instrument was closed successfully
+ * \param [in] conn the instrument connection to terminate
+ * \return #RBRGEN4_SUCCESS when the instrument was closed successfully
  * \see RBRGen4_open()
  */
 RBRGen4Error RBRGen4_close(RBRGen4 *conn);
@@ -922,11 +917,11 @@ RBRGen4Error RBRGen4_close(RBRGen4 *conn);
  *
  * Does not communicate with the instrument.
  *
- * \param [in,out] conn the instrument connection
- * \param [in] command storage for commands destined for the instrument
+ * \param [in] conn the instrument connection
+ * \param [out] command storage for commands destined for the instrument
  * \param [in] capacity the capacity of \a command in bytes
  * \return #RBRGEN4_SUCCESS when the buffer is replaced
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE if the buffer is missing or empty
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the buffer is missing or empty
  * \see RBRGen4Environment for the rules on sizing and sharing buffers
  * \see RBRGen4_setResponseBuffer()
  */
@@ -944,12 +939,12 @@ RBRGen4Error RBRGen4_setCommandBuffer(RBRGen4 *conn, uint8_t *command, int32_t c
  *
  * Does not communicate with the instrument.
  *
- * \param [in,out] conn the instrument connection
- * \param [in] response storage for data received from the instrument
+ * \param [in] conn the instrument connection
+ * \param [out] response storage for data received from the instrument
  * \param [in] capacity the capacity of \a response in bytes
  * \return #RBRGEN4_SUCCESS when the buffer is replaced
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE if the buffer is missing or cannot
- *         hold more than a line terminator
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the buffer is missing or cannot hold more than a
+ *         line terminator
  * \see RBRGen4Environment for the rules on sizing and sharing buffers
  * \see RBRGen4_setCommandBuffer()
  */
@@ -959,7 +954,7 @@ RBRGen4Error RBRGen4_setResponseBuffer(RBRGen4 *conn, uint8_t *response, int32_t
  * \brief Discard any buffered instrument response data.
  *
  * This function must be called after a response buffer has been shared with
- * another RBRGenX connection instance.
+ * another RBRGen4 connection instance.
  *
  * The response buffer is not always fully consumed during a command-response
  * interaction with an instrument. Unread data can include the prompt or
@@ -974,7 +969,7 @@ RBRGen4Error RBRGen4_setResponseBuffer(RBRGen4 *conn, uint8_t *response, int32_t
  *
  * Does not communicate with the instrument.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \see RBRGen4Environment for the rules on sharing buffers between connections
  */
 void RBRGen4_resetResponseBuffer(RBRGen4 *conn);
@@ -1045,8 +1040,7 @@ void *RBRGen4_getUserData(const RBRGen4 *conn);
 void RBRGen4_setUserData(RBRGen4 *conn, void *userData);
 
 /**
- * \brief Get the error which resulted from the last instrument command, if
- *        applicable.
+ * \brief Get the error which resulted from the last instrument command, if applicable.
  *
  * If the instrument responded with an error or a warning to the last command,
  * this function returns that error. Otherwise, and before any commands have
@@ -1068,8 +1062,7 @@ void RBRGen4_setUserData(RBRGen4 *conn, void *userData);
 RBRGen4HardwareError RBRGen4_getLastHardwareError(const RBRGen4 *conn);
 
 /**
- * \brief Get the error message which resulted from the last instrument
- *        command, if applicable.
+ * \brief Get the error message which resulted from the last instrument command, if applicable.
  *
  * If the last instrument command returned #RBRGEN4_HARDWARE_ERROR and an
  * error message is available, this function returns the verbatim error

@@ -12,7 +12,7 @@
 
 /* Required for snprintf. */
 #include <stdio.h>
-/* Required for memset. */
+/* Required for strlen. */
 #include <string.h>
 
 #include "RBRGen3.h"

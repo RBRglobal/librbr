@@ -10,9 +10,6 @@
  * \brief Library implementation.
  */
 
-/* Required for strcmp. */
-#include <string.h>
-
 #include "RBRGen3.h"
 #include "RBRGen3Internal.h"
 #include "RBRGen3Security.h"

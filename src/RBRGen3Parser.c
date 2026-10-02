@@ -10,13 +10,10 @@
  * \brief Library implementation.
  */
 
-/* Required for NAN. */
-#include <math.h>
+/* Required for NULL, size_t. */
+#include <stddef.h>
 /* Required for memcpy, memset. */
 #include <string.h>
-
-#include <stdio.h>
-#include <stddef.h>
 
 #include "RBRGen3Parser.h"
 /* Required for RBR_TRY. */

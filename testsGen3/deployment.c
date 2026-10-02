@@ -43,40 +43,45 @@ TEST_LOGGER2(verify)
 {
     StatusTest tests[] = {
         {
-            "verify = pending" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE,
-            },
-            RBRGEN3_STATUS_PENDING,
+            .response = "verify = pending" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_INFO,
+                    .error = RBRGEN3_HARDWARE_ERROR_NONE,
+                },
+            .expected = RBRGEN3_STATUS_PENDING,
         },
         {
-            "verify = logging" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE,
-            },
-            RBRGEN3_STATUS_LOGGING,
+            .response = "verify = logging" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_INFO,
+                    .error = RBRGEN3_HARDWARE_ERROR_NONE,
+                },
+            .expected = RBRGEN3_STATUS_LOGGING,
         },
         {
-            "E0402 memory not empty, erase first, verify = stopped" RESPONSE_TERMINATOR,
-            RBRGEN3_HARDWARE_ERROR,
-            {
-                .type = RBRGEN3_RESPONSE_ERROR,
-                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST,
-            },
-            RBRGEN3_UNKNOWN_STATUS,
+            .response = "E0402 memory not empty, erase first, verify = stopped" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_HARDWARE_ERROR,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_ERROR,
+                    .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST,
+                },
+            .expected = RBRGEN3_UNKNOWN_STATUS,
         },
         {
-            "E0401 estimated memory usage exceeds capacity, verify = logging" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_WARNING,
-                .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
-            },
-            RBRGEN3_STATUS_LOGGING,
+            .response = "E0401 estimated memory usage exceeds capacity, verify = "
+                        "logging" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_WARNING,
+                    .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
+                },
+            .expected = RBRGEN3_STATUS_LOGGING,
         },
         {0},
     };
@@ -88,40 +93,44 @@ TEST_LOGGER3(verify)
 {
     StatusTest tests[] = {
         {
-            "verify status = pending, warning = none" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE,
-            },
-            RBRGEN3_STATUS_PENDING,
+            .response = "verify status = pending, warning = none" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_INFO,
+                    .error = RBRGEN3_HARDWARE_ERROR_NONE,
+                },
+            .expected = RBRGEN3_STATUS_PENDING,
         },
         {
-            "verify status = logging, warning = none" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE,
-            },
-            RBRGEN3_STATUS_LOGGING,
+            .response = "verify status = logging, warning = none" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_INFO,
+                    .error = RBRGEN3_HARDWARE_ERROR_NONE,
+                },
+            .expected = RBRGEN3_STATUS_LOGGING,
         },
         {
-            "E0402 memory not empty, erase first" RESPONSE_TERMINATOR,
-            RBRGEN3_HARDWARE_ERROR,
-            {
-                .type = RBRGEN3_RESPONSE_ERROR,
-                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST,
-            },
-            RBRGEN3_UNKNOWN_STATUS,
+            .response = "E0402 memory not empty, erase first" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_HARDWARE_ERROR,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_ERROR,
+                    .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST,
+                },
+            .expected = RBRGEN3_UNKNOWN_STATUS,
         },
         {
-            "verify status = logging, warning = W0401" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_WARNING,
-                .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
-            },
-            RBRGEN3_STATUS_LOGGING,
+            .response = "verify status = logging, warning = W0401" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_WARNING,
+                    .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
+                },
+            .expected = RBRGEN3_STATUS_LOGGING,
         },
         {0},
     };
@@ -151,40 +160,45 @@ TEST_LOGGER2(enable)
 {
     StatusTest tests[] = {
         {
-            "enable = pending" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE,
-            },
-            RBRGEN3_STATUS_PENDING,
+            .response = "enable = pending" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_INFO,
+                    .error = RBRGEN3_HARDWARE_ERROR_NONE,
+                },
+            .expected = RBRGEN3_STATUS_PENDING,
         },
         {
-            "enable = logging" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE,
-            },
-            RBRGEN3_STATUS_LOGGING,
+            .response = "enable = logging" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_INFO,
+                    .error = RBRGEN3_HARDWARE_ERROR_NONE,
+                },
+            .expected = RBRGEN3_STATUS_LOGGING,
         },
         {
-            "E0402 memory not empty, erase first" RESPONSE_TERMINATOR,
-            RBRGEN3_HARDWARE_ERROR,
-            {
-                .type = RBRGEN3_RESPONSE_ERROR,
-                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST,
-            },
-            RBRGEN3_UNKNOWN_STATUS,
+            .response = "E0402 memory not empty, erase first" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_HARDWARE_ERROR,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_ERROR,
+                    .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST,
+                },
+            .expected = RBRGEN3_UNKNOWN_STATUS,
         },
         {
-            "E0401 estimated memory usage exceeds capacity, enable = logging" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_WARNING,
-                .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
-            },
-            RBRGEN3_STATUS_LOGGING,
+            .response = "E0401 estimated memory usage exceeds capacity, enable = "
+                        "logging" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_WARNING,
+                    .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
+                },
+            .expected = RBRGEN3_STATUS_LOGGING,
         },
         {0},
     };
@@ -196,40 +210,44 @@ TEST_LOGGER3(enable)
 {
     StatusTest tests[] = {
         {
-            "enable status = pending, warning = none" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE,
-            },
-            RBRGEN3_STATUS_PENDING,
+            .response = "enable status = pending, warning = none" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_INFO,
+                    .error = RBRGEN3_HARDWARE_ERROR_NONE,
+                },
+            .expected = RBRGEN3_STATUS_PENDING,
         },
         {
-            "enable status = logging, warning = none" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE,
-            },
-            RBRGEN3_STATUS_LOGGING,
+            .response = "enable status = logging, warning = none" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_INFO,
+                    .error = RBRGEN3_HARDWARE_ERROR_NONE,
+                },
+            .expected = RBRGEN3_STATUS_LOGGING,
         },
         {
-            "E0402 memory not empty, erase first" RESPONSE_TERMINATOR,
-            RBRGEN3_HARDWARE_ERROR,
-            {
-                .type = RBRGEN3_RESPONSE_ERROR,
-                .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST,
-            },
-            RBRGEN3_UNKNOWN_STATUS,
+            .response = "E0402 memory not empty, erase first" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_HARDWARE_ERROR,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_ERROR,
+                    .error = RBRGEN3_HARDWARE_ERROR_MEMORY_NOT_EMPTY_ERASE_FIRST,
+                },
+            .expected = RBRGEN3_UNKNOWN_STATUS,
         },
         {
-            "enable status = logging, warning = W0401" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_WARNING,
-                .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
-            },
-            RBRGEN3_STATUS_LOGGING,
+            .response = "enable status = logging, warning = W0401" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_WARNING,
+                    .error = RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
+                },
+            .expected = RBRGEN3_STATUS_LOGGING,
         },
         {0},
     };
@@ -259,40 +277,44 @@ TEST_LOGGER2(stop)
 {
     StatusTest tests[] = {
         {
-            "stop = stopped" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE,
-            },
-            RBRGEN3_STATUS_STOPPED,
+            .response = "stop = stopped" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_INFO,
+                    .error = RBRGEN3_HARDWARE_ERROR_NONE,
+                },
+            .expected = RBRGEN3_STATUS_STOPPED,
         },
         {
-            "E0406 not logging, stop = stopped" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_WARNING,
-                .error = RBRGEN3_HARDWARE_ERROR_NOT_LOGGING,
-            },
-            RBRGEN3_STATUS_STOPPED,
+            .response = "E0406 not logging, stop = stopped" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_WARNING,
+                    .error = RBRGEN3_HARDWARE_ERROR_NOT_LOGGING,
+                },
+            .expected = RBRGEN3_STATUS_STOPPED,
         },
         {
-            "E0406 not logging, stop = fullandstopped" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_WARNING,
-                .error = RBRGEN3_HARDWARE_ERROR_NOT_LOGGING,
-            },
-            RBRGEN3_STATUS_FULLANDSTOPPED,
+            .response = "E0406 not logging, stop = fullandstopped" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_WARNING,
+                    .error = RBRGEN3_HARDWARE_ERROR_NOT_LOGGING,
+                },
+            .expected = RBRGEN3_STATUS_FULLANDSTOPPED,
         },
         {
-            "E0406 not logging, stop = disabled" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_WARNING,
-                .error = RBRGEN3_HARDWARE_ERROR_NOT_LOGGING,
-            },
-            RBRGEN3_STATUS_DISABLED,
+            .response = "E0406 not logging, stop = disabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_WARNING,
+                    .error = RBRGEN3_HARDWARE_ERROR_NOT_LOGGING,
+                },
+            .expected = RBRGEN3_STATUS_DISABLED,
         },
         {0},
     };
@@ -304,31 +326,34 @@ TEST_LOGGER3(disable)
 {
     StatusTest tests[] = {
         {
-            "disable status = stopped" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE,
-            },
-            RBRGEN3_STATUS_STOPPED,
+            .response = "disable status = stopped" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_INFO,
+                    .error = RBRGEN3_HARDWARE_ERROR_NONE,
+                },
+            .expected = RBRGEN3_STATUS_STOPPED,
         },
         {
-            "disable status = fullandstopped" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE,
-            },
-            RBRGEN3_STATUS_FULLANDSTOPPED,
+            .response = "disable status = fullandstopped" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_INFO,
+                    .error = RBRGEN3_HARDWARE_ERROR_NONE,
+                },
+            .expected = RBRGEN3_STATUS_FULLANDSTOPPED,
         },
         {
-            "disable status = disabled" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
-            {
-                .type = RBRGEN3_RESPONSE_INFO,
-                .error = RBRGEN3_HARDWARE_ERROR_NONE,
-            },
-            RBRGEN3_STATUS_DISABLED,
+            .response = "disable status = disabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
+            .expectedResponse =
+                {
+                    .type = RBRGEN3_RESPONSE_INFO,
+                    .error = RBRGEN3_HARDWARE_ERROR_NONE,
+                },
+            .expected = RBRGEN3_STATUS_DISABLED,
         },
         {0},
     };
@@ -345,18 +370,20 @@ TEST_LOGGER3(simulation)
 {
     SimulationTest tests[] = {
         {
-            "simulation state = off, period = 3600000" RESPONSE_TERMINATOR,
-            {
-                .state = false,
-                .period = 3600000,
-            },
+            .response = "simulation state = off, period = 3600000" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .state = false,
+                    .period = 3600000,
+                },
         },
         {
-            "simulation state = on, period = 3600000" RESPONSE_TERMINATOR,
-            {
-                .state = true,
-                .period = 3600000,
-            },
+            .response = "simulation state = on, period = 3600000" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .state = true,
+                    .period = 3600000,
+                },
         },
         {0},
     };
@@ -386,53 +413,52 @@ TEST_LOGGER3(simulation_set)
 {
     SimulationSetTest tests[] = {
         {
-            {
-                .state = false,
-                .period = 3600000,
-            },
-            "permit command = simulation" COMMAND_TERMINATOR
-            "simulation state = off, period = 3600000" COMMAND_TERMINATOR,
-            "permit command = simulation" RESPONSE_TERMINATOR
-            "simulation state = off, period = 3600000" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
+            .simulation =
+                {
+                    .state = false,
+                    .period = 3600000,
+                },
+            .command = "permit command = simulation" COMMAND_TERMINATOR
+                       "simulation state = off, period = 3600000" COMMAND_TERMINATOR,
+            .response = "permit command = simulation" RESPONSE_TERMINATOR
+                        "simulation state = off, period = 3600000" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
         },
         {
-            {
-                .state = true,
-                .period = 3600000,
-            },
-            "permit command = simulation" COMMAND_TERMINATOR
-            "simulation state = on, period = 3600000" COMMAND_TERMINATOR,
-            "permit command = simulation" RESPONSE_TERMINATOR
-            "simulation state = on, period = 3600000" RESPONSE_TERMINATOR,
-            RBRGEN3_SUCCESS,
+            .simulation =
+                {
+                    .state = true,
+                    .period = 3600000,
+                },
+            .command = "permit command = simulation" COMMAND_TERMINATOR
+                       "simulation state = on, period = 3600000" COMMAND_TERMINATOR,
+            .response = "permit command = simulation" RESPONSE_TERMINATOR
+                        "simulation state = on, period = 3600000" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_SUCCESS,
         },
         {
-            {
-                .state = true,
-                .period = 123,
-            },
-            "permit command = simulation" COMMAND_TERMINATOR
-            "simulation state = on, period = 123" COMMAND_TERMINATOR,
-            "permit command = simulation" RESPONSE_TERMINATOR
-            "E0108 invalid argument to command: '123'" RESPONSE_TERMINATOR,
-            RBRGEN3_HARDWARE_ERROR,
+            .simulation =
+                {
+                    .state = true,
+                    .period = 123,
+                },
+            .command = "permit command = simulation" COMMAND_TERMINATOR
+                       "simulation state = on, period = 123" COMMAND_TERMINATOR,
+            .response = "permit command = simulation" RESPONSE_TERMINATOR
+                        "E0108 invalid argument to command: '123'" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN3_HARDWARE_ERROR,
         },
         {
-            {
-                .state = false,
-                .period = 0,
-            },
-            "",
-            "",
-            RBRGEN3_INVALID_PARAMETER_VALUE,
+            .simulation =
+                {
+                    .state = false,
+                    .period = 0,
+                },
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN3_INVALID_PARAMETER_VALUE,
         },
-        {
-            {0},
-            0,
-            0,
-            0,
-        },
+        {.simulation = {0}},
     };
 
     RBRGen3Error err;

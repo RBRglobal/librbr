@@ -10,7 +10,7 @@
  * \brief Library implementation.
  */
 
-/* Required for memcpy, memset, strcmp, strstr. */
+/* Required for memcpy, memset, strcmp. */
 #include <string.h>
 /* Required for snprintf. */
 #include <stdio.h>
@@ -51,15 +51,15 @@ RBRGen4Error RBRGen4_getId4(RBRGen4 *conn, RBRGen4Id4 *id)
         if (strcmp(parameter.key, "model") == 0) {
             snprintf(id->model, sizeof(id->model), "%s", parameter.value);
         } else if (strcmp(parameter.key, "fwversion") == 0) {
-            snprintf(id->fwversion, sizeof(id->fwversion), "%s", parameter.value);
+            snprintf(id->fwVersion, sizeof(id->fwVersion), "%s", parameter.value);
         } else if (strcmp(parameter.key, "semver") == 0) {
             snprintf(id->semver, sizeof(id->semver), "%s", parameter.value);
         } else if (strcmp(parameter.key, "apiversion") == 0) {
-            snprintf(id->apiversion, sizeof(id->apiversion), "%s", parameter.value);
+            snprintf(id->apiVersion, sizeof(id->apiVersion), "%s", parameter.value);
         } else if (strcmp(parameter.key, "sn") == 0) {
             id->sn = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "fwtype") == 0) {
-            id->fwtype = strtol(parameter.value, NULL, 10);
+            id->fwType = strtol(parameter.value, NULL, 10);
         }
     } while (true);
     if (id != &conn->id) {
@@ -80,6 +80,7 @@ const char *RBRGen4PowerSource_name(RBRGen4PowerSource source)
         return "ext";
     case RBRGEN4_POWER_SOURCE_COUNT:
         return "power source count";
+    case RBRGEN4_UNKNOWN_POWER_SOURCE:
     default:
         return "unknown power source";
     }
@@ -87,7 +88,7 @@ const char *RBRGen4PowerSource_name(RBRGen4PowerSource source)
 
 RBRGen4Error RBRGen4_getPowerSource(RBRGen4 *conn, RBRGen4PowerSource *powerSource)
 {
-    *powerSource = RBRGEN4_POWER_SOURCE_UNKNOWN;
+    *powerSource = RBRGEN4_UNKNOWN_POWER_SOURCE;
 
     RBR_TRY(RBRGen4_converse(conn, "instrument power"));
 
@@ -362,14 +363,14 @@ RBRGen4Error RBRGen4_getInstrument(RBRGen4 *conn, RBRGen4Instrument *instrumentI
         } else if (strcmp(parameter.key, "pn") == 0) {
             snprintf(instrumentInfo->pn, sizeof(instrumentInfo->pn), "%s", parameter.value);
         } else if (strcmp(parameter.key, "fwversion") == 0) {
-            snprintf(instrumentInfo->fwversion,
-                     sizeof(instrumentInfo->fwversion),
+            snprintf(instrumentInfo->fwVersion,
+                     sizeof(instrumentInfo->fwVersion),
                      "%s",
                      parameter.value);
         } else if (strcmp(parameter.key, "semver") == 0) {
             snprintf(instrumentInfo->semver, sizeof(instrumentInfo->semver), "%s", parameter.value);
         } else if (strcmp(parameter.key, "fwtype") == 0) {
-            instrumentInfo->fwtype = strtol(parameter.value, NULL, 10);
+            instrumentInfo->fwType = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "fwlock") == 0) {
             instrumentInfo->fwLock = (strcmp(parameter.value, "on") == 0);
         } else if (strcmp(parameter.key, "datatype") == 0) {
@@ -377,8 +378,8 @@ RBRGen4Error RBRGen4_getInstrument(RBRGen4 *conn, RBRGen4Instrument *instrumentI
         } else if (strcmp(parameter.key, "name") == 0) {
             snprintf(instrumentInfo->name, sizeof(instrumentInfo->name), "%s", parameter.value);
         } else if (strcmp(parameter.key, "apiversion") == 0) {
-            snprintf(instrumentInfo->apiversion,
-                     sizeof(instrumentInfo->apiversion),
+            snprintf(instrumentInfo->apiVersion,
+                     sizeof(instrumentInfo->apiVersion),
                      "%s",
                      parameter.value);
         }

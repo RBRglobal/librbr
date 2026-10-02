@@ -53,10 +53,9 @@ typedef struct ZephyrRBRGen3IO {
 
 RBRGen3Error ZephyrRBRGen3IO_init(ZephyrRBRGen3IO *io, const struct device *dev);
 
-RBRGen3Error ZephyrRBRGen3IO_read(const struct RBRGen3 *conn, void *data, int32_t *size);
+RBRGen3Error ZephyrRBRGen3IO_read(const RBRGen3 *conn, void *data, int32_t *size);
 
-RBRGen3Error ZephyrRBRGen3IO_write(const struct RBRGen3 *conn, const void *const data,
-                                   int32_t size);
+RBRGen3Error ZephyrRBRGen3IO_write(const RBRGen3 *conn, const void *const data, int32_t size);
 
 #ifdef __cplusplus
 }

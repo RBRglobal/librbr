@@ -116,8 +116,11 @@ static RBRGen3Error RBRGen3L3_parseDataResponse(RBRGen3 *conn, RBRGen3Data *data
  * \param [in] conn the instrument connection
  * \param [out] data the buffer to write into
  * \param [in] size the amount of data to write into the buffer
+ * \return #RBRGEN3_SUCCESS when \a size bytes have been read
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  */
-static RBRGen3Error RBRGen3_fixedRead(struct RBRGen3 *conn, void *data, int32_t size)
+static RBRGen3Error RBRGen3_fixedRead(RBRGen3 *conn, void *data, int32_t size)
 {
     int32_t bufferLength = 0;
     int32_t readLength;
@@ -627,7 +630,7 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
                              (double) postprocessing->depthMax));
 
     /* on-board dynamic correction only available for firmware 1.134 and above */
-    if (conn->id.fwtype == 104 && RBRGen3Version_compare(conn->id.version, "1.134") >= 0) {
+    if (conn->id.fwType == 104 && RBRGen3Version_compare(conn->id.version, "1.134") >= 0) {
         RBR_TRY(RBRGen3_converse(
             conn,
             "postprocessing dc_alpha = %.3f, dc_tau = %.3f, dc_tdelay = %.3f, dc_ctcoeff = %.4e",

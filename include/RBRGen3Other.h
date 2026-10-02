@@ -40,24 +40,27 @@ extern "C" {
  * will indicate that it is the lesser version. If neither is valid, then the
  * result will indicate equality.
  *
- * \param a the first firmware version as a null-terminated C string
- * \param b the second firmware version as a null-terminated C string
- * \return <0 if \a a is a lower version than \a b
- * \return 0 \a a and \a b are the same version
- * \return >0 if \a b is a lower version than \a b
+ * \param [in] a the first firmware version as a null-terminated C string
+ * \param [in] b the second firmware version as a null-terminated C string
+ * \return <0 when \a a is a lower version than \a b
+ * \return 0 when \a a and \a b are the same version
+ * \return >0 when \a b is a lower version than \a a
  */
 int RBRGen3Version_compare(const char *a, const char *b);
 
 /**
  * \brief Get identification information from the instrument.
  *
+ * \command{id}
+ *
  * \param [in] conn the instrument connection
  * \param [out] id the instrument information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  */
 RBRGen3Error RBRGen3_getId(RBRGen3 *conn, RBRGen3Id *id);
 
@@ -78,13 +81,16 @@ typedef struct RBRGen3HardwareRevision {
 /**
  * \brief Get instrument hardware revision information.
  *
+ * \command{hwrev}
+ *
  * \param [in] conn the instrument connection
  * \param [out] hwrev the hardware revision information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  */
 RBRGen3Error RBRGen3_getHardwareRevision(RBRGen3 *conn, RBRGen3HardwareRevision *hwrev);
 
@@ -103,7 +109,7 @@ typedef enum RBRGen3PowerSource {
     /** The number of specific power sources. */
     RBRGEN3_POWER_SOURCE_COUNT,
     /** An unknown or unrecognized power source. */
-    RBRGEN3_UNKNOWN_POWER_SOURCE
+    RBRGEN3_UNKNOWN_POWER_SOURCE,
 } RBRGen3PowerSource;
 
 /**
@@ -143,15 +149,18 @@ typedef struct RBRGen3Power {
 /**
  * \brief Get instrument power information.
  *
+ * \par Command:
+ * `power`, or `powerstatus` for Logger2
+ *
  * \param [in] conn the instrument connection
  * \param [out] power the power information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if an error occurs reading voltages, or
- *                                 another hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when an error occurs reading voltages, or another hardware error
+ *         occurs
  */
 RBRGen3Error RBRGen3_getPower(RBRGen3 *conn, RBRGen3Power *power);
 
@@ -159,6 +168,7 @@ RBRGen3Error RBRGen3_getPower(RBRGen3 *conn, RBRGen3Power *power);
  * Internal battery types.
  *
  * \see RBRGen3PowerInternal
+ * \see RBRGen3_setPowerInternalBatteryType()
  */
 typedef enum RBRGen3InternalBatteryType {
     /** No internal battery */
@@ -176,7 +186,7 @@ typedef enum RBRGen3InternalBatteryType {
     /** The number of specific internal battery types. */
     RBRGEN3_INTERNAL_BATTERY_COUNT,
     /** An unknown or unrecognized internal battery type. */
-    RBRGEN3_UNKNOWN_INTERNAL_BATTERY
+    RBRGEN3_UNKNOWN_INTERNAL_BATTERY,
 } RBRGen3InternalBatteryType;
 
 /**
@@ -226,15 +236,19 @@ typedef struct RBRGen3PowerInternal {
 /**
  * \brief Get instrument internal power information.
  *
+ * \command{powerinternal}
+ *
  * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
  * \param [in] conn the instrument connection
  * \param [out] power the power information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \see RBRGen3_setPowerInternalBatteryType()
  * \see RBRGen3_resetPowerInternalUsed()
  */
@@ -243,34 +257,38 @@ RBRGen3Error RBRGen3_getPowerInternal(RBRGen3 *conn, RBRGen3PowerInternal *power
 /**
  * \brief Set the internal power battery type.
  *
- * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
+ * \command{powerinternal}
+ *
+ * \nol2
  *
  * \param [in] conn the instrument connection
  * \param [in] type the battery type
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging, or another hardware error occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when \a type is not a valid battery type
  * \see RBRGen3_getPowerInternal()
+ * \see RBRGen3InternalBatteryType
  */
 RBRGen3Error RBRGen3_setPowerInternalBatteryType(RBRGen3 *conn, RBRGen3InternalBatteryType type);
 
 /**
  * \brief Reset the counter of energy used from the internal battery.
  *
- * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
+ * \command{powerinternal}
+ *
+ * \nol2
  *
  * \param [in] conn the instrument connection
- * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_SUCCESS when the counter is successfully reset
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument is logging, or another hardware error occurs
  * \see RBRGen3_getPowerInternal()
  */
 RBRGen3Error RBRGen3_resetPowerInternalUsed(RBRGen3 *conn);
@@ -279,6 +297,7 @@ RBRGen3Error RBRGen3_resetPowerInternalUsed(RBRGen3 *conn);
  * External battery types.
  *
  * \see RBRGen3PowerExternal
+ * \see RBRGen3_setPowerExternalBatteryType()
  */
 typedef enum RBRGen3ExternalBatteryType {
     /** Other/unknown external battery type */
@@ -302,7 +321,7 @@ typedef enum RBRGen3ExternalBatteryType {
     /** The number of specific external battery types. */
     RBRGEN3_EXTERNAL_BATTERY_COUNT,
     /** An unknown or unrecognized external battery type. */
-    RBRGEN3_UNKNOWN_EXTERNAL_BATTERY
+    RBRGEN3_UNKNOWN_EXTERNAL_BATTERY,
 } RBRGen3ExternalBatteryType;
 
 /**
@@ -354,15 +373,19 @@ typedef struct RBRGen3PowerExternal {
 /**
  * \brief Get instrument external power information.
  *
+ * \command{powerexternal}
+ *
  * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
  *
  * \param [in] conn the instrument connection
  * \param [out] power the power information
  * \return #RBRGEN3_SUCCESS when the information is successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \see RBRGen3_setPowerExternalBatteryType()
  * \see RBRGen3_resetPowerExternalUsed()
  */
@@ -371,30 +394,38 @@ RBRGen3Error RBRGen3_getPowerExternal(RBRGen3 *conn, RBRGen3PowerExternal *power
 /**
  * \brief Set the external power battery type.
  *
- * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
+ * \command{powerexternal}
+ *
+ * \nol2
  *
  * \param [in] conn the instrument connection
  * \param [in] type the battery type
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when \a type is not a valid battery type
  * \see RBRGen3_getPowerExternal()
+ * \see RBRGen3ExternalBatteryType
  */
 RBRGen3Error RBRGen3_setPowerExternalBatteryType(RBRGen3 *conn, RBRGen3ExternalBatteryType type);
 
 /**
  * \brief Reset the counter of energy used from the external battery.
  *
- * \nol2 Always returns #RBRGEN3_UNSUPPORTED.
+ * \command{powerexternal}
+ *
+ * \nol2
  *
  * \param [in] conn the instrument connection
- * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_SUCCESS when the counter is successfully reset
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_getPowerExternal()
  */
 RBRGen3Error RBRGen3_resetPowerExternalUsed(RBRGen3 *conn);
@@ -414,16 +445,19 @@ typedef struct RBRGen3Info {
 /**
  * \brief Get more information about the instrument.
  *
+ * \command{info}
+ *
  * \nol2
  *
  * \param [in] conn the instrument connection
  * \param [out] info the extended instrument information
- * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  * \return #RBRGEN3_SUCCESS when the information is successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN3_UNSUPPORTED for Logger2 instruments
  */
 RBRGen3Error RBRGen3_getInfo(RBRGen3 *conn, RBRGen3Info *info);
 

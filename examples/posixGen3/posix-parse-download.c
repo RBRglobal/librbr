@@ -36,8 +36,7 @@
 
 #define CHUNK_SIZE 1024
 
-RBRGen3Error parserSample(const struct RBRGen3Parser *parser,
-                          const struct RBRGen3Sample *const sample)
+RBRGen3Error parserSample(const RBRGen3Parser *parser, const RBRGen3Sample *const sample)
 {
     (void) parser;
 

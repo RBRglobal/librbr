@@ -55,536 +55,579 @@ TEST_LOGGER4(poll)
     PollTest tests[] = {
         /* A bare poll samples every channel. */
         {
-            NULL,
-            NULL,
-            false,
-            "poll" COMMAND_TERMINATOR,
-            "2024-03-10 07:01:06.000 Error-01 Error-09 Error-09 Error-09" RESPONSE_TERMINATOR,
-            OUTPUTFORMAT_DEFAULT,
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 1710054066000LL,
-                .channelCount = 4,
-                .readings = (double[]) {RBRGen4Reading_setError(1),
-                                        RBRGen4Reading_setError(9),
-                                        RBRGen4Reading_setError(9),
-                                        RBRGen4Reading_setError(9)},
-            },
-            {0},
+            .channelList = NULL,
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll" COMMAND_TERMINATOR,
+            .response =
+                "2024-03-10 07:01:06.000 Error-01 Error-09 Error-09 Error-09" RESPONSE_TERMINATOR,
+            .outputFormat = OUTPUTFORMAT_DEFAULT,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 1710054066000LL,
+                    .channelCount = 4,
+                    .readings =
+                        (double[]) {
+                            RBRGen4Reading_setError(1),
+                            RBRGen4Reading_setError(9),
+                            RBRGen4Reading_setError(9),
+                            RBRGen4Reading_setError(9),
+                        },
+                },
+            .expectedStreamed = {0},
         },
         {
-            "temperature_00",
-            NULL,
-            false,
-            "poll channellist=temperature_00" COMMAND_TERMINATOR,
-            "2024-03-10 07:01:07.000 Error-01" RESPONSE_TERMINATOR,
-            OUTPUTFORMAT_DEFAULT,
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 1710054067000LL,
-                .channelCount = 1,
-                .readings = (double[]) {RBRGen4Reading_setError(1)},
-            },
-            {0},
+            .channelList = "temperature_00",
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll channellist=temperature_00" COMMAND_TERMINATOR,
+            .response = "2024-03-10 07:01:07.000 Error-01" RESPONSE_TERMINATOR,
+            .outputFormat = OUTPUTFORMAT_DEFAULT,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 1710054067000LL,
+                    .channelCount = 1,
+                    .readings = (double[]) {RBRGen4Reading_setError(1)},
+                },
+            .expectedStreamed = {0},
         },
         /* A sample's timestamp may be a bare count of milliseconds. */
         {
-            NULL,
-            NULL,
-            false,
-            "poll" COMMAND_TERMINATOR,
-            "12345 12.5364470e+000 9.91695000e+000" RESPONSE_TERMINATOR,
-            OUTPUTFORMAT_DEFAULT,
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 12345LL,
-                .channelCount = 2,
-                .readings = (double[]) {12.5364470, 9.91695000},
-            },
-            {0},
+            .channelList = NULL,
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll" COMMAND_TERMINATOR,
+            .response = "12345 12.5364470e+000 9.91695000e+000" RESPONSE_TERMINATOR,
+            .outputFormat = OUTPUTFORMAT_DEFAULT,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 12345LL,
+                    .channelCount = 2,
+                    .readings = (double[]) {12.5364470, 9.91695000},
+                },
+            .expectedStreamed = {0},
         },
         /* A reading is never taken for a millisecond timestamp, so a line
          * missing its timestamp is refused as a sample. The library then
          * keeps waiting for one; here the read buffer runs dry first. */
         {
-            NULL,
-            NULL,
-            false,
-            "poll" COMMAND_TERMINATOR,
-            "12.5364470e+000 9.91695000e+000" RESPONSE_TERMINATOR,
-            OUTPUTFORMAT_DEFAULT,
-            RBRGEN4_CALLBACK_ERROR,
-            {0},
-            {0},
+            .channelList = NULL,
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll" COMMAND_TERMINATOR,
+            .response = "12.5364470e+000 9.91695000e+000" RESPONSE_TERMINATOR,
+            .outputFormat = OUTPUTFORMAT_DEFAULT,
+            .expectedError = RBRGEN4_CALLBACK_ERROR,
+            .expected = {0},
+            .expectedStreamed = {0},
         },
         /* A repeated channel is reported at every requested position. */
         {
-            "pressure_00|temperature_00|pressure_00",
-            NULL,
-            false,
-            "poll channellist=pressure_00|temperature_00|pressure_00" COMMAND_TERMINATOR,
-            "2024-03-10 07:01:09.000 Error-09 Error-01 Error-09" RESPONSE_TERMINATOR,
-            OUTPUTFORMAT_DEFAULT,
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 1710054069000LL,
-                .channelCount = 3,
-                .readings = (double[]) {RBRGen4Reading_setError(9),
-                                        RBRGen4Reading_setError(1),
-                                        RBRGen4Reading_setError(9)},
-            },
-            {0},
+            .channelList = "pressure_00|temperature_00|pressure_00",
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand =
+                "poll channellist=pressure_00|temperature_00|pressure_00" COMMAND_TERMINATOR,
+            .response = "2024-03-10 07:01:09.000 Error-09 Error-01 Error-09" RESPONSE_TERMINATOR,
+            .outputFormat = OUTPUTFORMAT_DEFAULT,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 1710054069000LL,
+                    .channelCount = 3,
+                    .readings =
+                        (double[]) {
+                            RBRGen4Reading_setError(9),
+                            RBRGen4Reading_setError(1),
+                            RBRGen4Reading_setError(9),
+                        },
+                },
+            .expectedStreamed = {0},
         },
         {
-            NULL,
-            "g",
-            false,
-            "poll grouplist=g" COMMAND_TERMINATOR,
-            "2024-03-10 07:01:10.000 Error-09" RESPONSE_TERMINATOR,
-            OUTPUTFORMAT_DEFAULT,
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 1710054070000LL,
-                .channelCount = 1,
-                .readings = (double[]) {RBRGen4Reading_setError(9)},
-            },
-            {0},
+            .channelList = NULL,
+            .groupList = "g",
+            .requireLabel = false,
+            .expectedCommand = "poll grouplist=g" COMMAND_TERMINATOR,
+            .response = "2024-03-10 07:01:10.000 Error-09" RESPONSE_TERMINATOR,
+            .outputFormat = OUTPUTFORMAT_DEFAULT,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 1710054070000LL,
+                    .channelCount = 1,
+                    .readings = (double[]) {RBRGen4Reading_setError(9)},
+                },
+            .expectedStreamed = {0},
         },
         /* Successful readings parse as their values. */
         {
-            NULL,
-            NULL,
-            false,
-            "poll" COMMAND_TERMINATOR,
-            "2024-10-21 11:50:49.000 18.1745130 12.7052970 2.69308210" RESPONSE_TERMINATOR,
-            OUTPUTFORMAT_DEFAULT,
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 1729511449000LL,
-                .channelCount = 3,
-                .readings = (double[]) {18.1745130, 12.7052970, 2.69308210},
-            },
-            {0},
+            .channelList = NULL,
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll" COMMAND_TERMINATOR,
+            .response =
+                "2024-10-21 11:50:49.000 18.1745130 12.7052970 2.69308210" RESPONSE_TERMINATOR,
+            .outputFormat = OUTPUTFORMAT_DEFAULT,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 1729511449000LL,
+                    .channelCount = 3,
+                    .readings = (double[]) {18.1745130, 12.7052970, 2.69308210},
+                },
+            .expectedStreamed = {0},
         },
         /* Polled samples carry the “polling” schedule label when enabled. */
         {
-            "temperature_00",
-            NULL,
-            false,
-            "poll channellist=temperature_00" COMMAND_TERMINATOR,
-            "polling 2024-03-10 07:01:31.000 Error-01" RESPONSE_TERMINATOR,
-            {
-                .sn = false,
-                .scheduleLabel = true,
-                .dateTime = true,
-                .crc = false,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 1710054091000LL,
-                .scheduleLabel = "polling",
-                .channelCount = 1,
-                .readings = (double[]) {RBRGen4Reading_setError(1)},
-            },
-            {0},
+            .channelList = "temperature_00",
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll channellist=temperature_00" COMMAND_TERMINATOR,
+            .response = "polling 2024-03-10 07:01:31.000 Error-01" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = false,
+                    .scheduleLabel = true,
+                    .dateTime = true,
+                    .crc = false,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 1710054091000LL,
+                    .scheduleLabel = "polling",
+                    .channelCount = 1,
+                    .readings = (double[]) {RBRGen4Reading_setError(1)},
+                },
+            .expectedStreamed = {0},
         },
         {
-            "temperature_00",
-            NULL,
-            false,
-            "poll channellist=temperature_00" COMMAND_TERMINATOR,
-            "RBR 999999 2024-03-10 07:01:33.000 Error-01" RESPONSE_TERMINATOR,
-            {
-                .sn = true,
-                .scheduleLabel = false,
-                .dateTime = true,
-                .crc = false,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 1710054093000LL,
-                .channelCount = 1,
-                .readings = (double[]) {RBRGen4Reading_setError(1)},
-            },
-            {0},
+            .channelList = "temperature_00",
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll channellist=temperature_00" COMMAND_TERMINATOR,
+            .response = "RBR 999999 2024-03-10 07:01:33.000 Error-01" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = true,
+                    .scheduleLabel = false,
+                    .dateTime = true,
+                    .crc = false,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 1710054093000LL,
+                    .channelCount = 1,
+                    .readings = (double[]) {RBRGen4Reading_setError(1)},
+                },
+            .expectedStreamed = {0},
         },
         {
-            "temperature_00",
-            NULL,
-            false,
-            "poll channellist=temperature_00" COMMAND_TERMINATOR,
-            "2024-03-10 07:01:35.000 Error-01 0x3C7A" RESPONSE_TERMINATOR,
-            {
-                .sn = false,
-                .scheduleLabel = false,
-                .dateTime = true,
-                .crc = true,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 1710054095000LL,
-                .channelCount = 1,
-                .readings = (double[]) {RBRGen4Reading_setError(1)},
-            },
-            {0},
+            .channelList = "temperature_00",
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll channellist=temperature_00" COMMAND_TERMINATOR,
+            .response = "2024-03-10 07:01:35.000 Error-01 0x3C7A" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = false,
+                    .scheduleLabel = false,
+                    .dateTime = true,
+                    .crc = true,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 1710054095000LL,
+                    .channelCount = 1,
+                    .readings = (double[]) {RBRGen4Reading_setError(1)},
+                },
+            .expectedStreamed = {0},
         },
         /* A single reading with no other fields is a one-token sample. */
         {
-            "pressure_00",
-            NULL,
-            false,
-            "poll channellist=pressure_00" COMMAND_TERMINATOR,
-            "9.85289000e+000" RESPONSE_TERMINATOR,
-            {
-                .sn = false,
-                .scheduleLabel = false,
-                .dateTime = false,
-                .crc = false,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 0,
-                .channelCount = 1,
-                .readings = (double[]) {9.85289000},
-            },
-            {0},
+            .channelList = "pressure_00",
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll channellist=pressure_00" COMMAND_TERMINATOR,
+            .response = "9.85289000e+000" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = false,
+                    .scheduleLabel = false,
+                    .dateTime = false,
+                    .crc = false,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 0,
+                    .channelCount = 1,
+                    .readings = (double[]) {9.85289000},
+                },
+            .expectedStreamed = {0},
         },
         {
-            "pressure_00",
-            NULL,
-            false,
-            "poll channellist=pressure_00" COMMAND_TERMINATOR,
-            "9.80449000e+000 0xF80B" RESPONSE_TERMINATOR,
-            {
-                .sn = false,
-                .scheduleLabel = false,
-                .dateTime = false,
-                .crc = true,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 0,
-                .channelCount = 1,
-                .readings = (double[]) {9.80449000},
-            },
-            {0},
+            .channelList = "pressure_00",
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll channellist=pressure_00" COMMAND_TERMINATOR,
+            .response = "9.80449000e+000 0xF80B" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = false,
+                    .scheduleLabel = false,
+                    .dateTime = false,
+                    .crc = true,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 0,
+                    .channelCount = 1,
+                    .readings = (double[]) {9.80449000},
+                },
+            .expectedStreamed = {0},
         },
         /* The first reading is not dropped when the timestamp,
          * schedule label, and serial number are all omitted. */
         {
-            NULL,
-            NULL,
-            false,
-            "poll" COMMAND_TERMINATOR,
-            "12.5363015e+000 9.82848000e+000 -304.020648e-003"
-            " -302.152465e-003" RESPONSE_TERMINATOR,
-            {
-                .sn = false,
-                .scheduleLabel = false,
-                .dateTime = false,
-                .crc = false,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 0,
-                .channelCount = 4,
-                .readings = (double[]) {12.5363015, 9.82848000, -0.304020648, -0.302152465},
-            },
-            {0},
+            .channelList = NULL,
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll" COMMAND_TERMINATOR,
+            .response = "12.5363015e+000 9.82848000e+000 -304.020648e-003"
+                        " -302.152465e-003" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = false,
+                    .scheduleLabel = false,
+                    .dateTime = false,
+                    .crc = false,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 0,
+                    .channelCount = 4,
+                    .readings = (double[]) {12.5363015, 9.82848000, -0.304020648, -0.302152465},
+                },
+            .expectedStreamed = {0},
         },
         {
-            NULL,
-            NULL,
-            false,
-            "poll" COMMAND_TERMINATOR,
-            "12.5361167e+000 9.82034000e+000 -312.160648e-003"
-            " -310.242445e-003 0x1E75" RESPONSE_TERMINATOR,
-            {
-                .sn = false,
-                .scheduleLabel = false,
-                .dateTime = false,
-                .crc = true,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 0,
-                .channelCount = 4,
-                .readings = (double[]) {12.5361167, 9.82034000, -0.312160648, -0.310242445},
-            },
-            {0},
+            .channelList = NULL,
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll" COMMAND_TERMINATOR,
+            .response = "12.5361167e+000 9.82034000e+000 -312.160648e-003"
+                        " -310.242445e-003 0x1E75" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = false,
+                    .scheduleLabel = false,
+                    .dateTime = false,
+                    .crc = true,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 0,
+                    .channelCount = 4,
+                    .readings = (double[]) {12.5361167, 9.82034000, -0.312160648, -0.310242445},
+                },
+            .expectedStreamed = {0},
         },
         {
-            NULL,
-            NULL,
-            false,
-            "poll" COMMAND_TERMINATOR,
-            "polling 12.5356691e+000 9.81261000e+000 -319.890648e-003"
-            " -317.924945e-003" RESPONSE_TERMINATOR,
-            {
-                .sn = false,
-                .scheduleLabel = true,
-                .dateTime = false,
-                .crc = false,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 0,
-                .scheduleLabel = "polling",
-                .channelCount = 4,
-                .readings = (double[]) {12.5356691, 9.81261000, -0.319890648, -0.317924945},
-            },
-            {0},
+            .channelList = NULL,
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll" COMMAND_TERMINATOR,
+            .response = "polling 12.5356691e+000 9.81261000e+000 -319.890648e-003"
+                        " -317.924945e-003" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = false,
+                    .scheduleLabel = true,
+                    .dateTime = false,
+                    .crc = false,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 0,
+                    .scheduleLabel = "polling",
+                    .channelCount = 4,
+                    .readings = (double[]) {12.5356691, 9.81261000, -0.319890648, -0.317924945},
+                },
+            .expectedStreamed = {0},
         },
         {
-            NULL,
-            NULL,
-            false,
-            "poll" COMMAND_TERMINATOR,
-            "polling 12.5356399e+000 9.79543000e+000 -337.070648e-003"
-            " -334.999375e-003 0x271D" RESPONSE_TERMINATOR,
-            {
-                .sn = false,
-                .scheduleLabel = true,
-                .dateTime = false,
-                .crc = true,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 0,
-                .scheduleLabel = "polling",
-                .channelCount = 4,
-                .readings = (double[]) {12.5356399, 9.79543000, -0.337070648, -0.334999375},
-            },
-            {0},
+            .channelList = NULL,
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll" COMMAND_TERMINATOR,
+            .response = "polling 12.5356399e+000 9.79543000e+000 -337.070648e-003"
+                        " -334.999375e-003 0x271D" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = false,
+                    .scheduleLabel = true,
+                    .dateTime = false,
+                    .crc = true,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 0,
+                    .scheduleLabel = "polling",
+                    .channelCount = 4,
+                    .readings = (double[]) {12.5356399, 9.79543000, -0.337070648, -0.334999375},
+                },
+            .expectedStreamed = {0},
         },
         {
-            NULL,
-            NULL,
-            false,
-            "poll" COMMAND_TERMINATOR,
-            "RBR 999999 12.5360777e+000 9.80820000e+000 -324.300648e-003"
-            " -322.307846e-003" RESPONSE_TERMINATOR,
-            {
-                .sn = true,
-                .scheduleLabel = false,
-                .dateTime = false,
-                .crc = false,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 0,
-                .channelCount = 4,
-                .readings = (double[]) {12.5360777, 9.80820000, -0.324300648, -0.322307846},
-            },
-            {0},
+            .channelList = NULL,
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll" COMMAND_TERMINATOR,
+            .response = "RBR 999999 12.5360777e+000 9.80820000e+000 -324.300648e-003"
+                        " -322.307846e-003" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = true,
+                    .scheduleLabel = false,
+                    .dateTime = false,
+                    .crc = false,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 0,
+                    .channelCount = 4,
+                    .readings = (double[]) {12.5360777, 9.80820000, -0.324300648, -0.322307846},
+                },
+            .expectedStreamed = {0},
         },
         {
-            NULL,
-            NULL,
-            false,
-            "poll" COMMAND_TERMINATOR,
-            "RBR 999999 12.5362042e+000 9.81825000e+000 -314.250648e-003"
-            " -312.319602e-003 0x3BE3" RESPONSE_TERMINATOR,
-            {
-                .sn = true,
-                .scheduleLabel = false,
-                .dateTime = false,
-                .crc = true,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 0,
-                .channelCount = 4,
-                .readings = (double[]) {12.5362042, 9.81825000, -0.314250648, -0.312319602},
-            },
-            {0},
+            .channelList = NULL,
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll" COMMAND_TERMINATOR,
+            .response = "RBR 999999 12.5362042e+000 9.81825000e+000 -314.250648e-003"
+                        " -312.319602e-003 0x3BE3" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = true,
+                    .scheduleLabel = false,
+                    .dateTime = false,
+                    .crc = true,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 0,
+                    .channelCount = 4,
+                    .readings = (double[]) {12.5362042, 9.81825000, -0.314250648, -0.312319602},
+                },
+            .expectedStreamed = {0},
         },
         {
-            NULL,
-            NULL,
-            false,
-            "poll" COMMAND_TERMINATOR,
-            "RBR 999999 polling 12.5369048e+000 9.81109000e+000"
-            " -321.410648e-003 -319.435605e-003" RESPONSE_TERMINATOR,
-            {
-                .sn = true,
-                .scheduleLabel = true,
-                .dateTime = false,
-                .crc = false,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 0,
-                .scheduleLabel = "polling",
-                .channelCount = 4,
-                .readings = (double[]) {12.5369048, 9.81109000, -0.321410648, -0.319435605},
-            },
-            {0},
+            .channelList = NULL,
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll" COMMAND_TERMINATOR,
+            .response = "RBR 999999 polling 12.5369048e+000 9.81109000e+000"
+                        " -321.410648e-003 -319.435605e-003" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = true,
+                    .scheduleLabel = true,
+                    .dateTime = false,
+                    .crc = false,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 0,
+                    .scheduleLabel = "polling",
+                    .channelCount = 4,
+                    .readings = (double[]) {12.5369048, 9.81109000, -0.321410648, -0.319435605},
+                },
+            .expectedStreamed = {0},
         },
         {
-            NULL,
-            NULL,
-            false,
-            "poll" COMMAND_TERMINATOR,
-            "RBR 999999 polling 12.5369632e+000 9.80959000e+000"
-            " -322.910648e-003 -320.926387e-003 0xF4F3" RESPONSE_TERMINATOR,
-            {
-                .sn = true,
-                .scheduleLabel = true,
-                .dateTime = false,
-                .crc = true,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 0,
-                .scheduleLabel = "polling",
-                .channelCount = 4,
-                .readings = (double[]) {12.5369632, 9.80959000, -0.322910648, -0.320926387},
-            },
-            {0},
+            .channelList = NULL,
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll" COMMAND_TERMINATOR,
+            .response = "RBR 999999 polling 12.5369632e+000 9.80959000e+000"
+                        " -322.910648e-003 -320.926387e-003 0xF4F3" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = true,
+                    .scheduleLabel = true,
+                    .dateTime = false,
+                    .crc = true,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 0,
+                    .scheduleLabel = "polling",
+                    .channelCount = 4,
+                    .readings = (double[]) {12.5369632, 9.80959000, -0.322910648, -0.320926387},
+                },
+            .expectedStreamed = {0},
         },
         /* A float64-encoded sample with every optional prefix still
          * retains its first reading. */
         {
-            NULL,
-            NULL,
-            false,
-            "poll" COMMAND_TERMINATOR,
-            "RBR 999999 polling 2024-03-13 12:37:36.000"
-            " 12.5369242316864e+000 9.80062000000000e+000"
-            " -331.880648498535e-003 -329.841267502290e-003 0xE4EE" RESPONSE_TERMINATOR,
-            {
-                .sn = true,
-                .scheduleLabel = true,
-                .dateTime = true,
-                .crc = true,
-                .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .timestamp = 1710333456000LL,
-                .scheduleLabel = "polling",
-                .channelCount = 4,
-                .readings =
-                    (double[]) {
-                        12.5369242316864, 9.80062000000000, -0.331880648498535, -0.329841267502290},
-            },
-            {0},
+            .channelList = NULL,
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll" COMMAND_TERMINATOR,
+            .response = "RBR 999999 polling 2024-03-13 12:37:36.000"
+                        " 12.5369242316864e+000 9.80062000000000e+000"
+                        " -331.880648498535e-003 -329.841267502290e-003 0xE4EE" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = true,
+                    .scheduleLabel = true,
+                    .dateTime = true,
+                    .crc = true,
+                    .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .timestamp = 1710333456000LL,
+                    .scheduleLabel = "polling",
+                    .channelCount = 4,
+                    .readings =
+                        (double[]) {
+                            12.5369242316864,
+                            9.80062000000000,
+                            -0.331880648498535,
+                            -0.329841267502290,
+                        },
+                },
+            .expectedStreamed = {0},
         },
         /* requireLabel is checked before anything is sent. */
         {
-            "pressure_00",
-            NULL,
-            true,
-            "",
-            "",
-            {
-                .sn = false,
-                .scheduleLabel = false,
-                .dateTime = false,
-                .crc = false,
-            },
-            RBRGEN4_UNSUPPORTED,
-            {0},
-            {0},
+            .channelList = "pressure_00",
+            .groupList = NULL,
+            .requireLabel = true,
+            .expectedCommand = "",
+            .response = "",
+            .outputFormat =
+                {
+                    .sn = false,
+                    .scheduleLabel = false,
+                    .dateTime = false,
+                    .crc = false,
+                },
+            .expectedError = RBRGEN4_UNSUPPORTED,
+            .expected = {0},
+            .expectedStreamed = {0},
         },
         /* With requireLabel set, streamed samples read while waiting for
          * the polled one are forwarded to the sample callback and skipped. */
         {
-            "pressure_00",
-            NULL,
-            true,
-            "poll channellist=pressure_00" COMMAND_TERMINATOR,
-            "RBR 999999 sch_asc_pts 9.84050000e+000 12.5362918e+000" RESPONSE_TERMINATOR
-            "RBR 999999 polling 9.83602000e+000" RESPONSE_TERMINATOR,
-            {
-                .sn = true,
-                .scheduleLabel = true,
-                .dateTime = false,
-                .crc = false,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .scheduleLabel = "polling",
-                .channelCount = 1,
-                .readings = (double[]) {9.83602000},
-            },
-            {
-                .scheduleLabel = "sch_asc_pts",
-                .channelCount = 2,
-                .readings = (double[]) {9.84050000, 12.5362918},
-            },
+            .channelList = "pressure_00",
+            .groupList = NULL,
+            .requireLabel = true,
+            .expectedCommand = "poll channellist=pressure_00" COMMAND_TERMINATOR,
+            .response = "RBR 999999 sch_asc_pts 9.84050000e+000 12.5362918e+000" RESPONSE_TERMINATOR
+                        "RBR 999999 polling 9.83602000e+000" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = true,
+                    .scheduleLabel = true,
+                    .dateTime = false,
+                    .crc = false,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .scheduleLabel = "polling",
+                    .channelCount = 1,
+                    .readings = (double[]) {9.83602000},
+                },
+            .expectedStreamed =
+                {
+                    .scheduleLabel = "sch_asc_pts",
+                    .channelCount = 2,
+                    .readings = (double[]) {9.84050000, 12.5362918},
+                },
         },
         /* Without requireLabel, the first sample read wins, even if it's a
          * streamed sample. */
         {
-            "pressure_00",
-            NULL,
-            false,
-            "poll channellist=pressure_00" COMMAND_TERMINATOR,
-            "RBR 999999 sch_asc_pts 9.84050000e+000 12.5362918e+000" RESPONSE_TERMINATOR
-            "RBR 999999 polling 9.83602000e+000" RESPONSE_TERMINATOR,
-            {
-                .sn = true,
-                .scheduleLabel = true,
-                .dateTime = false,
-                .crc = false,
-            },
-            RBRGEN4_SUCCESS,
-            {
-                .scheduleLabel = "sch_asc_pts",
-                .channelCount = 2,
-                .readings = (double[]) {9.84050000, 12.5362918},
-            },
-            {0},
+            .channelList = "pressure_00",
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll channellist=pressure_00" COMMAND_TERMINATOR,
+            .response = "RBR 999999 sch_asc_pts 9.84050000e+000 12.5362918e+000" RESPONSE_TERMINATOR
+                        "RBR 999999 polling 9.83602000e+000" RESPONSE_TERMINATOR,
+            .outputFormat =
+                {
+                    .sn = true,
+                    .scheduleLabel = true,
+                    .dateTime = false,
+                    .crc = false,
+                },
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .scheduleLabel = "sch_asc_pts",
+                    .channelCount = 2,
+                    .readings = (double[]) {9.84050000, 12.5362918},
+                },
+            .expectedStreamed = {0},
         },
         /* An unknown channel or group label is a hardware error. */
         {
-            "nosuchchannel_00",
-            NULL,
-            false,
-            "poll channellist=nosuchchannel_00" COMMAND_TERMINATOR,
-            "ERR-117 'nosuchchannel_00' is not a known qualifier" RESPONSE_TERMINATOR,
-            OUTPUTFORMAT_DEFAULT,
-            RBRGEN4_HARDWARE_ERROR,
-            {0},
-            {0},
+            .channelList = "nosuchchannel_00",
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "poll channellist=nosuchchannel_00" COMMAND_TERMINATOR,
+            .response = "ERR-117 'nosuchchannel_00' is not a known qualifier" RESPONSE_TERMINATOR,
+            .outputFormat = OUTPUTFORMAT_DEFAULT,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expected = {0},
+            .expectedStreamed = {0},
         },
         {
-            NULL,
-            "nosuchgroup",
-            false,
-            "poll grouplist=nosuchgroup" COMMAND_TERMINATOR,
-            "ERR-117 'nosuchgroup' is not a known qualifier" RESPONSE_TERMINATOR,
-            OUTPUTFORMAT_DEFAULT,
-            RBRGEN4_HARDWARE_ERROR,
-            {0},
-            {0},
+            .channelList = NULL,
+            .groupList = "nosuchgroup",
+            .requireLabel = false,
+            .expectedCommand = "poll grouplist=nosuchgroup" COMMAND_TERMINATOR,
+            .response = "ERR-117 'nosuchgroup' is not a known qualifier" RESPONSE_TERMINATOR,
+            .outputFormat = OUTPUTFORMAT_DEFAULT,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expected = {0},
+            .expectedStreamed = {0},
         },
         /* An empty list is refused before the command: `poll` has no
          * equivalent of the `none` an empty list is otherwise sent as. */
         {
-            "",
-            NULL,
-            false,
-            "",
-            "",
-            OUTPUTFORMAT_DEFAULT,
-            RBRGEN4_INVALID_PARAMETER_VALUE,
-            {0},
-            {0},
+            .channelList = "",
+            .groupList = NULL,
+            .requireLabel = false,
+            .expectedCommand = "",
+            .response = "",
+            .outputFormat = OUTPUTFORMAT_DEFAULT,
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+            .expected = {0},
+            .expectedStreamed = {0},
         },
-        {
-            NULL,
-            NULL,
-            false,
-            NULL,
-            NULL,
-            {0},
-            0,
-            {0},
-            {0},
-        },
+        {0},
     };
 
     RBRGen4Error err;
@@ -662,7 +705,7 @@ static RBRGen4DateTime pollTimeoutClock;
 /** \brief A time callback that advances #pollTimeoutClock by less than a
  * third of RBRGen4.pollTimeout on every call, so a poll's
  * overall timeout can be exercised without waiting in real time. */
-static RBRGen4Error pollTimeoutTime(const struct RBRGen4 *conn, RBRGen4DateTime *time)
+static RBRGen4Error pollTimeoutTime(const RBRGen4 *conn, RBRGen4DateTime *time)
 {
     (void) conn;
     *time = pollTimeoutClock;
@@ -740,7 +783,7 @@ static RBRGen4DateTime pollSlowResponseClock;
 /** \brief A time callback that advances #pollSlowResponseClock by more than
  * a small commandTimeout on every call, so that a wait spanning several
  * such ticks can be exercised without waiting in real time. */
-static RBRGen4Error pollSlowResponseTime(const struct RBRGen4 *conn, RBRGen4DateTime *time)
+static RBRGen4Error pollSlowResponseTime(const RBRGen4 *conn, RBRGen4DateTime *time)
 {
     (void) conn;
     *time = pollSlowResponseClock;
@@ -792,87 +835,98 @@ TEST_LOGGER4(readSample)
     ReadSampleTest tests[] = {
         /* sn, scheduleLabel, dateTime, and crc all on. */
         {
-            {
-                .sn = true,
-                .scheduleLabel = true,
-                .dateTime = true,
-                .crc = true,
-            },
-            "RBR 999999 sch_asc_pts 2024-03-13 12:45:53.000 9.84033000e+000"
-            " 12.5358150e+000 0x25C8" RESPONSE_TERMINATOR,
-            {
-                .timestamp = 1710333953000LL,
-                .scheduleLabel = "sch_asc_pts",
-                .channelCount = 2,
-                .readings = (double[]) {9.84033000, 12.5358150},
-            },
+            .outputFormat =
+                {
+                    .sn = true,
+                    .scheduleLabel = true,
+                    .dateTime = true,
+                    .crc = true,
+                },
+            .response = "RBR 999999 sch_asc_pts 2024-03-13 12:45:53.000 9.84033000e+000"
+                        " 12.5358150e+000 0x25C8" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .timestamp = 1710333953000LL,
+                    .scheduleLabel = "sch_asc_pts",
+                    .channelCount = 2,
+                    .readings = (double[]) {9.84033000, 12.5358150},
+                },
         },
         /* sn, scheduleLabel, dateTime, and crc all off. */
         {
-            {
-                .sn = false,
-                .scheduleLabel = false,
-                .dateTime = false,
-                .crc = false,
-            },
-            "9.85054000e+000 12.5359318e+000" RESPONSE_TERMINATOR,
-            {
-                .timestamp = 0,
-                .scheduleLabel = "",
-                .channelCount = 2,
-                .readings = (double[]) {9.85054000, 12.5359318},
-            },
+            .outputFormat =
+                {
+                    .sn = false,
+                    .scheduleLabel = false,
+                    .dateTime = false,
+                    .crc = false,
+                },
+            .response = "9.85054000e+000 12.5359318e+000" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .timestamp = 0,
+                    .scheduleLabel = "",
+                    .channelCount = 2,
+                    .readings = (double[]) {9.85054000, 12.5359318},
+                },
         },
         /* Only scheduleLabel and crc on. */
         {
-            {
-                .sn = false,
-                .scheduleLabel = true,
-                .dateTime = false,
-                .crc = true,
-            },
-            "sch_asc_pts 9.83676000e+000 12.5361556e+000 0xC4EC" RESPONSE_TERMINATOR,
-            {
-                .timestamp = 0,
-                .scheduleLabel = "sch_asc_pts",
-                .channelCount = 2,
-                .readings = (double[]) {9.83676000, 12.5361556},
-            },
+            .outputFormat =
+                {
+                    .sn = false,
+                    .scheduleLabel = true,
+                    .dateTime = false,
+                    .crc = true,
+                },
+            .response = "sch_asc_pts 9.83676000e+000 12.5361556e+000 0xC4EC" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .timestamp = 0,
+                    .scheduleLabel = "sch_asc_pts",
+                    .channelCount = 2,
+                    .readings = (double[]) {9.83676000, 12.5361556},
+                },
         },
         /* Only sn on, with a float64-encoded sample. */
         {
-            {
-                .sn = true,
-                .scheduleLabel = false,
-                .dateTime = false,
-                .crc = false,
-                .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
-            },
-            "RBR 999999 9.84050000000000e+000 12.5362917963016e+000" RESPONSE_TERMINATOR,
-            {
-                .timestamp = 0,
-                .scheduleLabel = "",
-                .channelCount = 2,
-                .readings = (double[]) {9.84050000000000, 12.5362917963016},
-            },
+            .outputFormat =
+                {
+                    .sn = true,
+                    .scheduleLabel = false,
+                    .dateTime = false,
+                    .crc = false,
+                    .dataType = RBRGEN4_DATA_TYPE_FLOAT64,
+                },
+            .response =
+                "RBR 999999 9.84050000000000e+000 12.5362917963016e+000" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .timestamp = 0,
+                    .scheduleLabel = "",
+                    .channelCount = 2,
+                    .readings = (double[]) {9.84050000000000, 12.5362917963016},
+                },
         },
         /* The same as the first row, but preceded by the command prompt,
          * which must be trimmed before the sample is parsed. */
         {
-            {
-                .sn = true,
-                .scheduleLabel = true,
-                .dateTime = true,
-                .crc = true,
-            },
-            "ready: RBR 999999 sch_asc_pts 2024-03-13 12:45:49.000"
-            " 9.83297000e+000 12.5356886e+000 0x29C1" RESPONSE_TERMINATOR,
-            {
-                .timestamp = 1710333949000LL,
-                .scheduleLabel = "sch_asc_pts",
-                .channelCount = 2,
-                .readings = (double[]) {9.83297000, 12.5356886},
-            },
+            .outputFormat =
+                {
+                    .sn = true,
+                    .scheduleLabel = true,
+                    .dateTime = true,
+                    .crc = true,
+                },
+            .response = "ready: RBR 999999 sch_asc_pts 2024-03-13 12:45:49.000"
+                        " 9.83297000e+000 12.5356886e+000 0x29C1" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .timestamp = 1710333949000LL,
+                    .scheduleLabel = "sch_asc_pts",
+                    .channelCount = 2,
+                    .readings = (double[]) {9.83297000, 12.5356886},
+                },
         },
     };
 
@@ -1046,7 +1100,11 @@ TEST_LOGGER4(readSampleWithoutCallback)
     conn->environment.sample = NULL;
 
     conn->outputFormat = (RBRGen4OutputFormat) {
-        .sn = false, .scheduleLabel = false, .dateTime = false, .crc = false};
+        .sn = false,
+        .scheduleLabel = false,
+        .dateTime = false,
+        .crc = false,
+    };
     TestIOBuffers_init(buffers, "9.85054000e+000 12.5359318e+000" RESPONSE_TERMINATOR, 0);
 
     err = RBRGen4_readSample(conn);

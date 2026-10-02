@@ -33,7 +33,7 @@
 /* Readings storage for as many channels as this application expects. */
 #define CHANNEL_MAX 32
 
-RBRGen3Error instrumentSample(const struct RBRGen3 *conn, const struct RBRGen3Sample *const sample)
+RBRGen3Error instrumentSample(const RBRGen3 *conn, const RBRGen3Sample *const sample)
 {
     /* Unused. */
     (void) conn;

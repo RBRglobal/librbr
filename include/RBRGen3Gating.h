@@ -32,7 +32,7 @@ typedef enum RBRGen3GatingState {
     /** The number of specific gating condition types. */
     RBRGEN3_GATING_COUNT,
     /** An unknown or unrecognized gating condition type. */
-    RBRGEN3_UNKNOWN_GATING
+    RBRGEN3_UNKNOWN_GATING,
 } RBRGen3GatingState;
 
 /**
@@ -53,7 +53,7 @@ typedef enum RBRGen3ThresholdingChannelSelection {
     /** The channel is set by index. */
     RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX,
     /** The channel is set by label. */
-    RBRGEN3_THRESHOLD_CHANNEL_BY_LABEL
+    RBRGEN3_THRESHOLD_CHANNEL_BY_LABEL,
 } RBRGen3ThresholdingChannelSelection;
 
 /**
@@ -79,7 +79,7 @@ typedef enum RBRGen3ThresholdingCondition {
     /** The number of thresholding conditions. */
     RBRGEN3_THRESHOLDING_COUNT,
     /** An unknown or unrecognized thresholding condition. */
-    RBRGEN3_UNKNOWN_THRESHOLDING
+    RBRGEN3_UNKNOWN_THRESHOLDING,
 } RBRGen3ThresholdingCondition;
 
 /**
@@ -161,21 +161,24 @@ typedef struct RBRGen3Thresholding {
 /**
  * \brief Get the instrument thresholding settings.
  *
+ * \command{thresholding}
+ *
  * \param [in] conn the instrument connection
  * \param [out] threshold the thresholding parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another hardware error occurs
  * \see RBRGen3_setThresholding()
  */
 RBRGen3Error RBRGen3_getThresholding(RBRGen3 *conn, RBRGen3Thresholding *threshold);
 
 /**
  * \brief Set the instrument thresholding settings.
+ *
+ * \command{thresholding}
  *
  * Hardware errors may occur if:
  *
@@ -187,16 +190,13 @@ RBRGen3Error RBRGen3_getThresholding(RBRGen3 *conn, RBRGen3Thresholding *thresho
  * \param [in] conn the instrument connection
  * \param [in] threshold the thresholding parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
- * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the
- *         command buffer
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
- *                                                of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out of range
  * \see RBRGen3_getThresholding()
  */
 RBRGen3Error RBRGen3_setThresholding(RBRGen3 *conn, const RBRGen3Thresholding *threshold);
@@ -223,21 +223,24 @@ typedef struct RBRGen3TwistActivation {
 /**
  * \brief Get the instrument twist activation settings.
  *
+ * \command{twistactivation}
+ *
  * \param [in] conn the instrument connection
  * \param [out] twistActivation the twist activation parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another hardware error occurs
  * \see RBRGen3_setTwistActivation()
  */
 RBRGen3Error RBRGen3_getTwistActivation(RBRGen3 *conn, RBRGen3TwistActivation *twistActivation);
 
 /**
  * \brief Set the instrument twist activation settings.
+ *
+ * \command{twistactivation}
  *
  * Hardware errors may occur if:
  *
@@ -247,12 +250,12 @@ RBRGen3Error RBRGen3_getTwistActivation(RBRGen3 *conn, RBRGen3TwistActivation *t
  * \param [in] conn the instrument connection
  * \param [in] twistActivation the twist activation parameters
  * \return #RBRGEN3_SUCCESS when the settings are successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or
- *                                 another hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when the settings cannot be changed, or another hardware error
+ *         occurs
  * \see RBRGen3_getTwistActivation()
  */
 RBRGen3Error RBRGen3_setTwistActivation(RBRGen3 *conn,

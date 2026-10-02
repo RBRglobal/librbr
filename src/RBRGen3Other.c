@@ -127,7 +127,7 @@ RBRGen3Error RBRGen3_getId(RBRGen3 *conn, RBRGen3Id *id)
         } else if (strcmp(parameter.key, "serial") == 0) {
             id->serial = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "fwtype") == 0) {
-            id->fwtype = strtol(parameter.value, NULL, 10);
+            id->fwType = strtol(parameter.value, NULL, 10);
         } else if (strcmp(parameter.key, "mode") == 0) {
             snprintf(id->mode, sizeof(id->mode), "%s", parameter.value);
         }

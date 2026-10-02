@@ -5,15 +5,16 @@
  */
 
 /**
- * \file dynamiccorrection_example.c
- * \brief Library for salinity dynamic correction (example / test)
+ * \file dynamicCorrection-example.c
+ * \brief Example of using the library to apply the dynamic correction to data
+ * read from a CSV file.
  */
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-#include <stdio.h>
 #include <math.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define _DEBUG 1
 #include "RBRDynamicCorrection.h"
@@ -37,8 +38,8 @@
  */
 typedef struct {
     int size;
-    double timestamp_sec[MAX_CSV_SIZE]; // time in second
-    float P_meas[MAX_CSV_SIZE];         // P_meas is sea pressure.
+    double timestamp_sec[MAX_CSV_SIZE]; /* time in second */
+    float P_meas[MAX_CSV_SIZE];         /* P_meas is sea pressure. */
     float T_meas[MAX_CSV_SIZE];
     float C_meas[MAX_CSV_SIZE];
     float T_cond[MAX_CSV_SIZE];
@@ -79,7 +80,7 @@ void RBRDynamicCorrection_replayData(FILE *file, csvData_t *data, float Fs)
     for (index = 0; index < data->size; index++) {
         /* input to algorithm */
         meas.timestamp =
-            (int64_t) llround(data->timestamp_sec[index] * 1000.0); // time in millisecond
+            (int64_t) llround(data->timestamp_sec[index] * 1000.0); /* time in millisecond */
         meas.conductivity = data->C_meas[index];
         meas.marineTemperature = data->T_meas[index];
         meas.condTemperature = data->T_cond[index];
@@ -103,7 +104,7 @@ void RBRDynamicCorrection_replayData(FILE *file, csvData_t *data, float Fs)
         /* here the pressure is sea pressure */
         fprintf(file,
                 "%.3f, %.8f, %.8f, %.8f, %.8f\n",
-                // maintain output time as second
+                /* maintain output time as second */
                 (double) corrResult.timestamp / 1000.0,
                 (double) corrResult.corrTemperature,
                 (double) corrResult.pressure,
@@ -271,6 +272,7 @@ int main(int argc, char *argv[])
 
         printf("Correction written to %s\n", filenameOut);
         RBRDynamicCorrection_replayData(file, &data, Fs);
+        fclose(file);
     } else {
         fprintf(stderr, "Unable to write file %s\n", filenameOut);
     }

@@ -15,7 +15,7 @@ CPPFLAGS += -MMD -MP
 LDFLAGS := -L../../bin
 LDLIBS := -lm
 
-example: dynamicCorrection-example 
+example: dynamicCorrection-example
 
 dynamicCorrection-example: dynamicCorrection-example.o ../../bin/libRBRDynamicCorrection.a
 
@@ -27,6 +27,6 @@ clean:
 	rm -Rf \
 		*.o \
 		*.d \
-		dynamicCorrection-example \
+		dynamicCorrection-example
 
 -include $(wildcard *.d)

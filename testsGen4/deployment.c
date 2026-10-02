@@ -29,75 +29,84 @@ TEST_LOGGER4(getClock)
     GetClockTest tests[] = {
         /* A bare query reports both parameters. */
         {
-            "clock datetime=20260824120000 offsetfromutc=0.00" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .dateTime = 1787572800000LL,
-                .offsetFromUtc = 0.0f,
-            },
+            .response = "clock datetime=20260824120000 offsetfromutc=0.00" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .dateTime = 1787572800000LL,
+                    .offsetFromUtc = 0.0f,
+                },
         },
         /* The instrument never signs a positive offset. */
         {
-            "clock datetime=20260824120130 offsetfromutc=5.50" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .dateTime = 1787572890000LL,
-                .offsetFromUtc = 5.5f,
-            },
+            .response = "clock datetime=20260824120130 offsetfromutc=5.50" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .dateTime = 1787572890000LL,
+                    .offsetFromUtc = 5.5f,
+                },
         },
         {
-            "clock datetime=20260824120000 offsetfromutc=-4.50" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .dateTime = 1787572800000LL,
-                .offsetFromUtc = -4.5f,
-            },
+            .response = "clock datetime=20260824120000 offsetfromutc=-4.50" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .dateTime = 1787572800000LL,
+                    .offsetFromUtc = -4.5f,
+                },
         },
         /*
          * The response echoes the parameters in the order they were asked
          * for, so the getter must not depend on their position.
          */
         {
-            "clock offsetfromutc=14.00 datetime=20260824120000" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .dateTime = 1787572800000LL,
-                .offsetFromUtc = 14.0f,
-            },
+            .response = "clock offsetfromutc=14.00 datetime=20260824120000" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .dateTime = 1787572800000LL,
+                    .offsetFromUtc = 14.0f,
+                },
         },
         /* An unreported parameter keeps its unset value. */
         {
-            "clock datetime=20260824120000" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .dateTime = 1787572800000LL,
-                .offsetFromUtc = NAN,
-            },
+            .response = "clock datetime=20260824120000" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .dateTime = 1787572800000LL,
+                    .offsetFromUtc = NAN,
+                },
         },
         {
-            "clock" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .dateTime = 0,
-                .offsetFromUtc = NAN,
-            },
+            .response = "clock" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .dateTime = 0,
+                    .offsetFromUtc = NAN,
+                },
         },
         /* Keys the library does not model are ignored. */
         {
-            "clock datetime=20260824120000 offsetfromutc=0.00 bogus=1" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .dateTime = 1787572800000LL,
-                .offsetFromUtc = 0.0f,
-            },
+            .response =
+                "clock datetime=20260824120000 offsetfromutc=0.00 bogus=1" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .dateTime = 1787572800000LL,
+                    .offsetFromUtc = 0.0f,
+                },
         },
         {
-            "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            {
-                .dateTime = 0,
-                .offsetFromUtc = NAN,
-            },
+            .response = "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expected =
+                {
+                    .dateTime = 0,
+                    .offsetFromUtc = NAN,
+                },
         },
         {0},
     };
@@ -136,88 +145,91 @@ TEST_LOGGER4(setClock)
     SetClockTest tests[] = {
         /* Both parameters are always sent. */
         {
-            {
-                .dateTime = 1787572800000LL,
-                .offsetFromUtc = 0.0f,
-            },
-            "clock datetime=20260824120000 offsetfromutc=0.00" COMMAND_TERMINATOR,
-            "clock datetime=20260824120000 offsetfromutc=0.00" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
+            .clock =
+                {
+                    .dateTime = 1787572800000LL,
+                    .offsetFromUtc = 0.0f,
+                },
+            .command = "clock datetime=20260824120000 offsetfromutc=0.00" COMMAND_TERMINATOR,
+            .response = "clock datetime=20260824120000 offsetfromutc=0.00" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
         },
         {
-            {
-                .dateTime = 1787572890000LL,
-                .offsetFromUtc = 5.5f,
-            },
-            "clock datetime=20260824120130 offsetfromutc=5.50" COMMAND_TERMINATOR,
-            "clock datetime=20260824120130 offsetfromutc=5.50" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
+            .clock =
+                {
+                    .dateTime = 1787572890000LL,
+                    .offsetFromUtc = 5.5f,
+                },
+            .command = "clock datetime=20260824120130 offsetfromutc=5.50" COMMAND_TERMINATOR,
+            .response = "clock datetime=20260824120130 offsetfromutc=5.50" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
         },
         {
-            {
-                .dateTime = 1787572800000LL,
-                .offsetFromUtc = -12.0f,
-            },
-            "clock datetime=20260824120000 offsetfromutc=-12.00" COMMAND_TERMINATOR,
-            "clock datetime=20260824120000 offsetfromutc=-12.00" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
+            .clock =
+                {
+                    .dateTime = 1787572800000LL,
+                    .offsetFromUtc = -12.0f,
+                },
+            .command = "clock datetime=20260824120000 offsetfromutc=-12.00" COMMAND_TERMINATOR,
+            .response = "clock datetime=20260824120000 offsetfromutc=-12.00" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
         },
         /*
          * The offset is not range-checked: an offset the instrument will not
          * accept is sent and refused there.
          */
         {
-            {
-                .dateTime = 1787572800000LL,
-                .offsetFromUtc = 99.0f,
-            },
-            "clock datetime=20260824120000 offsetfromutc=99.00" COMMAND_TERMINATOR,
-            "ERR-108 invalid argument to command: '99.00'" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
+            .clock =
+                {
+                    .dateTime = 1787572800000LL,
+                    .offsetFromUtc = 99.0f,
+                },
+            .command = "clock datetime=20260824120000 offsetfromutc=99.00" COMMAND_TERMINATOR,
+            .response = "ERR-108 invalid argument to command: '99.00'" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
         },
         /* `NAN` would emit "nan", so it is refused before the command. */
         {
-            {
-                .dateTime = 1787572800000LL,
-                .offsetFromUtc = NAN,
-            },
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
+            .clock =
+                {
+                    .dateTime = 1787572800000LL,
+                    .offsetFromUtc = NAN,
+                },
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
         },
         {
-            {
-                .dateTime = RBRGEN4_DATETIME_MIN - 1,
-                .offsetFromUtc = 0.0f,
-            },
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
+            .clock =
+                {
+                    .dateTime = RBRGEN4_DATETIME_MIN - 1,
+                    .offsetFromUtc = 0.0f,
+                },
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
         },
         {
-            {
-                .dateTime = RBRGEN4_DATETIME_MAX + 1,
-                .offsetFromUtc = 0.0f,
-            },
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
+            .clock =
+                {
+                    .dateTime = RBRGEN4_DATETIME_MAX + 1,
+                    .offsetFromUtc = 0.0f,
+                },
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
         },
         {
-            {
-                .dateTime = 1787572800000LL,
-                .offsetFromUtc = 0.0f,
-            },
-            "clock datetime=20260824120000 offsetfromutc=0.00" COMMAND_TERMINATOR,
-            "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
+            .clock =
+                {
+                    .dateTime = 1787572800000LL,
+                    .offsetFromUtc = 0.0f,
+                },
+            .command = "clock datetime=20260824120000 offsetfromutc=0.00" COMMAND_TERMINATOR,
+            .response = "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
         },
-        {
-            {0},
-            NULL,
-            NULL,
-            0,
-        },
+        {.clock = {0}},
     };
 
     RBRGen4Error err;
@@ -243,113 +255,126 @@ TEST_LOGGER4(getDeployment)
     GetDeploymentTest tests[] = {
         /* No gating condition, so no start time is reported. */
         {
-            "deployment status=inactive gate=none simulation=off" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .startTime = 0,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
-                .simulation = false,
-            },
+            .response = "deployment status=inactive gate=none simulation=off" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .startTime = 0,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
+                    .simulation = false,
+                },
         },
         /* Time gating adds the start time, ahead of the other parameters. */
         {
-            "deployment starttime=20270101000000 status=inactive gate=time "
-            "simulation=off" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .startTime = 1798761600000LL,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
-                .simulation = false,
-            },
+            .response = "deployment starttime=20270101000000 status=inactive gate=time "
+                        "simulation=off" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .startTime = 1798761600000LL,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
+                    .simulation = false,
+                },
         },
         {
-            "deployment status=sampling gate=none simulation=off" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .startTime = 0,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
-                .simulation = false,
-            },
+            .response = "deployment status=sampling gate=none simulation=off" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .startTime = 0,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
+                    .simulation = false,
+                },
         },
         {
-            "deployment status=paused gate=none simulation=off" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .startTime = 0,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_PAUSED,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
-                .simulation = false,
-            },
+            .response = "deployment status=paused gate=none simulation=off" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .startTime = 0,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_PAUSED,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
+                    .simulation = false,
+                },
         },
         {
-            "deployment starttime=20270101000000 status=gated gate=time "
-            "simulation=off" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .startTime = 1798761600000LL,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_GATED,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
-                .simulation = false,
-            },
+            .response = "deployment starttime=20270101000000 status=gated gate=time "
+                        "simulation=off" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .startTime = 1798761600000LL,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_GATED,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
+                    .simulation = false,
+                },
         },
         {
-            "deployment status=inactive gate=twistactivation simulation=on" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .startTime = 0,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_TWISTACTIVATION,
-                .simulation = true,
-            },
+            .response =
+                "deployment status=inactive gate=twistactivation simulation=on" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .startTime = 0,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_TWISTACTIVATION,
+                    .simulation = true,
+                },
         },
         {
-            "deployment status=inactive gate=wetswitch simulation=off" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .startTime = 0,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_WETSWITCH,
-                .simulation = false,
-            },
+            .response =
+                "deployment status=inactive gate=wetswitch simulation=off" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .startTime = 0,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_WETSWITCH,
+                    .simulation = false,
+                },
         },
         /*
          * A value the library does not model reads as unknown rather than as
          * the first member.
          */
         {
-            "deployment status=bogus gate=bogus simulation=off" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .startTime = 0,
-                .status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
-                .gate = RBRGEN4_UNKNOWN_DEPLOYMENT_GATE,
-                .simulation = false,
-            },
+            .response = "deployment status=bogus gate=bogus simulation=off" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .startTime = 0,
+                    .status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+                    .gate = RBRGEN4_UNKNOWN_DEPLOYMENT_GATE,
+                    .simulation = false,
+                },
         },
         /* An unreported parameter is left unknown, not zero. */
         {
-            "deployment" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .startTime = 0,
-                .status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
-                .gate = RBRGEN4_UNKNOWN_DEPLOYMENT_GATE,
-                .simulation = false,
-            },
+            .response = "deployment" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .startTime = 0,
+                    .status = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+                    .gate = RBRGEN4_UNKNOWN_DEPLOYMENT_GATE,
+                    .simulation = false,
+                },
         },
         /* Keys the library does not model are ignored. */
         {
-            "deployment status=inactive gate=none simulation=off bogus=1" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            {
-                .startTime = 0,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
-                .simulation = false,
-            },
+            .response =
+                "deployment status=inactive gate=none simulation=off bogus=1" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expected =
+                {
+                    .startTime = 0,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
+                    .simulation = false,
+                },
         },
         {0},
     };
@@ -386,50 +411,54 @@ TEST_LOGGER4(setDeployment)
          * `ERR-108` for `starttime` under any other condition.
          */
         {
-            {
-                .startTime = 0,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
-                .simulation = false,
-            },
-            "deployment gate=none" COMMAND_TERMINATOR,
-            "deployment gate=none" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
+            .deployment =
+                {
+                    .startTime = 0,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
+                    .simulation = false,
+                },
+            .command = "deployment gate=none" COMMAND_TERMINATOR,
+            .response = "deployment gate=none" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
         },
         /* A start time left over from a previous read is not sent either. */
         {
-            {
-                .startTime = 1798761600000LL,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_WETSWITCH,
-                .simulation = false,
-            },
-            "deployment gate=wetswitch" COMMAND_TERMINATOR,
-            "deployment gate=wetswitch" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
+            .deployment =
+                {
+                    .startTime = 1798761600000LL,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_WETSWITCH,
+                    .simulation = false,
+                },
+            .command = "deployment gate=wetswitch" COMMAND_TERMINATOR,
+            .response = "deployment gate=wetswitch" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
         },
         {
-            {
-                .startTime = 0,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_TWISTACTIVATION,
-                .simulation = false,
-            },
-            "deployment gate=twistactivation" COMMAND_TERMINATOR,
-            "deployment gate=twistactivation" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
+            .deployment =
+                {
+                    .startTime = 0,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_TWISTACTIVATION,
+                    .simulation = false,
+                },
+            .command = "deployment gate=twistactivation" COMMAND_TERMINATOR,
+            .response = "deployment gate=twistactivation" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
         },
         /* Time gating takes both parameters in one command. */
         {
-            {
-                .startTime = 1798761600000LL,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
-                .simulation = false,
-            },
-            "deployment gate=time starttime=20270101000000" COMMAND_TERMINATOR,
-            "deployment gate=time starttime=20270101000000" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
+            .deployment =
+                {
+                    .startTime = 1798761600000LL,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
+                    .simulation = false,
+                },
+            .command = "deployment gate=time starttime=20270101000000" COMMAND_TERMINATOR,
+            .response = "deployment gate=time starttime=20270101000000" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
         },
         /*
          * A start time is range-checked only when it is going to be sent, so
@@ -437,91 +466,93 @@ TEST_LOGGER4(setDeployment)
          * under any other condition does not.
          */
         {
-            {
-                .startTime = RBRGEN4_DATETIME_MIN - 1,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
-                .simulation = false,
-            },
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
+            .deployment =
+                {
+                    .startTime = RBRGEN4_DATETIME_MIN - 1,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
+                    .simulation = false,
+                },
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
         },
         {
-            {
-                .startTime = RBRGEN4_DATETIME_MAX + 1,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
-                .simulation = false,
-            },
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
+            .deployment =
+                {
+                    .startTime = RBRGEN4_DATETIME_MAX + 1,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_TIME,
+                    .simulation = false,
+                },
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
         },
         {
-            {
-                .startTime = RBRGEN4_DATETIME_MAX + 1,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
-                .simulation = false,
-            },
-            "deployment gate=none" COMMAND_TERMINATOR,
-            "deployment gate=none" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
+            .deployment =
+                {
+                    .startTime = RBRGEN4_DATETIME_MAX + 1,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
+                    .simulation = false,
+                },
+            .command = "deployment gate=none" COMMAND_TERMINATOR,
+            .response = "deployment gate=none" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
         },
         /* The sentinels a getter can leave behind never reach the command. */
         {
-            {
-                .startTime = 0,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_UNKNOWN_DEPLOYMENT_GATE,
-                .simulation = false,
-            },
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
+            .deployment =
+                {
+                    .startTime = 0,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_UNKNOWN_DEPLOYMENT_GATE,
+                    .simulation = false,
+                },
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
         },
         {
-            {
-                .startTime = 0,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_COUNT,
-                .simulation = false,
-            },
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
+            .deployment =
+                {
+                    .startTime = 0,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_COUNT,
+                    .simulation = false,
+                },
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
         },
         /* Both writable parameters are unavailable while logging. */
         {
-            {
-                .startTime = 0,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
-                .simulation = false,
-            },
-            "deployment gate=none" COMMAND_TERMINATOR,
-            "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
+            .deployment =
+                {
+                    .startTime = 0,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_NONE,
+                    .simulation = false,
+                },
+            .command = "deployment gate=none" COMMAND_TERMINATOR,
+            .response = "ERR-105 command prohibited while logging" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
         },
         /* A gating condition the instrument does not offer is refused. */
         {
-            {
-                .startTime = 0,
-                .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
-                .gate = RBRGEN4_DEPLOYMENT_GATE_WETSWITCH,
-                .simulation = false,
-            },
-            "deployment gate=wetswitch" COMMAND_TERMINATOR,
-            "ERR-108 invalid argument to command: 'wetswitch'" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
+            .deployment =
+                {
+                    .startTime = 0,
+                    .status = RBRGEN4_DEPLOYMENT_STATUS_INACTIVE,
+                    .gate = RBRGEN4_DEPLOYMENT_GATE_WETSWITCH,
+                    .simulation = false,
+                },
+            .command = "deployment gate=wetswitch" COMMAND_TERMINATOR,
+            .response = "ERR-108 invalid argument to command: 'wetswitch'" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
         },
-        {
-            {0},
-            NULL,
-            NULL,
-            0,
-        },
+        {.deployment = {0}},
     };
 
     RBRGen4Error err;
@@ -550,218 +581,229 @@ TEST_LOGGER4(verify)
 {
     VerifyTest tests[] = {
         {
-            {
-                .label = "c_test",
-            },
-            "d1",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "verify config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
-            "verify config=c_test dataset=d1 storagemode=normal state=enabled" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INSTRUMENT_STATE_ENABLED,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "verify config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
+            .response = "verify config=c_test dataset=d1 storagemode=normal "
+                        "state=enabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedState = RBRGEN4_INSTRUMENT_STATE_ENABLED,
         },
         {
-            {
-                .label = "pH_cal",
-            },
-            "d_pHcal_20260824",
-            RBRGEN4_STORAGE_MODE_CALIBRATION,
-            "verify config=pH_cal dataset=d_pHcal_20260824 "
-            "storagemode=calibration" COMMAND_TERMINATOR,
-            "verify config=pH_cal dataset=d_pHcal_20260824 "
-            "storagemode=calibration state=enabled" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INSTRUMENT_STATE_ENABLED,
+            .config =
+                {
+                    .label = "pH_cal",
+                },
+            .datasetLabel = "d_pHcal_20260824",
+            .storageMode = RBRGEN4_STORAGE_MODE_CALIBRATION,
+            .command = "verify config=pH_cal dataset=d_pHcal_20260824 "
+                       "storagemode=calibration" COMMAND_TERMINATOR,
+            .response = "verify config=pH_cal dataset=d_pHcal_20260824 "
+                        "storagemode=calibration state=enabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedState = RBRGEN4_INSTRUMENT_STATE_ENABLED,
         },
         /* A `NULL` dataset label leaves the parameter out. */
         {
-            {
-                .label = "c_test",
-            },
-            NULL,
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "verify config=c_test storagemode=normal" COMMAND_TERMINATOR,
-            "verify config=c_test storagemode=normal state=enabled" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INSTRUMENT_STATE_ENABLED,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = NULL,
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "verify config=c_test storagemode=normal" COMMAND_TERMINATOR,
+            .response = "verify config=c_test storagemode=normal state=enabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedState = RBRGEN4_INSTRUMENT_STATE_ENABLED,
         },
         /*
          * The response echoes the parameters in whatever order they were
          * sent, and `state` need not come last.
          */
         {
-            {
-                .label = "c_test",
-            },
-            "d1",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "verify config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
-            "verify state=disabled dataset=d1 config=c_test storagemode=normal" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INSTRUMENT_STATE_DISABLED,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "verify config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
+            .response = "verify state=disabled dataset=d1 config=c_test "
+                        "storagemode=normal" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedState = RBRGEN4_INSTRUMENT_STATE_DISABLED,
         },
         /* A state the library does not model reads as unknown. */
         {
-            {
-                .label = "c_test",
-            },
-            "d1",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "verify config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
-            "verify config=c_test dataset=d1 state=bogus" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "verify config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
+            .response = "verify config=c_test dataset=d1 state=bogus" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         /* A response with no state at all leaves it unknown. */
         {
-            {
-                .label = "c_test",
-            },
-            "d1",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "verify config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
-            "verify config=c_test dataset=d1" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "verify config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
+            .response = "verify config=c_test dataset=d1" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         /* Out-of-range parameters never reach the instrument. */
         {
-            {
-                .label = "",
-            },
-            "d1",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         {
-            {
-                .label = "c_test",
-            },
-            "",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         /* The longest label the field holds is sent. */
         {
-            {
-                .label = "c_test",
-            },
-            "0123456789012345678901234567890",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "verify config=c_test dataset=0123456789012345678901234567890 "
-            "storagemode=normal" COMMAND_TERMINATOR,
-            "verify config=c_test dataset=0123456789012345678901234567890 storagemode=normal "
-            "state=enabled" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INSTRUMENT_STATE_ENABLED,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "0123456789012345678901234567890",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "verify config=c_test dataset=0123456789012345678901234567890 "
+                       "storagemode=normal" COMMAND_TERMINATOR,
+            .response =
+                "verify config=c_test dataset=0123456789012345678901234567890 storagemode=normal "
+                "state=enabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedState = RBRGEN4_INSTRUMENT_STATE_ENABLED,
         },
         {
-            {
-                .label = "c_test",
-            },
-            "0123456789012345678901234567890123",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "0123456789012345678901234567890123",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         {
-            {
-                .label = "c_test",
-            },
-            "d1",
-            RBRGEN4_UNKNOWN_STORAGE_MODE,
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_UNKNOWN_STORAGE_MODE,
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         {
-            {
-                .label = "c_test",
-            },
-            "d1",
-            RBRGEN4_STORAGE_MODE_COUNT,
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_STORAGE_MODE_COUNT,
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         /* Every failing check the instrument makes. */
         {
-            {
-                .label = "nope",
-            },
-            "d1",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "verify config=nope dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
-            "ERR-108 invalid argument to command: 'nope'" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "nope",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "verify config=nope dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
+            .response = "ERR-108 invalid argument to command: 'nope'" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         {
-            {
-                .label = "c_test",
-            },
-            "d.1",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "verify config=c_test dataset=d.1 storagemode=normal" COMMAND_TERMINATOR,
-            "ERR-131 illegal character in label 'd.1'" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d.1",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "verify config=c_test dataset=d.1 storagemode=normal" COMMAND_TERMINATOR,
+            .response = "ERR-131 illegal character in label 'd.1'" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         {
-            {
-                .label = "c_test",
-            },
-            "d1",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "verify config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
-            "ERR-120 'd1' is already in use" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "verify config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
+            .response = "ERR-120 'd1' is already in use" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         {
-            {
-                .label = "c_test",
-            },
-            "d5",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "verify config=c_test dataset=d5 storagemode=normal" COMMAND_TERMINATOR,
-            "ERR-431 dataset limit of '4' reached, delete dataset(s) to make "
-            "space" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d5",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "verify config=c_test dataset=d5 storagemode=normal" COMMAND_TERMINATOR,
+            .response = "ERR-431 dataset limit of '4' reached, delete dataset(s) to make "
+                        "space" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         {
-            {
-                .label = "c_test",
-            },
-            "d2",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "verify config=c_test dataset=d2 storagemode=normal" COMMAND_TERMINATOR,
-            "ERR-436 instrument was already enabled with different settings" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d2",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "verify config=c_test dataset=d2 storagemode=normal" COMMAND_TERMINATOR,
+            .response = "ERR-436 instrument was already enabled with different "
+                        "settings" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
-        {
-            {
-                .label = "",
-            },
-            NULL,
-            0,
-            NULL,
-            NULL,
-            0,
-            0,
-        },
+        {.config = {.label = {0}}},
     };
 
     RBRGen4Error err;
@@ -794,172 +836,179 @@ TEST_LOGGER4(enable)
 {
     EnableTest tests[] = {
         {
-            {
-                .label = "c_test",
-            },
-            "d1",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "enable config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
-            "enable config=c_test dataset=d1 storagemode=normal state=enabled" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INSTRUMENT_STATE_ENABLED,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "enable config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
+            .response = "enable config=c_test dataset=d1 storagemode=normal "
+                        "state=enabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedState = RBRGEN4_INSTRUMENT_STATE_ENABLED,
         },
         {
-            {
-                .label = "pH_cal",
-            },
-            "d_pHcal_20260824",
-            RBRGEN4_STORAGE_MODE_CALIBRATION,
-            "enable config=pH_cal dataset=d_pHcal_20260824 "
-            "storagemode=calibration" COMMAND_TERMINATOR,
-            "enable config=pH_cal dataset=d_pHcal_20260824 "
-            "storagemode=calibration state=enabled" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INSTRUMENT_STATE_ENABLED,
+            .config =
+                {
+                    .label = "pH_cal",
+                },
+            .datasetLabel = "d_pHcal_20260824",
+            .storageMode = RBRGEN4_STORAGE_MODE_CALIBRATION,
+            .command = "enable config=pH_cal dataset=d_pHcal_20260824 "
+                       "storagemode=calibration" COMMAND_TERMINATOR,
+            .response = "enable config=pH_cal dataset=d_pHcal_20260824 "
+                        "storagemode=calibration state=enabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedState = RBRGEN4_INSTRUMENT_STATE_ENABLED,
         },
         /* A `NULL` dataset label leaves the parameter out. */
         {
-            {
-                .label = "c_test",
-            },
-            NULL,
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "enable config=c_test storagemode=normal" COMMAND_TERMINATOR,
-            "enable config=c_test storagemode=normal state=enabled" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INSTRUMENT_STATE_ENABLED,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = NULL,
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "enable config=c_test storagemode=normal" COMMAND_TERMINATOR,
+            .response = "enable config=c_test storagemode=normal state=enabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedState = RBRGEN4_INSTRUMENT_STATE_ENABLED,
         },
         /* Out-of-range parameters never reach the instrument. */
         {
-            {
-                .label = "",
-            },
-            "d1",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         {
-            {
-                .label = "c_test",
-            },
-            "",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         /* The longest label the field holds is sent. */
         {
-            {
-                .label = "c_test",
-            },
-            "0123456789012345678901234567890",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "enable config=c_test dataset=0123456789012345678901234567890 "
-            "storagemode=normal" COMMAND_TERMINATOR,
-            "enable config=c_test dataset=0123456789012345678901234567890 storagemode=normal "
-            "state=enabled" RESPONSE_TERMINATOR,
-            RBRGEN4_SUCCESS,
-            RBRGEN4_INSTRUMENT_STATE_ENABLED,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "0123456789012345678901234567890",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "enable config=c_test dataset=0123456789012345678901234567890 "
+                       "storagemode=normal" COMMAND_TERMINATOR,
+            .response =
+                "enable config=c_test dataset=0123456789012345678901234567890 storagemode=normal "
+                "state=enabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedState = RBRGEN4_INSTRUMENT_STATE_ENABLED,
         },
         /*
          * A label one character past the field is refused rather than
          * truncated into the instrument's 32-byte field.
          */
         {
-            {
-                .label = "c_test",
-            },
-            "0123456789012345678901234567890123",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "0123456789012345678901234567890123",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         {
-            {
-                .label = "c_test",
-            },
-            "d1",
-            RBRGEN4_UNKNOWN_STORAGE_MODE,
-            "",
-            "",
-            RBRGEN4_INVALID_PARAMETER_VALUE,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_UNKNOWN_STORAGE_MODE,
+            .command = "",
+            .response = "",
+            .expectedError = RBRGEN4_INVALID_PARAMETER_VALUE,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         /* Every failing check the instrument makes. */
         {
-            {
-                .label = "c_test",
-            },
-            "d1",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "enable config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
-            "ERR-408 instrument was already enabled" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "enable config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
+            .response = "ERR-408 instrument was already enabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         {
-            {
-                .label = "c_test",
-            },
-            "d2",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "enable config=c_test dataset=d2 storagemode=normal" COMMAND_TERMINATOR,
-            "ERR-436 instrument was already enabled with different settings" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d2",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "enable config=c_test dataset=d2 storagemode=normal" COMMAND_TERMINATOR,
+            .response = "ERR-436 instrument was already enabled with different "
+                        "settings" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         {
-            {
-                .label = "c_test",
-            },
-            "d1",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "enable config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
-            "ERR-120 'd1' is already in use" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "enable config=c_test dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
+            .response = "ERR-120 'd1' is already in use" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         {
-            {
-                .label = "c_test",
-            },
-            "d5",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "enable config=c_test dataset=d5 storagemode=normal" COMMAND_TERMINATOR,
-            "ERR-431 dataset limit of '4' reached, delete dataset(s) to make "
-            "space" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_test",
+                },
+            .datasetLabel = "d5",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "enable config=c_test dataset=d5 storagemode=normal" COMMAND_TERMINATOR,
+            .response = "ERR-431 dataset limit of '4' reached, delete dataset(s) to make "
+                        "space" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
         {
-            {
-                .label = "c_empty",
-            },
-            "d1",
-            RBRGEN4_STORAGE_MODE_NORMAL,
-            "enable config=c_empty dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
-            "ERR-430 empty schedule list in configuration 'c_empty'" RESPONSE_TERMINATOR,
-            RBRGEN4_HARDWARE_ERROR,
-            RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+            .config =
+                {
+                    .label = "c_empty",
+                },
+            .datasetLabel = "d1",
+            .storageMode = RBRGEN4_STORAGE_MODE_NORMAL,
+            .command = "enable config=c_empty dataset=d1 storagemode=normal" COMMAND_TERMINATOR,
+            .response =
+                "ERR-430 empty schedule list in configuration 'c_empty'" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
         },
-        {
-            {
-                .label = "",
-            },
-            NULL,
-            0,
-            NULL,
-            NULL,
-            0,
-            0,
-        },
+        {.config = {.label = {0}}},
     };
 
     RBRGen4Error err;
@@ -990,32 +1039,40 @@ TEST_LOGGER4(disable)
 {
     DisableTest tests[] = {
         /* The command reports an instrument state, not a deployment status. */
-        {"disable state=disabled" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_RESPONSE_INFO,
-         RBRGEN4_HARDWARE_ERROR_NONE,
-         RBRGEN4_INSTRUMENT_STATE_DISABLED},
+        {
+            .response = "disable state=disabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedType = RBRGEN4_RESPONSE_INFO,
+            .expectedHardwareError = RBRGEN4_HARDWARE_ERROR_NONE,
+            .expectedState = RBRGEN4_INSTRUMENT_STATE_DISABLED,
+        },
         /*
          * Disabling an instrument that is already disabled is a warning, which
          * the library surfaces as a hardware error with the response type
          * distinguishing it.
          */
-        {"WRN-435 instrument state is already disabled" RESPONSE_TERMINATOR,
-         RBRGEN4_HARDWARE_ERROR,
-         RBRGEN4_RESPONSE_WARNING,
-         RBRGEN4_HARDWARE_ERROR_INSTRUMENT_STATE_IS_ALREADY_DISABLED,
-         RBRGEN4_UNKNOWN_INSTRUMENT_STATE},
+        {
+            .response = "WRN-435 instrument state is already disabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedType = RBRGEN4_RESPONSE_WARNING,
+            .expectedHardwareError = RBRGEN4_HARDWARE_ERROR_INSTRUMENT_STATE_IS_ALREADY_DISABLED,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+        },
         /* A state the library does not model reads as unknown. */
-        {"disable state=bogus" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_RESPONSE_INFO,
-         RBRGEN4_HARDWARE_ERROR_NONE,
-         RBRGEN4_UNKNOWN_INSTRUMENT_STATE},
-        {"disable" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_RESPONSE_INFO,
-         RBRGEN4_HARDWARE_ERROR_NONE,
-         RBRGEN4_UNKNOWN_INSTRUMENT_STATE},
+        {
+            .response = "disable state=bogus" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedType = RBRGEN4_RESPONSE_INFO,
+            .expectedHardwareError = RBRGEN4_HARDWARE_ERROR_NONE,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+        },
+        {
+            .response = "disable" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedType = RBRGEN4_RESPONSE_INFO,
+            .expectedHardwareError = RBRGEN4_HARDWARE_ERROR_NONE,
+            .expectedState = RBRGEN4_UNKNOWN_INSTRUMENT_STATE,
+        },
         {0},
     };
 
@@ -1065,23 +1122,35 @@ static bool test_pauseResume(RBRGen4 *conn, TestIOBuffers *buffers, const char *
 TEST_LOGGER4(pause)
 {
     PauseResumeTest tests[] = {
-        {"pause status=paused" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_DEPLOYMENT_STATUS_PAUSED},
+        {
+            .response = "pause status=paused" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedStatus = RBRGEN4_DEPLOYMENT_STATUS_PAUSED,
+        },
         /*
          * Pausing a deployment that is waiting on its gating condition
          * succeeds and leaves it gated, not paused.
          */
-        {"pause status=gated" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_DEPLOYMENT_STATUS_GATED},
-        {"ERR-406 cannot pause while disabled" RESPONSE_TERMINATOR,
-         RBRGEN4_HARDWARE_ERROR,
-         RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS},
-        {"pause status=bogus" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS},
-        {"pause" RESPONSE_TERMINATOR, RBRGEN4_SUCCESS, RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS},
+        {
+            .response = "pause status=gated" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedStatus = RBRGEN4_DEPLOYMENT_STATUS_GATED,
+        },
+        {
+            .response = "ERR-406 cannot pause while disabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedStatus = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+        },
+        {
+            .response = "pause status=bogus" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedStatus = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+        },
+        {
+            .response = "pause" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedStatus = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+        },
         {0},
     };
 
@@ -1091,19 +1160,31 @@ TEST_LOGGER4(pause)
 TEST_LOGGER4(resume)
 {
     PauseResumeTest tests[] = {
-        {"resume status=sampling" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_DEPLOYMENT_STATUS_SAMPLING},
-        {"resume status=gated" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_DEPLOYMENT_STATUS_GATED},
-        {"ERR-407 cannot resume while disabled" RESPONSE_TERMINATOR,
-         RBRGEN4_HARDWARE_ERROR,
-         RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS},
-        {"resume status=bogus" RESPONSE_TERMINATOR,
-         RBRGEN4_SUCCESS,
-         RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS},
-        {"resume" RESPONSE_TERMINATOR, RBRGEN4_SUCCESS, RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS},
+        {
+            .response = "resume status=sampling" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedStatus = RBRGEN4_DEPLOYMENT_STATUS_SAMPLING,
+        },
+        {
+            .response = "resume status=gated" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedStatus = RBRGEN4_DEPLOYMENT_STATUS_GATED,
+        },
+        {
+            .response = "ERR-407 cannot resume while disabled" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_HARDWARE_ERROR,
+            .expectedStatus = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+        },
+        {
+            .response = "resume status=bogus" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedStatus = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+        },
+        {
+            .response = "resume" RESPONSE_TERMINATOR,
+            .expectedError = RBRGEN4_SUCCESS,
+            .expectedStatus = RBRGEN4_UNKNOWN_DEPLOYMENT_STATUS,
+        },
         {0},
     };
 

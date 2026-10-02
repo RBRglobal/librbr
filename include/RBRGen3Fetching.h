@@ -25,6 +25,8 @@ extern "C" {
 /**
  * \brief Requests an “on-demand” sample set from the logger.
  *
+ * \command{fetch}
+ *
  * Unlike streaming data/RBRGen3_readSample(), fetched data is returned
  * directly to the caller (independent of any RBRGen3SampleCallback
  * defined in RBRGen3Environment.sample).
@@ -43,26 +45,26 @@ extern "C" {
  * Logger2 instruments, readings will be fetched from all enabled channels.
  *
  * \param [in] conn the instrument connection
- * \param [in] channels the list of channels to be acquired (may be `NULL`);
- *                      its length must not exceed its size; an empty list
- *                      selects every channel, and a list
- *                      RBRGen3_getLabelsList() returned as truncated
- *                      selects only the labels it holds
+ * \param [in] channels the list of channels to be acquired (may be `NULL`); its length must not
+ *                      exceed its size; an empty list selects every channel, and a list
+ *                      RBRGen3_getLabelsList() returned as truncated selects only the labels it
+ *                      holds
  * \param [in] sleepAfter whether the instrument should sleep after fetching
- * \param [in,out] sample the fetched sample; RBRGen3Sample.readings and
- *                        RBRGen3Sample.size must be set by the caller
+ * \param [in,out] sample the fetched sample; RBRGen3Sample.readings and RBRGen3Sample.size must be
+ *                        set by the caller
  * \return #RBRGEN3_SUCCESS when a sample is successfully read
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when \a sample has no readings
- *         storage, or \a channels has a negative length, more labels than
- *         storage, or labels but no label storage
- * \return #RBRGEN3_COMMAND_TOO_LONG when a channel label does not fit the
- *         command buffer; the command itself may be longer than the buffer
+ * \return #RBRGEN3_COMMAND_TOO_LONG when a channel label does not fit the command buffer; the
+ *         command itself may be longer than the buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when an invalid channel is requested, or
- *                                 another hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when an invalid channel is requested, or another hardware error
+ *         occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when \a sample has no readings storage, or \a channels
+ *         has a negative length, more labels than storage, or labels but no label storage
+ * \see RBRGen3LabelsList
+ * \see RBRGen3Sample
+ * \see RBRGen3_readSample()
  */
 RBRGen3Error RBRGen3_fetch(RBRGen3 *conn, RBRGen3LabelsList *channels, bool sleepAfter,
                            RBRGen3Sample *sample);

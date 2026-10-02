@@ -36,7 +36,7 @@ typedef enum RBRGen4StorageAccess {
     /** The number of storage access modes. */
     RBRGEN4_STORAGE_ACCESS_COUNT,
     /** An unknown or unrecognized storage access mode. */
-    RBRGEN4_UNKNOWN_STORAGE_ACCESS
+    RBRGEN4_UNKNOWN_STORAGE_ACCESS,
 } RBRGen4StorageAccess;
 
 /**
@@ -77,15 +77,16 @@ typedef struct RBRGen4Storage {
 /**
  * \brief Get information about the usage and characteristics of data memory.
  *
- * \note Issues the `storage` command.
+ * \command{storage}
  *
  * \param [in] conn the instrument connection
  * \param [out] storage data memory information
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_setStorage()
  */
 RBRGen4Error RBRGen4_getStorage(RBRGen4 *conn, RBRGen4Storage *storage);
@@ -93,20 +94,19 @@ RBRGen4Error RBRGen4_getStorage(RBRGen4 *conn, RBRGen4Storage *storage);
 /**
  * \brief Set the instrument storage parameters.
  *
- * Sends `access`, the command's only writable parameter.
+ * \command{storage}
  *
- * \note Issues the `storage` command.
+ * Sends `access`, the command's only writable parameter.
  *
  * \param [in] conn the instrument connection
  * \param [in] storage the storage parameters to write
- * \return #RBRGEN4_SUCCESS when the parameters are successfully
- *                                    written
+ * \return #RBRGEN4_SUCCESS when the parameters are successfully written
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the storage access
- *                                                    mode is invalid
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the storage access mode is invalid
  * \see RBRGen4_getStorage()
  */
 RBRGen4Error RBRGen4_setStorage(RBRGen4 *conn, const RBRGen4Storage *storage);
@@ -124,7 +124,7 @@ typedef enum RBRGen4DatasetStatus {
     /** The number of specific dataset statuses. */
     RBRGEN4_DATASET_STATUS_COUNT,
     /** An unknown or unrecognized dataset status. */
-    RBRGEN4_UNKNOWN_DATASET_STATUS
+    RBRGEN4_UNKNOWN_DATASET_STATUS,
 } RBRGen4DatasetStatus;
 
 /**
@@ -185,21 +185,21 @@ typedef struct RBRGen4DatasetPool {
  * \brief Populate the pool of datasets with the labels of the datasets
  * stored in the instrument's memory.
  *
+ * \command{dataset}
+ *
  * Only the labels are populated: read the remaining parameters of a pool
  * entry with RBRGen4_getDataset().
- *
- * \note Issues the `dataset` command.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] datasetPool the datasets in storage, labels only
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_TRUNCATED when \a datasetPool cannot hold every
- *                            reported dataset; the first `size` are
- *                            stored
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
+ * \return #RBRGEN4_TRUNCATED when \a datasetPool cannot hold every reported dataset; the first
+ *         RBRGen4DatasetPool.size are stored
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when \a datasetPool has no storage
  * \see RBRGen4_getDataset()
  */
@@ -208,17 +208,16 @@ RBRGen4Error RBRGen4_getDatasetPool(RBRGen4 *conn, RBRGen4DatasetPool *datasetPo
 /**
  * \brief Read the number of datasets stored in the instrument's memory.
  *
- * \note Issues the `dataset count` command.
+ * \command{dataset count}
  *
  * \param [in] conn the instrument connection
  * \param [out] count the number of datasets stored
  * \return #RBRGEN4_SUCCESS when the count is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another
- *                                 hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the count cannot be read, or another hardware error occurs
  * \see RBRGen4_getDatasetPool()
  * \see RBRGen4_getDatasetMaxCount()
  */
@@ -227,17 +226,16 @@ RBRGen4Error RBRGen4_getDatasetCount(RBRGen4 *conn, int32_t *count);
 /**
  * \brief Read the maximum number of datasets the instrument can store.
  *
- * \note Issues the `dataset maxcount` command.
+ * \command{dataset maxcount}
  *
  * \param [in] conn the instrument connection
  * \param [out] maxCount the maximum number of datasets
  * \return #RBRGEN4_SUCCESS when the maximum is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another
- *                                 hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the maximum cannot be read, or another hardware error occurs
  * \see RBRGen4_getDatasetCount()
  */
 RBRGen4Error RBRGen4_getDatasetMaxCount(RBRGen4 *conn, int32_t *maxCount);
@@ -245,26 +243,23 @@ RBRGen4Error RBRGen4_getDatasetMaxCount(RBRGen4 *conn, int32_t *maxCount);
 /**
  * \brief Populate the parameters of a dataset.
  *
- * The caller sets RBRGen4Dataset.label to select the dataset.
+ * \command{dataset <dataset_label>}
  *
- * \note Issues the `dataset <dataset_label>` command.
+ * The caller sets RBRGen4Dataset.label to select the dataset.
  *
  * \param [in] conn the instrument connection
  * \param [in,out] dataset the dataset to read, selected by its label
- * \param [out] scheduleList the schedules run by the dataset, or `NULL` to
- *                           skip them
+ * \param [in,out] scheduleList the schedules run by the dataset, or `NULL` to skip them
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another hardware error occurs
+ * \return #RBRGEN4_TRUNCATED when \a scheduleList cannot hold every reported schedule; the first
+ *         RBRGen4LabelList.size are stored
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, or
  *         \a scheduleList is given without storage
- * \return #RBRGEN4_TRUNCATED when \a scheduleList cannot hold every
- *                            reported schedule; the first `size` are
- *                            stored
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
- *                                      hardware error occurs
  * \see RBRGen4_getDatasetPool()
  */
 RBRGen4Error RBRGen4_getDataset(RBRGen4 *conn, RBRGen4Dataset *dataset,
@@ -320,19 +315,19 @@ typedef struct RBRGen4DatasetDataBlock {
  * \brief Get the memory usage of all of a dataset's events, including
  * those not tied to any schedule.
  *
- * \note Issues the `dataset <dataset_label>/events` command.
+ * \command{dataset <dataset_label>/events}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [out] block the memory usage of the events block
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
- *                                      hardware error occurs
+ * \see RBRGen4DatasetEventsBlock
  */
 RBRGen4Error RBRGen4_getDatasetEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                            RBRGen4DatasetEventsBlock *block);
@@ -340,19 +335,19 @@ RBRGen4Error RBRGen4_getDatasetEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *
 /**
  * \brief Get the memory usage of all of a dataset's metadata.
  *
- * \note Issues the `dataset <dataset_label>/meta` command.
+ * \command{dataset <dataset_label>/meta}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
  * \param [out] block the memory usage of the metadata block
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
- *                                      hardware error occurs
+ * \see RBRGen4DatasetMetaBlock
  */
 RBRGen4Error RBRGen4_getDatasetMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                          RBRGen4DatasetMetaBlock *block);
@@ -361,22 +356,21 @@ RBRGen4Error RBRGen4_getDatasetMetaBlock(RBRGen4 *conn, const RBRGen4Dataset *da
  * \brief Get the memory usage of one of a dataset's schedules, summed over
  * all of its block types.
  *
- * \note Issues the `dataset <dataset_label>/<schedule_label>` command.
+ * \command{dataset <dataset_label>/<schedule_label>}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
- * \param [in] scheduleLabel the schedule, as listed by
- *                           RBRGen4_getDataset()
+ * \param [in] scheduleLabel the schedule, as listed by RBRGen4_getDataset()
  * \param [out] block the memory usage of the schedule's blocks
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is
- *                                                    empty
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
- *                                      or another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist, or another hardware
+ *         error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is empty
+ * \see RBRGen4DatasetScheduleBlock
  */
 RBRGen4Error RBRGen4_getDatasetScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                              const char *scheduleLabel,
@@ -385,23 +379,21 @@ RBRGen4Error RBRGen4_getDatasetScheduleBlock(RBRGen4 *conn, const RBRGen4Dataset
 /**
  * \brief Get the memory usage of one schedule's events within a dataset.
  *
- * \note Issues the `dataset <dataset_label>/<schedule_label>/events`
- * command.
+ * \command{dataset <dataset_label>/<schedule_label>/events}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
- * \param [in] scheduleLabel the schedule, as listed by
- *                           RBRGen4_getDataset()
+ * \param [in] scheduleLabel the schedule, as listed by RBRGen4_getDataset()
  * \param [out] block the memory usage of the schedule's events block
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is
- *                                                    empty
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
- *                                      or another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist, or another hardware
+ *         error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is empty
+ * \see RBRGen4DatasetEventsBlock
  */
 RBRGen4Error RBRGen4_getDatasetScheduleEventsBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                                    const char *scheduleLabel,
@@ -411,22 +403,21 @@ RBRGen4Error RBRGen4_getDatasetScheduleEventsBlock(RBRGen4 *conn, const RBRGen4D
  * \brief Get the memory usage of one schedule's sample data within a
  * dataset.
  *
- * \note Issues the `dataset <dataset_label>/<schedule_label>/data` command.
+ * \command{dataset <dataset_label>/<schedule_label>/data}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
- * \param [in] scheduleLabel the schedule, as listed by
- *                           RBRGen4_getDataset()
+ * \param [in] scheduleLabel the schedule, as listed by RBRGen4_getDataset()
  * \param [out] block the memory usage of the schedule's sample data block
  * \return #RBRGEN4_SUCCESS when the parameters are successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is
- *                                                    empty
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
- *                                      or another hardware error occurs
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist, or another hardware
+ *         error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when either label is empty
+ * \see RBRGen4DatasetDataBlock
  */
 RBRGen4Error RBRGen4_getDatasetScheduleDataBlock(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                                  const char *scheduleLabel,
@@ -434,18 +425,18 @@ RBRGen4Error RBRGen4_getDatasetScheduleDataBlock(RBRGen4 *conn, const RBRGen4Dat
 
 /**
  * \brief Delete one dataset from the instrument's memory.
- * \note Issues the `dataset delete <dataset_label>` command.
+ *
+ * \command{dataset delete <dataset_label>}
  *
  * \param [in] conn the instrument connection
  * \param [in] label the label of the dataset to delete
  * \return #RBRGEN4_SUCCESS when the dataset is deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another hardware error occurs
  * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
- *                                      hardware error occurs
  * \see RBRGen4_deleteDatasetAll()
  */
 RBRGen4Error RBRGen4_deleteDataset(RBRGen4 *conn, const char *label);
@@ -453,14 +444,15 @@ RBRGen4Error RBRGen4_deleteDataset(RBRGen4 *conn, const char *label);
 /**
  * \brief Delete every dataset from the instrument's memory.
  *
- * \note Issues the `dataset delete all` command.
+ * \command{dataset delete all}
  *
  * \param [in] conn the instrument connection
  * \return #RBRGEN4_SUCCESS when the datasets are deleted
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_deleteDataset()
  */
 RBRGen4Error RBRGen4_deleteDatasetAll(RBRGen4 *conn);
@@ -479,7 +471,7 @@ typedef enum RBRGen4DownloadDataUnit {
     /** The number of sample data download units. */
     RBRGEN4_DOWNLOAD_DATA_UNIT_COUNT,
     /** An unknown or unrecognized sample data download unit. */
-    RBRGEN4_UNKNOWN_DOWNLOAD_DATA_UNIT
+    RBRGEN4_UNKNOWN_DOWNLOAD_DATA_UNIT,
 } RBRGen4DownloadDataUnit;
 
 /**
@@ -505,7 +497,7 @@ typedef enum RBRGen4DownloadEventsUnit {
     /** The number of events download units. */
     RBRGEN4_DOWNLOAD_EVENTS_UNIT_COUNT,
     /** An unknown or unrecognized events download unit. */
-    RBRGEN4_UNKNOWN_DOWNLOAD_EVENTS_UNIT
+    RBRGEN4_UNKNOWN_DOWNLOAD_EVENTS_UNIT,
 } RBRGen4DownloadEventsUnit;
 
 /**
@@ -622,34 +614,27 @@ typedef struct RBRGen4DownloadMeta {
 /**
  * \brief Download part of one schedule's sample data within a dataset.
  *
- * The transfer is checked against its trailing CRC before returning.
+ * \command{download <dataset_label>/<schedule_label>/data}
  *
- * \note Issues the `download <dataset_label>/<schedule_label>/data`
- * command.
+ * The transfer is checked against its trailing CRC before returning.
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
- * \param [in] scheduleLabel the schedule, as listed by
- *                           RBRGen4_getDataset()
- * \param [in,out] download the download request: the caller populates the
- *                         unit, count, offset, and buffer fields to say what
- *                         to transfer and where to put it; the counts are
- *                         updated with what the instrument returned
+ * \param [in] scheduleLabel the schedule, as listed by RBRGen4_getDataset()
+ * \param [in,out] download the download request: the caller populates the unit, count, offset, and
+ *                          buffer fields to say what to transfer and where to put it; the counts
+ *                          are updated with what the instrument returned
  * \return #RBRGEN4_SUCCESS when the data is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a label is empty,
- *                                                    the unit is invalid, or
- *                                                    the count or offset is
- *                                                    negative
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the response byte count
- *                                             exceeds the buffer capacity
- * \return #RBRGEN4_CHECKSUM_ERROR when the transfer fails its CRC
- *                                           check
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
- *                                      or another hardware error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a label is empty, the unit is invalid, or the count
+ *         or offset is negative
+ * \return #RBRGEN4_BUFFER_TOO_SMALL when the response byte count exceeds the buffer capacity
+ * \return #RBRGEN4_CHECKSUM_ERROR when the transfer fails its CRC check
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist, or another hardware
+ *         error occurs
  */
 RBRGen4Error RBRGen4_downloadDatasetScheduleData(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                                  const char *scheduleLabel,
@@ -659,29 +644,23 @@ RBRGen4Error RBRGen4_downloadDatasetScheduleData(RBRGen4 *conn, const RBRGen4Dat
  * \brief Download a dataset's events, including those not tied to any
  * schedule.
  *
- * \note Issues the `download <dataset_label>/events` command.
+ * \command{download <dataset_label>/events}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
- * \param [in,out] download the download request: the caller populates the
- *                         unit, count, offset, and buffer fields to say what
- *                         to transfer and where to put it; the counts are
- *                         updated with what the instrument returned
+ * \param [in,out] download the download request: the caller populates the unit, count, offset, and
+ *                          buffer fields to say what to transfer and where to put it; the counts
+ *                          are updated with what the instrument returned
  * \return #RBRGEN4_SUCCESS when the data is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is
- *                                                    empty, the unit is
- *                                                    invalid, or the count
- *                                                    or offset is negative
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the response byte count
- *                                             exceeds the buffer capacity
- * \return #RBRGEN4_CHECKSUM_ERROR when the transfer fails its CRC
- *                                           check
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
- *                                      hardware error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty, the unit is invalid, or the
+ *         count or offset is negative
+ * \return #RBRGEN4_BUFFER_TOO_SMALL when the response byte count exceeds the buffer capacity
+ * \return #RBRGEN4_CHECKSUM_ERROR when the transfer fails its CRC check
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another hardware error occurs
  * \see RBRGen4_downloadDatasetScheduleEvents()
  */
 RBRGen4Error RBRGen4_downloadDatasetEvents(RBRGen4 *conn, const RBRGen4Dataset *dataset,
@@ -690,32 +669,25 @@ RBRGen4Error RBRGen4_downloadDatasetEvents(RBRGen4 *conn, const RBRGen4Dataset *
 /**
  * \brief Download part of one schedule's events within a dataset.
  *
- * \note Issues the `download <dataset_label>/<schedule_label>/events`
- * command.
+ * \command{download <dataset_label>/<schedule_label>/events}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
- * \param [in] scheduleLabel the schedule, as listed by
- *                           RBRGen4_getDataset()
- * \param [in,out] download the download request: the caller populates the
- *                         unit, count, offset, and buffer fields to say what
- *                         to transfer and where to put it; the counts are
- *                         updated with what the instrument returned
+ * \param [in] scheduleLabel the schedule, as listed by RBRGen4_getDataset()
+ * \param [in,out] download the download request: the caller populates the unit, count, offset, and
+ *                          buffer fields to say what to transfer and where to put it; the counts
+ *                          are updated with what the instrument returned
  * \return #RBRGEN4_SUCCESS when the data is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a label is empty,
- *                                                    the unit is invalid, or
- *                                                    the count or offset is
- *                                                    negative
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the response byte count
- *                                             exceeds the buffer capacity
- * \return #RBRGEN4_CHECKSUM_ERROR when the transfer fails its CRC
- *                                           check
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist,
- *                                      or another hardware error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a label is empty, the unit is invalid, or the count
+ *         or offset is negative
+ * \return #RBRGEN4_BUFFER_TOO_SMALL when the response byte count exceeds the buffer capacity
+ * \return #RBRGEN4_CHECKSUM_ERROR when the transfer fails its CRC check
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset or schedule does not exist, or another hardware
+ *         error occurs
  * \see RBRGen4_downloadDatasetEvents()
  */
 RBRGen4Error RBRGen4_downloadDatasetScheduleEvents(RBRGen4 *conn, const RBRGen4Dataset *dataset,
@@ -725,36 +697,32 @@ RBRGen4Error RBRGen4_downloadDatasetScheduleEvents(RBRGen4 *conn, const RBRGen4D
 /**
  * \brief Download a dataset's metadata.
  *
- * \note Issues the `download <dataset_label>/meta` command.
+ * \command{download <dataset_label>/meta}
  *
  * \param [in] conn the instrument connection
  * \param [in] dataset the dataset, selected by its label
- * \param [in,out] download the download request: the caller populates the
- *                         count, offset, and buffer fields to say what to
- *                         transfer and where to put it; the counts are
- *                         updated with what the instrument returned
+ * \param [in,out] download the download request: the caller populates the count, offset, and buffer
+ *                          fields to say what to transfer and where to put it; the counts are
+ *                          updated with what the instrument returned
  * \return #RBRGEN4_SUCCESS when the data is successfully read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN4_TIMEOUT when a timeout occurs
- * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is
- *                                                    empty or the count or
- *                                                    offset is negative
- * \return #RBRGEN4_BUFFER_TOO_SMALL when the response byte count
- *                                             exceeds the buffer capacity
- * \return #RBRGEN4_CHECKSUM_ERROR when the transfer fails its CRC
- *                                           check
- * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another
- *                                      hardware error occurs
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when the label is empty or the count or offset is
+ *         negative
+ * \return #RBRGEN4_BUFFER_TOO_SMALL when the response byte count exceeds the buffer capacity
+ * \return #RBRGEN4_CHECKSUM_ERROR when the transfer fails its CRC check
+ * \return #RBRGEN4_HARDWARE_ERROR when the dataset does not exist, or another hardware error occurs
  */
 RBRGen4Error RBRGen4_downloadDatasetMeta(RBRGen4 *conn, const RBRGen4Dataset *dataset,
                                          RBRGen4DownloadMeta *download);
 
 /**
- * \brief Calculate the 16-bit CRC using the CCITT polynomial f(x)=x^16+x^12+x^5+1
- * feeding bytes into the generator LSB first and using 0xFFFF as a seed value,
- * is then transmitted.
+ * \brief Calculate the 16-bit CRC of a block of data.
+ *
+ * Uses the CCITT polynomial f(x)=x^16+x^12+x^5+1 and a seed value of 0xFFFF.
+ * The download functions check transferred data against the same calculation.
  *
  * \param [in] data the data string used to calculate the CRC
  * \param [in] size the number of characters in the string used to calculate the CRC

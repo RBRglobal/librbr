@@ -102,9 +102,9 @@ int main(int argc, char *argv[])
            " v%s (%s) with command API v%s; logging is %s.\n",
            instrument.model,
            instrument.sn,
-           instrument.fwversion,
+           instrument.fwVersion,
            instrument.semver,
-           instrument.apiversion,
+           instrument.apiVersion,
            RBRGen4InstrumentState_name(instrument.state));
 
     /* Report how the instrument is connected */
@@ -118,7 +118,6 @@ int main(int argc, char *argv[])
 
     switch (link.type) {
     case RBRGEN4_LINK_TYPE_USB:
-        // case RBRGEN4_LINK_TYPE_WIFI:
         break;
     case RBRGEN4_LINK_TYPE_SERIAL: {
         RBRGen4LinkSerial serial;

@@ -35,7 +35,7 @@ typedef enum RBRGen3Link {
     /** The number of specific link types. */
     RBRGEN3_LINK_COUNT,
     /** An unknown or unrecognized link type. */
-    RBRGEN3_UNKNOWN_LINK
+    RBRGEN3_UNKNOWN_LINK,
 } RBRGen3Link;
 
 /**
@@ -50,13 +50,16 @@ const char *RBRGen3Link_name(RBRGen3Link link);
 /**
  * \brief Get the type of connectivity for the instrument connection.
  *
+ * \command{link}
+ *
  * \param [in] conn the instrument connection
  * \param [out] link the link type
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  */
 RBRGen3Error RBRGen3_getLink(RBRGen3 *conn, RBRGen3Link *link);
 
@@ -64,7 +67,7 @@ RBRGen3Error RBRGen3_getLink(RBRGen3 *conn, RBRGen3Link *link);
  * \brief Instrument serial baud rates.
  *
  * Most of these baud rates are unsupported by the instrument, but are included
- * for sake of completeness. Call RBRGen3_getBaudRates() to determine
+ * for sake of completeness. Call RBRGen3_getSerial() to determine
  * which rates are supported by a given instrument.
  *
  * \see RBRGen3Serial
@@ -103,7 +106,7 @@ typedef enum RBRGen3SerialBaudRate {
     /** 921,600 Bd */
     RBRGEN3_SERIAL_BAUD_921600 = 1 << 13,
     /** Corresponds to the largest baud rate enum value. */
-    RBRGEN3_SERIAL_BAUD_MAX = RBRGEN3_SERIAL_BAUD_921600
+    RBRGEN3_SERIAL_BAUD_MAX = RBRGEN3_SERIAL_BAUD_921600,
 } RBRGen3SerialBaudRate;
 
 /**
@@ -117,9 +120,6 @@ const char *RBRGen3SerialBaudRate_name(RBRGen3SerialBaudRate baud);
 
 /**
  * \brief Instrument serial modes.
- *
- * All modes are 8N1, use no flow control, and are full-duplex unless otherwise
- * noted.
  *
  * \see RBRGen3Serial
  * \see RBRGen3_getSerial()
@@ -139,7 +139,7 @@ typedef enum RBRGen3SerialMode {
     /** 0-3.3V logic, idle low. */
     RBRGEN3_SERIAL_MODE_UART_IDLE_LOW = 1 << 4,
     /** Corresponds to the largest UART mode enum value. */
-    RBRGEN3_SERIAL_MODE_MAX = RBRGEN3_SERIAL_MODE_UART_IDLE_LOW
+    RBRGEN3_SERIAL_MODE_MAX = RBRGEN3_SERIAL_MODE_UART_IDLE_LOW,
 } RBRGen3SerialMode;
 
 /**
@@ -195,13 +195,16 @@ typedef struct RBRGen3Serial {
 /**
  * \brief Retrieve the current and available serial baud rates and modes.
  *
+ * \command{serial}
+ *
  * \param [in] conn the instrument connection
  * \param [out] serial the current and available serial parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_setSerial()
  */
 RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn, RBRGen3Serial *serial);
@@ -209,9 +212,11 @@ RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn, RBRGen3Serial *serial);
 /**
  * \brief Reconfigure the instrument serial baud rate and mode.
  *
+ * \command{serial}
+ *
  * A hardware error will occur if the baud rate or mode is unsupported by the
  * instrument. See RBRGen3Serial.availableBaudRates and
- * RBRGen3Serial.availableSerialModes to determine supported
+ * RBRGen3Serial.availableModes to determine supported
  * rates/modes.
  *
  * The new serial mode and/or baud rate will take effect immediately after the
@@ -221,12 +226,11 @@ RBRGen3Error RBRGen3_getSerial(RBRGen3 *conn, RBRGen3Serial *serial);
  * \param [in] conn the instrument connection
  * \param [in] serial the new serial parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when a value is not supported, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when a value is not supported, or another hardware error occurs
  * \return #RBRGEN3_INVALID_PARAMETER_VALUE when the baud/mode is invalid
  * \see RBRGen3_getSerial()
  */
@@ -236,8 +240,12 @@ RBRGen3Error RBRGen3_setSerial(RBRGen3 *conn, const RBRGen3Serial *serial);
  * \brief Immediately shut down communications and implement any possible
  * power-saving measures.
  *
+ * \command{sleep}
+ *
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the instrument has been put to sleep
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  */
 RBRGen3Error RBRGen3_sleep(RBRGen3 *conn);
@@ -257,7 +265,7 @@ typedef enum RBRGen3WiFiState {
     /** The number of specific states. */
     RBRGEN3_WIFI_COUNT,
     /** An unknown or unrecognized state. */
-    RBRGEN3_UNKNOWN_WIFI
+    RBRGEN3_UNKNOWN_WIFI,
 } RBRGen3WiFiState;
 
 /**
@@ -320,21 +328,24 @@ typedef struct RBRGen3WiFi {
 /**
  * \brief Retrieve the current instrument Wi-Fi settings.
  *
+ * \command{wifi}
+ *
  * \param [in] conn the instrument connection
  * \param [out] wifi the current Wi-Fi parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
- *                                 hardware error occurs
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another hardware error occurs
  * \see RBRGen3_setWiFi()
  */
 RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn, RBRGen3WiFi *wifi);
 
 /**
  * \brief Reconfigure the instrument Wi-Fi settings.
+ *
+ * \command{wifi}
  *
  * For Logger3 instruments, this sends the values of RBRGen3WiFi.enabled,
  * RBRGen3WiFi.powerTimeout, and RBRGen3WiFi.commandTimeout. For
@@ -344,16 +355,14 @@ RBRGen3Error RBRGen3_getWiFi(RBRGen3 *conn, RBRGen3WiFi *wifi);
  * instruments.
  *
  * \param [in] conn the instrument connection
- * \param [out] wifi the new Wi-Fi parameters
+ * \param [in] wifi the new Wi-Fi parameters
  * \return #RBRGEN3_SUCCESS when the setting is successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the
- *         response buffer
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another
- *                                 hardware error occurs
- * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out
- *                                                of range
+ * \return #RBRGEN3_HARDWARE_ERROR when the feature is unavailable, or another hardware error occurs
+ * \return #RBRGEN3_INVALID_PARAMETER_VALUE when parameter values are out of range
  * \see RBRGen3_getWiFi()
  */
 RBRGen3Error RBRGen3_setWiFi(RBRGen3 *conn, const RBRGen3WiFi *wifi);

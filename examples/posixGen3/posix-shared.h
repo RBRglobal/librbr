@@ -10,8 +10,8 @@
  * \brief Shared functions used by the libRBR POSIX examples.
  */
 
-#ifndef LIBRBR_POSIX_SHARED_H
-#define LIBRBR_POSIX_SHARED_H
+#ifndef LIBRBR_POSIXGEN3_POSIX_SHARED_H
+#define LIBRBR_POSIXGEN3_POSIX_SHARED_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,13 +24,13 @@ extern "C" {
 
 int openSerialFd(char *devicePath);
 
-RBRGen3Error instrumentTime(const struct RBRGen3 *conn, RBRGen3DateTime *time);
+RBRGen3Error instrumentTime(const RBRGen3 *conn, RBRGen3DateTime *time);
 
-RBRGen3Error instrumentSleep(const struct RBRGen3 *conn, RBRGen3DateTime time);
+RBRGen3Error instrumentSleep(const RBRGen3 *conn, RBRGen3DateTime time);
 
-RBRGen3Error instrumentRead(const struct RBRGen3 *conn, void *data, int32_t *size);
+RBRGen3Error instrumentRead(const RBRGen3 *conn, void *data, int32_t *size);
 
-RBRGen3Error instrumentWrite(const struct RBRGen3 *conn, const void *const data, int32_t size);
+RBRGen3Error instrumentWrite(const RBRGen3 *conn, const void *const data, int32_t size);
 
 RBRGen3Error instrumentStart(RBRGen3 *conn);
 
@@ -38,4 +38,4 @@ RBRGen3Error instrumentStart(RBRGen3 *conn);
 }
 #endif
 
-#endif /* LIBRBR_POSIX_SHARED_H */
+#endif /* LIBRBR_POSIXGEN3_POSIX_SHARED_H */

@@ -2224,10 +2224,22 @@ TEST_LOGGER4(scheduleEveryBurstingMode)
         const char *mode;
         RBRGen4ScheduleMode expected;
     } cases[] = {
-        {"average", RBRGEN4_SCHEDULE_MODE_AVERAGE},
-        {"burst", RBRGEN4_SCHEDULE_MODE_BURST},
-        {"tide", RBRGEN4_SCHEDULE_MODE_TIDE},
-        {"wave", RBRGEN4_SCHEDULE_MODE_WAVE},
+        {
+            .mode = "average",
+            .expected = RBRGEN4_SCHEDULE_MODE_AVERAGE,
+        },
+        {
+            .mode = "burst",
+            .expected = RBRGEN4_SCHEDULE_MODE_BURST,
+        },
+        {
+            .mode = "tide",
+            .expected = RBRGEN4_SCHEDULE_MODE_TIDE,
+        },
+        {
+            .mode = "wave",
+            .expected = RBRGEN4_SCHEDULE_MODE_WAVE,
+        },
     };
 
     for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {

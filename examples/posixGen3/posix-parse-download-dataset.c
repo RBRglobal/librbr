@@ -34,8 +34,7 @@
 /* Readings storage for as many channels as this application expects. */
 #define CHANNEL_MAX 32
 
-RBRGen3Error parserSample(const struct RBRGen3Parser *parser,
-                          const struct RBRGen3Sample *const sample)
+RBRGen3Error parserSample(const RBRGen3Parser *parser, const RBRGen3Sample *const sample)
 {
     (void) parser;
 
@@ -124,8 +123,8 @@ int main(int argc, char *argv[])
     if (_downloadFrom == 1) {
         RBRGen3_getEnabledChannelCount(&conn, &enabledChannels);
     } else if (_downloadFrom == 4) {
-        // Important! This must match the postprocessing channels configured
-        // in the instrument.
+        /* Important! This must match the postprocessing channels configured
+         * in the instrument. */
         enabledChannels = 5;
     }
 

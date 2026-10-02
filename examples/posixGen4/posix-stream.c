@@ -142,7 +142,7 @@ void printHeader(void)
  * label and timestamp are only present when the output format includes them.
  * Error readings are NaNs carrying an error code; report the code instead of
  * the value. */
-RBRGen4Error instrumentSample(const struct RBRGen4 *conn, const struct RBRGen4Sample *const sample)
+RBRGen4Error instrumentSample(const RBRGen4 *conn, const RBRGen4Sample *const sample)
 {
     /* Unused. */
     (void) conn;

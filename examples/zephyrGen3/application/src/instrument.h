@@ -25,4 +25,4 @@ RBRGen3Error instrumentStart(RBRGen3 *conn);
 }
 #endif
 
-#endif /* LIBRBR_ZEPHYR_IO_H */
+#endif /* LIBRBR_ZEPHYR_INSTRUMENT_H */

@@ -37,8 +37,7 @@
 /* Readings storage for as many channels as this application expects. */
 #define CHANNEL_MAX 32
 
-RBRGen3Error parserSample(const struct RBRGen3Parser *parser,
-                          const struct RBRGen3Sample *const sample)
+RBRGen3Error parserSample(const RBRGen3Parser *parser, const RBRGen3Sample *const sample)
 {
     /* Unused. */
     (void) parser;
@@ -91,10 +90,16 @@ int main(int argc, char *argv[])
         .sampleBuffer = &sampleBuffer,
     };
 
-    RBRGen3ParserConfig parserConfig = {.format = RBRGEN3_MEMFORMAT_CALBIN00,
-                                        .formatConfig = {.easyParse = {
-                                                             .channels = channels,
-                                                         }}};
+    RBRGen3ParserConfig parserConfig = {
+        .format = RBRGEN3_MEMFORMAT_CALBIN00,
+        .formatConfig =
+            {
+                .easyParse =
+                    {
+                        .channels = channels,
+                    },
+            },
+    };
 
     RBRGen3Error err;
     if ((err = RBRGen3Parser_init(&parser, &parserCallbacks, &parserConfig, NULL)) !=

@@ -5,7 +5,7 @@
  */
 
 /**
- * \file runner.c
+ * \file main.c
  *
  * \brief Runner for library tests.
  */
@@ -77,20 +77,20 @@ void TestIOBuffers_init(TestIOBuffers *buffers, const char *readBuffer, int32_t 
     }
 }
 
-RBRGen3Error TestIOBuffers_time(const struct RBRGen3 *conn, RBRGen3DateTime *time)
+RBRGen3Error TestIOBuffers_time(const RBRGen3 *conn, RBRGen3DateTime *time)
 {
     /* No-op. */
     *time = 0;
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error TestIOBuffers_sleep(const struct RBRGen3 *conn, RBRGen3DateTime time)
+RBRGen3Error TestIOBuffers_sleep(const RBRGen3 *conn, RBRGen3DateTime time)
 {
     /* No-op. */
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error TestIOBuffers_read(const struct RBRGen3 *conn, void *data, int32_t *size)
+RBRGen3Error TestIOBuffers_read(const RBRGen3 *conn, void *data, int32_t *size)
 {
     TestIOBuffers *buffers;
     buffers = (TestIOBuffers *) RBRGen3_getUserData(conn);
@@ -115,7 +115,7 @@ RBRGen3Error TestIOBuffers_read(const struct RBRGen3 *conn, void *data, int32_t 
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error TestIOBuffers_write(const struct RBRGen3 *conn, const void *const data, int32_t size)
+RBRGen3Error TestIOBuffers_write(const RBRGen3 *conn, const void *const data, int32_t size)
 {
     TestIOBuffers *buffers;
     buffers = (TestIOBuffers *) RBRGen3_getUserData(conn);
@@ -138,8 +138,7 @@ RBRGen3Error TestIOBuffers_write(const struct RBRGen3 *conn, const void *const d
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error TestIOBuffers_sample(const struct RBRGen3 *conn,
-                                  const struct RBRGen3Sample *const sample)
+RBRGen3Error TestIOBuffers_sample(const RBRGen3 *conn, const RBRGen3Sample *const sample)
 {
     TestIOBuffers *buffers;
     buffers = (TestIOBuffers *) RBRGen3_getUserData(conn);
@@ -149,8 +148,8 @@ RBRGen3Error TestIOBuffers_sample(const struct RBRGen3 *conn,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error TestParserBuffers_sample(const struct RBRGen3Parser *parser,
-                                      const struct RBRGen3Sample *const sample)
+RBRGen3Error TestParserBuffers_sample(const RBRGen3Parser *parser,
+                                      const RBRGen3Sample *const sample)
 {
     TestParserBuffers *buffers;
     buffers = (TestParserBuffers *) RBRGen3Parser_getUserData(parser);
@@ -168,8 +167,7 @@ RBRGen3Error TestParserBuffers_sample(const struct RBRGen3Parser *parser,
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error TestParserBuffers_event(const struct RBRGen3Parser *parser,
-                                     const struct RBRGen3Event *const event)
+RBRGen3Error TestParserBuffers_event(const RBRGen3Parser *parser, const RBRGen3Event *const event)
 {
     TestParserBuffers *buffers;
     buffers = (TestParserBuffers *) RBRGen3Parser_getUserData(parser);

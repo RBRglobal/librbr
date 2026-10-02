@@ -85,7 +85,7 @@ int openSerialFd(const char *devicePath)
 typedef enum RawIoStatus {
     RAW_IO_SUCCESS,
     RAW_IO_TIMEOUT,
-    RAW_IO_ERROR
+    RAW_IO_ERROR,
 } RawIoStatus;
 
 static int64_t rawTime(void)
@@ -165,7 +165,7 @@ static RawIoStatus rawWrite(int fd, const void *const data, int32_t size)
     return RAW_IO_SUCCESS;
 }
 
-RBRGen3Error gen3InstrumentTime(const struct RBRGen3 *conn, RBRGen3DateTime *time)
+RBRGen3Error gen3InstrumentTime(const RBRGen3 *conn, RBRGen3DateTime *time)
 {
     /* Unused. */
     (void) conn;
@@ -174,7 +174,7 @@ RBRGen3Error gen3InstrumentTime(const struct RBRGen3 *conn, RBRGen3DateTime *tim
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error gen3InstrumentSleep(const struct RBRGen3 *conn, RBRGen3DateTime time)
+RBRGen3Error gen3InstrumentSleep(const RBRGen3 *conn, RBRGen3DateTime time)
 {
     /* Unused. */
     (void) conn;
@@ -183,7 +183,7 @@ RBRGen3Error gen3InstrumentSleep(const struct RBRGen3 *conn, RBRGen3DateTime tim
     return RBRGEN3_SUCCESS;
 }
 
-RBRGen3Error gen3InstrumentRead(const struct RBRGen3 *conn, void *data, int32_t *size)
+RBRGen3Error gen3InstrumentRead(const RBRGen3 *conn, void *data, int32_t *size)
 {
     int *instrumentFd = (int *) RBRGen3_getUserData(conn);
 
@@ -197,7 +197,7 @@ RBRGen3Error gen3InstrumentRead(const struct RBRGen3 *conn, void *data, int32_t 
     }
 }
 
-RBRGen3Error gen3InstrumentWrite(const struct RBRGen3 *conn, const void *const data, int32_t size)
+RBRGen3Error gen3InstrumentWrite(const RBRGen3 *conn, const void *const data, int32_t size)
 {
     int *instrumentFd = (int *) RBRGen3_getUserData(conn);
 
@@ -211,7 +211,7 @@ RBRGen3Error gen3InstrumentWrite(const struct RBRGen3 *conn, const void *const d
     }
 }
 
-RBRGen4Error gen4InstrumentTime(const struct RBRGen4 *conn, RBRGen4DateTime *time)
+RBRGen4Error gen4InstrumentTime(const RBRGen4 *conn, RBRGen4DateTime *time)
 {
     /* Unused. */
     (void) conn;
@@ -220,7 +220,7 @@ RBRGen4Error gen4InstrumentTime(const struct RBRGen4 *conn, RBRGen4DateTime *tim
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error gen4InstrumentSleep(const struct RBRGen4 *conn, RBRGen4DateTime time)
+RBRGen4Error gen4InstrumentSleep(const RBRGen4 *conn, RBRGen4DateTime time)
 {
     /* Unused. */
     (void) conn;
@@ -229,7 +229,7 @@ RBRGen4Error gen4InstrumentSleep(const struct RBRGen4 *conn, RBRGen4DateTime tim
     return RBRGEN4_SUCCESS;
 }
 
-RBRGen4Error gen4InstrumentRead(const struct RBRGen4 *conn, void *data, int32_t *size)
+RBRGen4Error gen4InstrumentRead(const RBRGen4 *conn, void *data, int32_t *size)
 {
     int *instrumentFd = (int *) RBRGen4_getUserData(conn);
 
@@ -243,7 +243,7 @@ RBRGen4Error gen4InstrumentRead(const struct RBRGen4 *conn, void *data, int32_t 
     }
 }
 
-RBRGen4Error gen4InstrumentWrite(const struct RBRGen4 *conn, const void *const data, int32_t size)
+RBRGen4Error gen4InstrumentWrite(const RBRGen4 *conn, const void *const data, int32_t size)
 {
     int *instrumentFd = (int *) RBRGen4_getUserData(conn);
 

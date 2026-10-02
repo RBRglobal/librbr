@@ -14,7 +14,7 @@
 #include <ctype.h>
 /* Required for SCNi64. */
 #include <inttypes.h>
-/* Required for INFINITY, NAN. */
+/* Required for NAN. */
 #include <math.h>
 /* Required for vsnprintf, va_list, va_start, va_end. */
 #include <stdarg.h>
@@ -90,7 +90,8 @@
  */
 static const RBRGen3HardwareError WARNING_NUMBERS[] = {
     RBRGEN3_HARDWARE_ERROR_ESTIMATED_MEMORY_USAGE_EXCEEDS_CAPACITY,
-    RBRGEN3_HARDWARE_ERROR_NOT_LOGGING};
+    RBRGEN3_HARDWARE_ERROR_NOT_LOGGING,
+};
 #define WARNING_NUMBER_COUNT ((long) (sizeof(WARNING_NUMBERS) / sizeof(WARNING_NUMBERS[0])))
 
 #define WARNING_PARAMETER     ", warning = W"
@@ -155,7 +156,7 @@ static int rbr_strncasecmp(const char *s1, const char *s2, size_t n)
  * \param [in] conn the instrument connection
  * \return #RBRGEN3_SUCCESS when the instrument has been woken
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  */
 static RBRGen3Error RBRGen3_wake(const RBRGen3 *conn)
 {
@@ -299,16 +300,16 @@ static void RBRGen3_removeLastResponse(RBRGen3 *conn)
 }
 
 /**
- * \brief Read data until we find the command termination sequence or the
- *        callback indicates a timeout.
+ * \brief Read data until we find the command termination sequence or the callback indicates a
+ * timeout.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] startTime when we started trying to read the command response
  * \param [out] end the end of the response within the response buffer
  * \return #RBRGEN3_SUCCESS when data is successfully read
- * \return #RBRGEN3_RESPONSE_TOO_LONG when the response exceeds the buffer
  * \return #RBRGEN3_TIMEOUT when a timeout occurs
- * \return #RBRGEN3_CALLBACK_ERROR when an unrecoverable error occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when the response exceeds the buffer
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
  */
 static RBRGen3Error RBRGen3_readSingleResponse(RBRGen3 *conn, RBRGen3DateTime startTime, char **end)
 {
@@ -412,7 +413,7 @@ static RBRGen3Error RBRGen3_readSingleResponse(RBRGen3 *conn, RBRGen3DateTime st
 /**
  * \brief Find the beginning of a response and null-terminate the end.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [out] beginning the beginning of the response
  * \param [in] end the end of the response
  */
@@ -461,11 +462,11 @@ static void RBRGen3_terminateResponse(RBRGen3 *conn, char **beginning, char *end
 /**
  * \brief Attempt to parse a sample from a response.
  *
- * \param [out] sample the sample
+ * \param [in,out] sample the sample; RBRGen3Sample.readings and RBRGen3Sample.size must be set by
+ *                        the caller
  * \param [in] response the response to parse
  * \return RBRGEN3_SUCCESS if the response is a sample
- * \return RBRGEN3_INVALID_PARAMETER_VALUE if the response is not a
- *                                               sample
+ * \return RBRGEN3_INVALID_PARAMETER_VALUE if the response is not a sample
  */
 static RBRGen3Error RBRGen3Sample_parse(RBRGen3Sample *sample, char *response)
 {
@@ -554,7 +555,7 @@ static RBRGen3Error RBRGen3Sample_parse(RBRGen3Sample *sample, char *response)
  *
  * Updates RBRGen3.response as appropriate.
  *
- * \param [in,out] conn the instrument connection
+ * \param [in] conn the instrument connection
  * \param [in] beginning the beginning of the textual response
  * \param [in] end the end of the textual response
  * \return #RBRGEN3_SUCCESS when the response is a warning or success
@@ -1070,7 +1071,13 @@ static inline void RBRGen3DateTime_initializeOffset(void)
 {
     if (localTimeOffset == OFFSET_UNINITIALIZED) {
         struct tm instrumentMinTimestamp = {
-            .tm_year = 100, .tm_mon = 0, .tm_mday = 1, .tm_hour = 0, .tm_min = 0, .tm_sec = 0};
+            .tm_year = 100,
+            .tm_mon = 0,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 0,
+        };
         localTimeOffset =
             RBRGEN3_DATETIME_MIN - ((RBRGen3DateTime) mktime(&instrumentMinTimestamp) * 1000);
     }

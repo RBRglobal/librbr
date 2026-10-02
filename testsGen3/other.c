@@ -46,7 +46,7 @@ TEST_LOGGER2(id)
         .model = "RBRduo",
         .version = "1.440",
         .serial = 912345,
-        .fwtype = 103,
+        .fwType = 103,
         .mode = "",
     };
     RBRGen3Id actual;
@@ -60,7 +60,7 @@ TEST_LOGGER2(id)
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
     TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.fwtype, actual.fwtype, "%" PRIi32);
+    TEST_ASSERT_EQ(expected.fwType, actual.fwType, "%" PRIi32);
     TEST_ASSERT_STR_EQ(expected.mode, actual.mode);
 
     return true;
@@ -72,7 +72,7 @@ TEST_LOGGER3(id)
         .model = "RBRduo3",
         .version = "1.092",
         .serial = 923456,
-        .fwtype = 104,
+        .fwType = 104,
         .mode = "",
     };
     RBRGen3Id actual;
@@ -87,7 +87,7 @@ TEST_LOGGER3(id)
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
     TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.fwtype, actual.fwtype, "%" PRIi32);
+    TEST_ASSERT_EQ(expected.fwType, actual.fwType, "%" PRIi32);
     TEST_ASSERT_STR_EQ(expected.mode, actual.mode);
 
     return true;
@@ -99,7 +99,7 @@ TEST_LOGGER3(id_simulated)
         .model = "RBRduo3",
         .version = "1.092",
         .serial = 923456,
-        .fwtype = 104,
+        .fwType = 104,
         .mode = "SIMULATED",
     };
     RBRGen3Id actual;
@@ -114,7 +114,7 @@ TEST_LOGGER3(id_simulated)
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
     TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.fwtype, actual.fwtype, "%" PRIi32);
+    TEST_ASSERT_EQ(expected.fwType, actual.fwType, "%" PRIi32);
     TEST_ASSERT_STR_EQ(expected.mode, actual.mode);
 
     return true;
@@ -126,7 +126,7 @@ TEST_LOGGER3(id_short)
         .model = "",
         .version = "",
         .serial = 0,
-        .fwtype = 0,
+        .fwType = 0,
         .mode = "",
     };
     RBRGen3Id actual;
@@ -138,7 +138,7 @@ TEST_LOGGER3(id_short)
     TEST_ASSERT_STR_EQ(expected.model, actual.model);
     TEST_ASSERT_STR_EQ(expected.version, actual.version);
     TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
-    TEST_ASSERT_EQ(expected.fwtype, actual.fwtype, "%" PRIi32);
+    TEST_ASSERT_EQ(expected.fwType, actual.fwType, "%" PRIi32);
 
     return true;
 }
@@ -243,14 +243,44 @@ TEST_LOGGER3(openRejectsInvalidBuffers)
         uint8_t *response;
         int32_t responseCapacity;
     } tests[] = {
-        {NULL, sizeof(commandBuffer), responseBuffer, sizeof(responseBuffer)},
-        {commandBuffer, 0, responseBuffer, sizeof(responseBuffer)},
-        {commandBuffer, sizeof(commandBuffer), NULL, sizeof(responseBuffer)},
-        {commandBuffer, sizeof(commandBuffer), responseBuffer, 0},
-        {commandBuffer, sizeof(commandBuffer), responseBuffer, -1},
+        {
+            .command = NULL,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = responseBuffer,
+            .responseCapacity = sizeof(responseBuffer),
+        },
+        {
+            .command = commandBuffer,
+            .commandCapacity = 0,
+            .response = responseBuffer,
+            .responseCapacity = sizeof(responseBuffer),
+        },
+        {
+            .command = commandBuffer,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = NULL,
+            .responseCapacity = sizeof(responseBuffer),
+        },
+        {
+            .command = commandBuffer,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = responseBuffer,
+            .responseCapacity = 0,
+        },
+        {
+            .command = commandBuffer,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = responseBuffer,
+            .responseCapacity = -1,
+        },
         /* Room for a line terminator and nothing else can never hold a
          * response. */
-        {commandBuffer, sizeof(commandBuffer), responseBuffer, 2},
+        {
+            .command = commandBuffer,
+            .commandCapacity = sizeof(commandBuffer),
+            .response = responseBuffer,
+            .responseCapacity = 2,
+        },
     };
 
     RBRGen3 unopened;
@@ -465,7 +495,7 @@ TEST_LOGGER3(responseBufferOverflow)
 
 /** \brief A clock which stands still until the fixture has been read, then
  * steps past the command timeout on every call. */
-static RBRGen3Error overflowReplyTime(const struct RBRGen3 *conn, RBRGen3DateTime *time)
+static RBRGen3Error overflowReplyTime(const RBRGen3 *conn, RBRGen3DateTime *time)
 {
     TestIOBuffers *buffers = (TestIOBuffers *) RBRGen3_getUserData(conn);
     static RBRGen3DateTime clock;
@@ -509,7 +539,7 @@ TEST_LOGGER3(responseBufferOverflowReply)
 /** \brief A clock which advances by a second on every call, whatever has been
  * read. */
 static RBRGen3DateTime tickingClock;
-static RBRGen3Error tickingTime(const struct RBRGen3 *conn, RBRGen3DateTime *time)
+static RBRGen3Error tickingTime(const RBRGen3 *conn, RBRGen3DateTime *time)
 {
     (void) conn;
     tickingClock += 1000;
@@ -636,7 +666,7 @@ TEST_LOGGER3(responseBufferOverflowInterrupted)
 /** \brief A clock which jumps past any command timeout as soon as anything
  * has been read, so the deadline lands right after the read which fills the
  * response buffer. */
-static RBRGen3Error overflowTimeoutTime(const struct RBRGen3 *conn, RBRGen3DateTime *time)
+static RBRGen3Error overflowTimeoutTime(const RBRGen3 *conn, RBRGen3DateTime *time)
 {
     TestIOBuffers *buffers = (TestIOBuffers *) RBRGen3_getUserData(conn);
     *time = buffers->readBufferPos > 0 ? INT64_MAX / 2 : 0;

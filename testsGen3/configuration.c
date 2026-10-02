@@ -105,186 +105,188 @@ TEST_LOGGER2(channels)
 {
     ChannelsTest tests[] = {
         {
-            "channels count = 3, on = 3, latency = 300, readtime = 350, "
-            "minperiod = 480" RESPONSE_TERMINATOR
+            .response = "channels count = 3, on = 3, latency = 300, readtime = 350, "
+                        "minperiod = 480" RESPONSE_TERMINATOR
 
-            "channel 1 type = temp09, module = 1, status = on, latency = 50, "
-            "readtime = 260, equation = tmp, userunits = C, gain = none, "
-            "gainsavailable = none, derived = off" RESPONSE_TERMINATOR
+                        "channel 1 type = temp09, module = 1, status = on, latency = 50, "
+                        "readtime = 260, equation = tmp, userunits = C, gain = none, "
+                        "gainsavailable = none, derived = off" RESPONSE_TERMINATOR
 
-            "calibration 1 type = temp09, datetime = 20000401000000, "
-            "c0 = 3.5000000e-003, c1 = -250.00002e-006, c2 = 2.7000000e-006, "
-            "c3 = 23.000000e-009" RESPONSE_TERMINATOR
+                        "calibration 1 type = temp09, datetime = 20000401000000, "
+                        "c0 = 3.5000000e-003, c1 = -250.00002e-006, c2 = 2.7000000e-006, "
+                        "c3 = 23.000000e-009" RESPONSE_TERMINATOR
 
-            "channel 2 type = pres19, module = 2, status = on, latency = 50, "
-            "readtime = 260, equation = corr_pres2, userunits = dbar, "
-            "gain = none, gainsavailable = none, derived = off" RESPONSE_TERMINATOR
+                        "channel 2 type = pres19, module = 2, status = on, latency = 50, "
+                        "readtime = 260, equation = corr_pres2, userunits = dbar, "
+                        "gain = none, gainsavailable = none, derived = off" RESPONSE_TERMINATOR
 
-            "calibration 2 type = pres19, datetime = 20000401000000, "
-            "c0 = 0.0000000e+000, c1 = 1.0000000e+000, c2 = 0.0000000e+000, "
-            "c3 = 0.0000000e+000, x0 = 0.0000000e+000, x1 = 0.0000000e+000, "
-            "x2 = 0.0000000e+000, x3 = 0.0000000e+000, x4 = 0.0000000e+000, "
-            "x5 = 0.0000000e+000, n0 = value" RESPONSE_TERMINATOR
+                        "calibration 2 type = pres19, datetime = 20000401000000, "
+                        "c0 = 0.0000000e+000, c1 = 1.0000000e+000, c2 = 0.0000000e+000, "
+                        "c3 = 0.0000000e+000, x0 = 0.0000000e+000, x1 = 0.0000000e+000, "
+                        "x2 = 0.0000000e+000, x3 = 0.0000000e+000, x4 = 0.0000000e+000, "
+                        "x5 = 0.0000000e+000, n0 = value" RESPONSE_TERMINATOR
 
-            "channel 3 type = volt00, module = 40, status = on, "
-            "latency = 300, readtime = 350, equation = lin, userunits = V, "
-            "gain = none, gainsavailable = none, derived = off" RESPONSE_TERMINATOR
+                        "channel 3 type = volt00, module = 40, status = on, "
+                        "latency = 300, readtime = 350, equation = lin, userunits = V, "
+                        "gain = none, gainsavailable = none, derived = off" RESPONSE_TERMINATOR
 
-            "calibration 3 type = volt00, datetime = 20000401000000, "
-            "c0 = 0.0000000e+000, c1 = 1.0000000e+000" RESPONSE_TERMINATOR,
+                        "calibration 3 type = volt00, datetime = 20000401000000, "
+                        "c0 = 0.0000000e+000, c1 = 1.0000000e+000" RESPONSE_TERMINATOR,
 
-            {
-                .len = 3,
-                .settlingTime = 300,
-                .readTime = 350,
-                .minimumPeriod = 480,
-                .channels =
-                    (RBRGen3Channel[]) {
-                        {
-                            .type = "temp09",
-                            .moduleAddr = 1,
-                            .status = true,
-                            .settlingTime = 50,
-                            .readTime = 260,
-                            .equation = "tmp",
-                            .userUnits = "C",
-                            .gain =
-                                {
-                                    .rangingMode = RBRGEN3_RANGING_NONE,
-                                    .currentGain = NAN,
-                                    .availableGains = {NAN},
-                                },
-                            .derived = false,
-                            .label = "none",
-                            .calibration =
-                                {
-                                    .dateTime = 954547200000LL,
-                                    .cCount = 4,
-                                    .c =
-                                        {
-                                            3.5000000e-003,
-                                            -250.00002e-006,
-                                            2.7000000e-006,
-                                            23.000000e-009,
-                                        },
-                                },
+            .expected =
+                {
+                    .len = 3,
+                    .settlingTime = 300,
+                    .readTime = 350,
+                    .minimumPeriod = 480,
+                    .channels =
+                        (RBRGen3Channel[]) {
+                            {
+                                .type = "temp09",
+                                .moduleAddr = 1,
+                                .status = true,
+                                .settlingTime = 50,
+                                .readTime = 260,
+                                .equation = "tmp",
+                                .userUnits = "C",
+                                .gain =
+                                    {
+                                        .rangingMode = RBRGEN3_RANGING_NONE,
+                                        .currentGain = NAN,
+                                        .availableGains = {NAN},
+                                    },
+                                .derived = false,
+                                .label = "none",
+                                .calibration =
+                                    {
+                                        .dateTime = 954547200000LL,
+                                        .cCount = 4,
+                                        .c =
+                                            {
+                                                3.5000000e-003,
+                                                -250.00002e-006,
+                                                2.7000000e-006,
+                                                23.000000e-009,
+                                            },
+                                    },
+                            },
+                            {
+                                .type = "pres19",
+                                .moduleAddr = 2,
+                                .status = true,
+                                .settlingTime = 50,
+                                .readTime = 260,
+                                .equation = "corr_pres2",
+                                .userUnits = "dbar",
+                                .gain =
+                                    {
+                                        .rangingMode = RBRGEN3_RANGING_NONE,
+                                        .currentGain = NAN,
+                                        .availableGains = {NAN},
+                                    },
+                                .derived = false,
+                                .label = "none",
+                                .calibration =
+                                    {
+                                        .dateTime = 954547200000LL,
+                                        .cCount = 4,
+                                        .c =
+                                            {
+                                                0.0000000e+000,
+                                                1.0000000e+000,
+                                                0.0000000e+000,
+                                                0.0000000e+000,
+                                            },
+                                        .xCount = 6,
+                                        .x =
+                                            {
+                                                0.0000000e+000,
+                                                0.0000000e+000,
+                                                0.0000000e+000,
+                                                0.0000000e+000,
+                                                0.0000000e+000,
+                                                0.0000000e+000,
+                                            },
+                                        .nCount = 1,
+                                        .n = {RBRGEN3_VALUE_COEFFICIENT},
+                                    },
+                            },
+                            {
+                                .type = "volt00",
+                                .moduleAddr = 40,
+                                .status = true,
+                                .settlingTime = 300,
+                                .readTime = 350,
+                                .equation = "lin",
+                                .userUnits = "V",
+                                .gain =
+                                    {
+                                        .rangingMode = RBRGEN3_RANGING_NONE,
+                                        .currentGain = NAN,
+                                        .availableGains = {NAN},
+                                    },
+                                .derived = false,
+                                .label = "none",
+                                .calibration =
+                                    {
+                                        .dateTime = 954547200000LL,
+                                        .cCount = 2,
+                                        .c =
+                                            {
+                                                0.0000000e+000,
+                                                1.0000000e+000,
+                                            },
+                                    },
+                            },
                         },
-                        {
-                            .type = "pres19",
-                            .moduleAddr = 2,
-                            .status = true,
-                            .settlingTime = 50,
-                            .readTime = 260,
-                            .equation = "corr_pres2",
-                            .userUnits = "dbar",
-                            .gain =
-                                {
-                                    .rangingMode = RBRGEN3_RANGING_NONE,
-                                    .currentGain = NAN,
-                                    .availableGains = {NAN},
-                                },
-                            .derived = false,
-                            .label = "none",
-                            .calibration =
-                                {
-                                    .dateTime = 954547200000LL,
-                                    .cCount = 4,
-                                    .c =
-                                        {
-                                            0.0000000e+000,
-                                            1.0000000e+000,
-                                            0.0000000e+000,
-                                            0.0000000e+000,
-                                        },
-                                    .xCount = 6,
-                                    .x =
-                                        {
-                                            0.0000000e+000,
-                                            0.0000000e+000,
-                                            0.0000000e+000,
-                                            0.0000000e+000,
-                                            0.0000000e+000,
-                                            0.0000000e+000,
-                                        },
-                                    .nCount = 1,
-                                    .n = {RBRGEN3_VALUE_COEFFICIENT},
-                                },
-                        },
-                        {
-                            .type = "volt00",
-                            .moduleAddr = 40,
-                            .status = true,
-                            .settlingTime = 300,
-                            .readTime = 350,
-                            .equation = "lin",
-                            .userUnits = "V",
-                            .gain =
-                                {
-                                    .rangingMode = RBRGEN3_RANGING_NONE,
-                                    .currentGain = NAN,
-                                    .availableGains = {NAN},
-                                },
-                            .derived = false,
-                            .label = "none",
-                            .calibration =
-                                {
-                                    .dateTime = 954547200000LL,
-                                    .cCount = 2,
-                                    .c =
-                                        {
-                                            0.0000000e+000,
-                                            1.0000000e+000,
-                                        },
-                                },
-                        },
-                    },
-            },
+                },
         },
         {
-            "channels count = 1, on = 1, latency = 600, readtime = 1700, "
-            "minperiod = 1910" RESPONSE_TERMINATOR
-            "channel 1 type = fluo01, module = 40, status = on, "
-            "latency = 600, readtime = 1700, equation = lin, "
-            "userunits = ug/L, gain = auto, "
-            "gainsavailable = 1.0|3.0|10.0|30.0, derived = off" RESPONSE_TERMINATOR
-            "calibration 1 type = fluo01, datetime = 20000401000000, "
-            "c0 = 203.47984e+000, c1 = -277.72070e+000" RESPONSE_TERMINATOR,
-            {
-                .len = 1,
-                .settlingTime = 600,
-                .readTime = 1700,
-                .minimumPeriod = 1910,
-                .channels =
-                    (RBRGen3Channel[]) {
-                        {
-                            .type = "fluo01",
-                            .moduleAddr = 40,
-                            .status = true,
-                            .settlingTime = 600,
-                            .readTime = 1700,
-                            .equation = "lin",
-                            .userUnits = "ug/L",
-                            .gain =
-                                {
-                                    .rangingMode = RBRGEN3_RANGING_AUTO,
-                                    .currentGain = NAN,
-                                    .availableGains = {1.0, 3.0, 10.0, 30.0, NAN},
-                                },
-                            .derived = false,
-                            .label = "none",
-                            .calibration =
-                                {
-                                    .dateTime = 954547200000LL,
-                                    .cCount = 2,
-                                    .c =
-                                        {
-                                            203.47984e+000,
-                                            -277.72070e+000,
-                                        },
-                                },
+            .response = "channels count = 1, on = 1, latency = 600, readtime = 1700, "
+                        "minperiod = 1910" RESPONSE_TERMINATOR
+                        "channel 1 type = fluo01, module = 40, status = on, "
+                        "latency = 600, readtime = 1700, equation = lin, "
+                        "userunits = ug/L, gain = auto, "
+                        "gainsavailable = 1.0|3.0|10.0|30.0, derived = off" RESPONSE_TERMINATOR
+                        "calibration 1 type = fluo01, datetime = 20000401000000, "
+                        "c0 = 203.47984e+000, c1 = -277.72070e+000" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .len = 1,
+                    .settlingTime = 600,
+                    .readTime = 1700,
+                    .minimumPeriod = 1910,
+                    .channels =
+                        (RBRGen3Channel[]) {
+                            {
+                                .type = "fluo01",
+                                .moduleAddr = 40,
+                                .status = true,
+                                .settlingTime = 600,
+                                .readTime = 1700,
+                                .equation = "lin",
+                                .userUnits = "ug/L",
+                                .gain =
+                                    {
+                                        .rangingMode = RBRGEN3_RANGING_AUTO,
+                                        .currentGain = NAN,
+                                        .availableGains = {1.0, 3.0, 10.0, 30.0, NAN},
+                                    },
+                                .derived = false,
+                                .label = "none",
+                                .calibration =
+                                    {
+                                        .dateTime = 954547200000LL,
+                                        .cCount = 2,
+                                        .c =
+                                            {
+                                                203.47984e+000,
+                                                -277.72070e+000,
+                                            },
+                                    },
+                            },
                         },
-                    },
-            },
+                },
         },
         {0},
     };
@@ -296,7 +298,7 @@ TEST_LOGGER3(channels)
 {
     ChannelsTest tests[] = {
         {
-            "channels count = 5, on = 5, settlingtime = 50, readtime = 290, "
+            .response = "channels count = 5, on = 5, settlingtime = 50, readtime = 290, "
             "minperiod = 450" RESPONSE_TERMINATOR
 
             "channel 1 type = temp09, module = 1, status = on, "
@@ -344,7 +346,7 @@ TEST_LOGGER3(channels)
             "calibration 5 label = count_00, datetime = 20000401000000, "
             "n0 = value" RESPONSE_TERMINATOR,
 
-            {
+            .expected = {
                 .len = 5,
                 .settlingTime = 50,
                 .readTime = 290,
@@ -494,7 +496,7 @@ TEST_LOGGER3(channels)
             },
         },
         {
-            "channels count = 1, on = 1, settlingtime = 5000, "
+            .response = "channels count = 1, on = 1, settlingtime = 5000, "
             "readtime = 10500, minperiod = 10670" RESPONSE_TERMINATOR
             "channel 1 type = fluo10, module = 40, status = on, "
             "settlingtime = 5000, readtime = 10500, equation = lin, "
@@ -502,7 +504,7 @@ TEST_LOGGER3(channels)
             "derived = off, label = chlorophyll_00" RESPONSE_TERMINATOR
             "calibration 1 label = chlorophyll_00, datetime = 20000401000000, "
             "c0 = 678.26611e+000, c1 = -925.73568e+000" RESPONSE_TERMINATOR,
-            {
+            .expected = {
                 .len = 1,
                 .settlingTime = 5000,
                 .readTime = 10500,
@@ -540,7 +542,7 @@ TEST_LOGGER3(channels)
             },
         },
         {
-            "channels count = 1, on = 1, settlingtime = 5000, "
+            .response = "channels count = 1, on = 1, settlingtime = 5000, "
             "readtime = 10500, minperiod = 10670" RESPONSE_TERMINATOR
             "channel 1 type = turb00, module = 40, status = on, "
             "settlingtime = 1000, readtime = 350, equation = lin, "
@@ -549,7 +551,7 @@ TEST_LOGGER3(channels)
             "label = turbidity_00" RESPONSE_TERMINATOR
             "calibration 1 label = turbidity_00, datetime = 20000401000000, "
             "c0 = 3.3910000e+003, c1 = -4.6280000e+003" RESPONSE_TERMINATOR,
-            {
+            .expected = {
                 .len = 1,
                 .settlingTime = 5000,
                 .readTime = 10500,
@@ -596,51 +598,52 @@ TEST_LOGGER3(channels_calibration_indices)
 {
     ChannelsTest tests[] = {
         {
-            "channels count = 1, on = 1, settlingtime = 5000, "
-            "readtime = 10500, minperiod = 10670" RESPONSE_TERMINATOR
-            "channel 1 type = fluo10, module = 40, status = on, "
-            "settlingtime = 5000, readtime = 10500, equation = lin, "
-            "userunits = ug/L, gain = none, availablegains = none, "
-            "derived = off, label = chlorophyll_00" RESPONSE_TERMINATOR
-            "calibration 1 label = chlorophyll_00, datetime = 20000401000000, "
-            "c1 = 2.0000000e+000, c0 = 1.0000000e+000, x2 = 3.0000000e+000, "
-            "cfoo = 9.0000000e+000, x = 8.0000000e+000, n1 = 4" RESPONSE_TERMINATOR,
-            {
-                .len = 1,
-                .settlingTime = 5000,
-                .readTime = 10500,
-                .minimumPeriod = 10670,
-                .channels =
-                    (RBRGen3Channel[]) {
-                        {
-                            .type = "fluo10",
-                            .moduleAddr = 40,
-                            .status = true,
-                            .settlingTime = 5000,
-                            .readTime = 10500,
-                            .equation = "lin",
-                            .userUnits = "ug/L",
-                            .gain =
-                                {
-                                    .rangingMode = RBRGEN3_RANGING_NONE,
-                                    .currentGain = NAN,
-                                    .availableGains = {NAN},
-                                },
-                            .derived = false,
-                            .label = "chlorophyll_00",
-                            .calibration =
-                                {
-                                    .dateTime = 954547200000LL,
-                                    .cCount = 2,
-                                    .c = {1.0000000e+000, 2.0000000e+000},
-                                    .xCount = 3,
-                                    .x = {0.0f, 0.0f, 3.0000000e+000},
-                                    .nCount = 2,
-                                    .n = {0, 4},
-                                },
+            .response = "channels count = 1, on = 1, settlingtime = 5000, "
+                        "readtime = 10500, minperiod = 10670" RESPONSE_TERMINATOR
+                        "channel 1 type = fluo10, module = 40, status = on, "
+                        "settlingtime = 5000, readtime = 10500, equation = lin, "
+                        "userunits = ug/L, gain = none, availablegains = none, "
+                        "derived = off, label = chlorophyll_00" RESPONSE_TERMINATOR
+                        "calibration 1 label = chlorophyll_00, datetime = 20000401000000, "
+                        "c1 = 2.0000000e+000, c0 = 1.0000000e+000, x2 = 3.0000000e+000, "
+                        "cfoo = 9.0000000e+000, x = 8.0000000e+000, n1 = 4" RESPONSE_TERMINATOR,
+            .expected =
+                {
+                    .len = 1,
+                    .settlingTime = 5000,
+                    .readTime = 10500,
+                    .minimumPeriod = 10670,
+                    .channels =
+                        (RBRGen3Channel[]) {
+                            {
+                                .type = "fluo10",
+                                .moduleAddr = 40,
+                                .status = true,
+                                .settlingTime = 5000,
+                                .readTime = 10500,
+                                .equation = "lin",
+                                .userUnits = "ug/L",
+                                .gain =
+                                    {
+                                        .rangingMode = RBRGEN3_RANGING_NONE,
+                                        .currentGain = NAN,
+                                        .availableGains = {NAN},
+                                    },
+                                .derived = false,
+                                .label = "chlorophyll_00",
+                                .calibration =
+                                    {
+                                        .dateTime = 954547200000LL,
+                                        .cCount = 2,
+                                        .c = {1.0000000e+000, 2.0000000e+000},
+                                        .xCount = 3,
+                                        .x = {0.0f, 0.0f, 3.0000000e+000},
+                                        .nCount = 2,
+                                        .n = {0, 4},
+                                    },
+                            },
                         },
-                    },
-            },
+                },
         },
         {0},
     };

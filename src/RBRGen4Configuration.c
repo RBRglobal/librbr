@@ -161,6 +161,12 @@ static RBRGen4ChannelNature RBRGen4ChannelNature_parse(const char *value)
  * \brief Read the labels of a `channel` response into a pool.
  *
  * Sets RBRGen4ChannelPool.len; the caller resets the pool's contents.
+ *
+ * \param [in] conn the instrument connection
+ * \param [in,out] channelPool the pool to populate, with its capacity given by
+ *                             RBRGen4ChannelPool.size
+ * \return #RBRGEN4_SUCCESS when every label is stored
+ * \return #RBRGEN4_TRUNCATED when labels past the pool's capacity were discarded
  */
 static RBRGen4Error RBRGen4_parseChannelPool(RBRGen4 *conn, RBRGen4ChannelPool *channelPool)
 {
