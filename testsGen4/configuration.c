@@ -1105,6 +1105,50 @@ TEST_LOGGER4(groupSet)
     return true;
 }
 
+/* Commands are assembled directly in the caller's buffer, so a list longer
+ * than the library's default size is sent when the buffer has room for it. */
+TEST_LOGGER4(groupSetLargeCommandBuffer)
+{
+    RBRGen4Group group = {
+        .label = "g",
+    };
+    RBRGen4Label labelBuf[POOL_SIZE];
+    RBRGen4LabelList channelList = {
+        .size = POOL_SIZE,
+        .len = POOL_SIZE,
+        .labels = labelBuf,
+    };
+    char expected[4 * RBRGEN4_COMMAND_BUFFER_DEFAULT] = "group g channellist=";
+    for (int32_t i = 0; i < channelList.len; ++i) {
+        memset(labelBuf[i], 'c', RBRGEN4_LABEL_NAME_MAX);
+        labelBuf[i][RBRGEN4_LABEL_NAME_MAX] = '\0';
+        if (i > 0) {
+            strcat(expected, "|");
+        }
+        strcat(expected, labelBuf[i]);
+    }
+    /* Too long for the default-sized buffer the harness opens with. */
+    TEST_ASSERT(strlen(expected) > RBRGEN4_COMMAND_BUFFER_DEFAULT);
+
+    const RBRGen4Environment before = conn->environment;
+    uint8_t commandBuffer[4 * RBRGEN4_COMMAND_BUFFER_DEFAULT];
+    RBRGen4Error err = RBRGen4_setCommandBuffer(conn, commandBuffer, sizeof(commandBuffer));
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+
+    char response[sizeof(expected) + sizeof(RESPONSE_TERMINATOR)];
+    snprintf(response, sizeof(response), "%s" RESPONSE_TERMINATOR, expected);
+    TestIOBuffers_init(buffers, response, 0);
+    err = RBRGen4_setGroup(conn, &group, &channelList);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+    strcat(expected, COMMAND_TERMINATOR);
+    TEST_ASSERT_STR_EQ(expected, buffers->writeBuffer);
+
+    err = RBRGen4_setCommandBuffer(conn, before.command, before.commandCapacity);
+    TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
+
+    return true;
+}
+
 TEST_LOGGER4(groupSetWithoutChannelList)
 {
     /* The setter has nothing to send without a list. */

@@ -38,20 +38,6 @@ extern "C" {
 #define RBRGEN3_COMMAND_TERMINATOR_LEN      2
 
 /**
- * \brief The length of the timestamp of a streamed sample.
- *
- * “YYYY-mm-dd HH:MM:SS.sss” format.
- */
-#define RBRGEN3_SAMPLE_TIME_LEN 23
-
-/**
- * \brief The length of the timestamp of schedule settings.
- *
- * “YYYYmmddHHMMSS” format.
- */
-#define RBRGEN3_SCHEDULE_TIME_LEN 14
-
-/**
  * \brief Simple error-checked return around a function call.
  *
  * Evaluates the function call passed as \a op. If it returns a value other
@@ -110,6 +96,35 @@ RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *conn);
  * \see RBRGen3_converse() for a send/receive shortcut
  */
 RBRGen3Error RBRGen3_sendCommand(RBRGen3 *conn, const char *command, ...);
+
+/**
+ * \brief Start a new command in RBRGen3Environment.command.
+ *
+ * Discards whatever the buffer holds from the previous command, including a
+ * length poisoned by a failed append, so that RBRGen3_appendCommand() writes
+ * from the start of the buffer.
+ *
+ * \param [in] conn the instrument connection
+ * \see RBRGen3_appendCommand() to add to the command
+ */
+void RBRGen3_beginCommand(RBRGen3 *conn);
+
+/**
+ * \brief Append formatted text to the command in RBRGen3Environment.command.
+ *
+ * Builds a command piece by piece, directly in the caller-supplied buffer.
+ * Call RBRGen3_beginCommand() before the first piece, then send the whole
+ * with RBRGen3_converseBuffer() or RBRGen3_sendBuffer().
+ *
+ * \param [in] conn the instrument connection
+ * \param [in] command the text to append as a printf-style format string
+ * \return #RBRGEN3_SUCCESS when the text is appended
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the text does not fit; the buffer
+ *                                   then holds a truncated command which
+ *                                   RBRGen3_sendBuffer() refuses
+ * \see RBRGen3_converseBuffer() to send the buffer and await the response
+ */
+RBRGen3Error RBRGen3_appendCommand(RBRGen3 *conn, const char *command, ...);
 
 /**
  * Read a response from the instrument. This function will block until a
@@ -184,6 +199,29 @@ RBRGen3Error RBRGen3_readResponse(RBRGen3 *conn, bool breakOnSample, RBRGen3Samp
  * \see RBRGen3_readResponse() to read the command response
  */
 RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...);
+
+/**
+ * \brief Send the command already in RBRGen3Environment.command and await an
+ *        appropriate response.
+ *
+ * The buffer form of RBRGen3_converse(), for commands assembled with
+ * RBRGen3_appendCommand(). A terminator is added if the command lacks one.
+ * The response matching and retry behaviour is exactly that of
+ * RBRGen3_converse(); a retry resends the buffer as it stands.
+ *
+ * \param [in] conn the instrument connection
+ * \return #RBRGEN3_SUCCESS when the command was successfully sent and a
+ *                                response was read
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the buffer holds a truncated command
+ *                                   or has no room for the terminator
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a line too long for the response
+ *         buffer was met and the correct response never arrived
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \see RBRGen3_appendCommand() to build the command
+ */
+RBRGen3Error RBRGen3_converseBuffer(RBRGen3 *conn);
 
 /**
  * \brief Read a single boolean parameter from the instrument.
@@ -342,28 +380,17 @@ RBRGen3Error RBRGen3DateTime_parseScheduleTime(const char *s, RBRGen3DateTime *t
                                                char **end);
 
 /**
- * \brief Convert a timestamp to a sample time/date string (i.e.,
- * “YYYY-mm-dd HH:MM:SS.sss” format).
+ * \brief Append a timestamp as “YYYYmmddHHMMSS”, the form the clock,
+ *        deployment, calibration and postprocessing commands take, to the
+ *        command in RBRGen3Environment.command.
  *
- * Exactly #RBRGEN3_SAMPLE_TIME_LEN + 1 characters will be written into
- * the buffer for the timestamp plus null terminator.
- *
+ * \param [in] conn the instrument connection
  * \param [in] timestamp the timestamp
- * \param [out] s the destination buffer
+ * \return #RBRGEN3_SUCCESS when the timestamp is appended
+ * \return #RBRGEN3_COMMAND_TOO_LONG when it does not fit
+ * \see RBRGen3_appendCommand()
  */
-void RBRGen3DateTime_toSampleTime(RBRGen3DateTime timestamp, char *s);
-
-/**
- * \brief Convert a timestamp to a schedule setting time/date string (i.e.,
- * “YYYYmmddHHMMSS” format).
- *
- * Exactly #RBRGEN3_SCHEDULE_TIME_LEN + 1 characters will be written into
- * the buffer for the timestamp plus null terminator.
- *
- * \param [in] timestamp the timestamp
- * \param [out] s the destination buffer
- */
-void RBRGen3DateTime_toScheduleTime(RBRGen3DateTime timestamp, char *s);
+RBRGen3Error RBRGen3_appendDateTime(RBRGen3 *conn, RBRGen3DateTime timestamp);
 
 #ifdef __cplusplus
 }

@@ -611,13 +611,15 @@ RBRGen3Error RBRGen3_setPostprocessing(RBRGen3 *conn, const RBRGen3Postprocessin
                              RBRGen3PostprocessingBinFilter_name(postprocessing->binFilter),
                              (double) postprocessing->binSize));
 
-    char tstamp[RBRGEN3_SCHEDULE_TIME_LEN + 1];
+    RBRGen3_beginCommand(conn);
+    RBR_TRY(RBRGen3_appendCommand(conn, "postprocessing tstamp_min = "));
+    RBR_TRY(RBRGen3_appendDateTime(conn, postprocessing->tstampMin));
+    RBR_TRY(RBRGen3_converseBuffer(conn));
 
-    RBRGen3DateTime_toScheduleTime(postprocessing->tstampMin, tstamp);
-    RBR_TRY(RBRGen3_converse(conn, "postprocessing tstamp_min = %s", tstamp));
-
-    RBRGen3DateTime_toScheduleTime(postprocessing->tstampMax, tstamp);
-    RBR_TRY(RBRGen3_converse(conn, "postprocessing tstamp_max = %s", tstamp));
+    RBRGen3_beginCommand(conn);
+    RBR_TRY(RBRGen3_appendCommand(conn, "postprocessing tstamp_max = "));
+    RBR_TRY(RBRGen3_appendDateTime(conn, postprocessing->tstampMax));
+    RBR_TRY(RBRGen3_converseBuffer(conn));
 
     RBR_TRY(RBRGen3_converse(conn,
                              "postprocessing depth_min = %.1f, depth_max = %.1f",

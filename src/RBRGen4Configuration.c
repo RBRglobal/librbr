@@ -25,16 +25,10 @@
 
 RBRGen4Error RBRGen4_getCalibration(RBRGen4 *conn, RBRGen4Calibration *calibration)
 {
-    /* The label selects the calibration to read, so it has to outlive the
-     * reset of the rest of the structure. */
-    char label[sizeof(calibration->label)];
-    snprintf(label, sizeof(label), "%s", calibration->label);
+    /* The label selects the calibration to read, so it survives the reset. */
+    RBR_RESET_EXCEPT(calibration, label);
 
-    memset(calibration, 0, sizeof(RBRGen4Calibration));
-
-    RBR_TRY(RBRGen4_converse(conn, "calibration %s", label));
-
-    snprintf(calibration->label, sizeof(calibration->label), "%s", label);
+    RBR_TRY(RBRGen4_converse(conn, "calibration %s", calibration->label));
 
     char *command = NULL;
     RBRGen4ResponseParameter parameter;
@@ -86,62 +80,6 @@ RBRGen4Error RBRGen4_getCalibration(RBRGen4 *conn, RBRGen4Calibration *calibrati
     return RBRGEN4_SUCCESS;
 }
 
-/**
- * \brief Append one `<group><index>=<value>` coefficient to a command.
- *
- * \return #RBRGEN4_COMMAND_TOO_LONG when the coefficient does not
- *                                             fit
- */
-static RBRGen4Error RBRGen4Calibration_appendCoefficient(char *command, int32_t size,
-                                                         int32_t *length, char group, int32_t index,
-                                                         float value)
-{
-    /* Checked before appending: the remaining space is only meaningful while
-     * the length is still within the buffer. */
-    if (*length < 0 || *length >= size) {
-        return RBRGEN4_COMMAND_TOO_LONG;
-    }
-
-    int32_t written = snprintf(
-        command + *length, size - *length, " %c%" PRId32 "=%.9g", group, index, (double) value);
-
-    if (written < 0 || *length + written >= size) {
-        return RBRGEN4_COMMAND_TOO_LONG;
-    }
-
-    *length += written;
-    return RBRGEN4_SUCCESS;
-}
-
-/**
- * \brief Append one `m<index>=<label>` reference to a command.
- *
- * An empty label is sent as `none`, which is how the instrument reports a
- * reference the equation does not use.
- *
- * \return #RBRGEN4_COMMAND_TOO_LONG when the reference does not fit
- */
-static RBRGen4Error RBRGen4Calibration_appendReference(char *command, int32_t size, int32_t *length,
-                                                       int32_t index, const char *label)
-{
-    if (*length < 0 || *length >= size) {
-        return RBRGEN4_COMMAND_TOO_LONG;
-    }
-
-    int32_t written = snprintf(command + *length,
-                               size - *length,
-                               " m%" PRId32 "=%s",
-                               index,
-                               label[0] == '\0' ? "none" : label);
-
-    if (written < 0 || *length + written >= size) {
-        return RBRGEN4_COMMAND_TOO_LONG;
-    }
-
-    *length += written;
-    return RBRGEN4_SUCCESS;
-}
-
 RBRGen4Error RBRGen4_setCalibration(RBRGen4 *conn, const RBRGen4Calibration *calibration)
 {
     if (calibration->aCount < 0 || calibration->aCount > RBRGEN4_CALIBRATION_COEFFICIENT_MAX ||
@@ -150,29 +88,30 @@ RBRGen4Error RBRGen4_setCalibration(RBRGen4 *conn, const RBRGen4Calibration *cal
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    char coefficients[RBRGEN4_COMMAND_BUFFER_DEFAULT] = "";
-    int32_t length = 0;
+    RBRGen4_beginCommand(conn);
+    RBR_TRY(RBRGen4_appendCommand(conn,
+                                  "calibration %s datetime=%014" PRId64 " offset=%.9g slope=%.9g",
+                                  calibration->label,
+                                  calibration->dateTime,
+                                  (double) calibration->userOffset,
+                                  (double) calibration->userSlope));
 
     for (int32_t a = 0; a < calibration->aCount; ++a) {
-        RBR_TRY(RBRGen4Calibration_appendCoefficient(
-            coefficients, (int32_t) sizeof(coefficients), &length, 'a', a, calibration->a[a]));
+        RBR_TRY(RBRGen4_appendCommand(conn, " a%" PRId32 "=%.9g", a, (double) calibration->a[a]));
     }
     for (int32_t b = 0; b < calibration->bCount; ++b) {
-        RBR_TRY(RBRGen4Calibration_appendCoefficient(
-            coefficients, (int32_t) sizeof(coefficients), &length, 'b', b, calibration->b[b]));
+        RBR_TRY(RBRGen4_appendCommand(conn, " b%" PRId32 "=%.9g", b, (double) calibration->b[b]));
     }
+    /* An empty reference label is sent as `none`, which is how the instrument
+     * reports a reference the equation does not use. */
     for (int32_t m = 0; m < calibration->mCount; ++m) {
-        RBR_TRY(RBRGen4Calibration_appendReference(
-            coefficients, (int32_t) sizeof(coefficients), &length, m, calibration->m[m]));
+        RBR_TRY(RBRGen4_appendCommand(conn,
+                                      " m%" PRId32 "=%s",
+                                      m,
+                                      calibration->m[m][0] == '\0' ? "none" : calibration->m[m]));
     }
 
-    return RBRGen4_converse(conn,
-                            "calibration %s datetime=%014" PRId64 " offset=%.9g slope=%.9g%s",
-                            calibration->label,
-                            calibration->dateTime,
-                            (double) calibration->userOffset,
-                            (double) calibration->userSlope,
-                            coefficients);
+    return RBRGen4_converseBuffer(conn);
 }
 
 const char *RBRGen4ScheduleStream_name(RBRGen4ScheduleStream stream)
@@ -420,34 +359,28 @@ RBRGen4Error RBRGen4_setSettings(RBRGen4 *conn, const RBRGen4Settings *settings)
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
+    RBRGen4_beginCommand(conn);
+    RBR_TRY(RBRGen4_appendCommand(conn, "settings "));
+
     /* An unavailable parameter is left out. */
-    char prompt[sizeof("prompt=off ")] = "";
     if (settings->prompt < RBRGEN4_SETTINGS_STATE_COUNT) {
-        snprintf(prompt, sizeof(prompt), "prompt=%s ", RBRGen4SettingsState_name(settings->prompt));
+        RBR_TRY(
+            RBRGen4_appendCommand(conn, "prompt=%s ", RBRGen4SettingsState_name(settings->prompt)));
+    }
+    if (settings->confirmation < RBRGEN4_SETTINGS_STATE_COUNT) {
+        RBR_TRY(RBRGen4_appendCommand(
+            conn, "confirmation=%s ", RBRGen4SettingsState_name(settings->confirmation)));
     }
 
-    char confirmation[sizeof("confirmation=off ")] = "";
-    if (settings->confirmation < RBRGEN4_SETTINGS_STATE_COUNT) {
-        snprintf(confirmation,
-                 sizeof(confirmation),
-                 "confirmation=%s ",
-                 RBRGen4SettingsState_name(settings->confirmation));
-    }
+    RBR_TRY(RBRGen4_appendCommand(conn, "pollpoweroffdelay=%" PRId32, settings->pollPowerOffDelay));
 
     /* The instrument answers with nothing at all once confirmation is off. */
     if (settings->confirmation == RBRGEN4_SETTINGS_STATE_OFF) {
-        return RBRGen4_sendCommand(conn,
-                                   "settings %s%spollpoweroffdelay=%" PRId32,
-                                   prompt,
-                                   confirmation,
-                                   settings->pollPowerOffDelay);
+        RBR_TRY(RBRGen4_appendCommand(conn, RBRGEN4_SEND_COMMAND_TERMINATOR));
+        return RBRGen4_sendBuffer(conn);
     }
 
-    return RBRGen4_converse(conn,
-                            "settings %s%spollpoweroffdelay=%" PRId32,
-                            prompt,
-                            confirmation,
-                            settings->pollPowerOffDelay);
+    return RBRGen4_converseBuffer(conn);
 }
 
 RBRGen4Error RBRGen4_getParameters(RBRGen4 *conn, RBRGen4Parameters *parameters)
@@ -539,10 +472,10 @@ RBRGen4Error RBRGen4_setGroup(RBRGen4 *conn, const RBRGen4Group *group,
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    char value[RBRGEN4_COMMAND_BUFFER_DEFAULT];
-    RBR_TRY(RBRGen4_formatLabelList(value, (int32_t) sizeof(value), channelList));
-
-    return RBRGen4_converse(conn, "group %s channellist=%s", group->label, value);
+    RBRGen4_beginCommand(conn);
+    RBR_TRY(RBRGen4_appendCommand(conn, "group %s channellist=", group->label));
+    RBR_TRY(RBRGen4_appendLabelList(conn, channelList));
+    return RBRGen4_converseBuffer(conn);
 }
 
 RBRGen4Error RBRGen4_getGroupPool(RBRGen4 *conn, RBRGen4GroupPool *groupPool)
@@ -664,10 +597,10 @@ RBRGen4Error RBRGen4_setConfig(RBRGen4 *conn, const RBRGen4Config *config,
         return RBRGEN4_INVALID_PARAMETER_VALUE;
     }
 
-    char value[RBRGEN4_COMMAND_BUFFER_DEFAULT];
-    RBR_TRY(RBRGen4_formatLabelList(value, (int32_t) sizeof(value), scheduleList));
-
-    return RBRGen4_converse(conn, "config %s schedulelist=%s", config->label, value);
+    RBRGen4_beginCommand(conn);
+    RBR_TRY(RBRGen4_appendCommand(conn, "config %s schedulelist=", config->label));
+    RBR_TRY(RBRGen4_appendLabelList(conn, scheduleList));
+    return RBRGen4_converseBuffer(conn);
 }
 
 RBRGen4Error RBRGen4_getConfigPool(RBRGen4 *conn, RBRGen4ConfigPool *configPool)
@@ -946,16 +879,14 @@ RBRGen4Error RBRGen4_setSchedule(RBRGen4 *conn, const RBRGen4Schedule *schedule,
         return RBRGEN4_UNSUPPORTED;
     }
 
+    RBRGen4_beginCommand(conn);
+    RBR_TRY(RBRGen4_appendCommand(conn, "schedule %s ", schedule->label));
+
     /* A NULL list leaves the instrument's group list unchanged. */
-    char groups[RBRGEN4_COMMAND_BUFFER_DEFAULT] = "";
     if (groupList != NULL) {
-        const char prefix[] = "grouplist=";
-        memcpy(groups, prefix, sizeof(prefix));
-        int32_t length = (int32_t) sizeof(prefix) - 1;
-        /* Leave room for the separating space. */
-        RBR_TRY(RBRGen4_formatLabelList(
-            groups + length, (int32_t) sizeof(groups) - length - 1, groupList));
-        strcat(groups, " ");
+        RBR_TRY(RBRGen4_appendCommand(conn, "grouplist="));
+        RBR_TRY(RBRGen4_appendLabelList(conn, groupList));
+        RBR_TRY(RBRGen4_appendCommand(conn, " "));
     }
 
     /* An unavailable `storage` is left out. */
@@ -964,36 +895,21 @@ RBRGen4Error RBRGen4_setSchedule(RBRGen4 *conn, const RBRGen4Schedule *schedule,
         storage = schedule->storage == RBRGEN4_SCHEDULE_STORAGE_ON ? "storage=on " : "storage=off ";
     }
 
-/* The parameters every mode sends, shared by the two forms below so the
- * spelling cannot drift between them. */
-#define SCHEDULE_COMMON "schedule %s %sstream=%s %scastdetection=%s mode=%s"
-
-    if (schedule->mode == RBRGEN4_SCHEDULE_MODE_CONTINUOUS) {
-        return RBRGen4_converse(conn,
-                                SCHEDULE_COMMON " period=%" PRId32,
-                                schedule->label,
-                                groups,
-                                RBRGen4ScheduleStream_name(schedule->stream),
-                                storage,
-                                schedule->castDetection ? "on" : "off",
-                                RBRGen4ScheduleMode_name(schedule->mode),
-                                period);
+    RBR_TRY(RBRGen4_appendCommand(conn,
+                                  "stream=%s %scastdetection=%s mode=%s period=%" PRId32,
+                                  RBRGen4ScheduleStream_name(schedule->stream),
+                                  storage,
+                                  schedule->castDetection ? "on" : "off",
+                                  RBRGen4ScheduleMode_name(schedule->mode),
+                                  period));
+    if (schedule->mode != RBRGEN4_SCHEDULE_MODE_CONTINUOUS) {
+        RBR_TRY(RBRGen4_appendCommand(conn,
+                                      " measurementcount=%" PRId32 " measurementperiod=%" PRId32,
+                                      measurementCount,
+                                      measurementPeriod));
     }
 
-    return RBRGen4_converse(conn,
-                            SCHEDULE_COMMON " period=%" PRId32 " measurementcount=%" PRId32
-                                            " measurementperiod=%" PRId32,
-                            schedule->label,
-                            groups,
-                            RBRGen4ScheduleStream_name(schedule->stream),
-                            storage,
-                            schedule->castDetection ? "on" : "off",
-                            RBRGen4ScheduleMode_name(schedule->mode),
-                            period,
-                            measurementCount,
-                            measurementPeriod);
-
-#undef SCHEDULE_COMMON
+    return RBRGen4_converseBuffer(conn);
 }
 
 RBRGen4Error RBRGen4_getSchedulePool(RBRGen4 *conn, RBRGen4SchedulePool *schedulePool)

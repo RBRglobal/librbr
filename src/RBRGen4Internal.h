@@ -40,20 +40,6 @@ extern "C" {
 #define RBRGEN4_EMPTY_LIST                  "none"
 
 /**
- * \brief The length of the timestamp of a streamed sample.
- *
- * “YYYY-mm-dd HH:MM:SS.sss” format.
- */
-#define RBRGEN4_SAMPLE_TIME_LEN 23
-
-/**
- * \brief The length of the timestamp of schedule settings.
- *
- * “YYYYmmddHHMMSS” format.
- */
-#define RBRGEN4_SCHEDULE_TIME_LEN 14
-
-/**
  * \brief Simple error-checked return around a function call.
  *
  * Evaluates the function call passed as \a op. If it returns a value other
@@ -129,6 +115,53 @@ RBRGen4Error RBRGen4_sendBuffer(RBRGen4 *conn);
 RBRGen4Error RBRGen4_sendCommand(RBRGen4 *conn, const char *command, ...);
 
 /**
+ * \brief Start a new command in RBRGen4Environment.command.
+ *
+ * Discards whatever the buffer holds from the previous command, including a
+ * length poisoned by a failed append, so that RBRGen4_appendCommand() writes
+ * from the start of the buffer.
+ *
+ * \param [in] conn the instrument connection
+ * \see RBRGen4_appendCommand() to add to the command
+ */
+void RBRGen4_beginCommand(RBRGen4 *conn);
+
+/**
+ * \brief Append formatted text to the command in RBRGen4Environment.command.
+ *
+ * Builds a command piece by piece, directly in the caller-supplied buffer,
+ * for commands whose length is not known up front (label lists, coefficient
+ * lists). Call RBRGen4_beginCommand() before the first piece, then send the
+ * whole with RBRGen4_converseBuffer() or RBRGen4_sendBuffer().
+ *
+ * \param [in] conn the instrument connection
+ * \param [in] command the text to append as a printf-style format string
+ * \return #RBRGEN4_SUCCESS when the text is appended
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the text does not fit; the buffer
+ *                                   then holds a truncated command which
+ *                                   RBRGen4_sendBuffer() refuses
+ * \see RBRGen4_appendLabelList() to append a label list
+ * \see RBRGen4_converseBuffer() to send the buffer and await the response
+ */
+RBRGen4Error RBRGen4_appendCommand(RBRGen4 *conn, const char *command, ...);
+
+/**
+ * \brief Append a label list, formatted by RBRGen4_formatLabelList(), to the
+ *        command in RBRGen4Environment.command.
+ *
+ * \param [in] conn the instrument connection
+ * \param [in] labelList the labels to append
+ * \return #RBRGEN4_SUCCESS when the list is appended
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE as RBRGen4_formatLabelList()
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit; on any
+ *                                   failure the buffer holds a truncated
+ *                                   command which RBRGen4_sendBuffer()
+ *                                   refuses
+ * \see RBRGen4_appendCommand()
+ */
+RBRGen4Error RBRGen4_appendLabelList(RBRGen4 *conn, const RBRGen4LabelList *labelList);
+
+/**
  * Read a response from the instrument. This function will block until a
  * complete response is read, or until the callback returns
  * #RBRGEN4_TIMEOUT or #RBRGEN4_CALLBACK_ERROR.
@@ -199,6 +232,29 @@ RBRGen4Error RBRGen4_readResponse(RBRGen4 *conn, bool breakOnSample, RBRGen4Samp
  * \see RBRGen4_readResponse() to read the command response
  */
 RBRGen4Error RBRGen4_converse(RBRGen4 *conn, const char *command, ...);
+
+/**
+ * \brief Send the command already in RBRGen4Environment.command and await an
+ *        appropriate response.
+ *
+ * The buffer form of RBRGen4_converse(), for commands assembled with
+ * RBRGen4_appendCommand(). A terminator is added if the command lacks one.
+ * The response matching and retry behaviour is exactly that of
+ * RBRGen4_converse(); a retry resends the buffer as it stands.
+ *
+ * \param [in] conn the instrument connection
+ * \return #RBRGEN4_SUCCESS when the command was successfully sent and a
+ *                                response was read
+ * \return #RBRGEN4_COMMAND_TOO_LONG when the buffer holds a truncated command
+ *                                   or has no room for the terminator
+ * \return #RBRGEN4_TIMEOUT when a timeout occurs
+ * \return #RBRGEN4_RESPONSE_TOO_LONG when a line too long for the response
+ *         buffer was met and the correct response never arrived
+ * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN4_HARDWARE_ERROR if the instrument indicated an error
+ * \see RBRGen4_appendCommand() to build the command
+ */
+RBRGen4Error RBRGen4_converseBuffer(RBRGen4 *conn);
 
 /**
  * \brief Read a single boolean parameter from the instrument.
@@ -357,28 +413,17 @@ RBRGen4Error RBRGen4DateTime_parseScheduleTime(const char *s, RBRGen4DateTime *t
                                                char **end);
 
 /**
- * \brief Convert a timestamp to a sample time/date string (i.e.,
- * “YYYY-mm-dd HH:MM:SS.sss” format).
+ * \brief Append a timestamp as “YYYYmmddHHMMSS”, the form the `clock` and
+ *        `deployment` commands take, to the command in
+ *        RBRGen4Environment.command.
  *
- * Exactly #RBRGEN4_SAMPLE_TIME_LEN + 1 characters will be written into
- * the buffer for the timestamp plus null terminator.
- *
+ * \param [in] conn the instrument connection
  * \param [in] timestamp the timestamp
- * \param [out] s the destination buffer
+ * \return #RBRGEN4_SUCCESS when the timestamp is appended
+ * \return #RBRGEN4_COMMAND_TOO_LONG when it does not fit
+ * \see RBRGen4_appendCommand()
  */
-void RBRGen4DateTime_toSampleTime(RBRGen4DateTime timestamp, char *s);
-
-/**
- * \brief Convert a timestamp to a schedule setting time/date string (i.e.,
- * “YYYYmmddHHMMSS” format).
- *
- * Exactly #RBRGEN4_SCHEDULE_TIME_LEN + 1 characters will be written into
- * the buffer for the timestamp plus null terminator.
- *
- * \param [in] timestamp the timestamp
- * \param [out] s the destination buffer
- */
-void RBRGen4DateTime_toScheduleTime(RBRGen4DateTime timestamp, char *s);
+RBRGen4Error RBRGen4_appendDateTime(RBRGen4 *conn, RBRGen4DateTime timestamp);
 
 /**
  * \brief Terminate the first value of a list, and find the next one.

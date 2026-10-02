@@ -140,32 +140,18 @@ static RBRGen4Error RBRGen4_sendPoll(RBRGen4 *conn, bool requireLabel, const cha
         return RBRGEN4_UNSUPPORTED;
     }
 
-    /* Sized against the longest parameter so that a list which fits here also
-     * fits the command. */
-    char value[RBRGEN4_COMMAND_BUFFER_DEFAULT -
-               sizeof("poll channellist=" RBRGEN4_SEND_COMMAND_TERMINATOR)] = "";
+    RBRGen4_beginCommand(conn);
+    RBR_TRY(RBRGen4_appendCommand(conn, "poll"));
     if (parameter != NULL) {
         /* An empty list is invalid */
         if (list == NULL || list->len == 0) {
             return RBRGEN4_INVALID_PARAMETER_VALUE;
         }
 
-        RBR_TRY(RBRGen4_formatLabelList(value, (int32_t) sizeof(value), list));
+        RBR_TRY(RBRGen4_appendCommand(conn, " %s", parameter));
+        RBR_TRY(RBRGen4_appendLabelList(conn, list));
     }
-
-    char *commandBuffer = (char *) conn->environment.command;
-    int32_t *commandBufferLength = &conn->commandBufferLength;
-
-    *commandBufferLength = snprintf(commandBuffer,
-                                    (size_t) conn->environment.commandCapacity,
-                                    "poll%s%s%s%s",
-                                    parameter != NULL ? " " : "",
-                                    parameter != NULL ? parameter : "",
-                                    value,
-                                    RBRGEN4_SEND_COMMAND_TERMINATOR);
-    if (*commandBufferLength >= conn->environment.commandCapacity) {
-        return RBRGEN4_COMMAND_TOO_LONG;
-    }
+    RBR_TRY(RBRGen4_appendCommand(conn, RBRGEN4_SEND_COMMAND_TERMINATOR));
 
     RBRGen4DateTime start;
     RBR_TRY(conn->environment.time(conn, &start));

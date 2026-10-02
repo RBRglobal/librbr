@@ -107,11 +107,14 @@ RBRGen3Error RBRGen3_getClock(RBRGen3 *conn, RBRGen3Clock *clock)
     }
 }
 
-static RBRGen3Error RBRGen3_setClockL2(RBRGen3 *conn, const char *dateTime, float offsetFromUtc)
+static RBRGen3Error RBRGen3_setClockL2(RBRGen3 *conn, RBRGen3DateTime dateTime, float offsetFromUtc)
 {
     /* Set the clock as quickly as possible so that the hardware clock is as
      * close as possible to the provided value. */
-    RBR_TRY(RBRGen3_converse(conn, "now = %s", dateTime));
+    RBRGen3_beginCommand(conn);
+    RBR_TRY(RBRGen3_appendCommand(conn, "now = "));
+    RBR_TRY(RBRGen3_appendDateTime(conn, dateTime));
+    RBR_TRY(RBRGen3_converseBuffer(conn));
 
     if (isnan(offsetFromUtc)) {
         return RBRGEN3_SUCCESS;
@@ -130,14 +133,15 @@ static RBRGen3Error RBRGen3_setClockL2(RBRGen3 *conn, const char *dateTime, floa
     return err;
 }
 
-static RBRGen3Error RBRGen3_setClockL3(RBRGen3 *conn, const char *dateTime, float offsetFromUtc)
+static RBRGen3Error RBRGen3_setClockL3(RBRGen3 *conn, RBRGen3DateTime dateTime, float offsetFromUtc)
 {
+    RBRGen3_beginCommand(conn);
+    RBR_TRY(RBRGen3_appendCommand(conn, "clock datetime = "));
+    RBR_TRY(RBRGen3_appendDateTime(conn, dateTime));
     if (!isnan(offsetFromUtc)) {
-        return RBRGen3_converse(
-            conn, "clock datetime = %s, offsetfromutc = %02f", dateTime, (double) offsetFromUtc);
-    } else {
-        return RBRGen3_converse(conn, "clock datetime = %s", dateTime);
+        RBR_TRY(RBRGen3_appendCommand(conn, ", offsetfromutc = %02f", (double) offsetFromUtc));
     }
+    return RBRGen3_converseBuffer(conn);
 }
 
 RBRGen3Error RBRGen3_setClock(RBRGen3 *conn, const RBRGen3Clock *clock)
@@ -146,13 +150,10 @@ RBRGen3Error RBRGen3_setClock(RBRGen3 *conn, const RBRGen3Clock *clock)
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    char dateTime[RBRGEN3_SCHEDULE_TIME_LEN + 1];
-    RBRGen3DateTime_toScheduleTime(clock->dateTime, dateTime);
-
     if (conn->generation == RBRCOMMON_LOGGER2) {
-        return RBRGen3_setClockL2(conn, dateTime, clock->offsetFromUtc);
+        return RBRGen3_setClockL2(conn, clock->dateTime, clock->offsetFromUtc);
     } else {
-        return RBRGen3_setClockL3(conn, dateTime, clock->offsetFromUtc);
+        return RBRGen3_setClockL3(conn, clock->dateTime, clock->offsetFromUtc);
     }
 }
 
@@ -531,20 +532,25 @@ RBRGen3Error RBRGen3_setDeployment(RBRGen3 *conn, const RBRGen3Deployment *deplo
         return RBRGEN3_INVALID_PARAMETER_VALUE;
     }
 
-    char startTime[RBRGEN3_SCHEDULE_TIME_LEN + 1];
-    RBRGen3DateTime_toScheduleTime(deployment->startTime, startTime);
-
-    char endTime[RBRGEN3_SCHEDULE_TIME_LEN + 1];
-    RBRGen3DateTime_toScheduleTime(deployment->endTime, endTime);
-
     /* As with reading deployment details, we'll have to call the starttime/
      * endtime commands each in turn for Logger2. */
     if (conn->generation == RBRCOMMON_LOGGER2) {
-        RBR_TRY(RBRGen3_converse(conn, "starttime = %s", startTime));
-        RBR_TRY(RBRGen3_converse(conn, "endtime = %s", endTime));
+        RBRGen3_beginCommand(conn);
+        RBR_TRY(RBRGen3_appendCommand(conn, "starttime = "));
+        RBR_TRY(RBRGen3_appendDateTime(conn, deployment->startTime));
+        RBR_TRY(RBRGen3_converseBuffer(conn));
+
+        RBRGen3_beginCommand(conn);
+        RBR_TRY(RBRGen3_appendCommand(conn, "endtime = "));
+        RBR_TRY(RBRGen3_appendDateTime(conn, deployment->endTime));
+        RBR_TRY(RBRGen3_converseBuffer(conn));
     } else {
-        RBR_TRY(
-            RBRGen3_converse(conn, "deployment starttime = %s, endtime = %s", startTime, endTime));
+        RBRGen3_beginCommand(conn);
+        RBR_TRY(RBRGen3_appendCommand(conn, "deployment starttime = "));
+        RBR_TRY(RBRGen3_appendDateTime(conn, deployment->startTime));
+        RBR_TRY(RBRGen3_appendCommand(conn, ", endtime = "));
+        RBR_TRY(RBRGen3_appendDateTime(conn, deployment->endTime));
+        RBR_TRY(RBRGen3_converseBuffer(conn));
     }
     return RBRGEN3_SUCCESS;
 }

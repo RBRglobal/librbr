@@ -140,7 +140,6 @@ RBRGen3Error RBRGen3_setThresholding(RBRGen3 *conn, const RBRGen3Thresholding *t
     const char *enabledParameter;
     const char *enabledValue;
     const char *channelParameter;
-    char channelValue[RBRGEN3_CHANNEL_LABEL_MAX + 1];
 
     if (conn->generation == RBRCOMMON_LOGGER2) {
         enabledParameter = "state";
@@ -152,23 +151,20 @@ RBRGen3Error RBRGen3_setThresholding(RBRGen3 *conn, const RBRGen3Thresholding *t
         channelParameter = "channelindex";
     }
 
+    RBRGen3_beginCommand(conn);
+    RBR_TRY(RBRGen3_appendCommand(conn, "thresholding %s = %s, ", enabledParameter, enabledValue));
     if (threshold->channelSelection == RBRGEN3_THRESHOLD_CHANNEL_BY_INDEX) {
-        snprintf(channelValue, sizeof(channelValue), "%" PRIi32, threshold->channelIndex);
+        RBR_TRY(RBRGen3_appendCommand(
+            conn, "%s = %" PRIi32, channelParameter, threshold->channelIndex));
     } else {
-        channelParameter = "channellabel";
-        snprintf(channelValue, sizeof(channelValue), "%s", threshold->channelLabel);
+        RBR_TRY(RBRGen3_appendCommand(conn, "channellabel = %s", threshold->channelLabel));
     }
-
-    return RBRGen3_converse(conn,
-                            "thresholding %s = %s, %s = %s, condition = %s, value = %0.4f, "
-                            "interval = %d",
-                            enabledParameter,
-                            enabledValue,
-                            channelParameter,
-                            channelValue,
-                            RBRGen3ThresholdingCondition_name(threshold->condition),
-                            (double) threshold->value,
-                            threshold->interval);
+    RBR_TRY(RBRGen3_appendCommand(conn,
+                                  ", condition = %s, value = %0.4f, interval = %d",
+                                  RBRGen3ThresholdingCondition_name(threshold->condition),
+                                  (double) threshold->value,
+                                  threshold->interval));
+    return RBRGen3_converseBuffer(conn);
 }
 
 RBRGen3Error RBRGen3_getTwistActivation(RBRGen3 *conn, RBRGen3TwistActivation *twistActivation)

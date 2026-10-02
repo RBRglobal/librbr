@@ -104,8 +104,6 @@ static const RBRGen3HardwareError WARNING_NUMBERS[] = {
 #define SAMPLE_ERROR_PREFIX     "Error-"
 #define SAMPLE_ERROR_PREFIX_LEN ((long) (sizeof(SAMPLE_ERROR_PREFIX) - 1))
 
-static const char *RBRGen3DateTime_sampleFormat = "%04d-%02d-%02d %02d:%02d:%02d.%03d";
-
 static const char *RBRGen3DateTime_sampleScanFormat = "%04d-%02d-%02d %02d:%02d:%02d.%" SCNi64 "%n";
 
 static const char *RBRGen3DateTime_scheduleFormat = "%04d%02d%02d%02d%02d%02d";
@@ -201,42 +199,67 @@ RBRGen3Error RBRGen3_sendBuffer(RBRGen3 *conn)
     return RBRGEN3_SUCCESS;
 }
 
-static RBRGen3Error RBRGen3_vSendCommand(RBRGen3 *conn, const char *command, va_list format)
+void RBRGen3_beginCommand(RBRGen3 *conn)
 {
-    /* Prepare the command. */
-    conn->commandBufferLength = vsnprintf((char *) conn->environment.command,
-                                          (size_t) conn->environment.commandCapacity,
-                                          command,
-                                          format);
+    conn->commandBufferLength = 0;
+}
+
+static RBRGen3Error RBRGen3_vAppendCommand(RBRGen3 *conn, const char *command, va_list format)
+{
+    /* The remaining space is only meaningful while the length is still within
+     * the buffer. */
+    if (conn->commandBufferLength < 0 ||
+        conn->commandBufferLength >= conn->environment.commandCapacity) {
+        return RBRGEN3_COMMAND_TOO_LONG;
+    }
+
+    int32_t written =
+        vsnprintf((char *) conn->environment.command + conn->commandBufferLength,
+                  (size_t) (conn->environment.commandCapacity - conn->commandBufferLength),
+                  command,
+                  format);
 
     /* Make sure we're within buffer bounds. This is a greater-or-equal check,
      * not just a greater-than check, because vsnprintf doesn't include the
      * null terminator in its return value. The longest value vsnprintf can
      * write is commandBufferCapacity - 1 bytes. */
-    if (conn->commandBufferLength >= conn->environment.commandCapacity) {
+    if (written < 0 || conn->commandBufferLength + written >= conn->environment.commandCapacity) {
         conn->commandBufferLength = conn->environment.commandCapacity;
         return RBRGEN3_COMMAND_TOO_LONG;
     }
 
-    /* Make sure the command is LF-terminated. */
-    if (conn->commandBufferLength < RBRGEN3_SEND_COMMAND_TERMINATOR_LEN ||
+    conn->commandBufferLength += written;
+    return RBRGEN3_SUCCESS;
+}
+
+RBRGen3Error RBRGen3_appendCommand(RBRGen3 *conn, const char *command, ...)
+{
+    RBRGen3Error err;
+    va_list format;
+    va_start(format, command);
+    err = RBRGen3_vAppendCommand(conn, command, format);
+    va_end(format);
+    return err;
+}
+
+/**
+ * \brief Make sure the command in the buffer carries the send terminator.
+ *
+ * \param [in] conn the instrument connection
+ * \return #RBRGEN3_SUCCESS when the command is terminated
+ * \return #RBRGEN3_COMMAND_TOO_LONG when there is no room for the terminator
+ */
+static RBRGen3Error RBRGen3_terminateCommand(RBRGen3 *conn)
+{
+    if (conn->commandBufferLength >= RBRGEN3_SEND_COMMAND_TERMINATOR_LEN &&
         memcmp(conn->environment.command + conn->commandBufferLength -
                    RBRGEN3_SEND_COMMAND_TERMINATOR_LEN,
                RBRGEN3_SEND_COMMAND_TERMINATOR,
-               RBRGEN3_SEND_COMMAND_TERMINATOR_LEN) != 0) {
-        /* It isn't. Make sure there's room before adding it. */
-        if (conn->commandBufferLength + RBRGEN3_SEND_COMMAND_TERMINATOR_LEN >=
-            conn->environment.commandCapacity) {
-            return RBRGEN3_COMMAND_TOO_LONG;
-        }
-
-        memcpy(conn->environment.command + conn->commandBufferLength,
-               RBRGEN3_SEND_COMMAND_TERMINATOR,
-               RBRGEN3_SEND_COMMAND_TERMINATOR_LEN);
-        conn->commandBufferLength += RBRGEN3_SEND_COMMAND_TERMINATOR_LEN;
+               RBRGEN3_SEND_COMMAND_TERMINATOR_LEN) == 0) {
+        return RBRGEN3_SUCCESS;
     }
 
-    return RBRGen3_sendBuffer(conn);
+    return RBRGen3_appendCommand(conn, RBRGEN3_SEND_COMMAND_TERMINATOR);
 }
 
 RBRGen3Error RBRGen3_sendCommand(RBRGen3 *conn, const char *command, ...)
@@ -244,9 +267,15 @@ RBRGen3Error RBRGen3_sendCommand(RBRGen3 *conn, const char *command, ...)
     RBRGen3Error err;
     va_list format;
     va_start(format, command);
-    err = RBRGen3_vSendCommand(conn, command, format);
+    RBRGen3_beginCommand(conn);
+    err = RBRGen3_vAppendCommand(conn, command, format);
     va_end(format);
-    return err;
+    if (err != RBRGEN3_SUCCESS) {
+        return err;
+    }
+
+    RBR_TRY(RBRGen3_terminateCommand(conn));
+    return RBRGen3_sendBuffer(conn);
 }
 
 /**
@@ -805,8 +834,22 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...)
 {
     RBRGen3Error err;
     va_list format;
-    va_list formatSend;
     va_start(format, command);
+    RBRGen3_beginCommand(conn);
+    err = RBRGen3_vAppendCommand(conn, command, format);
+    va_end(format);
+    if (err != RBRGEN3_SUCCESS) {
+        return err;
+    }
+
+    return RBRGen3_converseBuffer(conn);
+}
+
+RBRGen3Error RBRGen3_converseBuffer(RBRGen3 *conn)
+{
+    RBRGen3Error err;
+
+    RBR_TRY(RBRGen3_terminateCommand(conn));
 
     /* Keep firing off the command and looking for a response until we find one
      * which matches. */
@@ -821,12 +864,9 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...)
         retry = false;
         responseTooLong = false;
 
-        /* Can't use RBR_TRY anywhere within these while loops because we need
-         * to be sure to call va_end() on both va_lists before returning. */
-        va_copy(formatSend, format);
-        err = RBRGen3_vSendCommand(conn, command, formatSend);
-        va_end(formatSend);
-
+        /* The reads touch only the response buffer, so the command buffer
+         * still holds the command when it has to be sent again. */
+        err = RBRGen3_sendBuffer(conn);
         if (err != RBRGEN3_SUCCESS) {
             break;
         }
@@ -950,8 +990,6 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...)
             err = RBRGEN3_RESPONSE_TOO_LONG;
         }
     } while (retry);
-
-    va_end(format);
 
     return err;
 }
@@ -1143,32 +1181,16 @@ RBRGen3Error RBRGen3DateTime_parseScheduleTime(const char *s, RBRGen3DateTime *t
     return RBRGEN3_SUCCESS;
 }
 
-static void RBRGen3DateTime_toFormat(RBRGen3DateTime timestamp, char *s, size_t size,
-                                     const char *format)
+RBRGen3Error RBRGen3_appendDateTime(RBRGen3 *conn, RBRGen3DateTime timestamp)
 {
     time_t t = timestamp / 1000;
     struct tm *split = gmtime(&t);
-    int milliseconds = (int) (timestamp % 1000);
-    snprintf(s,
-             size,
-             format,
-             split->tm_year + 1900,
-             split->tm_mon + 1,
-             split->tm_mday,
-             split->tm_hour,
-             split->tm_min,
-             split->tm_sec,
-             milliseconds);
-}
-
-void RBRGen3DateTime_toSampleTime(RBRGen3DateTime timestamp, char *s)
-{
-    RBRGen3DateTime_toFormat(
-        timestamp, s, RBRGEN3_SAMPLE_TIME_LEN + 1, RBRGen3DateTime_sampleFormat);
-}
-
-void RBRGen3DateTime_toScheduleTime(RBRGen3DateTime timestamp, char *s)
-{
-    RBRGen3DateTime_toFormat(
-        timestamp, s, RBRGEN3_SCHEDULE_TIME_LEN + 1, RBRGen3DateTime_scheduleFormat);
+    return RBRGen3_appendCommand(conn,
+                                 RBRGen3DateTime_scheduleFormat,
+                                 split->tm_year + 1900,
+                                 split->tm_mon + 1,
+                                 split->tm_mday,
+                                 split->tm_hour,
+                                 split->tm_min,
+                                 split->tm_sec);
 }
