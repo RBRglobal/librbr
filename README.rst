@@ -5,7 +5,7 @@ libRBR
 ======
 
 Overview
-------------
+--------
 
 libRBR provides an interface
 for simplified communication
@@ -22,8 +22,8 @@ but the library handles the intricacies
 of waking the instrument,
 response parsing,
 etc.
-Command references 
-and instrument documentation 
+Command references
+and instrument documentation
 can be found at https://docs.rbr-global.com/.
 
 For example:
@@ -97,7 +97,7 @@ The standalone dynamic correction library
 is intended to be generation-agnostic.
 
 Coming from libRBR 1.x?
--------------------------
+-----------------------
 
 The Gen3 side of libRBR 2.x is an updated version of libRBR 1.2.4.
 
@@ -194,7 +194,7 @@ Examples can be built similarly:
    make all
 
 Most examples are intended to interact
-with a real RBR instrument. 
+with a real RBR instrument.
 Be aware that some will write / reconfigure the instrument.
 For an instrument connected via USB,
 an example might be run like:
@@ -204,9 +204,9 @@ an example might be run like:
    # Change '/dev/ttyACM0' below to the desired port/device
    ./posix-stream /dev/ttyACM0
 
-The ``posix-parse-file-dynamiccorrection`` example 
+The ``posix-parse-file-dynamiccorrection`` example
 in ``examples/posixGen3``
-requires a dataset rather than an instrument. 
+requires a dataset rather than an instrument.
 Run it with the provided sample data:
 
 .. code-block:: sh

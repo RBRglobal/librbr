@@ -9,12 +9,12 @@ libRBR can be built and run on Windows under two options: WSL2, or `Cygwin <http
 WSL2
 ----
 
-Prerequisits
-~~~~~~~~~~~~
+Prerequisites
+~~~~~~~~~~~~~
 
 In addition to the base WSL2 installation, the following additional packages are required:
 
-- ``gcc`` and set CC=gcc to compile the library.
+- ``gcc`` and set ``CC=gcc`` to compile the library.
 - ``linux-tools-virtual hwdata`` to forward the port. (Reference: https://github.com/dorssel/usbipd-win/wiki/WSL-support)
 
 Optionally, you can install:

@@ -106,7 +106,7 @@ Technical pedantry:
   should return a value directly.
 - Use UpperCamelCase type names
   and camelCase variable names.
-  Use TypeName_functionName for the names
+  Use ``TypeName_functionName`` for the names
   of method-like functions,
   and camelCase the names
   of freestanding functions.

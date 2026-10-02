@@ -33,7 +33,7 @@ Command Timeout
 
 The second type of timeout,
 configured by the user
-via the *commandTimeout* value passed to :c:func:`RBRGen3_open`
+via the ``commandTimeout`` value passed to :c:func:`RBRGen3_open`
 or :c:func:`RBRGen4_open`,
 or later changed via :c:func:`RBRGen3_setCommandTimeout`
 or :c:func:`RBRGen4_setCommandTimeout`,
@@ -55,7 +55,7 @@ It defines how long :c:func:`RBRGen4_poll`,
 and :c:func:`RBRGen4_pollGroups`
 will wait for the polled sample.
 :c:func:`RBRGen4_open` sets it
-to twice the *commandTimeout* value;
+to twice the ``commandTimeout`` value;
 change it via :c:func:`RBRGen4_setPollTimeout`.
 Changing the command timeout later
 does not change the poll timeout.
@@ -64,8 +64,8 @@ Character Timeout
 -----------------
 
 Because character reads are implemented by the user
-via the RBRGen3ReadCallback()
-or RBRGen4ReadCallback() callback function,
+via the :c:type:`RBRGen3ReadCallback`
+or :c:type:`RBRGen4ReadCallback` callback function,
 any character timeout must also be implemented by the user.
 On POSIX systems, this can be done by using ``select(3)``
 to determine whether a file descriptor is ready for reading

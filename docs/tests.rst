@@ -38,7 +38,7 @@ Gen4 tests use the ``TEST_LOGGER4`` macro instead,
 within any of the test modules
 found within ``testsGen4/``;
 it takes the same argument
-and its functions receive an ``RBRGen4`` connection.
+and its functions receive an :c:type:`RBRGen4` connection.
 You do not need to declare test functions
 in a header;
 test functions defined
@@ -162,9 +162,9 @@ For example,
 to add a new module
 for tests having to do with “frobbing”,
 create the file ``testsGen3/frobbing.c``,
-and add it to the Makefile:
+and add it to the ``Makefile``:
 
-::
+.. code-block:: make
 
    GEN3_TEST_MODULES := communication \
                         ...
