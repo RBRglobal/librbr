@@ -4,17 +4,17 @@
 # How to use dynamicCorrection example
 
 ## Setup
-Runtime environment: Linux, macOS, or cygwin
+Runtime environment: Linux, macOS, or Cygwin
 
 ## Build this example
-Assuming librbr is already built.(if not, go to librbr directory, and then use command "make")
+Assuming libRBR is already built.(if not, go to librbr directory, and then use command "make")
 Go to librbr/examples/dynamicCorrection directory, then use command "make".
 
-## Tips before you start:
+## Tips before you start
 (1) How to clean the built files:
 To clean the .o, .d, and executable files one built, use command "make clean" in that folder directory.
 
-## Usage for this example:
+## Usage for this example
 File name   |      command to use it | things to know
 ------------- | ------------- | -------------
 dynamicCorrection-example.c    | ./dynamicCorrection-example ../sampledata/dynamiccorrection-sample.csv | the sample .csv file columns have to be: timestamp(s), Cmeas(mS/cm), Tmeas(°C), Pmeas(sea pressure, dbar), Tcond(°C)

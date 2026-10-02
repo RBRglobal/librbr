@@ -6,7 +6,7 @@
 ## Setup
 * Hardware: an RBR Generation 4 instrument (SL4, SEN4, or L4) with a
   serial or USB connection
-* Runtime environment: Linux, macOS, or cygwin
+* Runtime environment: Linux, macOS, or Cygwin
 
 Not all examples require hardware (`posix-footprint` runs standalone).
 
@@ -15,7 +15,7 @@ Assuming libRBR is already built with Gen4 support
 (if not, go to the librbr directory, then run `make GEN4=1`).
 Go to the librbr/examples/posixGen4 directory, then run `make`.
 
-## Tips before you start:
+## Tips before you start
 (1) Check the baud rate:
 The examples open the serial port at 115200 baud, the instrument default. If
 your instrument is configured for another rate, change the `cfsetospeed()`
@@ -24,14 +24,14 @@ irrelevant over a USB connection.
 
 (2) Confirm which port is in use:
 On Linux the instrument usually appears as `/dev/ttyUSB0` or `/dev/ttyACM0`.
-In cygwin, if a terminal tool suggests `COM6`, it's most likely `/dev/ttyS5`;
+In Cygwin, if a terminal tool suggests `COM6`, it's most likely `/dev/ttyS5`;
 alternatively, run `ls /dev/ttyS*` and try each one.
 
 (3) How to clean the built files:
 To clean the built .o files and executables, run `make clean` in this
 directory.
 
-## Usage for each example:
+## Usage for each example
 File name     |  command to use it | things to know
 ------------- | ------------- | -------------
 `posix-communications.c` | `./posix-communications <device>` | reports how the instrument is connected and powered, then puts it to sleep; writes nothing
