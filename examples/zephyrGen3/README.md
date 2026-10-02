@@ -14,7 +14,7 @@ but it can easily be extended
 to run on any of [the multitude of boards supported by Zephyr][boards]
 or on custom hardware.
 
-Functionally, this example reproduces the `posix-stream` example
+Functionally, this example reproduces the `posixGen3/posix-stream` example
 in a Zephyr environment:
 connects to the instrument,
 configures streaming,

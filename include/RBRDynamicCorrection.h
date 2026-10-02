@@ -7,7 +7,7 @@
 /**
  * \file RBRDynamicCorrection.h
  *
- * \brief Library for salinity dynamic correction
+ * \brief Library for salinity dynamic correction.
  */
 
 #ifndef LIBRBR_RBRDYNAMICCORRECTION_H
@@ -28,65 +28,65 @@
  * (applicable for 10cm/sec ascent/descent rate) */
 
 /** \def DCORR_T_DELAY
- * \brief Define the C-T lag adjustment delay (in seconds)
+ * \brief Define the C-T lag adjustment delay (in seconds).
  */
 #define DCORR_T_DELAY    0.35f
 /** \def DCORR_ALPHA
- * \brief Define the magnitude of short-term thermal mass correction (unitless)
+ * \brief Define the magnitude of short-term thermal mass correction (unitless).
  */
 #define DCORR_ALPHA      0.041f
 /** \def DCORR_ALPHA_A
- * \brief Define the 'a' ascent-rate fit coefficient for alpha (unitless)
+ * \brief Define the 'a' ascent-rate fit coefficient for alpha (unitless).
  */
 #define DCORR_ALPHA_A    0.00323f
 /** \def DCORR_ALPHA_E
- * \brief Define the 'e' ascent-rate fit coefficient for alpha (unitless)
+ * \brief Define the 'e' ascent-rate fit coefficient for alpha (unitless).
  */
 #define DCORR_ALPHA_E    -1.03f
 /**
  *   \def DCORR_TAU
- * \brief Define the time constant of short-term thermal mass correction (seconds)
+ * \brief Define the time constant of short-term thermal mass correction (seconds).
  */
 #define DCORR_TAU        8.11f
 /** \def DCORR_TAU_A
- * \brief Define the 'a' ascent-rate fit coefficient for alpha (unitless)
+ * \brief Define the 'a' ascent-rate fit coefficient for tau (unitless).
  */
 #define DCORR_TAU_A      4.93f
 /** \def DCORR_TAU_E
- * \brief Define the 'e' ascent-rate fit coefficient for alpha (unitless)
+ * \brief Define the 'e' ascent-rate fit coefficient for tau (unitless).
  */
 #define DCORR_TAU_E      -0.26f
 /**
  *   \def DCORR_CT_COEFF
- * \brief Define the magnitude of long-term thermal mass correction (unitless)
+ * \brief Define the magnitude of long-term thermal mass correction (unitless).
  */
 #define DCORR_CT_COEFF   0.97e-2f
 /** \def DCORR_CT_COEFF_A
- * \brief Define the 'a' ascent-rate fit coefficient for ctcoeff (unitless)
+ * \brief Define the 'a' ascent-rate fit coefficient for ctcoeff (unitless).
  */
 #define DCORR_CT_COEFF_A 0.00139f
 /** \def DCORR_CT_COEFF_E
- * \brief Define the 'e' ascent-rate fit coefficient for ctcoeff (unitless)
+ * \brief Define the 'e' ascent-rate fit coefficient for ctcoeff (unitless).
  */
 #define DCORR_CT_COEFF_E -1.00f
 /**
  *   \def DCORR_VP_MIN
- * \brief Define the minimum for the range for ascent rate as pressure/time (dbar/sec)
+ * \brief Define the minimum for the range for ascent rate as pressure/time (dbar/sec).
  */
 #define DCORR_VP_MIN     0.03f
 /**
  *   \def DCORR_VP_MAX
- * \brief Define the minimum for the range for ascent rate as pressure/time (dbar/sec)
+ * \brief Define the maximum for the range for ascent rate as pressure/time (dbar/sec).
  */
 #define DCORR_VP_MAX     0.45f
 /**
  *   \def DCORR_VP_FC
- * \brief Define the filter cutoff frequency for ascent rate as pressure/time (Hz)
+ * \brief Define the filter cutoff frequency for ascent rate as pressure/time (Hz).
  */
 #define DCORR_VP_FC      0.04f
 
 /**
- * \brief Errors which can be returned from dynamic correction algorithm
+ * \brief Errors which can be returned from dynamic correction algorithm.
  *
  * Algorithm will return error codes in lieu of
  * data values; data will be passed back to the caller via out pointers. This
@@ -108,7 +108,7 @@ typedef enum {
 } RBRDynamicCorrectionError;
 
 /** \struct RBRDynamicCorrectionParams
- *  This is a struct
+ *  Dynamic correction parameters and state
  *
  *  \var RBRDynamicCorrectionParams::t_delay
  *    time delay (sec), or C-T lag
@@ -145,11 +145,11 @@ typedef struct {
     float alpha;
     float tau;
     float CT_coeff;
-    float alpha_a; /* alpha = alpha_a * powf(Vp * alpha_e) */
+    float alpha_a; /* alpha = alpha_a * powf(Vp, alpha_e) */
     float alpha_e;
-    float tau_a; /* tau = tau_a * powf(Vp * tau_e) */
+    float tau_a; /* tau = tau_a * powf(Vp, tau_e) */
     float tau_e;
-    float ctcoeff_a; /* ctcoeff = ctcoeff_a * powf(Vp * ctcoeff_e) */
+    float ctcoeff_a; /* ctcoeff = ctcoeff_a * powf(Vp, ctcoeff_e) */
     float ctcoeff_e;
     float Vp_min;
     float Vp_max;
@@ -181,7 +181,7 @@ typedef struct {
 } RBRDynamicCorrectionParams;
 
 /** \struct RBRDynamicCorrectionMeasurement
- *  This is a struct
+ *  A measurement to correct
  *
  *  \var RBRDynamicCorrectionMeasurement::timestamp
  *    Time in milliseconds
@@ -203,7 +203,7 @@ typedef struct {
 } RBRDynamicCorrectionMeasurement;
 
 /** \struct RBRDynamicCorrectionResult
- *  This is a struct
+ *  A corrected measurement
  *
  *  \var RBRDynamicCorrectionResult::timestamp
  *    Time in milliseconds
@@ -229,15 +229,15 @@ typedef struct {
  *
  * Initialize the algorithm for the given sampling rate.
  *
- * \param [out] params Parameters for dynamic correction algorithm
+ * \param [out] params parameters for dynamic correction algorithm
  * \param [in] Fs sampling rate (Samples/sec)
  * \param [in] t_delay default value DCORR_T_DELAY used as input
  * \param [in] alpha_a default value DCORR_ALPHA_A used as input
  * \param [in] alpha_e default value DCORR_ALPHA_E used as input
  * \param [in] tau_a default value DCORR_TAU_A used as input
  * \param [in] tau_e default value DCORR_TAU_E used as input
- * \param [in] ctcoeff_a default value DCORR_COEFF_A used as input
- * \param [in] ctcoeff_e default value DCORR_COEFF_E used as input
+ * \param [in] ctcoeff_a default value DCORR_CT_COEFF_A used as input
+ * \param [in] ctcoeff_e default value DCORR_CT_COEFF_E used as input
  * \param [in] Vp_min default value DCORR_VP_MIN used as input
  * \param [in] Vp_max default value DCORR_VP_MAX used as input
  * \param [in] Vp_fc default value DCORR_VP_FC used as input
@@ -252,7 +252,7 @@ RBRDynamicCorrectionError RBRDynamicCorrection_init(RBRDynamicCorrectionParams *
 /**
  * \brief Change the sampling rate for the algorithm.
  *
- * \param [in,out] params Parameters for dynamic correction algorithm
+ * \param [in,out] params parameters for dynamic correction algorithm
  * \param [in] Fs sampling rate (Samples/sec)
  * \return error code (0 = no error)
  */
@@ -264,9 +264,9 @@ RBRDynamicCorrectionError RBRDynamicCorrection_update_Fs(RBRDynamicCorrectionPar
  *
  * Return a corrected output (with proper time delay to align with all correction results)
  *
- * \param [in,out] params Parameters for dynamic correction algorithm
- * \param [in] measIn Input measurements for algorithm
- * \param [out] corrMeasOut Output corrected measurements (time aligned)
+ * \param [in,out] params parameters for dynamic correction algorithm
+ * \param [in] measIn input measurements for algorithm
+ * \param [out] corrMeasOut output corrected measurements (time aligned)
  * \return error code (0 = no error)
  */
 RBRDynamicCorrectionError

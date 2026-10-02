@@ -316,7 +316,7 @@ const char *bool_name(bool value);
 #define TEST_LOGGER2(fn) _TEST(fn##_l2)
 
 /**
- * \brief Declare a test function for Logger2-generation instruments.
+ * \brief Declare a test function for Logger3-generation instruments.
  *
  * \param [in] fn the name of the test function
  */

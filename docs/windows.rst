@@ -9,17 +9,18 @@ libRBR can be built and run on Windows under two options: WSL2, or `Cygwin <http
 WSL2
 ----
 
-Prerequisits
-~~~~~~~~~~~~
+Prerequisites
+~~~~~~~~~~~~~
 
 In addition to the base WSL2 installation, the following additional packages are required:
 
-- ``gcc`` and set CC=gcc to compile the library.
-- ``linux-tools-vertual hwdata`` to forward the port. (Reference: https://github.com/dorssel/usbipd-win/wiki/WSL-support)
+- ``gcc`` and set ``CC=gcc`` to compile the library.
+- ``linux-tools-virtual hwdata`` to forward the port. (Reference: https://github.com/dorssel/usbipd-win/wiki/WSL-support)
 
 Optionally, you can install:
 
-- ``doxygen`` and ``graphviz`` to compile the library documentation.
+- ``doxygen``, ``python3`` and ``pip`` to compile the library documentation,
+  along with the Python packages listed in ``docs/requirements.txt``.
 
 Cygwin
 ------
@@ -36,7 +37,8 @@ you'll need to install these additional packages
 
 Optionally, you can install:
 
-- ``doxygen`` to compile the library documentation.
+- ``doxygen``, ``python3`` and ``pip`` to compile the library documentation,
+  along with the Python packages listed in ``docs/requirements.txt``.
 - ``git``, to retrieve the project source.
 - ``libSDL2-devel`` to successfully compile
   the ``posix-stream-sdl`` example.

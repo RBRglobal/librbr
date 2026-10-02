@@ -2,7 +2,7 @@
 .. SPDX-License-Identifier: Apache-2.0
 
 RBRGen3Internal
-=========================
+===============
 
 .. c:namespace:: RBRGen3Internal
 

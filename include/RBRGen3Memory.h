@@ -548,7 +548,7 @@ typedef struct RBRGen3Postprocessing {
      */
     float depthMax;
     /**
-     * \brief (dynamic correction) Alpha parameter from Lueck and Picklo equation
+     * \brief (dynamic correction) Alpha parameter from Lueck and Picklo equation.
      *
      * Coefficient is unitless (default 0.08)
      *
@@ -556,7 +556,7 @@ typedef struct RBRGen3Postprocessing {
      */
     float dcAlpha;
     /**
-     * \brief (dynamic correction) Tau parameter from Lueck and Picklo equation (1/beta)
+     * \brief (dynamic correction) Tau parameter from Lueck and Picklo equation (1/beta).
      *
      * Coefficient is unitless (default 8.000)
      *
@@ -565,7 +565,7 @@ typedef struct RBRGen3Postprocessing {
     float dcTau;
     /**
      * \brief (dynamic correction) Parameter for the time lag correction between marine temperature
-     * and conductivity cell temperature
+     * and conductivity cell temperature.
      *
      * Coefficient is in second (default 0.35)
      *
@@ -574,7 +574,7 @@ typedef struct RBRGen3Postprocessing {
     float dcTdelay;
     /**
      * \brief (dynamic correction) Parameter for the long term thermal coefficient for the
-     * conductivity cell
+     * conductivity cell.
      *
      * Coefficient is in 1/celcius (default 2.4e-4)
      *

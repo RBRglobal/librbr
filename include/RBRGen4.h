@@ -53,14 +53,14 @@ extern const char *RBRGEN4_LIB_BUILD_DATE;
 /**
  * \brief A reasonable size for the buffer storing commands destined for the instrument.
  *
- * \see RBRGen4Environment.commandCapacity for how to size the buffer
+ * \note See RBRGen4Environment.commandCapacity for how to size the buffer
  */
 #define RBRGEN4_COMMAND_BUFFER_DEFAULT 256
 
 /**
  * \brief A reasonable size for the buffer storing instrument responses.
  *
- * \see RBRGen4Environment.responseCapacity for how to size the buffer
+ * \note See RBRGen4Environment.responseCapacity for how to size the buffer
  */
 #define RBRGEN4_RESPONSE_BUFFER_DEFAULT 1024
 

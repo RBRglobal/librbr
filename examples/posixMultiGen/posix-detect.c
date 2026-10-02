@@ -32,6 +32,8 @@
 #include "RBRGen3Commands.h"
 #include "RBRGen4Commands.h"
 
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
 const char *programName = "";
 
 /* Report a failed Gen3 library call. A hardware error also carries the
@@ -77,17 +79,18 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    uint8_t gen3CommandBuffer[RBRGEN3_COMMAND_BUFFER_DEFAULT];
-    uint8_t gen3ResponseBuffer[RBRGEN3_RESPONSE_BUFFER_DEFAULT];
+    uint8_t commandBuffer[MAX(RBRGEN3_COMMAND_BUFFER_DEFAULT, RBRGEN4_COMMAND_BUFFER_DEFAULT)];
+    uint8_t responseBuffer[MAX(RBRGEN3_RESPONSE_BUFFER_DEFAULT, RBRGEN4_RESPONSE_BUFFER_DEFAULT)];
+
     const RBRGen3Environment gen3Environment = {
         .time = gen3InstrumentTime,
         .sleep = gen3InstrumentSleep,
         .read = gen3InstrumentRead,
         .write = gen3InstrumentWrite,
-        .command = gen3CommandBuffer,
-        .commandCapacity = sizeof(gen3CommandBuffer),
-        .response = gen3ResponseBuffer,
-        .responseCapacity = sizeof(gen3ResponseBuffer),
+        .command = commandBuffer,
+        .commandCapacity = sizeof(commandBuffer),
+        .response = responseBuffer,
+        .responseCapacity = sizeof(responseBuffer),
     };
 
     RBRGen3 gen3Conn;
@@ -135,17 +138,15 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    uint8_t gen4CommandBuffer[RBRGEN4_COMMAND_BUFFER_DEFAULT];
-    uint8_t gen4ResponseBuffer[RBRGEN4_RESPONSE_BUFFER_DEFAULT];
     const RBRGen4Environment gen4Environment = {
         .time = gen4InstrumentTime,
         .sleep = gen4InstrumentSleep,
         .read = gen4InstrumentRead,
         .write = gen4InstrumentWrite,
-        .command = gen4CommandBuffer,
-        .commandCapacity = sizeof(gen4CommandBuffer),
-        .response = gen4ResponseBuffer,
-        .responseCapacity = sizeof(gen4ResponseBuffer),
+        .command = commandBuffer,
+        .commandCapacity = sizeof(commandBuffer),
+        .response = responseBuffer,
+        .responseCapacity = sizeof(responseBuffer),
     };
 
     RBRGen4 gen4Conn;

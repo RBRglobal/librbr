@@ -5,9 +5,9 @@ Timeouts
 ========
 
 When communicating with instruments,
-there are three types of timeout to consider.
+there are four types of timeout to consider.
 One is handled by the communications library,
-one must be configured,
+two must be configured,
 and one must be handled by the library consumer.
 
 Instrument Sleep
@@ -24,15 +24,19 @@ This process should be transparent
 to users of the library.
 For implementation details,
 see ``RBRGen3_wake()``
-in ``RBRGen3Internal.c``.
+in ``RBRGen3Internal.c``
+and ``RBRGen4_wake()``
+in ``RBRGen4Internal.c``.
 
 Command Timeout
 ---------------
 
 The second type of timeout,
 configured by the user
-via the *commandTimeout* value passed to :c:func:`RBRGen3_open`
-or :c:func:`RBRGen3_setCommandTimeout`,
+via the ``commandTimeout`` value passed to :c:func:`RBRGen3_open`
+or :c:func:`RBRGen4_open`,
+or later changed via :c:func:`RBRGen3_setCommandTimeout`
+or :c:func:`RBRGen4_setCommandTimeout`,
 defines the minimum amount of time the library will wait
 for a complete response from the instrument.
 
@@ -42,11 +46,26 @@ is defined to block,
 this timeout can only be checked
 between read operations.
 
+Poll Timeout
+------------
+
+The third type of timeout applies only to Gen4.
+It defines how long :c:func:`RBRGen4_poll`,
+:c:func:`RBRGen4_pollChannels`
+and :c:func:`RBRGen4_pollGroups`
+will wait for the polled sample.
+:c:func:`RBRGen4_open` sets it
+to twice the ``commandTimeout`` value;
+change it via :c:func:`RBRGen4_setPollTimeout`.
+Changing the command timeout later
+does not change the poll timeout.
+
 Character Timeout
 -----------------
 
 Because character reads are implemented by the user
-via the RBRGen3ReadCallback() callback function,
+via the :c:type:`RBRGen3ReadCallback`
+or :c:type:`RBRGen4ReadCallback` callback function,
 any character timeout must also be implemented by the user.
 On POSIX systems, this can be done by using ``select(3)``
 to determine whether a file descriptor is ready for reading

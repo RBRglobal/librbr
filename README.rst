@@ -4,8 +4,8 @@
 libRBR
 ======
 
-Introduction
-------------
+Overview
+--------
 
 libRBR provides an interface
 for simplified communication
@@ -22,31 +22,9 @@ but the library handles the intricacies
 of waking the instrument,
 response parsing,
 etc.
-The command reference for each instrument generation
-can be found by searching https://docs.rbr-global.com/.
-
-As of version 2.0.0,
-the library contains two independent APIs,
-one per instrument generation:
-the Gen3 API
-(``RBRGen3…``,
-for Logger2/Logger3 instruments,
-the libRBR 1.x API renamed)
-and the Gen4 API
-(``RBRGen4…``,
-for Generation 4 instruments,
-under active development).
-Applications choose the API to use per instrument;
-both generations are compiled
-into the same library
-by default
-(see the Building section below).
-Applications with the Gen3 API compiled
-can call ``RBRGen3_open()``
-and check ``RBRGen3_getGeneration()``
-on ``RBRGEN3_UNSUPPORTED``
-to detect a Gen4 instrument
-(see ``examples/posixMultiGen/posix-detect.c``).
+Command references
+and instrument documentation
+can be found at https://docs.rbr-global.com/.
 
 For example:
 
@@ -58,7 +36,22 @@ For example:
           RBRGen3SamplingMode_name(sampling.mode),
           sampling.period);
 
-The library also offers basic parsing
+As of version 2.0.0,
+the library contains two independent APIs:
+the Gen3 API
+(``RBRGen3…``,
+for Logger2/Logger3 instruments;
+this is libRBR 1.x with a few major API changes)
+and the Gen4 API
+(``RBRGen4…``,
+for Generation 4 instruments).
+Applications choose the API to use per instrument;
+both generations are compiled
+into the same library
+by default
+(see the Building section below).
+
+The Gen3 API also offers basic parsing
 for EasyParse sample data and events.
 
 The library tries to be platform-agnostic.
@@ -81,26 +74,51 @@ The library should have good forwards compatibility
 as breaking changes between firmware versions
 are rare and made only when absolutely necessary.
 
-======================= ========== ==============
-Firmware Type           Generation Version
-======================= ========== ==============
+Gen3
+~~~~
+
+======================= ========== ================
+Firmware Type           Generation Firmware Version
+======================= ========== ================
 103 (Logger2, standard) Early 2015 v1.440
 104 (Logger3, standard) Late 2017  v1.102 and up
-130/131 (RBRsolo⁴)      Gen4       in development
-150 (Logger4, standard) Gen4       in development
-======================= ========== ==============
+======================= ========== ================
 
-The Gen4 API targets the Generation 4 instrument command set;
-it is under active development
-and its surface may still change.
+Gen4
+~~~~
 
-The standalone dynamic correction library supports:
+=======================  ================
+Firmware Type            Gen4 API Version
+=======================  ================
+150 (Logger4, standard)  2.1
+=======================  ================
 
-======================= ========== =============
-Firmware Type           Generation Version
-======================= ========== =============
-104 (Logger3, standard) Late 2021  v1.136 and up
-======================= ========== =============
+The standalone dynamic correction library
+is intended to be generation-agnostic.
+
+Coming from libRBR 1.x?
+-----------------------
+
+The Gen3 side of libRBR 2.x is an updated version of libRBR 1.2.4.
+
+Major changes include
+
+- Naming: the ``RBRInstrument`` prefix found on most identifiers
+  was shortened to ``RBRGen3``.
+- The constructors ``RBRGen3_open()`` and ``RBRGen3Parser_init()``
+  no longer offer the ability to dynamically allocate memory.
+  libRBR has no dependency on ``malloc``, ``calloc``, ``realloc``, or ``free``.
+- Buffers throughout the library are now provided by the user
+  rather than being sized statically at compile time.
+  This includes the command buffer,
+  the response buffer,
+  and buffers for pools of objects (e.g. channels)
+  that can vary in size based on the specific instrument.
+
+The Gen4 side of libRBR 2.x
+is structurally similar to its Gen3 counterpart,
+but uses Gen4 parsing logic
+and models the Gen4 command set.
 
 Building
 --------
@@ -116,44 +134,17 @@ select the generations to include:
 
 .. code-block:: sh
 
-   # Both generations (the default):
-   $ make lib
-   # Gen3 only:
-   $ make GEN4=0 lib
-   # Gen4 only:
-   $ make GEN3=0 lib
+   # Both generations (the default)
+   make lib
+   # Gen3 only
+   make GEN4=0 lib
+   # Gen4 only
+   make GEN3=0 lib
 
 At least one generation must be enabled;
-``RBRCommon.h`` is compiled regardless.
-Coming from libRBR 1.2.x?
-The Gen3 API is the 1.x API
-with every file name and identifier
-carrying the ``RBRGen3`` prefix:
-``RBRInstrument`` became ``RBRGen3``
-and ``RBRParser`` became ``RBRGen3Parser``
-(``RBRInstrument_open()`` is now ``RBRGen3_open()``,
-``RBRINSTRUMENT_SUCCESS`` is now ``RBRGEN3_SUCCESS``,
-and ``RBRInstrument.h`` is now ``RBRGen3.h``).
-The behaviour is unchanged,
-but the library no longer owns any storage:
-``RBRGen3_open()`` takes the command and response buffers,
-and samples, channel lists and label lists
-carry a caller-supplied array and its size.
-``RBRDynamicCorrection`` is not generation-specific
-and keeps its 1.x name,
-but its error constants now carry the ``RBRDYNAMICCORRECTION_`` prefix
-(``RBR_DCORR_SUCCESS`` is now ``RBRDYNAMICCORRECTION_SUCCESS``,
-and ``DYN_CORR_BAD_PARAMS`` is now ``RBRDYNAMICCORRECTION_BAD_PARAMS``).
-``RBRGen3.h`` (and so ``RBRGen3Parser.h``)
-no longer includes the command headers:
-include the ones you use (such as ``RBRGen3Schedule.h``),
-or ``RBRGen3Commands.h`` for all of them.
-When building as a Zephyr module,
-the equivalent Kconfig options are
-``CONFIG_LIBRBR_GEN3`` and ``CONFIG_LIBRBR_GEN4``;
-dynamic correction is opt-in with ``CONFIG_LIBRBR_DYNAMIC_CORRECTION``.
+the ``RBRCommon`` helpers are compiled regardless.
 
-Library compilation requires a C99-compliant C compiler;
+Library compilation requires a C99-compliant C compiler.
 The library makes a few assumptions
 about its host platform.
 For details, see `the documentation on porting`_.
@@ -174,102 +165,83 @@ First, check out the code with Git:
 
 .. code-block:: sh
 
-   $ git clone https://bitbucket.org/rbr/librbr.git
-   $ cd <PATH>/librbr
+   git clone https://bitbucket.org/rbr/librbr.git
 
-option 1 (recommended): build librbr with dynamic correction feature
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Assuming cygwin is used, and current path is ``<PATH>/librbr``.
-Then use either ``make tests`` or ``make all`` to build the libraries:
-
-.. code-block:: sh
-
-   # Build and execute tests. Also builds the library if necessary:
-   $ make tests
-   # Build the documentation:
-   $ make docs
-   # Does all of the above. Build both libraries - librbr and libRBRDynamicCorrection:
-   $ make all
-
-continue with commands below if one wants to use the posix example with dynamic correction:
-
-.. code-block:: sh
-
-   $ cd <PATH>/librbr/examples/posixGen3
-   # Build all the posix example:
-   # (ignore errors if any)
-   $ make all
-
-To test posix-parse-file-dynamiccorrection example:
-
-.. code-block:: sh
-
-   $ ./posix-parse-file-dynamiccorrection ../sampledata/dynamiccorrection-sample.bin 4
-
-or if one wants to try posix-streaming-dynamiccorrection example, use commands below:
-
-.. code-block:: sh
-
-   # first connect USB, get the port:
-   $ ls /dev/tty*
-   /dev/tty /dev/ttyS<number>
-
-   # this command would make the instrument start streaming:
-   $ ./posix-stream-dynamiccorrection /dev/ttyS<number>
-
-or test with .csv file:
-
-.. code-block:: sh
-
-   $ cd <PATH>/librbr/examples/dynamicCorrection
-   # Build the example:
-   $ make
-   # Test with the example file:
-   $ ./dynamicCorrection-example ../sampledata/dynamiccorrection-sample.csv
-
-option 2: build standalone dynamic correction library only
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Assuming cygwin is used, and current path is ``<PATH>/librbr``:
-
-.. code-block:: sh
-
-   # Build just the standalone dynamic correction library:
-   $ make libdynamiccorrection
-
-   # Continue with commands below if one wants to use the example provided:
-   $ cd <PATH>/librbr/examples/dynamicCorrection
-   # Build the example:
-   $ make
-   # Test with the example file:
-   $ ./dynamicCorrection-example ../sampledata/dynamiccorrection-sample.csv
-
-option 3: build libRBR without dynamic correction feature
+Option 1: Build libRBR with the Dynamic Correction module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Assuming cywin is used, current path is ``<PATH>/librbr``.
-Then commands below shows how to use the library:
+Assuming a Linux shell is used (Cygwin or WSL on Windows).
 
 .. code-block:: sh
 
-   # Build just the library - libRBR:
-   $ make lib
+   cd path/to/librbr/
 
-   # Continue with commands below if one wants to use the posix example:
-   $ cd <PATH>/librbr/examples/posixGen3
-   # Build the exmamples:
-   $ make example
+   # Build and execute tests
+   # Also builds the library if necessary
+   make tests
+   # Build the documentation
+   make docs
+   # Does all of the above
+   make all
 
-Take streaming as example:
+Examples can be built similarly:
 
 .. code-block:: sh
 
-   # First connect USB, get the port:
-   $ ls /dev/tty*
-   /dev/tty /dev/ttyS<number>
-   # This command would make the instrument start streaming:
-   $ ./posix-stream /dev/ttyS<number>
+   # Build the Gen3 examples
+   # The other examples can be built the same way
+   cd examples/posixGen3
+   make all
+
+Most examples are intended to interact
+with a real RBR instrument.
+Be aware that some will write / reconfigure the instrument.
+For an instrument connected via USB,
+an example might be run like:
+
+.. code-block:: sh
+
+   # Change '/dev/ttyACM0' below to the desired port/device
+   ./posix-stream /dev/ttyACM0
+
+The ``posix-parse-file-dynamiccorrection`` example
+in ``examples/posixGen3``
+requires a dataset rather than an instrument.
+Run it with the provided sample data:
+
+.. code-block:: sh
+
+   ./posix-parse-file-dynamiccorrection ../sampledata/dynamiccorrection-sample.bin 4
+
+Option 2: Build the Dynamic Correction module standalone
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Assuming a Linux shell is used (Cygwin or WSL on Windows).
+
+.. code-block:: sh
+
+   cd path/to/librbr
+
+   # Build just the standalone dynamic correction library
+   make libdynamiccorrection
+
+   # Build the example
+   cd examples/dynamicCorrection
+   make
+   # Test with the example file
+   ./dynamicCorrection-example ../sampledata/dynamiccorrection-sample.csv
+
+Option 3: Build libRBR without the Dynamic Correction module
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Assuming a Linux shell is used (Cygwin or WSL on Windows).
+
+.. code-block:: sh
+
+   cd path/to/librbr
+
+   # Build just the core Gen3/Gen4 library
+   make lib
 
 Using
 -----
