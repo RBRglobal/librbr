@@ -64,7 +64,7 @@ for large commands
 which are better sent as multiple smaller chunks 
 (e.g. ``RBRGen3_setPostprocessing()``)
 or for convenience functions that perform multiple queries
-(e.g. ``RBRGen3_getChannelAll()``).
+(e.g. ``RBRGen3_getChannels()``).
 
 Read => Modify => Write
 ~~~~~~~~~~~~~~~~~~~~~~~

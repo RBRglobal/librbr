@@ -142,9 +142,9 @@ select the generations to include:
    make GEN3=0 lib
 
 At least one generation must be enabled;
-``RBRCommon.h`` is compiled regardless.
+the ``RBRCommon`` helpers are compiled regardless.
 
-Library compilation requires a C99-compliant C compiler;
+Library compilation requires a C99-compliant C compiler.
 The library makes a few assumptions
 about its host platform.
 For details, see `the documentation on porting`_.
