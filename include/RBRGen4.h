@@ -699,7 +699,7 @@ typedef struct RBRGen4Response {
      * \brief The instrument warning or error number, if applicable.
      *
      * Will be `0` for informational responses. Otherwise, will include the
-     * error number indicated by the instrument; e.g., for “E0109: feature not
+     * error number indicated by the instrument; e.g., for “ERR-109 feature not
      * available”, this field will contain `109`, aka
      * RBRGEN4_HARDWARE_ERROR_FEATURE_NOT_AVAILABLE.
      */
@@ -1041,8 +1041,8 @@ void RBRGen4_setUserData(RBRGen4 *conn, void *userData);
  * recorded by the library as responses are parsed. Accordingly, the value will
  * not persist across instrument connections.
  *
- * Error messages can be quite long: in particular, errors E0102 (“invalid
- * command '<unknown-command-name>'”) and E0108 (“invalid argument to command:
+ * Error messages can be quite long: in particular, errors ERR-102 (“invalid
+ * command '<unknown-command-name>'”) and ERR-108 (“invalid argument to command:
  * '<invalid-argument>'”) both include user-provided data. Make sure you
  * perform bounds-checking as necessary when consuming them.
  *
@@ -1077,8 +1077,8 @@ RBRGen4HardwareError RBRGen4_getLastHardwareError(const RBRGen4 *conn);
  * need to retain a copy of the message, you should `strcpy()` it to your own
  * buffer.
  *
- * Error messages can be quite long: in particular, errors E0102 (“invalid
- * command '<unknown-command-name>'”) and E0108 (“invalid argument to command:
+ * Error messages can be quite long: in particular, errors ERR-102 (“invalid
+ * command '<unknown-command-name>'”) and ERR-108 (“invalid argument to command:
  * '<invalid-argument>'”) both include user-provided data. Make sure you
  * perform bounds-checking as necessary when consuming them.
  *

@@ -529,14 +529,14 @@ static RBRGen4Error RBRGen4Sample_parse(RBRGen4Sample *sample, RBRGen4OutputForm
 RBRGen4Error RBRGen4_errorCheckResponse(RBRGen4 *conn, char *beginning, char *end)
 {
     /*
-     * In L3.5 and L4, errors and warnings are found at the beginning of
-     * commands and are followed by a message. E.g.,
+     * In Gen4, errors and warnings are found at the beginning of commands and
+     * are followed by a message. E.g.,
      *
      * >> enable config=pH_cal dataset=d_pHcal_20240401 storagemode=calibration
      * << WRN-408 instrument was already enabled
      *
      * >> enable config=pH_cal dataset=d_pHcal_20240401 storagemode=calibration
-     * << ERR-128 instrument was already enabled with different settings
+     * << ERR-436 instrument was already enabled with different settings
      */
     if (end - beginning >= (ERROR_PARAMETER_LEN + ERROR_NUMBER_LEN) &&
         memcmp(beginning, ERROR_PARAMETER, ERROR_PARAMETER_LEN) == 0) {
@@ -753,7 +753,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn, const char *command, ...)
      * which matches. */
     bool retry;
     do {
-        /* The retry flag might be set on by the “E0102 invalid command” error
+        /* The retry flag might be set on by the “ERR-102 invalid command” error
          * handling below. It needs to be reset every time we send the command
          * so that we don't accidentally retry infinitely. */
         retry = false;
@@ -795,7 +795,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn, const char *command, ...)
             }
             err = RBRGen4_readResponse(conn, false, NULL, now, conn->commandTimeout);
             /*
-             * There are a few reasons the instrument might generate an “E0102
+             * There are a few reasons the instrument might generate an “ERR-102
              * invalid command” error, and we can make the user's life a bit
              * easier by handling it.
              *

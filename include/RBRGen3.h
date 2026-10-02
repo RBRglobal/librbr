@@ -108,7 +108,7 @@ extern const char *RBRGEN3_LIB_BUILD_DATE;
  *
  * Does not include any null terminator.
  */
-#define RBRGEN3_CHANNEL_UNIT_MAX 7
+#define RBRGEN3_CHANNEL_UNIT_MAX 12
 
 /**
  * \brief The maximum number of characters in a channel label.
