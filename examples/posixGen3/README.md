@@ -33,7 +33,7 @@ make: Leaving directory '/path/to/librbr'
 ~~~
 
 To build examples,
-invoke one of three Make targets:
+invoke one of two Make targets:
 
 * To build all examples,
   invoke the default target, aka “all”:
@@ -147,7 +147,7 @@ and the needs of our [OEM] customers.
 However, we're happy to take [contributions] generally.
 
 [OEM]: https://rbr-global.com/products/oem
-[contributions]: CONTRIBUTING.md
+[contributions]: ../../CONTRIBUTING.rst
 
 ## License
 

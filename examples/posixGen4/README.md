@@ -8,9 +8,7 @@
   serial or USB connection
 * Runtime environment: Linux, macOS, or cygwin
 
-~~~{.sh}
-Info: not all examples require hardware (posix-footprint runs standalone).
-~~~
+Not all examples require hardware (`posix-footprint` runs standalone).
 
 ## Build all posix examples
 Assuming libRBR is already built with Gen4 support
@@ -51,7 +49,7 @@ The library is primarily maintained by RBR, and development is directed by our n
 However, we're happy to take [contributions] generally.
 
 [OEM]: https://rbr-global.com/products/oem
-[contributions]: CONTRIBUTING.md
+[contributions]: ../../CONTRIBUTING.rst
 
 ## License
 

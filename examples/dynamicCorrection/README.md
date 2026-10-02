@@ -4,15 +4,15 @@
 # How to use dynamicCorrection example
 
 ## Setup
-Runtime environment: cygwin
+Runtime environment: Linux, macOS, or cygwin
 
 ## Build this example
-Assuming librbr is already built.(if not, go to librbr directory, and then use cygwin command "make")
-Go to librbr/examples/dynanicCorrection directory, then use sygwin command "make".
+Assuming librbr is already built.(if not, go to librbr directory, and then use command "make")
+Go to librbr/examples/dynamicCorrection directory, then use command "make".
 
 ## Tips before you start:
 (1) How to clean the built files:
-To clean the .a, .o, .exe files one built, use cygwin command "make clean" in that folder directory.
+To clean the .o, .d, and executable files one built, use command "make clean" in that folder directory.
 
 ## Usage for this example:
 File name   |      command to use it | things to know

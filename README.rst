@@ -227,7 +227,7 @@ Assuming a Linux shell is used (Cygwin or WSL on Windows).
 
    # Build the example
    cd examples/dynamicCorrection
-   make all
+   make
    # Test with the example file
    ./dynamicCorrection-example ../sampledata/dynamiccorrection-sample.csv
 
