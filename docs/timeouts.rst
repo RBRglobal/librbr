@@ -5,9 +5,9 @@ Timeouts
 ========
 
 When communicating with instruments,
-there are three types of timeout to consider.
+there are four types of timeout to consider.
 One is handled by the communications library,
-one must be configured,
+two must be configured,
 and one must be handled by the library consumer.
 
 Instrument Sleep
@@ -45,6 +45,20 @@ to read instrument data
 is defined to block,
 this timeout can only be checked
 between read operations.
+
+Poll Timeout
+------------
+
+The third type of timeout applies only to Gen4.
+It defines how long :c:func:`RBRGen4_poll`,
+:c:func:`RBRGen4_pollChannels`
+and :c:func:`RBRGen4_pollGroups`
+will wait for the polled sample.
+:c:func:`RBRGen4_open` sets it
+to twice the *commandTimeout* value;
+change it via :c:func:`RBRGen4_setPollTimeout`.
+Changing the command timeout later
+does not change the poll timeout.
 
 Character Timeout
 -----------------
