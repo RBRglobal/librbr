@@ -278,11 +278,11 @@ static void RBRGen4_parseInstrumentState(RBRGen4 *conn, RBRGen4InstrumentState *
  * \param [in] command the command word
  * \param [in] config the configuration to deploy
  * \param [in] datasetLabel the label for the deployment's dataset, or `NULL` to leave the parameter
- *             out
+ *                          out
  * \param [in] storageMode the data storage mode
  * \return #RBRGEN4_SUCCESS when the command is built
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a parameter is out of range
  * \return #RBRGEN4_COMMAND_TOO_LONG when the command does not fit
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE when a parameter is out of range
  */
 static RBRGen4Error RBRGen4_buildDeploymentCommand(RBRGen4 *conn, const char *command,
                                                    const RBRGen4Config *config,

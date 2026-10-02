@@ -311,6 +311,12 @@ RBRGen3Error RBRGen3_setChannelGain(RBRGen3 *conn, RBRGen3ChannelIndex channel,
  * \param [in] group the coefficient group letter
  * \param [in] index the coefficient index within the group
  * \param [in] value the coefficient value
+ * \return #RBRGEN3_SUCCESS when the coefficient is successfully written
+ * \return #RBRGEN3_COMMAND_TOO_LONG when the command does not fit the command buffer
+ * \return #RBRGEN3_TIMEOUT when a timeout occurs
+ * \return #RBRGEN3_RESPONSE_TOO_LONG when a response does not fit the response buffer
+ * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  */
 static RBRGen3Error RBRGen3_sendCalibrationCoefficient(RBRGen3 *conn, RBRGen3ChannelIndex channel,
                                                        RBRGen3DateTime dateTime, char group,

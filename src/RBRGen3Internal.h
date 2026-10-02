@@ -219,7 +219,7 @@ RBRGen3Error RBRGen3_converse(RBRGen3 *conn, const char *command, ...);
  * \return #RBRGEN3_RESPONSE_TOO_LONG when a line too long for the response buffer was met and the
  *         correct response never arrived
  * \return #RBRGEN3_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN3_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN3_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen3_appendCommand() to build the command
  */
 RBRGen3Error RBRGen3_converseBuffer(RBRGen3 *conn);

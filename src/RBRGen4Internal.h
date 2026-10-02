@@ -153,9 +153,9 @@ RBRGen4Error RBRGen4_appendCommand(RBRGen4 *conn, const char *command, ...);
  * \param [in] conn the instrument connection
  * \param [in] labelList the labels to append
  * \return #RBRGEN4_SUCCESS when the list is appended
- * \return #RBRGEN4_INVALID_PARAMETER_VALUE as RBRGen4_formatLabelList()
  * \return #RBRGEN4_COMMAND_TOO_LONG when the list does not fit; on any failure the buffer holds a
  *         truncated command which RBRGen4_sendBuffer() refuses
+ * \return #RBRGEN4_INVALID_PARAMETER_VALUE as RBRGen4_formatLabelList()
  * \see RBRGen4_appendCommand()
  */
 RBRGen4Error RBRGen4_appendLabelList(RBRGen4 *conn, const RBRGen4LabelList *labelList);
@@ -250,7 +250,7 @@ RBRGen4Error RBRGen4_converse(RBRGen4 *conn, const char *command, ...);
  * \return #RBRGEN4_RESPONSE_TOO_LONG when a line too long for the response buffer was met and the
  *         correct response never arrived
  * \return #RBRGEN4_CALLBACK_ERROR returned by a callback
- * \return #RBRGEN4_HARDWARE_ERROR if the instrument indicated an error
+ * \return #RBRGEN4_HARDWARE_ERROR when the instrument reports a hardware error
  * \see RBRGen4_appendCommand() to build the command
  */
 RBRGen4Error RBRGen4_converseBuffer(RBRGen4 *conn);
