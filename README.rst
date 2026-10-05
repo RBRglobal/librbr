@@ -63,7 +63,7 @@ If you happen to have stumbled across this file
 in a source tree somewhere,
 you might be interested to know
 that this project is maintained
-`on Bitbucket <https://bitbucket.org/rbr/librbr>`__.
+`on GitHub <https://github.com/RBRglobal/librbr>`__.
 
 Support
 -------
@@ -165,7 +165,7 @@ First, check out the code with Git:
 
 .. code-block:: sh
 
-   git clone https://bitbucket.org/rbr/librbr.git
+   git clone https://github.com/RBRglobal/librbr.git
 
 Option 1: Build libRBR with the Dynamic Correction module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -251,7 +251,7 @@ for an overview of library conventions.
 
 API documentation is built into the ``docs/_build/html/`` subdirectory.
 Prebuilt API documentation corresponding to the latest release
-is available at https://docs.rbr-global.com/librbr/\ **.**
+is available at https://librbr.readthedocs.io/en/stable/\ **.**
 
 For examples,
 please see the ``examples/`` subdirectory.
