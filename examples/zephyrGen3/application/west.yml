@@ -7,7 +7,7 @@
 manifest:
   projects:
     - name: librbr
-      url: https://bitbucket.org/rbr/librbr.git
+      url: https://github.com/RBRglobal/librbr.git
       revision: v1.3.0
       path: modules/lib/librbr/
 
