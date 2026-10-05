@@ -35,26 +35,14 @@
 /** \brief 10-second command timeout. */
 #define COMMAND_TIMEOUT (10 * 1000)
 
-/* The command reference suggests using a carriage return (`\r`) as the wake
- * character with a 10ms pause. This works well when talking directly to the
- * instrument over a USB or serial link. However, without giving the user the
- * option of reconfiguring wake behaviour, we need to consider how possible
- * alternate transports might have different requirements. */
-
 /**
  * \brief The character sequence to send to wake the instrument.
  *
- * To improve compatibility with modems and other serial converters which
- * packetize conservatively (e.g., serial-over-Ethernet devices), we'll use
- * both a carriage return and a line feed. One or the other should satisfy the
- * default transmission criteria for most packetizers, and by reusing the
- * command terminator, we can make life easier for users of systems which only
- * support a single match criteria by ensuring that attempts to wake the
- * instrument will trigger the same behaviour as regular commands.
+ * The command reference recommends a lone carriage return (`\r`).
  */
-#define WAKE_COMMAND      RBRGEN3_COMMAND_TERMINATOR
+#define WAKE_COMMAND      RBRGEN3_SEND_COMMAND_TERMINATOR
 /** \brief The length of the wake sequence. */
-#define WAKE_COMMAND_LEN  RBRGEN3_COMMAND_TERMINATOR_LEN
+#define WAKE_COMMAND_LEN  RBRGEN3_SEND_COMMAND_TERMINATOR_LEN
 /**
  * \brief How long to wait after the wake sequence.
  *

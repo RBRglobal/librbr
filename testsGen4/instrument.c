@@ -943,8 +943,7 @@ TEST_LOGGER4(reboot)
     TestIOBuffers_init(buffers, "", 0);
     err = RBRGen4_reboot(conn, 0);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
-    TEST_ASSERT_STR_EQ(RESPONSE_TERMINATOR RESPONSE_TERMINATOR
-                       "instrument reboot" COMMAND_TERMINATOR,
+    TEST_ASSERT_STR_EQ(COMMAND_TERMINATOR COMMAND_TERMINATOR "instrument reboot" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
     TEST_ASSERT(conn->lastActivityTime < 0);
 
