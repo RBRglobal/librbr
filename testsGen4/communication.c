@@ -210,7 +210,7 @@ TEST_LOGGER4(sleep)
     RBRGen4Link actual;
     TestIOBuffers_init(buffers, "sleep" RESPONSE_TERMINATOR "link type=usb" RESPONSE_TERMINATOR, 0);
     err = RBRGen4_getLink(conn, &actual);
-    TEST_ASSERT_STR_EQ(RESPONSE_TERMINATOR RESPONSE_TERMINATOR "link" COMMAND_TERMINATOR,
+    TEST_ASSERT_STR_EQ(COMMAND_TERMINATOR COMMAND_TERMINATOR "link" COMMAND_TERMINATOR,
                        buffers->writeBuffer);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_SUCCESS, err, RBRGen4Error);
     TEST_ASSERT_ENUM_EQ(RBRGEN4_LINK_TYPE_USB, actual.type, RBRGen4LinkType);
