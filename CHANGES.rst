@@ -7,140 +7,41 @@ Changes
 v2.0.0
 ------
 
-Release TBD
+Released 2026-10-09
 
 Added
 ~~~~~
 
-- Unified the Gen3 (Logger2/Logger3) and Gen4 (Generation 4) instrument
-  APIs into a single source tree and library.
-  The Gen4 API (``RBRGen4_…``),
-  harvested from the 2023–2024 Gen4 development branches,
-  now lives alongside the Gen3 API
-  and is under active development.
-- Added the ``GEN3`` and ``GEN4`` Makefile options
-  (and ``CONFIG_LIBRBR_GEN3``/``CONFIG_LIBRBR_GEN4`` Kconfig options
-  for Zephyr builds)
-  to select the instrument generations
-  compiled into ``bin/libRBR.a``.
-  Both default to enabled.
+- Initial support for Gen4 instruments.
+  This release covers most of the Gen4 API,
+  but support for parsing downloaded data
+  is deferred to a future release.
+  Compiling libRBR includes both Gen4 support
+  and older Gen3/Gen2 support by default.
+  Standalone support for either generation can be achieved
+  by setting ``GEN3=0`` or ``GEN4=0`` when running ``make``.
+
 
 Changed
 ~~~~~~~
 
-- Renamed every identifier and file name
-  to a per-generation prefix (SYS-1877, SYS-1892):
-  the Gen3 API is ``RBRGen3…``
-  (``RBRInstrument_open()`` is now ``RBRGen3_open()``,
-  ``RBRParser`` is ``RBRGen3Parser``,
-  ``RBRDynamicCorrection`` is ``RBRGen3DynamicCorrection``,
-  ``RBRINSTRUMENT_SUCCESS`` is ``RBRGEN3_SUCCESS``,
-  and ``RBRInstrument.h`` is ``RBRGen3.h``)
-  and the Gen4 API is ``RBRGen4…``
-  (``RBRInstrumentGen4`` is now ``RBRGen4``).
-  The Zephyr Kconfig buffer-size options follow
-  (``CONFIG_RBRINSTRUMENTGEN3_COMMAND_BUFFER_MAX``
-  is now ``CONFIG_RBRGEN3_COMMAND_BUFFER_MAX``, and likewise for Gen4).
-  The connection parameter of every method is now named ``conn``
-  rather than ``instrument``.
-  Behaviour is unchanged.
-- The library no longer allocates memory (SYS-1875).
-  ``RBRGen3_open()``, ``RBRGen3Parser_init()``,
-  and ``RBRGen4_open()``
-  take a pointer to a caller-provided instance
-  (``RBRGen3 *`` rather than ``RBRGen3 **``, and likewise for Gen4)
-  and no longer accept a null pointer;
-  the corresponding close/destroy functions no longer free it.
-  ``RBRGEN3_ALLOCATION_FAILURE`` and the ``nomalloc`` Makefile target
-  (``RBR_LIB_NODYNAMICMEMORYALLOCATION``) are removed.
-  The build now verifies that the library archives
-  do not depend on ``malloc``, ``calloc``, ``realloc``, or ``free``.
-- Removed the links to the instrument command reference
-  from the API documentation (SYS-1878).
-  The README now points to https://docs.rbr-global.com/,
-  where the command reference for each instrument generation
-  can be found.
+The following list is not exhaustive,
+but highlights the high level changes coming from 1.x
 
-v1.3.0
-------
-
-Release TBD
-
-Added
-~~~~~
-
-- Added Zephyr module definition
-  permitting inclusion in a Zephyr workspace via `West <https://docs.zephyrproject.org/latest/develop/west/index.html>`__.
-- Added ``RBRInstrument_getChannelsWithoutCalibrations()`` method
-  to retrieve channel information without calibration data
-  to save bandwidth and time
-  when calibration information is unnecessary.
-- Improved
-  `examples/posixGen3/posix-download-wifi.c <examples/posixGen3/posix-download-wifi.c>`__
-  to show rolling average throughput and re-request chunks that fail to
-  download.
-
-Changed
-~~~~~~~
-
-- added support for no dynamic memory allocation.
-- fixed bug where wake up sequence not occuring after :c:func:`RBRInstrument_fetch` usage.
-- Poll each channel individually, rather than requesting ``channel all``.
-  This reduces the minimum response buffer size
-  when communicating with instruments with many channels
-  (at the cost of slightly increased interrogation time).
-- Make “Ready: ” prompt matching case-insensitive.
-  This is a precursor to Gen4 support.
-- Parse RBR_coda\_ timestamps
-  (continuously-incrementing millisecond counter).
-- Revised default coefficient count limits
-  to better match the numbers used by calibration equations
-  (now 8/16/8 *c*/*x*/*n* coefficients;
-  previously 24/8/8).
-- Make the sizes of array fields on channels overrideable
-  without source modification.
-- Updated CI targets:
-  reintroduced GCC 6;
-  added GCC 12–15;
-  updated to Clang 20;
-  updated documentation step to GCC 15.
-- Fixed parallel builds with Make ``-j, --jobs``,
-  and made ``.a``\ rchives compatible with deterministic archivers
-  (llvm-ar v10.0.0+, and most distro builds of GNU binutils ar v2.23+).
-- Improve error handling in ``RBRInstrument_setCalibration()``
-  (validate that the date/time is in range,
-  and informing the user if no coefficients were set).
-- The library version number
-  (stored in the string constant ``RBRINSTRUMENT_LIB_VERSION``)
-  is now based on the Git version information
-  (``git describe --dirty``)
-  where possible.
-  The ``VERSION`` file is still used as a fallback
-  when Git or the repository metadata is unavailable.
-- The library build date
-  (stored in the string constant ``RBRINSTRUMENT_LIB_BUILD_DATE``)
-  has been deprecated
-  to make library builds deterministic
-  and object contents compatible with reproducible build processes.
-  Per SemVer API compatibility guarantees,
-  the symbol will not be removed from the API surface
-  before the next major version increment;
-  however, when the library is built with the default, in-tree build process,
-  its value will always be “unknown”.
-
-Fixed
-~~~~~
-
-- The sample parsing helper function used internally by ``RBRParser_parse()``
-  previously cleared an incorrect buffer size
-  before writing the parsed sample.
-  In the typical case
-  where ``sizeof(RBRInstrumentSample) > sizeof(RBRInstrumentEvent)``,
-  this could have left stale data at the end of ``sample->readings``;
-  in a suitable non-default configuration
-  (e.g., where ``RBRINSTRUMENT_CHANNEL_MAX < 3``),
-  this could have resulted in writes
-  past the end of the ``data`` buffer.
+- Naming: the ``RBRInstrument`` prefix found on most identifiers
+  was shortened to ``RBRGen3`` for the Gen3 API
+  and ``RBRGen4`` for the Gen4 API
+- The constructors ``RBRGen3_open()`` and ``RBRGen3Parser_init()``
+  no longer offer the ability to dynamically allocate memory.
+  libRBR has no dependency on ``malloc``, ``calloc``, ``realloc``, or ``free``.
+- Buffers throughout the library are now provided by the user
+  rather than being sized statically at compile time.
+  This includes the command buffer,
+  the response buffer,
+  and buffers for pools of objects (e.g. channels)
+  that can vary in size based on the specific instrument.
+  The aim is to give users in memory constrained environments more control
+  over system resources at runtime.
 
 v1.2.4
 ------
