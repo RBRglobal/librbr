@@ -1,0 +1,174 @@
+.. Copyright (c) 2026 RBR Ltd.
+.. SPDX-License-Identifier: Apache-2.0
+
+Writing Tests
+=============
+
+Gen3 instrument tests are found
+in the ``testsGen3/`` subdirectory,
+and Gen4 instrument tests
+in the ``testsGen4/`` subdirectory.
+
+The dynamic correction tests are a separate suite
+in the ``testsDynamicCorrection/`` subdirectory.
+Declare a test there with the ``TEST`` macro
+and add it to the ``dynamicCorrectionTests`` list
+in ``testsDynamicCorrection/dynamiccorrection.c``;
+unlike instrument tests,
+they are not detected automatically.
+
+Adding an Instrument Test
+-------------------------
+
+You can use the ``TEST_LOGGER2`` and ``TEST_LOGGER3`` macros
+to declare instrument test functions
+within any of the test modules
+found within ``testsGen3/``.
+The macros take a single argument:
+the name of the test.
+
+Tests are usually named after (or are prefixed with)
+the instrument command being tested.
+Test names collide only within a generation;
+i.e., you may have both ``TEST_LOGGER2(foo)``
+and ``TEST_LOGGER3(foo)``,
+but you may not have two instances
+of ``TEST_LOGGER3(bar)``.
+Gen4 tests use the ``TEST_LOGGER4`` macro instead,
+within any of the test modules
+found within ``testsGen4/``;
+it takes the same argument
+and its functions receive an :c:type:`RBRGen4` connection.
+You do not need to declare test functions
+in a header;
+test functions defined
+using these macros
+will be automatically detected
+at build time.
+
+Functions declared with these macros
+receive two arguments:
+``conn``, the test instrument connection;
+and ``buffers``, the I/O buffers for the instrument.
+Test functions return a boolean indicating pass/fail.
+
+For an example of a straightforward test,
+let's consider the test for the ``id`` command:
+
+.. code-block:: c
+
+   TEST_LOGGER3(id)
+   {
+       /* This is the result we expect from command parsing. */
+       RBRGen3Id expected = {
+           .model = "RBRduo3",
+           .version = "1.092",
+           .serial = 923456,
+           .fwType = 104,
+           .mode = "",
+       };
+       RBRGen3Id actual;
+
+       /* Populate the read buffer with the command response. */
+       TestIOBuffers_init(buffers,
+                          "id model = RBRduo3, version = 1.092, "
+                          "serial = 923456, fwtype = 104" RESPONSE_TERMINATOR,
+                          0);
+       /* Get the test instrument connection to send/parse the command. */
+       RBRGen3Error err = RBRGen3_getId(conn, &actual);
+       /* Check that the command sent matches our expectation. */
+       TEST_ASSERT_STR_EQ("id" COMMAND_TERMINATOR, buffers->writeBuffer);
+       /* Check the return value. */
+       TEST_ASSERT_ENUM_EQ(RBRGEN3_SUCCESS, err, RBRGen3Error);
+       /* Check the struct members. */
+       TEST_ASSERT_STR_EQ(expected.model, actual.model);
+       TEST_ASSERT_STR_EQ(expected.version, actual.version);
+       TEST_ASSERT_EQ(expected.serial, actual.serial, "%" PRIi32);
+       TEST_ASSERT_EQ(expected.fwType, actual.fwType, "%" PRIi32);
+
+       /* If none of the previous tests failed, the test passes. */
+       return true;
+   }
+
+Adding a Parser Test
+--------------------
+
+Parser tests are similar to instrument tests:
+use the ``TEST_PARSER_CONFIG`` macro
+to declare a parser configuration,
+then use the ``TEST_PARSER`` macro
+to declare the test function.
+
+The ``TEST_PARSER_CONFIG`` macro takes one argument,
+the name of the config,
+and takes the place of type declaration.
+The same config can be reused
+for multiple tests.
+
+The ``TEST_PARSER`` macro takes two arguments:
+the name of the test, and the name of the config.
+As with instrument tests,
+functions declared with these macros
+receive two arguments:
+``parser``, the test parser instance;
+and ``buffers``, the output buffers for the parser.
+Test functions return a boolean indicating pass/fail.
+
+For example,
+
+.. code-block:: c
+
+   TEST_PARSER_CONFIG(two_channels) = {
+       .format = RBRGEN3_MEMFORMAT_CALBIN00,
+       .formatConfig =
+           {
+               .easyParse =
+                   {
+                       .channels = 2,
+                   },
+           },
+   };
+
+   TEST_PARSER(test_a, two_channels)
+   {
+       /* ... */
+       return true;
+   }
+
+   TEST_PARSER(test_b, two_channels)
+   {
+       /* ... */
+       return true;
+   }
+
+Adding a Test Module
+--------------------
+
+Test modules currently correspond exactly
+to documentation sections of instrument functionality.
+If you need to add a new test,
+it likely fits within one of the existing modules.
+However, if you're sure you do need a new module,
+then you can add one
+by creating a ``.c`` file in the ``testsGen3/`` subdirectory,
+then adding its name (without extension)
+to the ``GEN3_TEST_MODULES`` variable in the ``Makefile``.
+Gen4 modules live in ``testsGen4/``
+and are listed in ``GEN4_TEST_MODULES``.
+The test runner is generated from the listed modules,
+so no other registration is needed.
+
+For example,
+to add a new module
+for tests having to do with “frobbing”,
+create the file ``testsGen3/frobbing.c``,
+and add it to the ``Makefile``:
+
+.. code-block:: make
+
+   GEN3_TEST_MODULES := communication \
+                        ...
+                        fetching \
+                        frobbing \
+                        gating \
+                        ...

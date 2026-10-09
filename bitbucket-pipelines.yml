@@ -1,80 +1,174 @@
+# Copyright (c) 2026 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+clone:
+    # Full clone so `git describe` can always see a tag.
+    depth: full
+
+definitions:
+    steps:
+        - step:
+            name: Generic compilation
+            script: &compile
+                - export MAKEFLAGS=--jobs=$(nproc)
+                # Gen3-only configuration (equivalent to libRBR 1.x).
+                - make clean
+                - make GEN4=0 lib libdynamiccorrection tests checknoalloc
+                # Gen4-only configuration.
+                - make clean
+                - make GEN3=0 lib libdynamiccorrection tests checknoalloc
+                # Both generations (the default configuration). Built last so
+                # the examples below link against the both-generation archive.
+                - make clean
+                - make lib libdynamiccorrection tests checknoalloc
+                - cd examples/posixGen3
+                - make clean
+                - make nosdl
+                - cd ../posixGen4
+                - make clean
+                - make
+                - cd ../posixMultiGen
+                - make clean
+                - make
+                - cd ../posixCommon
+                - make clean
+                - make
+                - cd ../dynamicCorrection
+                - make clean
+                - make
+
 pipelines:
     default:
         - parallel:
             - step:
+                name: GCC 6 compilation
+                image: docker.io/library/gcc:6
+                script: *compile
+            - step:
                 name: GCC 7 compilation
-                image: gcc:7
-                script:
-                    - apt-get update && apt-get -y install libsdl2-dev
-                    - make clean
-                    - make lib tests
-                    - cd examples/posix
-                    - make clean
-                    - make
+                image: docker.io/library/gcc:7
+                script: *compile
             - step:
                 name: GCC 8 compilation
-                image: gcc:8
-                script:
-                    - apt-get update && apt-get -y install libsdl2-dev
-                    - make clean
-                    - make lib tests
-                    - cd examples/posix
-                    - make clean
-                    - make
+                image: docker.io/library/gcc:8
+                script: *compile
             - step:
                 name: GCC 9 compilation
-                image: gcc:9
-                script:
-                    - apt-get update && apt-get -y install libsdl2-dev
-                    - make clean
-                    - make lib tests
-                    - cd examples/posix
-                    - make clean
-                    - make
+                image: docker.io/library/gcc:9
+                script: *compile
             - step:
                 name: GCC 10 compilation
-                image: gcc:10
-                script:
-                    - apt-get update && apt-get -y install libsdl2-dev
-                    - make clean
-                    - make lib tests
-                    - cd examples/posix
-                    - make clean
-                    - make
+                image: docker.io/library/gcc:10
+                script: *compile
             - step:
                 name: GCC 11 compilation
-                image: gcc:11
+                image: docker.io/library/gcc:11
+                script: *compile
+            - step:
+                name: GCC 12 compilation
+                image: docker.io/library/gcc:12
+                script: *compile
+            - step:
+                name: GCC 13 compilation
+                image: docker.io/library/gcc:13
+                script: *compile
+            - step:
+                name: GCC 14 compilation
+                image: docker.io/library/gcc:14
+                script: *compile
+            - step:
+                name: GCC 15 compilation
+                image: docker.io/library/gcc:15
+                script: *compile
+
+            # To save time, and to avoid the need to reconfigure APT to pull
+            # from the Debian Archives on the older images, we'll only build
+            # the SDL example on the latest version of GCC.
+            - step:
+                name: SDL example compilation
+                image: docker.io/library/gcc:15
                 script:
                     - apt-get update && apt-get -y install libsdl2-dev
-                    - make clean
-                    - make lib tests
-                    - cd examples/posix
-                    - make clean
-                    - make
+                    - export MAKEFLAGS=--jobs=$(nproc)
+                    - make lib
+                    - cd examples/posixGen3
+                    - make posix-stream-sdl
+
+            - step:
+                name: Zephyr example compilation
+                # Container version pinned to provide an SDK compatible with
+                # the Zephyr version specified in west.yml.
+                image: ghcr.io/zephyrproject-rtos/ci:v0.28.8
+                script:
+                    - cd examples/zephyrGen3/
+                    # We're in the unique position of trying to use a consume
+                    # this repository as a West module from a West manifest
+                    # stored within this repository. We'll rewrite the manifest
+                    # so that West pulls in the expected commit.
+                    - 'sed --in-place "0,/revision: .*/ { s//revision: $BITBUCKET_COMMIT/ }" application/west.yml'
+                    - west init --local application/
+                    - west update
+                    - cd application/
+                    - >-
+                        boards=$(ls -1 boards/ | cut --delimiter . --field 1 | sort | uniq);
+                        for board in $boards;
+                        do
+                            west build \
+                                --board=$board \
+                                --build-dir=build-$board/ \
+                                -- \
+                                -DEXTRA_CONF_FILE=debug.conf \
+                                -DCONFIG_LIBRBR_DYNAMIC_CORRECTION=y;
+                        done
 
             # To save time, and under the assumption that the quality and
             # relevance of scan-build findings will only improve over time,
             # we'll perform static analysis with only the latest version of
             # Clang.
             - step:
-                name: Clang 12 compilation and static analysis
-                image: silkeh/clang:12
+                name: Clang 20 compilation and static analysis
+                image: docker.io/silkeh/clang:20
                 script:
                     - apt-get update && apt-get -y install libsdl2-dev
-                    - export CC=clang CCC_CC=clang
+                    - export CC=clang CCC_CC=clang MAKEFLAGS=--jobs=$(nproc)
                     - make clean
                     - scan-build make lib libdynamiccorrection
                     - make tests
-                    - cd examples/posix
+                    - cd examples/posixGen3
+                    - make clean
+                    - scan-build make
+                    - cd ../posixGen4
+                    - make clean
+                    - scan-build make
+                    - cd ../posixMultiGen
+                    - make clean
+                    - scan-build make
+                    - cd ../posixCommon
+                    - make clean
+                    - scan-build make
+                    - cd ../dynamicCorrection
                     - make clean
                     - scan-build make
 
             - step:
-                name: Documentation compilation
-                image: gcc:11
+                name: Formatting check
+                image: docker.io/silkeh/clang:20
                 script:
-                    - apt-get update && apt-get -y install doxygen graphviz
-                    - make clean
-                    - make docs
-                    - make clean
-                    - make devdocs
+                    - ./tools/format-check.sh
+
+            - step:
+                name: License header check
+                image: docker.io/library/alpine:3
+                script:
+                    - apk add --no-cache git
+                    - git config --global --add safe.directory "$BITBUCKET_CLONE_DIR"
+                    - ./tools/license-check.sh
+
+            - step:
+                name: Documentation compilation
+                image: docker.io/library/gcc:15
+                script:
+                    - apt-get update && apt-get -y install doxygen python3-venv
+                    - python3 -m venv /tmp/venv && . /tmp/venv/bin/activate
+                    - pip install -r docs/requirements.txt
+                    - make docs SPHINXOPTS=-W

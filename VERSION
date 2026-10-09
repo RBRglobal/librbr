@@ -1,9 +1,10 @@
-1.2.4
+2.0.0
 
 The first line of this file indicates the library version number. This is used
-automatically by the build process for both the library and the documentation.
-No format restrictions or expectations are imposed by the library, but versions
-released by RBR will follow [Semantic Versioning].
+automatically by the build process for both the library and the documentation
+when Git version information is unavailable (no Git tool, or missing .git
+directory). No format restrictions or expectations are imposed by the library,
+but versions released by RBR will follow [Semantic Versioning].
 
 A leading “v” is omitted as it is not considered to be part of the version
 number; it is part of the display formatting of the version number.
@@ -15,4 +16,4 @@ When incrementing the version number, remember to also:
   (`git tag -a v0.0.0`) for the release.
 
 [Semantic Versioning]: https://semver.org/
-[the changelog]: CHANGES.md
+[the changelog]: CHANGES.rst

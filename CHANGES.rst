@@ -1,0 +1,265 @@
+.. Copyright (c) 2026 RBR Ltd.
+.. SPDX-License-Identifier: Apache-2.0
+
+Changes
+=======
+
+v2.0.0
+------
+
+Released 2026-10-09
+
+Added
+~~~~~
+
+- Initial support for Gen4 instruments.
+  This release covers most of the Gen4 API,
+  but support for parsing downloaded data
+  is deferred to a future release.
+  Compiling libRBR includes both Gen4 support
+  and older Gen3/Gen2 support by default.
+  Standalone support for either generation can be achieved
+  by setting ``GEN3=0`` or ``GEN4=0`` when running ``make``.
+
+
+Changed
+~~~~~~~
+
+The following list is not exhaustive,
+but highlights the high level changes coming from 1.x
+
+- Naming: the ``RBRInstrument`` prefix found on most identifiers
+  was shortened to ``RBRGen3`` for the Gen3 API
+  and ``RBRGen4`` for the Gen4 API
+- The constructors ``RBRGen3_open()`` and ``RBRGen3Parser_init()``
+  no longer offer the ability to dynamically allocate memory.
+  libRBR has no dependency on ``malloc``, ``calloc``, ``realloc``, or ``free``.
+- Buffers throughout the library are now provided by the user
+  rather than being sized statically at compile time.
+  This includes the command buffer,
+  the response buffer,
+  and buffers for pools of objects (e.g. channels)
+  that can vary in size based on the specific instrument.
+  The aim is to give users in memory constrained environments more control
+  over system resources at runtime.
+
+v1.2.4
+------
+
+Released 2025-04-07
+
+Added
+~~~~~
+
+- fixed timestamp datatype in dynamiccorrection algorithm (RBRDynamicCorrection.c and .h files) so that they can batter span long periods without trancation /rounding errors.
+- fixed the timestamp comparision logic in dynamiccorrection algorithm (RBRDynamicCorrection.c and .h files) so that pressure velocity calculation starts with the second sample.
+
+Changed
+~~~~~~~
+
+- changed \_isFasterSampling in dynamiccorrection algorithm to cached value to improve performance.
+- changed pressure velocity calculation in dynamiccorrection algorithm for one path with no unused calculation to improve performance.
+- changed calculation of RBRDynamicCorrectionParams in dynamiccorrection algorithm to eliminate duplicate conversions to improve performance.
+
+Removed
+~~~~~~~
+
+- Removed support for gcc6 compilation in pipeline due to Jessie(Debian 8) EOL (jessie/main amd64 Packages not found in http://deb.debian.org, which blocks installation of libsdl2-dev).
+
+v1.2.3
+------
+
+Released 2022-11-25
+
+Added
+~~~~~
+
+- support for variable ascent rate in dynamic correction algorithm.
+- support for outputformat caltext07 for LOGGER3 with fw 1.109 or later.
+- support pause/resume feature for LOGGER3 with fw 1.116 or later.
+- added example bash file to auto connect to RBRinstrument wifi.
+- added error code RBRINSTRUMENT_COMMUNICATION_ERROR.
+
+Changed
+~~~~~~~
+
+- changed command terminator to ``\r`` instead of ``\r\n``.
+- checks if offset in response matches request.
+- updated description of function RBRInstrumentSleepCallBack in RBRInstrument.h.
+
+v1.2.2
+------
+
+Released 2021-12-01
+
+Changed
+~~~~~~~
+
+- default coefficients for dynamic correction updated.
+
+v1.2.1
+------
+
+Released 2021-10-21
+
+Changed
+~~~~~~~
+
+- method of dynamic correction updated.
+- default coefficients updated.
+- added README.md for the posix examples and the example in dynamicCorrection folder.
+
+v1.2.0
+------
+
+Released 2021-06-04
+
+Added
+~~~~~
+
+- new feature: standalone library for dynamic correction provided:
+
+..
+
+   Dynamic correction corrects all the dynamic errors affecting the salinity estimates for a profiling CTD, such as response time and sensor misalignments, or thermal mass errors.
+
+   A standalone dynamic correction library is provided, together with various examples on how to apply the dynamic correction to a .csv data file, or to loggers during/after logging.
+
+..
+
+   Refer to ``README.md`` for more details.
+
+- Download over Wi-Fi example.
+
+v1.1.2
+------
+
+Released 2020-04-23
+
+Added
+~~~~~
+
+- Bitbucket Pipelines: build with GCC 9 and Clang 9.
+
+Changed
+~~~~~~~
+
+- Moved developer tools into ``tools/``.
+  An attempt to keep only universally interesting things
+  in the top level of the project directory.
+- Added explicit array index subscript to unsigned char to remove char-subscripts warning.
+- PRIi64 use in sscanf is avoided.
+
+v1.1.0
+------
+
+Released 2019-05-22.
+
+Added
+~~~~~
+
+- Added support for the ``id mode`` parameter.
+- Added support for the ``postprocessing`` command.
+
+Changed
+~~~~~~~
+
+- Building: Better detection of ``-U`` flag support for ``ar(1)``.
+- Added missing parameter range validation
+  for some memory commands.
+
+v1.0.5
+------
+
+Released 2019-03-12.
+
+Changed
+~~~~~~~
+
+- More compatible wake behaviour.
+  Wake-from-sleep should now be more broadly compatible
+  with alternative transport layers,
+  particularly those with conservative/infrequent packetization.
+- Escaping of special characters
+  in string comparisons
+  shown upon test failures.
+
+Fixed
+~~~~~
+
+- Fixed uninitialized variable in POSIX examples.
+- Reset instrument activity timer when rebooting the instrument
+  (in ``RBRInstrument_reboot()``).
+  This will cause the library
+  to attempt to wake the instrument
+  before performing any subsequent operations.
+
+v1.0.4
+------
+
+Released 2019-02-15.
+
+Fixed
+~~~~~
+
+- Fixed compatibility error with Logger2 instruments
+  in ``RBRInstrument_setClock()``.
+
+v1.0.3
+------
+
+Released 2019-01-29.
+
+Changed
+~~~~~~~
+
+- Moved public headers out of the ``src/`` directory
+  into ``include/``.
+  This helps enforce the distinction
+  between public and internal APIs
+  and makes it slightly easier
+  for consumer projects
+  to include the library headers.
+
+v1.0.2
+------
+
+Released 2019-01-03.
+
+Changed
+~~~~~~~
+
+- Rebrand slightly from librbr to libRBR.
+  This is reflected
+  by the name of the library archive,
+  which has changed
+  from ``librbr.a``
+  to ``libRBR.a``
+  (and subsequently,
+  must now be linked with ``-lRBR``
+  instead of ``-lrbr``).
+
+v1.0.1
+------
+
+Released 2018-12-06.
+
+Added
+~~~~~
+
+- To the readme:
+
+  - Added a short example of what user code might look like.
+  - Added firmware support list.
+
+Fixed
+~~~~~
+
+- Added release date for v1.0.0 to this changelog.
+
+v1.0.0
+------
+
+Released 2018-12-05.
+
+The initial library release version.

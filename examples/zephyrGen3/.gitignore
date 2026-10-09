@@ -1,0 +1,10 @@
+# Copyright (c) 2026 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+# Zephyr source and modules.
+.west/
+modules/
+zephyr/
+
+# Generated artifacts.
+build*/

@@ -1,0 +1,17 @@
+# Copyright (c) 2026 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
+# Generated artifacts.
+posix-communications
+posix-download
+posix-enable
+posix-enable-multiconfig
+posix-footprint
+posix-generation
+posix-poll
+posix-stream
+*.exe
+*.o
+
+# Temporary/output files.
+*.bin

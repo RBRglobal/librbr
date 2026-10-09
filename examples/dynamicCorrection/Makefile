@@ -1,23 +1,32 @@
+# Copyright (c) 2026 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
 CFLAGS := -I../../include \
           -Werror \
           -Wall \
           -Wextra \
           -pedantic \
           -pedantic-errors \
+          -Wdouble-promotion \
           -Wwrite-strings \
           -std=c99 \
           -g
+CPPFLAGS += -MMD -MP
 LDFLAGS := -L../../bin
 LDLIBS := -lm
 
-example: dynamicCorrection-example 
+example: dynamicCorrection-example
 
 dynamicCorrection-example: dynamicCorrection-example.o ../../bin/libRBRDynamicCorrection.a
 
+../../bin/libRBRDynamicCorrection.a:
+	$(MAKE) -C ../../ libdynamiccorrection
 
 .PHONY: clean
 clean:
 	rm -Rf \
 		*.o \
-		dynamicCorrection-example \
+		*.d \
+		dynamicCorrection-example
 
+-include $(wildcard *.d)

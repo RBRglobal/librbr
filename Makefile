@@ -1,22 +1,24 @@
+# Copyright (c) 2018 RBR Ltd.
+# SPDX-License-Identifier: Apache-2.0
+
 ## \file Makefile
 ##
 ## \brief Build automation.
 ##
-## This makefile provides three different targets of interest to the end user:
+## This makefile provides these targets of interest to the end user:
 ##
 ## - `lib` will build the library (`bin/libRBR.a`)
-## - `docs` will generate the documentation via Doxygen (in `docs/`)
-## - `tests` will run library tests (from `tests/`)
+## - `libdynamiccorrection` will build the standalone dynamic correction library
+##   (`bin/libRBRDynamicCorrection.a`)
+## - `docs` will generate the documentation via Sphinx (in `docs/_build/html/`)
+## - `tests` will run library tests (from `testsDynamicCorrection/`, `testsGen3/`, and `testsGen4/`)
+## - `all` will do all of the above
 ##
 ## Additional targets may be useful to developers:
 ##
 ## - `clean` will remove any compiled binaries and documentation
-## - `devdocs` will generate the documentation inclusive of content only of
-##   interest to library developers
-##
-## \copyright
-## Copyright (c) 2018 RBR Ltd.
-## Licensed under the Apache License, Version 2.0.
+## - `checknoalloc` will check that the libraries never call the dynamic allocation
+##   functions
 
 ## \brief The project name.
 ##
@@ -25,19 +27,42 @@
 ## Project forks might like to override this by setting the `LIB_NAME`
 ## environment variable before invoking `make(1)` to easily identify which
 ## library variant is in use.
-export LIB_NAME?=libRBR
+export LIB_NAME ?= libRBR
 
 ## \brief The project version.
 ##
-## Embedded into the library and documentation. Determined from the contents of
-## the VERSION file.
-export LIB_VERSION?=$(shell head -n 1 VERSION)
+## Embedded into the library and documentation. Based on the output of the `git
+## describe --dirty` command where possible, or else the contents of the
+## VERSION file.
+export LIB_VERSION ?= $(shell ./tools/version.sh)
 
 ## \brief The project build date.
 ##
-## Embedded into the library. Probably shouldn't be overridden, unless you want
-## to match the build date or timestamp format of a containing project.
-export LIB_BUILD_DATE?=$(shell date '+%FT%T%z')
+## \deprecated As of libRBR v1.3.0, this builds with the value “unknown” to
+##             support deterministic builds.
+#export LIB_BUILD_DATE
+
+## \brief Instrument generation selection.
+##
+## The library contains two independent instrument APIs:
+##
+## - `GEN3`: the `RBRGen3`-prefixed API for Logger2/Logger3
+##   instruments — the libRBR 1.x API, renamed;
+## - `GEN4`: the `RBRGen4`-prefixed API for Generation 4
+##   (SL4/SEN4/L4) instruments.
+##
+## Both are enabled (`1`) by default and both land in the same
+## `bin/libRBR.a`; disable one by passing `GEN3=0` or `GEN4=0` to `make(1)`.
+## At least one generation must be enabled. The generation-independent
+## `RBRCommon` helpers are always compiled.
+GEN3 ?= 1
+GEN4 ?= 1
+
+ifeq ($(GEN3),0)
+ifeq ($(GEN4),0)
+$(error At least one instrument generation must be enabled: set GEN3=1 and/or GEN4=1)
+endif
+endif
 
 ## \brief Archiver flags.
 ##
@@ -47,27 +72,7 @@ export LIB_BUILD_DATE?=$(shell date '+%FT%T%z')
 ## - `c`: create the archive if necessary
 ## - `r`: replace existing contents of archive
 ## - `s`: create/update archive index
-##
-## In pursuit of reproducible builds, recent versions of Debian (and therefore
-## derivatives, including Ubuntu) ship a version of ar(1) which produces
-## “deterministic” archives; i.e., the UID/GID/timestamp/mode file attributes
-## are 0'd out. Unfortunately, because make(1) decides whether or not a target
-## needs to be built by comparing target and dependency modification times,
-## this completely breaks incremental builds: with deterministic archives left
-## enabled, every invocation of `make lib` causes the entire library to be
-## rebuilt. As a workaround, we'll explicitly disable deterministic mode on
-## systems using GNU ar(1):
-##
-## - `U`: maintain original UID/GID/timestamp/mode of archive contents
-##
-## The build is nondeterministic anyway because of the embedded build date, so
-## we gain nothing from leaving deterministic mode on, and we save a lot of
-## developer time on the edit/compile/test loop by turning it off.
 ARFLAGS := -c -r -s
-ARFLAGS += $(shell \
-    ar --version 2>&1 | grep -q GNU \
-    && ar --help 2>&1 | grep -q '\[U\]' \
-    && echo -U)
 
 ## \brief C compilation flags.
 ##
@@ -87,14 +92,24 @@ CFLAGS := -Werror \
           -Wextra \
           -pedantic \
           -pedantic-errors \
+          -Wdouble-promotion \
           -Wwrite-strings \
           -std=c99 \
           -g
 
 CFLAGS += -DRBR_LIB_NAME=\""$(LIB_NAME)"\" \
           -DRBR_LIB_VERSION=\""$(LIB_VERSION)"\" \
-          -DRBR_LIB_BUILD_DATE=\"$(LIB_BUILD_DATE)\" \
           -Iinclude
+
+ifneq ($(LIB_BUILD_DATE),)
+CFLAGS += -DRBR_LIB_BUILD_DATE=\"$(LIB_BUILD_DATE)\"
+endif
+
+## Have the compiler record the headers each object depends on so that an
+## incremental build rebuilds objects when a header changes. The dependency
+## files are included at the end of this makefile so that their rules cannot
+## become the default goal.
+CPPFLAGS += -MMD -MP
 
 all: lib libdynamiccorrection docs tests
 
@@ -102,69 +117,133 @@ libdynamiccorrection: bin/libRBRDynamicCorrection.a
 
 lib: bin/libRBR.a
 
-bin/libRBR.a: bin bin/libRBR.a(src/RBRInstrument.o \
-                               src/RBRInstrumentCommunication.o \
-                               src/RBRInstrumentConfiguration.o \
-                               src/RBRInstrumentDeployment.o \
-                               src/RBRInstrumentFetching.o \
-                               src/RBRInstrumentGating.o \
-                               src/RBRInstrumentHardwareErrors.o \
-                               src/RBRInstrumentInternal.o \
-                               src/RBRInstrumentMemory.o \
-                               src/RBRInstrumentOther.o \
-                               src/RBRInstrumentPauseresume.o \
-                               src/RBRInstrumentSchedule.o \
-                               src/RBRInstrumentSecurity.o \
-                               src/RBRInstrumentStreaming.o \
-                               src/RBRInstrumentVehicle.o \
-                               src/RBRParser.o)
+## \brief Objects compiled regardless of generation selection.
+COMMON_OBJECTS := src/RBRCommon.o
 
-bin/libRBRDynamicCorrection.a: bin bin/libRBRDynamicCorrection.a(src/RBRDynamicCorrection.o)
+## \brief Objects for the Gen3 (Logger2/Logger3) API.
+GEN3_OBJECTS := src/RBRGen3.o \
+                src/RBRGen3Communication.o \
+                src/RBRGen3Configuration.o \
+                src/RBRGen3Deployment.o \
+                src/RBRGen3Fetching.o \
+                src/RBRGen3Gating.o \
+                src/RBRGen3HardwareErrors.o \
+                src/RBRGen3Internal.o \
+                src/RBRGen3Memory.o \
+                src/RBRGen3Other.o \
+                src/RBRGen3PauseResume.o \
+                src/RBRGen3Schedule.o \
+                src/RBRGen3Security.o \
+                src/RBRGen3Streaming.o \
+                src/RBRGen3Vehicle.o \
+                src/RBRGen3Parser.o
+
+## \brief Objects for the Gen4 (SL4/SEN4/L4) API.
+GEN4_OBJECTS := src/RBRGen4.o \
+                src/RBRGen4Communication.o \
+                src/RBRGen4Configuration.o \
+                src/RBRGen4Deployment.o \
+                src/RBRGen4HardwareErrors.o \
+                src/RBRGen4Instrument.o \
+                src/RBRGen4Internal.o \
+                src/RBRGen4Memory.o \
+                src/RBRGen4Realtime.o
+
+LIB_OBJECTS := $(COMMON_OBJECTS)
+DYNAMICCORRECTION_OBJECTS := src/RBRDynamicCorrection.o
+ifeq ($(GEN3),1)
+LIB_OBJECTS += $(GEN3_OBJECTS)
+endif
+ifeq ($(GEN4),1)
+LIB_OBJECTS += $(GEN4_OBJECTS)
+endif
+
+# Due to incompatibility between parallel builds (-j, --jobs) and Make's
+# archive syntax, and between incremental builds and deterministically-produced
+# archives (as written out by llvm-ar v10.0.0+ and most distro builds of GNU
+# binutils ar v2.23+), we'll not use “member” syntax at all, and define our
+# archive rules with normal prerequisites.
+#
+# We can, however, still share the recipe between both of our archive rules.
+# And we'll filter for objects, and not any other files, so we don't try to
+# stuff bin/ – which is also a dependency of our archives – into the archives:
+%.a:
+	$(AR) $(ARFLAGS) $@ $(filter %.o,$?)
+
+bin/libRBR.a: $(LIB_OBJECTS) | bin
+
+bin/libRBRDynamicCorrection.a: $(DYNAMICCORRECTION_OBJECTS) | bin
 
 .PHONY: docs
 docs:
-	doxygen tools/Doxyfile
+	$(MAKE) -C docs html
 
-.PHONY: devdocs
-devdocs:
-	doxygen tools/Doxyfile-devdocs
+TEST_BINARIES := bin/testsDynamicCorrection
+ifeq ($(GEN3),1)
+TEST_BINARIES += bin/testsGen3
+endif
+ifeq ($(GEN4),1)
+TEST_BINARIES += bin/testsGen4
+endif
 
 tests: CFLAGS += -Wno-error=unused-parameter -Wno-unused-parameter
 tests: LDFLAGS += -Lbin
-tests: LDLIBS += -lRBR -lRBRDynamicCorrection -lm
+tests: LDLIBS += -lRBR -lm
 .PHONY: tests
-tests: bin bin/tests
-	./bin/tests
+tests: bin $(TEST_BINARIES)
+	$(foreach test,$(TEST_BINARIES),./$(test) &&) true
 
-## \brief Test modules.
+## \brief Fail if the library archives reference dynamic memory allocation.
 ##
-## Each one of these names corresponds to a C source file in the `tests/`
+## The library never allocates memory, so none of its objects may leave
+## malloc, calloc, realloc, or free unresolved. The symbol listing goes
+## through a file so that a failing nm fails the target rather than
+## producing an empty listing that trivially passes; the optional leading
+## underscore covers platforms (e.g. macOS) which prefix C symbols.
+CHECKNOALLOC_SYMBOLS := bin/undefined-symbols.txt
+.PHONY: checknoalloc
+checknoalloc: bin/libRBR.a bin/libRBRDynamicCorrection.a
+	nm --undefined-only $^ > $(CHECKNOALLOC_SYMBOLS)
+	! grep --word-regexp --extended-regexp '_?(malloc|calloc|realloc|free)' $(CHECKNOALLOC_SYMBOLS)
+
+## \brief Gen3 test modules.
+##
+## Each one of these names corresponds to a C source file in the `testsGen3/`
 ## directory. Tests declared within these files (using the `TEST_LOGGER2` and
 ## `TEST_LOGGER3` macros) are automatically discovered at build time and
 ## included in the test suite.
-TEST_MODULES := communication \
-                configuration \
-                deployment \
-                dynamiccorrection \
-                fetching \
-                gating \
-                memory \
-                other \
-                schedule \
-                security \
-                streaming \
-                vehicle \
-                parser \
-                pauseresume
+GEN3_TEST_MODULES := communication \
+                     configuration \
+                     deployment \
+                     fetching \
+                     gating \
+                     memory \
+                     other \
+                     schedule \
+                     security \
+                     streaming \
+                     vehicle \
+                     parser \
+                     pauseresume
 
-bin/tests: bin/libRBR.a \
-           bin/libRBRDynamicCorrection.a \
-           tests/main.o \
-           tests/tests.o \
-           $(foreach module,$(TEST_MODULES),tests/$(module).o)
+## \brief Gen4 test modules.
+##
+## As for the Gen3 suite, each one of these names corresponds to a C source
+## file in the `testsGen4/` directory (using the `TEST_LOGGER4` macro).
+GEN4_TEST_MODULES := communication \
+                     configuration \
+                     deployment \
+                     instrument \
+                     memory \
+                     realtime
+
+bin/testsGen3: bin/libRBR.a \
+           testsGen3/main.o \
+           testsGen3/tests.o \
+           $(foreach module,$(GEN3_TEST_MODULES),testsGen3/$(module).o)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
-tests/tests.c: $(foreach module,$(TEST_MODULES),tests/$(module).c)
+testsGen3/tests.c: $(foreach module,$(GEN3_TEST_MODULES),testsGen3/$(module).c)
 	@echo "/* This file is automatically generated. */" >$@
 	@echo '#include "tests.h"' >>$@
 	@grep -ho 'TEST_\(LOGGER[23]\|PARSER\)([A-Za-z_][A-Za-z0-9_]*\(, .*\)\?)' \
@@ -172,13 +251,13 @@ tests/tests.c: $(foreach module,$(TEST_MODULES),tests/$(module).c)
 		| sed -e 's/$$/;/' >>$@
 	@echo "InstrumentTest instrumentTests[] = {" >>$@
 	@grep -ho 'TEST_LOGGER[23]([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRINSTRUMENT_LOGGER\1, test_\2_l\1},/' \
+		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRCOMMON_LOGGER\1, test_\2_l\1},/' \
 		>>$@
 	@echo "    {0}" >>$@
 	@echo "};" >>$@
 
 	@grep -ho 'TEST_PARSER_CONFIG([A-Za-z_][A-Za-z0-9_]*)' $^ \
-		| sed -e 's/^TEST_PARSER_CONFIG(\([^,]*\))/extern const RBRParserConfig test_\1_parser_config;/' \
+		| sed -e 's/^TEST_PARSER_CONFIG(\([^,]*\))/extern const RBRGen3ParserConfig test_\1_parser_config;/' \
 		>>$@
 
 	@echo "ParserTest parserTests[] = {" >>$@
@@ -188,9 +267,37 @@ tests/tests.c: $(foreach module,$(TEST_MODULES),tests/$(module).c)
 	@echo "    {0}" >>$@
 	@echo "};" >>$@
 
+bin/testsDynamicCorrection: testsDynamicCorrection/main.o \
+                           testsDynamicCorrection/dynamiccorrection.o \
+                           bin/libRBRDynamicCorrection.a
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -lm -o $@
+
+bin/testsGen4: bin/libRBR.a \
+               bin/libRBRDynamicCorrection.a \
+               testsGen4/main.o \
+               testsGen4/tests.o \
+               $(foreach module,$(GEN4_TEST_MODULES),testsGen4/$(module).o)
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+testsGen4/tests.c: $(foreach module,$(GEN4_TEST_MODULES),testsGen4/$(module).c)
+	@echo "/* This file is automatically generated. */" >$@
+	@echo '#include "tests.h"' >>$@
+	@grep -ho 'TEST_LOGGER[4]([A-Za-z_][A-Za-z0-9_]*)' $^ \
+		| sed -e 's/$$/;/' >>$@
+	@echo "InstrumentTest instrumentTests[] = {" >>$@
+	@grep -ho 'TEST_LOGGER[4]([A-Za-z_][A-Za-z0-9_]*)' $^ \
+		| sed -e 's/^TEST_LOGGER\([^(]*\)(\([^)]*\))/    {"\2", RBRCOMMON_LOGGER\1, test_\2_l\1},/' \
+		>>$@
+	@echo "    {0}" >>$@
+	@echo "};" >>$@
+
 bin:
 	mkdir bin
 
 .PHONY: clean
 clean:
-	rm -Rf src/*.o bin/ tests/tests.c tests/*.o docs/
+	rm -Rf src/*.o src/*.d bin/ testsGen3/tests.c testsGen3/*.o testsGen3/*.d testsGen4/tests.c testsGen4/*.o testsGen4/*.d testsDynamicCorrection/*.o testsDynamicCorrection/*.d docs/_build/
+
+## The dependency files are only ever a side effect of compilation, so a
+## clean tree has none to include yet.
+-include $(wildcard src/*.d testsGen3/*.d testsGen4/*.d testsDynamicCorrection/*.d)

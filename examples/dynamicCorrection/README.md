@@ -1,20 +1,23 @@
+<!-- Copyright (c) 2026 RBR Ltd. -->
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+
 # How to use dynamicCorrection example
 
 ## Setup
-Runtime environment: cygwin
+Runtime environment: Linux, macOS, or Cygwin
 
 ## Build this example
-Assuming librbr is already built.(if not, go to librbr directory, and then use cygwin command "make")
-Go to librbr/examples/dynanicCorrection directory, then use sygwin command "make". Ignore the error you see.
+Assuming libRBR is already built.(if not, go to librbr directory, and then use command "make")
+Go to librbr/examples/dynamicCorrection directory, then use command "make".
 
-## Tips before you start:
+## Tips before you start
 (1) How to clean the built files:
-To clean the .a, .o, .exe files one built, use cygwin command "make clean" in that folder directory.
+To clean the .o, .d, and executable files one built, use command "make clean" in that folder directory.
 
-## Usage for this example:
+## Usage for this example
 File name   |      command to use it | things to know
 ------------- | ------------- | -------------
-posix-parse-file-dynamiccorrection.c    | ./dynamicCorrection-example ../sampledata/dynamiccorrection-sample.csv | the sample .bin file columns have to be: Cmeas(mS/cm), Tmeas(°C), Pmeas(sea pressure, dbar), Tcond(°C)
+dynamicCorrection-example.c    | ./dynamicCorrection-example ../sampledata/dynamiccorrection-sample.csv | the sample .csv file columns have to be: timestamp(s), Cmeas(mS/cm), Tmeas(°C), Pmeas(sea pressure, dbar), Tcond(°C)
 
 ## Contributing
 
@@ -22,7 +25,7 @@ The library is primarily maintained by RBR, and development is directed by our n
 However, we're happy to take [contributions] generally.
 
 [OEM]: https://rbr-global.com/products/oem
-[contributions]: CONTRIBUTING.md
+[contributions]: ../../CONTRIBUTING.rst
 
 ## License
 
